@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		662599E018B551E400235B65 /* EWGraphLabelCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 662599D818B551E400235B65 /* EWGraphLabelCell.m */; };
 		662599E218B551E400235B65 /* EWGraphRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 662599DA18B551E400235B65 /* EWGraphRenderer.m */; };
 		662599E318B551E400235B65 /* EWGraphCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 662599DE18B551E400235B65 /* EWGraphCell.m */; };
 		662599F218B5776300235B65 /* PrioritySplitViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 662599F118B5776300235B65 /* PrioritySplitViewDelegate.m */; };
@@ -144,10 +143,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		662599D818B551E400235B65 /* EWGraphLabelCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWGraphLabelCell.m; path = ../CommonUI/EWGraphLabelCell.m; sourceTree = "<group>"; };
 		662599DA18B551E400235B65 /* EWGraphRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWGraphRenderer.m; path = ../CommonUI/EWGraphRenderer.m; sourceTree = "<group>"; };
 		662599DB18B551E400235B65 /* EWGraphRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWGraphRenderer.h; path = ../CommonUI/EWGraphRenderer.h; sourceTree = "<group>"; };
-		662599DC18B551E400235B65 /* EWGraphLabelCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWGraphLabelCell.h; path = ../CommonUI/EWGraphLabelCell.h; sourceTree = "<group>"; };
 		662599DE18B551E400235B65 /* EWGraphCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWGraphCell.m; path = ../CommonUI/EWGraphCell.m; sourceTree = "<group>"; };
 		662599DF18B551E400235B65 /* EWGraphCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWGraphCell.h; path = ../CommonUI/EWGraphCell.h; sourceTree = "<group>"; };
 		662599F018B5776300235B65 /* PrioritySplitViewDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrioritySplitViewDelegate.h; sourceTree = SOURCE_ROOT; };
@@ -348,8 +345,6 @@
 			children = (
 				662599DA18B551E400235B65 /* EWGraphRenderer.m */,
 				662599DB18B551E400235B65 /* EWGraphRenderer.h */,
-				662599DC18B551E400235B65 /* EWGraphLabelCell.h */,
-				662599D818B551E400235B65 /* EWGraphLabelCell.m */,
 				662599DF18B551E400235B65 /* EWGraphCell.h */,
 				662599DE18B551E400235B65 /* EWGraphCell.m */,
 				66EDFEBD18ABFF9E00B29CFE /* EWUndoWindowController.h */,
@@ -538,7 +533,6 @@
 				66EDFEC318ABFF9E00B29CFE /* EWUtilityWindowController.m in Sources */,
 				663EFD8618A17FB30030BD2F /* main.m in Sources */,
 				663EFD8318A17FB30030BD2F /* EWTextView.m in Sources */,
-				662599E018B551E400235B65 /* EWGraphLabelCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

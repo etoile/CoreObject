@@ -71,7 +71,7 @@
 											<string key="NSFrameSize">{590, 289}</string>
 											<reference key="NSSuperview" ref="1018695483"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="908930679"/>
+											<reference key="NSNextKeyView" ref="57292709"/>
 											<bool key="NSEnabled">YES</bool>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -126,7 +126,7 @@
 														<int key="NSCellFlags2">131072</int>
 														<reference key="NSControlView" ref="154456502"/>
 													</object>
-													<int key="NSResizingMask">3</int>
+													<int key="NSResizingMask">2</int>
 													<bool key="NSIsResizeable">YES</bool>
 													<bool key="NSIsEditable">YES</bool>
 													<reference key="NSTableView" ref="154456502"/>
@@ -177,7 +177,7 @@
 												</object>
 												<object class="NSTableColumn" id="500816147">
 													<string key="NSIdentifier">document</string>
-													<double key="NSWidth">96</double>
+													<double key="NSWidth">97</double>
 													<double key="NSMinWidth">10</double>
 													<double key="NSMaxWidth">3.4028234663852886e+38</double>
 													<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -210,7 +210,7 @@
 														</object>
 														<reference key="NSTextColor" ref="672190575"/>
 													</object>
-													<int key="NSResizingMask">3</int>
+													<int key="NSResizingMask">2</int>
 													<bool key="NSIsResizeable">YES</bool>
 													<bool key="NSIsEditable">YES</bool>
 													<reference key="NSTableView" ref="154456502"/>
@@ -247,7 +247,7 @@
 														<reference key="NSBackgroundColor" ref="827749968"/>
 														<reference key="NSTextColor" ref="672190575"/>
 													</object>
-													<int key="NSResizingMask">3</int>
+													<int key="NSResizingMask">2</int>
 													<bool key="NSIsResizeable">YES</bool>
 													<bool key="NSIsEditable">YES</bool>
 													<reference key="NSTableView" ref="154456502"/>
@@ -266,7 +266,7 @@
 												</object>
 											</object>
 											<double key="NSRowHeight">17</double>
-											<int key="NSTvFlags">1377828864</int>
+											<int key="NSTvFlags">1379926016</int>
 											<reference key="NSDelegate"/>
 											<reference key="NSDataSource"/>
 											<int key="NSColumnAutoresizingStyle">4</int>
@@ -316,7 +316,7 @@
 									<reference key="NSNextResponder" ref="461634304"/>
 									<int key="NSvFlags">-2147482368</int>
 									<object class="NSPSMatrix" key="NSFrameMatrix"/>
-									<string key="NSFrame">{{1, 291}, {459, 15}}</string>
+									<string key="NSFrame">{{1, 291}, {590, 15}}</string>
 									<reference key="NSSuperview" ref="461634304"/>
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="179151694"/>
@@ -324,8 +324,7 @@
 									<int key="NSsFlags">1</int>
 									<reference key="NSTarget" ref="461634304"/>
 									<string key="NSAction">_doScroller:</string>
-									<double key="NSCurValue">1</double>
-									<double key="NSPercent">0.98922413793103448</double>
+									<double key="NSPercent">0.99830795262267347</double>
 								</object>
 								<reference ref="57292709"/>
 							</array>
@@ -333,7 +332,7 @@
 							<string key="NSFrame">{{-1, 45}, {592, 307}}</string>
 							<reference key="NSSuperview" ref="442872210"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="57292709"/>
+							<reference key="NSNextKeyView" ref="1018695483"/>
 							<int key="NSsFlags">133682</int>
 							<reference key="NSVScroller" ref="908930679"/>
 							<reference key="NSHScroller" ref="88580517"/>
@@ -413,7 +412,6 @@
 							<string key="NSFrame">{{444, 6}, {132, 32}}</string>
 							<reference key="NSSuperview" ref="442872210"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="567920774">

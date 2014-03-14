@@ -126,14 +126,14 @@
 														<int key="NSCellFlags2">0</int>
 														<reference key="NSControlView" ref="154456502"/>
 													</object>
-													<int key="NSResizingMask">3</int>
+													<int key="NSResizingMask">2</int>
 													<bool key="NSIsResizeable">YES</bool>
 													<bool key="NSIsEditable">YES</bool>
 													<reference key="NSTableView" ref="154456502"/>
 												</object>
 												<object class="NSTableColumn" id="271933553">
 													<string key="NSIdentifier">description</string>
-													<double key="NSWidth">211.4140625</double>
+													<double key="NSWidth">213.4140625</double>
 													<double key="NSMinWidth">40</double>
 													<double key="NSMaxWidth">1000</double>
 													<object class="NSTableHeaderCell" key="NSHeaderCell">
@@ -147,10 +147,28 @@
 														</object>
 														<reference key="NSTextColor" ref="1043563517"/>
 													</object>
-													<object class="IBCustomCell" key="NSDataCell" id="255043031">
-														<int key="NSCellFlags">0</int>
-														<int key="NSCellFlags2">0</int>
+													<object class="NSTextFieldCell" key="NSDataCell" id="254091352">
+														<int key="NSCellFlags">337641537</int>
+														<int key="NSCellFlags2">272762880</int>
+														<string key="NSContents">Text</string>
+														<reference key="NSSupport" ref="26"/>
+														<string key="NSCellIdentifier">_NS:9</string>
 														<reference key="NSControlView" ref="154456502"/>
+														<object class="NSColor" key="NSBackgroundColor">
+															<int key="NSColorSpace">6</int>
+															<string key="NSCatalogName">System</string>
+															<string key="NSColorName">controlColor</string>
+															<object class="NSColor" key="NSColor" id="73343316">
+																<int key="NSColorSpace">3</int>
+																<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
+															</object>
+														</object>
+														<object class="NSColor" key="NSTextColor" id="692485476">
+															<int key="NSColorSpace">6</int>
+															<string key="NSCatalogName">System</string>
+															<string key="NSColorName">controlTextColor</string>
+															<reference key="NSColor" ref="804677898"/>
+														</object>
 													</object>
 													<int key="NSResizingMask">3</int>
 													<bool key="NSIsResizeable">YES</bool>
@@ -180,13 +198,9 @@
 													</object>
 													<object class="NSTextFieldCell" key="NSDataCell" id="210835884">
 														<int key="NSCellFlags">337641536</int>
-														<int key="NSCellFlags2">-2147481600</int>
+														<int key="NSCellFlags2">-2147350528</int>
 														<string key="NSContents">Text Cell</string>
-														<object class="NSFont" key="NSSupport" id="312804117">
-															<string key="NSName">.LucidaGrandeUI</string>
-															<double key="NSSize">13</double>
-															<int key="NSfFlags">1044</int>
-														</object>
+														<reference key="NSSupport" ref="26"/>
 														<object class="NSDateFormatter" key="NSFormatter" id="829907704">
 															<dictionary class="NSMutableDictionary" key="NS.attributes">
 																<integer value="1" key="dateStyle"/>
@@ -201,19 +215,11 @@
 															<int key="NSColorSpace">6</int>
 															<string key="NSCatalogName">System</string>
 															<string key="NSColorName">controlBackgroundColor</string>
-															<object class="NSColor" key="NSColor">
-																<int key="NSColorSpace">3</int>
-																<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
-															</object>
+															<reference key="NSColor" ref="73343316"/>
 														</object>
-														<object class="NSColor" key="NSTextColor">
-															<int key="NSColorSpace">6</int>
-															<string key="NSCatalogName">System</string>
-															<string key="NSColorName">controlTextColor</string>
-															<reference key="NSColor" ref="804677898"/>
-														</object>
+														<reference key="NSTextColor" ref="692485476"/>
 													</object>
-													<int key="NSResizingMask">3</int>
+													<int key="NSResizingMask">2</int>
 													<bool key="NSIsResizeable">YES</bool>
 													<bool key="NSIsEditable">YES</bool>
 													<reference key="NSTableView" ref="154456502"/>
@@ -232,7 +238,7 @@
 												</object>
 											</object>
 											<double key="NSRowHeight">17</double>
-											<int key="NSTvFlags">1377828864</int>
+											<int key="NSTvFlags">1379926016</int>
 											<reference key="NSDelegate"/>
 											<reference key="NSDataSource"/>
 											<int key="NSColumnAutoresizingStyle">4</int>
@@ -324,7 +330,11 @@
 								<int key="NSCellFlags">67108864</int>
 								<int key="NSCellFlags2">134217728</int>
 								<string key="NSContents">Step Backward</string>
-								<reference key="NSSupport" ref="312804117"/>
+								<object class="NSFont" key="NSSupport" id="312804117">
+									<string key="NSName">.LucidaGrandeUI</string>
+									<double key="NSSize">13</double>
+									<int key="NSfFlags">1044</int>
+								</object>
 								<reference key="NSControlView" ref="179151694"/>
 								<int key="NSButtonFlags">-2034352128</int>
 								<int key="NSButtonFlags2">129</int>
@@ -374,7 +384,6 @@
 							<string key="NSFrame">{{314, 6}, {132, 32}}</string>
 							<reference key="NSSuperview" ref="442872210"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="567920774">
@@ -400,7 +409,7 @@
 					<reference key="NSNextKeyView" ref="461634304"/>
 					<string key="NSReuseIdentifierKey">_NS:21</string>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1440, 878}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
 				<bool key="NSWindowIsRestorable">YES</bool>
 			</object>
@@ -482,14 +491,6 @@
 						<reference key="destination" ref="471673241"/>
 					</object>
 					<string key="id">Yir-Jl-33p</string>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">graphRenderer</string>
-						<reference key="source" ref="255043031"/>
-						<reference key="destination" ref="471673241"/>
-					</object>
-					<string key="id">ufv-1f-EYA</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -612,7 +613,7 @@
 						<string key="id">7Wv-il-5FT</string>
 						<reference key="object" ref="271933553"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="255043031"/>
+							<reference ref="254091352"/>
 						</array>
 						<reference key="parent" ref="154456502"/>
 					</object>
@@ -666,11 +667,6 @@
 						<reference key="parent" ref="1036122882"/>
 					</object>
 					<object class="IBObjectRecord">
-						<string key="id">4ns-Js-9zy</string>
-						<reference key="object" ref="255043031"/>
-						<reference key="parent" ref="271933553"/>
-					</object>
-					<object class="IBObjectRecord">
 						<string key="id">3Mn-QH-O7Q</string>
 						<reference key="object" ref="422572411"/>
 						<reference key="parent" ref="461634304"/>
@@ -696,6 +692,11 @@
 						<reference key="object" ref="829907704"/>
 						<reference key="parent" ref="210835884"/>
 					</object>
+					<object class="IBObjectRecord">
+						<string key="id">JHE-vA-YLa</string>
+						<reference key="object" ref="254091352"/>
+						<reference key="parent" ref="271933553"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -707,8 +708,6 @@
 				<boolean value="NO" key="-3.showNotes"/>
 				<string key="3Mn-QH-O7Q.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="3fn-dM-qV6.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="4ns-Js-9zy.CustomClassName">EWGraphLabelCell</string>
-				<string key="4ns-Js-9zy.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="7Wv-il-5FT.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="7Wv-il-5FT.showNotes"/>
 				<string key="ArB-uT-hdy.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -718,6 +717,7 @@
 				<reference key="DnJ-9B-SM2.IBUserGuides" ref="0"/>
 				<boolean value="NO" key="DnJ-9B-SM2.showNotes"/>
 				<string key="FAs-20-yyk.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="JHE-vA-YLa.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="JRS-HS-cfr.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<reference key="JRS-HS-cfr.IBUserGuides" ref="0"/>
 				<boolean value="NO" key="JRS-HS-cfr.showNotes"/>
@@ -774,25 +774,6 @@
 					</object>
 				</object>
 				<object class="IBPartialClassDescription">
-					<string key="className">EWGraphLabelCell</string>
-					<string key="superclassName">NSCell</string>
-					<object class="NSMutableDictionary" key="outlets">
-						<string key="NS.key.0">graphRenderer</string>
-						<string key="NS.object.0">EWGraphRenderer</string>
-					</object>
-					<object class="NSMutableDictionary" key="toOneOutletInfosByName">
-						<string key="NS.key.0">graphRenderer</string>
-						<object class="IBToOneOutletInfo" key="NS.object.0">
-							<string key="name">graphRenderer</string>
-							<string key="candidateClassName">EWGraphRenderer</string>
-						</object>
-					</object>
-					<object class="IBClassDescriptionSource" key="sourceIdentifier">
-						<string key="majorKey">IBProjectSource</string>
-						<string key="minorKey">./Classes/EWGraphLabelCell.h</string>
-					</object>
-				</object>
-				<object class="IBPartialClassDescription">
 					<string key="className">EWGraphRenderer</string>
 					<string key="superclassName">NSObject</string>
 					<object class="IBClassDescriptionSource" key="sourceIdentifier">
@@ -804,26 +785,16 @@
 					<string key="className">EWUndoWindowController</string>
 					<string key="superclassName">EWUtilityWindowController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
-						<string key="redo:">id</string>
 						<string key="selectiveRedo:">id</string>
 						<string key="selectiveUndo:">id</string>
-						<string key="undo:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
-						<object class="IBActionInfo" key="redo:">
-							<string key="name">redo:</string>
-							<string key="candidateClassName">id</string>
-						</object>
 						<object class="IBActionInfo" key="selectiveRedo:">
 							<string key="name">selectiveRedo:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="selectiveUndo:">
 							<string key="name">selectiveUndo:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="undo:">
-							<string key="name">undo:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 					</dictionary>

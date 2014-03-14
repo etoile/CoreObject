@@ -195,10 +195,14 @@
 }
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
+	id<COTrackNode> node = [graphRenderer revisionAtIndex: row];
 	if ([[tableColumn identifier] isEqualToString: @"date"])
 	{
-		id<COTrackNode> node = [graphRenderer revisionAtIndex: row];
 		return node.date;
+	}
+	else if ([[tableColumn identifier] isEqualToString: @"description"])
+	{
+		return [node localizedShortDescription];
 	}
 	return @(row);
 }
