@@ -7,8 +7,12 @@
 
 #import "EWUndoWindowController.h"
 #import "EWGraphRenderer.h"
+#import "TypewriterDocument.h"
 #import <CoreObject/CoreObject.h>
 #import <CoreObject/COCommandGroup.h>
+#import <CoreObject/COCommandSetCurrentVersionForBranch.h>
+#import <CoreObject/COEditingContext+Private.h>
+#import <CoreObject/COAttributedStringDiff.h>
 #import <EtoileFoundation/Macros.h>
 
 @implementation EWUndoWindowController
@@ -164,6 +168,47 @@
 	return node;
 }
 
+/*
+- (NSString *) detailedDescriptionOfNode: (COCommandGroup *)aCommand
+{
+	if ([[aCommand contents] count] != 1)
+		return nil;
+
+	if (![[[aCommand contents] firstObject] isKindOfClass: [COCommandSetCurrentVersionForBranch class]])
+		return nil;
+	
+	COCommandSetCurrentVersionForBranch *versionChange = [[aCommand contents] firstObject];
+	
+	COPersistentRoot *noteProot = [_track.editingContext persistentRootForUUID: [versionChange persistentRootUUID]];
+	if (noteProot == nil)
+		return nil;
+	
+	if (![[noteProot rootObject] isKindOfClass: [TypewriterDocument class]])
+		return nil;
+	
+	COObjectGraphContext *docGraph = [noteProot objectGraphContextForPreviewingRevision: [_track.editingContext revisionForRevisionUUID: versionChange.revisionUUID
+																													 persistentRootUUID: versionChange.persistentRootUUID]];
+
+	COObjectGraphContext *oldDocGraph = [noteProot objectGraphContextForPreviewingRevision: [_track.editingContext revisionForRevisionUUID: versionChange.oldRevisionUUID
+																														persistentRootUUID: versionChange.persistentRootUUID]];
+				
+	
+	TypewriterDocument *doc = docGraph.rootObject;
+	COAttributedString *as = doc.attrString;
+
+	TypewriterDocument *oldDoc =  oldDocGraph.rootObject;
+	COAttributedString *oldAs = oldDoc.attrString;
+
+	COAttributedStringDiff *diff = [[COAttributedStringDiff alloc] initWithFirstAttributedString: oldAs
+																		  secondAttributedString: as
+																						  source: nil];
+
+	NSString *desc = [diff description];
+	desc =[desc stringByReplacingOccurrencesOfString: @"\n" withString: @" "];
+	return desc;
+}
+*/
+
 /* NSTableViewDataSource */
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
@@ -186,7 +231,14 @@
 	{
 		return node.date;
 	}
-	return @(row);
+	else if ([[tableColumn identifier] isEqualToString: @"description"])
+	{
+		return [node localizedShortDescription];
+	}
+	else
+	{
+		return @(row);
+	}
 }
 
 - (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row

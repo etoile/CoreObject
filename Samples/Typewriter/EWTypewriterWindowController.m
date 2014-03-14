@@ -14,6 +14,7 @@
 #import "EWNoteListDataSource.h"
 #import "PrioritySplitViewDelegate.h"
 #import "EWHistoryWindowController.h"
+#import <CoreObject/COAttributedStringDiff.h>
 
 @implementation EWTypewriterWindowController
 
@@ -444,26 +445,6 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 {
 	changedByUser = YES;
 	
-	NSLog(@"should add %@", replacementString);
-	
-	// These are just used to provide commit metadata
-	
-	if (affectedText == nil)
-		affectedText = @"";
-	
-	if (replacementText == nil)
-		replacementText = @"";
-	
-	// This is a complete hack (just append together the modified regions and replacement
-	// text of possibly disjoint edits) but it produces commit descriptions that are usually helpful
-	
-	if (affectedCharRange.length > 0)
-		affectedText = [affectedText stringByAppendingString:
-						[[[aTextView textStorage] string] substringWithRange: affectedCharRange]];
-	
-	if ([replacementString length] > 0)
-		replacementText = [replacementText stringByAppendingString: replacementString];
-	
 	return YES;
 }
 
@@ -486,6 +467,8 @@ static NSString *Trim(NSString *text)
 	NSString *editedText = [[textStorage string] substringWithRange: [textStorage editedRange]];
 	
 	NSLog(@"Text storage did process editing. %@ edited range: %@ = %@", notification.userInfo, NSStringFromRange([textStorage editedRange]), editedText);
+	
+	// FIXME: I don't think this is needed
 	[textView setNeedsDisplay: YES];
 	
 	if (changedByUser)
@@ -514,31 +497,66 @@ static NSString *Trim(NSString *text)
 
 - (void) commitTextChangesAsCheckpoint: (BOOL)isCheckpoint
 {
-	if (isCheckpoint)
-	{
-		selectedNote.currentBranch.shouldMakeEmptyCommit = YES;
-	}
+	// Use COAttributedStringDiff to generate commit metadata that summarizes
+	// simple changes. Otherwise, if several edits were made, just record the change as "Typing"
 	
-	if (replacementText == nil && [affectedText length] > 0)
+	TypewriterDocument *doc = [selectedNote rootObject];
+	COAttributedString *as = doc.attrString;
+	
+	TypewriterDocument *oldDoc = [[selectedNote objectGraphContextForPreviewingRevision: [selectedNote currentRevision]] rootObject];
+	COAttributedString *oldAs = oldDoc.attrString;
+	
+	COAttributedStringDiff *diff = [[COAttributedStringDiff alloc] initWithFirstAttributedString: oldAs
+																		  secondAttributedString: as
+																						  source: nil];
+	NSString *identifier = @"typing";
+	NSArray *descArgs = @[];
+	
+	if ([diff.operations count] == 1)
 	{
-		[self commitWithIdentifier: @"modify-text" descriptionArguments: @[Trim(affectedText)] coalesce: YES isMinorTextEdit: !isCheckpoint];
+		COAttributedStringOperation *op = diff.operations[0];
+		
+		NSString *opRangeString = [[oldAs string] substringWithRange: op.range];
+		NSString *opRangeStringTrimmed = Trim(opRangeString);
+		
+		if ([op isKindOfClass: [COAttributedStringDiffOperationAddAttribute class]])
+		{
+			identifier = @"modify-text";
+			descArgs = @[opRangeStringTrimmed];
+		}
+		else if ([op isKindOfClass: [COAttributedStringDiffOperationRemoveAttribute class]])
+		{
+			identifier = @"modify-text";
+			descArgs = @[opRangeStringTrimmed];
+		}
+		else if ([op isKindOfClass: [COAttributedStringDiffOperationDeleteRange class]])
+		{
+			identifier = @"delete-text";
+			descArgs = @[opRangeStringTrimmed];
+		}
+		else if ([op isKindOfClass: [COAttributedStringDiffOperationInsertAttributedSubstring class]])
+		{
+			COObjectGraphContext *insertedSubstringCtx = [COObjectGraphContext new];
+			[insertedSubstringCtx setItemGraph: ((COAttributedStringDiffOperationInsertAttributedSubstring *)op).attributedStringItemGraph];
+			COAttributedString *insertedSubstring = insertedSubstringCtx.rootObject;
+			NSString *insertedTextTrimmed = Trim([insertedSubstring string]);
+						
+			identifier = @"insert-text";
+			descArgs = @[insertedTextTrimmed];
+		}
+		else if ([op isKindOfClass: [COAttributedStringDiffOperationReplaceRange class]])
+		{
+			COObjectGraphContext *insertedSubstringCtx = [COObjectGraphContext new];
+			[insertedSubstringCtx setItemGraph: ((COAttributedStringDiffOperationReplaceRange *)op).attributedStringItemGraph];
+			COAttributedString *insertedSubstring = insertedSubstringCtx.rootObject;
+			NSString *insertedTextTrimmed = Trim([insertedSubstring string]);
+			
+			identifier = @"replace-text";
+			descArgs = @[opRangeStringTrimmed, insertedTextTrimmed];
+		}
 	}
-	else if ([replacementText isEqualToString: @""] && [affectedText length] > 0)
-	{
-		[self commitWithIdentifier: @"delete-text" descriptionArguments: @[Trim(affectedText)] coalesce: YES isMinorTextEdit: !isCheckpoint];
-	}
-	else if ([replacementText length] > 0 && [affectedText isEqualToString: @""])
-	{
-		[self commitWithIdentifier: @"insert-text" descriptionArguments: @[Trim(replacementText)] coalesce: YES isMinorTextEdit: !isCheckpoint];
-	}
-	else if ([replacementText length] > 0 && [affectedText length] > 0)
-	{
-		[self commitWithIdentifier: @"replace-text" descriptionArguments: @[Trim(affectedText), Trim(replacementText)] coalesce: YES isMinorTextEdit: !isCheckpoint];
-	}
-	else
-	{
-		NSLog(@"%@: got -textStorageDidProcessEditing:, but it wasn't caused by us.. ignoring", self);
-	}
+
+	[self commitWithIdentifier: identifier descriptionArguments: descArgs];
 }
 
 - (void) coalescingTimer: (NSTimer *)timer
@@ -553,8 +571,6 @@ static NSString *Trim(NSString *text)
 
 		[coalescingTimer invalidate];
 		coalescingTimer = nil;
-		affectedText = nil;
-		replacementText = nil;
 	}
 }
 
