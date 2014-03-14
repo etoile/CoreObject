@@ -700,6 +700,9 @@ static NSString *Trim(NSString *text)
 	NSLog(@"Selected tag %@", aTag);
 	
 	[noteListDataSource reloadData];
+	
+	[addNoteButton setEnabled:
+	 ![[[self tagsOutlineSelectedTreeNode] representedObject] isKindOfClass: [COTagGroup class]]];
 }
 
 - (void) commitChangesInBlock: (void(^)())aBlock withIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args

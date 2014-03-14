@@ -28,6 +28,9 @@ NSString * EWTagDragType;
 	IBOutlet NSSearchField *searchfield;
 	IBOutlet NSSplitView *splitView;
 	
+	IBOutlet NSButton *addTagButton;
+	IBOutlet NSButton *addNoteButton;
+	
 	PrioritySplitViewDelegate *splitViewDelegate;
 	COAttributedStringWrapper *textStorage;
 	COPersistentRoot *selectedNote;
