@@ -88,7 +88,7 @@
 												</object>
 												<string key="NSCellIdentifier">_NS:9</string>
 												<reference key="NSControlView" ref="225019472"/>
-												<int key="NSButtonFlags">-2042347520</int>
+												<int key="NSButtonFlags">138690560</int>
 												<int key="NSButtonFlags2">162</int>
 												<object class="NSCustomResource" key="NSNormalImage" id="67877710">
 													<string key="NSClassName">NSImage</string>
@@ -374,7 +374,7 @@
 												<reference key="NSSupport" ref="1070166364"/>
 												<string key="NSCellIdentifier">_NS:9</string>
 												<reference key="NSControlView" ref="303055204"/>
-												<int key="NSButtonFlags">-2042347520</int>
+												<int key="NSButtonFlags">138690560</int>
 												<int key="NSButtonFlags2">162</int>
 												<reference key="NSNormalImage" ref="67877710"/>
 												<reference key="NSAlternateImage" ref="534773135"/>
@@ -1482,6 +1482,7 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						<string key="addTag:">id</string>
 						<string key="addTagGroup:">id</string>
 						<string key="duplicate:">id</string>
+						<string key="removeTagFromNote:">id</string>
 						<string key="search:">id</string>
 						<string key="showDocumentHistory:">id</string>
 					</dictionary>
@@ -1500,6 +1501,10 @@ AAEAAQAAAT0AAwAAAAEAAgAAAVIAAwAAAAEAAQAAAVMAAwAAAAIAAQABAAAAAA</bytes>
 						</object>
 						<object class="IBActionInfo" key="duplicate:">
 							<string key="name">duplicate:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="removeTagFromNote:">
+							<string key="name">removeTagFromNote:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="search:">
