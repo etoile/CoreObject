@@ -290,6 +290,37 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	[tagListDataSource reloadData];
 }
 
+#pragma mark Untitled document name
+
+- (NSString *) untitledDocumentNameForIndex: (NSUInteger)index
+{
+	return [NSString stringWithFormat: @"Untitled Note %d", (int)index];
+}
+
+- (BOOL) isDocumentNameInUse: (NSString *)aName
+{
+	for (COPersistentRoot *persistentRoot in self.editingContext.persistentRoots)
+	{
+		if ([persistentRoot.metadata[@"label"] isEqualToString: aName])
+			return YES;
+	}
+	return NO;
+}
+
+/**
+ * Returns a document name like "Untitled 1" that is not currently in use
+ * for a document in context
+ */
+- (NSString *) untitledDocumentName
+{
+	NSUInteger i = 1;
+	while ([self isDocumentNameInUse: [self untitledDocumentNameForIndex: i]])
+	{
+		i++;
+	}
+	return [self untitledDocumentNameForIndex: i];
+}
+
 - (IBAction) addNote:(id)sender
 {
 	__block COPersistentRoot *newNote = nil;
@@ -297,7 +328,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	[self commitChangesInBlock: ^{
 		newNote = [self.editingContext insertNewPersistentRootWithEntityName: @"TypewriterDocument"];
 		NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: newNote.metadata];
-		[md addEntriesFromDictionary: @{ @"label" : @"Untitled Note" }];
+		[md addEntriesFromDictionary: @{ @"label" : [self untitledDocumentName] }];
 		newNote.metadata = md;
 		
 		COTag *currentTag = [self clickedOrSelectedTag];
