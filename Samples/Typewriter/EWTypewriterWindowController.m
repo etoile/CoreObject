@@ -295,7 +295,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	__block COPersistentRoot *newNote = nil;
 	
 	[self commitChangesInBlock: ^{
-		COPersistentRoot *newNote = [self.editingContext insertNewPersistentRootWithEntityName: @"TypewriterDocument"];
+		newNote = [self.editingContext insertNewPersistentRootWithEntityName: @"TypewriterDocument"];
 		NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: newNote.metadata];
 		[md addEntriesFromDictionary: @{ @"label" : @"Untitled Note" }];
 		newNote.metadata = md;
