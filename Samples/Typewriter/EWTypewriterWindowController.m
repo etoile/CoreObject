@@ -445,6 +445,17 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 {
 	changedByUser = YES;
 	
+	BOOL willDelete = (replacementString != nil && [replacementString isEqualToString: @""]);
+	
+	if (willDelete && !isDeleting)
+	{
+		// If the user has uncommitted text, and the start deleting, commit their uncommitted changes
+		// so they can undo the deletions
+		[self commitTextChangesAsCheckpoint: NO];
+	}
+	
+	isDeleting = willDelete;
+	
 	return YES;
 }
 

@@ -40,6 +40,7 @@ NSString * EWTagDragType;
 	// Tracking text changes
 	BOOL changedByUser;
 	NSTimer *coalescingTimer;
+	BOOL isDeleting;
 }
 
 @property (nonatomic, readonly) NSTableView *notesTable;
