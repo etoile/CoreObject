@@ -73,6 +73,9 @@
 {
 	if (nil == item) { item = [self rootObject]; }
 	NSTreeNode *treeNode = item;
+	
+	if (treeNode == allNotesTreeNode)
+		return @"All Notes";
 		
 	return [(COObject *)[treeNode representedObject] name];
 }
@@ -81,6 +84,9 @@
 {
 	if (nil == item) { item = [self rootObject]; }
 	NSTreeNode *treeNode = item;
+	
+	if (treeNode == allNotesTreeNode)
+		return;
 	
 	COObject *treeNodeRepObj = [treeNode representedObject];
 	
@@ -156,6 +162,10 @@ descriptionArguments: @[oldName, newName]];
 	
 	COTagLibrary *library = [self.owner tagLibrary];
 	rootTreeNode = [[NSTreeNode alloc] initWithRepresentedObject: library];
+	
+	allNotesTreeNode = [[NSTreeNode alloc] initWithRepresentedObject: nil];
+	[[rootTreeNode mutableChildNodes] addObject: allNotesTreeNode];
+	
 	for (COTagGroup *tagGroup in [library tagGroups])
 	{
 		NSTreeNode *tagGroupNode = [[NSTreeNode alloc] initWithRepresentedObject: tagGroup];
@@ -196,12 +206,23 @@ descriptionArguments: @[oldName, newName]];
 			}
 		}
 	}
+	
+	if ([newSelectedRows isEmpty])
+	{
+		NSInteger allNotesIndex = [self.outlineView rowForItem: allNotesTreeNode];
+		ETAssert(allNotesIndex != -1);
+		[newSelectedRows addIndex: allNotesIndex];
+	}
+	
 	[self.outlineView selectRowIndexes: newSelectedRows byExtendingSelection: NO];
 	[self cacheSelection];
 }
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
 {
+	if (item == allNotesTreeNode)
+		return YES;
+	
 	return [[item representedObject] isKindOfClass: [COTagGroup class]];
 }
 
