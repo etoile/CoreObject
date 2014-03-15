@@ -691,4 +691,51 @@
 	 }];
 }
 
+- (void) testNameBasic
+{
+	UKNil(persistentRoot.name);
+	UKFalse(persistentRoot.hasChanges);
+	
+	persistentRoot.name = @"todo";
+	
+	UKObjectsEqual(@"todo", persistentRoot.name);
+	UKTrue(persistentRoot.hasChanges);
+	[persistentRoot commit];
+	
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKObjectsEqual(@"todo", persistentRoot.name);
+	 }];
+}
+
+- (void) testNameSetToNil
+{
+	persistentRoot.name = @"todo";
+	[persistentRoot commit];
+	
+	persistentRoot.name = nil;
+	UKNil(persistentRoot.name);
+	UKTrue(persistentRoot.hasChanges);
+	[persistentRoot commit];
+	
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 UKNil(persistentRoot.name);
+	 }];
+}
+
+- (void) testNameCopies
+{
+	NSMutableString *ms = [NSMutableString new];
+	persistentRoot.name = ms;
+	
+	UKObjectsEqual(@"", persistentRoot.name);
+	UKRaisesException([(NSMutableString *)persistentRoot.name appendString: @"foo"]);
+	
+	[ms appendString: @"a"];
+	UKObjectsEqual(@"", persistentRoot.name);
+}
+
 @end

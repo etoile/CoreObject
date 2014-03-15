@@ -25,6 +25,11 @@
 
 NSString * const COPersistentRootDidChangeNotification = @"COPersistentRootDidChangeNotification";
 
+/**
+ * Metadata dictionary key used by the `name` property.
+ */
+NSString * const COPersistentRootName = @"org.etoile.coreobject.name";
+
 @implementation COPersistentRoot
 
 @synthesize parentContext = _parentContext, UUID = _UUID;
@@ -282,6 +287,25 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 - (NSDictionary *)attributes
 {
 	return [[self store] attributesForPersistentRootWithUUID: _UUID];
+}
+
+- (NSString *) name
+{
+	return self.metadata[COPersistentRootName];
+}
+
+- (void) setName: (NSString *)name
+{
+	NSMutableDictionary *md = [[NSMutableDictionary alloc] initWithDictionary: self.metadata];
+	if (name == nil)
+	{
+		[md removeObjectForKey: COPersistentRootName];
+	}
+	else
+	{
+		md[COPersistentRootName] = [[NSString alloc] initWithString: name];
+	}
+	self.metadata = md;
 }
 
 #pragma mark Accessing Branches -

@@ -260,7 +260,22 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * See COPersistentRootAttributeExportSize, COPersistentRootAttributeUsedSize.
  */
 @property (nonatomic, readonly) NSDictionary *attributes;
-
+/**
+ * The user-facing name of the persistent root. This property is provided for
+ * convenience; it is implemented on top of the metadata property.
+ *
+ * Because it's stored in the metadata dictionary, changes to the name are visible
+ * across all revisions and branches.
+ *
+ * You could also store a document name in
+ * the root object's -name property (see -[COObject name]), which would have the
+ * expected consequences: changing the name would cause a new revision to be committed, 
+ * old revisions would still use the old name, and different branches could have different names
+ * for the document.
+ *
+ * TODO: Rename to -displayName or -label to emphasize that this is the user-facing name?
+ */
+@property (nonatomic, copy) NSString *name;
 
 /** @taskunit Accessing Branches */
 
