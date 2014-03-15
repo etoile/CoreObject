@@ -145,7 +145,8 @@
 	if (node != nil)
 	{
 		[inspectedBranch undoNode: node];
-		[self commitWithIdentifier: @"selective-undo" descriptionArguments: @[]];
+		NSString *desc = [node localizedShortDescription] != nil ? [node localizedShortDescription] : @"";
+		[self commitWithIdentifier: @"selective-undo" descriptionArguments: @[desc]];
 	}
 }
 
@@ -155,7 +156,8 @@
 	if (node != nil)
 	{
 		[inspectedBranch redoNode: node];
-		[self commitWithIdentifier: @"selective-redo" descriptionArguments: @[]];
+		NSString *desc = [node localizedShortDescription] != nil ? [node localizedShortDescription] : @"";
+		[self commitWithIdentifier: @"selective-redo" descriptionArguments: @[desc]];
 	}
 }
 
