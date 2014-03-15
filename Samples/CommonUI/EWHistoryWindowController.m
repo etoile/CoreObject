@@ -48,7 +48,7 @@
 
 - (NSString *)windowTitleForDocumentDisplayName:(NSString *)displayName
 {
-	return [NSString stringWithFormat: @"%@ History", inspectedPersistentRoot.metadata[@"label"]];
+	return [NSString stringWithFormat: @"%@ History", inspectedPersistentRoot.name];
 }
 
 - (void) update

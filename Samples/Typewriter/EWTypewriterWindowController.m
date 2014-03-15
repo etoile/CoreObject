@@ -297,7 +297,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 {
 	for (COPersistentRoot *persistentRoot in self.editingContext.persistentRoots)
 	{
-		if ([persistentRoot.metadata[@"label"] isEqualToString: aName])
+		if ([persistentRoot.name isEqualToString: aName])
 			return YES;
 	}
 	return NO;
@@ -323,9 +323,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	
 	[self commitChangesInBlock: ^{
 		newNote = [self.editingContext insertNewPersistentRootWithEntityName: @"TypewriterDocument"];
-		NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: newNote.metadata];
-		[md addEntriesFromDictionary: @{ @"label" : [self untitledDocumentName] }];
-		newNote.metadata = md;
+		newNote.name = [self untitledDocumentName];
 		
 		COTag *currentTag = [self clickedOrSelectedTag];
 		if (currentTag != nil)
@@ -352,11 +350,9 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 		[self commitChangesInBlock: ^{
 			copyOfSelection = [selectedPersistentRoot.currentBranch makePersistentRootCopy];
 			
-			sourceLabel = selectedPersistentRoot.metadata[@"label"];
+			sourceLabel = selectedPersistentRoot.name;
 			
-			NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: copyOfSelection.metadata];
-			[md addEntriesFromDictionary: @{ @"label" : [NSString stringWithFormat: @"Copy of %@", sourceLabel] }];
-			copyOfSelection.metadata = md;
+			copyOfSelection.name = [NSString stringWithFormat: @"Copy of %@", sourceLabel];
 			
 			// Also give it the selected tag
 			COTag *selectedTag = [self clickedOrSelectedTag];
@@ -398,7 +394,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 			ETAssert([tag containsObject: noteRootObject]);
 			[tag removeObject: noteRootObject];
 			
-		}withIdentifier: @"untag-note" descriptionArguments: @[[tag name], note.metadata[@"label"]]];
+		}withIdentifier: @"untag-note" descriptionArguments: @[[tag name], note.name]];
 	}
 }
 
@@ -638,9 +634,9 @@ static NSString *Trim(NSString *text)
 			for (COPersistentRoot *selectedPersistentRoot in [self selectedNotePersistentRoots])
 			{
 				selectedPersistentRoot.deleted = YES;
-				if (selectedPersistentRoot.metadata[@"label"] != nil)
+				if (selectedPersistentRoot.name != nil)
 				{
-					[label appendFormat: @" %@", selectedPersistentRoot.metadata[@"label"]];
+					[label appendFormat: @" %@", selectedPersistentRoot.name];
 				}
 			}
 		} withIdentifier: @"delete-note" descriptionArguments: @[label]];
@@ -709,9 +705,9 @@ static NSString *Trim(NSString *text)
 	}
 	
 	// Set window title
-	if (selectedNote.metadata[@"label"] != nil)
+	if (selectedNote.name != nil)
 	{
-		[[self window] setTitle: selectedNote.metadata[@"label"]];
+		[[self window] setTitle: selectedNote.name];
 	}
 	else
 	{

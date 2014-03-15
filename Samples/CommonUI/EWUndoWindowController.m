@@ -223,7 +223,7 @@
 		if (node.persistentRootUUID != nil)
 		{
 			COPersistentRoot *proot = [_track.editingContext persistentRootForUUID: node.persistentRootUUID];
-			return proot.metadata[@"label"];
+			return proot.name;
 		}
 		return @"";
 	}

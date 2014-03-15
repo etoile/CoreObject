@@ -37,7 +37,7 @@
 	
     if ([[tableColumn identifier] isEqual: @"name"])
     {
-        return persistentRoot.metadata[@"label"];
+        return persistentRoot.name;
     }
     else if ([[tableColumn identifier] isEqual: @"date"])
     {
@@ -52,15 +52,11 @@
 	
 	if ([[tableColumn identifier] isEqual: @"name"])
     {
-		NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: persistentRoot.metadata];
-		
-		NSString *oldName = md[@"label"] != nil ? md[@"label"] : @"";
-		NSString *newName = [object stringValue] != nil ? [object stringValue] : @"";
-		
-		md[@"label"] = newName;
-		
+		NSString *oldName = persistentRoot.name != nil ? persistentRoot.name : @"";
+		__block NSString *newName = [object stringValue] != nil ? [object stringValue] : @"";
+
 		[self.owner commitChangesInBlock: ^{
-			persistentRoot.metadata = md;
+			persistentRoot.name = newName;
 		} withIdentifier: @"rename-note" descriptionArguments: @[oldName, newName]];
     }
 }
