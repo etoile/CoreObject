@@ -275,17 +275,22 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	COUndoTrack *track = [COUndoTrack trackForName: ((COCommandGroup *)aNode).trackName withEditingContext: _editingContext];
 	ETAssert(track != nil);
 	
-	COCommand *command = [(COCommand *)aNode inverse];
-	[command applyToContext: _editingContext];
+	COCommandGroup *command = [(COCommandGroup *)aNode inverse];
 	
 	NSString *commitShortDescription = [aNode localizedShortDescription];
 	if (commitShortDescription == nil)
 		commitShortDescription = @"";
 	
-	[_editingContext commitWithIdentifier: @"org.etoile.CoreObject.selective-undo"
-								 metadata: @{ kCOCommitMetadataShortDescriptionArguments : @[commitShortDescription]}
-								undoTrack: track
-									error: NULL];
+	NSDictionary *md = @{kCOCommitMetadataIdentifier : @"org.etoile.CoreObject.selective-undo",
+						 kCOCommitMetadataShortDescriptionArguments : @[commitShortDescription]};
+		
+	command.metadata = md;
+	
+	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+	[command addToStoreTransaction: txn withRevisionMetadata: md assumingEditingContextState: _editingContext];
+	[self commitStoreTransaction: txn];
+	
+	[self recordCommand: command];
 }
 
 - (void)redoNode: (id <COTrackNode>)aNode
@@ -293,17 +298,22 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	COUndoTrack *track = [COUndoTrack trackForName: ((COCommandGroup *)aNode).trackName withEditingContext: _editingContext];
 	ETAssert(track != nil);
 	
-	COCommand *command = (COCommand *)aNode;
-	[command applyToContext: _editingContext];
+	COCommandGroup *command = [(COCommandGroup *)aNode copy];
 	
 	NSString *commitShortDescription = [aNode localizedShortDescription];
 	if (commitShortDescription == nil)
 		commitShortDescription = @"";
 	
-	[_editingContext commitWithIdentifier: @"org.etoile.CoreObject.selective-redo"
-								 metadata: @{ kCOCommitMetadataShortDescriptionArguments : @[commitShortDescription]}
-								undoTrack: track
-									error: NULL];
+	NSDictionary *md = @{kCOCommitMetadataIdentifier : @"org.etoile.CoreObject.selective-redo",
+						 kCOCommitMetadataShortDescriptionArguments : @[commitShortDescription]};
+
+	command.metadata = md;
+	
+	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+	[command addToStoreTransaction: txn withRevisionMetadata: md assumingEditingContextState: _editingContext];
+	[self commitStoreTransaction: txn];
+	
+	[self recordCommand: command];
 }
 
 #pragma mark - COUndoTrack - Other Public Methods
@@ -488,13 +498,22 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		[self doCommand: cmd inverse: NO addToStoreTransaction: txn];
 	}
 	
+	[self commitStoreTransaction: txn];
+}
+
+- (void) commitStoreTransaction: (COStoreTransaction *)txn
+{
 	// Set the last transaction IDs so the store will accept our transaction
 	for (ETUUID *uuid in [txn persistentRootUUIDs])
 	{
 		COPersistentRoot *proot = [_editingContext persistentRootForUUID: uuid];
 		[txn setOldTransactionID: proot.lastTransactionID forPersistentRoot: uuid];
+		
+		// N.B.: We DO NOT MODIFY proot's lastTransactionID property here, because the
+		// in-memory state is out of date with respect to the store, and we need the
+		// notification mechanism to refresh the in-memory state
 	}
-
+	
 	BOOL ok = [[_editingContext store] commitStoreTransaction: txn];
 	ETAssert(ok);
 }
@@ -503,7 +522,15 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 {
 	COCommandGroup *commandToApply = (inverse ? [aCommand inverse] : aCommand);
 	[commandToApply setParentUndoTrack: self];
-	[commandToApply addToStoreTransaction: txn isUndo: inverse assumingEditingContextState: _editingContext];
+	
+	NSMutableDictionary *md = [NSMutableDictionary new];
+	md[kCOCommitMetadataIdentifier] = inverse ? @"org.etoile.CoreObject.undo" : @"org.etoile.CoreObject.redo";
+	if ([aCommand localizedShortDescription] != nil)
+	{
+		md[kCOCommitMetadataShortDescriptionArguments] = @[[aCommand localizedShortDescription]];
+	}
+	
+	[commandToApply addToStoreTransaction: txn withRevisionMetadata: md assumingEditingContextState: _editingContext];
 	
 	// Update the current command for this track.
 

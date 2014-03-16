@@ -54,19 +54,7 @@ static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
 	NILARG_EXCEPTION_TEST(aContext);
     return YES;
 }
-
-- (void) applyToContext: (COEditingContext *)aContext
-{
-	NILARG_EXCEPTION_TEST(aContext);
-
-    COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
-    COBranch *branch = [proot branchForUUID: _newBranchUUID];
-    ETAssert(branch != nil);
-
-    [proot setCurrentBranch: branch];
-}
-
-- (void) addToStoreTransaction: (COStoreTransaction *)txn isUndo: (BOOL)isUndo assumingEditingContextState: (COEditingContext *)ctx
+- (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
 {
 	[txn setCurrentBranch: _newBranchUUID forPersistentRoot: _persistentRootUUID];
 }
@@ -74,6 +62,14 @@ static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
 - (NSString *)kind
 {
 	return _(@"Branch Switch");
+}
+
+- (id) copyWithZone:(NSZone *)zone
+{
+    COCommandSetCurrentBranch *aCopy = [super copyWithZone: zone];
+	aCopy->_oldBranchUUID = _oldBranchUUID;
+	aCopy->_newBranchUUID = _newBranchUUID;
+    return aCopy;
 }
 
 @end

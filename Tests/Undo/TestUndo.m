@@ -645,7 +645,7 @@
 	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
 	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r0 to: r1];
 	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r1 to: r2];
-	[self checkCommand: _testTrack.nodes[3] isSetVersionFrom: r2 to: r3];
+	[self checkCommand: _testTrack.nodes[3] isSetVersionFrom: r1 to: r0];
 	
 	// Check that the commit created by COUndoTrack has proper commit metadata
 	UKObjectsEqual(@"org.etoile.CoreObject.selective-undo", [[_testTrack.nodes[3] commitDescriptor] identifier]);

@@ -49,18 +49,7 @@ static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
     return YES;
 }
 
-- (void) applyToContext: (COEditingContext *)aContext
-{
-	NILARG_EXCEPTION_TEST(aContext);
-
-    COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
-    COBranch *branch = [proot branchForUUID: _branchUUID];
-	ETAssert(branch != nil);
-    
-    [branch setDeleted: NO];
-}
-
-- (void) addToStoreTransaction: (COStoreTransaction *)txn isUndo: (BOOL)isUndo assumingEditingContextState: (COEditingContext *)ctx
+- (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
 {
 	[txn undeleteBranch: _branchUUID ofPersistentRoot: _persistentRootUUID];
 }
@@ -68,6 +57,13 @@ static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
 - (NSString *)kind
 {
 	return _(@"Branch Undeletion");
+}
+
+- (id) copyWithZone:(NSZone *)zone
+{
+    COCommandUndeleteBranch *aCopy = [super copyWithZone: zone];
+    aCopy->_branchUUID = _branchUUID;
+    return aCopy;
 }
 
 @end

@@ -77,13 +77,7 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
     return YES;
 }
 
-- (void) applyToContext: (COEditingContext *)aContext
-{
-	NILARG_EXCEPTION_TEST(aContext);
-    [[aContext persistentRootForUUID: _persistentRootUUID] setDeleted: YES];
-}
-
-- (void) addToStoreTransaction: (COStoreTransaction *)txn isUndo: (BOOL)isUndo assumingEditingContextState: (COEditingContext *)ctx
+- (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
 {
 	[txn deletePersistentRoot: _persistentRootUUID];
 }
@@ -91,6 +85,13 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 - (NSString *)kind
 {
 	return _(@"Persistent Root Deletion");
+}
+
+- (id) copyWithZone:(NSZone *)zone
+{
+    COCommandDeletePersistentRoot *aCopy = [super copyWithZone: zone];
+	aCopy->_initialRevisionID = _initialRevisionID;
+    return aCopy;
 }
 
 @end

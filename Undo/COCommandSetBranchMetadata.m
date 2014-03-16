@@ -64,18 +64,7 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
     return YES;
 }
 
-- (void) applyToContext: (COEditingContext *)aContext
-{
-	NILARG_EXCEPTION_TEST(aContext);
-
-    COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
-    COBranch *branch = [proot branchForUUID: _branchUUID];
-   	ETAssert(branch != nil);
-
-    [branch setMetadata: _newMetadata];
-}
-
-- (void) addToStoreTransaction: (COStoreTransaction *)txn isUndo: (BOOL)isUndo assumingEditingContextState: (COEditingContext *)ctx
+- (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
 {
 	[txn setMetadata: _newMetadata forBranch: _branchUUID ofPersistentRoot: _persistentRootUUID];
 }
@@ -83,6 +72,15 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
 - (NSString *)kind
 {
 	return _(@"Branch Metadata Update");
+}
+
+- (id) copyWithZone:(NSZone *)zone
+{
+    COCommandSetBranchMetadata *aCopy = [super copyWithZone: zone];
+    aCopy->_branchUUID = _branchUUID;
+	aCopy->_oldMetadata = _oldMetadata;
+	aCopy->_newMetadata = _newMetadata;
+    return aCopy;
 }
 
 @end

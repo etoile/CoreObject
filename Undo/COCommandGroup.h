@@ -17,7 +17,7 @@
  *
  * See COCommand for a detailed presentation.
  */
-@interface COCommandGroup : NSObject <COTrackNode, ETCollection>
+@interface COCommandGroup : NSObject <COTrackNode, ETCollection, NSCopying>
 {
 	@private
 	COUndoTrack __weak *_parentUndoTrack;
@@ -119,14 +119,10 @@
  */
 - (BOOL) canApplyToContext: (COEditingContext *)aContext;
 /**
- * Applies the receiver changes to the editing context.
- */
-- (void) applyToContext: (COEditingContext *)aContext;
-/**
  * Applies the receiver changes directly to a store transaction.
  */
 - (void) addToStoreTransaction: (COStoreTransaction *)txn
-						isUndo: (BOOL)isUndo
+		  withRevisionMetadata: (NSDictionary *)metadata
    assumingEditingContextState: (COEditingContext *)ctx;
 
 

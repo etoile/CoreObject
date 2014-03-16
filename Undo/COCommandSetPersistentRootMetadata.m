@@ -59,17 +59,7 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
     return YES;
 }
 
-- (void) applyToContext: (COEditingContext *)aContext
-{
-	NILARG_EXCEPTION_TEST(aContext);
-
-    COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
-   	ETAssert(proot != nil);
-
-    [proot setMetadata: _newMetadata];
-}
-
-- (void) addToStoreTransaction: (COStoreTransaction *)txn isUndo: (BOOL)isUndo assumingEditingContextState: (COEditingContext *)ctx
+- (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
 {
 	[txn setMetadata: _newMetadata forPersistentRoot: _persistentRootUUID];
 }
@@ -77,6 +67,14 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
 - (NSString *)kind
 {
 	return _(@"Persistent Root Metadata Update");
+}
+
+- (id) copyWithZone:(NSZone *)zone
+{
+    COCommandSetPersistentRootMetadata *aCopy = [super copyWithZone: zone];
+	aCopy->_oldMetadata = _oldMetadata;
+	aCopy->_newMetadata = _newMetadata;
+    return aCopy;
 }
 
 @end

@@ -124,11 +124,28 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 	return inversedCommands;
 }
 
+- (NSMutableArray *)copiedCommands
+{
+	NSMutableArray *commands = [NSMutableArray array];
+    for (COCommand *command in _contents)
+    {
+		[commands addObject: [command copy]];
+    }
+	return commands;
+}
+
 - (COCommandGroup *) inverse
 {
     COCommandGroup *inverse = [[COCommandGroup alloc] init];
     inverse.contents = [self inversedCommands];
     return inverse;
+}
+
+- (id) copyWithZone: (NSZone *)aZone
+{
+    COCommandGroup *copied = [[COCommandGroup alloc] init];
+    copied.contents = [self copiedCommands];
+    return copied;
 }
 
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
@@ -145,24 +162,14 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     return YES;
 }
 
-- (void) applyToContext: (COEditingContext *)aContext
-{
-	NILARG_EXCEPTION_TEST(aContext);
-
-    for (COCommand *command in _contents)
-    {
-        [command applyToContext: aContext];
-    }
-}
-
-- (void) addToStoreTransaction: (COStoreTransaction *)txn isUndo: (BOOL)isUndo assumingEditingContextState: (COEditingContext *)ctx
+- (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
 {
 	NILARG_EXCEPTION_TEST(ctx);
 	NILARG_EXCEPTION_TEST(txn);
 	
     for (COCommand *command in _contents)
     {
-        [command addToStoreTransaction: txn isUndo: isUndo assumingEditingContextState: ctx];
+        [command addToStoreTransaction: txn withRevisionMetadata: metadata assumingEditingContextState: ctx];
     }
 }
 

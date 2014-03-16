@@ -37,13 +37,7 @@
     return YES;
 }
 
-- (void) applyToContext: (COEditingContext *)aContext
-{
-	NILARG_EXCEPTION_TEST(aContext);
-    [[aContext persistentRootForUUID: _persistentRootUUID] setDeleted: NO];
-}
-
-- (void) addToStoreTransaction: (COStoreTransaction *)txn isUndo: (BOOL)isUndo assumingEditingContextState: (COEditingContext *)ctx
+- (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
 {
 	[txn undeletePersistentRoot: _persistentRootUUID];
 }
@@ -113,6 +107,13 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 - (NSString *)localizedShortDescription
 {
 	return [[self revision] localizedShortDescription];
+}
+
+- (id) copyWithZone:(NSZone *)zone
+{
+    COCommandCreatePersistentRoot *aCopy = [super copyWithZone: zone];
+	aCopy->_initialRevisionID = _initialRevisionID;
+    return aCopy;
 }
 
 @end
