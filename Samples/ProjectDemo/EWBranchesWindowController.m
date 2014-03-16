@@ -38,6 +38,9 @@ static EWBranchesWindowController *shared;
 
 - (void) setInspectedWindowController: (EWDocumentWindowController *)aDoc
 {
+	if (![aDoc respondsToSelector: @selector(persistentRoot)])
+		return;
+	
     [self setPersistentRoot: [aDoc persistentRoot]];
 }
 
