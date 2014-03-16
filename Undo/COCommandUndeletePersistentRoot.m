@@ -43,7 +43,7 @@
     [[aContext persistentRootForUUID: _persistentRootUUID] setDeleted: NO];
 }
 
-- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx
+- (void) addToStoreTransaction: (COStoreTransaction *)txn isUndo: (BOOL)isUndo assumingEditingContextState: (COEditingContext *)ctx
 {
 	[txn undeletePersistentRoot: _persistentRootUUID];
 }

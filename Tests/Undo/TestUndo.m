@@ -125,26 +125,57 @@
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
         UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
         
-        // Selective undo
+		CORevision *r3 = ctx2persistentRoot.currentRevision;
+		
+		//
+        // First Selective undo
+		//
         [rootEditTrack undo];
         
         UKNil([root valueForProperty: kCOLabel]);
         UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
         
-        // Selective undo    
+		// Check that a new revision was created
+		CORevision *r4 = ctx2persistentRoot.currentRevision;
+		UKObjectsNotEqual(r3, r4);
+		UKObjectsEqual(r3, [r4 parentRevision]);
+		UKObjectsEqual(@"org.etoile.CoreObject.undo", [[r4 commitDescriptor] identifier]);
+		
+		//
+        // Second Selective undo
+		//
         [childEditTrack undo];
         
+		// Check that a new revision was created
+		CORevision *r5 = ctx2persistentRoot.currentRevision;
+		UKObjectsEqual(r4, [r5 parentRevision]);
+		UKObjectsEqual(@"org.etoile.CoreObject.undo", [[r5 commitDescriptor] identifier]);
+		
         UKNil([root valueForProperty: kCOLabel]);
         UKNil([child valueForProperty: kCOLabel]);
         
-        // Selective Redo
+		//
+        // First selective redo
+		//
         [rootEditTrack redo];
         
+		// Check that a new revision was created
+		CORevision *r6 = ctx2persistentRoot.currentRevision;
+		UKObjectsEqual(r5, [r6 parentRevision]);
+		UKObjectsEqual(@"org.etoile.CoreObject.redo", [[r6 commitDescriptor] identifier]);
+		
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
         UKNil([child valueForProperty: kCOLabel]);
         
-        // Selective Redo
+		//
+        // Second selective redo
+		//
         [childEditTrack redo];
+		
+		// Check that a new revision was created
+		CORevision *r7 = ctx2persistentRoot.currentRevision;
+		UKObjectsEqual(r6, [r7 parentRevision]);
+		UKObjectsEqual(@"org.etoile.CoreObject.redo", [[r7 commitDescriptor] identifier]);
         
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
         UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);

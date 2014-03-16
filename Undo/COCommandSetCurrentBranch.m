@@ -66,7 +66,7 @@ static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
     [proot setCurrentBranch: branch];
 }
 
-- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx
+- (void) addToStoreTransaction: (COStoreTransaction *)txn isUndo: (BOOL)isUndo assumingEditingContextState: (COEditingContext *)ctx
 {
 	[txn setCurrentBranch: _newBranchUUID forPersistentRoot: _persistentRootUUID];
 }

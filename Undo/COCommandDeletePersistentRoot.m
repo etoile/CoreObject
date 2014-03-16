@@ -83,7 +83,7 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
     [[aContext persistentRootForUUID: _persistentRootUUID] setDeleted: YES];
 }
 
-- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx
+- (void) addToStoreTransaction: (COStoreTransaction *)txn isUndo: (BOOL)isUndo assumingEditingContextState: (COEditingContext *)ctx
 {
 	[txn deletePersistentRoot: _persistentRootUUID];
 }

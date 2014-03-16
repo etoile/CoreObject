@@ -100,6 +100,7 @@
  * Applies the receiver changes directly to a store transaction.
  */
 - (void) addToStoreTransaction: (COStoreTransaction *)txn
+						isUndo: (BOOL)isUndo
    assumingEditingContextState: (COEditingContext *)ctx;
 
 /** @taskunit Framework Private */

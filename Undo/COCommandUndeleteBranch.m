@@ -60,7 +60,7 @@ static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
     [branch setDeleted: NO];
 }
 
-- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx
+- (void) addToStoreTransaction: (COStoreTransaction *)txn isUndo: (BOOL)isUndo assumingEditingContextState: (COEditingContext *)ctx
 {
 	[txn undeleteBranch: _branchUUID ofPersistentRoot: _persistentRootUUID];
 }

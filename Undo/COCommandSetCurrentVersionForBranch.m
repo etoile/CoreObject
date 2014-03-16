@@ -198,7 +198,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 	return valueFromEditingContext;
 }
 
-- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)aContext
+- (void) addToStoreTransaction: (COStoreTransaction *)txn isUndo: (BOOL)isUndo assumingEditingContextState: (COEditingContext *)aContext
 {
 	NILARG_EXCEPTION_TEST(aContext);
 	
@@ -240,9 +240,16 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 		
 		// TODO: Filter out unmodified items
 		
+		NSMutableDictionary *md = [NSMutableDictionary new];
+		md[kCOCommitMetadataIdentifier] = isUndo ? @"org.etoile.CoreObject.undo" : @"org.etoile.CoreObject.redo";
+		if ([self localizedShortDescription] != nil)
+		{
+			md[kCOCommitMetadataShortDescriptionArguments] = @[[self localizedShortDescription]];
+		}
+		
 		[txn writeRevisionWithModifiedItems: result
 							   revisionUUID: newRevisionUUID
-								   metadata: nil // FIXME: Copy from commented out part of COUndoTrack
+								   metadata: md
 						   parentRevisionID: branchCurrentRevisionUUID
 					  mergeParentRevisionID: nil
 						 persistentRootUUID: _persistentRootUUID

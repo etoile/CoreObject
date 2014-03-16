@@ -69,7 +69,7 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
     [proot setMetadata: _newMetadata];
 }
 
-- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx
+- (void) addToStoreTransaction: (COStoreTransaction *)txn isUndo: (BOOL)isUndo assumingEditingContextState: (COEditingContext *)ctx
 {
 	[txn setMetadata: _newMetadata forPersistentRoot: _persistentRootUUID];
 }

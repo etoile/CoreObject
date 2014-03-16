@@ -27,7 +27,6 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 @synthesize timestamp = _timestamp;
 @synthesize sequenceNumber = _sequenceNumber;
 @synthesize parentUUID = _parentUUID;
-@synthesize parentUndoTrack = _parentUndoTrack;
 @synthesize trackName = _trackName;
 
 #pragma mark -
@@ -156,20 +155,34 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     }
 }
 
-- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx
+- (void) addToStoreTransaction: (COStoreTransaction *)txn isUndo: (BOOL)isUndo assumingEditingContextState: (COEditingContext *)ctx
 {
 	NILARG_EXCEPTION_TEST(ctx);
 	NILARG_EXCEPTION_TEST(txn);
 	
     for (COCommand *command in _contents)
     {
-        [command addToStoreTransaction: txn assumingEditingContextState: ctx];
+        [command addToStoreTransaction: txn isUndo: isUndo assumingEditingContextState: ctx];
     }
 }
 
 - (NSString *)kind
 {
 	return _(@"Change Group");
+}
+
+- (COUndoTrack *)parentUndoTrack
+{
+	return _parentUndoTrack;
+}
+
+- (void)setParentUndoTrack:(COUndoTrack *)parentUndoTrack
+{
+	_parentUndoTrack = parentUndoTrack;
+	for (COCommand *childCommand in self.contents)
+	{
+		childCommand.parentUndoTrack = parentUndoTrack;
+	}
 }
 
 #pragma mark -

@@ -123,7 +123,7 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
     [NSException raise: NSInvalidArgumentException format: @"override"];
 }
 
-- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx
+- (void) addToStoreTransaction: (COStoreTransaction *)txn isUndo: (BOOL)isUndo assumingEditingContextState: (COEditingContext *)ctx
 {
     [NSException raise: NSInvalidArgumentException format: @"override"];
 }

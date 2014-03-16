@@ -75,7 +75,7 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
     [branch setMetadata: _newMetadata];
 }
 
-- (void) addToStoreTransaction: (COStoreTransaction *)txn assumingEditingContextState: (COEditingContext *)ctx
+- (void) addToStoreTransaction: (COStoreTransaction *)txn isUndo: (BOOL)isUndo assumingEditingContextState: (COEditingContext *)ctx
 {
 	[txn setMetadata: _newMetadata forBranch: _branchUUID ofPersistentRoot: _persistentRootUUID];
 }

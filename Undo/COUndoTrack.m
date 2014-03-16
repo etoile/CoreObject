@@ -502,24 +502,8 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 - (void) doCommand: (COCommandGroup *)aCommand inverse: (BOOL)inverse addToStoreTransaction: (COStoreTransaction *)txn
 {
 	COCommandGroup *commandToApply = (inverse ? [aCommand inverse] : aCommand);
-//	[commandToApply applyToContext: _editingContext];
-	[commandToApply addToStoreTransaction: txn assumingEditingContextState: _editingContext];
-	
-
-	
-    // N.B. This must not automatically push a revision
-//    _editingContext.isRecordingUndo = NO;
-	// TODO: If we can detect a non-selective undo and -commit returns a command,
-	// we could implement -validateUndoCommitWithCommand: to ensure there is no
-	// command COCommandCreatePersistentRoot or COCommandNewRevisionForBranch
-	// that create new revisions in the store.
-//    [_editingContext commitWithIdentifier: inverse ?  @"org.etoile.CoreObject.undo" : @"org.etoile.CoreObject.redo"
-//						  metadata: [commandToApply localizedShortDescription] != nil
-//										? @{ kCOCommitMetadataShortDescriptionArguments : @[[commandToApply localizedShortDescription]] }
-//										: @{}
-//						 undoTrack: nil
-//							 error: NULL];
-//    _editingContext.isRecordingUndo = YES;
+	[commandToApply setParentUndoTrack: self];
+	[commandToApply addToStoreTransaction: txn isUndo: inverse assumingEditingContextState: _editingContext];
 	
 	// Update the current command for this track.
 
@@ -562,10 +546,6 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	}
 	
 	aCommand.parentUndoTrack = self;
-	for (COCommand *childCommand in aCommand.contents)
-	{
-		childCommand.parentUndoTrack = self;
-	}
 	
 	_commandsByUUID[aCommand.UUID] = aCommand;
 }
