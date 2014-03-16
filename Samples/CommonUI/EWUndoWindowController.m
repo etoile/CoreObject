@@ -7,12 +7,10 @@
 
 #import "EWUndoWindowController.h"
 #import "EWGraphRenderer.h"
-#import "TypewriterDocument.h"
 #import <CoreObject/CoreObject.h>
 #import <CoreObject/COCommandGroup.h>
 #import <CoreObject/COCommandSetCurrentVersionForBranch.h>
 #import <CoreObject/COEditingContext+Private.h>
-#import <CoreObject/COAttributedStringDiff.h>
 #import <EtoileFoundation/Macros.h>
 
 @implementation EWUndoWindowController

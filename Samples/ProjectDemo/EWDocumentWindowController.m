@@ -2,7 +2,7 @@
 #import <CoreObject/COSQLiteStore+Graphviz.h>
 #import <CoreObject/COObjectGraphContext+Graphviz.h>
 #import "ApplicationDelegate.h"
-
+#import "EWHistoryWindowController.h"
 
 @interface EWDocumentWindowController ()
 @end
@@ -55,6 +55,9 @@
 
 - (void)windowDidLoad
 {
+	undoManagerBridge = [[EWUndoManager alloc] init];
+	[undoManagerBridge setDelegate: self];
+	
 	[self resetBranchesMenu];
 	[self resetBranchesCheckbox];
 	[self resetTitle];
@@ -308,23 +311,57 @@
 	
 }
 
-- (IBAction) projectDemoUndo: (id)sender
+#pragma mark - NSWindowDelegate
+
+-(NSUndoManager *)windowWillReturnUndoManager:(NSWindow *)window
 {
-    COUndoTrack *stack = [self undoTrack];
-    
-    if ([stack canUndo])
-    {
-        [stack undo];
-    }
+	NSLog(@"asked for undo manager");
+	return (NSUndoManager *)undoManagerBridge;
 }
-- (IBAction) projectDemoRedo: (id)sender
+
+#pragma mark - EWUndoManagerDelegate
+
+- (void) undo
 {
-    COUndoTrack *stack = [self undoTrack];
+	[[self undoTrack] undo];
+}
+
+- (void) redo
+{
+	[[self undoTrack] redo];
+}
+
+- (BOOL) canUndo
+{
+	return [[self undoTrack] canUndo];
+}
+
+- (BOOL) canRedo
+{
+	return [[self undoTrack] canRedo];
+}
+
+- (NSString *) undoMenuItemTitle
+{
+	return [[self undoTrack] undoMenuItemTitle];
+}
+- (NSString *) redoMenuItemTitle
+{
+	return [[self undoTrack] redoMenuItemTitle];
+}
+
+#pragma mark -
+
+- (IBAction)showDocumentHistory:(id)sender
+{
+	if (historyWindowController != nil)
+	{
+		[historyWindowController close];
+	}
 	
-    if ([stack canRedo])
-    {
-        [stack redo];
-    }
+	historyWindowController = [[EWHistoryWindowController alloc] initWithInspectedPersistentRoot: _persistentRoot
+																					   undoTrack: [self undoTrack]];
+	[historyWindowController showWindow: nil];
 }
 
 - (IBAction) branch: (id)sender

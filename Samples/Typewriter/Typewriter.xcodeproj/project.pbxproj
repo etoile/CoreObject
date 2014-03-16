@@ -17,7 +17,6 @@
 		663EFD8118A17FB30030BD2F /* EWDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 663EFD6E18A17FB30030BD2F /* EWDocument.m */; };
 		663EFD8318A17FB30030BD2F /* EWTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 663EFD7218A17FB30030BD2F /* EWTextView.m */; };
 		663EFD8418A17FB30030BD2F /* EWTypewriterWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 663EFD7418A17FB30030BD2F /* EWTypewriterWindowController.m */; };
-		663EFD8518A17FB30030BD2F /* EWUndoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 663EFD7618A17FB30030BD2F /* EWUndoManager.m */; };
 		663EFD8618A17FB30030BD2F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 663EFD7718A17FB30030BD2F /* main.m */; };
 		6642F88418C1471900E30BFF /* EWHistoryWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6642F88318C1471900E30BFF /* EWHistoryWindowController.m */; };
 		6642F88E18C16C2700E30BFF /* History.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6642F88D18C16C2700E30BFF /* History.xib */; };
@@ -25,6 +24,7 @@
 		664CC9F618A4A3FC002F04B7 /* plus_8x8.png in Resources */ = {isa = PBXBuildFile; fileRef = 664CC9F118A4A3FC002F04B7 /* plus_8x8.png */; };
 		664E93B518A1929300261673 /* TypewriterDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 664E93B418A1929300261673 /* TypewriterDocument.m */; };
 		667A9A9018A5A34E009A2F0E /* document_stroke.icns in Resources */ = {isa = PBXBuildFile; fileRef = 667A9A8F18A5A34E009A2F0E /* document_stroke.icns */; };
+		668E942318D57C1400531C43 /* EWUndoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 668E942218D57C1400531C43 /* EWUndoManager.m */; };
 		66A080F118C7C1A50008739A /* EWTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66A080F018C7C1A50008739A /* EWTableView.m */; };
 		66B7DB3518A96FD200010BCB /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 663EFD9318A180170030BD2F /* CoreObject.framework */; };
 		66B7DB3618A96FD400010BCB /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66B7DB2C18A96F9100010BCB /* EtoileFoundation.framework */; };
@@ -48,13 +48,6 @@
 			proxyType = 2;
 			remoteGlobalIDString = 602E12AE18B3A10E004F171B;
 			remoteInfo = "EtoileFoundation (iOS)";
-		};
-		662599EE18B551E400235B65 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 66B7DB2218A96F9100010BCB /* EtoileFoundation.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 602E13A818B3A836004F171B;
-			remoteInfo = "PlugInExample (iOS)";
 		};
 		663EFD9218A180170030BD2F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -90,6 +83,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 6686BDAB12592BDA0065DE1A;
 			remoteInfo = CoreObject;
+		};
+		668E941F18D57C0600531C43 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 66B7DB2218A96F9100010BCB /* EtoileFoundation.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 609A557718C209FE0096927F;
+			remoteInfo = "TestEtoileFoundation (iOS)";
 		};
 		66B7DB2918A96F9100010BCB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -164,8 +164,6 @@
 		663EFD7218A17FB30030BD2F /* EWTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWTextView.m; sourceTree = SOURCE_ROOT; };
 		663EFD7318A17FB30030BD2F /* EWTypewriterWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWTypewriterWindowController.h; sourceTree = SOURCE_ROOT; };
 		663EFD7418A17FB30030BD2F /* EWTypewriterWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWTypewriterWindowController.m; sourceTree = SOURCE_ROOT; };
-		663EFD7518A17FB30030BD2F /* EWUndoManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWUndoManager.h; sourceTree = SOURCE_ROOT; };
-		663EFD7618A17FB30030BD2F /* EWUndoManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWUndoManager.m; sourceTree = SOURCE_ROOT; };
 		663EFD7718A17FB30030BD2F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = SOURCE_ROOT; };
 		663EFD7818A17FB30030BD2F /* Typewriter-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Typewriter-Info.plist"; sourceTree = SOURCE_ROOT; };
 		663EFD7918A17FB30030BD2F /* Typewriter-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Typewriter-Prefix.pch"; sourceTree = SOURCE_ROOT; };
@@ -180,6 +178,8 @@
 		664E93B318A1929300261673 /* TypewriterDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TypewriterDocument.h; sourceTree = "<group>"; };
 		664E93B418A1929300261673 /* TypewriterDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TypewriterDocument.m; sourceTree = "<group>"; };
 		667A9A8F18A5A34E009A2F0E /* document_stroke.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = document_stroke.icns; sourceTree = "<group>"; };
+		668E942118D57C1400531C43 /* EWUndoManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWUndoManager.h; path = ../CommonUI/EWUndoManager.h; sourceTree = "<group>"; };
+		668E942218D57C1400531C43 /* EWUndoManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWUndoManager.m; path = ../CommonUI/EWUndoManager.m; sourceTree = "<group>"; };
 		66A080EF18C7C1A50008739A /* EWTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWTableView.h; sourceTree = SOURCE_ROOT; };
 		66A080F018C7C1A50008739A /* EWTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWTableView.m; sourceTree = SOURCE_ROOT; };
 		66B7DB1C18A96F2900010BCB /* EtoileFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EtoileFoundation.framework; path = "../../../../../../../../Library/Developer/Xcode/DerivedData/Typewriter-ewqruishaxmvlhhefeyihtxobbmk/Build/Products/Debug/EtoileFoundation.framework"; sourceTree = "<group>"; };
@@ -268,8 +268,6 @@
 				662599F118B5776300235B65 /* PrioritySplitViewDelegate.m */,
 				663EFD7318A17FB30030BD2F /* EWTypewriterWindowController.h */,
 				663EFD7418A17FB30030BD2F /* EWTypewriterWindowController.m */,
-				663EFD7518A17FB30030BD2F /* EWUndoManager.h */,
-				663EFD7618A17FB30030BD2F /* EWUndoManager.m */,
 				663EFD7718A17FB30030BD2F /* main.m */,
 				663EFD7818A17FB30030BD2F /* Typewriter-Info.plist */,
 				663EFD7918A17FB30030BD2F /* Typewriter-Prefix.pch */,
@@ -335,7 +333,7 @@
 				66B7DB2E18A96F9100010BCB /* TestEtoileFoundation.bundle */,
 				66B7DB3018A96F9100010BCB /* PlugInExample.plugin */,
 				662599ED18B551E400235B65 /* libEtoileFoundation.a */,
-				662599EF18B551E400235B65 /* PlugInExample.plugin */,
+				668E942018D57C0600531C43 /* TestEtoileFoundation.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -353,6 +351,8 @@
 				6642F88318C1471900E30BFF /* EWHistoryWindowController.m */,
 				66EDFEBF18ABFF9E00B29CFE /* EWUtilityWindowController.h */,
 				66EDFEC018ABFF9E00B29CFE /* EWUtilityWindowController.m */,
+				668E942118D57C1400531C43 /* EWUndoManager.h */,
+				668E942218D57C1400531C43 /* EWUndoManager.m */,
 				6642F88D18C16C2700E30BFF /* History.xib */,
 				66EDFEC118ABFF9E00B29CFE /* Undo.xib */,
 			);
@@ -426,13 +426,6 @@
 			remoteRef = 662599EC18B551E400235B65 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		662599EF18B551E400235B65 /* PlugInExample.plugin */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = PlugInExample.plugin;
-			remoteRef = 662599EE18B551E400235B65 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
 		663EFD9318A180170030BD2F /* CoreObject.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -459,6 +452,13 @@
 			fileType = "compiled.mach-o.executable";
 			path = BasicPersistence;
 			remoteRef = 663EFD9818A180170030BD2F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		668E942018D57C0600531C43 /* TestEtoileFoundation.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = TestEtoileFoundation.app;
+			remoteRef = 668E941F18D57C0600531C43 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 		66B7DB2A18A96F9100010BCB /* EtoileXML.framework */ = {
@@ -518,13 +518,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				6642F88418C1471900E30BFF /* EWHistoryWindowController.m in Sources */,
-				663EFD8518A17FB30030BD2F /* EWUndoManager.m in Sources */,
 				662599E318B551E400235B65 /* EWGraphCell.m in Sources */,
 				66A080F118C7C1A50008739A /* EWTableView.m in Sources */,
 				662599E218B551E400235B65 /* EWGraphRenderer.m in Sources */,
 				66EDFEC218ABFF9E00B29CFE /* EWUndoWindowController.m in Sources */,
 				663EFD8418A17FB30030BD2F /* EWTypewriterWindowController.m in Sources */,
 				663EFD8118A17FB30030BD2F /* EWDocument.m in Sources */,
+				668E942318D57C1400531C43 /* EWUndoManager.m in Sources */,
 				664E93B518A1929300261673 /* TypewriterDocument.m in Sources */,
 				66EDFED218ACA7AD00B29CFE /* EWTagListDataSource.m in Sources */,
 				66EDFEDB18ACA7BC00B29CFE /* EWNoteListDataSource.m in Sources */,

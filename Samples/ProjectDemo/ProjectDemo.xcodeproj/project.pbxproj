@@ -57,23 +57,19 @@
 		6627EEDD1278A55A00E06946 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 6627EEDC1278A55A00E06946 /* README.md */; };
 		662C2B78182431EC00ED975F /* SharingSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 662C2B77182431EC00ED975F /* SharingSession.m */; };
 		6638C026181852FD008341E6 /* ProjectNav.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6638C025181852FD008341E6 /* ProjectNav.xib */; };
-		663EFCD7189F90FF0030BD2F /* EWGraphLabelCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 663EFCD6189F90FF0030BD2F /* EWGraphLabelCell.m */; };
 		664697F417CFF82100A1B767 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 664697EA17CFF7FD00A1B767 /* CoreObject.framework */; };
 		6646980617CFF8AA00A1B767 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 664697FF17CFF8A200A1B767 /* EtoileFoundation.framework */; };
 		6646987F17D3FF6500A1B767 /* DocumentItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646987E17D3FF6000A1B767 /* DocumentItem.m */; };
 		6646988717D407A400A1B767 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6646988617D407A000A1B767 /* AppKit.framework */; };
+		66488DC718D57DF9009F4C55 /* EWUndoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 66488DC618D57DF9009F4C55 /* EWUndoManager.m */; };
 		66568C6A189399A80075FD9A /* TODO.md in Resources */ = {isa = PBXBuildFile; fileRef = 66568C69189399A80075FD9A /* TODO.md */; };
-		665D41E9182868840044E6B9 /* EWUndoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 665D41E7182868840044E6B9 /* EWUndoWindowController.m */; };
-		665D41EA182868840044E6B9 /* Undo.xib in Resources */ = {isa = PBXBuildFile; fileRef = 665D41E8182868840044E6B9 /* Undo.xib */; };
 		66708F9C12486F0400E65F00 /* ProjectDemoMainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* ProjectDemoMainMenu.xib */; };
 		66708F9F12486F0400E65F00 /* OutlineWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66708F9412486E9D00E65F00 /* OutlineWindow.xib */; };
 		66708FAB12486F0400E65F00 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		66708FB312486F0400E65F00 /* OutlineController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66708F7212486CD300E65F00 /* OutlineController.m */; };
 		667090011248726900E65F00 /* OutlineInspector.xib in Resources */ = {isa = PBXBuildFile; fileRef = 667090001248726900E65F00 /* OutlineInspector.xib */; };
 		667C6C7B181AF40400BDD213 /* EWBranchesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C6C72181AF40400BDD213 /* EWBranchesWindowController.m */; };
-		667C6C7F181AF40400BDD213 /* EWUtilityWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C6C7A181AF40400BDD213 /* EWUtilityWindowController.m */; };
 		667C6C83181AF44E00BDD213 /* Branches.xib in Resources */ = {isa = PBXBuildFile; fileRef = 667C6C81181AF44E00BDD213 /* Branches.xib */; };
-		667C6C84181AF44E00BDD213 /* History.xib in Resources */ = {isa = PBXBuildFile; fileRef = 667C6C82181AF44E00BDD213 /* History.xib */; };
 		6686B80F125513D80065DE1A /* OutlineItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686B7B11253C1850065DE1A /* OutlineItem.m */; };
 		6686B810125513D80065DE1A /* DrawingItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686B7B61253F44F0065DE1A /* DrawingItem.m */; };
 		6686B811125513D80065DE1A /* TextItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686B7B912550B550065DE1A /* TextItem.m */; };
@@ -87,17 +83,21 @@
 		6686C342125EC5070065DE1A /* ProjectDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 6686C341125EC5070065DE1A /* ProjectDocument.m */; };
 		6689D9891859050600EC48FB /* SharingDrawer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6689D9881859050600EC48FB /* SharingDrawer.xib */; };
 		6689D9921859053E00EC48FB /* SharingDrawerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6689D9911859053E00EC48FB /* SharingDrawerViewController.m */; };
+		668E940E18D579CF00531C43 /* EWGraphCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 668E940318D579CF00531C43 /* EWGraphCell.m */; };
+		668E940F18D579CF00531C43 /* EWGraphRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 668E940518D579CF00531C43 /* EWGraphRenderer.m */; };
+		668E941018D579CF00531C43 /* EWHistoryWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 668E940718D579CF00531C43 /* EWHistoryWindowController.m */; };
+		668E941118D579CF00531C43 /* EWUndoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 668E940918D579CF00531C43 /* EWUndoWindowController.m */; };
+		668E941218D579CF00531C43 /* EWUtilityWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 668E940B18D579CF00531C43 /* EWUtilityWindowController.m */; };
+		668E941318D579CF00531C43 /* History.xib in Resources */ = {isa = PBXBuildFile; fileRef = 668E940C18D579CF00531C43 /* History.xib */; };
+		668E941418D579CF00531C43 /* Undo.xib in Resources */ = {isa = PBXBuildFile; fileRef = 668E940D18D579CF00531C43 /* Undo.xib */; };
 		66A313611828C5CA00CE0B0D /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 66A3135F1828C5CA00CE0B0D /* Commits */; };
 		66C33D71128F395400E5B15B /* ItemReference.m in Resources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66C33D90128F449400E5B15B /* ItemReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66C3F7F1183EB6BA0044F5E1 /* EWDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3F7F0183EB6BA0044F5E1 /* EWDocumentWindowController.m */; };
 		66CA1844181A3E5B00DE6AFB /* Search.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66CA1843181A3E5B00DE6AFB /* Search.xib */; };
 		66CA184E181A3F4F00DE6AFB /* SearchWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66CA184D181A3F4F00DE6AFB /* SearchWindowController.m */; };
-		66D73787182597330023692B /* EWHistoryWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C6C78181AF40400BDD213 /* EWHistoryWindowController.m */; };
-		66D737881825973A0023692B /* EWGraphRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 667C6C74181AF40400BDD213 /* EWGraphRenderer.m */; };
 		66DBB3781813B1A80047301A /* PreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66DBB3771813B1A80047301A /* PreferencesController.m */; };
 		66DBB3831813B1BB0047301A /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66DBB3821813B1BB0047301A /* Preferences.xib */; };
-		66F1800918890E040046A951 /* EWGraphCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 66F1800818890E040046A951 /* EWGraphCell.m */; };
 		7991190512CD3D75009D28C0 /* ProjectNavWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7991190412CD3D75009D28C0 /* ProjectNavWindowController.m */; };
 		7991191512CD3F3C009D28C0 /* 2560x1600.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 7991191412CD3F3C009D28C0 /* 2560x1600.jpg */; };
 		7991198A12CD4B72009D28C0 /* stamp.png in Resources */ = {isa = PBXBuildFile; fileRef = 7991198912CD4B72009D28C0 /* stamp.png */; };
@@ -193,6 +193,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = 603647AB0E409244003377E0;
 			remoteInfo = EtoileFoundation;
+		};
+		668E93FD18D579A300531C43 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 664697F517CFF8A100A1B767 /* EtoileFoundation.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 602E12AE18B3A10E004F171B;
+			remoteInfo = "EtoileFoundation (iOS)";
+		};
+		668E93FF18D579A300531C43 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 664697F517CFF8A100A1B767 /* EtoileFoundation.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 609A557718C209FE0096927F;
+			remoteInfo = "TestEtoileFoundation (iOS)";
 		};
 		66DBB37D1813B1A90047301A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -321,32 +335,22 @@
 		662C2B76182431EC00ED975F /* SharingSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingSession.h; sourceTree = "<group>"; };
 		662C2B77182431EC00ED975F /* SharingSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingSession.m; sourceTree = "<group>"; };
 		6638C025181852FD008341E6 /* ProjectNav.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProjectNav.xib; sourceTree = "<group>"; };
-		663EFCD5189F90FF0030BD2F /* EWGraphLabelCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWGraphLabelCell.h; sourceTree = "<group>"; };
-		663EFCD6189F90FF0030BD2F /* EWGraphLabelCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWGraphLabelCell.m; sourceTree = "<group>"; };
 		664697DD17CFF76200A1B767 /* ProjectDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ProjectDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		664697DF17CFF7FC00A1B767 /* CoreObject.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = CoreObject.xcodeproj; path = ../../CoreObject.xcodeproj; sourceTree = "<group>"; };
 		664697F517CFF8A100A1B767 /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = ../../../EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
 		6646987D17D3FF5B00A1B767 /* DocumentItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DocumentItem.h; sourceTree = "<group>"; };
 		6646987E17D3FF6000A1B767 /* DocumentItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DocumentItem.m; sourceTree = "<group>"; };
 		6646988617D407A000A1B767 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = ../../../../../../System/Library/Frameworks/AppKit.framework; sourceTree = "<group>"; };
+		66488DC518D57DF9009F4C55 /* EWUndoManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWUndoManager.h; sourceTree = "<group>"; };
+		66488DC618D57DF9009F4C55 /* EWUndoManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWUndoManager.m; sourceTree = "<group>"; };
 		66568C69189399A80075FD9A /* TODO.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO.md; sourceTree = "<group>"; };
-		665D41E6182868840044E6B9 /* EWUndoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWUndoWindowController.h; sourceTree = "<group>"; };
-		665D41E7182868840044E6B9 /* EWUndoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWUndoWindowController.m; sourceTree = "<group>"; };
-		665D41E8182868840044E6B9 /* Undo.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Undo.xib; sourceTree = "<group>"; };
 		66708F7112486CD300E65F00 /* OutlineController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutlineController.h; sourceTree = "<group>"; };
 		66708F7212486CD300E65F00 /* OutlineController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OutlineController.m; sourceTree = "<group>"; };
 		66708F9412486E9D00E65F00 /* OutlineWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OutlineWindow.xib; sourceTree = "<group>"; };
 		667090001248726900E65F00 /* OutlineInspector.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OutlineInspector.xib; sourceTree = "<group>"; };
 		667C6C71181AF40400BDD213 /* EWBranchesWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWBranchesWindowController.h; sourceTree = "<group>"; };
 		667C6C72181AF40400BDD213 /* EWBranchesWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWBranchesWindowController.m; sourceTree = "<group>"; };
-		667C6C73181AF40400BDD213 /* EWGraphRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWGraphRenderer.h; sourceTree = "<group>"; };
-		667C6C74181AF40400BDD213 /* EWGraphRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWGraphRenderer.m; sourceTree = "<group>"; };
-		667C6C77181AF40400BDD213 /* EWHistoryWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWHistoryWindowController.h; sourceTree = "<group>"; };
-		667C6C78181AF40400BDD213 /* EWHistoryWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWHistoryWindowController.m; sourceTree = "<group>"; };
-		667C6C79181AF40400BDD213 /* EWUtilityWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWUtilityWindowController.h; sourceTree = "<group>"; };
-		667C6C7A181AF40400BDD213 /* EWUtilityWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWUtilityWindowController.m; sourceTree = "<group>"; };
 		667C6C81181AF44E00BDD213 /* Branches.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Branches.xib; sourceTree = "<group>"; };
-		667C6C82181AF44E00BDD213 /* History.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = History.xib; sourceTree = "<group>"; };
 		6686B7B01253C1850065DE1A /* OutlineItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutlineItem.h; sourceTree = "<group>"; };
 		6686B7B11253C1850065DE1A /* OutlineItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OutlineItem.m; sourceTree = "<group>"; };
 		6686B7B51253F44F0065DE1A /* DrawingItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawingItem.h; sourceTree = "<group>"; };
@@ -370,6 +374,18 @@
 		6689D9881859050600EC48FB /* SharingDrawer.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SharingDrawer.xib; sourceTree = "<group>"; };
 		6689D9901859053E00EC48FB /* SharingDrawerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SharingDrawerViewController.h; sourceTree = "<group>"; };
 		6689D9911859053E00EC48FB /* SharingDrawerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharingDrawerViewController.m; sourceTree = "<group>"; };
+		668E940218D579CF00531C43 /* EWGraphCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWGraphCell.h; sourceTree = "<group>"; };
+		668E940318D579CF00531C43 /* EWGraphCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWGraphCell.m; sourceTree = "<group>"; };
+		668E940418D579CF00531C43 /* EWGraphRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWGraphRenderer.h; sourceTree = "<group>"; };
+		668E940518D579CF00531C43 /* EWGraphRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWGraphRenderer.m; sourceTree = "<group>"; };
+		668E940618D579CF00531C43 /* EWHistoryWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWHistoryWindowController.h; sourceTree = "<group>"; };
+		668E940718D579CF00531C43 /* EWHistoryWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWHistoryWindowController.m; sourceTree = "<group>"; };
+		668E940818D579CF00531C43 /* EWUndoWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWUndoWindowController.h; sourceTree = "<group>"; };
+		668E940918D579CF00531C43 /* EWUndoWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWUndoWindowController.m; sourceTree = "<group>"; };
+		668E940A18D579CF00531C43 /* EWUtilityWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWUtilityWindowController.h; sourceTree = "<group>"; };
+		668E940B18D579CF00531C43 /* EWUtilityWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWUtilityWindowController.m; sourceTree = "<group>"; };
+		668E940C18D579CF00531C43 /* History.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = History.xib; sourceTree = "<group>"; };
+		668E940D18D579CF00531C43 /* Undo.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Undo.xib; sourceTree = "<group>"; };
 		6698320312691F970011C7FC /* SCRATCHPAD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SCRATCHPAD; sourceTree = "<group>"; };
 		66A313601828C5CA00CE0B0D /* English */ = {isa = PBXFileReference; lastKnownFileType = folder; name = English; path = English.lproj/Commits; sourceTree = "<group>"; };
 		66A313621828C5D600CE0B0D /* org.etoile.ProjectDemo.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = org.etoile.ProjectDemo.json; path = English.lproj/Commits/org.etoile.ProjectDemo.json; sourceTree = "<group>"; };
@@ -409,8 +425,6 @@
 		66DBB3761813B1A80047301A /* PreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesController.h; sourceTree = "<group>"; };
 		66DBB3771813B1A80047301A /* PreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesController.m; sourceTree = "<group>"; };
 		66DBB3821813B1BB0047301A /* Preferences.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = "<group>"; };
-		66F1800718890E040046A951 /* EWGraphCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWGraphCell.h; sourceTree = "<group>"; };
-		66F1800818890E040046A951 /* EWGraphCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWGraphCell.m; sourceTree = "<group>"; };
 		7991190312CD3D75009D28C0 /* ProjectNavWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectNavWindowController.h; sourceTree = "<group>"; };
 		7991190412CD3D75009D28C0 /* ProjectNavWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectNavWindowController.m; sourceTree = "<group>"; };
 		7991191412CD3F3C009D28C0 /* 2560x1600.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = 2560x1600.jpg; path = Images/2560x1600.jpg; sourceTree = "<group>"; };
@@ -462,6 +476,7 @@
 				6612114C1821A3D5003AEC29 /* XMPPFramework */,
 				66708FEF124870CB00E65F00 /* ProjectDemo */,
 				664697DE17CFF76200A1B767 /* Products */,
+				668E940118D579CF00531C43 /* CommonUI */,
 			);
 			name = ObjectMerging;
 			sourceTree = "<group>";
@@ -751,25 +766,16 @@
 				664697FF17CFF8A200A1B767 /* EtoileFoundation.framework */,
 				6646980117CFF8A200A1B767 /* TestEtoileFoundation.bundle */,
 				6646980317CFF8A200A1B767 /* PlugInExample.plugin */,
+				668E93FE18D579A300531C43 /* libEtoileFoundation.a */,
+				668E940018D579A300531C43 /* TestEtoileFoundation.app */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		665D41DF182868300044E6B9 /* Undo Window */ = {
-			isa = PBXGroup;
-			children = (
-				665D41E6182868840044E6B9 /* EWUndoWindowController.h */,
-				665D41E7182868840044E6B9 /* EWUndoWindowController.m */,
-				665D41E8182868840044E6B9 /* Undo.xib */,
-			);
-			name = "Undo Window";
 			sourceTree = "<group>";
 		};
 		66708FEF124870CB00E65F00 /* ProjectDemo */ = {
 			isa = PBXGroup;
 			children = (
 				667C6C80181AF42B00BDD213 /* Branches Window */,
-				665D41DF182868300044E6B9 /* Undo Window */,
 				66E8EE0C12D673BB00780264 /* Search Window */,
 				7991190212CD3D36009D28C0 /* Project Navigator */,
 				66C33DED1290BC7700E5B15B /* Sketch */,
@@ -779,13 +785,10 @@
 				6686B8721255169B0065DE1A /* Drawing Document */,
 				6686B871125516950065DE1A /* Text Document */,
 				6686BFD8125AE74B0065DE1A /* Networking */,
-				6686BF431259476B0065DE1A /* History Inspector */,
 				1DDD58140DA1D0A300B32029 /* ProjectDemoMainMenu.xib */,
 				667090001248726900E65F00 /* OutlineInspector.xib */,
 				66DBB3821813B1BB0047301A /* Preferences.xib */,
 				8D1107310486CEB800E47090 /* ProjectDemo-Info.plist */,
-				667C6C79181AF40400BDD213 /* EWUtilityWindowController.h */,
-				667C6C7A181AF40400BDD213 /* EWUtilityWindowController.m */,
 				66C3F7EF183EB6BA0044F5E1 /* EWDocumentWindowController.h */,
 				66C3F7F0183EB6BA0044F5E1 /* EWDocumentWindowController.m */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
@@ -873,22 +876,6 @@
 			name = "Model Objects";
 			sourceTree = "<group>";
 		};
-		6686BF431259476B0065DE1A /* History Inspector */ = {
-			isa = PBXGroup;
-			children = (
-				667C6C82181AF44E00BDD213 /* History.xib */,
-				667C6C73181AF40400BDD213 /* EWGraphRenderer.h */,
-				667C6C74181AF40400BDD213 /* EWGraphRenderer.m */,
-				667C6C77181AF40400BDD213 /* EWHistoryWindowController.h */,
-				667C6C78181AF40400BDD213 /* EWHistoryWindowController.m */,
-				66F1800718890E040046A951 /* EWGraphCell.h */,
-				66F1800818890E040046A951 /* EWGraphCell.m */,
-				663EFCD5189F90FF0030BD2F /* EWGraphLabelCell.h */,
-				663EFCD6189F90FF0030BD2F /* EWGraphLabelCell.m */,
-			);
-			name = "History Inspector";
-			sourceTree = "<group>";
-		};
 		6686BFD8125AE74B0065DE1A /* Networking */ = {
 			isa = PBXGroup;
 			children = (
@@ -904,6 +891,28 @@
 				6689D9911859053E00EC48FB /* SharingDrawerViewController.m */,
 			);
 			name = Networking;
+			sourceTree = "<group>";
+		};
+		668E940118D579CF00531C43 /* CommonUI */ = {
+			isa = PBXGroup;
+			children = (
+				668E940218D579CF00531C43 /* EWGraphCell.h */,
+				668E940318D579CF00531C43 /* EWGraphCell.m */,
+				668E940418D579CF00531C43 /* EWGraphRenderer.h */,
+				668E940518D579CF00531C43 /* EWGraphRenderer.m */,
+				668E940618D579CF00531C43 /* EWHistoryWindowController.h */,
+				668E940718D579CF00531C43 /* EWHistoryWindowController.m */,
+				668E940818D579CF00531C43 /* EWUndoWindowController.h */,
+				668E940918D579CF00531C43 /* EWUndoWindowController.m */,
+				668E940A18D579CF00531C43 /* EWUtilityWindowController.h */,
+				668E940B18D579CF00531C43 /* EWUtilityWindowController.m */,
+				66488DC518D57DF9009F4C55 /* EWUndoManager.h */,
+				66488DC618D57DF9009F4C55 /* EWUndoManager.m */,
+				668E940C18D579CF00531C43 /* History.xib */,
+				668E940D18D579CF00531C43 /* Undo.xib */,
+			);
+			name = CommonUI;
+			path = ../CommonUI;
 			sourceTree = "<group>";
 		};
 		66C33DED1290BC7700E5B15B /* Sketch */ = {
@@ -1098,6 +1107,20 @@
 			remoteRef = 6646980217CFF8A200A1B767 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		668E93FE18D579A300531C43 /* libEtoileFoundation.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libEtoileFoundation.a;
+			remoteRef = 668E93FD18D579A300531C43 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		668E940018D579A300531C43 /* TestEtoileFoundation.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = TestEtoileFoundation.app;
+			remoteRef = 668E93FF18D579A300531C43 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		66DBB37E1813B1A90047301A /* BenchmarkCoreObject */ = {
 			isa = PBXReferenceProxy;
 			fileType = "compiled.mach-o.executable";
@@ -1118,21 +1141,21 @@
 				66708F9C12486F0400E65F00 /* ProjectDemoMainMenu.xib in Resources */,
 				667090011248726900E65F00 /* OutlineInspector.xib in Resources */,
 				667C6C83181AF44E00BDD213 /* Branches.xib in Resources */,
+				668E941318D579CF00531C43 /* History.xib in Resources */,
 				6627EEDD1278A55A00E06946 /* README.md in Resources */,
 				79F122AA128A48DF00EC0255 /* edit-redo.tiff in Resources */,
 				661210F818217955003AEC29 /* AccountBox.xib in Resources */,
 				79F122AB128A48DF00EC0255 /* edit-undo.tiff in Resources */,
 				79F122B1128A49FE00EC0255 /* history.tiff in Resources */,
-				665D41EA182868840044E6B9 /* Undo.xib in Resources */,
 				79F122C4128A4B7800EC0255 /* format-indent-less.tiff in Resources */,
 				79F122C5128A4B7800EC0255 /* format-indent-more.tiff in Resources */,
 				79F122C6128A4B7800EC0255 /* list-add.tiff in Resources */,
 				66C33D71128F395400E5B15B /* ItemReference.m in Resources */,
 				66568C6A189399A80075FD9A /* TODO.md in Resources */,
+				668E941418D579CF00531C43 /* Undo.xib in Resources */,
 				7991191512CD3F3C009D28C0 /* 2560x1600.jpg in Resources */,
 				7991198A12CD4B72009D28C0 /* stamp.png in Resources */,
 				79911A6312CDB215009D28C0 /* Arrow.tiff in Resources */,
-				667C6C84181AF44E00BDD213 /* History.xib in Resources */,
 				66CA1844181A3E5B00DE6AFB /* Search.xib in Resources */,
 				79911A6412CDB215009D28C0 /* Circle.tiff in Resources */,
 				66DBB3831813B1BB0047301A /* Preferences.xib in Resources */,
@@ -1153,8 +1176,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				66D737881825973A0023692B /* EWGraphRenderer.m in Sources */,
-				66D73787182597330023692B /* EWHistoryWindowController.m in Sources */,
 				6612118C1821A482003AEC29 /* DDLog.m in Sources */,
 				79911A4712CDAECD009D28C0 /* SKTCircle.m in Sources */,
 				6612118A1821A482003AEC29 /* DDASLLogger.m in Sources */,
@@ -1168,6 +1189,7 @@
 				661211D01821A568003AEC29 /* XMPPDeprecatedDigestAuthentication.m in Sources */,
 				661211E51821A568003AEC29 /* XMPPStringPrep.m in Sources */,
 				661211E01821A568003AEC29 /* DDList.m in Sources */,
+				668E941018D579CF00531C43 /* EWHistoryWindowController.m in Sources */,
 				79911A4912CDAECD009D28C0 /* SKTGraphic.m in Sources */,
 				79911A4A12CDAECD009D28C0 /* SKTImage.m in Sources */,
 				661212051821B3F6003AEC29 /* NSDate+XMPPDateTimeProfiles.m in Sources */,
@@ -1178,23 +1200,22 @@
 				661210DC18217451003AEC29 /* AccountWindowController.m in Sources */,
 				661211D11821A568003AEC29 /* XMPPDeprecatedPlainAuthentication.m in Sources */,
 				6612118F1821A482003AEC29 /* DispatchQueueLogFormatter.m in Sources */,
+				66488DC718D57DF9009F4C55 /* EWUndoManager.m in Sources */,
 				79911A4C12CDAECD009D28C0 /* SKTRectangle.m in Sources */,
 				661211D91821A568003AEC29 /* XMPPIQ.m in Sources */,
 				79911A4D12CDAECD009D28C0 /* SKTRenderingView.m in Sources */,
-				66F1800918890E040046A951 /* EWGraphCell.m in Sources */,
 				79911A4E12CDAECD009D28C0 /* SKTTextArea.m in Sources */,
 				79911A5012CDAECD009D28C0 /* SKTFoundationExtras.m in Sources */,
 				79911A5112CDAECD009D28C0 /* SKTGraphicView.m in Sources */,
 				661211F91821B216003AEC29 /* XMPPUserMemoryStorageObject.m in Sources */,
-				665D41E9182868840044E6B9 /* EWUndoWindowController.m in Sources */,
 				79911A5212CDAECD009D28C0 /* SKTGridPanelController.m in Sources */,
 				661211891821A482003AEC29 /* DDAbstractDatabaseLogger.m in Sources */,
 				79911A5312CDAECD009D28C0 /* SKTGridView.m in Sources */,
-				663EFCD7189F90FF0030BD2F /* EWGraphLabelCell.m in Sources */,
+				668E940E18D579CF00531C43 /* EWGraphCell.m in Sources */,
 				79911A5412CDAECD009D28C0 /* SKTInspectorController.m in Sources */,
 				661211CF1821A568003AEC29 /* XMPPAnonymousAuthentication.m in Sources */,
 				66C33D90128F449400E5B15B /* ItemReference.m in Sources */,
-				667C6C7F181AF40400BDD213 /* EWUtilityWindowController.m in Sources */,
+				668E941118D579CF00531C43 /* EWUndoWindowController.m in Sources */,
 				6686B80F125513D80065DE1A /* OutlineItem.m in Sources */,
 				6686B810125513D80065DE1A /* DrawingItem.m in Sources */,
 				6686B811125513D80065DE1A /* TextItem.m in Sources */,
@@ -1206,6 +1227,7 @@
 				66708FB312486F0400E65F00 /* OutlineController.m in Sources */,
 				661211E41821A568003AEC29 /* XMPPSRVResolver.m in Sources */,
 				66708FAB12486F0400E65F00 /* main.m in Sources */,
+				668E940F18D579CF00531C43 /* EWGraphRenderer.m in Sources */,
 				6686B814125513D80065DE1A /* ApplicationDelegate.m in Sources */,
 				661211881821A482003AEC29 /* GCDAsyncSocket.m in Sources */,
 				661211D41821A568003AEC29 /* XMPPXFacebookPlatformAuthentication.m in Sources */,
@@ -1229,6 +1251,7 @@
 				66C3F7F1183EB6BA0044F5E1 /* EWDocumentWindowController.m in Sources */,
 				661211D21821A568003AEC29 /* XMPPDigestMD5Authentication.m in Sources */,
 				661211DF1821A568003AEC29 /* XMPPStream.m in Sources */,
+				668E941218D579CF00531C43 /* EWUtilityWindowController.m in Sources */,
 				661211D71821A568003AEC29 /* NSXMLElement+XMPP.m in Sources */,
 				79911A0912CD974A009D28C0 /* Application.m in Sources */,
 				79FC089012DBE8E300DE3C18 /* TagWindowController.m in Sources */,

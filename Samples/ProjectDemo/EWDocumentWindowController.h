@@ -4,8 +4,10 @@
 #import "SharingSession.h"
 #import "EWDocumentWindowController.h"
 #import "SharingDrawerViewController.h"
+#import "EWUndoManager.h"
+#import "EWHistoryWindowController.h"
 
-@interface EWDocumentWindowController : NSWindowController <NSWindowDelegate>
+@interface EWDocumentWindowController : NSWindowController <NSWindowDelegate, EWUndoManagerDelegate>
 {
 	/**
 	 * Is this the primary window for the persistent root?
@@ -27,6 +29,10 @@
 	IBOutlet NSButton *defaultBranchCheckBox;
 	
 	COUndoTrack *_undoTrack;
+	
+	EWUndoManager *undoManagerBridge;
+	
+	EWHistoryWindowController *historyWindowController;
 }
 
 - (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
@@ -109,7 +115,7 @@
 - (IBAction) showGraphvizHistoryGraph: (id)sender;
 - (IBAction) showGraphvizItemGraph: (id)sender;
 
-- (IBAction) history: (id)sender;
+- (IBAction) showDocumentHistory:(id)sender;
 
 - (IBAction) shareWith: (id)sender;
 

@@ -2,6 +2,7 @@
 #import <CoreObject/CoreObject.h>
 #import <EtoileFoundation/Macros.h>
 #import "ProjectDocument.h"
+#import "EWDocumentWindowController.h"
 
 @implementation EWBranchesWindowController
 
