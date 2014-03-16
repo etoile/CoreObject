@@ -25,7 +25,7 @@
 
 - (NSString *) prettyPrintBranch: (COBranch *)aBranch
 {
-	NSString *prootLabel = aBranch.persistentRoot.metadata[@"documentName"];
+	NSString *prootLabel = aBranch.persistentRoot.name;
 	NSString *branchLabel = aBranch.label;
 	NSString *type = (aBranch.isCurrentBranch) ? @"current" : @"head";
 	

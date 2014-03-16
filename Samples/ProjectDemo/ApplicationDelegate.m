@@ -128,7 +128,7 @@
 {
 	for (COPersistentRoot *persistentRoot in context.persistentRoots)
 	{
-		if ([persistentRoot.metadata[@"documentName"] isEqualToString: aName])
+		if ([persistentRoot.name isEqualToString: aName])
 			return YES;
 	}
 	return NO;
@@ -155,8 +155,7 @@
     COPersistentRoot *persistentRoot = [context insertNewPersistentRootWithEntityName: @"Anonymous.Document"];
     assert(persistentRoot != nil);
     
-	// FIXME: Merge with old metadata dictionary
-	persistentRoot.metadata = @{ @"documentName" : [self untitledDocumentName] };
+	persistentRoot.name = [self untitledDocumentName];
 	
 	persistentRoot.currentBranch.label = @"Initial Branch";
 	
@@ -199,11 +198,8 @@
 		COPersistentRoot *persistentRoot = [[wc editingBranch] makePersistentRootCopy];
 		assert(persistentRoot != nil);
 
-		NSString *oldDocName = wc.persistentRoot.metadata[@"documentName"];
-		NSMutableDictionary *md = [NSMutableDictionary dictionaryWithDictionary: persistentRoot.metadata];
-		md[@"documentName"] = [NSString stringWithFormat: @"Copy of %@", oldDocName];
-		persistentRoot.metadata = md;
-		
+		NSString *oldDocName = wc.persistentRoot.name;
+		persistentRoot.name = [NSString stringWithFormat: @"Copy of %@", oldDocName];
 		persistentRoot.currentBranch.label = @"Initial Branch";
 		
 		Document *doc = persistentRoot.rootObject;

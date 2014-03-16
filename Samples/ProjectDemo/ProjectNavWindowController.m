@@ -98,7 +98,7 @@
 	
 	if ([item isKindOfClass: [Document class]])
 	{
-		return [[[item persistentRoot] metadata] valueForKey: @"documentName"];
+		return [[item persistentRoot] name];
 	}
 	return @"?";
 }
