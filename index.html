@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CoreObject</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/coreobject.css" rel="stylesheet">
+
+	<link href='http://fonts.googleapis.com/css?family=Raleway:400,100,200,300,500,600,700,900,800' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Raleway+Dots' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,800,300' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+  
+  <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="index.html">CoreObject</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav" id="menu">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#download">Download</a></li>
+            <li><a href="http://etoileos.com/dev/api/CoreObject/">Documentation</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+
+      </div>
+    </div>
+
+	<div id="content">
+
+	<div class="container">
+		<div class="jumbotron" id="splash">
+	<!--<div class="container-full" id="splash">
+	<div class="container">-->
+			<h1>Distributed version control<br>+<br> Object persistence</h1>
+		</div>
+	</div>
+
+	<div class="container-full" id="introduction">
+	<div class="container" >
+		<div class="row">
+			<div class="col-md-5">
+			</div>
+			<div class="col-md-6">
+				<div id="splashline">CoreObject is a <em>version-controlled object database</em>, designed to be a humane persistence layer for applications with a <span class="highlighted-text">"never lose any work"</span> philosophy.</div>
+			</div>
+			<div class="col-md-1">
+			</div>
+		</div>
+	</div>
+	</div>
+
+	<div class="container" id="userexperience">
+		<h1>User Experience</h1>
+		<div class="tagline">CoreObject came from imagining how we would apply <em>first principles of UI design</em> to <span class="highlighted-text">graphics and productivity applications</span> in a legacy-free world.</div>
+
+		<div class="row inner-row">
+			<div class="col-md-1"></div>
+			<div class="col-md-5">
+				<h2>Simple</h2>
+				<ul>
+					<li>no save command, and never lose even one keystroke</li>
+					<li>we can go back anywhere in the past instantly</li>
+					<li>document variations or branches (and possibility to convert copies into branches and vice-versa)</li>
+					<li>the history can be navigated at various granularities (document, activity etc.)</li>
+				</ul>
+			</div>
+			<div class="col-md-5">
+				<h2>Resilient</h2>
+				<ul>
+					<li>everything can be undone even deletion, copy, undo etc.</li>
+					<li>any change can be cancelled individually in the history (no matter how big is the history)</li>
+					<li>undo/redo persistent across application restart</li>
+					<li>merging support that doesn't require use to look at a textual merge</li>
+				</ul>
+			</div>
+				<div class="col-md-1"></div>
+		</div>
+					<div class="small-tagline">Our idea is to go a step futher in term of persistency, by including notions such as <em>document/data structuration and organization, collaborative editing, undo/redo and revision control</em> directly into CoreObject, to give the possibility to support them <span class="highlighted-text">easily in all applications</span>, rather than restrict them to just few applications, that always end up reinventing the wheels in incompatible ways.</div>
+		<div class="row">
+			<div class="col-md-1"></div>
+			<div class="col-md-5">
+
+			</div>
+			<div class="col-md-5">
+				<h2>Open</h2>
+					<ul>
+					<li>collaborative editing</li>
+					<li>concurrent editing accross multiple applications, with updates propagated transparently to every working copies in memory</li>
+					<li>easy data sharing accross multiple applications</li>
+					<li>everything is searchable in the present and in the past</li>
+					<li>a UI toolkit or compound document model can be written on top</li>
+				</ul>
+			</div>
+			<div class="col-md-1"></div>
+		</div>
+
+		</div>
+	</div>
+
+	<div class="container-full" id="features">
+	<div class="container">
+    <h1>Features</h1>
+		<div class="tagline">CoreObject is a <em>pragmatic OODB</em> built on top of a <span class="highlighted-text">SQL database</span> that rethinks ideas from various horizons.</div>
+		<div class="row">
+			<div class="col-md-4">
+			<h2>Revision Control</h2>
+				<ul>
+					<li>Distributed Revision Control based on an Object Graph Diff Model</li>
+					<li>Semantic Merging</li>
+					<li>Pervasive Undo/Redo</li>
+					<li>Muliple Undo or History Views over one or several Documents</li>
+					<li>Selective Undo (each change can be cancelled individually)</li>
+				</ul>
+			</div>
+			<div class="col-md-4">
+			<h2>Object Model</h2>
+				<ul>
+					<li>Versatile Object Model with rich Relationship support</li>
+					<li>Flexible Storage Model with Documents and Branches backed by a Store (Documents are similar to Git repositories)</li>
+					<li>Stable Serialization Format with Integrity Checking</li>
+					<li>Optional Organizational Model with Tags and Libraries</li>
+				</ul>
+			</div>
+			<div class="col-md-4">
+			<h2>And More…</h2>
+				<ul>
+					<li>Relationships accross Documents and Branches</li>
+					<li>Transparent Object Graph Copy</li>
+					<li>Document Cheap Copy (a copy consumes no space)</li>
+					<li>Real-time Collaborative Editing with full Undo support per User</li>
+					<li>Built-in Indexing and Search including over the history</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	</div>
+
+	<div class="container" id="overall-design">
+    <h1>Framework</h1>
+	<ul>
+		<li>Small Code Base (around 20 000 loc)</li>
+		<li>Pretty Large Test suite (over 3500 tests)</li>
+		<li>High Quality API documentation</li>
+		<li>Good Debugging Support (e.g. View object graph in memory as PDF diagram)</li>
+		<li>Minimal dependencies (SQLite and EtoileFoundation)</li>
+		<li>Pervasive UUID use</li>
+		<li>Favor JSON formats</li>
+	</ul>
+	</div>
+
+	<div class="container-full" id="download">
+	<div class="container">
+    <h1>Download</h1>
+		<div class="center-block">
+		<button type="button" class="btn btn-primary btn-lg">
+			<span class="glyphicon glyphicon-circle-arrow-down"></span>CoreObject 0.5
+		</button>
+		<button type="button" class="btn btn-info btn-lg">
+			<span class="glyphicon glyphicon-eye-open"></span>View on Github
+		</button>
+		</div>
+	</div>
+	</div>
+
+	</div> <!-- content-->
+
+    <div id="footer">
+      <div class="container">
+        <p class="text-muted">Copyright 2014 Étoilé. CoreObject is open source and MIT licensed.</p>
+      </div>
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+	
+	<!-- One Page Nav  -->
+	<!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>-->
+	<script type="text/javascript" charset="utf-8" src="js/jquery.scrollTo.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/one-page-nav/jquery.nav.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function()
+{
+	$('#menu').onePageNav({
+		currentClass: 'active'
+	});
+});
+</script>
+
+  </body>
+</html>

@@ -1,0 +1,361 @@
+@font-face {
+	font-family: 'Lobster';
+	src: url('../fonts/Lobster_1.1_-webfont.eot');
+	src: local('☺'), url('../fonts/Lobster_1.1_-webfont.woff') format('woff'), url('../fonts/Lobster_1.1_-webfont.ttf') format('truetype'), url('../fonts/Lobster_1.1_-webfont.svg#webfont30G9S4nm') format('svg');
+	font-weight: normal;
+	font-style: normal; }
+    
+@font-face {
+	font-family: 'RalewayThin';
+	src: url('../fonts/raleway_thin-webfont.eot');
+	src: local('☺'), url('../fonts/raleway_thin-webfont.woff') format('woff'), url('../fonts/raleway_thin-webfont.ttf') format('truetype'), url('../fonts/raleway_thin-webfont.svg#webfont') format('svg');
+	font-weight: normal;
+	font-style: normal; }
+
+@font-face 
+{
+    font-family: 'Sansus';
+    src: url('../fonts/sansus-webissimo-regular-webfont.eot');
+    src: url('../fonts/sansus-webissimo-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/sansus-webissimo-regular-webfont.woff') format('woff'),
+         url('../fonts/sansus-webissimo-regular-webfont.ttf') format('truetype'),
+         url('../fonts/sansus-webissimo-regular-webfont.svg#SansusWebissimoRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face 
+{
+    font-family: 'Collator';
+    src: url('../fonts/collator-webfont.eot');
+    src: url('../fonts/collator-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/collator-webfont.woff') format('woff'),
+         url('../fonts/collator-webfont.ttf') format('truetype'),
+         url('../fonts/collator-webfont.svg#CollatorRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face
+{
+	font-family: 'GothamHTFMedium';
+	src: url('../fonts/gothamhtf-medium-webfont.eot');
+	src: url('../fonts/gothamhtf-medium-webfont.eot?iefix') format('eot'),
+	     url('../fonts/gothamhtf-medium-webfont.woff') format('woff'),
+		 url('../fonts/gothamhtf-medium-webfont.ttf') format('truetype'),
+		 url('../fonts/gothamhtf-medium-webfont.svg#webfont2ghG5I8Y') format('svg');
+	font-weight:normal;font-style: normal
+}
+
+@font-face
+{
+	font-family: 'GothamHTFBold';
+	src: url('../fonts/gothamhtf-bold-webfont.eot');
+	src: url('../fonts/gothamhtf-bold-webfont.eot?iefix') format('eot'),
+	     url('../fonts/gothamhtf-bold-webfont.woff') format('woff'),
+		 url('../fonts/gothamhtf-bold-webfont.ttf') format('truetype'),
+		 url('../fonts/gothamhtf-bold-webfont.svg#webfont0xBiO3b4') format('svg');
+	font-weight: normal;
+	font-style: normal
+}
+
+@font-face{
+	font-family: 'GothamHTFBlack';
+	src: url('../fonts/gothamhtf-black-webfont.eot');
+	src: url('../fonts/gothamhtf-black-webfont.eot?iefix') format('eot'),
+	     url('../fonts/gothamhtf-black-webfont.woff') format('woff'),url('../fonts/gothamhtf-black-webfont.ttf') format('truetype'),
+	     url('../fonts/gothamhtf-black-webfont.svg#webfont0xBiO3b4') format('svg');
+	font-weight: normal;
+	font-style: normal
+}
+
+@import url(http://fonts.googleapis.com/css?family=Ruda:400,900);
+
+/* For the sticky footer */
+html 
+{
+	position: relative;
+	min-height: 100%;
+}
+
+body 
+{
+	padding-top: 80px;
+  	/* Margin bottom by footer height */
+	margin-bottom: 80px;
+	background-color: #f6f6f4;
+	/*background-color: #faf4f1;*/
+	/*background: #f6f6f4;*/
+}
+
+.navbar
+{
+	font-family: 'Open Sans';
+	font-weight: 300;
+	font-size: 16px; 	
+	background-color: #FFFFFF; /* #383428; */ /*#f6f6f4;*/
+	opacity: 0.97;
+}
+
+.navbar-brand
+{
+	font-family: 'Lobster';
+	font-weight: 200;
+	font-size: 24px;
+}
+
+.jumbotron
+{
+	background-color: 0;
+}
+
+.container p
+{
+	font-family: 'Open Sans', sans-serif;
+	font-size: 14px;
+	/*font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;*/
+}
+
+.tagline
+{
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 500;
+	font-size: 20px;
+	padding-bottom: 80px;
+}
+
+.small-tagline
+{
+	margin-top: 40px;
+
+	text-align: center;
+	line-height: 230%;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 500;
+	font-size: 14px;
+	padding-bottom: 30px;
+}
+
+.highlighted-text
+{
+	text-style: bold;
+	color: #ef4832;
+}
+
+/*#content .container ul
+{
+    list-style: none;
+	
+	color: #686868;
+}
+
+#content .container > ul
+{
+    list-style: none;
+    padding:0;
+    margin:0;
+	
+	margin-top: 30px;
+}
+
+#content .container li
+{
+    padding-left: 1em; 
+    text-indent: -.7em;
+
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 400;
+	font-size: 13px;
+	margin-top: .5em;
+	margin-bottom: .5em;
+}
+
+#content .container li:before 
+{
+    content: "• ";
+    color: #F8F8FF;
+}*/
+
+.container h1
+{
+	padding-bottom: 20px;
+
+	text-align: center;
+	font-family: 'Raleway';
+	font-weight: 100;
+	font-size: 32px;
+}
+
+.container-full h1
+{
+	text-transform:uppercase;
+}
+
+#splash
+{
+	background-color: rgba(255, 204, 2, 0.44);
+}
+
+#splash h1
+{
+	text-align: center;
+	font-family: 'Raleway Dots';
+	font-weight: 100;
+	font-size: 64px;
+}
+
+#splashline
+{
+	text-align: right;
+	font-family: 'Raleway';
+	font-weight: 400;
+	font-size: 16px;
+	color: #585858;
+}
+
+#splashline em
+{
+	font-style: normal;
+	color: #111;
+	background-color: #AEE4FF;
+	opacity: 0.8;
+}
+
+#introduction
+{
+	border-bottom: dotted 1px lightgray;
+}
+
+#userexperience
+{
+	padding-top: 40px;
+	padding-bottom: 80px;
+}
+
+#userexperience h2
+{
+	margin-top: 0px;
+
+	text-align: left;
+	text-transform: uppercase;
+	font-family: 'Raleway';
+	font-weight: 700;
+	font-size: 22px;
+	color: #585858;
+}
+
+#userexperience .inner-row
+{
+	margin-bottom: 20px;
+}
+
+#userexperience ul
+{
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+ 
+ 	color: #686868;
+}
+
+#userexperience li
+{
+	margin-top: .5em;
+	margin-bottom: .5em;
+
+	/*text-transform: capitalize;*/
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 400;
+	font-size: 13px;
+
+}
+
+#features h2
+{
+	margin-top: 0px;
+
+	text-align: left;
+	text-transform: uppercase;
+	font-family: 'Raleway';
+	font-weight: 700;
+	font-size: 22px;
+	color: white;
+}
+
+#features ul
+{
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+ 
+ 	color: #686868;
+}
+
+#features li
+{
+	margin-top: .5em;
+	margin-bottom: .5em;
+
+	/*text-transform: capitalize;*/
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 400;
+	font-size: 13px;
+
+}
+
+#splashline
+{
+	padding-bottom: 30px;
+}
+
+#features 
+{
+	margin: 0 auto;
+	width: 100%;
+	background-color: #6cf;
+	padding-top: 40px;
+	padding-bottom: 80px;
+}
+
+.container-full h1
+{
+	color: #F8F8FF;
+}
+
+#overall-design
+{
+	padding-top: 30px;
+	padding-bottom: 70px;
+}
+
+#download
+{
+	background-color: #ef4832;
+	margin: 0 auto;
+	width: 100%;
+	padding-top: 40px;
+	padding-bottom: 80px;
+}
+
+/* See sticky footer with nav bar in Bootstrap examples */
+#footer
+{
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 80px;
+	text-align: center;
+	padding: 30px 0;
+	/*margin-top: 70px;*/
+	border-top: 1px solid #e5e5e5;
+	background-color: #f5f5f5;
+	opacity: 0.6;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+	-webkit-box-shadow: inset 0 4px 9px -3px #000;
+	-moz-box-shadow: inset 0 4px 9px -3px #000;
+	box-shadow: inset 0 4px 9px -3px #000;
+	font-family: 'Lobster';
+}
