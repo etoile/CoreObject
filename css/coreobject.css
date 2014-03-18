@@ -88,13 +88,17 @@ body
 	/*background: #f6f6f4;*/
 }
 
+/*
+ * Navigation Bar 
+ */
+
 .navbar
 {
 	font-family: 'Open Sans';
 	font-weight: 300;
 	font-size: 16px; 	
 	background-color: #FFFFFF; /* #383428; */ /*#f6f6f4;*/
-	opacity: 0.97;
+	opacity: 0.88;
 }
 
 .navbar-brand
@@ -103,6 +107,10 @@ body
 	font-weight: 200;
 	font-size: 24px;
 }
+
+/*
+ * Misc
+ */
 
 .jumbotron
 {
@@ -142,39 +150,22 @@ body
 	color: #ef4832;
 }
 
-/*#content .container ul
+#content ul
 {
-    list-style: none;
-	
-	color: #686868;
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
 }
 
-#content .container > ul
+#content li
 {
-    list-style: none;
-    padding:0;
-    margin:0;
-	
-	margin-top: 30px;
-}
-
-#content .container li
-{
-    padding-left: 1em; 
-    text-indent: -.7em;
+	margin-top: .5em;
+	margin-bottom: .5em;
 
 	font-family: 'Open Sans', sans-serif;
 	font-weight: 400;
 	font-size: 13px;
-	margin-top: .5em;
-	margin-bottom: .5em;
 }
-
-#content .container li:before 
-{
-    content: "• ";
-    color: #F8F8FF;
-}*/
 
 .container h1
 {
@@ -189,7 +180,24 @@ body
 .container-full h1
 {
 	text-transform:uppercase;
+	color: #F8F8FF;
 }
+
+h2
+{
+	margin-top: 0px;
+
+	text-align: left;
+	text-transform: uppercase;
+	font-family: 'Raleway';
+	font-weight: 700;
+	font-size: 22px;
+	color: #585858;
+}
+
+/*
+ * Top Area
+ */
 
 #splash
 {
@@ -206,6 +214,8 @@ body
 
 #splashline
 {
+	padding-bottom: 30px;
+
 	text-align: right;
 	font-family: 'Raleway';
 	font-weight: 400;
@@ -226,6 +236,10 @@ body
 	border-bottom: dotted 1px lightgray;
 }
 
+/*
+ * User Experience
+ */
+
 #userexperience
 {
 	padding-top: 40px;
@@ -234,13 +248,6 @@ body
 
 #userexperience h2
 {
-	margin-top: 0px;
-
-	text-align: left;
-	text-transform: uppercase;
-	font-family: 'Raleway';
-	font-weight: 700;
-	font-size: 22px;
 	color: #585858;
 }
 
@@ -251,61 +258,21 @@ body
 
 #userexperience ul
 {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
- 
- 	color: #686868;
+	color: #686868;
 }
 
-#userexperience li
-{
-	margin-top: .5em;
-	margin-bottom: .5em;
-
-	/*text-transform: capitalize;*/
-	font-family: 'Open Sans', sans-serif;
-	font-weight: 400;
-	font-size: 13px;
-
-}
+/*
+ * Features
+ */
 
 #features h2
 {
-	margin-top: 0px;
-
-	text-align: left;
-	text-transform: uppercase;
-	font-family: 'Raleway';
-	font-weight: 700;
-	font-size: 22px;
 	color: white;
 }
 
 #features ul
 {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
- 
  	color: #686868;
-}
-
-#features li
-{
-	margin-top: .5em;
-	margin-bottom: .5em;
-
-	/*text-transform: capitalize;*/
-	font-family: 'Open Sans', sans-serif;
-	font-weight: 400;
-	font-size: 13px;
-
-}
-
-#splashline
-{
-	padding-bottom: 30px;
 }
 
 #features 
@@ -317,16 +284,19 @@ body
 	padding-bottom: 80px;
 }
 
-.container-full h1
-{
-	color: #F8F8FF;
-}
+/*
+ * Framework
+ */
 
 #overall-design
 {
 	padding-top: 30px;
 	padding-bottom: 70px;
 }
+
+/*
+ * Download
+ */
 
 #download
 {
@@ -336,6 +306,10 @@ body
 	padding-top: 40px;
 	padding-bottom: 80px;
 }
+
+/*
+ * Footer
+ */
 
 /* See sticky footer with nav bar in Bootstrap examples */
 #footer
