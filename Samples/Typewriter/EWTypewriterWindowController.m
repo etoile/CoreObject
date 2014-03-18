@@ -15,6 +15,7 @@
 #import "PrioritySplitViewDelegate.h"
 #import "EWHistoryWindowController.h"
 #import <CoreObject/COAttributedStringDiff.h>
+#import <CoreObject/COObject+Private.h>
 
 @implementation EWTypewriterWindowController
 
@@ -539,6 +540,17 @@ static NSString *Trim(NSString *text)
 	
 	TypewriterDocument *oldDoc = [[selectedNote objectGraphContextForPreviewingRevision: [selectedNote currentRevision]] rootObject];
 	COAttributedString *oldAs = oldDoc.attrString;
+	
+	// HACK: -[COAttributedStringDiff initWithFirstAttributedString:secondAttributedString:source:] will throw an exception
+	// if the first attributed string is nil, which can happen for a new document. Just make an empty string in that case.
+	COObjectGraphContext *tempCtx = [COObjectGraphContext new];
+	if (oldAs == nil)
+	{
+		oldAs = [[COAttributedString alloc] prepareWithUUID: as.UUID
+										  entityDescription: [[selectedNote.editingContext modelDescriptionRepository] entityDescriptionForClass: [COAttributedString class]]
+										   objectGraphContext: tempCtx
+														isNew: YES];
+	}
 	
 	COAttributedStringDiff *diff = [[COAttributedStringDiff alloc] initWithFirstAttributedString: oldAs
 																		  secondAttributedString: as
