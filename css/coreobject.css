@@ -168,6 +168,11 @@ body
 	padding-bottom: 30px;
 }
 
+.small-tagline p:not(:first-child)
+{
+	margin-top: 20px;
+}
+
 .highlighted-text
 {
 	text-style: bold;
@@ -338,11 +343,6 @@ background-color: #FF7A4C;
 	padding-bottom: 80px;
 }
 
-#download .container
-{
-	text-align: center;
-}
-
 #download .tagline
 {
 	color: #F8F8FF;
@@ -350,7 +350,8 @@ background-color: #FF7A4C;
 
 #download .small-tagline
 {
-	/*color: black;*/
+	/* The body color */
+	color: #222;
 }
 
 .download-button
