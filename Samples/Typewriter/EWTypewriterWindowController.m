@@ -538,7 +538,8 @@ static NSString *Trim(NSString *text)
 	TypewriterDocument *doc = [selectedNote rootObject];
 	COAttributedString *as = doc.attrString;
 	
-	TypewriterDocument *oldDoc = [[selectedNote objectGraphContextForPreviewingRevision: [selectedNote currentRevision]] rootObject];
+	COObjectGraphContext *oldDocCtx = [selectedNote objectGraphContextForPreviewingRevision: [selectedNote currentRevision]];
+	TypewriterDocument *oldDoc = [oldDocCtx rootObject];
 	COAttributedString *oldAs = oldDoc.attrString;
 	
 	// HACK: -[COAttributedStringDiff initWithFirstAttributedString:secondAttributedString:source:] will throw an exception
