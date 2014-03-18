@@ -68,7 +68,7 @@
 			<div class="col-md-5">
 			</div>
 			<div class="col-md-6">
-				<div id="splashline">CoreObject is a <em>version-controlled object database</em>, designed to be a humane persistence layer for applications with a <span class="highlighted-text">"never lose any work"</span> philosophy.</div>
+				<div id="splashline">CoreObject is a <em>version-controlled object database</em> for Objective-C, designed to be a humane persistence layer for applications with a <span class="highlighted-text">"never lose any work"</span> philosophy.</div>
 			</div>
 			<div class="col-md-1">
 			</div>
@@ -102,7 +102,8 @@
 			</div>
 				<div class="col-md-1"></div>
 		</div>
-					<div class="small-tagline">Our idea is to go a step futher in term of persistency, by including notions such as <em>document/data structuration and organization, collaborative editing, undo/redo and revision control</em> directly into CoreObject, to give the possibility to support them <span class="highlighted-text">easily in all applications</span>, rather than restrict them to just few applications, that always end up reinventing the wheels in incompatible ways.</div>
+					<div class="small-tagline">
+					Our idea is to go futher than traditional filesystems by including <em>document/data structure and organization, collaborative editing, rich undo/redo, and version control</em> directly in CoreObject, to allow <span class="highlighted-text">all applications to easily implement these features</span>, and avoid each app reinventing the wheel in incompatible ways. In existing apps, we either see poor persistence support, or reliance on proprietary systems.</div>
 		<div class="row">
 			<div class="col-md-1"></div>
 			<div class="col-md-5">
@@ -130,32 +131,32 @@
 		<div class="tagline">CoreObject is a <em>pragmatic OODB</em> built on top of a <span class="highlighted-text">SQL database</span> that rethinks ideas from various horizons.</div>
 		<div class="row">
 			<div class="col-md-4">
-			<h2>Revision Control</h2>
+			<h2>Version Control</h2>
 				<ul>
-					<li>Distributed Revision Control based on an Object Graph Diff Model</li>
-					<li>Semantic Merging</li>
-					<li>Pervasive Undo/Redo</li>
-					<li>Muliple Undo or History Views over one or several Documents</li>
-					<li>Selective Undo (each change can be cancelled individually)</li>
+					<li>Distributed version control based on an object graph diff model</li>
+					<li>Structured data merge works well for most use cases; pluggable merge strategies (with an example styled text merge algorithm)</li>
+					<li>Pervasive undo/redo</li>
+					<li>Muliple undo or history views over one or several documents</li>
+					<li>Selective undo (each change can be cancelled individually)</li>
 				</ul>
 			</div>
 			<div class="col-md-4">
 			<h2>Object Model</h2>
 				<ul>
-					<li>Versatile Object Model with rich Relationship support</li>
-					<li>Flexible Storage Model with Documents and Branches backed by a Store (Documents are similar to Git repositories)</li>
-					<li>Stable Serialization Format with Integrity Checking</li>
-					<li>Optional Organizational Model with Tags and Libraries</li>
+					<li>Versatile object model with rich relationship support</li>
+					<li>Flexible storage model with documents and branches backed by a store (documents are similar to Git repositories)</li>
+					<li>Stable serialization format with integrity checking</li>
+					<li>Optional organizational model with tags and libraries</li>
 				</ul>
 			</div>
 			<div class="col-md-4">
 			<h2>And More…</h2>
 				<ul>
-					<li>Relationships accross Documents and Branches</li>
-					<li>Transparent Object Graph Copy</li>
-					<li>Document Cheap Copy (a copy consumes no space)</li>
-					<li>Real-time Collaborative Editing with full Undo support per User</li>
-					<li>Built-in Indexing and Search including over the history</li>
+					<li>Relationships accross documents and branches</li>
+					<li>Transparent object graph copy</li>
+					<li>Document cheap copy (a copy consumes no space)</li>
+					<li>Real-time collaborative editing with full undo support per user</li>
+					<li>Built-in indexing and search including over the history</li>
 				</ul>
 			</div>
 		</div>
@@ -165,13 +166,11 @@
 	<div class="container" id="overall-design">
     <h1>Framework</h1>
 	<ul>
-		<li>Small Code Base (around 20 000 loc)</li>
-		<li>Pretty Large Test suite (over 3500 tests)</li>
-		<li>High Quality API documentation</li>
-		<li>Good Debugging Support (e.g. View object graph in memory as PDF diagram)</li>
+		<li>Written in Objective-C with ARC</li>
+		<li>Small code base (around 20 000 loc)</li>
+		<li>Reasonably large test suite (around 12 000 loc)</li>
+		<li>Good debugging support (e.g. render object graph as PDF diagram from debugger)</li>
 		<li>Minimal dependencies (SQLite and EtoileFoundation)</li>
-		<li>Pervasive UUID use</li>
-		<li>Favor JSON formats</li>
 	</ul>
 	</div>
 
