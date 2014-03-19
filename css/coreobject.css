@@ -371,16 +371,15 @@ background-color: #FF7A4C;
 	padding-bottom: 80px;
 }
 
-.row .col-xs-6:nth-child(2)
+#download h2
 {
-	text-align: right;
-	padding-right: 15px;
+	color: #333;
 }
 
-.row .col-xs-6:nth-child(3)
+#download .row div:nth-child(2)
 {
-	text-align: left;
-	padding-left: 15px;
+	/*width: 350px;*/
+	text-align: center;
 }
 
 #download .tagline
@@ -397,18 +396,24 @@ background-color: #FF7A4C;
 
 .annotation
 {
-	text-align: center;
+	text-align: left;
 }
 
 .annotation p
 {
 	/* The body color */
 	color: #222;
-
-	line-height: 200%;
+	text-align: left;
+	/*line-height: 200%;
 	font-family: 'Open Sans', sans-serif;
 	font-weight: 100;
-	font-size: 14px;
+	font-size: 18px;
+	text-transform: uppercase;*/
+	
+	line-height: 200%;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 400;
+	font-size: 13px;
 	text-shadow: 0px 3px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -419,6 +424,11 @@ background-color: #FF7A4C;
 	
 	font-weight: 100;
 	font-family: 'Open Sans';
+}
+
+.download-button:first-child
+{
+	margin-right: 30px;
 }
 
 .download-icon
@@ -449,6 +459,7 @@ background-color: #FF7A4C;
 .code
 {
 	padding: 5px;
+	white-space: nowrap;
 	font-style: normal;
 	font-family: 'Raleway';
 	color: white;
