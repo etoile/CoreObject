@@ -1338,11 +1338,13 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 
 #pragma mark - Hash and Equality
 
+// FIXME: Remove, to revert to pointer hash/equality. See failing test -[TestObject testHashStabilityAcrossSetCurrentBranch] and Jan 25th email
 - (NSUInteger)hash
 {
 	return [_UUID hash] ^ [[_objectGraphContext branchUUID] hash] ^ [_objectGraphContext isTrackingSpecificBranch] ^ 0x39ab6f39b15233de;
 }
 
+// FIXME: Remove, to revert to pointer hash/equality. See failing test -[TestObject testHashStabilityAcrossSetCurrentBranch] and Jan 25th email
 - (BOOL)isEqual: (id)anObject
 {
 	if (anObject == self)

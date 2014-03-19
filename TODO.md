@@ -324,6 +324,7 @@ the following situations at least:
 	
   - Add some collection-oriented KVO update tests to TestObjectUpdate
 
+  - Remove COObject -hash, -isEqual: so we use NSObject's version (pointer comparison). See failing test -[TestObject testHashStabilityAcrossSetCurrentBranch] and Jan 25th email
 
 - COObjectGraphContext
 
