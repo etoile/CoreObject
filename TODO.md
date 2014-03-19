@@ -68,6 +68,11 @@ Major Missing Features
 
   - Should support displaying all key/values (like past StoreBorwser prototypes)
     Not blocking release, but critical for ObjectManager
+	
+  - The missing feature is: CoreObject can't load a COItem as a COObject unless it has the matching
+    entity description available in memory. This can be a barrier for debugging
+	(you can't take a saved item graph from an app and load it in a test case, without adding all 
+	 of the relevant model classes to the test case)
 
 - Implement something like COSelectiveHistoryTrack (using a query to select revisions based on criterias e.g. inner object subset)
 
