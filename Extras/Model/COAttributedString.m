@@ -52,26 +52,68 @@
 	return result;
 }
 
+- (NSArray *) chunkUUIDsOverlappingRange: (NSRange)aRange
+				 excessCharactersAtStart: (NSUInteger *)excessAtStart
+				   excessCharactersAtEnd: (NSUInteger *)excessAtEnd
+{
+	NSMutableArray *result = [NSMutableArray new];
+	
+	NSUInteger chunkIndex = 0, chunkStart = 0;
+	COAttributedStringChunk *chunk = [self chunkContainingIndex: aRange.location chunkStart: &chunkStart chunkIndex: &chunkIndex];
+	
+	*excessAtStart = (aRange.location - chunkStart);
+	
+	[result addObject: chunk.UUID];
+	
+	const NSUInteger maxRange = NSMaxRange(aRange);
+	
+	while (chunkStart + chunk.length < maxRange)
+	{
+		chunkStart += chunk.length;
+		chunkIndex++;
+		chunk = self.chunks[chunkIndex];
+		
+		[result addObject: chunk.UUID];
+	}
+	
+	*excessAtEnd = ((chunkStart + chunk.length) - maxRange);
+	
+	return result;
+}
+
 - (COItemGraph *) substringItemGraphWithRange: (NSRange)aRange
 {
-	// Copy the receiver into a temporary context
-	COObjectGraphContext *tempCtx = [COObjectGraphContext new];
+	ETAssert(aRange.length > 0);
+	
+	COItemGraph *result = [[COItemGraph alloc] init];
+	
+	NSUInteger excessAtStart = 0;
+	NSUInteger excessAtEnd = 0;
+	NSArray *chunkUUIDS = [self chunkUUIDsOverlappingRange: aRange excessCharactersAtStart: &excessAtStart excessCharactersAtEnd: &excessAtEnd];
 	
 	COCopier *copier = [COCopier new];
-	ETUUID *copyUUID = [copier copyItemWithUUID: [self UUID] fromGraph: self.objectGraphContext toGraph: tempCtx];
-	COAttributedString *tempCopy = [tempCtx loadedObjectForUUID: copyUUID];
-	[tempCtx setRootObject: tempCopy];
+	NSArray *copiedUUIDs = [copier copyItemsWithUUIDs: chunkUUIDS fromGraph: self.objectGraphContext toGraph: result];
 	
-	// Split the copy with the given range
-	NSUInteger start = [tempCopy splitChunkAtIndex: aRange.location];
-	NSUInteger end = [tempCopy splitChunkAtIndex: aRange.location + aRange.length];
+	// Trim off excess characters
 	
-	// Remove all chunks outside the requested range.
-	tempCopy.chunks = [tempCopy.chunks subarrayWithRange: NSMakeRange(start, end-start)];
+	COMutableItem *firstChunk = [result itemForUUID: copiedUUIDs[0]];
+	[firstChunk setValue: [[firstChunk valueForAttribute: @"text"] substringFromIndex: excessAtStart]
+			forAttribute: @"text"
+					type: kCOTypeString];
 	
-	[tempCtx removeUnreachableObjects];
+	COMutableItem *lastChunk = [result itemForUUID: [copiedUUIDs lastObject]];
+	[lastChunk setValue: [[lastChunk valueForAttribute: @"text"] substringToIndex: ([[lastChunk valueForAttribute: @"text"] length] - excessAtEnd)]
+			forAttribute: @"text"
+					type: kCOTypeString];
 	
-	COItemGraph *result = [[COItemGraph alloc] initWithItemGraph: tempCtx];
+	// Insert a root COAttributedString item
+	
+	COMutableItem *rootItem = [COMutableItem item];
+	[rootItem setValue: @"COAttributedString" forAttribute: kCOObjectEntityNameProperty type: kCOTypeString];
+	[rootItem setValue: copiedUUIDs forAttribute: @"chunks" type: COTypeMakeArrayOf(kCOTypeCompositeReference)];
+	[result insertOrUpdateItems: @[rootItem]];
+	[result setRootItemUUID: [rootItem UUID]];
+	
 	return result;
 }
 

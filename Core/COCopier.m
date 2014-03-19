@@ -99,18 +99,29 @@
     return result;
 }
 
-
 - (ETUUID*) copyItemWithUUID: (ETUUID*)aUUID
                    fromGraph: (id<COItemGraph>)source
                      toGraph: (id<COItemGraph>)dest
 {
 	NILARG_EXCEPTION_TEST(aUUID);
+	return [self copyItemsWithUUIDs: @[aUUID] fromGraph: source toGraph: dest][0];
+}
+
+- (NSArray*) copyItemsWithUUIDs: (NSArray*)uuids
+					 fromGraph: (id<COItemGraph>)source
+					   toGraph: (id<COItemGraph>)dest
+{
+	NILARG_EXCEPTION_TEST(uuids);
 	NILARG_EXCEPTION_TEST(source);
 	NILARG_EXCEPTION_TEST(dest);
 	
-    NSSet *uuidsToCopy = [self itemUUIDsToCopyForItemItemWithUUID: aUUID
-                                                        fromGraph: source
-                                                          toGraph: dest];
+    NSMutableSet *uuidsToCopy = [NSMutableSet new];
+	for (ETUUID *uuid in uuids)
+	{
+		[uuidsToCopy unionSet: [self itemUUIDsToCopyForItemItemWithUUID: uuid
+															  fromGraph: source
+																toGraph: dest]];
+	}
     
     NSMutableDictionary *mapping = [NSMutableDictionary dictionary];
     for (ETUUID *oldUUID in uuidsToCopy)
@@ -130,7 +141,8 @@
     
     [dest insertOrUpdateItems: result];
     
-    return [mapping objectForKey: aUUID];
+	return [uuids mappedCollectionWithBlock:
+			^(id inputUUID){ return [mapping objectForKey: inputUUID]; }];
 }
 
 @end

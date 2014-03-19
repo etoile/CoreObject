@@ -34,4 +34,10 @@
 - (ETUUID*) copyItemWithUUID: (ETUUID*)aUUID
                    fromGraph: (id<COItemGraph>)source
                      toGraph: (id<COItemGraph>)dest;
+
+- (NSArray*) copyItemsWithUUIDs: (NSArray*)uuids
+					  fromGraph: (id<COItemGraph>)source
+						toGraph: (id<COItemGraph>)dest;
+
+
 @end
