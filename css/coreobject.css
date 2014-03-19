@@ -150,6 +150,7 @@ body
 
 .tagline
 {
+	text-align: justify;
 	font-family: 'Open Sans', sans-serif;
 	font-weight: 500;
 	font-size: 20px;
@@ -204,6 +205,12 @@ body
 	font-family: 'Raleway';
 	font-weight: 100;
 	font-size: 32px;
+}
+
+.container-full 
+{
+	padding: 0;
+	margin: 0;
 }
 
 .container-full h1
@@ -302,13 +309,19 @@ h2
 #features ul
 {
  	color: #686868;
+	text-shadow: 0px 3px 4px rgba(0, 0, 0, 0.06);
 }
 
 #features 
 {
 	margin: 0 auto;
+	padding: 0;
 	width: 100%;
 	background-color: #6cf;
+}
+
+#features .container
+{
 	padding-top: 40px;
 	padding-bottom: 80px;
 }
@@ -320,7 +333,12 @@ h2
 #overall-design
 {
 	padding-top: 30px;
-	padding-bottom: 70px;
+	padding-bottom: 80px;
+}
+
+#overall-design .small-tagline
+{
+	padding-bottom: 0px;
 }
 
 /*
@@ -329,16 +347,26 @@ h2
 
 #download
 {
+	background-color: #ef4832;
 	background-color: #F05C44; /*#F07057; #E74C3C;*/
-	/*background-color: #ff9933;*/
+	background-color: #ff9933;
 
 	background-color: #F56432;
-	background-color: #F46032; /* #F35C32*/
+	background-color: #F35C32;
+	background-color: #F46032;
+
 
 background-color: #FF7A4C;
 
 	margin: 0 auto;
+	padding: 0;
 	width: 100%;
+}
+
+#download .container
+{
+	margin-top: 0;
+	margin-bottom: 0;
 	padding-top: 40px;
 	padding-bottom: 80px;
 }
@@ -346,12 +374,30 @@ background-color: #FF7A4C;
 #download .tagline
 {
 	color: #F8F8FF;
+	text-shadow: 0px 3px 4px rgba(0, 0, 0, 0.07);
 }
 
 #download .small-tagline
 {
+	padding-bottom: 0px;
+	text-shadow: 0px 3px 4px rgba(5, 5, 5, 0.07);
+}
+
+.annotation
+{
+	text-align: center;
+}
+
+.annotation p
+{
 	/* The body color */
 	color: #222;
+
+	line-height: 200%;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 100;
+	font-size: 14px;
+	text-shadow: 0px 3px 4px rgba(0, 0, 0, 0.1);
 }
 
 .download-button
@@ -381,6 +427,11 @@ background-color: #FF7A4C;
 
 	background: url('../images/GitHub-Mark-Light-120px-plus.png') center no-repeat;
 	background-size: 90px;
+}
+
+.codewrapper
+{
+
 }
 
 .code
