@@ -413,6 +413,44 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	}
 }
 
+- (CORevision*) revisionToRevertTo
+{
+	NSArray *notes = [self selectedNotePersistentRoots];
+	if ([notes count] == 1)
+	{
+		COPersistentRoot *note = notes[0];
+		CORevision *inspectedRevision = [note currentRevision];
+		while (inspectedRevision != nil
+			   && ![inspectedRevision.commitDescriptor.identifier isEqualToString: @"org.etoile.CoreObject.checkpoint"])
+		{
+			inspectedRevision = [inspectedRevision parentRevision];
+		}
+		return inspectedRevision;
+	}
+	return nil;
+}
+
+- (void)revertDocumentToSaved:(id)sender
+{
+	NSArray *notes = [self selectedNotePersistentRoots];
+	if ([notes count] == 1)
+	{
+		COPersistentRoot *note = notes[0];
+		CORevision *revisionToRevertTo = [self revisionToRevertTo];
+		
+		if (revisionToRevertTo == nil)
+		{
+			// TODO: Disable the menu item in this case
+			NSLog(@"Can't revert");
+			return;
+		}
+		
+		[self commitChangesInBlock: ^{
+			note.currentRevision = revisionToRevertTo;
+		} withIdentifier: @"org.etoile.CoreObject.revert" descriptionArguments: @[]];
+	}
+}
+
 #pragma mark - EWUndoManagerDelegate
 
 - (void) undo
@@ -753,8 +791,12 @@ static NSString *Trim(NSString *text)
 	ETAssert(![selectedNote hasChanges]);
 	
 	aBlock();
-		
-	identifier = [@"org.etoile.Typewriter." stringByAppendingString: identifier];
+	
+	// FIXME: Ugly. We should probably always use constants to refer to the fully-qualified names
+	if (![identifier hasPrefix: @"org.etoile.CoreObject"])
+	{
+		identifier = [@"org.etoile.Typewriter." stringByAppendingString: identifier];
+	}
 	
 	NSMutableDictionary *metadata = [NSMutableDictionary new];
 	if (args != nil)
