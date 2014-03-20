@@ -423,6 +423,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		
 	NSUInteger chunkIndex = 0, chunkStart = 0;
 	COAttributedStringChunk *chunk = [_backing chunkContainingIndex: aRange.location chunkStart: &chunkStart chunkIndex: &chunkIndex];
+	const NSUInteger firstChunkIndex = chunkIndex;
 	
 	/* Sepecial case: empty string */
 	if ([self length] == 0)
@@ -474,6 +475,8 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 			[[_backing mutableArrayValueForKey: @"chunks"] removeObjectAtIndex: chunkIndex--];
 		}
 	}
+	
+	[self mergeChunksInChunkRange: NSMakeRange(firstChunkIndex, chunkIndex + 1 - firstChunkIndex)];
 	
 	// TODO: Add tests that check for this
 	const NSInteger delta = [aString length] - aRange.length;
@@ -538,6 +541,34 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	aChunk.attributes = [self ourAttributesForAttributeDict: attrs];
 }
 
+- (void)mergeChunksInChunkRange: (NSRange)range
+{
+	NSMutableArray *chunksProxy = [self.backing mutableArrayValueForKey: @"chunks"];
+	
+	for (NSUInteger i = range.location; i <= NSMaxRange(range); i++)
+	{
+		if (i >= [chunksProxy count])
+			break;
+		
+		if (i == 0)
+			continue;
+		
+		COAttributedStringChunk *chunkI = chunksProxy[i];
+		COAttributedStringChunk *chunkLeftOfI = chunksProxy[i - 1];
+		
+		if ([COAttributedStringAttribute isAttributeSet: chunkI.attributes
+											 equalToSet: chunkLeftOfI.attributes])
+		{
+			// we can merge them!
+			
+			chunkLeftOfI.text = [chunkLeftOfI.text stringByAppendingString: chunkI.text];
+			
+			[chunksProxy removeObjectAtIndex: i];
+			i--; // N.B.: Won't underflow because i > 0 (see if (i == 0) continue; above)
+		}
+	}
+}
+
 - (void)setAttributes: (NSDictionary *)aDict range: (NSRange)aRange
 {
 	//NSLog(@"%p (%@) Set attributes %@ range %@", self, [self string], aDict, NSStringFromRange(aRange));
@@ -582,6 +613,8 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		COAttributedStringChunk *chunk = _backing.chunks[i];
 		[self setAttributes: aDict forChunk: chunk];
 	}
+	
+	[self mergeChunksInChunkRange: NSMakeRange(splitChunk1, splitChunk2 - splitChunk1)];
 	
 	// TODO: Add tests that check for this
 	[self edited: NSTextStorageEditedAttributes range: aRange changeInLength: 0];

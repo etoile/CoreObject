@@ -458,6 +458,27 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	UKObjectsEqual(@"d", [attributedString.chunks[1] text]);
 }
 
+- (void) testRemovingAttributeMergesAdjacentChunks
+{
+	[self appendHTMLString: @"a<B>b</B>c" toAttributedString: attributedString];
+	UKIntsEqual(3, [attributedString.chunks count]);
+	
+	[self setFontTraits: 0 inRange: NSMakeRange(1,1) inTextStorage:as];
+	UKObjectsEqual(@"abc", [as string]);
+	UKIntsEqual(1, [attributedString.chunks count]);
+	UKObjectsEqual(@"abc", [attributedString.chunks[0] text]);
+}
+
+- (void) testRemovingSubstringMergesAdjacentChunks
+{
+	[self appendHTMLString: @"a<B>b</B>c" toAttributedString: attributedString];
+	
+	[as replaceCharactersInRange: NSMakeRange(1, 1) withString: @""];
+	UKObjectsEqual(@"ac", [as string]);
+	UKIntsEqual(1, [attributedString.chunks count]);
+	UKObjectsEqual(@"ac", [attributedString.chunks[0] text]);
+}
+
 @end
 
 /**
