@@ -6,7 +6,6 @@
  */
 
 #import "EWTextView.h"
-#import "EWDocument.h"
 #import <CoreObject/COSQLiteStore+Attachments.h>
 
 @implementation EWTextView

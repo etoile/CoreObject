@@ -7,7 +7,6 @@
 
 #import <Cocoa/Cocoa.h>
 #import "EWTypewriterWindowController.h"
-#import "EWDocument.h"
 #import "EWAppDelegate.h"
 #import "TypewriterDocument.h"
 #import "EWTagListDataSource.h"
@@ -33,7 +32,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 - (COEditingContext *) editingContext
 {
-	return [(EWDocument *)[self document] editingContext];
+	return [(EWAppDelegate *)[NSApp delegate] editingContext];
 }
 
 - (NSArray *) arrangedNotePersistentRoots
@@ -377,7 +376,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	{
 		COPersistentRoot *note = notes[0];
 		EWHistoryWindowController *historyWindow = [[EWHistoryWindowController alloc] initWithInspectedPersistentRoot: note undoTrack: undoTrack];
-		[[self document] addWindowController: historyWindow];
+		[(EWAppDelegate *)[NSApp delegate] addWindowController: historyWindow];
 		[historyWindow showWindow: nil];
 	}
 }
@@ -846,7 +845,7 @@ static NSString *Trim(NSString *text)
 
 - (COTagLibrary *)tagLibrary
 {
-	return [[[self document] libraryPersistentRoot] rootObject];
+	return [[(EWAppDelegate *)[NSApp delegate] libraryPersistentRoot] rootObject];
 }
 
 #pragma mark - Search
@@ -854,6 +853,42 @@ static NSString *Trim(NSString *text)
 - (void)search:(id)sender
 {
 	[noteListDataSource reloadData];
+}
+
+#pragma mark - NSDocument replacements - Printing
+
+- (void) printDocument: (id)sender
+{
+	[[NSPrintOperation printOperationWithView: textView] runOperation];
+}
+
+#pragma mark - NSDocument replacements - Export
+
+- (void) saveDocumentTo: (id)sender
+{
+	NSSavePanel *panel = [NSSavePanel savePanel];
+	[panel setCanCreateDirectories: YES];
+	[panel setCanSelectHiddenExtension: YES];
+	[panel setAllowedFileTypes: @[@"public.html"]];
+	[panel setTreatsFilePackagesAsDirectories: YES];
+	
+	[panel beginSheetModalForWindow: [self window]
+				  completionHandler: ^(NSInteger result)
+	{
+		if (result == NSFileHandlingPanelOKButton)
+		{
+			 [self exportAsHTMLToURL: [panel URL]];
+		}
+	}];
+}
+
+- (void) exportAsHTMLToURL: (NSURL *)aURL
+{
+	NSError *outError = nil;
+	NSData *data = [self.textStorage dataFromRange: NSMakeRange(0, [self.textStorage length])
+								documentAttributes: @{ NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType }
+											 error: &outError];
+	[data writeToURL: aURL atomically: YES];
 }
 
 @end

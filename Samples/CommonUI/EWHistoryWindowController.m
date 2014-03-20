@@ -25,8 +25,6 @@
                                                  selector: @selector(persistentRootDidChange:)
                                                      name: COPersistentRootDidChangeNotification
                                                    object: aPersistentRoot];
-		
-		
     }
     return self;
 }
@@ -36,7 +34,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 }
 
-- (void) awakeFromNib
+- (void) windowDidLoad
 {
 	graphRenderer.delegate = self;
 	
@@ -44,9 +42,11 @@
     [table setTarget: self];
 	
 	[self update];
+	
+	[[self window] setTitle: [self windowTitle]];
 }
 
-- (NSString *)windowTitleForDocumentDisplayName:(NSString *)displayName
+- (NSString *)windowTitle
 {
 	return [NSString stringWithFormat: @"%@ History", inspectedPersistentRoot.name];
 }

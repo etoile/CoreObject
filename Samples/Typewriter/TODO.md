@@ -10,5 +10,4 @@ Typewriter TODO
 - [ ] a way to give a name to a checkpoint
 - [ ] some way to see the list of all the checkpoints
 - [ ] have Revert show a panel listing all the checkpoints, so you can pick the one you want
-- [ ] "Checkpoint" opens a standard Mac save dialog (OS X 10.7)
-- [ ] NSDocument stack trace from Quentin
+- [x] Don't use NSDocument
