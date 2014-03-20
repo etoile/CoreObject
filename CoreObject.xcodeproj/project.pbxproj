@@ -185,6 +185,7 @@
 		6646978017CE7E2600A1B767 /* COSynchronizationServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6646977E17CE7E2600A1B767 /* COSynchronizationServer.m */; };
 		6646982E17D1C50800A1B767 /* COSQLiteStore+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646982D17D1C50800A1B767 /* COSQLiteStore+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6646985A17D3C55600A1B767 /* COObjectGraphContext+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646985917D3C55500A1B767 /* COObjectGraphContext+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		66488DFE18DA41B9009F4C55 /* TestAttributedStringDiffPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66488DEF18DA3F6D009F4C55 /* TestAttributedStringDiffPerformance.m */; };
 		664E076E18C95BF700CBFF74 /* 1a.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 664E075C18C9592700CBFF74 /* 1a.json */; };
 		664E076F18C95BF900CBFF74 /* 1b.json in CopyFiles */ = {isa = PBXBuildFile; fileRef = 664E075D18C9592700CBFF74 /* 1b.json */; };
 		664F279A188E2DC900DF36FC /* TestSynchronizerCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 664F2799188E2DC900DF36FC /* TestSynchronizerCommon.m */; };
@@ -273,6 +274,7 @@
 		66B1FC6918727D7E00745859 /* TestAttributedStringHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B1FC6818727D7E00745859 /* TestAttributedStringHistory.m */; };
 		66B1FC72187377ED00745859 /* TestAttributedString.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B1FC71187377ED00745859 /* TestAttributedString.m */; };
 		66B6DC5C187A020900870370 /* TestDiffManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B6DC5B187A020900870370 /* TestDiffManager.m */; };
+		66BA3D4A18DA6C4B00641D40 /* TestAttributedStringCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 660EE3B1186E3DA600E8C22C /* TestAttributedStringCommon.m */; };
 		66BBB3BC18516ABC005430B1 /* TestItemStableSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 66BBB3BB18516ABC005430B1 /* TestItemStableSerialization.m */; };
 		66BDC4AF17B6ED27003B0EDA /* COBranchInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670917B5F9AF009ACF2F /* COBranchInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66BDC4B017B6ED27003B0EDA /* COPersistentRootInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 66C3670D17B5FA0D009ACF2F /* COPersistentRootInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -741,6 +743,7 @@
 		6646977E17CE7E2600A1B767 /* COSynchronizationServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = COSynchronizationServer.m; path = Synchronization/COSynchronizationServer.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		6646982D17D1C50800A1B767 /* COSQLiteStore+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COSQLiteStore+Private.h"; path = "Store/COSQLiteStore+Private.h"; sourceTree = "<group>"; };
 		6646985917D3C55500A1B767 /* COObjectGraphContext+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+Private.h"; path = "Core/COObjectGraphContext+Private.h"; sourceTree = "<group>"; };
+		66488DEF18DA3F6D009F4C55 /* TestAttributedStringDiffPerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestAttributedStringDiffPerformance.m; path = Benchmark/TestAttributedStringDiffPerformance.m; sourceTree = "<group>"; };
 		664E075C18C9592700CBFF74 /* 1a.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 1a.json; sourceTree = "<group>"; };
 		664E075D18C9592700CBFF74 /* 1b.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = 1b.json; sourceTree = "<group>"; };
 		664F2798188E2DC900DF36FC /* TestSynchronizerCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestSynchronizerCommon.h; sourceTree = "<group>"; };
@@ -1342,6 +1345,7 @@
 				66E6823F18B972C4003294EB /* BenchmarkCommon.h */,
 				66E6824018B972C4003294EB /* BenchmarkCommon.m */,
 				66E6826018BA9B5D003294EB /* TestObjectPerformance.m */,
+				66488DEF18DA3F6D009F4C55 /* TestAttributedStringDiffPerformance.m */,
 			);
 			name = Benchmark;
 			sourceTree = "<group>";
@@ -2241,6 +2245,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66BA3D4A18DA6C4B00641D40 /* TestAttributedStringCommon.m in Sources */,
+				66488DFE18DA41B9009F4C55 /* TestAttributedStringDiffPerformance.m in Sources */,
 				664F27A1188E69C000DF36FC /* COSynchronizerFakeMessageTransport.m in Sources */,
 				664F27A0188E69AD00DF36FC /* TestSynchronizerCommon.m in Sources */,
 				66E6824118B972C4003294EB /* BenchmarkCommon.m in Sources */,
