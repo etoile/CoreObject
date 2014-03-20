@@ -90,8 +90,8 @@ html
 body 
 {
 	padding-top: 80px;
-  	/* Margin bottom by footer height */
-	margin-bottom: 200px;
+  	/* Must match footer height */
+	margin-bottom: 240px;
 
 	background-color: #f6f6f4; /* #faf4f1; */
 
@@ -99,11 +99,43 @@ body
 	font-size: 1em;
 }
 
+@media (max-width: 768px) 
+{
+	body
+	{
+  		/* Must match footer height */
+		margin-bottom: 200px;
+	}
+}
+
 /* Stretchable container that extends horizontally all the way to the page border */
 .container-full 
 {
 	padding: 0;
 	margin: 0;
+}
+
+/*
+ * Grid Adjustments
+ * ================
+ */
+ 
+@media (max-width: 768px) 
+{
+	[class*="row"]
+	{
+		/* Don't use column padding to do that (e.g. xs-12 would overflow) */
+		margin-left: 40px;
+		margin-right: 40px;
+	}
+
+	[class*="col-"]
+	{
+		/* Could be better to set the left and right padding just for the first and last column */
+		padding-left: 0;
+		padding-right: 0;
+		margin-bottom: 30px;
+	}
 }
 
 /*
@@ -126,6 +158,58 @@ body
 	font-family: 'Lobster';
 	font-weight: 200;
 	font-size: 1.5em;
+}
+
+/**
+ * Headers and Paragraphs
+ * ======================
+ */
+
+.container h1
+{
+	padding-bottom: 20px;
+
+	text-align: center;
+	font-family: 'Raleway', sans-serif;
+	font-weight: 100;
+	font-size: 2em;
+}
+
+.container-full h1
+{
+	text-transform:uppercase;
+	color: #F8F8FF;
+}
+
+h2
+{
+	margin-top: 0;
+
+	text-align: left;
+	text-transform: uppercase;
+	font-family: 'Raleway', sans-serif;
+	font-weight: 700;
+	font-size: 1.375em;
+	color: #585858;
+}
+
+@media (max-width: 768px) 
+{
+	.container h1
+	{
+		font-size: 1.7em;
+	}
+	
+	h2
+	{
+		font-size: 1.1em;
+	}
+}
+
+.container p
+{
+	font-family: 'Open Sans', sans-serif;
+	font-size: 0.875em;
 }
 
 /*
@@ -153,6 +237,33 @@ body
 	font-family: 'Open Sans', sans-serif;
 	font-weight: 500;
 	font-size: 0.875em;
+}
+
+@media (max-width: 768px) 
+{
+	.tagline
+	{
+		margin-left: 15px;
+		margin-right: 15px;
+		/*padding-bottom: 70px;*/
+
+		font-size: 1em;
+	}
+	
+	.small-tagline
+	{
+		margin-left: 40px;
+		margin-right: 40px;
+		margin-top: 0px;
+		padding-top: 15px;
+		padding-bottom: 15px;
+		
+		border-top: 1px solid lightgray;
+		border-bottom: 1px dotted lightgray;
+
+		text-align: justify;
+		font-size: 0.813em;
+	}
 }
 
 .small-tagline p:not(:first-child)
@@ -206,45 +317,6 @@ body
 	text-shadow: 0px 3px 4px rgba(0, 0, 0, 0.1);
 }
 
-/**
- * Headers and Paragraphs
- * ======================
- */
-
-.container h1
-{
-	padding-bottom: 20px;
-
-	text-align: center;
-	font-family: 'Raleway', sans-serif;
-	font-weight: 100;
-	font-size: 2em;
-}
-
-.container-full h1
-{
-	text-transform:uppercase;
-	color: #F8F8FF;
-}
-
-h2
-{
-	margin-top: 0;
-
-	text-align: left;
-	text-transform: uppercase;
-	font-family: 'Raleway', sans-serif;
-	font-weight: 700;
-	font-size: 1.375em;
-	color: #585858;
-}
-
-.container p
-{
-	font-family: 'Open Sans', sans-serif;
-	font-size: 0.875em;
-}
-
 /*
  * Code Snippets
  * =============
@@ -293,6 +365,14 @@ h2
 	font-size: 4em;
 }
 
+@media (max-width: 768px) 
+{
+	#splash h1
+	{
+		font-size: 2.8em;
+	}
+}
+
 #splashline
 {
 	padding-bottom: 30px;
@@ -303,6 +383,17 @@ h2
 	font-size: 1em;
 	color: #585858;
 }
+
+@media (max-width: 768px) 
+{
+	#splashline
+	{
+		padding-bottom: 0;
+
+		font-size: 0.9em;
+	}
+}
+
 
 #splashline em
 {
@@ -336,7 +427,7 @@ h2
 
 #userexperience .inner-row
 {
-	margin-bottom: 20px;
+	/*margin-bottom: 20px;*/
 }
 
 #userexperience ul
@@ -386,9 +477,12 @@ h2
 	padding-bottom: 80px;
 }
 
-#overall-design .small-tagline
+@media (min-width: 768px)
 {
-	padding-bottom: 0;
+	#overall-design .small-tagline
+	{
+		padding-bottom: 0;
+	}
 }
 
 /*
@@ -439,9 +533,23 @@ h2
 
 #download .small-tagline
 {
-	padding-bottom: 0;
-
 	text-shadow: 0px 3px 4px rgba(5, 5, 5, 0.07);
+}
+
+@media (min-width: 768px)
+{
+	#download .small-tagline
+	{
+		padding-bottom: 0;
+	}
+}
+
+@media (max-width: 768px)
+{
+	#download .small-tagline
+	{
+		border-top: 1px solid white;
+	}
 }
 
 .download-button
@@ -490,7 +598,8 @@ h2
 	position: absolute;
 	bottom: 0;
 	width: 100%;
-	height: 120px; /* was 80 */
+	/* Must match body margin bottom */
+	height: 240px; /* ~160 (.container) + 80 (.full-container) */
 	padding: 0;
 
 	background-color: #F6F6F4;
@@ -498,10 +607,11 @@ h2
 	text-align: center;
 }
 
+
 /* Main container */
 #footer .container
 {
-	padding-top: 0;
+	padding-top: 80px;
 	/* For the splash line inside, the bottom padding is 30px, for the small 
 	   print, the bottom margin is 10px, this stretches the last column 
 	   vertically in the row, and translates as a 40px between main and pattern 
@@ -517,6 +627,25 @@ h2
 	border-top: 1px dotted lightgray;
 
 	background-image: url('../images/struckaxiom.png');
+}
+
+@media (max-width: 768px) 
+{
+	#footer
+	{
+  		/* Must match body margin bottom */
+		height: 200px;
+	}
+	
+	#footer .container
+	{
+		padding-top: 40px;
+	}
+
+	#footer h2
+	{
+		text-align: center;
+	}
 }
 
 /* Copyright notice */
