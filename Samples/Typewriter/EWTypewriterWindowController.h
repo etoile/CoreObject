@@ -72,6 +72,8 @@ NSString * EWTagDragType;
 
 - (IBAction)showDocumentHistory:(id)sender;
 
+- (IBAction)showItemGraph:(id)sender;
+
 @end
 
 

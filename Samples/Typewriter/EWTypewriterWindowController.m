@@ -15,6 +15,7 @@
 #import "EWHistoryWindowController.h"
 #import <CoreObject/COAttributedStringDiff.h>
 #import <CoreObject/COObject+Private.h>
+#import <CoreObject/COObjectGraphContext+Graphviz.h>
 
 @implementation EWTypewriterWindowController
 
@@ -889,6 +890,13 @@ static NSString *Trim(NSString *text)
 								documentAttributes: @{ NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType }
 											 error: &outError];
 	[data writeToURL: aURL atomically: YES];
+}
+
+#pragma mark - Debugging
+
+- (IBAction)showItemGraph:(id)sender
+{
+	[selectedNote.objectGraphContext showGraph];
 }
 
 @end
