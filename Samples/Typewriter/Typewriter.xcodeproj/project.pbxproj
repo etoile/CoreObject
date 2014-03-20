@@ -184,6 +184,7 @@
 		66A080F018C7C1A50008739A /* EWTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWTableView.m; sourceTree = SOURCE_ROOT; };
 		66B7DB1C18A96F2900010BCB /* EtoileFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EtoileFoundation.framework; path = "../../../../../../../../Library/Developer/Xcode/DerivedData/Typewriter-ewqruishaxmvlhhefeyihtxobbmk/Build/Products/Debug/EtoileFoundation.framework"; sourceTree = "<group>"; };
 		66B7DB2218A96F9100010BCB /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = ../../../EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
+		66BA3D5618DA81FE00641D40 /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = TODO.md; sourceTree = SOURCE_ROOT; };
 		66E6821418B723AD003294EB /* plus_8x8@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plus_8x8@2x.png"; sourceTree = "<group>"; };
 		66E6821E18B72427003294EB /* plus_8x8-grey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plus_8x8-grey.png"; sourceTree = "<group>"; };
 		66E6821F18B72428003294EB /* plus_8x8-grey@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plus_8x8-grey@2x.png"; sourceTree = "<group>"; };
@@ -256,6 +257,7 @@
 		663EFD3218A17E270030BD2F /* Typewriter */ = {
 			isa = PBXGroup;
 			children = (
+				66BA3D5618DA81FE00641D40 /* TODO.md */,
 				664E93AC18A1914C00261673 /* Model */,
 				663EFD5E18A17FB30030BD2F /* en.lproj */,
 				663EFD6B18A17FB30030BD2F /* EWAppDelegate.h */,
