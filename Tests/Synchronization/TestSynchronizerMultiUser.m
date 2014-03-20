@@ -157,7 +157,7 @@
 	UKIntsEqual(2, [[self client2Messages] count]);
 	
 	UKIntsEqual(2, [[[client1Branch rootObject] contents] count]);
-	UKObjectsEqual(S(client1Child, client2Child), SA([[client1Branch rootObject] contents]));
+	UKObjectsEqual(S(client1Child.UUID, client2Child.UUID), SA([[client1Branch rootObject] valueForKeyPath: @"contents.UUID"]));
 
 	[transport deliverMessagesToClient: @"client2"];
 	
@@ -166,7 +166,7 @@
 	UKIntsEqual(0, [[self client2Messages] count]);
 	
 	UKIntsEqual(2, [[[client2Branch rootObject] contents] count]);
-	UKObjectsEqual(S(client1Child, client2Child), SA([[client2Branch rootObject] contents]));
+	UKObjectsEqual(S(client1Child.UUID, client2Child.UUID), SA([[client2Branch rootObject] valueForKeyPath: @"contents.UUID"]));
 }
 
 @end

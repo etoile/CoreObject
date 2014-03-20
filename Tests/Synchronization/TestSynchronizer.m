@@ -40,7 +40,7 @@
 	UKObjectKindOf([self clientMessages][0], COSynchronizerResponseToClientForSentRevisionsMessage);
 	
 	UKIntsEqual(1, [[[serverBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1), [[serverBranch rootObject] contents]);
+	UKObjectsEqual(S(clientChild1.UUID), [[serverBranch rootObject] valueForKeyPath: @"contents.UUID"]);
 	
 	// Deliver the response to the client
 	[transport deliverMessagesToClient];
@@ -62,7 +62,7 @@
 	[transport deliverMessagesToClient];
 	
 	UKIntsEqual(1, [[[clientBranch rootObject] contents] count]);
-	UKObjectsEqual(S(serverChild1), [[clientBranch rootObject] contents]);
+	UKObjectsEqual(S(serverChild1.UUID), [[clientBranch rootObject] valueForKeyPath: @"contents.UUID"]);
 	
 	// No more messages
 	UKIntsEqual(0, [[self clientMessages] count]);
@@ -97,7 +97,7 @@
 	UKObjectKindOf([self clientMessages][0], COSynchronizerResponseToClientForSentRevisionsMessage);
 	
 	UKIntsEqual(2, [[[serverBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1, serverChild1), [[serverBranch rootObject] contents]);
+	UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [[serverBranch rootObject] valueForKeyPath: @"contents.UUID"]);
 	
 	// Deliver the response to the client
 	[transport deliverMessagesToClient];
@@ -107,7 +107,7 @@
 	UKIntsEqual(0, [[self clientMessages] count]);
 		
 	UKIntsEqual(2, [[[clientBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1, serverChild1), [[clientBranch rootObject] contents]);
+	UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [[clientBranch rootObject] valueForKeyPath: @"contents.UUID"]);
 }
 
 - (void) testServerAndClientEdit
@@ -143,7 +143,7 @@
 	[transport deliverMessagesToServer];
 	
 	UKIntsEqual(2, [[[serverBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1, serverChild1), [[serverBranch rootObject] contents]);
+	UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [[serverBranch rootObject] valueForKeyPath: @"contents.UUID"]);
 	
 	UKIntsEqual(0, [[self serverMessages] count]);
 	
@@ -173,7 +173,7 @@
 	UKIntsEqual(0, [[self clientMessages] count]);
 	
 	UKIntsEqual(2, [[[clientBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1, serverChild1), [[clientBranch rootObject] contents]);
+	UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [[clientBranch rootObject] valueForKeyPath: @"contents.UUID"]);
 }
 
 - (void) testLocalClientCommitsAfterPushingToServer
@@ -197,7 +197,7 @@
 	UKObjectKindOf([self clientMessages][1], COSynchronizerResponseToClientForSentRevisionsMessage);
 	
 	UKIntsEqual(2, [[[serverBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1, serverChild1), [[serverBranch rootObject] contents]);
+	UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [[serverBranch rootObject] valueForKeyPath: @"contents.UUID"]);
 	
 	// Before the merged changes arrives at the client, make another commit on the client
 	
