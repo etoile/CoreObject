@@ -40,6 +40,18 @@
  * but you can also make subclasses of COObject for a particular entity to get 
  * static type checking.
  * 
+ * @section Object Equality
+ *
+ * COObject inherits NSObject's -hash and -isEqual: methods, so equality is
+ * based on pointer comparison.
+ *
+ * You must never override -hash or -isEqual:. This is a consequence of the fact that
+ * we promise it is safe to put a COObject instance in an NSSet and then mutate
+ * the COObject.
+ *
+ * Use -isTemporallyEqual: to check both UUID and revision match. For example,
+ * when the same object is in use in multiple editing contexts simultaneously.
+ *
  * @section Common Use Cases
  *
  * For an existing persistent root or transient object graph context, 
@@ -829,27 +841,6 @@
 
 /** @taskunit Object Equality */
 
-
-/** 
- * Returns a hash based on the UUID. 
- *
- * You must never override -hash.
- */
-- (NSUInteger)hash;
-/**
- * Returns whether anObject is equal to the receiver.
- *
- * Two persistent objects are equal if they share the same UUID (even when the 
- * two object revisions don't match).
- *
- * Use -isTemporallyEqual: to check both UUID and revision match. For example, 
- * when the same object is in use in multiple editing contexts simultaneously.
- *
- * You must never override -isEqual:. This is a consequence of the fact that
- * we promise it is safe to put a COObject instance in an NSSet and then mutate
- * the COObject.
- */
-- (BOOL)isEqual: (id)anObject;
 /** 
  * Returns whether anObject saved state is equal the receiver saved state. 
  *

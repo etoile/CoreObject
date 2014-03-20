@@ -138,13 +138,30 @@
 	[proot setCurrentBranch: secondaryBranch];
 	[ctx commit];
 	
-	// This breaks currently, because object belongs to the "current branch object graph"
-	// [proot objectGraphContext]. The branch of [proot objectGraphContext] changes
-	// when -setCurrentBranch: is called, but the branch UUID is incorporated
-	// into -[COObject hash] right now, so this fails
-#if 0
 	UKIntsEqual(hash, [object hash]);
-#endif
+}
+
+- (void) testIsEqualUsesPointerEquality
+{
+	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+	[ctx commit];
+	
+	COObject *object = [proot rootObject];
+	
+	[self checkPersistentRootWithExistingAndNewContext: proot
+											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	 {
+		 if (isNewContext)
+		 {
+			 UKObjectsNotEqual(object, [testProot rootObject]);
+			 UKObjectsNotSame(object, [testProot rootObject]);
+		 }
+		 else
+		 {
+			 UKObjectsEqual(object, [testProot rootObject]);
+			 UKObjectsSame(object, [testProot rootObject]);
+		 }
+	 }];
 }
 
 - (void) testDetailedDescription
