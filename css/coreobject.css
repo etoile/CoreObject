@@ -71,6 +71,11 @@
 
 @import url(http://fonts.googleapis.com/css?family=Ruda:400,900);
 
+/*
+ * Body
+ * ====
+ */
+
 /* For the sticky footer */
 html 
 {
@@ -83,22 +88,30 @@ body
 	padding-top: 80px;
   	/* Margin bottom by footer height */
 	margin-bottom: 200px;
-	background-color: #f6f6f4;
-	/*background-color: #faf4f1;*/
-	/*background: #f6f6f4;*/
+
+	background-color: #f6f6f4; /* #faf4f1; */
+}
+
+/* Stretchable container that extends horizontally all the way to the page border */
+.container-full 
+{
+	padding: 0;
+	margin: 0;
 }
 
 /*
  * Navigation Bar 
+ * ==============
  */
 
 .navbar
 {
-	font-family: 'Open Sans';
-	font-weight: 300;
-	font-size: 16px; 	
-	background-color: #FFFFFF; /* #383428; */ /*#f6f6f4;*/
+	background-color: #FFFFFF; /* #383428; #f6f6f4; */
 	opacity: 0.88;
+
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 300;
+	font-size: 16px;
 }
 
 .navbar-brand
@@ -109,64 +122,30 @@ body
 }
 
 /*
- * Misc
+ * Tag Lines
+ * =========
  */
- 
-.dotted {
-  padding: 2.25em 1.6875em;
-  background-image: -webkit-repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 1px, transparent 1px, transparent 100%);
-  background-image: -moz-repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 1px, transparent 1px, transparent 100%);
-  background-image: -ms-repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 1px, transparent 1px, transparent 100%);
-  background-image: repeating-radial-gradient(center center, rgba(0,0,0,.2), rgba(0,0,0,.2) 1px, transparent 1px, transparent 100%);
-  -webkit-background-size: 3px 3px;
-  -moz-background-size: 3px 3px;
-  background-size: 3px 3px;
-  }
-
-.stripped {
-  padding: 2.25em 1.6875em;
-  background-image: -webkit-repeating-linear-gradient(135deg, rgba(0,0,0,.3), rgba(0,0,0,.3) 1px, transparent 2px, transparent 2px, rgba(0,0,0,.3) 3px);
-  background-image: -moz-repeating-linear-gradient(135deg, rgba(0,0,0,.3), rgba(0,0,0,.3) 1px, transparent 2px, transparent 2px, rgba(0,0,0,.3) 3px);
-  background-image: -o-repeating-linear-gradient(135deg, rgba(0,0,0,.3), rgba(0,0,0,.3) 1px, transparent 2px, transparent 2px, rgba(0,0,0,.3) 3px);
-  background-image: repeating-linear-gradient(135deg, rgba(0,0,0,.3), rgba(0,0,0,.3) 1px, transparent 2px, transparent 2px, rgba(0,0,0,.3) 3px);
-  -webkit-background-size: 4px 4px;
-  -moz-background-size: 4px 4px;
-  background-size: 4px 4px;
-  }
-  
-
-
-.jumbotron
-{
-	background-color: 0;
-}
-
-.container p
-{
-	font-family: 'Open Sans', sans-serif;
-	font-size: 14px;
-	/*font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;*/
-}
 
 .tagline
 {
+	padding-bottom: 80px;
+
 	text-align: justify;
 	font-family: 'Open Sans', sans-serif;
 	font-weight: 500;
 	font-size: 20px;
-	padding-bottom: 80px;
 }
 
 .small-tagline
 {
 	margin-top: 40px;
+	padding-bottom: 30px;
 
 	text-align: center;
 	line-height: 230%;
 	font-family: 'Open Sans', sans-serif;
 	font-weight: 500;
 	font-size: 14px;
-	padding-bottom: 30px;
 }
 
 .small-tagline p:not(:first-child)
@@ -180,11 +159,17 @@ body
 	color: #ef4832;
 }
 
+/*
+ * Lists and Annotations
+ * =====================
+ */
+
 #content ul
 {
-	list-style-type: none;
 	margin: 0;
 	padding: 0;
+
+	list-style-type: none;
 }
 
 #content li
@@ -197,20 +182,36 @@ body
 	font-size: 13px;
 }
 
+.annotation
+{
+	text-align: left;
+}
+
+.annotation p
+{
+	color: #222;
+
+	text-align: left;
+	line-height: 200%;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 400;
+	font-size: 13px;
+	text-shadow: 0px 3px 4px rgba(0, 0, 0, 0.1);
+}
+
+/**
+ * Headers and Paragraphs
+ * ======================
+ */
+
 .container h1
 {
 	padding-bottom: 20px;
 
 	text-align: center;
-	font-family: 'Raleway';
+	font-family: 'Raleway', sans-serif;
 	font-weight: 100;
 	font-size: 32px;
-}
-
-.container-full 
-{
-	padding: 0;
-	margin: 0;
 }
 
 .container-full h1
@@ -221,19 +222,56 @@ body
 
 h2
 {
-	margin-top: 0px;
+	margin-top: 0;
 
 	text-align: left;
 	text-transform: uppercase;
-	font-family: 'Raleway';
+	font-family: 'Raleway', sans-serif;
 	font-weight: 700;
 	font-size: 22px;
 	color: #585858;
 }
 
+.container p
+{
+	font-family: 'Open Sans', sans-serif;
+	font-size: 14px;
+}
+
+/**
+ * Code Snippets
+ * =============
+ */
+
+.codewrapper
+{
+
+}
+
+.code
+{
+	padding: 5px;
+
+	background-color: rgba(255, 204, 2, 0.7);
+	opacity: 0.85;
+
+	white-space: nowrap;
+	font-style: normal;
+	font-family: 'Raleway', sans-serif;
+	font-weight: 400;
+	font-size: 16px;
+	color: white;
+}
+
 /*
  * Top Area
+ * ========
  */
+ 
+.jumbotron
+{
+	background-color: 0;
+}
 
 #splash
 {
@@ -243,7 +281,7 @@ h2
 #splash h1
 {
 	text-align: center;
-	font-family: 'Raleway Dots';
+	font-family: 'Raleway Dots', sans-serif;
 	font-weight: 100;
 	font-size: 64px;
 }
@@ -253,7 +291,7 @@ h2
 	padding-bottom: 30px;
 
 	text-align: right;
-	font-family: 'Raleway';
+	font-family: 'Raleway', sans-serif;
 	font-weight: 400;
 	font-size: 16px;
 	color: #585858;
@@ -261,10 +299,11 @@ h2
 
 #splashline em
 {
-	font-style: normal;
-	color: #111;
 	background-color: #AEE4FF;
 	opacity: 0.8;
+
+	font-style: normal;
+	color: #111;
 }
 
 #introduction
@@ -274,6 +313,7 @@ h2
 
 /*
  * User Experience
+ * ===============
  */
 
 #userexperience
@@ -299,6 +339,7 @@ h2
 
 /*
  * Features
+ * ========
  */
 
 #features h2
@@ -317,6 +358,7 @@ h2
 	margin: 0 auto;
 	padding: 0;
 	width: 100%;
+
 	background-color: #6cf;
 }
 
@@ -328,6 +370,7 @@ h2
 
 /*
  * Framework
+ * =========
  */
 
 #overall-design
@@ -338,25 +381,25 @@ h2
 
 #overall-design .small-tagline
 {
-	padding-bottom: 0px;
+	padding-bottom: 0;
 }
 
 /*
  * Download
+ * ========
  */
 
 #download
 {
 	background-color: #ef4832;
-	background-color: #F05C44; /*#F07057; #E74C3C;*/
+	background-color: #F05C44; /* #F07057; #E74C3C; */
 	background-color: #ff9933;
-
+	
 	background-color: #F56432;
 	background-color: #F35C32;
 	background-color: #F46032;
 
-
-background-color: #FF7A4C;
+	background-color: #FF7A4C;
 
 	margin: 0 auto;
 	padding: 0;
@@ -378,7 +421,6 @@ background-color: #FF7A4C;
 
 #download .row div:nth-child(2)
 {
-	/*width: 350px;*/
 	text-align: center;
 }
 
@@ -390,31 +432,9 @@ background-color: #FF7A4C;
 
 #download .small-tagline
 {
-	padding-bottom: 0px;
+	padding-bottom: 0;
+
 	text-shadow: 0px 3px 4px rgba(5, 5, 5, 0.07);
-}
-
-.annotation
-{
-	text-align: left;
-}
-
-.annotation p
-{
-	/* The body color */
-	color: #222;
-	text-align: left;
-	/*line-height: 200%;
-	font-family: 'Open Sans', sans-serif;
-	font-weight: 100;
-	font-size: 18px;
-	text-transform: uppercase;*/
-	
-	line-height: 200%;
-	font-family: 'Open Sans', sans-serif;
-	font-weight: 400;
-	font-size: 13px;
-	text-shadow: 0px 3px 4px rgba(0, 0, 0, 0.1);
 }
 
 .download-button
@@ -451,26 +471,9 @@ background-color: #FF7A4C;
 	background-size: 90px;
 }
 
-.codewrapper
-{
-
-}
-
-.code
-{
-	padding: 5px;
-	white-space: nowrap;
-	font-style: normal;
-	font-family: 'Raleway';
-	font-weight: 400;
-	font-size: 16px;
-	color: white;
-	background-color: rgba(255, 204, 2, 0.7);
-	opacity: 0.85;
-}
-
 /*
  * Footer
+ * ======
  */
 
 /* See sticky footer with nav bar in Bootstrap examples */
@@ -479,45 +482,45 @@ background-color: #FF7A4C;
 	position: absolute;
 	bottom: 0;
 	width: 100%;
-	
 	height: 120px; /* was 80 */
-	text-align: center;
 	padding: 0;
-	/*margin-top: 70px;*/
-	/*border-top: 1px solid lightgray;*/
-	background-color: #F6F6F4;;
-	/*background-image: url('../images/struckaxiom.png');*/
-	opacity: 1;
 
-	/*-webkit-background-size: cover;
-	-moz-background-size: cover;
-	-o-background-size: cover;
-	background-size: cover;
-	-webkit-box-shadow: inset 0 4px 9px -3px #000;
-	-moz-box-shadow: inset 0 4px 9px -3px #000;
-	box-shadow: inset 0 4px 9px -3px #000;*/
+	background-color: #F6F6F4;
+	
+	text-align: center;
 }
 
+/* Main container */
 #footer .container
 {
-	padding-top: 0px;
-	padding-bottom: 0px;
+	padding-top: 0;
+	/* For the splash line inside, the bottom padding is 30px, for the small 
+	   print, the bottom margin is 10px, this stretches the last column 
+	   vertically in the row, and translates as a 40px between main and pattern 
+	   containers. */
+	padding-bottom: 0;
 }
 
+/* Pattern container */
 #footer .container-full
 {
 	height: 80px;
-	border-top: 1px dotted lightgray;
 	vertical-align: center;
+	border-top: 1px dotted lightgray;
+
 	background-image: url('../images/struckaxiom.png');
 }
 
-#footer p
+/* Copyright notice */
+#footer small
 {
+	/* Make it look like a paragraph element */
+	display: block;
+	margin-bottom: 10px;
+
 	opacity: 0.7;
 
-	/*word-spacing: 0.1em;*/
 	letter-spacing: 0.05em;
 	font-size: 14px;
-	font-family: 'Raleway';
+	font-family: 'Raleway', sans-serif;
 }
