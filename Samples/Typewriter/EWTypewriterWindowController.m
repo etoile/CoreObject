@@ -576,8 +576,9 @@ static NSString *Trim(NSString *text)
 	TypewriterDocument *doc = [selectedNote rootObject];
 	COAttributedString *as = doc.attrString;
 	
-	COObjectGraphContext *oldDocCtx = [selectedNote objectGraphContextForPreviewingRevision: [selectedNote currentRevision]];
-	TypewriterDocument *oldDoc = [oldDocCtx rootObject];
+	// NOTE: selectedNoteCommittedState is equal to [selectedNote objectGraphContextForPreviewingRevision: [selectedNote currentRevision]];
+	// we could use that instead but it's too expensive to call -objectGraphContextForPreviewingRevision:.
+	TypewriterDocument *oldDoc = [selectedNoteCommittedState rootObject];
 	COAttributedString *oldAs = oldDoc.attrString;
 	
 	// HACK: -[COAttributedStringDiff initWithFirstAttributedString:secondAttributedString:source:] will throw an exception
@@ -651,6 +652,10 @@ static NSString *Trim(NSString *text)
 		NSLog(@"Can't write description for diff: %@", diff);
 	}
 
+	// Update selectedNoteCommittedState to reflect the commit
+	NSArray *objectsToUpdateInSnapshot = (NSArray *)[[[selectedNote.objectGraphContext changedObjects] mappedCollection] storeItem];
+	[selectedNoteCommittedState insertOrUpdateItems: objectsToUpdateInSnapshot];
+	
 	[self commitWithIdentifier: identifier descriptionArguments: descArgs];
 }
 
@@ -722,6 +727,10 @@ static NSString *Trim(NSString *text)
 - (void) selectNote: (COPersistentRoot *)aNote
 {
 	selectedNote = aNote;
+	
+	// Make a temporary copy of the note's current state. We use this to generate the diff for the commit metadata.
+	selectedNoteCommittedState = [COObjectGraphContext new];
+	[selectedNoteCommittedState setItemGraph: selectedNote.objectGraphContext];
 	
 	if (selectedNote == nil)
 	{

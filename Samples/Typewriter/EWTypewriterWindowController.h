@@ -44,6 +44,7 @@ NSString * EWTagDragType;
 	BOOL changedByUser;
 	NSTimer *coalescingTimer;
 	BOOL isDeleting;
+	COObjectGraphContext *selectedNoteCommittedState;
 }
 
 @property (nonatomic, readonly) NSTableView *notesTable;
