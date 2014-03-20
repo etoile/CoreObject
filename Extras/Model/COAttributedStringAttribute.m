@@ -43,30 +43,30 @@
 	return result;
 }
 
-+ (NSDictionary *) dictionaryForAttributeSet: (NSSet *)aSet
++ (NSSet *) setOfStringPairsForAttributeSet: (NSSet *)aSet
 {
-	NSMutableDictionary *result = [NSMutableDictionary new];
+	NSMutableSet *result = [NSMutableSet new];
 	for (COAttributedStringAttribute *attr in aSet)
 	{
-		result[attr.styleKey] = attr.styleValue;
+		[result addObject: @[attr.styleKey, attr.styleValue]];
 	}
 	return result;
 }
 
 + (BOOL) isAttributeSet: (NSSet *)aSet equalToSet: (NSSet *)anotherSet
 {
-	return [[self dictionaryForAttributeSet: aSet]
-			isEqual: [self dictionaryForAttributeSet: anotherSet]];
+	return [[self setOfStringPairsForAttributeSet: aSet]
+			isEqual: [self setOfStringPairsForAttributeSet: anotherSet]];
 }
 
 + (NSSet *) attributeSet: (NSSet *)aSet minusSet: (NSSet *)anotherSet
 {
-	NSDictionary *pairsToRemove = [self dictionaryForAttributeSet: anotherSet];
+	NSSet *pairsToRemove = [self setOfStringPairsForAttributeSet: anotherSet];
 	
 	NSMutableSet *result = [NSMutableSet set];
 	for (COAttributedStringAttribute *attr in aSet)
 	{
-		if (![pairsToRemove[attr.styleKey] isEqualToString: attr.styleValue])
+		if (![pairsToRemove containsObject: @[attr.styleKey, attr.styleValue]])
 		{
 			[result addObject: attr];
 		}

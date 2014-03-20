@@ -533,6 +533,8 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		}
 	}
 
+	//NSLog(@">>> Returning %@ for %@", newAttribs, attrs);
+	
 	return newAttribs;
 }
 

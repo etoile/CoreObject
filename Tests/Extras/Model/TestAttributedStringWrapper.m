@@ -308,6 +308,22 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	[self checkFontHasTraits: 0 withLongestEffectiveRange: NSMakeRange(0, 1) inAttributedString: as];
 }
 
+- (void) testAddUnderlineAndStrikethrough
+{
+	[as replaceCharactersInRange: NSMakeRange(0, 0) withString: @"abc"];
+	
+	[self checkBlock: ^() {
+		[as addAttribute: NSUnderlineStyleAttributeName value: @(NSUnderlineStyleSingle) range: NSMakeRange(1, 1)];
+	} modifiesRange: NSMakeRange(1, 1) mask: NSTextStorageEditedAttributes delta: 0 newString: @"abc"];
+	
+	[self checkBlock: ^() {
+		[as addAttribute: NSStrikethroughStyleAttributeName value: @(NSUnderlineStyleSingle) range: NSMakeRange(0, 3)];
+	} modifiesRange: NSMakeRange(0, 3) mask: NSTextStorageEditedAttributes delta: 0 newString: @"abc"];
+	
+	[self checkAttribute: NSStrikethroughStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(0, 3) inAttributedString: as];
+	[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(1, 1) inAttributedString: as];
+}
+
 @end
 
 
