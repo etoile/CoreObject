@@ -260,7 +260,10 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 {
 	COTagGroup *targetTagGroup = [self tagGroupOfSelectedRow];
 	if (targetTagGroup == nil)
-		targetTagGroup = [self defaultTagGroup];
+	{
+		NSLog(@"Couldn't create tag; no tag group to insert it in to");
+		return;
+	}
 
 	__block COTag *newTag = nil;
 	
@@ -727,23 +730,25 @@ static NSString *Trim(NSString *text)
 - (void) selectNote: (COPersistentRoot *)aNote
 {
 	selectedNote = aNote;
-	
-	// Make a temporary copy of the note's current state. We use this to generate the diff for the commit metadata.
-	selectedNoteCommittedState = [COObjectGraphContext new];
-	[selectedNoteCommittedState setItemGraph: selectedNote.objectGraphContext];
-	
+		
 	if (selectedNote == nil)
 	{
 		// Nothing selected
 		NSLog(@"Nothing selected");
 		[textView setEditable: NO];
 		[textView setHidden: YES];
+		
+		selectedNoteCommittedState = nil;
 		return;
 	}
 	else
 	{
 		[textView setEditable: YES];
 		[textView setHidden: NO];
+		
+		// Make a temporary copy of the note's current state. We use this to generate the diff for the commit metadata.
+		selectedNoteCommittedState = [COObjectGraphContext new];
+		[selectedNoteCommittedState setItemGraph: selectedNote.objectGraphContext];
 	}
 	
 	TypewriterDocument *doc = [selectedNote rootObject];
@@ -842,11 +847,6 @@ static NSString *Trim(NSString *text)
 - (COTagLibrary *)tagLibrary
 {
 	return [[[self document] libraryPersistentRoot] rootObject];
-}
-
-- (COTagGroup *)defaultTagGroup
-{
-	return [self tagLibrary].tagGroups[0];
 }
 
 #pragma mark - Search

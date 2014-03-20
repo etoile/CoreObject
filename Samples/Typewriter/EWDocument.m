@@ -37,12 +37,6 @@
 	if ([libraryPersistentRoots count] == 0)
 	{
 		library = [ctx insertNewPersistentRootWithEntityName: @"COTagLibrary"];
-		
-		// Create a default tag group
-		COTagGroup *defaultTagGroup = [[COTagGroup alloc] initWithObjectGraphContext: library.objectGraphContext];
-		defaultTagGroup.name = @"Default Tag Group";
-		[(COTagLibrary *)library.rootObject setTagGroups: @[defaultTagGroup]];
-		
 		[ctx commit];
 	}
 	else if ([libraryPersistentRoots count] == 1)
