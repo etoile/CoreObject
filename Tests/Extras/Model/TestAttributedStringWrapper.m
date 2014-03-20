@@ -433,6 +433,31 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	} modifiesRange: NSMakeRange(1, 1) mask: NSTextStorageEditedCharacters | NSTextStorageEditedAttributes delta: -1 newString: @"ad"];
 }
 
+- (void) testReplacingSingleChunkWithEmptyStringDeletesChunk
+{
+	[self appendHTMLString: @"a<B>b</B><I>c</I>" toAttributedString: attributedString];
+	
+	[as replaceCharactersInRange: NSMakeRange(1, 1) withString: @""];
+	
+	UKObjectsEqual(@"ac", [as string]);
+	UKIntsEqual(2, [attributedString.chunks count]);
+	UKObjectsEqual(@"a", [attributedString.chunks[0] text]);
+	UKObjectsEqual(@"c", [attributedString.chunks[1] text]);
+}
+
+- (void) testReplacingMultipleChunksWithEmptyStringDeletesChunk
+{
+	[self appendHTMLString: @"a<B>b</B><I>c</I><U>dd</U>" toAttributedString: attributedString];
+	
+	// Delete chunks 'b' and 'c', and the first character of 'dd'
+	[as replaceCharactersInRange: NSMakeRange(1, 3) withString: @""];
+	
+	UKObjectsEqual(@"ad", [as string]);
+	UKIntsEqual(2, [attributedString.chunks count]);
+	UKObjectsEqual(@"a", [attributedString.chunks[0] text]);
+	UKObjectsEqual(@"d", [attributedString.chunks[1] text]);
+}
+
 @end
 
 /**

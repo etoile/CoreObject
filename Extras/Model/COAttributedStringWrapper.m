@@ -452,6 +452,11 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	NSString *newText = [chunk.text stringByReplacingCharactersInRange: NSMakeRange(indexInChunk, lengthInChunkToReplace) withString: aString];
 	chunk.text = newText;
 	
+	if ([newText length] == 0)
+	{
+		[[_backing mutableArrayValueForKey: @"chunks"] removeObjectAtIndex: chunkIndex--];
+	}
+	
 	NSUInteger remainingLengthToDelete = aRange.length - lengthInChunkToReplace;
 	
 	while (remainingLengthToDelete > 0)
@@ -463,6 +468,11 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		lengthInChunkToReplace = MIN([[chunk text] length], remainingLengthToDelete);
 		chunk.text = [chunk.text stringByReplacingCharactersInRange: NSMakeRange(0, lengthInChunkToReplace) withString: @""];
 		remainingLengthToDelete -= lengthInChunkToReplace;
+		
+		if ([chunk.text length] == 0)
+		{
+			[[_backing mutableArrayValueForKey: @"chunks"] removeObjectAtIndex: chunkIndex--];
+		}
 	}
 	
 	// TODO: Add tests that check for this
