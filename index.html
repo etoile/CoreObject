@@ -68,7 +68,8 @@
 				<div class="hidden-xs col-md-5">
 				</div>
 				<div class="col-md-6">
-					<div id="splashline">CoreObject is a <em>version-controlled object database</em> for Objective-C, designed to be a humane persistence layer for applications with a <span class="highlighted-text">"never lose any work"</span> philosophy.</div>
+					<div id="splashline">CoreObject is a <em>version-controlled object database</em> for Objective-C that supports powerful undo, merging, and collaborative editing.</div>					
+					<!-- designed to be a humane persistence layer for applications with a <span class="highlighted-text">"never lose any work"</span> philosophy.</div>-->
 				</div>
 				<div class="hidden-xs col-md-1">
 				</div>
@@ -78,32 +79,45 @@
 
 		<div class="container" id="userexperience">
 			<h1>User Experience</h1>
+			<div class="tagline">CoreObject came from imagining how we would use <em>first principles of UI design</em> to write <span class="highlighted-text">content creation and productivity apps</span> without being bound by legacy compatibility.</div>
+			<!--
 			<div class="tagline">CoreObject came from imagining how we would apply <em>first principles of UI design</em> to <span class="highlighted-text">graphics and productivity applications</span> in a legacy-free world.</div>
-
+			-->
 			<div class="row inner-row">
 				<div class="hidden-xs col-md-1"></div>
 				<div class="col-md-5">
-					<h2>Simple</h2>
+					<h2>Modern</h2>
 					<ul>
+						<li>No need to explicitly save</li>						
+						<li>Organize documents by tagging</li>
+						<li>No restrictions on document names (no illegal characters)</li>
+						<li>Compare documents and merge changes, no need to convert to plain text</li>
+						<!--
 						<li>no save command, and never lose even one keystroke</li>
 						<li>we can go back anywhere in the past instantly</li>
 						<li>document variations or branches (and possibility to convert copies into branches and vice-versa)</li>
 						<li>the history can be navigated at various granularities (document, activity etc.)</li>
+						-->
 					</ul>
 				</div>
 				<div class="col-md-5">
 					<h2>Resilient</h2>
 					<ul>
+						<li>Everything can be undone, even document creation/deletion, copy, revert, and single changes (selective undo)</li>
+						<li>Everything persists across application restart (including undo/redo)</li>
+						<li>Undo history is tree-structured so you never lose access to a change</li>
+						<!--
 						<li>everything can be undone even deletion, copy, undo etc.</li>
 						<li>any change can be cancelled individually in the history (no matter how big is the history)</li>
 						<li>undo/redo persistent across application restart</li>
 						<li>merging support that doesn't require use to look at a textual merge</li>
+						-->
 					</ul>
 				</div>
 				<div class="hidden-xs col-md-1"></div>
 			</div><!-- row -->
 
-			<div class="small-tagline">Our idea is to go futher than traditional filesystems by including <em>document/data structure and organization, collaborative editing, rich undo/redo, and version control</em> directly in CoreObject, to allow <span class="highlighted-text">all applications to easily implement these features</span>, and avoid each app reinventing the wheel in incompatible ways. In existing apps, we either see poor persistence support, or reliance on proprietary systems.</div>
+			<div class="small-tagline">Our idea is to go futher than traditional filesystems and databases by including <em>document/data structure and organization, collaborative editing, rich undo/redo, and version control</em> directly in CoreObject, to allow <span class="highlighted-text">all applications to easily implement these features</span>, and avoid each app reinventing the wheel in incompatible ways. In existing apps, we either see poor persistence support, or reliance on proprietary systems.</div>
 					
 			<div class="row">
 				<div class="hidden-xs col-md-1"></div>
@@ -112,11 +126,16 @@
 				<div class="col-md-5">
 					<h2>Open</h2>
 						<ul>
+						<li>Collaborative editing</li>						
+						<li>Easy data sharing across applications</li>
+						<li>Everything is searchable, past and present</li>
+						<!--
 						<li>collaborative editing</li>
 						<li>concurrent editing accross multiple applications, with updates propagated transparently to every working copies in memory</li>
 						<li>easy data sharing accross multiple applications</li>
 						<li>everything is searchable in the present and in the past</li>
 						<li>a UI toolkit or compound document model can be written on top</li>
+						-->
 					</ul>
 				</div>
 				<div class="hidden-xs col-md-1"></div>
@@ -127,8 +146,10 @@
 		<div class="container-full" id="features">
 		<div class="container">
 			<h1>Features</h1>
+			<div class="tagline">CoreObject is a <em>pragmatic OODB</em> with a homegrown DVCS, leveraging <span class="highlighted-text">SQLite</span> for transactional storage and indexing.</div>
+			<!--
 			<div class="tagline">CoreObject is a <em>pragmatic OODB</em> built on top of a <span class="highlighted-text">SQL database</span> that rethinks ideas from various horizons.</div>
-
+			-->
 			<div class="row">
 				<div class="col-md-4">
 					<h2>Version Control</h2>
