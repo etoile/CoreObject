@@ -82,6 +82,8 @@ Major Missing Features
 Open Questions
 --------------
 
+- We only have automatic metamodel-driven copying on subsets of an inner object graph. Investigate copying a persistent root and also referenced persistent roots. For example, being able to copy the Typewriter library persistent root, and have all note persistent roots in the library automatically copied as well, would be genuinely useful. This seems to be essentially the same problem we already solve with COCopier. Note that the persistent root copies would be essentially cheap copies, but we would have to rewrite the cross-references to point to the copies instead of the originals.
+
 - Do cross-store references make sense? i.e. switch from COPath to a URL?
 
 - Adjust COEditingContext loaded object cache to use a strategy that matches which root objects are going to be accessed recurrently (e.g. photos in a Photo Manager should have priority over other root objects)
