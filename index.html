@@ -154,32 +154,53 @@
 				<div class="col-md-4">
 					<h2>Version Control</h2>
 					<ul>
+						<li>SQLite <em>store</em> holds a set of documents; each document has its own history graph (documents are analogous to Git repositories)</li>
+						<li>Git-like branch semantics: document branches are pointers on the revision graph (plus metadata)</li>
+						<li>Revision storage inspired by <a href="http://mercurial.selenic.com/wiki/Presentations?action=AttachFile&do=get&target=ols-mercurial-paper.pdf">Mercurial</a>; fast to commit and fast to read any state</li>
+						<li>Garbage collection of unreachable revisions</li>
+						<li>Orthogonal undo system, can undo all possible modifications to a CoreObject store</li>
+						<!--
 						<li>Distributed version control based on an object graph diff model</li>
 						<li>Structured data merge works well for most use cases; pluggable merge strategies (with an example styled text merge algorithm)</li>
 						<li>Pervasive undo/redo</li>
 						<li>Muliple undo or history views over one or several documents</li>
 						<li>Selective undo (each change can be cancelled individually)</li>
+						-->				
 					</ul>
 				</div>
 
 				<div class="col-md-4">
 					<h2>Object Model</h2>
 					<ul>
+						<!--
 						<li>Versatile object model with rich relationship support</li>
 						<li>Flexible storage model with documents and branches backed by a store (documents are similar to Git repositories)</li>
+						-->
+						<li>The contents of a doucment is a garbage-collected object graph</li>						
+						<li>Objects are a UUID label and a set of key/value pairs</li>
+						<li>Values can be set, array, or single value of string, number, etc., a reference to another object in the same document, or another document</li>
+						<li>Structured data merge works well for most use cases; pluggable merge strategies (with an example styled text merge algorithm)</li>
 						<li>Stable serialization format with integrity checking</li>
 						<li>Optional organizational model with tags and libraries</li>
+						<li>Metamodel-driven copying</li>						
 					</ul>
 				</div>
 
 				<div class="col-md-4">
 					<h2>And More…</h2>
 					<ul>
+						<li>Supports large file attachments, treated as garbage collected, uniqued, immutable BLOBs</li>						
+						<li>Cheap copy documents (a copy consumes no space)</li>
+						<li>Real-time collaborative editing with full undo support per user</li>
+						<li>Built-in indexing and search including over the history</li>
+						<li>Concurrent editing accross multiple applications, with updates propagated transparently to every working copy in memory</li>
+						<!--
 						<li>Relationships accross documents and branches</li>
 						<li>Transparent object graph copy</li>
 						<li>Document cheap copy (a copy consumes no space)</li>
 						<li>Real-time collaborative editing with full undo support per user</li>
 						<li>Built-in indexing and search including over the history</li>
+						-->
 					</ul>
 				</div>
 			</div><!-- row -->
