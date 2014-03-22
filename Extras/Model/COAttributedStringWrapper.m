@@ -398,6 +398,14 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 			{
 				result[NSStrikethroughStyleAttributeName] = @(NSUnderlineStyleSingle);
 			}
+			if ([attr.styleKey isEqualToString: @"color"])
+			{
+				NSColor *color = [[NSValueTransformer valueTransformerForName: @"COColorToHTMLString"] reverseTransformedValue: attr.styleValue];
+				if (color != nil)
+				{
+					result[NSForegroundColorAttributeName] = color;
+				}
+			}
 		}
 		
 		result[NSFontAttributeName] = font;
@@ -529,7 +537,11 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		}
 		else if ([attributeName isEqual: NSForegroundColorAttributeName])
 		{
-			
+			NSString *colorString = [[NSValueTransformer valueTransformerForName: @"COColorToHTMLString"] transformedValue: attributeValue];
+			if (colorString != nil)
+			{
+				[newAttribs addObject: [self makeAttr: @"color" value: colorString]];
+			}
 		}
 	}
 
