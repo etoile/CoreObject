@@ -3,15 +3,14 @@
 //
 
 #import "SKTGraphic.h"
+#import <CoreObject/COAttributedString.h>
+#import <CoreObject/COAttributedStringWrapper.h>
 
-@interface SKTTextArea : SKTGraphic <NSTextViewDelegate> {
-    @private
-    NSTextStorage *_contents;
+@interface SKTTextArea : SKTGraphic <NSTextViewDelegate>
+{
+	COAttributedStringWrapper *textStorage;
 }
 
-- (void)setContents:(id)contents;
-- (NSTextStorage *)contents;
-    // setContents: is typed to take an id since it accepts either a string or an attributed string.
 @end
 
 /*

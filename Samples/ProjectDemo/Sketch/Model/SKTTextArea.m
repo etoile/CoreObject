@@ -5,6 +5,7 @@
 #import "SKTTextArea.h"
 #import "SKTGraphicView.h"
 #import "SKTDrawDocument.h"
+#import "DrawingController.h"
 
 @implementation SKTTextArea
 
@@ -13,17 +14,20 @@
     ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTTextArea"];
 	[entity setParent: (id)@"SKTGraphic"];
 	
+	ETPropertyDescription *attrStrProperty = [ETPropertyDescription descriptionWithName: @"attrStr"
+																					  type: (id)@"COAttributedString"];
+    [attrStrProperty setPersistent: YES];
+    [entity setPropertyDescriptions: A(attrStrProperty)];
+	
     return entity;
 }
 
-- (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
+- (instancetype) initWithObjectGraphContext:(COObjectGraphContext *)aContext
 {
 	self = [super initWithObjectGraphContext: aContext];
-	if (self) 
-	{
-		_contents = [[NSTextStorage alloc] init];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(SKT_contentsChanged:) name:NSTextStorageDidProcessEditingNotification object:_contents];
-	}
+	
+	[self setAttrStr: [[COAttributedString alloc] initWithObjectGraphContext: aContext]];
+	
 	return self;
 }
 
@@ -32,53 +36,33 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (id)copyWithZone:(NSZone *)zone 
+- (COAttributedString *) attrStr
 {
-    id newObj = [super copyWithZone:zone];
-
-    [newObj setContents:[self contents]];
-
-    return newObj;
+	return [self valueForVariableStorageKey: @"attrStr"];
 }
 
-- (void)setContents:(id)contents 
+- (void) setAttrStr: (COAttributedString *)attrStr
 {
-    if (contents != _contents) 
-	{
-        NSAttributedString *contentsCopy = [[NSAttributedString alloc] initWithAttributedString:_contents];
-        //[[[self undoManager] prepareWithInvocationTarget:self] setContents:contentsCopy];
-
-        // We are willing to accept either a string or an attributed string.
-        if ([contents isKindOfClass:[NSAttributedString class]]) 
-		{
-            [_contents replaceCharactersInRange:NSMakeRange(0, [_contents length]) withAttributedString:contents];
-        } 
-		else 
-		{
-            [_contents replaceCharactersInRange:NSMakeRange(0, [_contents length]) withString:contents];
-        }
-        [self didChange];
-    }
+	// Set the value
+	[self willChangeValueForProperty: @"attrStr"];
+	[self setValue: attrStr forVariableStorageKey: @"attrStr"];
+	[self didChangeValueForProperty: @"attrStr"];
+	
+	// After
+	
+	[textStorage setBacking: attrStr];
 }
 
-- (id)coerceValueForContents:(id)value 
+- (NSTextStorage *) contents
 {
-    // We want to just get Strings unchanged.  We will detect this and do the right thing in setContents().  We do this because, this way, we will do more reasonable things about attributes when we are receiving plain text.
-    if ([value isKindOfClass:[NSString class]]) 
+	if (textStorage == nil)
 	{
-        return value;
-    }
-	else 
-	{
-	    return nil; //NRO -- we don't have NSScript stuff..
-        //return [[NSScriptCoercionHandler sharedCoercionHandler] coerceValue:value toClass:[NSTextStorage class]];
-    }
-}
-
-
-- (NSTextStorage *)contents 
-{
-    return _contents;
+		textStorage = [[COAttributedStringWrapper alloc] initWithBacking: [self attrStr]];
+		
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(SKT_contentsChanged:) name:NSTextStorageDidProcessEditingNotification object:textStorage];
+	}
+	
+	return textStorage;
 }
 
 - (void)SKT_contentsChanged:(NSNotification *)notification 
@@ -99,26 +83,16 @@
     return NO;
 }
 
-/* NOTE: We do not share NSLayoutManager anymore because GNUstep crashes
- * when trying to do layout with reused layout manager.
- */
-/*static*/ NSLayoutManager *sharedDrawingLayoutManager() 
+NSArray *makeLMAndTC()
 {
-    // This method returns an NSLayoutManager that can be used to draw the contents of a SKTTextArea.
-    /*static*/ NSLayoutManager *sharedLM = nil;
-    if (!sharedLM) 
-	{
-        //NSTextContainer *tc = [[NSTextContainer allocWithZone:NULL] initWithContainerSize:NSMakeSize(1.0e6, 1.0e6)];
-        NSTextContainer *tc = [[NSTextContainer new] initWithContainerSize:NSMakeSize(1.0e6, 1.0e6)];
-        
-        //sharedLM = [[NSLayoutManager allocWithZone:NULL] init];
-        sharedLM = [[NSLayoutManager new] init];
+	NSTextContainer *tc = [[NSTextContainer new] initWithContainerSize:NSMakeSize(1.0e6, 1.0e6)];
+	NSLayoutManager *lm = [[NSLayoutManager new] init];
 
-        [tc setWidthTracksTextView:NO];
-        [tc setHeightTracksTextView:NO];
-        [sharedLM addTextContainer:tc];
-    }
-    return sharedLM;
+	[tc setWidthTracksTextView:NO];
+	[tc setHeightTracksTextView:NO];
+	[lm addTextContainer:tc];
+
+    return @[lm, tc];
 }
 
 - (void)drawInView:(SKTGraphicView *)view isSelected:(BOOL)flag 
@@ -140,8 +114,9 @@
         NSTextStorage *contents = [self contents];
         if ([contents length] > 0) 
 		{
-            NSLayoutManager *lm = sharedDrawingLayoutManager();
-            NSTextContainer *tc = [[lm textContainers] objectAtIndex:0];
+			NSArray *lmAndTc = makeLMAndTC();
+            NSLayoutManager *lm = lmAndTc[0];
+            NSTextContainer *tc = lmAndTc[1];
             NSRange glyphRange;
 
             [tc setContainerSize:bounds.size];
@@ -170,11 +145,7 @@ static const float SKTRightMargin = 36.0;
 
 - (NSSize)maxSize 
 {
-    NSRect bounds = [self bounds];
-    NSSize size = [[self document] documentSize];
-    size.width = (size.width - bounds.origin.x - SKTRightMargin);
-    size.height = (size.height - bounds.origin.y - SKTRightMargin);
-    return size;
+	return NSMakeSize(1.0e6, 1.0e6);
 }
 
 - (NSSize)requiredSize:(float)maxWidth 
@@ -186,8 +157,9 @@ static const float SKTRightMargin = 36.0;
     
     if (len > 0) 
 	{
-        NSLayoutManager *lm = sharedDrawingLayoutManager();
-        NSTextContainer *tc = [[lm textContainers] objectAtIndex:0];
+		NSArray *lmAndTc = makeLMAndTC();
+		NSLayoutManager *lm = lmAndTc[0];
+		NSTextContainer *tc = lmAndTc[1];
         NSRange glyphRange;
         NSSize requiredSize;
         
@@ -283,9 +255,8 @@ static const float SKTRightMargin = 36.0;
     return YES;
 }
 
-static NSTextView *newEditor() 
+static NSArray *makeLM_TC_TV()
 {
-    // This method returns an NSTextView whose NSLayoutManager has a refcount of 1.  It is the caller's responsibility to release the NSLayoutManager.  This function is only for the use of the following method.
     NSLayoutManager *lm = [[NSLayoutManager alloc] init];
     NSTextContainer *tc = [[NSTextContainer alloc] initWithContainerSize:NSMakeSize(1.0e6, 1.0e6)];
     NSTextView *tv = [[NSTextView alloc] initWithFrame:NSMakeRect(0.0, 0.0, 100.0, 100.0) textContainer:nil];
@@ -297,52 +268,46 @@ static NSTextView *newEditor()
     [tv setAllowsUndo:YES];
     [tc setTextView:tv];
 
-    return tv;
+	assert([tv layoutManager] == lm);
+	assert([tv textContainer] == tc);
+	
+    return @[lm, tc, tv];
 }
 
-static NSTextView *sharedEditor = nil;
-static BOOL sharedEditorInUse = NO;
-
 - (void)startEditingWithEvent:(NSEvent *)event inView:(SKTGraphicView *)view 
-{ 
-    NSTextView *editor;
+{
+	NSLayoutManager *lm;
+	NSTextContainer *tc;
+	NSTextView *editor;
     NSTextStorage *contents = [self contents];
     NSSize maxSize = [self maxSize];
     NSSize minSize = [self minSize];
     NSRect bounds = [self bounds];
     
-    if (!sharedEditorInUse) 
-	{
-        if (!sharedEditor) 
-		{
-            sharedEditor = newEditor();
-        }
-        sharedEditorInUse = YES;
-        editor = sharedEditor;
-    }
-	else 
-	{
-        editor = newEditor();
-    }
-    [[editor textContainer] setWidthTracksTextView:NO];
+	NSArray *lmTcTv = makeLM_TC_TV();
+	lm = lmTcTv[0];
+	tc = lmTcTv[1];
+	editor = lmTcTv[2];
+	
+    [tc setWidthTracksTextView:NO];
     if (NSWidth(bounds) > minSize.width + 1.0) 
 	{
         // If we are bigger than the minimum width we assume that someone already edited this SKTTextArea or that they created it by dragging out a rect.  In either case, we figure the width should remain fixed.
-        [[editor textContainer] setContainerSize:NSMakeSize(NSWidth(bounds), maxSize.height)];
+        [tc setContainerSize:NSMakeSize(NSWidth(bounds), maxSize.height)];
         [editor setHorizontallyResizable:NO];
     }
 	else 
 	{
-        [[editor textContainer] setContainerSize:maxSize];
+        [tc setContainerSize:maxSize];
         [editor setHorizontallyResizable:YES];
     }
     [editor setMinSize:minSize];
     [editor setMaxSize:maxSize];
-    [[editor textContainer] setHeightTracksTextView:NO];
+    [tc setHeightTracksTextView:NO];
     [editor setVerticallyResizable:YES];
     [editor setFrame:bounds];
 
-    [contents addLayoutManager:[editor layoutManager]];
+    [contents addLayoutManager:lm];
     [view addSubview:editor];
     [view setEditingGraphic:self editorView:editor];
     [editor setSelectedRange:NSMakeRange(0, [contents length])];
@@ -366,11 +331,10 @@ static BOOL sharedEditorInUse = NO;
         [editor setDelegate:nil];
         [editor removeFromSuperview];
         [[self contents] removeLayoutManager:[editor layoutManager]];
-        if (editor == sharedEditor) 
-		{
-            sharedEditorInUse = NO;
-        }
+		
         [view setEditingGraphic:nil editorView:nil];
+		
+		[[view drawingController] commitWithIdentifier: @"typing"];
     }
 }
 
@@ -388,29 +352,6 @@ static BOOL sharedEditorInUse = NO;
         // MF: For multiple editors we must fix up the others...  but we don't support multiple views of a document yet, and that's the only way we'd ever have the potential for multiple editors.
     }
 }
-
-NSString *SKTTextAreaContentsKey = @"Text";
-
-- (NSMutableDictionary *)propertyListRepresentation 
-{
-    NSMutableDictionary *dict = [super propertyListRepresentation];
-    [dict setObject:[NSArchiver archivedDataWithRootObject:[self contents]] forKey:SKTTextAreaContentsKey];
-    return dict;
-}
-
-- (void)loadPropertyListRepresentation:(NSDictionary *)dict 
-{
-    id obj;
-
-    [super loadPropertyListRepresentation:dict];
-
-    obj = [dict objectForKey:SKTTextAreaContentsKey];
-    if (obj) 
-	{
-        [self setContents:[NSUnarchiver unarchiveObjectWithData:obj]];
-    }
-}
-
 
 @end
 

@@ -154,6 +154,12 @@
 		{
 			"type": "modification",
 			"shortDescription": "Change attributes of text '%@'"
+		},
+		
+		"typing":
+		{
+			"type": "modification",
+			"shortDescription": "Typing"
 		}
 	}
 }
