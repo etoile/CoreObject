@@ -79,4 +79,10 @@
 	[graphicView setNeedsDisplay: YES];
 }
 
+- (void) objectGraphContextDidSwitch
+{
+	[graphicView objectGraphContextDidSwitch];
+	[graphicView setNeedsDisplay: YES];
+}
+
 @end

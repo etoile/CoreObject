@@ -49,6 +49,7 @@ static float SKTDefaultPasteCascadeDelta = 10.0;
 }
 
 - (void)dealloc {
+	[[NSNotificationCenter defaultCenter] removeObserver: self];
     [self endEditing];
 }
 
@@ -59,6 +60,32 @@ static float SKTDefaultPasteCascadeDelta = 10.0;
 - (void)setDrawingController: (DrawingController*)c
 {
 	_drawingController = c;
+	
+	[self objectGraphContextDidSwitch];
+}
+
+- (void) objectGraphContextDidSwitch
+{
+	[[NSNotificationCenter defaultCenter] removeObserver: self];
+	
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(objectGraphContextDidRelinquishObjects:)
+												 name: COObjectGraphContextWillRelinquishObjectsNotification
+											   object: _drawingController.objectGraphContext];
+	
+	[self clearCachedObjects];
+}
+
+- (void) objectGraphContextDidRelinquishObjects: (NSNotification *)notif
+{
+	[self clearCachedObjects];
+}
+
+- (void) clearCachedObjects
+{
+	_editingGraphic = nil;
+	_creatingGraphic = nil;
+	[_selectedGraphics removeAllObjects];
 }
 
 - (SKTDrawDocument *)drawDocument {

@@ -46,6 +46,8 @@
 - (DrawingController*)drawingController;
 - (void)setDrawingController: (DrawingController*)c;
 
+- (void) objectGraphContextDidSwitch;
+
 // Display invalidation
 - (void)invalidateGraphic:(SKTGraphic *)graphic;
 
