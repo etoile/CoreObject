@@ -200,18 +200,40 @@ static int i = 0;
 	[self shiftLeft: sender];
 }
 
+static NSString *implode(NSArray *array, NSString *separator)
+{
+	NSMutableString *result = [NSMutableString new];
+	const NSUInteger count = [array count];
+	for (NSUInteger i = 0; i < count; i++)
+	{
+		[result appendString: [array[i] description]];
+		if (i + 1 < count)
+		{
+			[result appendString: separator];
+		}
+	}
+	return result;
+}
+
 - (void)deleteForward:(id)sender
 {
-	OutlineItem *itemToDelete = [self selectedItem];
-	if (itemToDelete != nil && itemToDelete != [self rootObject])
+	NSArray *selectedRows = [self selectedRows];
+	if ([selectedRows count] == 0)
+		return;
+	
+	NSString *label = implode((NSArray *)[[selectedRows mappedCollection] label], @", ");
+	
+	for (OutlineItem *item in selectedRows)
 	{
-		NSInteger index = [[[itemToDelete parent] contents] indexOfObject: itemToDelete];
-		assert(index != NSNotFound);
-
-		[[itemToDelete parent] removeItemAtIndex: index];
+		if (item == [self rootObject])
+			continue;
 		
-		[self commitWithIdentifier: @"delete" descriptionArguments: @[itemToDelete.label]];
+		NSInteger index = [[[item parent] contents] indexOfObject: item];
+		assert(index != NSNotFound);
+		[[item parent] removeItemAtIndex: index];
 	}
+	
+	[self commitWithIdentifier: @"delete" descriptionArguments: @[label]];
 }
 
 - (void)delete:(id)sender
