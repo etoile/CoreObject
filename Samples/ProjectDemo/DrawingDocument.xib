@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1070</int>
-		<string key="IBDocument.SystemVersion">13A603</string>
-		<string key="IBDocument.InterfaceBuilderVersion">4514</string>
-		<string key="IBDocument.AppKitVersion">1265</string>
-		<string key="IBDocument.HIToolboxVersion">695.00</string>
+		<string key="IBDocument.SystemVersion">13C64</string>
+		<string key="IBDocument.InterfaceBuilderVersion">5053</string>
+		<string key="IBDocument.AppKitVersion">1265.19</string>
+		<string key="IBDocument.HIToolboxVersion">697.40</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">4514</string>
+			<string key="NS.object.0">5053</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSButton</string>
@@ -760,6 +760,14 @@
 					<string key="id">j1n-XW-qPn</string>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">showDocumentHistory:</string>
+						<reference key="source" ref="1003"/>
+						<reference key="destination" ref="706772967"/>
+					</object>
+					<string key="id">2If-Np-arQ</string>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
 						<string key="label">delegate</string>
 						<reference key="source" ref="1005"/>
@@ -1103,7 +1111,9 @@
 						<string key="moveToTrash:">id</string>
 						<string key="projectDemoRedo:">id</string>
 						<string key="projectDemoUndo:">id</string>
+						<string key="rename:">id</string>
 						<string key="shareWith:">id</string>
+						<string key="showDocumentHistory:">id</string>
 						<string key="showGraphvizHistoryGraph:">id</string>
 						<string key="showGraphvizItemGraph:">id</string>
 						<string key="stepBackward:">id</string>
@@ -1134,8 +1144,16 @@
 							<string key="name">projectDemoUndo:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="rename:">
+							<string key="name">rename:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="shareWith:">
 							<string key="name">shareWith:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showDocumentHistory:">
+							<string key="name">showDocumentHistory:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="showGraphvizHistoryGraph:">

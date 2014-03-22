@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1070</int>
-		<string key="IBDocument.SystemVersion">13B42</string>
-		<string key="IBDocument.InterfaceBuilderVersion">4514</string>
-		<string key="IBDocument.AppKitVersion">1265</string>
-		<string key="IBDocument.HIToolboxVersion">696.00</string>
+		<string key="IBDocument.SystemVersion">13C64</string>
+		<string key="IBDocument.InterfaceBuilderVersion">5053</string>
+		<string key="IBDocument.AppKitVersion">1265.19</string>
+		<string key="IBDocument.HIToolboxVersion">697.40</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">4514</string>
+			<string key="NS.object.0">5053</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSButton</string>
@@ -341,10 +341,10 @@
 												<string>WebURLsWithTitlesPboardType</string>
 												<string>public.url</string>
 											</set>
-											<string key="NSFrameSize">{480, 236}</string>
+											<string key="NSFrameSize">{465, 236}</string>
 											<reference key="NSSuperview" ref="379660971"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="1022588078"/>
+											<reference key="NSNextKeyView" ref="36355145"/>
 											<object class="NSTextContainer" key="NSTextContainer" id="413431993">
 												<object class="NSLayoutManager" key="NSLayoutManager">
 													<object class="NSTextStorage" key="NSTextStorage">
@@ -360,7 +360,7 @@
 													<nil key="NSDelegate"/>
 												</object>
 												<reference key="NSTextView" ref="1020043142"/>
-												<double key="NSWidth">480</double>
+												<double key="NSWidth">465</double>
 												<int key="NSTCFlags">1</int>
 											</object>
 											<object class="NSTextViewSharedData" key="NSSharedData">
@@ -412,7 +412,7 @@
 											<nil key="NSDelegate"/>
 										</object>
 									</array>
-									<string key="NSFrame">{{1, 1}, {480, 236}}</string>
+									<string key="NSFrame">{{1, 1}, {465, 236}}</string>
 									<reference key="NSSuperview" ref="24334463"/>
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="1020043142"/>
@@ -442,7 +442,7 @@
 								<object class="NSScroller" id="1022588078">
 									<reference key="NSNextResponder" ref="24334463"/>
 									<int key="NSvFlags">256</int>
-									<string key="NSFrame">{{465, 1}, {16, 236}}</string>
+									<string key="NSFrame">{{466, 1}, {15, 236}}</string>
 									<reference key="NSSuperview" ref="24334463"/>
 									<reference key="NSWindow"/>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
@@ -469,7 +469,7 @@
 							<string key="NSFrame">{{-1, -1}, {482, 238}}</string>
 							<reference key="NSSuperview" ref="1006"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="36355145"/>
+							<reference key="NSNextKeyView" ref="379660971"/>
 							<int key="NSsFlags">133137</int>
 							<reference key="NSVScroller" ref="1022588078"/>
 							<reference key="NSHScroller" ref="36355145"/>
@@ -695,6 +695,14 @@
 						<reference key="destination" ref="477676675"/>
 					</object>
 					<string key="id">HyD-2I-ZaH</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">showDocumentHistory:</string>
+						<reference key="source" ref="1003"/>
+						<reference key="destination" ref="664411503"/>
+					</object>
+					<string key="id">S2H-JR-QHH</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
@@ -965,7 +973,9 @@
 						<string key="moveToTrash:">id</string>
 						<string key="projectDemoRedo:">id</string>
 						<string key="projectDemoUndo:">id</string>
+						<string key="rename:">id</string>
 						<string key="shareWith:">id</string>
+						<string key="showDocumentHistory:">id</string>
 						<string key="showGraphvizHistoryGraph:">id</string>
 						<string key="showGraphvizItemGraph:">id</string>
 						<string key="stepBackward:">id</string>
@@ -996,8 +1006,16 @@
 							<string key="name">projectDemoUndo:</string>
 							<string key="candidateClassName">id</string>
 						</object>
+						<object class="IBActionInfo" key="rename:">
+							<string key="name">rename:</string>
+							<string key="candidateClassName">id</string>
+						</object>
 						<object class="IBActionInfo" key="shareWith:">
 							<string key="name">shareWith:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="showDocumentHistory:">
+							<string key="name">showDocumentHistory:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="showGraphvizHistoryGraph:">
