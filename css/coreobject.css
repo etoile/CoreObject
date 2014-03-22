@@ -99,7 +99,7 @@ body
 	font-size: 1em;
 }
 
-@media (max-width: 768px) 
+@media (max-width: 992px)
 {
 	body
 	{
@@ -135,6 +135,21 @@ body
 		padding-left: 0;
 		padding-right: 0;
 		margin-bottom: 30px;
+	}
+	
+	/* If no more content follows in the same section, remove the margin bottom 
+	   to ensure we got the same amount empty space:
+
+	   - between the last list column and the section end
+	   - between a small tag line and the section end
+
+	   For small sizes, the small tag line shows a separator line at its bottom 
+	   that visually splits and reduces the space below it.
+	   
+	   To do so, we mark the last (visible) list column with 'last-content-col'. */
+	[class*="last-content-col"]
+	{
+		margin-bottom: 0;
 	}
 }
 
@@ -193,7 +208,7 @@ h2
 	color: #585858;
 }
 
-@media (max-width: 768px) 
+@media (max-width: 992px)
 {
 	.container h1
 	{
@@ -349,6 +364,8 @@ h2
  
 .jumbotron
 {
+	/* Override Bootstrap margin bottom 30px */
+	margin-bottom: 0;
 	background-color: 0;
 }
 
@@ -375,6 +392,7 @@ h2
 
 #splashline
 {
+	padding-top: 30px;
 	padding-bottom: 30px;
 
 	text-align: right;
@@ -384,11 +402,17 @@ h2
 	color: #585858;
 }
 
-@media (max-width: 768px) 
+@media (max-width: 992px) 
 {
+	/* Override the margin bottom set on .row in Grid section (for the same media max-wdith) */
+	#introduction .col-md-6
+	{
+		margin-bottom: 0;
+	}
+
 	#splashline
 	{
-		padding-bottom: 0;
+		/*padding-bottom: 0;*/
 
 		font-size: 0.9em;
 	}
@@ -492,6 +516,10 @@ h2
 
 #download
 {
+	margin: 0 auto;
+	padding: 0;
+	width: 100%;
+
 	background-color: #ef4832;
 	background-color: #F05C44; /* #F07057; #E74C3C; */
 	background-color: #ff9933;
@@ -502,9 +530,8 @@ h2
 
 	background-color: #FF7A4C;
 
-	margin: 0 auto;
-	padding: 0;
-	width: 100%;
+	/*background: radial-gradient(circle at center,#E4542D,#8B190C);
+	background: radial-gradient(circle at center,#FF7A4C,#ef4832);*/
 }
 
 #download .container
@@ -587,6 +614,70 @@ h2
 	background-size: 90px;
 }
 
+@media (max-width: 992px)
+{
+	.download-button
+	{
+		height: 140px;
+		width: 140px;
+		
+		font-size: 16px; /* Bootstrap set .btn-lg fontsize to 18px */
+		font-weight: 100;
+		font-family: 'Open Sans';
+	}
+
+	.download-icon
+	{
+		height: 70px;
+		width: 70px;
+		margin: 10px 20px 10px 20px;
+
+		/* Not expressed in 'em', it is a text-based icon inside a button (not resizable without a media query) */
+		font-size: 70px;
+	}
+
+	.github-icon
+	{
+		height: 70px;
+		width: 70px;
+		margin: 10px 20px 10px 20px;
+
+		background-size: 70px;
+	}
+}
+
+@media (max-width: 768px)
+{
+	.download-button
+	{
+		height: 120px;
+		width: 120px;
+		
+		font-size: 13px; /* Bootstrap set .btn-lg fontsize to 18px */
+		font-weight: 100;
+		font-family: 'Open Sans';
+	}
+
+	.download-icon
+	{
+		height: 60px;
+		width: 60px;
+		margin: 10px 15px 10px 15px;
+
+		/* Not expressed in 'em', it is a text-based icon inside a button (not resizable without a media query) */
+		font-size: 60px;
+	}
+
+	.github-icon
+	{
+		height: 60px;
+		width: 60px;
+		margin: 10px 15px 10px 15px;
+
+		background-size: 60px;
+	}
+}
+
 /*
  * Footer
  * ======
@@ -629,7 +720,7 @@ h2
 	background-image: url('../images/struckaxiom.png');
 }
 
-@media (max-width: 768px) 
+@media (max-width: 992px) 
 {
 	#footer
 	{
