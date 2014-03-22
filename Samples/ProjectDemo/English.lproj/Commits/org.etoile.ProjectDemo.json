@@ -39,25 +39,25 @@
 		"add-item":
 		{
 			"type": "creation",
-			"shortDescription": "Add item"
+			"shortDescription": "Add item '%@'"
 		},
 		
 		"add-child-item":
 		{
 			"type": "creation",
-			"shortDescription": "Add child item"
+			"shortDescription": "Add child item '%@' to '%@'"
 		},
 		
 		"shift-left":
 		{
 			"type": "modification",
-			"shortDescription": "Shift left"
+			"shortDescription": "Shift item '%@' left"
 		},
 
 		"shift-right":
 		{
 			"type": "modification",
-		  	"shortDescription": "Shift right"
+		  	"shortDescription": "Shift item '%@' right"
 		},
 
 		"revert":
@@ -81,13 +81,13 @@
 		"delete":
 		{
 			"type": "deletion",
-			"shortDescription": "Deleted one or several objects"
+			"shortDescription": "Delete '%@'"
 		},
 		
 		"rename":
 		{
 			"type": "renaming",
-		  	"shortDescription": "Rename outline item"
+		  	"shortDescription": "Rename outline item '%@' to '%@'"
 		},
 		
 		"duplicate":

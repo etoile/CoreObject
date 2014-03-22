@@ -123,8 +123,7 @@ static int i = 0;
 	
 	[outlineView expandItem: dest];
 	
-	[self commitWithIdentifier: @"add-item"];
-	//	TODO: pass [item label] to commit description
+	[self commitWithIdentifier: @"add-item" descriptionArguments: @[item.label]];
 }
 
 - (IBAction) addChildItem: (id)sender;
@@ -138,7 +137,7 @@ static int i = 0;
 		
 		[outlineView expandItem: dest];
 		
-		[self commitWithIdentifier: @"add-child-item"];
+		[self commitWithIdentifier: @"add-child-item" descriptionArguments: @[item.label, dest.label]];
 	}
 }
 
@@ -155,7 +154,7 @@ static int i = 0;
 		[parent removeItemAtIndex: indexOfItemInParent];
 		[grandparent addItem: item atIndex: [[grandparent contents] indexOfObject: parent] + 1];
 		
-		[self commitWithIdentifier: @"shift-left"];
+		[self commitWithIdentifier: @"shift-left" descriptionArguments: @[item.label]];
 		
 		[outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex:[outlineView rowForItem: item]]
 				 byExtendingSelection: NO];
@@ -179,7 +178,7 @@ static int i = 0;
 			[parent removeItemAtIndex: [[parent contents] indexOfObject: item]];
 			[newParent addItem: item];
 			
-			[self commitWithIdentifier: @"shift-right"]; // TODO: Pass [item label]
+			[self commitWithIdentifier: @"shift-right" descriptionArguments: @[item.label]];
 			
 			[outlineView expandItem: newParent];
 			
@@ -208,10 +207,10 @@ static int i = 0;
 	{
 		NSInteger index = [[[itemToDelete parent] contents] indexOfObject: itemToDelete];
 		assert(index != NSNotFound);
-		NSString *label = [itemToDelete label];
+
 		[[itemToDelete parent] removeItemAtIndex: index];
 		
-		[self commitWithIdentifier: @"delete"];
+		[self commitWithIdentifier: @"delete" descriptionArguments: @[itemToDelete.label]];
 	}
 }
 
@@ -339,7 +338,7 @@ static int i = 0;
 		NSString *oldLabel = [item label];
 		[item setLabel: object];
 	
-		[self commitWithIdentifier: @"rename"]; // TODO: Use [item label] in description
+		[self commitWithIdentifier: @"rename" descriptionArguments: @[oldLabel, object]];
 	}
 }
 
