@@ -12,6 +12,16 @@
 
 @implementation TestSynchronizer
 
+- (void) testPersistentRootMetadataReplicated
+{
+	UKObjectsEqual([self persistentRootMetadataForTest], clientPersistentRoot.metadata);
+}
+
+- (void) testBranchMetadataReplicated
+{
+	UKObjectsEqual([self branchMetadataForTest], clientBranch.metadata);
+}
+
 - (void) testBasicReplicationToClient
 {
 	UKNotNil(clientPersistentRoot);
@@ -202,8 +212,8 @@
 	// Before the merged changes arrives at the client, make another commit on the client
 	
 	[[clientBranch rootObject] setLabel: @"more changes"];
-	[clientPersistentRoot commitWithMetadata: [self clientMetadataForTest]];
-	UKObjectsEqual([self clientMetadataForTest], [[clientPersistentRoot currentRevision] metadata]);
+	[clientPersistentRoot commitWithMetadata: [self clientRevisionMetadataForTest]];
+	UKObjectsEqual([self clientRevisionMetadataForTest], [[clientPersistentRoot currentRevision] metadata]);
 	
 	// This should not produce any more messages
 	
@@ -214,7 +224,7 @@
 	[transport deliverMessagesToClient];
 
 	UKObjectsEqual(@"more changes", [[clientBranch rootObject] label]);
-	UKObjectsEqual([self clientMetadataForTest], [[clientPersistentRoot currentRevision] metadata]);
+	UKObjectsEqual([self clientRevisionMetadataForTest], [[clientPersistentRoot currentRevision] metadata]);
 	
 	// The client should push back the @"more changes" change to the server
 	

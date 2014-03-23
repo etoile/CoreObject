@@ -64,6 +64,7 @@
     if (persistentRoot == nil)
     {
 		[txn createPersistentRootWithUUID: message.persistentRootUUID persistentRootForCopy: nil];
+		[txn setMetadata: message.persistentRootMetadata forPersistentRoot: message.persistentRootUUID];
     }
 	
 	// 2. Do we have the branch?
@@ -74,6 +75,10 @@
 					 parentBranch: nil
 				  initialRevision: message.currentRevision.revisionUUID
 				forPersistentRoot: message.persistentRootUUID];
+		
+		[txn setMetadata: message.branchMetadata
+			   forBranch: message.branchUUID
+		ofPersistentRoot: message.persistentRootUUID];
 		
 		[txn setCurrentBranch: message.branchUUID
 			forPersistentRoot: message.persistentRootUUID];

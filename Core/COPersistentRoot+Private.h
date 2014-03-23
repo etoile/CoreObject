@@ -7,6 +7,11 @@
 
 #import <CoreObject/COPersistentRoot.h>
 
+/**
+ * Metadata dictionary key used by the `name` property.
+ */
+extern NSString * const COPersistentRootName;
+
 @class COStoreTransaction;
 
 @interface COPersistentRoot ()

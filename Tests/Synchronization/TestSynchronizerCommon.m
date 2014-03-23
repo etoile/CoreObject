@@ -17,7 +17,9 @@
 	[[[COSQLiteStore alloc] initWithURL: CLIENT_STORE_URL] clearStore];
 	
 	serverPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupNoOpposite"];
+	serverPersistentRoot.metadata = [self persistentRootMetadataForTest];
 	serverBranch = [serverPersistentRoot currentBranch];
+	serverBranch.metadata = [self branchMetadataForTest];
 	[ctx commit];
 	
 	server = [[COSynchronizerServer alloc] initWithBranch: serverBranch];
@@ -26,6 +28,7 @@
 	clientCtx = [COEditingContext contextWithURL: CLIENT_STORE_URL];
 	client = [[COSynchronizerClient alloc] initWithClientID: @"client" editingContext: clientCtx];
 	
+	// Transmits the persistent root to the client
 	[transport addClient: client];
 	
 	clientPersistentRoot = client.persistentRoot;
@@ -45,21 +48,31 @@
 	ETAssert(error == nil);
 }
 
-- (NSDictionary *)serverMetadataForTest
+- (NSDictionary *)serverRevisionMetadataForTest
 {
 	return @{ @"testMetadata" : @"server"};
 }
 
-- (NSDictionary *)clientMetadataForTest
+- (NSDictionary *)clientRevisionMetadataForTest
 {
 	return @{ @"testMetadata" : @"client"};
+}
+
+- (NSDictionary *)branchMetadataForTest
+{
+	return @{ kCOBranchLabel : @"my branch" };
+}
+
+- (NSDictionary *)persistentRootMetadataForTest
+{
+	return @{ COPersistentRootName : @"my persistent root" };
 }
 
 - (UnorderedGroupNoOpposite *) addAndCommitServerChild
 {
 	UnorderedGroupNoOpposite *serverChild1 = [[serverBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];
 	[[[serverBranch rootObject] mutableSetValueForKey: @"contents"] addObject: serverChild1];
-	[serverPersistentRoot commitWithMetadata: [self serverMetadataForTest]];
+	[serverPersistentRoot commitWithMetadata: [self serverRevisionMetadataForTest]];
 	return serverChild1;
 }
 
@@ -67,7 +80,7 @@
 {
 	UnorderedGroupNoOpposite *clientChild1 = [[clientBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];
 	[[[clientBranch rootObject] mutableSetValueForKey: @"contents"] addObject: clientChild1];
-	[clientPersistentRoot commitWithMetadata: [self clientMetadataForTest]];
+	[clientPersistentRoot commitWithMetadata: [self clientRevisionMetadataForTest]];
 	return clientChild1;
 }
 
