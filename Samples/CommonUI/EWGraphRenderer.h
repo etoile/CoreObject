@@ -19,6 +19,7 @@
 	NSMutableDictionary *revisionInfoForUUID;
 	NSMutableDictionary *childrenForUUID;
 	NSMutableDictionary *levelForUUID;
+	NSMutableSet *currentUUIDAndAncestors;
 	NSMutableArray *graphRows;
 	
 	id<COTrack> track;

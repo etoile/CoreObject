@@ -222,6 +222,29 @@
 	}
 }
 
+- (void) addUUIDAndParents: (ETUUID *)aNode toSet: (NSMutableSet *)dest
+{
+	if ([dest containsObject: aNode])
+		return;
+	
+	[dest addObject: aNode];
+	
+	for (ETUUID *parent in [self parentUUIDsForRevisionUUID: aNode])
+	{
+		[self addUUIDAndParents: parent toSet: dest];
+	}
+}
+
+- (void) buildCurrentUUIDAndAncestors
+{
+	currentUUIDAndAncestors = [NSMutableSet new];
+	
+	if ([track currentNode] != nil)
+	{
+		[self addUUIDAndParents: [[track currentNode] UUID] toSet: currentUUIDAndAncestors];
+	}
+}
+
 - (void) buildGraphRows
 {
 	ETAssert(trackNodesChronological != nil);
@@ -267,7 +290,7 @@
 	[self buildChildrenForUUID];
 	[self buildLevelForUUID];
 	[self buildGraphRows];
-//	[self buildBranchForRevisionUUID];
+	[self buildCurrentUUIDAndAncestors];
 }
 
 - (NSUInteger) count
@@ -329,6 +352,18 @@
 	[bp stroke];
 }
 
+- (NSColor *)colorForUUID: (ETUUID *)commit
+{
+	if ([currentUUIDAndAncestors containsObject: commit])
+	{
+		return [NSColor colorWithCalibratedRed: 0 green: 0.2 blue: 0.5 alpha: 1.0];
+	}
+	else
+	{
+		return [NSColor colorWithCalibratedRed: 0.7 green: 0.7 blue: 0.7 alpha: 1.0];
+	}
+}
+
 - (void) drawRevisionAtIndex: (NSUInteger)index inRect: (NSRect)aRect
 {
 	[NSGraphicsContext saveGraphicsState];
@@ -339,14 +374,6 @@
 	ETUUID *commit = [revisionInfo UUID];
 	const NSInteger level = [levelForUUID[commit] integerValue];
 
-	if ([revisionInfo.metadata[@"minorEdit"] isEqual: @(YES)])
-	{
-		[[NSColor grayColor] set];
-	}
-	else
-	{
-		[[NSColor blueColor] set];
-	}
 
 	// Draw lines
 	
@@ -356,10 +383,12 @@
 	{
 		for (ETUUID *child in [self childrenForUUID: parent])
 		{
+			[[self colorForUUID: child] setStroke];
 			[self drawLineFromUUID: parent toUUID: child currentRow: index inRect: aRect];
 		}
 	}
 	
+	[[self colorForUUID: commit] setStroke];
 	[[NSColor whiteColor] setFill];
 	NSBezierPath *circle = [NSBezierPath bezierPathWithOvalInRect: [self circleRectAtLevel: level inRect: aRect]];
 	[circle setLineWidth: [[[track currentNode] UUID] isEqual: commit] ? 2 : 1];
