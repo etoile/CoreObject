@@ -121,9 +121,9 @@ static int i = 0;
 	OutlineItem *item = [self newItem];
 	[dest addItem: item];
 	
-	[outlineView expandItem: dest];
-	
 	[self commitWithIdentifier: @"add-item" descriptionArguments: @[item.label]];
+
+	[outlineView expandItem: dest];
 }
 
 - (IBAction) addChildItem: (id)sender;
@@ -135,9 +135,11 @@ static int i = 0;
 		OutlineItem *item = [self newItem];
 		[dest addItem: item];
 		
-		[outlineView expandItem: dest];
-		
 		[self commitWithIdentifier: @"add-child-item" descriptionArguments: @[item.label, dest.label]];
+		
+		// Needs to be after the outline view reloads its data; the outline view won't expand an item
+		// it thinks is a leaf.
+		[outlineView expandItem: dest];
 	}
 }
 
