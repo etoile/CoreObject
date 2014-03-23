@@ -8,6 +8,7 @@
 #import "SKTDrawDocument.h"
 #import "Project.h"
 #import <CoreObject/CoreObject.h>
+#import <CoreObject/COPersistentRoot+Private.h>
 
 @implementation ApplicationDelegate
 
@@ -205,6 +206,53 @@
 		Document *doc = persistentRoot.rootObject;
 		[self registerDocumentRootObject: doc];
 	}
+}
+
+- (IBAction) reattachAsBranch:(id)sender
+{
+	id wcObject = [[NSApp mainWindow] windowController];
+	if (wcObject != nil && [wcObject respondsToSelector: @selector(projectDocument)])
+    {
+		EWDocumentWindowController *wc = wcObject;
+		COPersistentRoot *proot = wc.persistentRoot;
+		
+		[wc close];
+		[controllerForWindowID removeObjectForKey: wc.windowID];
+		
+		ETAssert(proot.isCopy);
+		
+		// FIXME: This is a private method. The ability to create a branch at an arbitrary
+		// revision should probably be exposed by COPersistentRoot
+		COBranch *reattachedBranch = [proot.parentPersistentRoot makeBranchWithLabel: proot.name
+																		  atRevision: proot.currentRevision
+																		parentBranch: nil];
+		
+		proot.deleted = YES;
+		
+		[context commit];
+	}
+}
+
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem
+{
+    SEL theAction = [anItem action];
+		
+	EWDocumentWindowController *wc = nil;
+	COPersistentRoot *proot = nil;
+	
+	id wcObject = [[NSApp mainWindow] windowController];
+	if (wcObject != nil && [wcObject respondsToSelector: @selector(projectDocument)])
+    {
+		wc = wcObject;
+		proot = wc.persistentRoot;
+	}
+				
+	if (theAction == @selector(reattachAsBranch:))
+	{
+		return proot.isCopy;
+	}
+		
+	return [self respondsToSelector: theAction];;
 }
 
 - (EWDocumentWindowController *) makeWindowControllerForDocumentRootObject: (Document *)aDoc

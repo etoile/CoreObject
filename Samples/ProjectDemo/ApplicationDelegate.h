@@ -29,7 +29,7 @@
 - (IBAction) newDrawing: (id)sender;
 
 - (IBAction) newWindow: (id)sender;
-
+- (IBAction) reattachAsBranch:(id)sender;
 - (IBAction) duplicate:(id)sender;
 
 - (void)checkpointWithName: (NSString*)name;

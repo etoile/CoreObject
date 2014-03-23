@@ -295,6 +295,14 @@
 									<reference key="NSOnImage" ref="128092494"/>
 									<reference key="NSMixedImage" ref="818417131"/>
 								</object>
+								<object class="NSMenuItem" id="117003011">
+									<reference key="NSMenu" ref="958508040"/>
+									<string key="NSTitle">Re-attach as branch</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="128092494"/>
+									<reference key="NSMixedImage" ref="818417131"/>
+								</object>
 								<object class="NSMenuItem" id="790466051">
 									<reference key="NSMenu" ref="958508040"/>
 									<string key="NSTitle">Rename...</string>
@@ -1615,7 +1623,6 @@
 									<string key="NSFrame">{{1, 119}, {223, 15}}</string>
 									<reference key="NSSuperview" ref="371928918"/>
 									<reference key="NSWindow"/>
-									<reference key="NSNextKeyView"/>
 									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<int key="NSsFlags">1</int>
 									<reference key="NSTarget" ref="371928918"/>
@@ -1837,7 +1844,6 @@
 							<string key="NSFrame">{{338, 12}, {96, 32}}</string>
 							<reference key="NSSuperview" ref="967803874"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView"/>
 							<string key="NSHuggingPriority">{250, 750}</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="669802616">
@@ -1901,6 +1907,13 @@
 				<bool key="NSIsDisabled">YES</bool>
 				<bool key="NSIsSeparator">YES</bool>
 				<string key="NSTitle"/>
+				<string key="NSKeyEquiv"/>
+				<int key="NSMnemonicLoc">2147483647</int>
+				<reference key="NSOnImage" ref="128092494"/>
+				<reference key="NSMixedImage" ref="818417131"/>
+			</object>
+			<object class="NSMenuItem" id="217847298">
+				<string key="NSTitle">Item</string>
 				<string key="NSKeyEquiv"/>
 				<int key="NSMnemonicLoc">2147483647</int>
 				<reference key="NSOnImage" ref="128092494"/>
@@ -2600,6 +2613,14 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
+						<string key="label">reattachAsBranch:</string>
+						<reference key="source" ref="471146553"/>
+						<reference key="destination" ref="117003011"/>
+					</object>
+					<string key="id">iIN-cR-bOw</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
 						<string key="label">orderFrontFontPanel:</string>
 						<reference key="source" ref="274351205"/>
 						<reference key="destination" ref="796845054"/>
@@ -3004,6 +3025,7 @@
 							<reference ref="212240817"/>
 							<reference ref="209018966"/>
 							<reference ref="790466051"/>
+							<reference ref="117003011"/>
 						</array>
 						<reference key="parent" ref="753782612"/>
 					</object>
@@ -4141,6 +4163,16 @@
 						<reference key="object" ref="796451796"/>
 						<reference key="parent" ref="853014698"/>
 					</object>
+					<object class="IBObjectRecord">
+						<string key="id">Agr-hk-GVz</string>
+						<reference key="object" ref="217847298"/>
+						<reference key="parent" ref="0"/>
+					</object>
+					<object class="IBObjectRecord">
+						<string key="id">90C-0l-Xg1</string>
+						<reference key="object" ref="117003011"/>
+						<reference key="parent" ref="958508040"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -4511,8 +4543,10 @@
 				<string key="8SS-ae-TLD.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<boolean value="NO" key="8SS-ae-TLD.showNotes"/>
 				<string key="8aD-2S-poi.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="90C-0l-Xg1.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="9xf-eK-abN.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="A0F-d0-oUC.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="Agr-hk-GVz.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="DEf-Y0-PTG.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="Go5-4C-6Ug.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="I6F-dJ-MtP.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -4730,6 +4764,7 @@
 						<string key="moveToTrash:">id</string>
 						<string key="projectDemoRedo:">id</string>
 						<string key="projectDemoUndo:">id</string>
+						<string key="reattachAsBranch:">id</string>
 						<string key="rename:">id</string>
 						<string key="shareWith:">id</string>
 						<string key="showDocumentHistory:">id</string>
@@ -4761,6 +4796,10 @@
 						</object>
 						<object class="IBActionInfo" key="projectDemoUndo:">
 							<string key="name">projectDemoUndo:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="reattachAsBranch:">
+							<string key="name">reattachAsBranch:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="rename:">
