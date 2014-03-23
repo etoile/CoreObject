@@ -239,7 +239,7 @@
 {
 	currentUUIDAndAncestors = [NSMutableSet new];
 	
-	if ([track currentNode] != nil)
+	if ([[track currentNode] UUID] != nil)
 	{
 		[self addUUIDAndParents: [[track currentNode] UUID] toSet: currentUUIDAndAncestors];
 	}
