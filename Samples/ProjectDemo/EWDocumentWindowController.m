@@ -305,9 +305,11 @@
 	if (args != nil)
 		metadata[kCOCommitMetadataShortDescriptionArguments] = args;
 	
-	XMPPController *xmppController = [XMPPController sharedInstance];
-	if (xmppController.username != nil)
-		metadata[@"username"] = xmppController.username;
+//	XMPPController *xmppController = [XMPPController sharedInstance];
+//	if (xmppController.username != nil)
+//		metadata[@"username"] = xmppController.username;
+	
+	metadata[@"username"] = NSFullUserName();
 	
 	[[self persistentRoot] commitWithIdentifier: identifier metadata: metadata undoTrack: [self undoTrack] error:NULL];
 }
