@@ -781,6 +781,11 @@ h2
 	}
 }
 
+#footer #splashline
+{
+	padding-top: 0;
+}
+
 /* Copyright notice */
 #footer small
 {
