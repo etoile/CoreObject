@@ -34,6 +34,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 @implementation COUndoTrack
 
 @synthesize name = _name, editingContext = _editingContext, store = _store;
+@synthesize customRevisionMetadata;
 
 #pragma mark -
 #pragma mark Initialization
@@ -281,9 +282,14 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	if (commitShortDescription == nil)
 		commitShortDescription = @"";
 	
-	NSDictionary *md = @{kCOCommitMetadataIdentifier : @"org.etoile.CoreObject.selective-undo",
-						 kCOCommitMetadataShortDescriptionArguments : @[commitShortDescription]};
+	NSMutableDictionary *md = [@{kCOCommitMetadataIdentifier : @"org.etoile.CoreObject.selective-undo",
+								 kCOCommitMetadataShortDescriptionArguments : @[commitShortDescription]} mutableCopy];
 		
+	if (self.customRevisionMetadata != nil)
+	{
+		[md addEntriesFromDictionary: self.customRevisionMetadata];
+	}
+	
 	command.metadata = md;
 	
 	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
@@ -304,8 +310,13 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	if (commitShortDescription == nil)
 		commitShortDescription = @"";
 	
-	NSDictionary *md = @{kCOCommitMetadataIdentifier : @"org.etoile.CoreObject.selective-redo",
-						 kCOCommitMetadataShortDescriptionArguments : @[commitShortDescription]};
+	NSMutableDictionary *md = [@{kCOCommitMetadataIdentifier : @"org.etoile.CoreObject.selective-redo",
+								 kCOCommitMetadataShortDescriptionArguments : @[commitShortDescription]} mutableCopy];
+	
+	if (self.customRevisionMetadata != nil)
+	{
+		[md addEntriesFromDictionary: self.customRevisionMetadata];
+	}
 
 	command.metadata = md;
 	
@@ -528,6 +539,10 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	if ([aCommand localizedShortDescription] != nil)
 	{
 		md[kCOCommitMetadataShortDescriptionArguments] = @[[aCommand localizedShortDescription]];
+	}
+	if (self.customRevisionMetadata != nil)
+	{
+		[md addEntriesFromDictionary: self.customRevisionMetadata];
 	}
 	
 	[commandToApply addToStoreTransaction: txn withRevisionMetadata: md assumingEditingContextState: _editingContext];

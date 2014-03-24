@@ -116,7 +116,15 @@ extern NSString * const kCOUndoTrackName;
  * called.
  */
 @property (nonatomic, readonly) COEditingContext *editingContext;
-
+/**
+ * If set, COUndoTrack will add these keys/values to the revision
+ * metadata when it commits a revision in response to -undo/-redo, 
+ * or -undoNode:/-redoNode:.
+ *
+ * For example, use this if you want to record the user's name
+ * in revisions they commit using the undo track.
+ */
+@property (nonatomic, readwrite) NSDictionary *customRevisionMetadata;
 
 /** @taskunit Clearing and Coalescing Commands */
 

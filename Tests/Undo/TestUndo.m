@@ -126,10 +126,13 @@
         UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
         
 		CORevision *r3 = ctx2persistentRoot.currentRevision;
+
+		rootEditTrack.customRevisionMetadata = @{ @"extraKey" : @"extraValue" };
 		
 		//
         // First Selective undo
 		//
+
         [rootEditTrack undo];
         
         UKNil([root valueForProperty: kCOLabel]);
@@ -140,6 +143,7 @@
 		UKObjectsNotEqual(r3, r4);
 		UKObjectsEqual(r3, [r4 parentRevision]);
 		UKObjectsEqual(@"org.etoile.CoreObject.undo", [[r4 commitDescriptor] identifier]);
+		UKObjectsEqual(@"extraValue", r4.metadata[@"extraKey"]);
 		
 		//
         // Second Selective undo
@@ -633,6 +637,8 @@
 	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r0 to: r1];
 	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r1 to: r2];
 	
+	_testTrack.customRevisionMetadata = @{ @"extraKey" : @"extraValue" };
+	
 	// selective undo child1 insertion
 	[_testTrack undoNode: _testTrack.nodes[1]];
 	CORevision *r3 = [doc1 currentRevision];
@@ -648,7 +654,9 @@
 	[self checkCommand: _testTrack.nodes[3] isSetVersionFrom: r1 to: r0];
 	
 	// Check that the commit created by COUndoTrack has proper commit metadata
+	// FIXME: This next line tests the undo track node metadata, not the revision metadata.
 	UKObjectsEqual(@"org.etoile.CoreObject.selective-undo", [[_testTrack.nodes[3] commitDescriptor] identifier]);
+	UKObjectsEqual(@"extraValue", doc1.currentRevision.metadata[@"extraKey"]);
 	
 	// Efficiency test: the r3 commit should only have written one item to the store
 	// (root) since that was the only change.
