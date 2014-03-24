@@ -678,6 +678,47 @@ h2
 	}
 }
 
+@media (max-width: 400px) 
+{
+	.download-button 
+	{
+		height: 90px;
+		width: 90px;
+		padding-left: 8px;
+		padding-right: 8px;
+
+		font-size: 11px; /* Bootstrap set .btn-lg fontsize to 18px */
+		font-weight: 100;
+		font-family: 'Open Sans';
+	}
+
+	.download-button:first-child 
+	{
+		margin-right: 15px;
+	}
+
+	.download-icon 
+	{
+		/* We make the download icon slightly smaller to correct the visual 
+		   impression it gives of being bigger than the Github icon */
+		height: 48px;
+		width: 48px;
+		margin: 2px 13px 6px 13px;
+		
+		/* Not expressed in 'em', it is a text-based icon inside a button (not resizable without a media query) */
+		font-size: 48px;
+	}
+
+	.github-icon 
+	{
+		height: 50px;
+		width: 50px;
+		margin: 2px 12px 4px 12px;
+
+		background-size: 50px auto;
+	}
+}
+
 /*
  * Footer
  * ======
