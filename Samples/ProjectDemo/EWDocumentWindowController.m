@@ -185,6 +185,7 @@
 		
 		_undoTrack = [COUndoTrack trackForName: name
 							withEditingContext: self.editingContext];
+		_undoTrack.customRevisionMetadata = @{ @"username" : NSFullUserName() };
 	}
 	return _undoTrack;
 }

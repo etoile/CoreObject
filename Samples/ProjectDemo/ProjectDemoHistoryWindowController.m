@@ -28,4 +28,9 @@
 	return [super tableView: tableView objectValueForTableColumn: tableColumn row: row];
 }
 
+- (NSDictionary *) customRevisionMetadata
+{
+	return @{ @"username" : NSFullUserName() };
+}
+
 @end

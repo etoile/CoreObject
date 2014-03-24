@@ -41,4 +41,6 @@
 - (IBAction) selectiveUndo: (id)sender;
 - (IBAction) selectiveRedo: (id)sender;
 
+- (NSDictionary *) customRevisionMetadata;
+
 @end

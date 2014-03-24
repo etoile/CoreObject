@@ -178,6 +178,11 @@
 	return node;
 }
 
+- (NSDictionary *) customRevisionMetadata
+{
+	return nil;
+}
+
 - (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args
 {
 	NSMutableDictionary *metadata = [NSMutableDictionary new];
@@ -186,6 +191,11 @@
 	
 	if ([undoTrackToCommitTo isCoalescing])
 		[undoTrackToCommitTo endCoalescing];
+	
+	if ([self customRevisionMetadata] != nil)
+	{
+		[metadata addEntriesFromDictionary: [self customRevisionMetadata]];
+	}
 	
 	[inspectedPersistentRoot.editingContext commitWithIdentifier: [@"org.etoile.CoreObject." stringByAppendingString: identifier]
 														metadata: metadata
