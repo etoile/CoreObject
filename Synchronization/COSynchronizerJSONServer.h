@@ -17,8 +17,7 @@
 
 @interface COSynchronizerJSONServer : NSObject <COSynchronizerServerDelegate>
 {
-	NSMutableDictionary *queuedOutgoingMessagesByClient;
-	NSMutableArray *queuedIncomingMessages;
+	NSMutableArray *queuedMessages;
 	BOOL paused;
 }
 

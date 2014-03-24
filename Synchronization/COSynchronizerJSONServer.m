@@ -21,8 +21,7 @@
 - (instancetype) init
 {
 	SUPERINIT;
-	queuedOutgoingMessagesByClient = [NSMutableDictionary new];
-	queuedIncomingMessages = [NSMutableArray new];
+	queuedMessages = [NSMutableArray new];
 	return self;
 }
 
@@ -32,13 +31,7 @@
 	
 	if (paused)
 	{
-		NSMutableArray *userQueue = queuedOutgoingMessagesByClient[aClient];
-		if (userQueue == nil)
-		{
-			userQueue = [NSMutableArray new];
-			queuedOutgoingMessagesByClient[aClient] = userQueue;
-		}
-		[userQueue addObject: text];
+		[queuedMessages addObject: @{ @"text" : text, @"type" : @"outgoing", @"client" : aClient }];
 	}
 	else
 	{
@@ -100,7 +93,7 @@
 {
 	if (paused)
 	{
-		[queuedIncomingMessages addObject: text];
+		[queuedMessages addObject: @{ @"text" : text, @"type" : @"incoming", @"client" : aClient }];
 	}
 	else
 	{
@@ -123,33 +116,21 @@
 	}
 }
 
-- (void) processQueuedIncomingMessages
-{
-	NSArray *incomingMessages = [NSArray arrayWithArray: queuedIncomingMessages];
-	[queuedIncomingMessages removeAllObjects];
-	for (NSString *incomingMessage in incomingMessages)
-	{
-		[self processIncomingText: incomingMessage];
-	}
-}
-
-- (void) processQueuedOutgoingMessages
-{
-	for (NSString *aClient in queuedOutgoingMessagesByClient)
-	{
-		NSArray *messages = queuedOutgoingMessagesByClient[aClient];
-		for (NSString *text in messages)
-		{
-			[delegate JSONServer: self sendText: text toClient: aClient];
-		}
-	}
-	[queuedOutgoingMessagesByClient removeAllObjects];
-}
-
 - (void) processQueuedMessages
 {
-	[self processQueuedIncomingMessages];
-	[self processQueuedOutgoingMessages];
+	NSArray *messages = [NSArray arrayWithArray: queuedMessages];
+	[queuedMessages removeAllObjects];
+	for (NSDictionary *msg in messages)
+	{
+		if ([msg[@"type"] isEqualToString: @"incoming"])
+		{
+			[self processIncomingText: msg[@"text"]];
+		}
+		else
+		{
+			[delegate JSONServer: self sendText: msg[@"text"] toClient: msg[@"client"]];
+		}
+	}
 }
 
 - (BOOL) paused

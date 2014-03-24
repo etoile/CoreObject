@@ -21,8 +21,7 @@
 - (instancetype) init
 {
 	SUPERINIT;
-	queuedOutgoingMessages = [NSMutableArray new];
-	queuedIncomingMessages = [NSMutableArray new];
+	queuedMessages = [NSMutableArray new];
 	return self;
 }
 - (void) sendPropertyListToServer: (id)aPropertyList
@@ -30,7 +29,7 @@
 	NSString *text = [COSynchronizerJSONUtils serializePropertyList: aPropertyList];
 	if (paused)
 	{
-		[queuedOutgoingMessages addObject: text];
+		[queuedMessages addObject: @{ @"text" : text, @"type" : @"outgoing" }];
 	}
 	else
 	{
@@ -81,7 +80,7 @@
 {
 	if (paused)
 	{
-		[queuedIncomingMessages addObject: text];
+		[queuedMessages addObject: @{ @"text" : text, @"type" : @"incoming" }];
 	}
 	else
 	{
@@ -117,30 +116,21 @@
 	[delegate JSONClient: self sendTextToServer: text];
 }
 
-- (void) processQueuedIncomingMessages
-{
-	NSArray *incomingMessages = [NSArray arrayWithArray: queuedIncomingMessages];
-	[queuedIncomingMessages removeAllObjects];
-	for (NSString *incomingMessage in incomingMessages)
-	{
-		[self processIncomingText: incomingMessage];
-	}
-}
-
-- (void) processQueuedOutgoingMessages
-{
-	NSArray *outgoingMessages = [NSArray arrayWithArray: queuedOutgoingMessages];
-	[queuedOutgoingMessages removeAllObjects];
-	for (NSString *outgoingMessage in outgoingMessages)
-	{
-		[self processOutgoingText: outgoingMessage];
-	}
-}
-
 - (void) processQueuedMessages
 {
-	[self processQueuedIncomingMessages];
-	[self processQueuedOutgoingMessages];
+	NSArray *messages = [NSArray arrayWithArray: queuedMessages];
+	[queuedMessages removeAllObjects];
+	for (NSDictionary *msg in messages)
+	{
+		if ([msg[@"type"] isEqualToString: @"incoming"])
+		{
+			[self processIncomingText: msg[@"text"]];
+		}
+		else
+		{
+			[self processOutgoingText: msg[@"text"]];
+		}
+	}
 }
 
 - (BOOL) paused
