@@ -160,6 +160,8 @@ body
 
 .navbar
 {
+	margin-bottom: 0;
+
 	background-color: #FFFFFF; /* #383428; #f6f6f4; */
 	opacity: 0.88;
 
@@ -718,6 +720,58 @@ h2
 
 		background-size: 50px auto;
 	}
+}
+
+/*
+ * Community
+ * =========
+ */
+
+#community
+{
+	padding-top: 70px;
+	padding-bottom: 80px;
+}
+
+#community h2
+{
+	color: #585858;
+}
+
+#community ul
+{
+	color: #686868;
+}
+
+/*
+ * Team
+ * ====
+ */
+
+#team h2
+{
+	color: white;
+}
+
+#team ul
+{
+ 	color: #686868;
+	text-shadow: 0px 3px 4px rgba(0, 0, 0, 0.06);
+}
+
+#team
+{
+	margin: 0 auto;
+	padding: 0;
+	width: 100%;
+
+	background-color: #6cf;
+}
+
+#team .container
+{
+	padding-top: 50px;
+	padding-bottom: 80px;
 }
 
 /*
