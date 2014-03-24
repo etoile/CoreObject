@@ -169,4 +169,22 @@
 	return [[_xmppStream myJID] full];
 }
 
+- (BOOL)paused
+{
+	return _isServer ? _JSONServer.paused : _JSONClient.paused;
+}
+
+- (void)setPaused:(BOOL)paused
+{
+	if (_isServer)
+	{
+		_JSONServer.paused = paused;
+	}
+	else
+	{
+		_JSONClient.paused = paused;
+	}
+}
+
 @end
+

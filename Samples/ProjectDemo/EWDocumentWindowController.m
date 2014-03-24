@@ -487,4 +487,9 @@
     }
 }
 
+- (SharingSession *) sharingSession
+{
+	return [[XMPPController sharedInstance] sharingSessionForBranch: self.editingBranch];
+}
+
 @end

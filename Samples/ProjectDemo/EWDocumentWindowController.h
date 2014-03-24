@@ -121,4 +121,6 @@
 
 - (IBAction) moveToTrash:(id)sender;
 
+- (SharingSession *) sharingSession;
+
 @end

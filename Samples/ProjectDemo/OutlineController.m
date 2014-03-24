@@ -3,6 +3,7 @@
 #import "Document.h"
 #import "ApplicationDelegate.h"
 #import <CoreObject/COSQLiteStore+Graphviz.h>
+#import "EWOutlineView.h"
 
 @implementation OutlineController
 
@@ -65,6 +66,7 @@
 	[outlineView setDelegate: self];
 	[outlineView setTarget: self];
 	[outlineView setDoubleAction: @selector(doubleClick:)];
+	outlineView.delegate = self;
 	
 	//NSLog(@"Got rect %@ for doc %@", NSStringFromRect([doc screenRectValue]), [doc uuid]);
 	
@@ -722,6 +724,30 @@ static NSString *implode(NSArray *array, NSString *separator)
 	 NSLog(@"%@ didchange", [item label]);
 	 [outlineView reloadItem: item reloadChildren: YES];  
 	 }*/
+}
+
+#pragma mark - EWOutlineViewDelegate
+
+- (void) outlineViewDidStartFieldEditor: (EWOutlineView *)aView
+{
+	NSLog(@"outlineViewDidStartFieldEditor:");
+	if ([self sharingSession] != nil)
+	{
+		[self sharingSession].paused = YES;
+	}
+}
+
+- (void) outlineViewDidEndFieldEditor: (EWOutlineView *)aView
+{
+	NSLog(@"outlineViewDidEndFieldEditor:");
+	
+	SharingSession *ss = [self sharingSession];
+	if (ss != nil)
+	{
+		dispatch_async(dispatch_get_main_queue(), ^{
+			ss.paused = NO;
+		});
+	}
 }
 
 @end

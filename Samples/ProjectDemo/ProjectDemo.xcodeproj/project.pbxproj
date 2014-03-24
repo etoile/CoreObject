@@ -63,6 +63,7 @@
 		6646988717D407A400A1B767 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6646988617D407A000A1B767 /* AppKit.framework */; };
 		66488DC718D57DF9009F4C55 /* EWUndoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 66488DC618D57DF9009F4C55 /* EWUndoManager.m */; };
 		66568C6A189399A80075FD9A /* TODO.md in Resources */ = {isa = PBXBuildFile; fileRef = 66568C69189399A80075FD9A /* TODO.md */; };
+		665EF96318DFB89500BCF089 /* EWOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 665EF96218DFB89500BCF089 /* EWOutlineView.m */; };
 		66708F9C12486F0400E65F00 /* ProjectDemoMainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* ProjectDemoMainMenu.xib */; };
 		66708F9F12486F0400E65F00 /* OutlineWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66708F9412486E9D00E65F00 /* OutlineWindow.xib */; };
 		66708FAB12486F0400E65F00 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
@@ -344,6 +345,8 @@
 		66488DC518D57DF9009F4C55 /* EWUndoManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWUndoManager.h; sourceTree = "<group>"; };
 		66488DC618D57DF9009F4C55 /* EWUndoManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWUndoManager.m; sourceTree = "<group>"; };
 		66568C69189399A80075FD9A /* TODO.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO.md; sourceTree = "<group>"; };
+		665EF96118DFB89500BCF089 /* EWOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWOutlineView.h; sourceTree = "<group>"; };
+		665EF96218DFB89500BCF089 /* EWOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWOutlineView.m; sourceTree = "<group>"; };
 		66708F7112486CD300E65F00 /* OutlineController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutlineController.h; sourceTree = "<group>"; };
 		66708F7212486CD300E65F00 /* OutlineController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OutlineController.m; sourceTree = "<group>"; };
 		66708F9412486E9D00E65F00 /* OutlineWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OutlineWindow.xib; sourceTree = "<group>"; };
@@ -849,6 +852,8 @@
 				66708F9412486E9D00E65F00 /* OutlineWindow.xib */,
 				66708F7112486CD300E65F00 /* OutlineController.h */,
 				66708F7212486CD300E65F00 /* OutlineController.m */,
+				665EF96118DFB89500BCF089 /* EWOutlineView.h */,
+				665EF96218DFB89500BCF089 /* EWOutlineView.m */,
 			);
 			name = "Outline Document";
 			sourceTree = "<group>";
@@ -1201,6 +1206,7 @@
 				661211D11821A568003AEC29 /* XMPPDeprecatedPlainAuthentication.m in Sources */,
 				6612118F1821A482003AEC29 /* DispatchQueueLogFormatter.m in Sources */,
 				66488DC718D57DF9009F4C55 /* EWUndoManager.m in Sources */,
+				665EF96318DFB89500BCF089 /* EWOutlineView.m in Sources */,
 				79911A4C12CDAECD009D28C0 /* SKTRectangle.m in Sources */,
 				661211D91821A568003AEC29 /* XMPPIQ.m in Sources */,
 				79911A4D12CDAECD009D28C0 /* SKTRenderingView.m in Sources */,

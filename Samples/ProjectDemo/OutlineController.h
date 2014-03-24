@@ -3,10 +3,11 @@
 #import "Document.h"
 #import "SharingSession.h"
 #import "EWDocumentWindowController.h"
+#import "EWOutlineView.h"
 
-@interface OutlineController : EWDocumentWindowController <NSOutlineViewDelegate>
+@interface OutlineController : EWDocumentWindowController <NSOutlineViewDelegate, EWOutlineViewDelegate>
 {
-	IBOutlet NSOutlineView *outlineView;
+	IBOutlet EWOutlineView *outlineView;
 }
 
 - (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot

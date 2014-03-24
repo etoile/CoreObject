@@ -50,4 +50,6 @@
 
 - (void) addClientJID: (XMPPJID *)peerJID;
 
+@property (nonatomic, readwrite, assign) BOOL paused;
+
 @end
