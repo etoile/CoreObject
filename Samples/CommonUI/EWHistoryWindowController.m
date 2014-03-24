@@ -258,4 +258,16 @@
 	return revisions;
 }
 
+- (NSColor *) colorForNode: (id<COTrack>)aTrack isCurrentOrAncestorOfCurrent: (BOOL)current
+{
+	if (current)
+	{
+		return [NSColor colorWithCalibratedRed: 0.5 green: 0.0 blue: 0.2 alpha: 1.0];
+	}
+	else
+	{
+		return [NSColor colorWithCalibratedRed: 0.7 green: 0.7 blue: 0.7 alpha: 1.0];
+	}
+}
+
 @end

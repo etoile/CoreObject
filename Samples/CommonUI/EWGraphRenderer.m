@@ -354,14 +354,8 @@
 
 - (NSColor *)colorForUUID: (ETUUID *)commit
 {
-	if ([currentUUIDAndAncestors containsObject: commit])
-	{
-		return [NSColor colorWithCalibratedRed: 0 green: 0.2 blue: 0.5 alpha: 1.0];
-	}
-	else
-	{
-		return [NSColor colorWithCalibratedRed: 0.7 green: 0.7 blue: 0.7 alpha: 1.0];
-	}
+	return [self.delegate colorForNode: revisionInfoForUUID[commit]
+		  isCurrentOrAncestorOfCurrent: [currentUUIDAndAncestors containsObject: commit]];
 }
 
 - (void) drawRevisionAtIndex: (NSUInteger)index inRect: (NSRect)aRect

@@ -10,6 +10,7 @@
 
 @protocol EWGraphRendererDelegate <NSObject>
 - (NSArray *) allOrderedNodesToDisplayForTrack: (id<COTrack>)aTrack;
+- (NSColor *) colorForNode: (id<COTrack>)aTrack isCurrentOrAncestorOfCurrent: (BOOL)current;
 @end
 
 @interface EWGraphRenderer : NSObject
