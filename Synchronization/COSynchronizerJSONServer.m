@@ -18,10 +18,32 @@
 
 @synthesize delegate, server;
 
+- (instancetype) init
+{
+	SUPERINIT;
+	queuedOutgoingMessagesByClient = [NSMutableDictionary new];
+	queuedIncomingMessages = [NSMutableArray new];
+	return self;
+}
+
 - (void) sendPropertyList: (id)aPropertyList toClient: (NSString *)aClient
 {
 	NSString *text = [COSynchronizerJSONUtils serializePropertyList: aPropertyList];
-	[delegate JSONServer: self sendText: text toClient: aClient];
+	
+	if (paused)
+	{
+		NSMutableArray *userQueue = queuedOutgoingMessagesByClient[aClient];
+		if (userQueue == nil)
+		{
+			userQueue = [NSMutableArray new];
+			queuedOutgoingMessagesByClient[aClient] = userQueue;
+		}
+		[userQueue addObject: text];
+	}
+	else
+	{
+		[delegate JSONServer: self sendText: text toClient: aClient];
+	}
 }
 
 - (void) sendResponseMessage: (COSynchronizerResponseToClientForSentRevisionsMessage *)message
@@ -76,6 +98,18 @@
 
 - (void) receiveText: (NSString *)text fromClient: (NSString *)aClient
 {
+	if (paused)
+	{
+		[queuedIncomingMessages addObject: text];
+	}
+	else
+	{
+		[self processIncomingText: text];
+	}
+}
+
+- (void) processIncomingText: (NSString *)text
+{
 	id propertyList = [COSynchronizerJSONUtils deserializePropertyList: text];
 	
 	NSString *type = propertyList[@"class"];
@@ -86,6 +120,49 @@
 	else
 	{
 		NSLog(@"COSynchronizerJSONClient: unknown message type: %@", type);
+	}
+}
+
+- (void) processQueuedIncomingMessages
+{
+	NSArray *incomingMessages = [NSArray arrayWithArray: queuedIncomingMessages];
+	[queuedIncomingMessages removeAllObjects];
+	for (NSString *incomingMessage in incomingMessages)
+	{
+		[self processIncomingText: incomingMessage];
+	}
+}
+
+- (void) processQueuedOutgoingMessages
+{
+	for (NSString *aClient in queuedOutgoingMessagesByClient)
+	{
+		NSArray *messages = queuedOutgoingMessagesByClient[aClient];
+		for (NSString *text in messages)
+		{
+			[delegate JSONServer: self sendText: text toClient: aClient];
+		}
+	}
+	[queuedOutgoingMessagesByClient removeAllObjects];
+}
+
+- (void) processQueuedMessages
+{
+	[self processQueuedIncomingMessages];
+	[self processQueuedOutgoingMessages];
+}
+
+- (BOOL) paused
+{
+	return paused;
+}
+
+- (void)setPaused:(BOOL)flag
+{
+	paused = flag;
+	if (!paused)
+	{
+		[self processQueuedMessages];
 	}
 }
 

@@ -16,10 +16,17 @@
 @end
 
 @interface COSynchronizerJSONServer : NSObject <COSynchronizerServerDelegate>
+{
+	NSMutableDictionary *queuedOutgoingMessagesByClient;
+	NSMutableArray *queuedIncomingMessages;
+	BOOL paused;
+}
 
 @property (nonatomic, readwrite, strong) id<COSynchronizerJSONServerDelegate> delegate;
 @property (nonatomic, readwrite, weak) COSynchronizerServer *server;
 
 - (void) receiveText: (NSString *)text fromClient: (NSString *)aClient;
+
+@property (nonatomic, readwrite, assign) BOOL paused;
 
 @end

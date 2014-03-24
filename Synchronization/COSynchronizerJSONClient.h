@@ -16,11 +16,19 @@
 - (void) JSONClient: (COSynchronizerJSONClient *)client didStartSharingOnBranch: (COBranch *)aBranch;
 
 @end
+
 @interface COSynchronizerJSONClient : NSObject <COSynchronizerClientDelegate>
+{
+	NSMutableArray *queuedOutgoingMessages;
+	NSMutableArray *queuedIncomingMessages;
+	BOOL paused;
+}
 
 @property (nonatomic, readwrite, strong) id<COSynchronizerJSONClientDelegate> delegate;
 @property (nonatomic, readwrite, weak) COSynchronizerClient *client;
 
 - (void) receiveTextFromServer: (NSString *)text;
+
+@property (nonatomic, readwrite, assign) BOOL paused;
 
 @end

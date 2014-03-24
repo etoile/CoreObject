@@ -18,10 +18,24 @@
 
 @synthesize delegate, client;
 
+- (instancetype) init
+{
+	SUPERINIT;
+	queuedOutgoingMessages = [NSMutableArray new];
+	queuedIncomingMessages = [NSMutableArray new];
+	return self;
+}
 - (void) sendPropertyListToServer: (id)aPropertyList
 {
 	NSString *text = [COSynchronizerJSONUtils serializePropertyList: aPropertyList];
-	[delegate JSONClient: self sendTextToServer: text];
+	if (paused)
+	{
+		[queuedOutgoingMessages addObject: text];
+	}
+	else
+	{
+		[delegate JSONClient: self sendTextToServer: text];
+	}
 }
 
 - (void) sendPushToServer: (COSynchronizerPushedRevisionsFromClientMessage *)message
@@ -65,6 +79,18 @@
 
 - (void) receiveTextFromServer:(NSString *)text
 {
+	if (paused)
+	{
+		[queuedIncomingMessages addObject: text];
+	}
+	else
+	{
+		[self processIncomingText: text];
+	}
+}
+
+- (void) processIncomingText: (NSString *)text
+{
 	id propertyList = [COSynchronizerJSONUtils deserializePropertyList: text];
 	
 	NSString *type = propertyList[@"class"];
@@ -83,6 +109,51 @@
 	else
 	{
 		NSLog(@"COSynchronizerJSONClient: unknown message type: %@", type);
+	}
+}
+
+- (void) processOutgoingText: (NSString *)text
+{
+	[delegate JSONClient: self sendTextToServer: text];
+}
+
+- (void) processQueuedIncomingMessages
+{
+	NSArray *incomingMessages = [NSArray arrayWithArray: queuedIncomingMessages];
+	[queuedIncomingMessages removeAllObjects];
+	for (NSString *incomingMessage in incomingMessages)
+	{
+		[self processIncomingText: incomingMessage];
+	}
+}
+
+- (void) processQueuedOutgoingMessages
+{
+	NSArray *outgoingMessages = [NSArray arrayWithArray: queuedOutgoingMessages];
+	[queuedOutgoingMessages removeAllObjects];
+	for (NSString *outgoingMessage in outgoingMessages)
+	{
+		[self processOutgoingText: outgoingMessage];
+	}
+}
+
+- (void) processQueuedMessages
+{
+	[self processQueuedIncomingMessages];
+	[self processQueuedOutgoingMessages];
+}
+
+- (BOOL) paused
+{
+	return paused;
+}
+
+- (void)setPaused:(BOOL)flag
+{
+	paused = flag;
+	if (!paused)
+	{
+		[self processQueuedMessages];
 	}
 }
 
