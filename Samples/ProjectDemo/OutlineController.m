@@ -26,8 +26,25 @@
 
 - (void) objectGraphDidChange
 {
+	// FIXME: Merge this and the next method!
+	
     //NSLog(@"Reloading outline for %@", doc);
     [outlineView reloadData];
+}
+
+- (void) objectGraphContextDidChange: (NSNotification *)notif
+{
+	// FIXME: Merge this and the previous method!
+	
+	NSLog(@"object graph context did change: %@", [notif userInfo]);
+	
+	[outlineView reloadData];
+	
+	for (ETUUID *updated in notif.userInfo[COUpdatedObjectsKey])
+	{
+		COObject *updatedObject = [self.objectGraphContext loadedObjectForUUID: updated];
+		[outlineView expandItem: updatedObject];
+	}
 }
 
 - (Document *)projectDocument

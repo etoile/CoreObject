@@ -28,6 +28,11 @@
 												 name: COPersistentRootDidChangeNotification
 											   object: _persistentRoot];
 	
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(objectGraphContextDidChange:)
+												 name: COObjectGraphContextObjectsDidChangeNotification
+											   object: self.objectGraphContext];
+	
 	return self;
 }
 
@@ -49,6 +54,11 @@
 											 selector: @selector(persistentRootDidChange:)
 												 name: COPersistentRootDidChangeNotification
 											   object: _persistentRoot];
+	
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(objectGraphContextDidChange:)
+												 name: COObjectGraphContextObjectsDidChangeNotification
+											   object: self.objectGraphContext];
 	
 	return self;
 }
@@ -97,7 +107,14 @@
 	}
 	if (pinnedBranch != _pinnedBranch)
 	{
+		[[NSNotificationCenter defaultCenter] removeObserver: self name: COObjectGraphContextObjectsDidChangeNotification object: _pinnedBranch];
+		
 		_pinnedBranch = pinnedBranch;
+		
+		[[NSNotificationCenter defaultCenter] addObserver: self
+												 selector: @selector(objectGraphContextDidChange:)
+													 name: COObjectGraphContextObjectsDidChangeNotification
+												   object: self.objectGraphContext];
 		
 		[self resetBranchesMenu];
 		[self resetBranchesCheckbox];
@@ -134,6 +151,13 @@
 	[self resetTitle];
 	
 	[self objectGraphDidChange];
+}
+
+- (void) objectGraphContextDidChange: (NSNotification *)notif
+{
+	NSLog(@"object graph context did change: %@", [notif userInfo]);
+	
+	
 }
 
 - (void)dealloc
