@@ -13,9 +13,14 @@
 
 @implementation EWHistoryWindowController
 
+- (NSString *) windowNibName
+{
+	return @"History";
+}
+
 - (instancetype) initWithInspectedPersistentRoot: (COPersistentRoot *)aPersistentRoot undoTrack: (COUndoTrack *)aTrack
 {
-	self = [super initWithWindowNibName: @"History"];
+	self = [super initWithWindowNibName: [self windowNibName]];
     if (self)
 	{
 		inspectedPersistentRoot = aPersistentRoot;

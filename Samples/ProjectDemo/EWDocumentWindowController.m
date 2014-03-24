@@ -2,7 +2,6 @@
 #import <CoreObject/COSQLiteStore+Graphviz.h>
 #import <CoreObject/COObjectGraphContext+Graphviz.h>
 #import "ApplicationDelegate.h"
-#import "EWHistoryWindowController.h"
 
 @interface EWDocumentWindowController ()
 @end
@@ -383,8 +382,8 @@
 		[historyWindowController close];
 	}
 	
-	historyWindowController = [[EWHistoryWindowController alloc] initWithInspectedPersistentRoot: _persistentRoot
-																					   undoTrack: [self undoTrack]];
+	historyWindowController = [[ProjectDemoHistoryWindowController alloc] initWithInspectedPersistentRoot: _persistentRoot
+																								undoTrack: [self undoTrack]];
 	[historyWindowController showWindow: nil];
 }
 

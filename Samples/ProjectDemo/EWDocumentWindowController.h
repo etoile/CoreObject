@@ -5,7 +5,7 @@
 #import "EWDocumentWindowController.h"
 #import "SharingDrawerViewController.h"
 #import "EWUndoManager.h"
-#import "EWHistoryWindowController.h"
+#import "ProjectDemoHistoryWindowController.h"
 
 @interface EWDocumentWindowController : NSWindowController <NSWindowDelegate, EWUndoManagerDelegate>
 {
@@ -32,7 +32,7 @@
 	
 	EWUndoManager *undoManagerBridge;
 	
-	EWHistoryWindowController *historyWindowController;
+	ProjectDemoHistoryWindowController *historyWindowController;
 }
 
 - (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot

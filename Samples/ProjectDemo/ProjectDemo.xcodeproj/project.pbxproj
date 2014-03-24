@@ -64,6 +64,8 @@
 		66488DC718D57DF9009F4C55 /* EWUndoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 66488DC618D57DF9009F4C55 /* EWUndoManager.m */; };
 		66568C6A189399A80075FD9A /* TODO.md in Resources */ = {isa = PBXBuildFile; fileRef = 66568C69189399A80075FD9A /* TODO.md */; };
 		665EF96318DFB89500BCF089 /* EWOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 665EF96218DFB89500BCF089 /* EWOutlineView.m */; };
+		665EF97918E09A8600BCF089 /* ProjectDemoHistory.xib in Resources */ = {isa = PBXBuildFile; fileRef = 665EF97818E09A8600BCF089 /* ProjectDemoHistory.xib */; };
+		665EF97D18E09BA900BCF089 /* ProjectDemoHistoryWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 665EF97C18E09BA900BCF089 /* ProjectDemoHistoryWindowController.m */; };
 		66708F9C12486F0400E65F00 /* ProjectDemoMainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* ProjectDemoMainMenu.xib */; };
 		66708F9F12486F0400E65F00 /* OutlineWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66708F9412486E9D00E65F00 /* OutlineWindow.xib */; };
 		66708FAB12486F0400E65F00 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
@@ -347,6 +349,9 @@
 		66568C69189399A80075FD9A /* TODO.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TODO.md; sourceTree = "<group>"; };
 		665EF96118DFB89500BCF089 /* EWOutlineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWOutlineView.h; sourceTree = "<group>"; };
 		665EF96218DFB89500BCF089 /* EWOutlineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWOutlineView.m; sourceTree = "<group>"; };
+		665EF97818E09A8600BCF089 /* ProjectDemoHistory.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProjectDemoHistory.xib; sourceTree = "<group>"; };
+		665EF97B18E09BA900BCF089 /* ProjectDemoHistoryWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProjectDemoHistoryWindowController.h; sourceTree = "<group>"; };
+		665EF97C18E09BA900BCF089 /* ProjectDemoHistoryWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProjectDemoHistoryWindowController.m; sourceTree = "<group>"; };
 		66708F7112486CD300E65F00 /* OutlineController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OutlineController.h; sourceTree = "<group>"; };
 		66708F7212486CD300E65F00 /* OutlineController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OutlineController.m; sourceTree = "<group>"; };
 		66708F9412486E9D00E65F00 /* OutlineWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OutlineWindow.xib; sourceTree = "<group>"; };
@@ -775,9 +780,20 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		665EF97A18E09B9100BCF089 /* History */ = {
+			isa = PBXGroup;
+			children = (
+				665EF97818E09A8600BCF089 /* ProjectDemoHistory.xib */,
+				665EF97B18E09BA900BCF089 /* ProjectDemoHistoryWindowController.h */,
+				665EF97C18E09BA900BCF089 /* ProjectDemoHistoryWindowController.m */,
+			);
+			name = History;
+			sourceTree = "<group>";
+		};
 		66708FEF124870CB00E65F00 /* ProjectDemo */ = {
 			isa = PBXGroup;
 			children = (
+				665EF97A18E09B9100BCF089 /* History */,
 				667C6C80181AF42B00BDD213 /* Branches Window */,
 				66E8EE0C12D673BB00780264 /* Search Window */,
 				7991190212CD3D36009D28C0 /* Project Navigator */,
@@ -1161,6 +1177,7 @@
 				7991191512CD3F3C009D28C0 /* 2560x1600.jpg in Resources */,
 				7991198A12CD4B72009D28C0 /* stamp.png in Resources */,
 				79911A6312CDB215009D28C0 /* Arrow.tiff in Resources */,
+				665EF97918E09A8600BCF089 /* ProjectDemoHistory.xib in Resources */,
 				66CA1844181A3E5B00DE6AFB /* Search.xib in Resources */,
 				79911A6412CDB215009D28C0 /* Circle.tiff in Resources */,
 				66DBB3831813B1BB0047301A /* Preferences.xib in Resources */,
@@ -1205,6 +1222,7 @@
 				661210DC18217451003AEC29 /* AccountWindowController.m in Sources */,
 				661211D11821A568003AEC29 /* XMPPDeprecatedPlainAuthentication.m in Sources */,
 				6612118F1821A482003AEC29 /* DispatchQueueLogFormatter.m in Sources */,
+				665EF97D18E09BA900BCF089 /* ProjectDemoHistoryWindowController.m in Sources */,
 				66488DC718D57DF9009F4C55 /* EWUndoManager.m in Sources */,
 				665EF96318DFB89500BCF089 /* EWOutlineView.m in Sources */,
 				79911A4C12CDAECD009D28C0 /* SKTRectangle.m in Sources */,
