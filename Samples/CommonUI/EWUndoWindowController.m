@@ -133,7 +133,10 @@
 - (void) doubleClick: (id)sender
 {
 	id<COTrackNode> node = [self selectedNode];
-	[_track setCurrentNode: node];
+	if (node != nil)
+	{
+		[_track setCurrentNode: node];
+	}
 }
 
 - (IBAction) selectiveUndo: (id)sender

@@ -3,12 +3,12 @@
 	<data>
 		<int key="IBDocument.SystemTarget">1070</int>
 		<string key="IBDocument.SystemVersion">13C64</string>
-		<string key="IBDocument.InterfaceBuilderVersion">4514</string>
+		<string key="IBDocument.InterfaceBuilderVersion">5053</string>
 		<string key="IBDocument.AppKitVersion">1265.19</string>
 		<string key="IBDocument.HIToolboxVersion">697.40</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">4514</string>
+			<string key="NS.object.0">5053</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>IBCustomCell</string>
@@ -71,7 +71,7 @@
 											<string key="NSFrameSize">{590, 289}</string>
 											<reference key="NSSuperview" ref="1018695483"/>
 											<reference key="NSWindow"/>
-											<reference key="NSNextKeyView" ref="57292709"/>
+											<reference key="NSNextKeyView" ref="908930679"/>
 											<bool key="NSEnabled">YES</bool>
 											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 											<bool key="NSControlAllowsExpansionToolTips">YES</bool>
@@ -84,13 +84,10 @@
 												<reference key="NSNextKeyView" ref="1018695483"/>
 												<reference key="NSTableView" ref="154456502"/>
 											</object>
-											<object class="_NSCornerView" key="NSCornerView" id="57292709">
-												<reference key="NSNextResponder" ref="461634304"/>
+											<object class="_NSCornerView" key="NSCornerView">
+												<nil key="NSNextResponder"/>
 												<int key="NSvFlags">-2147482368</int>
 												<string key="NSFrameSize">{15, 20}</string>
-												<reference key="NSSuperview" ref="461634304"/>
-												<reference key="NSWindow"/>
-												<reference key="NSNextKeyView" ref="331572057"/>
 											</object>
 											<array class="NSMutableArray" key="NSTableColumns">
 												<object class="NSTableColumn" id="1036122882">
@@ -326,19 +323,17 @@
 									<string key="NSAction">_doScroller:</string>
 									<double key="NSPercent">0.99830795262267347</double>
 								</object>
-								<reference ref="57292709"/>
 							</array>
 							<object class="NSPSMatrix" key="NSFrameMatrix"/>
 							<string key="NSFrame">{{-1, 45}, {592, 307}}</string>
 							<reference key="NSSuperview" ref="442872210"/>
 							<reference key="NSWindow"/>
-							<reference key="NSNextKeyView" ref="1018695483"/>
+							<reference key="NSNextKeyView" ref="331572057"/>
 							<int key="NSsFlags">133682</int>
 							<reference key="NSVScroller" ref="908930679"/>
 							<reference key="NSHScroller" ref="88580517"/>
 							<reference key="NSContentView" ref="1018695483"/>
 							<reference key="NSHeaderClipView" ref="331572057"/>
-							<reference key="NSCornerView" ref="57292709"/>
 							<bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
 							<double key="NSMinMagnification">0.25</double>
 							<double key="NSMaxMagnification">4</double>
@@ -364,7 +359,7 @@
 									<int key="NSfFlags">1044</int>
 								</object>
 								<reference key="NSControlView" ref="179151694"/>
-								<int key="NSButtonFlags">-2034352128</int>
+								<int key="NSButtonFlags">-2034483200</int>
 								<int key="NSButtonFlags2">129</int>
 								<object class="NSCustomResource" key="NSNormalImage">
 									<string key="NSClassName">NSImage</string>
@@ -393,7 +388,7 @@
 								<string key="NSContents">Redo</string>
 								<reference key="NSSupport" ref="312804117"/>
 								<reference key="NSControlView" ref="1033688661"/>
-								<int key="NSButtonFlags">-2034352128</int>
+								<int key="NSButtonFlags">-2034483200</int>
 								<int key="NSButtonFlags2">129</int>
 								<object class="NSCustomResource" key="NSNormalImage">
 									<string key="NSClassName">NSImage</string>
@@ -412,6 +407,7 @@
 							<string key="NSFrame">{{444, 6}, {132, 32}}</string>
 							<reference key="NSSuperview" ref="442872210"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="567920774">
@@ -495,6 +491,14 @@
 						<reference key="destination" ref="471673241"/>
 					</object>
 					<string key="id">Yir-Jl-33p</string>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">undo</string>
+						<reference key="source" ref="578893345"/>
+						<reference key="destination" ref="179151694"/>
+					</object>
+					<string key="id">GMm-2v-di1</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
