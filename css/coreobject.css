@@ -182,7 +182,8 @@ body
 
 .container h1
 {
-	padding-bottom: 20px;
+	margin-top: 0px;
+	margin-bottom: 30px;
 
 	text-align: center;
 	font-family: 'Raleway', sans-serif;
@@ -440,7 +441,7 @@ h2
 
 #userexperience
 {
-	padding-top: 40px;
+	padding-top: 70px;
 	padding-bottom: 80px;
 }
 
@@ -486,7 +487,7 @@ h2
 
 #features .container
 {
-	padding-top: 40px;
+	padding-top: 50px;
 	padding-bottom: 80px;
 }
 
@@ -497,7 +498,7 @@ h2
 
 #overall-design
 {
-	padding-top: 30px;
+	padding-top: 50px;
 	padding-bottom: 80px;
 }
 
@@ -538,7 +539,7 @@ h2
 {
 	margin-top: 0;
 	margin-bottom: 0;
-	padding-top: 40px;
+	padding-top: 50px;
 	padding-bottom: 80px;
 }
 
