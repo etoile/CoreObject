@@ -90,6 +90,7 @@
 {
 	[undo setEnabled: [inspectedBranch canUndo]];
 	[redo setEnabled: [inspectedBranch canRedo]];
+	[selectiveUndo setEnabled: NO];
 	
 	id<COTrackNode> highlightedNode = [self selectedNode];
 	
@@ -98,12 +99,14 @@
 	const BOOL canSelectiveUndo = (highlightedNode != nil
 								   && highlightedNode != [COEndOfUndoTrackPlaceholderNode sharedInstance]
 								   && highlightedNodeIndex != NSNotFound
-								   && highlightedNodeIndex < currentNodeIndex);
+								   && highlightedNodeIndex < currentNodeIndex
+								   && inspectedBranch.supportsRevert);
 	
 	const BOOL canSelectiveRedo = (!canSelectiveUndo
 								   && highlightedNode != nil
 								   && highlightedNode != [COEndOfUndoTrackPlaceholderNode sharedInstance]
-								   && highlightedNodeIndex != currentNodeIndex);
+								   && highlightedNodeIndex != currentNodeIndex
+								   && inspectedBranch.supportsRevert);
 	
 	if (canSelectiveUndo)
 	{
@@ -117,16 +120,17 @@
 		[selectiveUndo setTitle: @"Selective Redo"];
 		[selectiveUndo setAction: @selector(selectiveRedo:)];
 	}
-	else
-	{
-		[selectiveUndo setEnabled: NO];
-	}
 }
 
 /* Target/action */
 
 - (void) doubleClick: (id)sender
 {
+	if (!inspectedBranch.supportsRevert)
+	{
+		NSLog(@"%@: Branch doesn't support revert", self);
+		return;
+	}
 	id<COTrackNode> node = [self selectedNode];
 	[inspectedBranch setCurrentNode: node];
 	[self commitWithIdentifier: @"revert" descriptionArguments: @[]];
