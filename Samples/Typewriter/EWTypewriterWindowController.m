@@ -256,6 +256,36 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 #pragma mark - IBActions
 
+- (NSString *) untitledTagNameForIndex: (NSUInteger)index
+{
+	if (index == 1)
+		return @"New Tag";
+	return [NSString stringWithFormat: @"New Tag %d", (int)index];
+}
+
+- (BOOL) isTagNameInUse: (NSString *)aName
+{
+	for (COTagGroup *tagGroup in self.tagLibrary.tagGroups)
+	{
+		for (COTag *tag in tagGroup.content)
+		{
+			if ([tag.name isEqualToString: aName])
+				return YES;
+		}
+	}
+	return NO;
+}
+
+- (NSString *) untitledTagName
+{
+	NSUInteger i = 1;
+	while ([self isTagNameInUse: [self untitledTagNameForIndex: i]])
+	{
+		i++;
+	}
+	return [self untitledTagNameForIndex: i];
+}
+
 - (IBAction) addTag:(id)sender
 {
 	COTagGroup *targetTagGroup = [self tagGroupOfSelectedRow];
@@ -266,25 +296,54 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	}
 
 	__block COTag *newTag = nil;
+	__block NSString *name = [self untitledTagName];
 	
 	[self commitChangesInBlock: ^{
 		newTag = [[COTag alloc] initWithObjectGraphContext: [[self tagLibrary] objectGraphContext]];
-		newTag.name = @"New Tag";
+		newTag.name = name;
 		[targetTagGroup addObject: newTag];
-	} withIdentifier: @"add-tag" descriptionArguments: @[]];
+	} withIdentifier: @"add-tag" descriptionArguments: @[name]];
 	[tagListDataSource setNextSelection: [[EWTagGroupTagPair alloc] initWithTagGroup: targetTagGroup.UUID tag:newTag.UUID]];
 	[tagListDataSource reloadData];
+}
+
+- (NSString *) untitledTagGroupNameForIndex: (NSUInteger)index
+{
+	if (index == 1)
+		return @"New Tag Group";
+	return [NSString stringWithFormat: @"New Tag Group %d", (int)index];
+}
+
+- (BOOL) isTagGroupNameInUse: (NSString *)aName
+{
+	for (COTagGroup *tagGroup in self.tagLibrary.tagGroups)
+	{
+		if ([tagGroup.name isEqualToString: aName])
+			return YES;
+	}
+	return NO;
+}
+
+- (NSString *) untitledTagGroupName
+{
+	NSUInteger i = 1;
+	while ([self isTagGroupNameInUse: [self untitledTagGroupNameForIndex: i]])
+	{
+		i++;
+	}
+	return [self untitledTagGroupNameForIndex: i];
 }
 
 - (IBAction) addTagGroup:(id)sender
 {
 	__block COTagGroup *newTagGroup = nil;
+	__block NSString *name = [self untitledTagGroupName];
 	
 	[self commitChangesInBlock: ^{
 		newTagGroup = [[COTagGroup alloc] initWithObjectGraphContext: [[self tagLibrary] objectGraphContext]];
-		newTagGroup.name = @"New Tag Group";
+		newTagGroup.name = name;
 		[[[self tagLibrary] mutableArrayValueForKey: @"tagGroups"] addObject: newTagGroup];
-	} withIdentifier: @"add-tag-group" descriptionArguments: @[]];
+	} withIdentifier: @"add-tag-group" descriptionArguments: @[name]];
 	
 	[tagListDataSource setNextSelection: [[EWTagGroupTagPair alloc] initWithTagGroup: newTagGroup.UUID tag:nil]];
 	[tagListDataSource reloadData];
@@ -294,6 +353,8 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 - (NSString *) untitledDocumentNameForIndex: (NSUInteger)index
 {
+	if (index == 1)
+			return @"Untitled Note";
 	return [NSString stringWithFormat: @"Untitled Note %d", (int)index];
 }
 
@@ -324,17 +385,18 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 - (IBAction) addNote:(id)sender
 {
 	__block COPersistentRoot *newNote = nil;
+	__block NSString *name = [self untitledDocumentName];
 	
 	[self commitChangesInBlock: ^{
 		newNote = [self.editingContext insertNewPersistentRootWithEntityName: @"TypewriterDocument"];
-		newNote.name = [self untitledDocumentName];
+		newNote.name = name;
 		
 		COTag *currentTag = [self clickedOrSelectedTag];
 		if (currentTag != nil)
 		{
 			[currentTag addObject: [newNote rootObject]];
 		}
-	} withIdentifier: @"add-note" descriptionArguments: @[]];
+	} withIdentifier: @"add-note" descriptionArguments: @[name]];
 	
 	[noteListDataSource setNextSelection: newNote.UUID];
 	[noteListDataSource reloadData];

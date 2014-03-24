@@ -21,7 +21,7 @@
 		"add-note":
 		{
 			"type": "creation",
-			"shortDescription": "Create note"
+			"shortDescription": "Create note '%@'"
 		},
 		"rename-note":
 		{
@@ -52,7 +52,7 @@
 		"add-tag":
 		{
 			"type": "creation",
-			"shortDescription": "Create tag"
+			"shortDescription": "Create tag '%@'"
 		},
 		"rename-tag":
 		{
@@ -75,7 +75,7 @@
 		"add-tag-group":
 		{
 			"type": "creation",
-			"shortDescription": "Create tag group"
+			"shortDescription": "Create tag group '%@'"
 		},
 		"rename-tag-group":
 		{
