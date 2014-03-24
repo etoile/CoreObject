@@ -121,15 +121,35 @@
 - (void) handleRevisionsFromServer: (NSArray *)revs
 {
 	ETUUID *lastServerRevUUID = [self lastRevisionUUIDFromServer];
-	_lastRevisionUUIDFromServer = [[revs lastObject] revisionUUID];
-	
+		
 	NSUInteger i = [revs indexOfObjectPassingTest: ^(id obj, NSUInteger idx, BOOL *stop)
 					{
 						COSynchronizerRevision *revision = obj;
 						return [revision.parentRevisionUUID isEqual: lastServerRevUUID];
 					}];
 	
-	ETAssert(i != NSNotFound);
+	if (i == NSNotFound)
+	{
+		NSLog(@"COSynchronizerClient: Ignoring push from server, it seems to be an old message that arrived late");
+		
+		// FIXME: write unit test for this case:
+		//
+		// - add outline item 1 on server
+		// - Rename "outline item 1" to "foo" on server, leave field editor open (so the change isn't sent to the client)
+		// - add outline item 2 on client
+		// - end field editor on server
+		//
+		// The server processses the "add outline item 2 on client", which is waiting in a buffer.
+		// Then server sends out the 'Rename "outline item 1" to "foo"' revision (which the client should ignore)
+		// and server also sends the merged revision, which the client should accept.
+		//
+		// If the messages arrive out of order, so the merged (good) revision arrives at the client before the stale 'Rename "outline item 1" to "foo"' revision,
+		// we get to this case.
+
+		return;
+	}
+	
+	_lastRevisionUUIDFromServer = [[revs lastObject] revisionUUID];
 	
 	NSArray *revsToUse = [revs subarrayWithRange: NSMakeRange(i, [revs count] - i)];
 	
