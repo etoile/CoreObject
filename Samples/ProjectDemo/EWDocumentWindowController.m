@@ -494,4 +494,17 @@
 	return [[XMPPController sharedInstance] sharingSessionForBranch: self.editingBranch];
 }
 
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem
+{
+    SEL theAction = [anItem action];
+
+	if (theAction == @selector(stepBackward:)
+		|| theAction == @selector(stepForward:))
+	{
+		return self.editingBranch.supportsRevert;
+	}
+	
+	return [self respondsToSelector: theAction];
+}
+
 @end
