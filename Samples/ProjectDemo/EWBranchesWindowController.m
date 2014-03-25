@@ -34,17 +34,38 @@ static EWBranchesWindowController *shared;
 {
 }
 
+- (EWDocumentWindowController *) inspectedWindowController
+{
+	return inspectedWindowController;
+}
+
 - (void) setInspectedWindowController: (EWDocumentWindowController *)aDoc
 {
 	if (![aDoc respondsToSelector: @selector(persistentRoot)])
 		return;
 	
-    [self setPersistentRoot: [aDoc persistentRoot]];
+    [[NSNotificationCenter defaultCenter] removeObserver: self
+                                                    name: COPersistentRootDidChangeNotification
+                                                  object: inspectedWindowController.persistentRoot];
+	
+	inspectedWindowController = aDoc;
+	
+	[[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(storePersistentRootMetadataDidChange:)
+                                                 name: COPersistentRootDidChangeNotification
+                                               object: inspectedWindowController.persistentRoot];
+
+    [table reloadData];
+}
+
+- (COPersistentRoot *) persistentRoot
+{
+	return inspectedWindowController.persistentRoot;
 }
 
 - (NSArray *) orderedBranches
 {
-    NSArray *unsorted = [[_persistentRoot branches] allObjects];
+    NSArray *unsorted = [[self.persistentRoot branches] allObjects];
     NSArray *sorted = [unsorted sortedArrayUsingDescriptors:
      A([NSSortDescriptor sortDescriptorWithKey: @"label" ascending: NO],
        [NSSortDescriptor sortDescriptorWithKey: @"UUID.stringValue" ascending: NO])];
@@ -57,28 +78,15 @@ static EWBranchesWindowController *shared;
     [table reloadData];
 }
 
-- (void) setPersistentRoot: (COPersistentRoot *)proot
-{
-    [[NSNotificationCenter defaultCenter] removeObserver: self
-                                                    name: COPersistentRootDidChangeNotification
-                                                  object: _persistentRoot];
-        
-    _persistentRoot =  proot;
-    
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(storePersistentRootMetadataDidChange:)
-                                                 name: COPersistentRootDidChangeNotification
-                                               object: proot];
-    
-    [table reloadData];
-}
-
-- (void) commitWithIdentifier: (NSString *)identifier
+- (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args
 {
 	identifier = [@"org.etoile.ProjectDemo." stringByAppendingString: identifier];
 	
-	// FIXME: Pass a valid undo track as EWDocumentWindowController does it
-	[_persistentRoot commitWithIdentifier: identifier metadata: nil undoTrack: nil error: NULL];
+	NSMutableDictionary *metadata = [NSMutableDictionary new];
+	if (args != nil)
+		metadata[kCOCommitMetadataShortDescriptionArguments] = args;
+		
+	[[self persistentRoot] commitWithIdentifier: identifier metadata: metadata undoTrack: inspectedWindowController.undoTrack error:NULL];
 }
 
 - (COBranch *)selectedBranch
@@ -90,22 +98,6 @@ static EWBranchesWindowController *shared;
     return branch;
 }
 
-- (void)deleteForward:(id)sender
-{
-	COBranch *branch = [self selectedBranch];
-    branch.deleted = YES;
-}
-
-- (void)delete:(id)sender
-{
-	[self deleteForward: sender];
-}
-
-- (void)deleteBackward:(id)sender
-{
-	[self deleteForward: sender];
-}
-
 /**
  * THis seems to be needed to get -delete/-deleteForward:/-deleteBackward: called
  */
@@ -114,11 +106,11 @@ static EWBranchesWindowController *shared;
 	[self interpretKeyEvents: [NSArray arrayWithObject:theEvent]];
 }
 
-/* NSTableViewDataSource */
+#pragma mark - NSTableViewDataSource
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-	return [[_persistentRoot branches] count];;
+	return [[self.persistentRoot branches] count];;
 }
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
@@ -143,8 +135,9 @@ static EWBranchesWindowController *shared;
     COBranch *branch = [[self orderedBranches] objectAtIndex: row];
     if ([[tableColumn identifier] isEqual: @"name"])
     {
+		NSString *oldLabel = branch.label;
         [branch setLabel: object];
-        [self commitWithIdentifier: @"set-branch-label"];
+        [self commitWithIdentifier: @"set-branch-label" descriptionArguments: @[ oldLabel, branch.label ] ];
     }
     else if ([[tableColumn identifier] isEqual: @"important"])
     {
@@ -152,15 +145,50 @@ static EWBranchesWindowController *shared;
         NSMutableDictionary *metadata = [NSMutableDictionary dictionaryWithDictionary: [branch metadata]];
         metadata[@"important"] = object;
         [branch setMetadata: metadata];
-        [self commitWithIdentifier: @"set-branch-importance"];
+        [self commitWithIdentifier: @"set-branch-importance" descriptionArguments: @[ branch.label ]];
     }
     else if ([[tableColumn identifier] isEqual: @"checked"])
     {
         if ([object boolValue])
         {
-            [_persistentRoot setCurrentBranch: branch];
-			[self commitWithIdentifier: @"set-branch"];
+            [self.persistentRoot setCurrentBranch: branch];
+			[self commitWithIdentifier: @"set-branch" descriptionArguments: @[ branch.label ]];
         }
     }
 }
+
+#pragma mark - IBActions
+
+- (IBAction)addBranch:(id)sender
+{
+	[inspectedWindowController branch: sender];
+}
+
+- (IBAction)deleteBranch:(id)sender
+{
+	COBranch *branch = [self selectedBranch];
+	if (branch.isCurrentBranch)
+	{
+		NSLog(@"Can't delete current branch (TODO: Gray out the button)");
+		return;
+	}
+	branch.deleted = YES;
+	[self commitWithIdentifier: @"delete-branch" descriptionArguments: @[ branch.label ]];
+}
+
+- (void)deleteForward:(id)sender
+{
+	[self deleteBranch: sender];
+}
+
+- (void)delete:(id)sender
+{
+	[self deleteForward: sender];
+}
+
+- (void)deleteBackward:(id)sender
+{
+	[self deleteForward: sender];
+}
+
 @end

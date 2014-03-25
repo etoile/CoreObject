@@ -410,7 +410,7 @@
 {
     COBranch *branch = [self.editingBranch makeBranchWithLabel: @"Untitled"];
     [self.persistentRoot setCurrentBranch: branch];
-    [self.persistentRoot commit];
+    [self commitWithIdentifier: @"add-branch" descriptionArguments: @[ branch.label ]];
 }
 
 - (IBAction) stepBackward: (id)sender

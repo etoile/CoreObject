@@ -21,21 +21,33 @@
 		"set-branch":
 		{
 			"type": "branch",
-			"shortDescription": "Set branch"
+			"shortDescription": "Set current branch to %@"
 		},
 
 		"set-branch-label":
 		{
 			"type": "branch",
-			"shortDescription": "Set branch label"
+			"shortDescription": "Rename branch from '%@' to '%@'"
 		},
 
 		"set-branch-importance":
 		{
 			"type": "branch",
-			"shortDescription": "Set branch importance"
+			"shortDescription": "Set branch importance of '%@'"
 		},
 
+		"add-branch":
+		{
+			"type": "branch",
+			"shortDescription": "Create branch '%@'"
+		},
+		
+		"delete-branch":
+		{
+			"type": "branch",
+			"shortDescription": "Delete branch '%@'"
+		},
+		
 		"add-item":
 		{
 			"type": "creation",

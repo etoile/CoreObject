@@ -1,14 +1,18 @@
 #import <Cocoa/Cocoa.h>
 
 #import "EWUtilityWindowController.h"
-@class COPersistentRoot;
+
+@class EWDocumentWindowController;
 
 @interface EWBranchesWindowController : EWUtilityWindowController <NSTableViewDelegate, NSTableViewDataSource>
 {
 	IBOutlet NSTableView *table;
-    COPersistentRoot *_persistentRoot;
+	EWDocumentWindowController *inspectedWindowController;
 }
 
 + (EWBranchesWindowController *) sharedController;
+
+- (IBAction)addBranch:(id)sender;
+- (IBAction)deleteBranch:(id)sender;
 
 @end
