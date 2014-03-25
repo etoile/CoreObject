@@ -112,8 +112,29 @@ body
 /* Stretchable container that extends horizontally all the way to the page border */
 .container-full 
 {
-	padding: 0;
 	margin: 0;
+}
+
+section
+{
+	padding-top: 50px;
+	padding-bottom: 80px;
+}
+
+@media (max-width: 768px) 
+{
+	section
+	{
+		padding-bottom: 70px;
+	}
+}
+
+@media (max-width: 400px) 
+{
+	section
+	{
+		padding-bottom: 50px;
+	}
 }
 
 /*
@@ -447,7 +468,6 @@ h2
 {
 	/* Additional sections on the same page uses a bit less padding (50px) at the top */
 	padding-top: 70px;
-	padding-bottom: 80px;
 }
 
 #userexperience h2
@@ -484,28 +504,15 @@ h2
 #features 
 {
 	margin: 0 auto;
-	padding: 0;
 	width: 100%;
 
 	background-color: #6cf;
-}
-
-#features .container
-{
-	padding-top: 50px;
-	padding-bottom: 80px;
 }
 
 /*
  * Framework
  * =========
  */
-
-#overall-design
-{
-	padding-top: 50px;
-	padding-bottom: 80px;
-}
 
 @media (min-width: 768px)
 {
@@ -523,7 +530,6 @@ h2
 #download
 {
 	margin: 0 auto;
-	padding: 0;
 	width: 100%;
 
 	background-color: #ef4832;
@@ -538,14 +544,6 @@ h2
 
 	/*background: radial-gradient(circle at center,#E4542D,#8B190C);
 	background: radial-gradient(circle at center,#FF7A4C,#ef4832);*/
-}
-
-#download .container
-{
-	margin-top: 0;
-	margin-bottom: 0;
-	padding-top: 50px;
-	padding-bottom: 80px;
 }
 
 #download h2
@@ -581,7 +579,7 @@ h2
 {
 	#download .small-tagline
 	{
-		border-top: 1px solid white;
+		border-top: 1px solid #F8F8FF;
 	}
 }
 
@@ -734,7 +732,6 @@ h2
 {
 	/* Additional sections on the same page uses a bit less padding (50px) at the top */
 	padding-top: 70px;
-	padding-bottom: 80px;
 }
 
 #community h2
@@ -766,16 +763,9 @@ h2
 #team
 {
 	margin: 0 auto;
-	padding: 0;
 	width: 100%;
 
 	background-color: #6cf;
-}
-
-#team .container
-{
-	padding-top: 50px;
-	padding-bottom: 80px;
 }
 
 /*
