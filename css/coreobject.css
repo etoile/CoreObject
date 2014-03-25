@@ -829,6 +829,16 @@ h2
 	}
 }
 
+/* Override special rule that adds a margin between columns stacked up at small sizes */
+@media (max-width: 768px) 
+{
+	#footer .container .row > *
+	{
+		margin-bottom: 0px;
+	}
+}
+
+
 #footer #splashline
 {
 	padding-top: 0;
