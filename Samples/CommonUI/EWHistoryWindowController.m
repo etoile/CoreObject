@@ -99,14 +99,12 @@
 	const BOOL canSelectiveUndo = (highlightedNode != nil
 								   && highlightedNode != [COEndOfUndoTrackPlaceholderNode sharedInstance]
 								   && highlightedNodeIndex != NSNotFound
-								   && highlightedNodeIndex < currentNodeIndex
-								   && inspectedBranch.supportsRevert);
+								   && highlightedNodeIndex < currentNodeIndex);
 	
 	const BOOL canSelectiveRedo = (!canSelectiveUndo
 								   && highlightedNode != nil
 								   && highlightedNode != [COEndOfUndoTrackPlaceholderNode sharedInstance]
-								   && highlightedNodeIndex != currentNodeIndex
-								   && inspectedBranch.supportsRevert);
+								   && highlightedNodeIndex != currentNodeIndex);
 	
 	if (canSelectiveUndo)
 	{
