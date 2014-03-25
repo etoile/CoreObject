@@ -9,6 +9,6 @@
 
 @interface EWOutlineView : NSOutlineView
 
-@property (readwrite, nonatomic, weak) id<EWOutlineViewDelegate> delegate;
+@property (readwrite, nonatomic, unsafe_unretained) id<EWOutlineViewDelegate> delegate;
 
 @end
