@@ -85,6 +85,9 @@ static EWBranchesWindowController *shared;
 
 - (COBranch *)selectedBranch
 {
+	if ([table selectedRow] == -1)
+		return nil;
+	
     COBranch *branch = [[self orderedBranches] objectAtIndex: [table selectedRow]];
     return branch;
 }
@@ -95,8 +98,11 @@ static EWBranchesWindowController *shared;
 	{
 		COBranch *branch = [self selectedBranch];
 		
-        [_persistentRoot setCurrentBranch: branch];
-		[self commitWithIdentifier: @"set-branch"];
+		if (branch != nil)
+		{
+			[_persistentRoot setCurrentBranch: branch];
+			[self commitWithIdentifier: @"set-branch"];
+		}
 	}
 }
 
