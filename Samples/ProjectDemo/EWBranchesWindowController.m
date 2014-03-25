@@ -32,8 +32,6 @@ static EWBranchesWindowController *shared;
 
 - (void) awakeFromNib
 {
-    [table setDoubleAction: @selector(doubleClick:)];
-    [table setTarget: self];
 }
 
 - (void) setInspectedWindowController: (EWDocumentWindowController *)aDoc
@@ -90,20 +88,6 @@ static EWBranchesWindowController *shared;
 	
     COBranch *branch = [[self orderedBranches] objectAtIndex: [table selectedRow]];
     return branch;
-}
-
-- (void)doubleClick: (id)sender
-{
-	if (sender == table)
-	{
-		COBranch *branch = [self selectedBranch];
-		
-		if (branch != nil)
-		{
-			[_persistentRoot setCurrentBranch: branch];
-			[self commitWithIdentifier: @"set-branch"];
-		}
-	}
 }
 
 - (void)deleteForward:(id)sender
