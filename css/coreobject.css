@@ -342,18 +342,31 @@ h2
 
 .annotation
 {
+	/* Compensate the line-height for .annotation p and matches the visual space 
+	   at the bottom of the last list in other sections. */
+	margin-bottom: -5px;
 	text-align: left;
 }
 
 .annotation p
 {
-	color: #222;
+	margin: 0;
+	padding: 0;
+
+
+
+	/*color: #F8F8FF;*/
 
 	text-align: left;
-	line-height: 200%;
+	line-height: 180%;
+
 	font-family: 'Open Sans', sans-serif;
 	font-weight: 400;
 	font-size: 0.813em;
+
+	text-shadow: 0px 3px 4px rgba(0, 0, 0, 0.1);
+	
+ 	color: #484848;
 	text-shadow: 0px 3px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -371,8 +384,9 @@ h2
 {
 	padding: 5px;
 
-	background-color: rgba(255, 204, 2, 0.7);
-	opacity: 0.85;
+	border-left: 6px solid rgba(255, 204, 2, 0.7);
+	background-color: rgba(255, 204, 2, 0.3);
+	opacity: 0.95;
 
 	white-space: nowrap;
 	font-style: normal;
@@ -548,7 +562,10 @@ h2
 
 #download h2
 {
-	color: #333;
+	/* Same color as tagline in Features section */
+	color: #333; /* #383838; */
+	color: #F8F8FF;
+	/* text-shadow: 0px 5px 6px rgba(0, 0, 0, 0.07); */
 }
 
 #download .row div:nth-child(2)
@@ -559,6 +576,7 @@ h2
 #download .tagline
 {
 	color: #F8F8FF;
+	color: #333;
 	text-shadow: 0px 3px 4px rgba(0, 0, 0, 0.07);
 }
 
@@ -656,6 +674,7 @@ h2
 	{
 		height: 120px;
 		width: 120px;
+		margin-bottom: 20px;
 		
 		font-size: 13px; /* Bootstrap set .btn-lg fontsize to 18px */
 		font-weight: 100;
