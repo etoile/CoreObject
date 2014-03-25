@@ -579,7 +579,7 @@ h2
 {
 	#download .small-tagline
 	{
-		border-top: 1px solid #F8F8FF;
+		border-top: 1px dotted #F8F8FF;
 	}
 }
 
@@ -766,6 +766,14 @@ h2
 	width: 100%;
 
 	background-color: #6cf;
+}
+
+@media (max-width: 768px)
+{
+	#team .small-tagline
+	{
+		border-top: 1px dotted #F8F8FF;
+	}
 }
 
 /*
