@@ -56,7 +56,8 @@
 	else if (tag == PER_DOCUMENT)
 	{
 		value = @"Document";
-		[[COUndoTrack trackForPattern: @"org.etoile.projectdemo-*" withEditingContext: nil] clear];
+		// FIXME: Doesn't work
+		[[COUndoTrack trackForPattern: @"org.etoile.projectdemo*" withEditingContext: nil] clear];
 		NSLog(@"Cleared document stacks");
 	}
 	
