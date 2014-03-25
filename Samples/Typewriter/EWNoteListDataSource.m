@@ -114,17 +114,6 @@
 			row++;
 		}
 	}
-	
-	if ([newSelectedRows count] == 0
-		&& [objs count] > 0)
-	{
-		// If there was no previous selection, select the top note.
-		[newSelectedRows addIndex: 0];
-	}
-	
-	// Clear the selection so the following line generates a selection changed
-	// notification.
-	[self.tableView selectRowIndexes: [NSIndexSet indexSet] byExtendingSelection: NO];
 	[self.tableView selectRowIndexes: newSelectedRows byExtendingSelection: NO];
 	[self cacheSelection];
 }
