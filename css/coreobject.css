@@ -89,7 +89,8 @@ html
 
 body 
 {
-	padding-top: 80px;
+	/* Must match navbar height */
+	padding-top: 50px;
   	/* Must match footer height */
 	margin-bottom: 240px;
 
@@ -263,7 +264,7 @@ h2
 	{
 		margin-left: 15px;
 		margin-right: 15px;
-		/*padding-bottom: 70px;*/
+		padding-bottom: 50px;
 
 		font-size: 1em;
 	}
@@ -367,6 +368,7 @@ h2
  
 .jumbotron
 {
+	margin-top: 30px;
 	/* Override Bootstrap margin bottom 30px */
 	margin-bottom: 0;
 	background-color: 0;
@@ -443,6 +445,7 @@ h2
 
 #userexperience
 {
+	/* Additional sections on the same page uses a bit less padding (50px) at the top */
 	padding-top: 70px;
 	padding-bottom: 80px;
 }
@@ -729,6 +732,7 @@ h2
 
 #community
 {
+	/* Additional sections on the same page uses a bit less padding (50px) at the top */
 	padding-top: 70px;
 	padding-bottom: 80px;
 }
