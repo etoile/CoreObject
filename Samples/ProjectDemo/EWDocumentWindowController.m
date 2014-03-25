@@ -32,6 +32,11 @@
 												 name: COObjectGraphContextObjectsDidChangeNotification
 											   object: self.objectGraphContext];
 	
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(defaultsChanged:)
+												 name: NSUserDefaultsDidChangeNotification
+											   object: nil];
+	
 	return self;
 }
 
@@ -58,6 +63,11 @@
 											 selector: @selector(objectGraphContextDidChange:)
 												 name: COObjectGraphContextObjectsDidChangeNotification
 											   object: self.objectGraphContext];
+	
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(defaultsChanged:)
+												 name: NSUserDefaultsDidChangeNotification
+											   object: nil];
 	
 	return self;
 }
@@ -177,17 +187,23 @@
 	{
 		NSString *name = self.windowID;
 
-		// TODO: Re-enable
-//		if ([[self class] isProjectUndo])
-//		{
-//			name = @"org.etoile.projectdemo";
-//		}
+		if ([[self class] isProjectUndo])
+		{
+			name = @"org.etoile.projectdemo";
+		}
 		
 		_undoTrack = [COUndoTrack trackForName: name
 							withEditingContext: self.editingContext];
 		_undoTrack.customRevisionMetadata = @{ @"username" : NSFullUserName() };
 	}
 	return _undoTrack;
+}
+
+- (void) defaultsChanged: (NSNotification*)notif
+{
+	// Re-cache undo track
+	_undoTrack = nil;
+	[self undoTrack];
 }
 
 // UI Stuff

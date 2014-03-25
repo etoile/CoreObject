@@ -673,8 +673,11 @@ static NSString *implode(NSArray *array, NSString *separator)
 				NSUInteger oldIndex = [[oldParent contents] indexOfObject: outlineItem];
 				[oldParent removeItemAtIndex: oldIndex];
 			}
+			Document *document = [oldParent rootObject];
+			ETAssert(document != nil);
 			
-            OutlineController *sourceController = (OutlineController *)[(ApplicationDelegate *)[NSApp delegate] controllerForDocumentRootObject: [oldParent document]];
+            OutlineController *sourceController = (OutlineController *)[(ApplicationDelegate *)[NSApp delegate] controllerForDocumentRootObject: document];
+			ETAssert(sourceController != nil);
 			
 			if (![[self class] isProjectUndo])
 			{
@@ -684,7 +687,10 @@ static NSString *implode(NSArray *array, NSString *separator)
 			else
 			{
 				// Commit both persistent roots in one commit
-				[self.editingContext commitWithUndoTrack: [self undoTrack]];
+				[self.editingContext commitWithIdentifier: @"org.etoile.ProjectDemo.drop"
+												 metadata: @{}
+												undoTrack: [self undoTrack]
+													error: NULL];
 			}
         }
 	}
