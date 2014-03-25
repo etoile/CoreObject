@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1070</int>
-		<string key="IBDocument.SystemVersion">13C64</string>
-		<string key="IBDocument.InterfaceBuilderVersion">5053</string>
-		<string key="IBDocument.AppKitVersion">1265.19</string>
-		<string key="IBDocument.HIToolboxVersion">697.40</string>
+		<string key="IBDocument.SystemVersion">11G63b</string>
+		<string key="IBDocument.InterfaceBuilderVersion">3084</string>
+		<string key="IBDocument.AppKitVersion">1138.51</string>
+		<string key="IBDocument.HIToolboxVersion">569.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">5053</string>
+			<string key="NS.object.0">3084</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>IBCustomCell</string>
@@ -43,7 +43,7 @@
 				<string key="NSClassName">NSApplication</string>
 			</object>
 			<object class="NSWindowTemplate" id="366282360">
-				<int key="NSWindowStyleMask">31</int>
+				<int key="NSWindowStyleMask">15</int>
 				<int key="NSWindowBacking">2</int>
 				<string key="NSWindowRect">{{196, 112}, {602, 351}}</string>
 				<int key="NSWTFlags">-461896704</int>
@@ -66,15 +66,12 @@
 										<object class="NSTableView" id="154456502">
 											<reference key="NSNextResponder" ref="1018695483"/>
 											<int key="NSvFlags">1280</int>
-											<array class="NSMutableArray" key="NSSubviews"/>
 											<object class="NSPSMatrix" key="NSFrameMatrix"/>
 											<string key="NSFrameSize">{602, 289}</string>
 											<reference key="NSSuperview" ref="1018695483"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="63580981"/>
 											<bool key="NSEnabled">YES</bool>
-											<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
-											<bool key="NSControlAllowsExpansionToolTips">YES</bool>
 											<object class="NSTableHeaderView" key="NSHeaderView" id="422572411">
 												<reference key="NSNextResponder" ref="331572057"/>
 												<int key="NSvFlags">1280</int>
@@ -103,7 +100,7 @@
 														<int key="NSCellFlags2">2048</int>
 														<string key="NSContents"/>
 														<object class="NSFont" key="NSSupport" id="26">
-															<string key="NSName">.LucidaGrandeUI</string>
+															<string key="NSName">LucidaGrande</string>
 															<double key="NSSize">11</double>
 															<int key="NSfFlags">3100</int>
 														</object>
@@ -239,7 +236,7 @@
 																<integer value="1040" key="formatterBehavior"/>
 																<integer value="1" key="timeStyle"/>
 															</dictionary>
-															<string key="NS.format">yyyy-MM-dd, h:mm a</string>
+															<string key="NS.format">dd/MM/yy HH:mm</string>
 															<bool key="NS.natural">NO</bool>
 														</object>
 														<reference key="NSControlView" ref="154456502"/>
@@ -306,7 +303,6 @@
 									<reference key="NSSuperview" ref="461634304"/>
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="88580517"/>
-									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<reference key="NSTarget" ref="461634304"/>
 									<string key="NSAction">_doScroller:</string>
 									<double key="NSPercent">0.94809688581314877</double>
@@ -319,7 +315,6 @@
 									<reference key="NSSuperview" ref="461634304"/>
 									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="179151694"/>
-									<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 									<int key="NSsFlags">1</int>
 									<reference key="NSTarget" ref="461634304"/>
 									<string key="NSAction">_doScroller:</string>
@@ -339,9 +334,6 @@
 							<reference key="NSHeaderClipView" ref="331572057"/>
 							<reference key="NSCornerView" ref="63580981"/>
 							<bytes key="NSScrollAmts">QSAAAEEgAABBmAAAQZgAAA</bytes>
-							<double key="NSMinMagnification">0.25</double>
-							<double key="NSMaxMagnification">4</double>
-							<double key="NSMagnification">1</double>
 						</object>
 						<object class="NSButton" id="179151694">
 							<reference key="NSNextResponder" ref="442872210"/>
@@ -358,7 +350,7 @@
 								<int key="NSCellFlags2">134217728</int>
 								<string key="NSContents">Step Backward</string>
 								<object class="NSFont" key="NSSupport" id="312804117">
-									<string key="NSName">.LucidaGrandeUI</string>
+									<string key="NSName">LucidaGrande</string>
 									<double key="NSSize">13</double>
 									<int key="NSfFlags">1044</int>
 								</object>
@@ -374,7 +366,6 @@
 								<int key="NSPeriodicDelay">400</int>
 								<int key="NSPeriodicInterval">75</int>
 							</object>
-							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						</object>
 						<object class="NSButton" id="1033688661">
 							<reference key="NSNextResponder" ref="442872210"/>
@@ -403,7 +394,6 @@
 								<int key="NSPeriodicDelay">400</int>
 								<int key="NSPeriodicInterval">75</int>
 							</object>
-							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						</object>
 						<object class="NSButton" id="913427906">
 							<reference key="NSNextResponder" ref="442872210"/>
@@ -427,7 +417,6 @@
 								<int key="NSPeriodicDelay">200</int>
 								<int key="NSPeriodicInterval">25</int>
 							</object>
-							<bool key="NSAllowsLogicalLayoutDirection">NO</bool>
 						</object>
 					</array>
 					<string key="NSFrameSize">{602, 351}</string>
@@ -897,11 +886,6 @@
 		</object>
 		<int key="IBDocument.localizationMode">0</int>
 		<string key="IBDocument.TargetRuntimeIdentifier">IBCocoaFramework</string>
-		<bool key="IBDocument.previouslyAttemptedUpgradeToXcode5">YES</bool>
-		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDependencyDefaults">
-			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.macosx</string>
-			<real value="1070" key="NS.object.0"/>
-		</object>
 		<object class="NSMutableDictionary" key="IBDocument.PluginDeclaredDevelopmentDependencies">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin.InterfaceBuilder3</string>
 			<integer value="4600" key="NS.object.0"/>
