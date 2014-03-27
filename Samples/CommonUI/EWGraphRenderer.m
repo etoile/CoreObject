@@ -171,7 +171,19 @@
 	}
 	else
 	{
-		ETUUID *parentUUID = [self parentUUIDsForRevisionUUID: currentRevision][0];
+		NSArray *parentUUIDs = [self parentUUIDsForRevisionUUID: currentRevision];
+		ETUUID *parentUUID = nil;
+		
+		// Set parentUUID to the first parent for which we have already assigned a level
+		for (ETUUID *aParent in parentUUIDs)
+		{
+			if (levelForUUID[aParent] != nil)
+			{
+				parentUUID = aParent;
+				break;
+			}
+		}
+		
 		ETAssert(parentUUID != nil);
 		
 		NSInteger value = [self maxLevelFromUUIDInclusive: currentRevision

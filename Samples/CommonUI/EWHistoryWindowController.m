@@ -49,6 +49,17 @@
 	[self update];
 	
 	[[self window] setTitle: [self windowTitle]];
+	
+	[table setMenu: [self makeTableViewMenu]];
+}
+
+- (NSMenu *) makeTableViewMenu
+{
+	NSMenu *menu = [[NSMenu alloc] initWithTitle: @""];
+	
+	[menu addItemWithTitle:@"Merge into Current Revision" action: @selector(merge:) keyEquivalent:@""];
+	
+	return menu;
 }
 
 - (NSString *)windowTitle
@@ -166,6 +177,40 @@
 		NSString *desc = [node localizedShortDescription] != nil ? [node localizedShortDescription] : @"";
 		[self commitWithIdentifier: @"selective-redo" descriptionArguments: @[desc]];
 	}
+}
+
+- (IBAction)merge:(id)sender
+{
+	const NSInteger clickedRow = [table clickedRow];
+	if (clickedRow < 0 || clickedRow >= [graphRenderer count])
+		return;
+	
+	CORevision *clickedRevision = (CORevision *)[graphRenderer revisionAtIndex: clickedRow];
+	CORevision *currentRevision = [inspectedBranch currentRevision];
+	
+	NSLog(@"Merge %@ into %@", clickedRevision, currentRevision);
+	
+	COMergeInfo *mergeInfo = [inspectedBranch mergeInfoForMergingRevision: clickedRevision];
+	
+	if (nil == mergeInfo)
+	{
+		NSLog(@"No merge info generated");
+		return;
+	}
+	if ([mergeInfo.diff hasConflicts])
+	{
+		NSLog(@"Can't merge, diff has conflicts. %@", mergeInfo.diff);
+		return;
+	}
+	
+	// FIXME: Inefficient, ugly
+	COObjectGraphContext *temp = [inspectedPersistentRoot objectGraphContextForPreviewingRevision: mergeInfo.baseRevision];
+    [mergeInfo.diff applyTo: temp];
+	[[inspectedBranch objectGraphContext] insertOrUpdateItems: (NSArray *)[[[temp loadedObjects] mappedCollection] storeItem]];
+	
+	inspectedBranch.mergingRevision = clickedRevision;
+	
+	[self commitWithIdentifier: @"merge" descriptionArguments: @[[clickedRevision localizedShortDescription]]];
 }
 
 /* Convenience */

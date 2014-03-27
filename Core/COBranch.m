@@ -41,6 +41,7 @@ NSString * const kCOBranchLabel = @"COBranchLabel";
 @synthesize UUID = _UUID, persistentRoot = _persistentRoot;
 @synthesize shouldMakeEmptyCommit = _shouldMakeEmptyCommit, supportsRevert = _supportsRevert;
 @synthesize mergingBranch = _mergingBranch;
+@synthesize mergingRevision = _mergingRevision;
 
 + (void) initialize
 {
@@ -624,10 +625,17 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 		if ([[modifiedItems itemUUIDs] count] > 0 || self.shouldMakeEmptyCommit)
 		{
 			ETUUID *mergeParent = nil;
+			ETAssert(self.mergingBranch == nil
+					 || self.mergingRevision == nil);
 			if (self.mergingBranch != nil)
 			{
 				mergeParent = [[self.mergingBranch currentRevision] UUID];
 				self.mergingBranch = nil;
+			}
+			else if (self.mergingRevision != nil)
+			{
+				mergeParent = [self.mergingRevision UUID];
+				self.mergingRevision = nil;
 			}
 			
 			ETUUID *revUUID = [ETUUID UUID];

@@ -107,6 +107,7 @@ extern NSString * const kCOBranchLabel;
     ETUUID *_parentBranchUUID;
 	NSMutableArray *_revisions;
 	COBranch *_mergingBranch;
+	CORevision *_mergingRevision;
 }
 
 
@@ -400,12 +401,23 @@ extern NSString * const kCOBranchLabel;
 /**
  * The branch that is currently being merged. 
  *
- * Always returns nil unless explicitly set. 
+ * Always returns nil unless explicitly set. Only one of mergingBranch
+ * or mergingRevision can be set to non-nil.
  * 
  * If it is set at commit time, records the <em>current revision</em> of 
  * the merging branch as the merge parent of the new commit.
  */
 @property (nonatomic, strong) COBranch *mergingBranch;
+/**
+ * The revision that is currently being merged.
+ *
+ * Always returns nil unless explicitly set. Only one of mergingBranch
+ * or mergingRevision can be set to non-nil.
+ *
+ * If it is set at commit time, records the given revision
+ * as the merge parent of the new commit.
+ */
+@property (nonatomic, strong) CORevision *mergingRevision;
 /**
  * Returns a merge info object representing the changes between the receiver and 
  * the given branch to be merged.

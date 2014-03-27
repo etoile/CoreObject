@@ -13,27 +13,56 @@
 
 @implementation COEditingContext (CommonAncestor)
 
-/**
- * Naiive algorithm: gather paths from commitA to the root, and commitB to the root,
- * and return their first intersection.
- */
+- (void) addUUIDAndParents: (ETUUID *)aUUID persistentRoot: (ETUUID *)persistentRoot toSet: (NSMutableSet *)dest
+{
+	if ([dest containsObject: aUUID])
+		return;
+	
+	[dest addObject: aUUID];
+	
+	CORevision *revision = [self revisionForRevisionUUID: aUUID persistentRootUUID: persistentRoot];
+	
+	if (revision.parentRevision != nil)
+		[self addUUIDAndParents: revision.parentRevision.UUID persistentRoot: persistentRoot toSet: dest];
+	
+	if (revision.mergeParentRevision != nil)
+		[self addUUIDAndParents: revision.mergeParentRevision.UUID persistentRoot: persistentRoot toSet: dest];
+}
+
 - (ETUUID *)commonAncestorForCommit: (ETUUID *)commitA
 						  andCommit: (ETUUID *)commitB
 					 persistentRoot: (ETUUID *)persistentRoot
 {
 	NSMutableSet *ancestorsOfA = [NSMutableSet set];
 	
-	for (ETUUID *temp = commitA; temp != nil; temp = [[[self revisionForRevisionUUID: temp persistentRootUUID: persistentRoot] parentRevision] UUID])
-	{
-		[ancestorsOfA addObject: temp];
-	}
+	[self addUUIDAndParents: commitA persistentRoot: persistentRoot toSet: ancestorsOfA];
 	
-	for (ETUUID *temp = commitB; temp != nil; temp = [[[self revisionForRevisionUUID: temp persistentRootUUID: persistentRoot] parentRevision] UUID])
+	// Do a BFS starting at commitB until we hit a commit in ancestorsOfA
+	// TODO: Check whether this makes sense
+	
+	NSMutableArray *siblingsArray = [NSMutableArray arrayWithObject: commitB];
+	
+	while ([siblingsArray count] > 0)
 	{
-		if ([ancestorsOfA containsObject: temp])
+		NSMutableArray *nextSiblingsArray = [NSMutableArray new];
+		
+		for (ETUUID *sibling in siblingsArray)
 		{
-			return temp;
+			if ([ancestorsOfA containsObject: sibling])
+			{
+				return sibling;
+			}
+			
+			CORevision *revision = [self revisionForRevisionUUID: sibling persistentRootUUID: persistentRoot];
+			
+			if (revision.parentRevision != nil)
+				[nextSiblingsArray addObject: revision.parentRevision.UUID];
+			
+			if (revision.mergeParentRevision != nil)
+				[nextSiblingsArray addObject: revision.mergeParentRevision.UUID];
 		}
+		
+		[siblingsArray setArray: nextSiblingsArray];
 	}
 	
 	// No common ancestor

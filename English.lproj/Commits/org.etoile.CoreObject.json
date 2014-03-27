@@ -52,6 +52,12 @@
 		{
 			"type": "history",
 			"shortDescription": "Checkpoint"
-		}		
+		},
+		
+		"merge":
+		{
+			"type": "history",
+			"shortDescription": "Merge changes from '%@'"
+		}
 	}
 }
