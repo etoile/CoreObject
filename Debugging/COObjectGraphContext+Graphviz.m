@@ -63,6 +63,8 @@ static NSString *COGraphvizNodeNameForCollectionNodeForAttribute(NSString *anAtt
 
 static NSString *COGraphvizSanatizeStringForHTML(NSString *aString)
 {
+	aString = [aString stringByReplacingOccurrencesOfString: @"&"
+												 withString: @"&amp;"];
 	aString = [aString stringByReplacingOccurrencesOfString: @"<"
 												 withString: @"&lt;"];
 	aString = [aString stringByReplacingOccurrencesOfString: @">"
