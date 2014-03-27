@@ -78,9 +78,15 @@ Major Missing Features
 
 - Something to aggregate the history of multiple persistent roots in this same class?
 
+- Attributed string merge needs work - doing a selective undo of an older change
+  tends to corrupt the document. We probably need different merge variants for collaborative
+  editing and (merging branches/selective undo)
+
 
 Open Questions
 --------------
+
+- Merging UI
 
 - We only have automatic metamodel-driven copying on subsets of an inner object graph. Investigate copying a persistent root and also referenced persistent roots. For example, being able to copy the Typewriter library persistent root, and have all note persistent roots in the library automatically copied as well, would be genuinely useful. This seems to be essentially the same problem we already solve with COCopier. Note that the persistent root copies would be essentially cheap copies, but we would have to rewrite the cross-references to point to the copies instead of the originals.
 
