@@ -69,6 +69,17 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
 	[txn setMetadata: _newMetadata forBranch: _branchUUID ofPersistentRoot: _persistentRootUUID];
 }
 
+- (void) applyToContext: (COEditingContext *)aContext
+{
+	NILARG_EXCEPTION_TEST(aContext);
+
+    COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
+    COBranch *branch = [proot branchForUUID: _branchUUID];
+   	ETAssert(branch != nil);
+
+    [branch setMetadata: _newMetadata];
+}
+
 - (NSString *)kind
 {
 	return _(@"Branch Metadata Update");

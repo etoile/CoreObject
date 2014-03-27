@@ -92,6 +92,11 @@
 - (BOOL) canApplyToContext: (COEditingContext *)aContext;
 /**
  * <override-subclass />
+ * Applies the receiver changes to the editing context.
+ */
+- (void) applyToContext: (COEditingContext *)aContext;
+/**
+ * <override-subclass />
  * Applies the receiver changes directly to a store transaction.
  */
 - (void) addToStoreTransaction: (COStoreTransaction *)txn

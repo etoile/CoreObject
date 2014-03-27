@@ -119,6 +119,10 @@
  */
 - (BOOL) canApplyToContext: (COEditingContext *)aContext;
 /**
+ * Applies the receiver changes to the editing context.
+ */
+- (void) applyToContext: (COEditingContext *)aContext;
+/**
  * Applies the receiver changes directly to a store transaction.
  */
 - (void) addToStoreTransaction: (COStoreTransaction *)txn

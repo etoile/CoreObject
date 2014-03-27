@@ -128,6 +128,61 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 //    }
 }
 
+- (void) applyToContext: (COEditingContext *)aContext
+{
+	NILARG_EXCEPTION_TEST(aContext);
+
+    COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
+    COBranch *branch = [proot branchForUUID: _branchUUID];
+	ETAssert(branch != nil);
+
+    if ([[[branch currentRevision] UUID] isEqual: _oldRevisionUUID]
+		&& branch.supportsRevert)
+    {
+        [branch setCurrentRevision:
+            [aContext revisionForRevisionUUID: _newRevisionUUID persistentRootUUID: _persistentRootUUID]];
+	
+		if (![aContext isRevision: _newHeadRevisionUUID
+		equalToOrParentOfRevision: _oldHeadRevisionUUID
+				   persistentRoot: _persistentRootUUID])
+		{
+			[branch setHeadRevision:
+				[aContext revisionForRevisionUUID: _newHeadRevisionUUID persistentRootUUID: _persistentRootUUID]];
+		}
+    }
+    else
+    {
+		_currentRevisionBeforeSelectiveApply = [[branch currentRevision] UUID];
+		
+        CODiffManager *merged = [self diffToSelectivelyApplyToBranchCurrentRevision: _currentRevisionBeforeSelectiveApply
+															 assumingEditingContext: aContext];
+        COItemGraph *oldGraph = [[proot store] itemGraphForRevisionUUID: _oldRevisionUUID persistentRoot: _persistentRootUUID];
+        
+        id<COItemGraph> result = [[COItemGraph alloc] initWithItemGraph: oldGraph];
+		[merged applyTo: result];
+        
+        // FIXME: Works, but an ugly API mismatch when setting object graph context contents
+        NSMutableArray *items = [NSMutableArray array];
+        for (ETUUID *uuid in [result itemUUIDs])
+        {
+			COItem *replacementItem = [result itemForUUID: uuid];
+			COItem *existingItem = [[branch objectGraphContext] itemForUUID: uuid];
+			if (existingItem == nil
+				|| ![existingItem isEqual: replacementItem])
+			{
+				[items addObject: replacementItem];
+			}
+        }
+        
+		// FIXME: Handle cross-persistent root relationship constraint violations,
+		// if we introduce those
+        [[branch objectGraphContext] insertOrUpdateItems: items];
+		
+		// N.B. newHeadRevisionID is intentionally ignored here, it only applies
+		// if we were able to do a non-selective undo.
+    }
+}
+
 + (ETUUID *) currentRevisionUUIDForBranch: (COBranch *)branch withChangesInStoreTransaction: (COStoreTransaction *)txn
 {
 	NILARG_EXCEPTION_TEST(branch);

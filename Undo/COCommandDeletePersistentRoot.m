@@ -82,6 +82,12 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 	[txn deletePersistentRoot: _persistentRootUUID];
 }
 
+- (void) applyToContext: (COEditingContext *)aContext
+{
+	NILARG_EXCEPTION_TEST(aContext);
+    [[aContext persistentRootForUUID: _persistentRootUUID] setDeleted: YES];
+}
+
 - (NSString *)kind
 {
 	return _(@"Persistent Root Deletion");

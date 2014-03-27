@@ -276,27 +276,23 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	COUndoTrack *track = [COUndoTrack trackForName: ((COCommandGroup *)aNode).trackName withEditingContext: _editingContext];
 	ETAssert(track != nil);
 	
-	COCommandGroup *command = [(COCommandGroup *)aNode inverse];
+	COCommand *command = [(COCommand *)aNode inverse];
+	[command applyToContext: _editingContext];
 	
 	NSString *commitShortDescription = [aNode localizedShortDescription];
 	if (commitShortDescription == nil)
 		commitShortDescription = @"";
 	
-	NSMutableDictionary *md = [@{kCOCommitMetadataIdentifier : @"org.etoile.CoreObject.selective-undo",
-								 kCOCommitMetadataShortDescriptionArguments : @[commitShortDescription]} mutableCopy];
-		
+	NSMutableDictionary *md = [@{kCOCommitMetadataShortDescriptionArguments : @[commitShortDescription]} mutableCopy];
 	if (self.customRevisionMetadata != nil)
 	{
 		[md addEntriesFromDictionary: self.customRevisionMetadata];
 	}
 	
-	command.metadata = md;
-	
-	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-	[command addToStoreTransaction: txn withRevisionMetadata: md assumingEditingContextState: _editingContext];
-	[self commitStoreTransaction: txn];
-	
-	[self recordCommand: command];
+	[_editingContext commitWithIdentifier: @"org.etoile.CoreObject.selective-undo"
+								 metadata: md
+								undoTrack: track
+									error: NULL];
 }
 
 - (void)redoNode: (id <COTrackNode>)aNode
@@ -304,27 +300,23 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	COUndoTrack *track = [COUndoTrack trackForName: ((COCommandGroup *)aNode).trackName withEditingContext: _editingContext];
 	ETAssert(track != nil);
 	
-	COCommandGroup *command = [(COCommandGroup *)aNode copy];
+	COCommand *command = (COCommand *)aNode;
+	[command applyToContext: _editingContext];
 	
 	NSString *commitShortDescription = [aNode localizedShortDescription];
 	if (commitShortDescription == nil)
 		commitShortDescription = @"";
 	
-	NSMutableDictionary *md = [@{kCOCommitMetadataIdentifier : @"org.etoile.CoreObject.selective-redo",
-								 kCOCommitMetadataShortDescriptionArguments : @[commitShortDescription]} mutableCopy];
-	
+	NSMutableDictionary *md = [@{kCOCommitMetadataShortDescriptionArguments : @[commitShortDescription]} mutableCopy];
 	if (self.customRevisionMetadata != nil)
 	{
 		[md addEntriesFromDictionary: self.customRevisionMetadata];
 	}
-
-	command.metadata = md;
 	
-	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-	[command addToStoreTransaction: txn withRevisionMetadata: md assumingEditingContextState: _editingContext];
-	[self commitStoreTransaction: txn];
-	
-	[self recordCommand: command];
+	[_editingContext commitWithIdentifier: @"org.etoile.CoreObject.selective-redo"
+								 metadata: md
+								undoTrack: track
+									error: NULL];
 }
 
 #pragma mark - COUndoTrack - Other Public Methods

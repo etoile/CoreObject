@@ -54,6 +54,17 @@ static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
 	[txn undeleteBranch: _branchUUID ofPersistentRoot: _persistentRootUUID];
 }
 
+- (void) applyToContext: (COEditingContext *)aContext
+{
+	NILARG_EXCEPTION_TEST(aContext);
+
+    COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
+    COBranch *branch = [proot branchForUUID: _branchUUID];
+	ETAssert(branch != nil);
+    
+    [branch setDeleted: NO];
+}
+
 - (NSString *)kind
 {
 	return _(@"Branch Undeletion");

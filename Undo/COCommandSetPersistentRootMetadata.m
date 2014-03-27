@@ -64,6 +64,16 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
 	[txn setMetadata: _newMetadata forPersistentRoot: _persistentRootUUID];
 }
 
+- (void) applyToContext: (COEditingContext *)aContext
+{
+	NILARG_EXCEPTION_TEST(aContext);
+	
+    COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
+   	ETAssert(proot != nil);
+	
+    [proot setMetadata: _newMetadata];
+}
+
 - (NSString *)kind
 {
 	return _(@"Persistent Root Metadata Update");

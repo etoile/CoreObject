@@ -162,6 +162,16 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     return YES;
 }
 
+- (void) applyToContext: (COEditingContext *)aContext
+{
+	NILARG_EXCEPTION_TEST(aContext);
+
+    for (COCommand *command in _contents)
+    {
+        [command applyToContext: aContext];
+    }
+}
+
 - (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
 {
 	NILARG_EXCEPTION_TEST(ctx);
