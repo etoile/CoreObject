@@ -15,8 +15,11 @@ Critical
 
 ###Graphics editor
 
+ - Text editing in drawing UI is buggy
+
 ###General
 
+ - Reopen documents at startup
  - fix project level undo
  - there is a lot more broken... test the app and take notes on use cases that should work
 

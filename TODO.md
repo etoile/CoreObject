@@ -353,10 +353,16 @@ the following situations at least:
 
 - Collaboration
 
+  - COSynchronizer should handle syncing persistent root / branch metadata changes?
+
   - support sending attachments (or large persistent roots) using XMPP file transfer
+
+  - COSynchronizerClient is missing the detection for illegal reverts
 
 
 - COUndoTrack
+
+  - Doesn’t work: [[COUndoTrack trackForPattern: @"org.etoile.projectdemo*" withEditingContext: nil] clear];
 
   - Perhaps have different commands for a regular commit and a revert.
     It's probably confusing or dangerous that undoing a revert can cause a selective undo (as it can now),
