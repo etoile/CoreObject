@@ -358,6 +358,10 @@ the following situations at least:
 
 - COUndoTrack
 
+  - Perhaps have different commands for a regular commit and a revert.
+    It's probably confusing or dangerous that undoing a revert can cause a selective undo (as it can now),
+	whereas for undoing a regular commit it's okay to make a selective undo.
+
   - Refactor COCommand initialization which is a mess
 
   - Rename COTrack to COHistoryTrack protocol
