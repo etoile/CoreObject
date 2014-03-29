@@ -11,4 +11,4 @@ Typewriter TODO
 - [ ] some way to see the list of all the checkpoints
 - [ ] have Revert show a panel listing all the checkpoints, so you can pick the one you want
 - [x] Don't use NSDocument
-- [ ] NSOutlineView Warning: reloadData called while in the middle of doing a reloadData (break on NSLog to debug). Quentin: I manage to reproduce by typing a tag name while pressing '+'	but I had to try twice
+- [x] NSOutlineView Warning: reloadData called while in the middle of doing a reloadData (break on NSLog to debug). Quentin: I manage to reproduce by typing a tag name while pressing '+'	but I had to try twice
