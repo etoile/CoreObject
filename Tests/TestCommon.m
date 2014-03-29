@@ -227,7 +227,7 @@ doesNotPostNotification: (NSString *)notif
 	{
 		[FMDatabase logOpenDatabases];
 
-		const int expectedOpenDatabases = 3;
+		const int expectedOpenDatabases = 4;
 		if ([FMDatabase countOfOpenDatabases] > expectedOpenDatabases)
 		{
 			NSLog(@"ERROR: Expected only %d SQLite database connections to still be open.", expectedOpenDatabases);

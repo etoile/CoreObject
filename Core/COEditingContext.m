@@ -524,81 +524,95 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 			 withUndoTrack: (COUndoTrack *)track
 					 error: (NSError **)anError
 {
-	[self validateMetadata: metadata];
-
-	// TODO: We could organize validation errors by persistent root. Each
-	// persistent root might result in a validation error that contains a
-	// suberror per inner object, then each suberror could in turn contain
-	// a suberror per validation result. For now, we just aggregate errors per
-	// inner object.
-	if ([self validateChangedObjectsForContext: self error: anError] == NO)
-		return NO;
-
-	/* Commit persistent root changes (deleted persistent roots included) */
-
-    COStoreTransaction *transaction = [[COStoreTransaction alloc] init];
-    [self recordBeginUndoGroupWithMetadata: metadata];
-
-	for (COPersistentRoot *persistentRoot in persistentRoots)
+	if (_inCommit)
 	{
-		[persistentRoot saveCommitWithMetadata: metadata transaction: transaction];
+		[NSException raise: NSGenericException
+					format: @"%@ called recursively", NSStringFromSelector(_cmd)];
 	}
-	
-	/* Add persistent root deletions to the transaction */
-	
-	for (COPersistentRoot *persistentRoot in persistentRoots)
+		
+	@try
 	{
-        ETUUID *uuid = [persistentRoot UUID];
-        
-		if ([_persistentRootsPendingDeletion containsObject: persistentRoot])
-        {
-            [transaction deletePersistentRoot: uuid];
-            [self recordPersistentRootDeletion: persistentRoot];
-        }
-        else if ([_persistentRootsPendingUndeletion containsObject: persistentRoot])
-        {
-            [transaction undeletePersistentRoot: uuid];
-            [self recordPersistentRootUndeletion: persistentRoot];
-        }
-    }
+		_inCommit = YES;
+		[self validateMetadata: metadata];
 
-	/* Update transaction IDs (can't add to the transaction after this) */
-	
-	for (ETUUID *uuid in [transaction persistentRootUUIDs])
-	{
-		COPersistentRoot *persistentRoot = [self persistentRootForUUID: uuid];
+		// TODO: We could organize validation errors by persistent root. Each
+		// persistent root might result in a validation error that contains a
+		// suberror per inner object, then each suberror could in turn contain
+		// a suberror per validation result. For now, we just aggregate errors per
+		// inner object.
+		if ([self validateChangedObjectsForContext: self error: anError] == NO)
+			return NO;
 
-		persistentRoot.lastTransactionID = [transaction setOldTransactionID: persistentRoot.lastTransactionID
-		                                                  forPersistentRoot: uuid];
-	}
-	
-	/* Update _persistentRootsPendingDeletion and _persistentRootsPendingUndeletion and unload
-	   persistent roots. */
-	
-	for (COPersistentRoot *persistentRoot in persistentRoots)
-	{
-		if ([_persistentRootsPendingDeletion containsObject: persistentRoot])
-        {
-            [_persistentRootsPendingDeletion removeObject: persistentRoot];
-            
-            [self unloadPersistentRoot: persistentRoot];
-        }
-        else if ([_persistentRootsPendingUndeletion containsObject: persistentRoot])
-        {
-            [_persistentRootsPendingUndeletion removeObject: persistentRoot];
-        }
-    }
-											
+		/* Commit persistent root changes (deleted persistent roots included) */
+
+		COStoreTransaction *transaction = [[COStoreTransaction alloc] init];
+		[self recordBeginUndoGroupWithMetadata: metadata];
+
+		for (COPersistentRoot *persistentRoot in persistentRoots)
+		{
+			[persistentRoot saveCommitWithMetadata: metadata transaction: transaction];
+		}
+		
+		/* Add persistent root deletions to the transaction */
+		
+		for (COPersistentRoot *persistentRoot in persistentRoots)
+		{
+			ETUUID *uuid = [persistentRoot UUID];
+			
+			if ([_persistentRootsPendingDeletion containsObject: persistentRoot])
+			{
+				[transaction deletePersistentRoot: uuid];
+				[self recordPersistentRootDeletion: persistentRoot];
+			}
+			else if ([_persistentRootsPendingUndeletion containsObject: persistentRoot])
+			{
+				[transaction undeletePersistentRoot: uuid];
+				[self recordPersistentRootUndeletion: persistentRoot];
+			}
+		}
+
+		/* Update transaction IDs (can't add to the transaction after this) */
+		
+		for (ETUUID *uuid in [transaction persistentRootUUIDs])
+		{
+			COPersistentRoot *persistentRoot = [self persistentRootForUUID: uuid];
+
+			persistentRoot.lastTransactionID = [transaction setOldTransactionID: persistentRoot.lastTransactionID
+															  forPersistentRoot: uuid];
+		}
+		
+		/* Update _persistentRootsPendingDeletion and _persistentRootsPendingUndeletion and unload
+		   persistent roots. */
+		
+		for (COPersistentRoot *persistentRoot in persistentRoots)
+		{
+			if ([_persistentRootsPendingDeletion containsObject: persistentRoot])
+			{
+				[_persistentRootsPendingDeletion removeObject: persistentRoot];
 				
-    ETAssert([_store commitStoreTransaction: transaction]);
-	COCommandGroup *command = [self recordEndUndoGroupWithUndoTrack: track];
-    
-	/* For a commit triggered by undo/redo on a COUndoTrack, the command is nil */
-	[self didCommitWithCommand: command persistentRoots: persistentRoots];
+				[self unloadPersistentRoot: persistentRoot];
+			}
+			else if ([_persistentRootsPendingUndeletion containsObject: persistentRoot])
+			{
+				[_persistentRootsPendingUndeletion removeObject: persistentRoot];
+			}
+		}
+												
+					
+		ETAssert([_store commitStoreTransaction: transaction]);
+		COCommandGroup *command = [self recordEndUndoGroupWithUndoTrack: track];
+		
+		/* For a commit triggered by undo/redo on a COUndoTrack, the command is nil */
+		[self didCommitWithCommand: command persistentRoots: persistentRoots];
 
-	if (anError != NULL)
+		if (anError != NULL)
+		{
+			*anError = nil;
+		}
+	}
+	@finally
 	{
-		*anError = nil;
+		_inCommit = NO;
 	}
 	return YES;
 }

@@ -280,4 +280,27 @@
 	UKRaisesException([r2cxt2 parentRevision]);
 }
 
+- (void) testCommitWithinCommitNotificationIllegal
+{
+	__block BOOL receivedNotification = NO;
+	__block BOOL insideCommit = NO;
+	
+	[[NSNotificationCenter defaultCenter] addObserverForName: COEditingContextDidChangeNotification
+													  object: ctx
+													   queue: nil
+												  usingBlock: ^(NSNotification *notif) {
+													  receivedNotification = YES;
+													  UKTrue(insideCommit);
+													  UKRaisesException([ctx commit]);
+												  }];
+		
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+
+	insideCommit = YES;
+	[ctx commit];
+	insideCommit = NO;
+	
+	UKTrue(receivedNotification);
+}
+
 @end

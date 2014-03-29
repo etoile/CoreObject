@@ -133,6 +133,8 @@
     BOOL _isRecordingUndo;
     COCommandGroup *_currentEditGroup;
 	CORevisionCache *_revisionCache;
+	/** Detect illegal recursive calls to commit */
+	BOOL _inCommit;
 }
 
 
