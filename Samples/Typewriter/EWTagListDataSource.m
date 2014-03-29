@@ -82,6 +82,10 @@
 
 - (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
+	// HACK: Work around a recursive commit when you add a tag while you are renaming another tag
+	if (ignoreSelectionChanges)
+		return;
+	
 	if (nil == item) { item = [self rootObject]; }
 	NSTreeNode *treeNode = item;
 	
@@ -172,6 +176,8 @@ descriptionArguments: @[oldName, newName]];
 			[[tagGroupNode mutableChildNodes] addObject: tagNode];			
 		}
 	}
+	
+	ETAssert(!ignoreSelectionChanges);
 	
 	ignoreSelectionChanges = YES;
 	[self.outlineView reloadData];
