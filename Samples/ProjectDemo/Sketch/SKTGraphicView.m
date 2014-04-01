@@ -377,7 +377,13 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
         }
         [_drawingController commitWithIdentifier: @"draw-shape"];
     }
-    _creatingGraphic = nil;
+	else
+	{
+		_creatingGraphic = nil;
+		
+		// This is necessary so the _creatingGraphic created above doesn't get persisted in the next commit
+		[_drawingController.objectGraphContext discardAllChanges];
+	}
 }
 
 - (SKTGraphic *)creatingGraphic {
