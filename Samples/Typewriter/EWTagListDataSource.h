@@ -30,4 +30,6 @@
 - (void)cacheSelection;
 
 - (void) setNextSelection: (EWTagGroupTagPair *)aUUID;
+
+- (void) selectTagGroupAndTag: (EWTagGroupTagPair *)aPair;
 @end

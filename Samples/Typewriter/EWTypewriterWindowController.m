@@ -977,6 +977,15 @@ static NSString *Trim(NSString *text)
 
 #pragma mark - Navigation
 
+- (ETUUID *) uuidFromStringOrNil: (NSString *)aString
+{
+	if ([aString length] > 0)
+	{
+		return [ETUUID UUIDWithString: aString];
+	}
+	return nil;
+}
+
 - (NSDictionary *) navigationHistoryItemForTagGroup: (COTagGroup *)tagGroup tag: (COTag*)tag notePersistentRoot: (COPersistentRoot*)aNote
 {
 	return @{ @"tagGroup" : (tagGroup != nil ? tagGroup.UUID.stringValue : @""),
@@ -988,19 +997,13 @@ static NSString *Trim(NSString *text)
 {
 	isNavigating = YES;
 	@try {
-		NSLog(@"Navigating to %@", anItem[@"note"]);
+		NSLog(@"Navigating to %@", anItem);
 		
-		if ([anItem[@"note"] isEqualToString: @""])
-		{
-			[self selectNote: nil];
-		}
-		else
-		{
-			COPersistentRoot *proot = [self.editingContext persistentRootForUUID:
-									   [ETUUID UUIDWithString: anItem[@"note"]]];
-			
-			[self selectNote: proot];
-		}
+		[tagListDataSource selectTagGroupAndTag:
+		 [[EWTagGroupTagPair alloc] initWithTagGroup: [self uuidFromStringOrNil: anItem[@"tagGroup"]]
+												 tag: [self uuidFromStringOrNil: anItem[@"tag"]]]];
+		
+		[noteListDataSource selectNoteWithUUID: [self uuidFromStringOrNil: anItem[@"note"]]];
 	} @finally {
 		isNavigating = NO;
 	}

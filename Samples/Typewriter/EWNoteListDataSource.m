@@ -76,6 +76,11 @@
 {
 	nextSelection = aUUID;
 }
+- (void) selectNoteWithUUID: (ETUUID *)aUUID
+{
+	[self setNextSelection: aUUID];
+	[self reloadData];
+}
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
