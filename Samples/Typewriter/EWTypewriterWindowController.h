@@ -45,6 +45,11 @@ NSString * EWTagDragType;
 	NSTimer *coalescingTimer;
 	BOOL isDeleting;
 	COObjectGraphContext *selectedNoteCommittedState;
+	
+	// Navigation history
+	NSMutableArray *navigationHistory;
+	NSInteger navigationHistoryPosition;
+	BOOL isNavigating;
 }
 
 @property (nonatomic, readonly) NSTableView *notesTable;
