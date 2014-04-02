@@ -150,6 +150,12 @@ descriptionArguments: @[oldName, newName]];
 	nextSelection = aUUID;
 }
 
+- (void) selectTagGroupAndTag: (EWTagGroupTagPair *)aPair
+{
+	[self setNextSelection: aPair];
+	[self reloadData];
+}
+
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification
 {
 	[self cacheSelection];

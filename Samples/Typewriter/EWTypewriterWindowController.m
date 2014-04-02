@@ -187,6 +187,8 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 
 - (void)windowDidLoad
 {
+	navigationHistory = [NSMutableArray new];
+	
 	undoManagerBridge = [[EWUndoManager alloc] init];
 	[undoManagerBridge setDelegate: self];
 	
@@ -516,6 +518,16 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	}
 }
 
+- (void) goBack: (id)sender
+{
+	[self goBack];
+}
+
+- (void) goForward: (id)sender
+{
+	[self goForward];
+}
+
 #pragma mark - EWUndoManagerDelegate
 
 - (void) undo
@@ -791,6 +803,8 @@ static NSString *Trim(NSString *text)
 
 - (void) selectNote: (COPersistentRoot *)aNote
 {
+	[self recordVisitingTagGroup: [self tagGroupOfSelectedRow] tag: [self selectedTag] notePersistentRoot: aNote];
+	
 	selectedNote = aNote;
 		
 	if (selectedNote == nil)
@@ -960,5 +974,118 @@ static NSString *Trim(NSString *text)
 {
 	[selectedNote.objectGraphContext showGraph];
 }
+
+#pragma mark - Navigation
+
+- (ETUUID *) uuidFromStringOrNil: (NSString *)aString
+{
+	if ([aString length] > 0)
+	{
+		return [ETUUID UUIDWithString: aString];
+	}
+	return nil;
+}
+
+- (NSDictionary *) navigationHistoryItemForTagGroup: (COTagGroup *)tagGroup tag: (COTag*)tag notePersistentRoot: (COPersistentRoot*)aNote
+{
+	return @{ @"tagGroup" : (tagGroup != nil ? tagGroup.UUID.stringValue : @""),
+			  @"tag" : (tag != nil ? tag.UUID.stringValue : @""),
+			  @"note" : (aNote != nil ? aNote.UUID.stringValue : @"") };
+}
+
+- (void) navigateToNavigationHistoryItem: (NSDictionary *)anItem
+{
+	isNavigating = YES;
+	@try {
+		NSLog(@"Navigating to %@", anItem);
+		
+		[tagListDataSource selectTagGroupAndTag:
+		 [[EWTagGroupTagPair alloc] initWithTagGroup: [self uuidFromStringOrNil: anItem[@"tagGroup"]]
+												 tag: [self uuidFromStringOrNil: anItem[@"tag"]]]];
+		
+		[noteListDataSource selectNoteWithUUID: [self uuidFromStringOrNil: anItem[@"note"]]];
+	} @finally {
+		isNavigating = NO;
+	}
+}
+
+- (void) recordVisitingTagGroup: (COTagGroup *)tagGroup tag: (COTag*)tag notePersistentRoot: (COPersistentRoot*)aNote
+{
+	if (isNavigating)
+		return;
+	
+	NSLog(@"Visited %@ %@ %@", tagGroup, tag, aNote);
+	
+	NSDictionary *dict = [self navigationHistoryItemForTagGroup: tagGroup tag: tag notePersistentRoot: aNote];
+
+	if (navigationHistoryPosition - 1 >= 0
+		&& [navigationHistory count] > 0)
+	{
+		NSDictionary *lastDict = navigationHistory[navigationHistoryPosition - 1];
+		if ([lastDict[@"note"] isEqual: dict[@"note"]])
+		{
+			NSLog(@"Revisting same note");
+			return;
+		}
+	}
+	
+	
+	if (navigationHistoryPosition >= 0
+		&& [navigationHistory count] > navigationHistoryPosition)
+	{
+		[navigationHistory removeObjectsFromIndex: navigationHistoryPosition];
+	}
+	
+	[navigationHistory addObject: dict];
+	navigationHistoryPosition = [navigationHistory count];
+}
+
+- (BOOL) canGoBack
+{
+	return navigationHistoryPosition > 1;
+}
+
+- (BOOL) canGoForward
+{
+	return navigationHistoryPosition >= 0
+		&& navigationHistoryPosition < [navigationHistory count];
+}
+
+- (void) goBack
+{
+	if ([self canGoBack])
+	{
+		navigationHistoryPosition--;
+		[self navigateToNavigationHistoryItem: navigationHistory[navigationHistoryPosition - 1]];
+	}
+}
+
+- (void) goForward
+{
+	if ([self canGoForward])
+	{
+		[self navigateToNavigationHistoryItem: navigationHistory[navigationHistoryPosition]];
+		navigationHistoryPosition++;
+	}
+}
+
+#pragma mark - User Interface Validation
+
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem
+{
+    SEL theAction = [anItem action];
+	
+	if (theAction == @selector(goBack:))
+	{
+		return [self canGoBack];
+	}
+	else if (theAction == @selector(goForward:))
+	{
+		return [self canGoForward];
+	}
+	
+	return [self respondsToSelector: theAction];
+}
+
 
 @end
