@@ -284,19 +284,23 @@ section
 	text-transform: none;
 }
 
-/* To prevent the navbar bottom line to appear pushed downwards on a:hover */
-.nav li a
+/* If the navbar is a dropdown menu, don't apply */
+@media (min-width: 768px)
 {
-	border-bottom: 1px solid rgba(0, 0, 0, 0);
+	/* To prevent the navbar bottom line to appear pushed downwards on a:hover */
+	.nav li a
+	{
+		border-bottom: 1px solid rgba(0, 0, 0, 0);
+	}
+
+	.nav li a:hover, .nav li a:active, .nav .active a, .nav .active a:hover, .nav .active a:active
+	{
+		color: black;
+		border-bottom: 1px solid #ef4832; /* #FF7A4C #ef4832 #AEE4FF */
+	}
 }
 
-.nav li a:hover, .nav li a:active, .nav .active a, .nav .active a:hover, .nav .active a:active
-{
-	color: black;
-	border-bottom: 1px solid #ef4832; /* #FF7A4C #ef4832 #AEE4FF */
-}
-
-/**
+/*
  * Headers and Paragraphs
  * ======================
  */
