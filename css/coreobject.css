@@ -142,7 +142,7 @@ section
  * ================
  */
  
-@media (min-width: 768px) 
+@media (min-width: 768px)
 {
 	/* Bigger gutter for sm5 */
 	.left-col
@@ -220,7 +220,7 @@ section
 	font-weight: 600;
 	text-decoration: none;
 
-	border-bottom: 3px dotted lightgray; /* #2980B9; rgba(0, 0, 0, 0.8); */
+	border-bottom: 3px solid lightgray; /* #2980B9; rgba(0, 0, 0, 0.8); */
 }
 
 .blue-section a:not(.btn):link,  .blue-section a:not(.btn):active, .blue-section a:not(.btn):visited
@@ -241,12 +241,12 @@ section
 
 .blue-section a:not(.btn):hover, .blue-section a:not(.btn):active
 {
-	border-bottom: 3px dotted rgba(255, 255, 255, 0.4);
+	border-bottom: 3px solid rgba(255, 255, 255, 0.4);
 }
 
 .orange-section a:not(.btn):hover, .orange-section a:not(.btn):active
 {
-	border-bottom: 3px dotted rgba(255, 255, 255, 0.3);
+	border-bottom: 3px solid rgba(255, 255, 255, 0.3);
 }
 
 /*a:hover 
