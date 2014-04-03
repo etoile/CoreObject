@@ -142,6 +142,34 @@ section
  * ================
  */
  
+@media (min-width: 768px) 
+{
+	/* Bigger gutter for sm5 */
+	.left-col
+	{
+		padding-right: 30px;
+	}
+
+	.right-col
+	{
+		padding-left: 30px;
+	}
+}
+
+@media (min-width: 992px) 
+{
+	/* Bigger gutter for sm5 */
+	.left-col
+	{
+		padding-right: 50px;
+	}
+
+	.right-col
+	{
+		padding-left: 50px;
+	}
+}
+
 @media (max-width: 768px) 
 {
 	[class*="row"]
