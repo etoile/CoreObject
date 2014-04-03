@@ -556,6 +556,11 @@ h2
  * ======
  */
  
+img 
+{
+	max-width: 100%;
+}
+ 
 .small-screenshot
 {
 	display: block;
