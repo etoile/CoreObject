@@ -268,11 +268,12 @@ section
 	margin-bottom: 0;
 
 	background-color: #FFFFFF; /* #383428; #f6f6f4; */
-	opacity: 0.88;
+	opacity: 0.96;
 
 	font-family: 'Open Sans', sans-serif;
 	font-weight: 300;
-	font-size: 1em;
+	font-size: 0.8em;
+	text-transform: uppercase;
 }
 
 .navbar-brand
@@ -280,6 +281,19 @@ section
 	font-family: 'Lobster';
 	font-weight: 200;
 	font-size: 1.5em;
+	text-transform: none;
+}
+
+/* To prevent the navbar bottom line to appear pushed downwards on a:hover */
+.nav li a
+{
+	border-bottom: 1px solid rgba(0, 0, 0, 0);
+}
+
+.nav li a:hover, .nav li a:active, .nav .active a, .nav .active a:hover, .nav .active a:active
+{
+	color: black;
+	border-bottom: 1px solid #ef4832; /* #FF7A4C #ef4832 #AEE4FF */
 }
 
 /**
