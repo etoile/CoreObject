@@ -176,6 +176,61 @@ section
 }
 
 /*
+ * Links
+ * =====
+ */
+
+.content a:not(.btn):link, .content a:not(.btn):visited
+{
+	font-weight: 600;
+	text-decoration: none;
+	/* color: #222; */
+}
+
+.content a:not(.btn):hover, .content a:not(.btn):active
+{
+	font-weight: 600;
+	text-decoration: none;
+
+	border-bottom: 3px dotted lightgray; /* #2980B9; rgba(0, 0, 0, 0.8); */
+}
+
+.blue-section a:not(.btn):link,  .blue-section a:not(.btn):active, .blue-section a:not(.btn):visited
+{
+	color: #444;
+}
+
+.blue-section .tagline a:not(.btn):link,  .blue-section .tagline a:not(.btn):active, .blue-section .tagline a:not(.btn):visited
+{
+	color: #333;
+}
+
+.blue-section a:not(.btn):hover, .blue-section a:not(.btn):active, .orange-section a:not(.btn):hover, .orange-section a:not(.btn):active
+{
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.blue-section a:not(.btn):hover, .blue-section a:not(.btn):active
+{
+	border-bottom: 3px dotted rgba(255, 255, 255, 0.4);
+}
+
+.orange-section a:not(.btn):hover, .orange-section a:not(.btn):active
+{
+	border-bottom: 3px dotted rgba(255, 255, 255, 0.3);
+}
+
+/*a:hover 
+{
+	color: #111;
+	opacity: 0.8;
+	background-color: #AEE4FF;
+	text-decoration: none;
+	border-bottom: 3px darkgray dotted;
+}*/
+
+/*
  * Navigation Bar 
  * ==============
  */
@@ -368,6 +423,12 @@ h2
 	
  	color: #484848;
 	text-shadow: 0px 3px 4px rgba(0, 0, 0, 0.1);
+	
+	padding: 5px;
+	padding-left: 10px;
+	border-left: 1px solid white;
+	/*border-left: 6px solid rgba(255, 204, 2, 0.7);*/
+	opacity: 0.95;
 }
 
 /*
@@ -395,6 +456,35 @@ h2
 	font-size: 1em;
 	color: white;
 }
+
+/*
+ * Images
+ * ======
+ */
+ 
+.small-screenshot
+{
+	display: block;
+
+	width: 300px;
+
+	border: 1px solid lightgray;
+	border-radius: 6px;
+}
+
+ 
+.big-screenshot
+{
+	display: block;
+
+	width: 900px;
+	margin: auto;
+	margin-top: 30px;
+
+	border: 1px solid lightgray;
+	border-radius: 6px;
+}
+
 
 /*
  * Top Area

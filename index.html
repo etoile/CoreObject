@@ -52,7 +52,7 @@
 		</div>
 	</div>
 
-	<div id="content">
+	<div id="content" class="content">
 
 		<div class="container">
 			<div class="jumbotron" id="splash">
@@ -122,6 +122,7 @@
 			<div class="row">
 				<div class="hidden-xs col-sm-1"></div>
 				<div class="col-sm-5">
+					<img class="small-screenshot" src="images/projectdemo2.png" alt="ProjectDemo history screenshot">
 				</div>
 				<div class="col-sm-5 last-content-col">
 					<h2>Open</h2>
@@ -143,21 +144,21 @@
 		
 		</section><!-- #userexperience -->
 
-		<section class="container-full" id="features">
+		<section class="container-full blue-section" id="features">
 		<div class="container">
 			<h1>Features</h1>
-			<div class="tagline">CoreObject is a <em>pragmatic OODB</em> with a homegrown DVCS, leveraging <span class="highlighted-text">SQLite</span> for transactional storage and indexing.</div>
+			<div class="tagline">CoreObject is a <em>pragmatic OODB</em> with a <span class="highlighted-text">homegrown DVCS</span>, leveraging <a href="http://sqlite.org/">SQLite</a> for transactional storage and indexing.</div>
 			<!--
 			<div class="tagline">CoreObject is a <em>pragmatic OODB</em> built on top of a <span class="highlighted-text">SQL database</span> that rethinks ideas from various horizons.</div>
 
-			<li>SQLite <em>store</em> holds a set of documents; each document has its own history graph (documents are analogous to Git repositories)</li>
+			<li>SQLite <em>store</em> holds a set of documents; each document has its own history graph (documents are analogous to <a href="http://www.git-scm.com">Git</a> repositories)</li>
 
 			-->
 			<div class="row">
 				<div class="col-sm-4">
 					<h2>Version Control</h2>
 					<ul>
-						<li>Branches (pointers on the document revision graph, analogous to Git)</li>
+						<li>Branches (pointers on the document revision graph, analogous to <a href="http://www.git-scm.com">Git</a>)</li>
 						<li>Efficient revision storage inspired by <a href="http://mercurial.selenic.com/wiki/Presentations?action=AttachFile&do=get&target=ols-mercurial-paper.pdf">Mercurial</a></li>
 						<li>Orthogonal undo system, can undo all possible modifications to a CoreObject store</li>
 						<li>Muliple undo or history views over one or several documents</li>
@@ -232,7 +233,7 @@
 					<h2>Lean</h2>
 					<ul>
 						<li>Written in Objective-C with ARC</li>
-						<li>Minimal dependencies (SQLite and EtoileFoundation)</li>
+						<li>Minimal dependencies (<a href="http://sqlite.org/">SQLite</a> and EtoileFoundation)</li>
 					</ul>
 				</div>
 				<div class="col-sm-5">
@@ -247,12 +248,15 @@
 			</div><!-- row -->
 
 			<div class="small-tagline">More than seven prototypes have been written to explore various design choices, until we settled on the current architecture. Although it is still a <em>preview release</em>, the core architecture and API are <span class="highlighted-text">pretty mature</span> and shouldn't undergo any major changes.</div>
+
+			<img class="big-screenshot" src="images/projectdemo3.png" alt="ProjectDemo history screenshot">		
+
 		</section><!-- #framework -->
 
-		<section class="container-full" id="download">
+		<section class="container-full orange-section" id="download">
 		<div class="container">
 			<h1>Download</h1>
-			<div class="tagline">The package includes the EtoileFoundation dependency, and supports both <em>Cocoa and GNUstep</em> as development environments. To get started quickly, follow the <a href="http://www.etoile-project.org/dev/coreobject/INSTALL.Cocoa.html">Mac OS X</a> or <a href="http://www.etoile-project.org/dev/coreobject/INSTALL.GNUstep.html">GNUstep</a> instructions.</div>
+			<div class="tagline">The package includes the EtoileFoundation dependency, and supports both <em>Cocoa and GNUstep</em> as development environments.</div>
 
 			<div class="row">
 				<div class="hidden-xs col-sm-1 col-lg-1"></div>
@@ -265,9 +269,10 @@
 					</a>
 				</div>
 				<div class="col-xs-12 col-sm-4 col-lg-5">
-					<h2>Demo + Framework</h2>
+					<h2>Install</h2>
+					<p>Follow our <a href="http://www.etoile-project.org/dev/coreobject/INSTALL.Cocoa.html">Mac OS X</a> or <a href="http://www.etoile-project.org/dev/coreobject/INSTALL.GNUstep.html">GNUstep</a> instructions.</p>
 					<div class="annotation">
-						<p>For Mac OS X developers, demo applications are in the Samples directory. Just check our CoreObject <a href="http://www.coreobject.org">video</a> at the top, to see them in action.</p>
+						<p><span class="glyphicon glyphicon-flash"></span> For Mac OS X developers, demo applications are in the Samples directory.</p>
 					</div>
 				</div>
 				<div class="hidden-xs col-sm-1 col-lg-1"></div>
