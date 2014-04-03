@@ -511,6 +511,24 @@ h2
 	}
 }
 
+@media (max-width: 380px)
+{
+	.code
+	{
+		font-size: 0.77em;
+	}
+}
+
+/* With these settings, for a non-retina iPhone screen width (320px), both code and tagline blocks uses the same width. */
+@media (max-width: 350px)
+{
+	.code
+	{
+		font-size: 0.75em;
+		letter-spacing: -0.06em;
+	}
+}
+
 /*
  * Images
  * ======
