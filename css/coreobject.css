@@ -477,9 +477,25 @@ h2
 	{
 		padding: 5px;
 		padding-left: 10px;
-		border-left: 1px solid white;
+		border-left: 1px solid rgba(255, 255, 255, 0.95);
 		/*border-left: 6px solid rgba(255, 204, 2, 0.7);*/
 		opacity: 0.95;
+	}
+}
+
+.annotation .glyphicon
+{
+	/* Override [class*="row"] that matches glyph-right-arrow */
+	margin-left: 0;
+
+	margin-right: 5px;
+}
+
+@media (max-width: 768px)
+{
+	.annotation .glyphicon
+	{
+		color: rgba(255, 255, 255, 0.8);
 	}
 }
 
