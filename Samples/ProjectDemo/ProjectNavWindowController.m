@@ -28,9 +28,6 @@
 
 - (void)awakeFromNib
 {
-	// Hmm.. we really need to listen for persistent root creation
-	// and update our outline view.
-	
 	[outline setTarget: self];
 	[outline setDoubleAction: @selector(doubleClick:)];
 	
@@ -38,11 +35,14 @@
 											 selector: @selector(editingContextChanged:)
 												 name: COEditingContextDidChangeNotification
 											   object: [[NSApp delegate] editingContext]];
+	
+	[outline expandItem: nil expandChildren: YES];
 }
 
 - (void) editingContextChanged: (NSNotification *)notif
 {
 	[outline reloadData];
+	[outline expandItem: nil expandChildren: YES];
 }
 
 /* NSOutlineView Target/Action */
@@ -100,7 +100,7 @@
 	{
 		return [[item persistentRoot] name];
 	}
-	return @"?";
+	return @"Default Project";
 }
 
 - (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
