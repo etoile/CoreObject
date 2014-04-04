@@ -105,7 +105,10 @@
 	for (Project *project in projects)
 	{
 		// Show existing documents
-		[self projectDocumentsDidChange: project];
+		for (Document *document in project.documents)
+		{
+			[self openDocumentWindowForPersistentRoot: document.persistentRoot];
+		}
 	}
 }
 
