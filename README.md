@@ -18,6 +18,7 @@ At the center is an ACID-compliant object store using SQLite, and built on this 
 semantic merging, rich undo/redo support, collaborative editing, and a
 transaction API for viewing database snapshots in memory and batching changes for commit.
 
+Read more at [coreobject.org](http://coreobject.org)
 
 [![Build Status](https://travis-ci.org/etoile/CoreObject.png?branch=master)](https://travis-ci.org/etoile/CoreObject)
 
