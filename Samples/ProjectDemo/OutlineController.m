@@ -25,12 +25,26 @@
 	return self;
 }
 
+- (void) reloadOutlineView
+{
+	@try {
+		// Reloading the outline view could cause a commit (e.g., a field editor ends editing).
+		// Block the commit from happening.
+		preventCommits = YES;
+		
+		[outlineView reloadData];
+		
+	} @finally {
+		preventCommits = NO;
+	}
+}
+
 - (void) objectGraphDidChange
 {
 	// FIXME: Merge this and the next method!
 	
     //NSLog(@"Reloading outline for %@", doc);
-    [outlineView reloadData];
+    [self reloadOutlineView];
 }
 
 - (void) objectGraphContextDidChange: (NSNotification *)notif
@@ -39,7 +53,7 @@
 	
 	NSLog(@"object graph context did change: %@", [notif userInfo]);
 	
-	[outlineView reloadData];
+	[self reloadOutlineView];
 	
 	for (ETUUID *updated in notif.userInfo[COUpdatedObjectsKey])
 	{
@@ -345,7 +359,18 @@ static NSString *implode(NSArray *array, NSString *separator)
 - (id) outlineView: (NSOutlineView *)outlineView child: (NSInteger)index ofItem: (id)item
 {
 	if (nil == item) { item = [self rootObject]; }
-	return [[item contents] objectAtIndex: index];
+	
+	NSArray *contents = [item contents];
+	
+	// Sometime NSOutlineView (OS X 10.9) is buggy and asks for non-existent children
+	// (e.g. Two outline items:
+	//   - A
+	//   - B
+	//  With the field editor open, rename B, and click 'shift right' before closing the field editor)
+	if (index >= [contents count])
+		return nil;
+	
+	return [contents objectAtIndex: index];
 }
 
 - (BOOL) outlineView: (NSOutlineView *)ov isItemExpandable: (id)item
@@ -374,6 +399,9 @@ static NSString *implode(NSArray *array, NSString *separator)
 
 - (void)outlineView:(NSOutlineView *)outlineView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn byItem:(id)item
 {
+	if (preventCommits)
+		return;
+	
 	if (nil == item) { item = [self rootObject]; }
 
 	if ([item isKindOfClass: [OutlineItem class]])

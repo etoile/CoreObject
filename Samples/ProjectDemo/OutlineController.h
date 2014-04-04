@@ -8,6 +8,7 @@
 @interface OutlineController : EWDocumentWindowController <NSOutlineViewDelegate, EWOutlineViewDelegate>
 {
 	IBOutlet EWOutlineView *outlineView;
+	BOOL preventCommits;
 }
 
 - (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
