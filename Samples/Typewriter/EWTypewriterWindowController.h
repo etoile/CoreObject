@@ -11,6 +11,7 @@
 
 #import "EWTextView.h"
 #import "EWUndoManager.h"
+#import "EWDiffWindowController.h"
 
 @class EWTagListDataSource;
 @class EWNoteListDataSource;
@@ -39,6 +40,8 @@ NSString * EWTagDragType;
 	
 	EWTagListDataSource *tagListDataSource;
 	EWNoteListDataSource *noteListDataSource;
+	
+	EWDiffWindowController *diffWindowController;
 	
 	// Tracking text changes
 	BOOL changedByUser;
@@ -76,6 +79,8 @@ NSString * EWTagDragType;
 - (NSArray *) selectedNotePersistentRoots;
 
 - (IBAction)showDocumentHistory:(id)sender;
+
+- (IBAction)showDiff:(id)sender;
 
 - (IBAction)showItemGraph:(id)sender;
 

@@ -22,6 +22,10 @@
 		664CC9E818A4607F002F04B7 /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 664CC9E618A4607F002F04B7 /* Commits */; };
 		664CC9F618A4A3FC002F04B7 /* plus_8x8.png in Resources */ = {isa = PBXBuildFile; fileRef = 664CC9F118A4A3FC002F04B7 /* plus_8x8.png */; };
 		664E93B518A1929300261673 /* TypewriterDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 664E93B418A1929300261673 /* TypewriterDocument.m */; };
+		665880BC18F31BB1004B03D6 /* DiffWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 665880BA18F31BB1004B03D6 /* DiffWindow.xib */; };
+		665880C718F31D09004B03D6 /* EWDiffWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 665880C618F31D09004B03D6 /* EWDiffWindowController.m */; };
+		666293DC18F348DC00BC2AFB /* COAttributedStringDiff+PrettyPrint.m in Sources */ = {isa = PBXBuildFile; fileRef = 666293DB18F348DC00BC2AFB /* COAttributedStringDiff+PrettyPrint.m */; };
+		666293E718F35E6200BC2AFB /* COPersistentRoot+Revert.m in Sources */ = {isa = PBXBuildFile; fileRef = 666293E618F35E6200BC2AFB /* COPersistentRoot+Revert.m */; };
 		667A9A9018A5A34E009A2F0E /* document_stroke.icns in Resources */ = {isa = PBXBuildFile; fileRef = 667A9A8F18A5A34E009A2F0E /* document_stroke.icns */; };
 		668E942318D57C1400531C43 /* EWUndoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 668E942218D57C1400531C43 /* EWUndoManager.m */; };
 		66A080F118C7C1A50008739A /* EWTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66A080F018C7C1A50008739A /* EWTableView.m */; };
@@ -174,6 +178,13 @@
 		664CC9F118A4A3FC002F04B7 /* plus_8x8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = plus_8x8.png; sourceTree = "<group>"; };
 		664E93B318A1929300261673 /* TypewriterDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TypewriterDocument.h; sourceTree = "<group>"; };
 		664E93B418A1929300261673 /* TypewriterDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TypewriterDocument.m; sourceTree = "<group>"; };
+		665880BB18F31BB1004B03D6 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = DiffWindow.xib; sourceTree = "<group>"; };
+		665880C518F31D09004B03D6 /* EWDiffWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWDiffWindowController.h; sourceTree = SOURCE_ROOT; };
+		665880C618F31D09004B03D6 /* EWDiffWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWDiffWindowController.m; sourceTree = SOURCE_ROOT; };
+		666293DA18F348DC00BC2AFB /* COAttributedStringDiff+PrettyPrint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "COAttributedStringDiff+PrettyPrint.h"; sourceTree = SOURCE_ROOT; };
+		666293DB18F348DC00BC2AFB /* COAttributedStringDiff+PrettyPrint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "COAttributedStringDiff+PrettyPrint.m"; sourceTree = SOURCE_ROOT; };
+		666293E518F35E6200BC2AFB /* COPersistentRoot+Revert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "COPersistentRoot+Revert.h"; sourceTree = SOURCE_ROOT; };
+		666293E618F35E6200BC2AFB /* COPersistentRoot+Revert.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "COPersistentRoot+Revert.m"; sourceTree = SOURCE_ROOT; };
 		667A9A8F18A5A34E009A2F0E /* document_stroke.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = document_stroke.icns; sourceTree = "<group>"; };
 		668E942118D57C1400531C43 /* EWUndoManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWUndoManager.h; path = ../CommonUI/EWUndoManager.h; sourceTree = "<group>"; };
 		668E942218D57C1400531C43 /* EWUndoManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWUndoManager.m; path = ../CommonUI/EWUndoManager.m; sourceTree = "<group>"; };
@@ -274,6 +285,12 @@
 				66EDFEDA18ACA7BC00B29CFE /* EWNoteListDataSource.m */,
 				66A080EF18C7C1A50008739A /* EWTableView.h */,
 				66A080F018C7C1A50008739A /* EWTableView.m */,
+				665880C518F31D09004B03D6 /* EWDiffWindowController.h */,
+				665880C618F31D09004B03D6 /* EWDiffWindowController.m */,
+				666293DA18F348DC00BC2AFB /* COAttributedStringDiff+PrettyPrint.h */,
+				666293DB18F348DC00BC2AFB /* COAttributedStringDiff+PrettyPrint.m */,
+				666293E518F35E6200BC2AFB /* COPersistentRoot+Revert.h */,
+				666293E618F35E6200BC2AFB /* COPersistentRoot+Revert.m */,
 			);
 			path = Typewriter;
 			sourceTree = "<group>";
@@ -286,6 +303,7 @@
 				663EFD6118A17FB30030BD2F /* Document.xib */,
 				663EFD6518A17FB30030BD2F /* InfoPlist.strings */,
 				663EFD6718A17FB30030BD2F /* MainMenu.xib */,
+				665880BA18F31BB1004B03D6 /* DiffWindow.xib */,
 			);
 			path = en.lproj;
 			sourceTree = SOURCE_ROOT;
@@ -493,6 +511,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				665880BC18F31BB1004B03D6 /* DiffWindow.xib in Resources */,
 				663EFD7E18A17FB30030BD2F /* MainMenu.xib in Resources */,
 				664CC9E818A4607F002F04B7 /* Commits in Resources */,
 				663EFD7D18A17FB30030BD2F /* InfoPlist.strings in Resources */,
@@ -516,8 +535,11 @@
 			files = (
 				6642F88418C1471900E30BFF /* EWHistoryWindowController.m in Sources */,
 				662599E318B551E400235B65 /* EWGraphCell.m in Sources */,
+				666293DC18F348DC00BC2AFB /* COAttributedStringDiff+PrettyPrint.m in Sources */,
 				66A080F118C7C1A50008739A /* EWTableView.m in Sources */,
+				666293E718F35E6200BC2AFB /* COPersistentRoot+Revert.m in Sources */,
 				662599E218B551E400235B65 /* EWGraphRenderer.m in Sources */,
+				665880C718F31D09004B03D6 /* EWDiffWindowController.m in Sources */,
 				66EDFEC218ABFF9E00B29CFE /* EWUndoWindowController.m in Sources */,
 				663EFD8418A17FB30030BD2F /* EWTypewriterWindowController.m in Sources */,
 				668E942318D57C1400531C43 /* EWUndoManager.m in Sources */,
@@ -578,6 +600,14 @@
 				664CC9E718A4607F002F04B7 /* en */,
 			);
 			name = Commits;
+			sourceTree = "<group>";
+		};
+		665880BA18F31BB1004B03D6 /* DiffWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				665880BB18F31BB1004B03D6 /* en */,
+			);
+			name = DiffWindow.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

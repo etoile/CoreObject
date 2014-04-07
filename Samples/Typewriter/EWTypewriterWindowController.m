@@ -16,6 +16,7 @@
 #import <CoreObject/COAttributedStringDiff.h>
 #import <CoreObject/COObject+Private.h>
 #import <CoreObject/COObjectGraphContext+Graphviz.h>
+#import "COPersistentRoot+Revert.h"
 
 @implementation EWTypewriterWindowController
 
@@ -486,13 +487,7 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	if ([notes count] == 1)
 	{
 		COPersistentRoot *note = notes[0];
-		CORevision *inspectedRevision = [note currentRevision];
-		while (inspectedRevision != nil
-			   && ![inspectedRevision.commitDescriptor.identifier isEqualToString: @"org.etoile.CoreObject.checkpoint"])
-		{
-			inspectedRevision = [inspectedRevision parentRevision];
-		}
-		return inspectedRevision;
+		return [note revisionToRevertTo];
 	}
 	return nil;
 }
@@ -526,6 +521,23 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 - (void) goForward: (id)sender
 {
 	[self goForward];
+}
+
+- (IBAction) showDiff: (id)sender
+{
+	NSArray *notes = [self selectedNotePersistentRoots];
+	if ([notes count] == 1)
+	{
+		COPersistentRoot *note = notes[0];
+		
+		if (diffWindowController != nil)
+		{
+			[diffWindowController close];
+		}
+		
+		diffWindowController = [[EWDiffWindowController alloc] initWithInspectedPersistentRoot: note];
+		[diffWindowController showWindow: nil];
+	}
 }
 
 #pragma mark - EWUndoManagerDelegate
