@@ -447,6 +447,16 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	}
 }
 
+- (IBAction)showLibraryHistory:(id)sender
+{
+	EWAppDelegate *appDelegate = (EWAppDelegate *)[NSApp delegate];
+	
+	EWHistoryWindowController *historyWindow = [[EWHistoryWindowController alloc] initWithInspectedPersistentRoot: appDelegate.libraryPersistentRoot
+																										undoTrack: undoTrack];
+	[appDelegate addWindowController: historyWindow];
+	[historyWindow showWindow: nil];
+}
+
 - (IBAction) removeTagFromNote:(id)sender
 {
 	NSArray *notes = [self selectedNotePersistentRoots];

@@ -79,6 +79,7 @@ NSString * EWTagDragType;
 - (NSArray *) selectedNotePersistentRoots;
 
 - (IBAction)showDocumentHistory:(id)sender;
+- (IBAction)showLibraryHistory:(id)sender;
 
 - (IBAction)showDiff:(id)sender;
 
