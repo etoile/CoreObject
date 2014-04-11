@@ -236,6 +236,9 @@ Future Work (Minor features, refactoring, cleanup)
   - perform validation at freezing time on the set of entities being frozen. This means a group of entities can only become frozen if they are valid. 
 
   - call +newEntityDescription methods lazily, either at first use of -entityDescriptionForClass: or -descriptionForName: on ETModelDescriptionRepository (for performance)
+  
+  - Have a look at the section "Discussion of Composite & Aggregate Terminology in UML" in ETModelElementDescription's class description.
+    See if we want to tweak the metamodel to be closer to UML or FAME. Consider how this will impact COCopier.
 
 
 - COObject
