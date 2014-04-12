@@ -667,6 +667,33 @@ static NSString *Trim(NSString *text)
 	}
 }
 
+/**
+ * Returns an object graph context with the committed state of selectedNote
+ * (selectedNote.currentRevision). This is used to calculate a textual diff and
+ * make pretty commit metadata.
+ */
+- (COObjectGraphContext *)committedState
+{
+	if (selectedNote.currentRevision == nil)
+		return nil;
+	
+	if ([selectedNote.currentRevision isEqual: selectedNoteCommittedStateRevision])
+	{
+		NSLog(@"-committedState: returning cached value: %@", selectedNoteCommittedState);
+		return selectedNoteCommittedState;
+	}
+	else
+	{
+		selectedNoteCommittedStateRevision = selectedNote.currentRevision;
+
+		// N.B.: expensive call
+		selectedNoteCommittedState = [selectedNote objectGraphContextForPreviewingRevision: selectedNoteCommittedStateRevision];
+
+		NSLog(@"-committedState: stale cache, refreshed to: %@", selectedNoteCommittedState);
+		return selectedNoteCommittedState;
+	}
+}
+
 - (void) commitTextChangesAsCheckpoint: (BOOL)isCheckpoint
 {
 	// Use COAttributedStringDiff to generate commit metadata that summarizes
@@ -675,9 +702,8 @@ static NSString *Trim(NSString *text)
 	TypewriterDocument *doc = [selectedNote rootObject];
 	COAttributedString *as = doc.attrString;
 	
-	// NOTE: selectedNoteCommittedState is equal to [selectedNote objectGraphContextForPreviewingRevision: [selectedNote currentRevision]];
-	// we could use that instead but it's too expensive to call -objectGraphContextForPreviewingRevision:.
-	TypewriterDocument *oldDoc = [selectedNoteCommittedState rootObject];
+	COObjectGraphContext *oldCtx = [self committedState];
+	TypewriterDocument *oldDoc = [oldCtx rootObject];
 	COAttributedString *oldAs = oldDoc.attrString;
 	
 	// HACK: -[COAttributedStringDiff initWithFirstAttributedString:secondAttributedString:source:] will throw an exception
@@ -756,6 +782,8 @@ static NSString *Trim(NSString *text)
 	[selectedNoteCommittedState insertOrUpdateItems: objectsToUpdateInSnapshot];
 	
 	[self commitWithIdentifier: identifier descriptionArguments: descArgs];
+	
+	selectedNoteCommittedStateRevision = selectedNote.currentRevision;
 }
 
 - (void) coalescingTimer: (NSTimer *)timer
@@ -835,18 +863,12 @@ static NSString *Trim(NSString *text)
 		NSLog(@"Nothing selected");
 		[textView setEditable: NO];
 		[textView setHidden: YES];
-		
-		selectedNoteCommittedState = nil;
 		return;
 	}
 	else
 	{
 		[textView setEditable: YES];
 		[textView setHidden: NO];
-		
-		// Make a temporary copy of the note's current state. We use this to generate the diff for the commit metadata.
-		selectedNoteCommittedState = [COObjectGraphContext new];
-		[selectedNoteCommittedState setItemGraph: selectedNote.objectGraphContext];
 	}
 	
 	TypewriterDocument *doc = [selectedNote rootObject];

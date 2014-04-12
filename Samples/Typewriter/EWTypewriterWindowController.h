@@ -48,6 +48,7 @@ NSString * EWTagDragType;
 	NSTimer *coalescingTimer;
 	BOOL isDeleting;
 	COObjectGraphContext *selectedNoteCommittedState;
+	CORevision *selectedNoteCommittedStateRevision;
 	
 	// Navigation history
 	NSMutableArray *navigationHistory;
