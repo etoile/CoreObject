@@ -550,6 +550,40 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	}
 }
 
+- (IBAction) stepBackward: (id)sender
+{
+	NSArray *notes = [self selectedNotePersistentRoots];
+	if ([notes count] == 1)
+	{
+		COPersistentRoot *note = notes[0];
+		__block COBranch *brach = note.currentBranch;
+		
+		[self commitChangesInBlock: ^{
+			if ([brach canUndo])
+			{
+				[brach undo];
+			}
+		} withIdentifier: @"org.etoile.CoreObject.step-backward" descriptionArguments: @[]];
+	}
+}
+
+- (IBAction) stepForward: (id)sender
+{
+	NSArray *notes = [self selectedNotePersistentRoots];
+	if ([notes count] == 1)
+	{
+		COPersistentRoot *note = notes[0];
+		__block COBranch *branch = note.currentBranch;
+		
+		[self commitChangesInBlock: ^{
+			if ([branch canRedo])
+			{
+				[branch redo];
+			}
+		} withIdentifier: @"org.etoile.CoreObject.step-forward" descriptionArguments: @[]];
+	}}
+
+
 #pragma mark - EWUndoManagerDelegate
 
 - (void) undo
