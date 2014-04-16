@@ -708,9 +708,6 @@ static NSString *Trim(NSString *text)
  */
 - (COObjectGraphContext *)committedState
 {
-	if (selectedNote.currentRevision == nil)
-		return nil;
-	
 	if ([selectedNote.currentRevision isEqual: selectedNoteCommittedStateRevision])
 	{
 		NSLog(@"-committedState: returning cached value: %@", selectedNoteCommittedState);
@@ -720,8 +717,15 @@ static NSString *Trim(NSString *text)
 	{
 		selectedNoteCommittedStateRevision = selectedNote.currentRevision;
 
-		// N.B.: expensive call
-		selectedNoteCommittedState = [selectedNote objectGraphContextForPreviewingRevision: selectedNoteCommittedStateRevision];
+		if (selectedNoteCommittedStateRevision != nil)
+		{
+			// N.B.: expensive call
+			selectedNoteCommittedState = [selectedNote objectGraphContextForPreviewingRevision: selectedNoteCommittedStateRevision];
+		}
+		else
+		{
+			selectedNoteCommittedState = nil;
+		}
 
 		NSLog(@"-committedState: stale cache, refreshed to: %@", selectedNoteCommittedState);
 		return selectedNoteCommittedState;
