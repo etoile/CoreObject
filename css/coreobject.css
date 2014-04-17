@@ -233,6 +233,11 @@ section
 	color: #333;
 }
 
+.blue-section .tagline .highlighted-text a:not(.btn):link,  .blue-section .tagline .highlighted-text a:not(.btn):active,  .blue-section .tagline .highlighted-text a:not(.btn):visited
+{
+	color: #ef4832;
+}
+
 .blue-section a:not(.btn):hover, .blue-section a:not(.btn):active, .orange-section a:not(.btn):hover, .orange-section a:not(.btn):active
 {
 	font-weight: 600;

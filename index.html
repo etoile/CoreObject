@@ -90,9 +90,9 @@
 					<ul>
 						<li>No need to explicitly save</li>						
 						<li>Organize documents by tagging</li>						
-						<li>Compare document's structures and merge changes, no need to convert to plain text</li>
-						<li>Document variations (branches) and the possibility to convert copies into branches and vice-versa</li>
-						<li>The history can be navigated at various granularities (document, activity etc.)</li>
+						<li>Compare document structures and merge changes without converting to plain text</li>
+						<li>Document variations (branches), which can be converted to/from document copies</li>
+						<li>Navigate history at various granularities (document, activity, etc.)</li>
 						<!--
 						<li>No restrictions on document names (no illegal characters)</li>
 						<li>no save command, and never lose even one keystroke</li>
@@ -103,9 +103,9 @@
 				<div class="col-sm-5 right-col">
 					<h2>Resilient</h2>
 					<ul>
-						<li>Everything can be undone, even document creation/deletion, copy, revert, and single changes (selective undo)</li>
-						<li>Everything persists across application restart (including undo/redo)</li>
-						<li>Undo history is tree-structured so you never lose access to a change</li>
+						<li>Undo anything, even document creation/deletion, copying, reverting, or individual changes (selective undo)</li>
+						<li>Everything persists across application restarts (including undo/redo)</li>
+						<li>Undo history is tree-structured&mdash;never lose access to a change</li>
 						<!--
 						<li>everything can be undone even deletion, copy, undo etc.</li>
 						<li>any change can be cancelled individually in the history (no matter how big is the history)</li>
@@ -117,7 +117,7 @@
 				<div class="hidden-xs col-sm-1"></div>
 			</div><!-- row -->
 
-			<div class="small-tagline">Our idea is to go futher than traditional filesystems and databases by including <em>document/data structure and organization, collaborative editing, rich undo/redo, and version control</em> directly in CoreObject, to allow <span class="highlighted-text">all applications to easily implement these features</span>, and avoid each app reinventing the wheel in incompatible ways. In existing apps, we either see poor persistence support, or reliance on proprietary systems.</div>
+			<div class="small-tagline">Our idea is to go further than traditional filesystems and databases by supporting <span class="highlighted-text">document organization, structured documents, version control, rich undo/redo, and collaborative editing</span> in a single framework. CoreObject allows apps to easily adopt all these features and create a coherent user experience, without each app reinventing the wheel in incomplete or incompatible ways.</div>
 					
 			<div class="row">
 				<div class="hidden-xs col-sm-1"></div>
@@ -127,8 +127,8 @@
 				<div class="col-sm-5 right-col last-content-col">
 					<h2>Open</h2>
 						<ul>
-						<li>Collaborative editing</li>						
-						<li>Easy data sharing across applications</li>
+						<li>Collaborative editing on any document</li>						
+						<li>Easy data sharing between applications</li>
 						<li>Everything is searchable, past and present</li>
 						<!--
 						<li>collaborative editing</li>
@@ -147,7 +147,7 @@
 		<section class="container-full blue-section" id="features">
 		<div class="container">
 			<h1>Features</h1>
-			<div class="tagline">CoreObject is a <em>pragmatic OODB</em> with a <span class="highlighted-text">homegrown DVCS</span>, leveraging <a href="http://sqlite.org/">SQLite</a> for transactional storage and indexing.</div>
+			<div class="tagline">CoreObject is a <em>pragmatic <a href="http://en.wikipedia.org/wiki/Object_database">OODB</a></em> with a <span class="highlighted-text">homegrown <a href="http://en.wikipedia.org/wiki/Distributed_version_control_system">DVCS</a></span>, leveraging <a href="http://sqlite.org/">SQLite</a> for transactional storage and indexing.</div>
 			<!--
 			<div class="tagline">CoreObject is a <em>pragmatic OODB</em> built on top of a <span class="highlighted-text">SQL database</span> that rethinks ideas from various horizons.</div>
 
@@ -158,7 +158,7 @@
 				<div class="col-sm-4">
 					<h2>Version Control</h2>
 					<ul>
-						<li>Branches (pointers on the document revision graph, analogous to <a href="http://www.git-scm.com">Git</a>)</li>
+						<li>Branches (pointers to the document revision graph, like <a href="http://www.git-scm.com">Git</a>)</li>
 						<li>Efficient revision storage inspired by <a href="http://mercurial.selenic.com/wiki/Presentations?action=AttachFile&do=get&target=ols-mercurial-paper.pdf">Mercurial</a></li>
 						<li>Orthogonal undo system, can undo all possible modifications to a CoreObject store</li>
 						<li>Muliple undo or history views over one or several documents</li>
@@ -205,7 +205,7 @@
 					<ul>
 						<li>Supports large file attachments</li>						
 						<li>Cheap copy documents (a copy consumes no space)</li>
-						<li>Real-time collaborative editing with full undo support per user</li>
+						<li>Real-time collaborative editing with full undo support per user (inspired by <a href="https://neil.fraser.name/writing/sync/">Differential Synchronization</a>)</li>
 						<li>Built-in indexing and search including over the history</li>
 						<li>Concurrent editing accross multiple applications, with updates propagated transparently to every working copy in memory</li>
 						<!--
@@ -233,8 +233,8 @@
 					<h2>Lean</h2>
 					<ul>
 						<li>Written in Objective-C with ARC</li>
-						<li>Minimal dependencies (<a href="http://sqlite.org/">SQLite</a> and EtoileFoundation)</li>
-						<li>Favor JSON to export</li>
+						<li>Minimal dependencies (<a href="http://sqlite.org/">SQLite</a> and <a href="https://github.com/etoile/EtoileFoundation">EtoileFoundation</a>)</li>
+						<li>Favors exporting JSON</li>
 					</ul>
 				</div>
 				<div class="col-sm-5 right-col">
@@ -248,7 +248,7 @@
 				<div class="hidden-xs col-sm-1"></div>
 			</div><!-- row -->
 
-			<div class="small-tagline">More than seven prototypes have been written to explore various design choices, until we settled on the current architecture. Although it is still a <em>preview release</em> (don't use it in production and remember the API remains unstable), and several important features are missing, the core architecture and API are <span class="highlighted-text">pretty mature</span> and shouldn't undergo any major changes.</div>
+			<div class="small-tagline">More than seven prototypes have been written to explore various design choices, until we settled on the current architecture. Although it is still a <em>preview release</em> (don't use it in production and remember the API remains unstable), and several important features are missing (see <a href="https://github.com/etoile/CoreObject/blob/master/TODO.md">TODO</a>), the core architecture and API are <span class="highlighted-text">pretty mature</span> and shouldn't undergo any major changes.</div>
 
 			<img class="big-screenshot" src="images/projectdemo5.png" alt="ProjectDemo history screenshot">
 
@@ -257,7 +257,7 @@
 		<section class="container-full orange-section" id="download">
 		<div class="container">
 			<h1>Download</h1>
-			<div class="tagline">The package includes the EtoileFoundation dependency, and supports both <em>Cocoa and GNUstep</em> as development environments.</div>
+			<div class="tagline">The package includes the <a href="https://github.com/etoile/EtoileFoundation">EtoileFoundation</a> dependency, the <a href="https://github.com/etoile/UnitKit">UnitKit</a> test framework, and supports both <em>Cocoa and GNUstep</em> as development environments.</div>
 
 			<div class="row">
 				<div class="hidden-xs col-sm-1 col-lg-1"></div>
@@ -279,7 +279,7 @@
 				<div class="hidden-xs col-sm-1 col-lg-1"></div>
 			</div>
 
-			<div class="small-tagline">To grab the latest source, view our GitHub repository, or clone it with this command: <div class="codewrapper"><span class="code">git clone https://github.com/etoile/CoreObject.git</span></div></div>
+			<div class="small-tagline">To grab the latest source: <!--, view our GitHub repository, or clone it with this command: --><div class="codewrapper"><span class="code">git clone https://github.com/etoile/CoreObject.git</span></div></div>
 
 		</div><!-- inner container -->
 		</section><!-- #download -->
