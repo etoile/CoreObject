@@ -400,6 +400,7 @@ h2
 	{
 		margin-left: 40px;
 		margin-right: 40px;
+		/* TODO: We should have a zero margin-top at all sizes, we could just set a custom column padding-bottom at all sizes. */
 		margin-top: 0px;
 		padding-top: 15px;
 		padding-bottom: 15px;
@@ -416,6 +417,12 @@ h2
 {
 	margin-top: 20px;
 }
+
+/* TODO: Improve, a bit convoluted (this doesn't work when targeting padding-bottom, not sure why)
+.small-tagline:not(:last-child)
+{
+	margin-bottom: 30px;
+}*/
 
 .highlighted-text
 {
@@ -583,6 +590,7 @@ img
 
 	width: 900px;
 	margin: auto;
+	/* TODO: Remove by adjusting margin-bottom for the previous element */
 	margin-top: 30px;
 
 	border: 1px solid lightgray;
@@ -663,8 +671,78 @@ img
 }
 
 #introduction
-{
+{	/* Override section element */
+	padding-top: 0px;
 	border-bottom: dotted 1px lightgray;
+	border-bottom: dotted 1px #e4e4e4;
+	border-bottom: solid 1px #ededed;	
+}
+
+#video
+{	/* Override section element */
+	padding-top: 0px;
+	padding-bottom: 50px;
+	border-bottom: dotted 6px white;
+	border-bottom: dotted 1px lightgray;
+}
+
+#video h2
+{
+	margin-top: 0;
+
+	text-align: left;
+	text-transform: uppercase;
+	font-family: 'Raleway', sans-serif;
+	font-weight: 300;
+	font-size: 1.375em;
+	color: #ababab; /* #585858; */
+}
+
+#video a
+{
+	font-family: 'Raleway', sans-serif;
+	font-weight: 300;
+	font-size: 0.875em;
+}
+
+.videoline
+{
+	padding-top: 30px;
+	padding-bottom: 50px;
+
+	text-align: center;
+}
+
+#video .container
+{
+	padding-top: 50px;
+	
+	/*border-top: dotted 1px lightgray;*/
+}
+
+.container .videoline a:link, .container .videoline a:hover
+{
+	/*line-height: 70px;*/
+
+	font-family: 'Raleway', sans-serif;
+	font-weight: 200;
+	font-size: 1.3em;
+	color: #585858;
+}
+
+.videoline .glyphicon
+{
+	/*font-size:30px;*/
+	font-weight: 100;
+	vertical-align: middle;
+	/*line-height: 70px;*/
+}
+
+#video .glyphicon
+{
+	font-size: 0.8em;
+	font-weight: 100;
+	vertical-align: baseline;
 }
 
 /*

@@ -8,10 +8,14 @@
 
 		<!-- Bootstrap -->
 		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<!-- Magnific Popup -->
+		<link rel="stylesheet" href="css/magnific-popup.css">
 
 		<!-- Custom styles for this template -->
 		<link href="css/coreobject.css" rel="stylesheet">
-
+		<link href="css/coreobject-popup.css" rel="stylesheet">
+		
+		<link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 		<link href='http://fonts.googleapis.com/css?family=Raleway:400,100,200,300,500,600,700,900,800' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Raleway+Dots' rel='stylesheet' type='text/css'>
 		<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,800,300' rel='stylesheet' type='text/css'>
@@ -62,21 +66,47 @@
 			</div>
 		</div>
 
-		<div class="container-full" id="introduction">
-		<div class="container" >
+ 		<div class="container-full" id="introduction">
+		<div class="container">
 			<div class="row">
 				<div class="hidden-xs col-md-5">
+					<div class="videoline"><a type="button" class="btn btn-info popup-youtube" href="http://www.youtube.com/watch?v=0O2aH4XLbto"><span class="fa fa-youtube-play"></span> Watch our Introduction video</a></div>
 				</div>
 				<div class="col-md-6">
-					<div id="splashline">CoreObject is a <em>version-controlled object database</em> for Objective-C that supports powerful undo, semantic merging, and real-time collaborative editing.</div>					
+					<div id="splashline">CoreObject is a <em>version-controlled object database</em> for Objective-C that supports powerful undo, semantic merging, and real-time collaborative editing.</div>
 					<!-- designed to be a humane persistence layer for applications with a <span class="highlighted-text">"never lose any work"</span> philosophy.</div>-->
 				</div>
-				<div class="hidden-xs col-md-1">
-				</div>
+				<div class="hidden-xs col-md-1"></div>
 			</div>
-		</div><!-- inner container -->
-		</div><!-- #introduction -->
+		</div>
+		</div>
 
+		<section class="container-full" id="video">
+		<div class="container">
+			<div class="row">
+				<div class="hidden-xs col-sm-2"></div>
+				<div class="col-sm-2 ">
+					<h2>Branching</h2>
+					<a class="popup-youtube" href="http://www.youtube.com/watch?v=0O2aH4XLbto">Watch <span class="glyphicon glyphicon-chevron-right"></span></a>
+				</div>
+				<div class="col-sm-2 ">
+					<h2>Tagging</h2>
+					<a class="popup-youtube" href="http://www.youtube.com/watch?v=0O2aH4XLbto">Watch <span class="glyphicon glyphicon-chevron-right"></span></a>
+				</div>
+				<div class="col-sm-2 ">
+					<h2>Undo</h2>
+					<a class="popup-youtube" href="http://www.youtube.com/watch?v=0O2aH4XLbto">Watch <span class="glyphicon glyphicon-chevron-right"></span></a>
+				</div>
+				<div class="col-sm-2 last-content-col">
+					<h2>Collaboration</h2>
+					<a class="popup-youtube" href="http://www.youtube.com/watch?v=0O2aH4XLbto">Watch <span class="glyphicon glyphicon-chevron-right"></span></a>
+				</div>
+				<div class="hidden-xs col-sm-2"></div>
+			</div>
+
+		</div><!-- inner container -->
+		</section><!-- video -->
+	
 		<section class="container" id="userexperience">
 			<h1>User Experience</h1>
 			<div class="tagline">CoreObject came from imagining how we would use <em>first principles of UI design</em> to write <span class="highlighted-text">better creativity and productivity apps</span> without being bound by legacy compatibility.</div>
@@ -312,6 +342,9 @@
 	<!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>-->
 	<script type="text/javascript" charset="utf-8" src="js/jquery.scrollTo.js"></script>
 	<script type="text/javascript" charset="utf-8" src="js/one-page-nav/jquery.nav.js"></script>
+	<!-- Magnific Popup core JS file -->
+	<!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>-->
+	<script src="js/jquery.magnific-popup.js"></script>
 
 	<script type="text/javascript">
 $(document).ready(function()
@@ -321,6 +354,20 @@ $(document).ready(function()
 	});
 });
 	</script>
+
+    <script type="text/javascript">
+$(document).ready(function()
+{
+	$('.popup-youtube, .popup-vimeo, .popup-gmaps').magnificPopup({
+		disableOn: 700,
+		type: 'iframe',
+		mainClass: 'mfp-fade',
+		removalDelay: 160,
+		preloader: false,
+		fixedContentPos: false
+	});
+});
+    </script>
 
 </body>
 </html>
