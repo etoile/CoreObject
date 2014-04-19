@@ -1018,6 +1018,8 @@ static NSString *Trim(NSString *text)
 
 - (void) printDocument: (id)sender
 {
+	[[NSPrintInfo sharedPrintInfo] setHorizontalPagination: NSFitPagination];
+	[[NSPrintInfo sharedPrintInfo] setVerticallyCentered: NO];
 	[[NSPrintOperation printOperationWithView: textView] runOperation];
 }
 
