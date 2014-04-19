@@ -281,19 +281,17 @@ descriptionArguments: @[oldName, newName]];
 	{
 		COTag *tag = [item representedObject];
 		ETAssert([tag isTag]);
-				
+					
+		NSPasteboardItem *pbItem = [pasteboard pasteboardItems][0];
+		id plist = [pbItem propertyListForType: EWNoteDragType];
+
+		__block COPersistentRoot *notePersistentRoot = [owner.editingContext persistentRootForUUID: [ETUUID UUIDWithString: plist]];
+		ETAssert(notePersistentRoot != nil);
+		
 		[self.owner commitChangesInBlock: ^{
-			for (NSPasteboardItem *pbItem in [pasteboard pasteboardItems])
-			{
-				id plist = [pbItem propertyListForType: EWNoteDragType];
-				COPersistentRoot *notePersistentRoot = [owner.editingContext persistentRootForUUID: [ETUUID UUIDWithString: plist]];
-				ETAssert(notePersistentRoot != nil);
-				
-				COObject *noteRootObject = [notePersistentRoot rootObject];
-				
-				[tag addObject: noteRootObject];
-			}
-		} withIdentifier: @"tag-note" descriptionArguments: @[tag.name != nil ? tag.name : @""]];
+			COObject *noteRootObject = [notePersistentRoot rootObject];
+			[tag addObject: noteRootObject];
+		} withIdentifier: @"tag-note" descriptionArguments: @[tag.name != nil ? tag.name : @"", notePersistentRoot.name]];
 	}
 	
 	return YES;
