@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="8.00">
 	<data>
 		<int key="IBDocument.SystemTarget">1070</int>
-		<string key="IBDocument.SystemVersion">13A603</string>
-		<string key="IBDocument.InterfaceBuilderVersion">4514</string>
-		<string key="IBDocument.AppKitVersion">1265</string>
-		<string key="IBDocument.HIToolboxVersion">695.00</string>
+		<string key="IBDocument.SystemVersion">13C64</string>
+		<string key="IBDocument.InterfaceBuilderVersion">5056</string>
+		<string key="IBDocument.AppKitVersion">1265.19</string>
+		<string key="IBDocument.HIToolboxVersion">697.40</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
-			<string key="NS.object.0">4514</string>
+			<string key="NS.object.0">5056</string>
 		</object>
 		<array key="IBDocument.IntegratedClassDependencies">
 			<string>NSBox</string>
@@ -61,7 +61,7 @@
 										<object class="NSMatrix" id="643295927">
 											<reference key="NSNextResponder" ref="12309818"/>
 											<int key="NSvFlags">1292</int>
-											<string key="NSFrame">{{18, 215}, {119, 38}}</string>
+											<string key="NSFrame">{{18, 215}, {148, 38}}</string>
 											<reference key="NSSuperview" ref="12309818"/>
 											<reference key="NSWindow"/>
 											<reference key="NSNextKeyView" ref="122417116"/>
@@ -95,7 +95,7 @@
 												<object class="NSButtonCell" id="992269448">
 													<int key="NSCellFlags">67108864</int>
 													<int key="NSCellFlags2">0</int>
-													<string key="NSContents">Per-project</string>
+													<string key="NSContents">Application wide</string>
 													<reference key="NSSupport" ref="191207611"/>
 													<reference key="NSControlView" ref="643295927"/>
 													<int key="NSButtonFlags">1211912448</int>
@@ -200,7 +200,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 													<int key="NSPeriodicInterval">75</int>
 												</object>
 											</array>
-											<string key="NSCellSize">{113, 18}</string>
+											<string key="NSCellSize">{148, 18}</string>
 											<string key="NSIntercellSpacing">{4, 2}</string>
 											<int key="NSMatrixFlags">1143480320</int>
 											<string key="NSCellClass">NSActionCell</string>
@@ -329,6 +329,7 @@ y7bMNcy1zTXNtc42zrbPN8+40DnQutE80b7SP9LB00TTxtRJ1MvVTtXR1lXW2Ndc1+DYZNjo2WzZ8dp2
 											<string key="NSFrame">{{15, 14}, {407, 193}}</string>
 											<reference key="NSSuperview" ref="12309818"/>
 											<reference key="NSWindow"/>
+											<reference key="NSNextKeyView"/>
 											<string key="NSReuseIdentifierKey">_NS:397</string>
 											<string key="NSHuggingPriority">{251, 750}</string>
 											<bool key="NSEnabled">YES</bool>
@@ -341,13 +342,13 @@ cyBzdWNoIGFzIHJlZ3VsYXIgY29tbWl0cywgcmV2ZXJ0aW5nLCBjcmVhdGluZyBicmFuY2hlcywgZGVs
 ZXRpbmcgYnJhbmNoZXMsIHN3aXRjaGluZyB0aGUgY3VycmVudCBicmFuY2gsIGFuZCBlZGl0aW5nIGJy
 YW5jaCBtZXRhZGF0YSBhcmUgcmVjb3JkZWQgb24gYSB0cmFjayBwZXIgZG9jdW1lbnQuIENvbW1hbmQt
 WiBhbmQgQ29tbWFuZC1TaGlmdC1aIGFyZSBib3VuZCB0byB1bmRvIGFuZCByZWRvIGFjdGlvbnMgb24g
-dGhlIGtleSBkb2N1bWVudCB3aW5kb3cncyB0cmFjay4KClBlci1wcm9qZWN0IGNvbWJpbmVzIGFsbCBv
-ZiB0aGUgYWN0aW9uIHR5cGVzIGFib3ZlIG9uIG9uZSB0cmFjaywgc28gQ29tbWFuZC1aIGFuZCBDb21t
-YW5kLVNoaWZ0LVogb3BlcmF0ZSBhY3Jvc3MgYWxsIGRvY3VtZW50cyBpbiB0aGUgcHJvamVjdC4gRHJh
-Zy1hbmQtZHJvcCBiZXR3ZWVuIGRvY3VtZW50cyBpbiB0aGlzIG1vZGUgaXMgYW4gYXRvbWljIG9wZXJh
-dGlvbiB0aGF0IHdpbGwgYmUgdW5kb25lIGFzIGEgc2luZ2xlIGFjdGlvbi4KCkluIGVpdGhlciBtb2Rl
-LCB5b3UgY2FuIHVzZSB0aGUgIlN0ZXAgRm9yd2FyZCIgYW5kICJTdGVwIEJhY2t3YXJkIiBjb21tYW5k
-cyB0byBuYXZpZ2F0ZSB0aGUgaGlzdG9yeSBvZiB0aGUgY3VycmVudCBkb2N1bWVudC4</bytes>
+dGhlIGtleSBkb2N1bWVudCB3aW5kb3cncyB0cmFjay4KCiJBcHBsaWNhdGlvbiB3aWRlIiBjb21iaW5l
+cyBhbGwgb2YgdGhlIGFjdGlvbiB0eXBlcyBhYm92ZSBvbiBvbmUgdHJhY2ssIHNvIENvbW1hbmQtWiBh
+bmQgQ29tbWFuZC1TaGlmdC1aIG9wZXJhdGUgYWNyb3NzIGFsbCBkb2N1bWVudHMuIERyYWctYW5kLWRy
+b3AgYmV0d2VlbiBkb2N1bWVudHMgaW4gdGhpcyBtb2RlIGlzIGFuIGF0b21pYyBvcGVyYXRpb24gdGhh
+dCB3aWxsIGJlIHVuZG9uZSBhcyBhIHNpbmdsZSBhY3Rpb24uCgpJbiBlaXRoZXIgbW9kZSwgeW91IGNh
+biB1c2UgdGhlICJTdGVwIEZvcndhcmQiIGFuZCAiU3RlcCBCYWNrd2FyZCIgY29tbWFuZHMgdG8gbmF2
+aWdhdGUgdGhlIGhpc3Rvcnkgb2YgdGhlIGN1cnJlbnQgZG9jdW1lbnQuA</bytes>
 												</object>
 												<object class="NSFont" key="NSSupport" id="26">
 													<string key="NSName">.LucidaGrandeUI</string>
