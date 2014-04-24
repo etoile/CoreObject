@@ -9,6 +9,7 @@
 #import <EtoileFoundation/Macros.h>
 #import <EtoileFoundation/ETUUID.h>
 #import <EtoileFoundation/ETCollection.h>
+#import <EtoileFoundation/NSArray+Etoile.h>
 #import "COItemGraph.h"
 #import "COItem.h"
 #import "FMDatabase.h"
