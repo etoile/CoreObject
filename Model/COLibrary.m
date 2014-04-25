@@ -15,8 +15,6 @@
 
 @implementation COLibrary
 
-@synthesize identifier;
-
 + (ETEntityDescription *)newEntityDescription
 {
 	ETEntityDescription *collection = [self newBasicEntityDescription];
@@ -62,6 +60,9 @@
 	return YES;
 }
 
+// FIXME: Should be able to use @dynamic and let CoreObject generate the accessors,
+// but we can't, because COObject also implements -identifier. See TODO.
+
 - (NSString *)identifier
 {
 	return _identifier;
@@ -69,7 +70,9 @@
 
 - (void)setIdentifier: (NSString *)anIdentifier
 {
+	[self willChangeValueForProperty: @"identifier"];
 	_identifier = anIdentifier;
+	[self didChangeValueForProperty: @"identifier"];
 }
 
 @end
