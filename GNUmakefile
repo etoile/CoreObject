@@ -3,6 +3,8 @@ PACKAGE_NAME = CoreObject
 include $(GNUSTEP_MAKEFILES)/common.make
 
 FRAMEWORK_NAME = CoreObject
+
+# ABI version (the API version is in CFBundleShortVersionString of FrameworkSource/Info.plist)
 VERSION = 0.5
 
 LIBRARIES_DEPEND_UPON = $(shell pkg-config --libs sqlite3) -lEtoileFoundation $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS) $(SYSTEM_LIBS)
