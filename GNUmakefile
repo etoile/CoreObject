@@ -76,8 +76,6 @@ CoreObject_LANGUAGES = \
 CoreObject_RESOURCE_FILES = \
 	English.lproj/Commits 
 
-clean : test=yes
-
 CoreObjectDoc_MENU_TEMPLATE_FILE = Documentation/Templates/menu.html
 
 CoreObjectDoc_HEADER_DIRS =
@@ -122,3 +120,6 @@ ifeq ($(test), yes)
 else	
   include $(GNUSTEP_MAKEFILES)/framework.make
 endif
+
+after-clean::
+	rm -rf CoreObject.bundle
