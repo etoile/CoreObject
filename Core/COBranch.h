@@ -1,4 +1,4 @@
-/***
+/**
     Copyright (C) 2011 Quentin Mathe, Eric Wasylishen, Christopher Armstrong
 
     Date:  September 2011
