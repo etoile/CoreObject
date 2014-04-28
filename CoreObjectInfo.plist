@@ -13,10 +13,8 @@
 	<key>CFBundlePackageType</key>
 	<string>FMWK</string>
 	<key>CFBundleShortVersionString</key>
-	<string>${DYLIB_COMPATIBILITY_VERSION}.${DYLIB_CURRENT_VERSION}</string>
+	<string>0.5</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>${DYLIB_COMPATIBILITY_VERSION}.${DYLIB_CURRENT_VERSION}</string>
 </dict>
 </plist>

@@ -795,7 +795,7 @@
 		668084EE1791FBAB003A3CC6 /* COObjectGraphContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COObjectGraphContext.h; path = Core/COObjectGraphContext.h; sourceTree = "<group>"; };
 		668084EF1791FBAB003A3CC6 /* COObjectGraphContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COObjectGraphContext.m; path = Core/COObjectGraphContext.m; sourceTree = "<group>"; };
 		6686BDAC12592BDA0065DE1A /* CoreObject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CoreObject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		6686BDAD12592BDA0065DE1A /* CoreObject-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CoreObject-Info.plist"; sourceTree = "<group>"; };
+		6686BDAD12592BDA0065DE1A /* CoreObjectInfo.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = CoreObjectInfo.plist; sourceTree = "<group>"; };
 		669724D317D4610E0090B31A /* COSetAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSetAttribute.h; path = Diff/COSetAttribute.h; sourceTree = "<group>"; };
 		669724D417D4610E0090B31A /* COSetAttribute.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSetAttribute.m; path = Diff/COSetAttribute.m; sourceTree = "<group>"; };
 		669724D717D4614F0090B31A /* CODeleteAttribute.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CODeleteAttribute.h; path = Diff/CODeleteAttribute.h; sourceTree = "<group>"; };
@@ -1379,7 +1379,7 @@
 		6686BDB212592C1B0065DE1A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				6686BDAD12592BDA0065DE1A /* CoreObject-Info.plist */,
+				6686BDAD12592BDA0065DE1A /* CoreObjectInfo.plist */,
 				60C913C5165BBF5000E0C5F4 /* CoreObject.h */,
 			);
 			name = "Supporting Files";
@@ -2580,10 +2580,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_COMPATIBILITY_VERSION = 0;
 				DYLIB_CURRENT_VERSION = 5;
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = "CoreObject-Info.plist";
+				INFOPLIST_FILE = CoreObjectInfo.plist;
 				INSTALL_PATH = "@rpath";
 				OTHER_CFLAGS = (
 					"-DSQLITE_ENABLE_FTS3",
@@ -2604,10 +2604,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_COMPATIBILITY_VERSION = 0;
 				DYLIB_CURRENT_VERSION = 5;
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = "CoreObject-Info.plist";
+				INFOPLIST_FILE = CoreObjectInfo.plist;
 				INSTALL_PATH = "@rpath";
 				OTHER_CFLAGS = (
 					"-DSQLITE_ENABLE_FTS3",
