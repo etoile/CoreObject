@@ -80,10 +80,6 @@ clean : test=yes
 
 CoreObjectDoc_MENU_TEMPLATE_FILE = Documentation/Templates/menu.html
 
-CoreObjectDoc_README_FILE = README.md
-CoreObjectDoc_INSTALL_FILES = INSTALL.Cocoa.md INSTALL.GNUstep.md
-CoreObjectDoc_NEWS_FILE = NEWS.md
-
 CoreObjectDoc_HEADER_DIRS =
 CoreObjectDoc_SOURCE_DIRS =
 CoreObjectDoc_DOC_FILES = \
