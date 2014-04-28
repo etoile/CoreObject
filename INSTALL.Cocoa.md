@@ -57,5 +57,5 @@ the Scheme menu.
 Trouble
 -------
 
-Give us feedback! Tell us what you like; tell us what you think
-could be better. Send bug reports and patches to <bug-etoile@gna.org>.
+Give us feedback! Tell us what you like; tell us what you think could be better. 
+Send bug reports and patches to <https://github.com/etoile/CoreObject>.
