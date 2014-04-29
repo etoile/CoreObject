@@ -199,7 +199,7 @@
 	
 	[self insertObjects: @[rightChunk]
 			  atIndexes: [[NSIndexSet alloc] initWithIndex: chunkIndex + 1]
-				  hints: nil
+				  hints: @[]
 			forProperty: @"chunks"];
 	
 	return chunkIndex + 1;

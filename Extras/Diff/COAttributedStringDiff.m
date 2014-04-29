@@ -525,7 +525,7 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 	// FIXME: Why is -insertObjects:atIndexes:hints:forProperty: private?!
 	[target insertObjects: sourceString.chunks
 				atIndexes: [[NSIndexSet alloc] initWithIndexesInRange: NSMakeRange(insertionPosChunkIndex, [sourceString.chunks count])]
-					hints: nil
+					hints: @[]
 			  forProperty: @"chunks"];
 	
 	return sourceStringLength;

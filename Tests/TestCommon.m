@@ -320,7 +320,7 @@ doesNotPostNotification: (NSString *)notif
 	
 	[self insertObjects: (object != nil ? A(object) : [NSArray array])
 	          atIndexes: indexes
-	              hints: (hint != nil ? A(hint) : nil)
+	              hints: (hint != nil ? A(hint) : [NSArray array])
 	        forProperty: key];
 }
 
@@ -331,7 +331,7 @@ doesNotPostNotification: (NSString *)notif
 	
 	[self removeObjects: (object != nil ? A(object) : [NSArray array])
 	          atIndexes: indexes
-	              hints: (hint != nil ? A(hint) : nil)
+	              hints: (hint != nil ? A(hint) : [NSArray array])
 	        forProperty: key];
 }
 
