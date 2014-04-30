@@ -29,6 +29,8 @@
 #import "CORevisionCache.h"
 #import "COStoreTransaction.h"
 
+#pragma GCC diagnostic ignored "-Wprotocol"
+
 /**
  * Expensive, paranoid validation for debugging
  */

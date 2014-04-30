@@ -17,6 +17,8 @@
 #import "COStoreTransaction.h"
 #import "COPersistentRoot+Private.h"
 
+#pragma GCC diagnostic ignored "-Wprotocol"
+
 extern NSString * const kCOCommandUUID;
 
 NSString * const COUndoTrackDidChangeNotification = @"COUndoTrackDidChangeNotification";
