@@ -7,6 +7,8 @@ Required software
 You need to have the GNUstep core libraries installed in order to compile and 
 use CoreObject, see <http://www.gnustep.org/>. The core packages are, at a minimum:
 
+  - clang 3.3 or higher
+  - libobjc2 trunk
   - gnustep-make 2.6.6 or higher
   - gnustep-base trunk
   - gnustep-gui recent release
@@ -19,9 +21,9 @@ You also need to have the SQLite and EtoileFoundation libraries installed:
   - libsqlite 3.7.7, see <http://www.sqlite.org/>
   - EtoileFoundation, see <https://github.com/etoile/EtoileFoundation>
 
-**Note:** If you have the entire Etoile repository, EtoileFoundation is built 
-together with CoreObject, by running 'make' in Frameworks or any other parent 
-directories.
+**Note:** If you have the entire (Etoile repository)[https://github.com/etoile/Etoile], 
+EtoileFoundation is built together with CoreObject, by running 'make' in 
+Frameworks or any other parent directories.
 
 
 Build and Install

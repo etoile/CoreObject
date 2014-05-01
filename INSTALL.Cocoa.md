@@ -12,8 +12,8 @@ You also need to have the SQLite and EtoileFoundation libraries installed:
   - libsqlite 3.7.7 (the one bundled with Mac OS X 10.7), see <http://www.sqlite.org/>
   - EtoileFoundation, see <https://github.com/etoile/EtoileFoundation>
 
-**Note:** If you have the entire Etoile repository, EtoileFoundation is built 
-together with CoreObject (as a workspace subproject).
+**Note:** If you have the entire (Etoile repository)[https://github.com/etoile/Etoile], 
+EtoileFoundation is built together with CoreObject (as a workspace subproject).
 
 **Warning:** There is no iOS support yet.
 
