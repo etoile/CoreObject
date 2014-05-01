@@ -236,14 +236,23 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		NSArray *newArray = change[NSKeyValueChangeNewKey];
 		
 		NSMutableSet *newChunks = [NSMutableSet setWithSet: [NSSet setWithArray: newArray]];
+		// N.B.: Objects in these sets are COAttributedStringChunk. The set difference is using
+		// pointer equality, this is intended.
 		[newChunks minusSet: [NSSet setWithArray: oldArray]];
 		
 		NSLog(@"%@: New chunks: %@", object, newChunks);
 		
 		// Set up observation for the new chunks
+		// TODO: Could there be a case when we weren't already observing the old chunks?
 		
 		for (COAttributedStringChunk *chunk in newChunks)
 		{
+			if ([_observedObjectsSet containsObject: chunk])
+			{
+				// Don't observe it again!
+				continue;
+			}
+			
 			[_observedObjectsSet addObject: chunk];
 			[chunk addObserver: self forKeyPath: @"text" options: NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context: NULL];
 			[chunk addObserver: self forKeyPath: @"attributes" options: NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context: NULL];
@@ -252,8 +261,6 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	
 	if (_inPrimitiveMethod)
 		return;
-	
-	_cachedString = [_backing string];
 	
 	if ([keyPath isEqualToString: @"chunks"])
 	{
@@ -266,11 +273,20 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		// We should probably do an actual character-by-character diff
 		
 		[self beginEditing];
+		
+		// N.B. This used to be above the -beginEditingCall, but that would violate
+		// the principle that you can't modify an NSAttributedStringWrapper from
+		// outside a -beginEditing/-endEditing block
+		_cachedString = [_backing string];
+		
 		CODiffArrays(oldArray, newArray, self, oldArray);
 		[self endEditing];
 	}
 	else if ([keyPath isEqualToString: @"text"])
 	{
+		_cachedString = [_backing string];
+		
+		
 		NSLog(@"%@: Text changed from %@ to %@", object, change[NSKeyValueChangeOldKey], change[NSKeyValueChangeNewKey]);
 		
 		COAttributedStringChunk *chunk = object;
@@ -310,6 +326,9 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	}
 	else if ([keyPath isEqualToString: @"attributes"])
 	{
+		_cachedString = [_backing string];
+		
+		
 		COAttributedStringChunk *chunk = object;
 		ETAssert([chunk isKindOfClass: [COAttributedStringChunk class]]);
 		
@@ -636,17 +655,60 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	_inPrimitiveMethod = NO;
 }
 
+#pragma mark - Debugging / Self-checks
+
 - (void) beginEditing
 {
 	NSLog(@"->> beginEditing");
+	
+	if (_beginEditingStackDepth == 0)
+	{
+		_lengthAtStartOfBatch = [self length];
+		_lengthDeltaInBatch = 0;
+	}
+	
+	_beginEditingStackDepth++;
+	
 	[super beginEditing];
 }
 
 - (void) endEditing
 {
 	NSLog(@"<<- endEditing");
+	
+	_beginEditingStackDepth--;
+	
+	BOOL reachedZero = (_beginEditingStackDepth == 0);
+	
+	if (_beginEditingStackDepth < 0)
+	{
+		[NSException raise: NSInternalInconsistencyException
+					format: @"-endEditing called too many times on %@", self];
+	}
+	
 	[super endEditing];
+	
+	if (reachedZero)
+	{
+		// Self-check
+		
+		NSInteger lengthAtEndOfBatch = [self length];
+		NSInteger expectedLength = _lengthAtStartOfBatch + _lengthDeltaInBatch;
+		
+		if (lengthAtEndOfBatch != expectedLength)
+		{
+			[NSException raise: NSInternalInconsistencyException
+						format: @"COAttributedStringWrapper user made incorrect calls to -edited:range:changeInLength:. Expected length %d, actual length at end of batch is %d", (int)expectedLength, (int)lengthAtEndOfBatch];
+		}
+	}
 }
+
+- (void) edited: (NSUInteger)editedMask range: (NSRange)range changeInLength: (NSInteger)delta
+{
+	_lengthDeltaInBatch += delta;
+	[super edited: editedMask range: range changeInLength: delta];
+}
+
 
 
 @end

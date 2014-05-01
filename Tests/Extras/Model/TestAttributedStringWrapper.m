@@ -495,6 +495,31 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	UKObjectsEqual(@"ac", [attributedString.chunks[0] text]);
 }
 
+- (void) testRevertLongSentenceFromEmptyString
+{
+	// WARNING: Was failing intermittently. Should be fixed now. 
+	
+	// 'x'
+	[self checkBlock: ^() {
+		[as replaceCharactersInRange: NSMakeRange(0, 0) withString: @"x"];
+	} modifiesRange: NSMakeRange(0, 1) mask: NSTextStorageEditedCharacters delta: 1 newString: @"x"];
+	
+	// Create snapshot1 from objectGraph
+	COObjectGraphContext *snapshot1 = [COObjectGraphContext new];
+	[snapshot1 setItemGraph: objectGraph];
+	
+	// Set the string to @""
+	[self checkBlock: ^() {
+		[[as mutableString] setString: @""];
+	} modifiesRange: NSMakeRange(0, 0) mask: NSTextStorageEditedCharacters delta: -1 newString: @""];
+	
+	// Restore to snapshot1
+	[self checkBlock: ^() {
+		[objectGraph setItemGraph: snapshot1];
+	} modifiesRange: NSMakeRange(0, 1) mask: NSTextStorageEditedCharacters delta: 1 newString: @"x"];
+}
+
+
 @end
 
 /**

@@ -20,6 +20,11 @@
 	 * so we can unregister accurately.
 	 */
 	NSHashTable *_observedObjectsSet;
+	
+	// Debugging / Self-checks
+	NSInteger _beginEditingStackDepth;
+	NSInteger _lengthAtStartOfBatch;
+	NSInteger _lengthDeltaInBatch;
 }
 
 - (instancetype) initWithBacking: (COAttributedString *)aBacking;
