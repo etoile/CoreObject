@@ -7,6 +7,7 @@
 
 #import <CoreObject/CoreObject.h>
 #import <CoreObject/COEditingContext+Private.h>
+#import <CoreObject/COBranch+Private.h>
 #import "CORevisionCache.h"
 #import "COSynchronizerRevision.h"
 #import "COSynchronizerPushedRevisionsToClientMessage.h"
@@ -207,15 +208,15 @@
 										modelDescriptionRepository: self.persistentRoot.editingContext.modelDescriptionRepository];
 		ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
 
-		[_branch setCurrentRevision: [self.persistentRoot.editingContext revisionForRevisionUUID: [rebasedRevs lastObject]
-																			  persistentRootUUID: self.persistentRoot.UUID]];
+		[_branch setCurrentRevisionSkipSupportsRevertCheck: [self.persistentRoot.editingContext revisionForRevisionUUID: [rebasedRevs lastObject]
+																									 persistentRootUUID: self.persistentRoot.UUID]];
 	}
 	else if (!isCurrentRevDescendentOfServerRev)
 	{
 		// Fast-forward
 		
-		[_branch setCurrentRevision: [self.persistentRoot.editingContext revisionForRevisionUUID: [(COSynchronizerRevision *)[revsToUse lastObject] revisionUUID]
-																			  persistentRootUUID: self.persistentRoot.UUID]];
+		[_branch setCurrentRevisionSkipSupportsRevertCheck: [self.persistentRoot.editingContext revisionForRevisionUUID: [(COSynchronizerRevision *)[revsToUse lastObject] revisionUUID]
+																									 persistentRootUUID: self.persistentRoot.UUID]];
 	}
 	_lastRevisionUUIDInTransitToServer = nil;
 	[self.persistentRoot commit];

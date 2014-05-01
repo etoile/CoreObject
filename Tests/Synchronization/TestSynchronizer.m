@@ -261,8 +261,8 @@
 	UKIntsEqual(0, [[self clientMessages] count]);
 	UKObjectsEqual(@"revertThis", [[clientBranch rootObject] label]);
 	
-	[serverBranch setCurrentRevision: [[serverBranch currentRevision] parentRevision]];
-	UKRaisesException([serverPersistentRoot commit]);
+	UKRaisesException([serverBranch setCurrentRevision: [[serverBranch currentRevision] parentRevision]]);
+	[serverPersistentRoot commit];
 	
 	UKIntsEqual(0, [[self serverMessages] count]);
 	UKIntsEqual(0, [[self clientMessages] count]);
@@ -280,8 +280,8 @@
 	UKIntsEqual(0, [[self clientMessages] count]);
 	UKObjectsEqual(@"revertThis", [[clientBranch rootObject] label]);
 	
-	[clientBranch setCurrentRevision: [[clientBranch currentRevision] parentRevision]];
-	UKRaisesException([clientPersistentRoot commit]);
+	UKRaisesException([clientBranch setCurrentRevision: [[clientBranch currentRevision] parentRevision]]);
+	[clientPersistentRoot commit];
 
 	// No more messages
 	

@@ -125,6 +125,7 @@
 		6633F11C185516B5009CE6F7 /* COBezierPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 6633F11A185516B5009CE6F7 /* COBezierPath.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6633F11D185516B5009CE6F7 /* COBezierPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 6633F11B185516B5009CE6F7 /* COBezierPath.m */; };
 		6633F12218552570009CE6F7 /* TestAttributedStringDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 6633F12118552570009CE6F7 /* TestAttributedStringDiff.m */; };
+		66392DD019122B4F006299EB /* COBranch+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646975517CDA94000A1B767 /* COBranch+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		663CE29517C07ED800E729F5 /* COCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28717C07ED800E729F5 /* COCommand.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		663CE29617C07ED800E729F5 /* COCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE28817C07ED800E729F5 /* COCommand.m */; };
 		663CE29917C07ED800E729F5 /* COCommandDeleteBranch.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28B17C07ED800E729F5 /* COCommandDeleteBranch.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1950,6 +1951,7 @@
 				601FD94518893ED50002F957 /* COEditingContext+Debugging.h in Headers */,
 				607335B418AB96A6008A02DC /* COSmartGroup.h in Headers */,
 				663CE2A117C07ED800E729F5 /* COUndoTrackStore.h in Headers */,
+				66392DD019122B4F006299EB /* COBranch+Private.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

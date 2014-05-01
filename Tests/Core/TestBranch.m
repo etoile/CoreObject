@@ -547,6 +547,25 @@
     
 }
 
+- (void) testSetCurrentRevisionWhenSupportsRevertFalseDisallowed
+{
+    [persistentRoot commit];
+    CORevision *firstRevision = [originalBranch currentRevision];
+    
+    [[originalBranch rootObject] setLabel: @"test"];
+    [persistentRoot commit];
+    CORevision *secondRevision = [originalBranch currentRevision];
+
+	UKDoesNotRaiseException([originalBranch setCurrentRevision: firstRevision]);
+	UKDoesNotRaiseException([originalBranch setCurrentRevision: secondRevision]);
+	UKObjectsEqual(secondRevision, originalBranch.currentRevision);
+	
+	originalBranch.supportsRevert = NO;
+	
+	UKRaisesException([originalBranch setCurrentRevision: firstRevision]);
+	UKObjectsEqual(secondRevision, originalBranch.currentRevision);
+}
+
 - (void) testDiscardAllChangesAndHasChanges
 {
 	COBranch *uncommittedBranch = [originalBranch makeBranchWithLabel: @"uncommitted"];

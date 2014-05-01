@@ -63,5 +63,15 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
 
 - (COObjectGraphContext *) objectGraphContextWithoutUnfaulting;
 - (BOOL)objectGraphContextHasChanges;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * Same as -setCurrentRevision:, but doesn't check the supportsRevert
+ * property. This is used by COSynchronizerServer/COSynchronizerClient,
+ * which need to violate the supportsRevert flag.
+ *
+ * The public API -setCurrentRevision: uses this method.
+ */
+- (void)setCurrentRevisionSkipSupportsRevertCheck:(CORevision *)currentRevision;
 
 @end

@@ -327,12 +327,10 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     return nil;
 }
 
-- (void) setCurrentRevision:(CORevision *)newCurrentRevision
+- (void) setCurrentRevisionSkipSupportsRevertCheck:(CORevision *)newCurrentRevision
 {
     NILARG_EXCEPTION_TEST(newCurrentRevision);
-	
-	// TODO: Check and enforce self.supportsRevert
-	
+		
 	if (![newCurrentRevision isEqualToOrAncestorOfRevision: self.headRevision])
 	{
 		_headRevisionUUID = [newCurrentRevision UUID];
@@ -340,6 +338,22 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	
     _currentRevisionUUID = [newCurrentRevision UUID];
     [self reloadAtRevision: newCurrentRevision];
+}
+
+- (void) setCurrentRevision:(CORevision *)newCurrentRevision
+{
+	if (!self.supportsRevert)
+	{
+		if (![self.currentRevision isEqualToOrAncestorOfRevision: newCurrentRevision])
+		{
+			[NSException raise: NSGenericException
+						format: @"%@: self.supportsRevert is NO, but -setCurrentRevision: was called "
+			 "with a revision %@ that is not a descendent of the current revision, %@",
+			 self, newCurrentRevision, self.currentRevision];
+		}
+	}
+	
+	[self setCurrentRevisionSkipSupportsRevertCheck: newCurrentRevision];
 }
 
 - (COBranch *) parentBranch
