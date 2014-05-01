@@ -322,7 +322,7 @@
 - (NSRect) circleRectAtLevel: (NSInteger)level inRect: (NSRect)aRect
 {
 	aRect.size.width = aRect.size.height;
-	aRect = NSInsetRect(aRect, 3, 3);
+	aRect = NSInsetRect(aRect, 4, 4);
 	
 	aRect.origin.x += level * (2.5 * aRect.size.width);
 	return aRect;
@@ -394,12 +394,27 @@
 		}
 	}
 	
-	[[self colorForUUID: commit] setStroke];
+	NSColor *commitColor = [self colorForUUID: commit];
+	const BOOL isCurrentCommit = [[[track currentNode] UUID] isEqual: commit];
+	const NSRect circleRect = [self circleRectAtLevel: level inRect: aRect];
+	
+	[commitColor setStroke];
 	[[NSColor whiteColor] setFill];
-	NSBezierPath *circle = [NSBezierPath bezierPathWithOvalInRect: [self circleRectAtLevel: level inRect: aRect]];
-	[circle setLineWidth: [[[track currentNode] UUID] isEqual: commit] ? 2 : 1];
+	NSBezierPath *circle = [NSBezierPath bezierPathWithOvalInRect: circleRect];
+	[circle setLineWidth: isCurrentCommit ? 2 : 1];
 	[circle fill];
 	[circle stroke];
+	
+	if (isCurrentCommit)
+	{
+		NSBezierPath *outline = [NSBezierPath bezierPathWithOvalInRect: NSInsetRect(circleRect, -1, -1)];
+		[outline setLineWidth: 1];
+		[[NSColor blackColor] setStroke];
+		[outline stroke];
+	}
+	
+	[[commitColor colorWithAlphaComponent: 0.25] setFill];
+	[circle fill];
 	
 	[NSGraphicsContext restoreGraphicsState];
 }
