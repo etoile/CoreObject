@@ -299,7 +299,7 @@
 	 */
 		
 	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: [serverBranch objectGraphContext]];
-	[[serverBranch rootObject] setContents: S(serverStr)];
+	[(UnorderedGroupNoOpposite *)[serverBranch rootObject] setContents: S(serverStr)];
 	[self appendString: @"Hello" htmlCode: nil toAttributedString: serverStr];
 	[serverPersistentRoot commit];
 	
@@ -314,7 +314,7 @@
 	 
 	 */
 	
-	COAttributedString *clientStr = [[[clientBranch rootObject] contents] anyObject];
+	COAttributedString *clientStr = [[(UnorderedGroupNoOpposite *)[clientBranch rootObject] contents] anyObject];
 	COAttributedStringWrapper *clientWrapper = [[COAttributedStringWrapper alloc] initWithBacking: clientStr];
 	[self setFontTraits: NSFontBoldTrait inRange: NSMakeRange(0,4) inTextStorage: clientWrapper];
 	[clientPersistentRoot commit];
@@ -357,12 +357,12 @@
 {
 	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: [serverBranch objectGraphContext]];
 	COAttributedStringWrapper *serverWrapper = [[COAttributedStringWrapper alloc] initWithBacking: serverStr];
-	[[serverBranch rootObject] setContents: S(serverStr)];
+	[(UnorderedGroupNoOpposite *)[serverBranch rootObject] setContents: S(serverStr)];
 	[serverPersistentRoot commit];
 	
 	[transport deliverMessagesToClient];
 	
-	COAttributedString *clientStr = [[[clientBranch rootObject] contents] anyObject];
+	COAttributedString *clientStr = [[(UnorderedGroupNoOpposite *)[clientBranch rootObject] contents] anyObject];
 	COAttributedStringWrapper *clientWrapper = [[COAttributedStringWrapper alloc] initWithBacking: clientStr];
 	[clientWrapper replaceCharactersInRange: NSMakeRange(0,0) withString: @"a"];
 	[clientPersistentRoot commit];
@@ -400,7 +400,7 @@
 - (NSString *)stringForRevision: (CORevision *)aRevision persistentRoot: (COPersistentRoot *)proot
 {
 	COObjectGraphContext *graph = [proot objectGraphContextForPreviewingRevision: aRevision];
-	COAttributedStringWrapper *wrapper = [[COAttributedStringWrapper alloc] initWithBacking: [[[graph rootObject] contents] anyObject]];
+	COAttributedStringWrapper *wrapper = [[COAttributedStringWrapper alloc] initWithBacking: [[(UnorderedGroupNoOpposite *)[graph rootObject] contents] anyObject]];
 	return [wrapper string];
 }
 
@@ -417,14 +417,14 @@
 {
 	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: [serverBranch objectGraphContext]];
 	COAttributedStringWrapper *serverWrapper = [[COAttributedStringWrapper alloc] initWithBacking: serverStr];
-	[[serverBranch rootObject] setContents: S(serverStr)];
+	[(UnorderedGroupNoOpposite *)[serverBranch rootObject] setContents: S(serverStr)];
 	[serverPersistentRoot commit];
 	
 	[transport deliverMessagesToClient];
 	
 	// 3 commits on client
 	
-	COAttributedString *clientStr = [[[clientBranch rootObject] contents] anyObject];
+	COAttributedString *clientStr = [[(UnorderedGroupNoOpposite *)[clientBranch rootObject] contents] anyObject];
 	COAttributedStringWrapper *clientWrapper = [[COAttributedStringWrapper alloc] initWithBacking: clientStr];
 	[clientWrapper replaceCharactersInRange: NSMakeRange(0,0) withString: @"a"];
 	[clientPersistentRoot commit];

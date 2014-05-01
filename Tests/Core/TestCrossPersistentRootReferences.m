@@ -152,7 +152,7 @@
     // Set up library
     
     COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-    [[library1 rootObject] setContents: S([photo1 rootObject], [branchA rootObject])];
+    [(Tag *)[library1 rootObject] setContents: S([photo1 rootObject], [branchA rootObject])];
 	UKIntsEqual(2, [[[library1 rootObject] contents] count]);
 	
     [ctx commit];
