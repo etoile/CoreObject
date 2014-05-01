@@ -1,6 +1,7 @@
 Typewriter TODO
 ===============
 
+- [ ] Trying to undo past a checkpoint switches to performing selective undos, because the creation of the checkpoint revision isn't in the undo log. This may be the correct behaviour, but it was surprising to me now when I noticed it.
 - [ ] Maybe commit text changes when the user manually moves the insertion point, to try to avoid "... and other edits" commits
 - [x] Don't create Default Tag Group
 - [ ] Delete' is enabled in the menus for All Notes
