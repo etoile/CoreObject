@@ -481,7 +481,6 @@ namespace ManagedFusion
 	static bool canEmitInsertion(int posA, int posB, Range *modifiedRangeA, Range *modifiedRangeB)
 	{
 		assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
-		const int offset = posB - posA;
 		
 		if (modifiedRangeA == NULL)
 			return true;
