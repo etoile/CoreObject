@@ -10,8 +10,6 @@
 #import "COObject+Private.h"
 #import "COPersistentRoot.h"
 
-#pragma GCC diagnostic ignored "-Wprotocol"
-
 @implementation COCollection
 
 + (void)initialize

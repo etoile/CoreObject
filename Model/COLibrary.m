@@ -11,8 +11,6 @@
 #import "COTag.h"
 #import "COPersistentRoot.h"
 
-#pragma GCC diagnostic ignored "-Wprotocol"
-
 @implementation COLibrary
 
 + (ETEntityDescription *)newEntityDescription

@@ -16,8 +16,6 @@
 #import "COUndoTrack.h"
 #import <EtoileFoundation/Macros.h>
 
-#pragma GCC diagnostic ignored "-Wprotocol"
-
 NSString * const kCOCommandUUID = @"COCommandUUID";
 static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
 static NSString * const kCOCommandContents = @"COCommandContents";

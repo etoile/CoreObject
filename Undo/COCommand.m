@@ -178,6 +178,16 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
 	return nil;
 }
 
+- (id <COTrackNode>)parentNode
+{
+	return nil;
+}
+
+- (id <COTrackNode>)mergeParentNode
+{
+	return nil;
+}
+
 - (id) copyWithZone:(NSZone *)zone
 {
     COCommand *aCopy = [[[self class] allocWithZone: zone] init];

@@ -61,6 +61,16 @@
  * (for an inverse).
  */
 @property (nonatomic, copy) ETUUID *persistentRootUUID;
+/**
+ * Returns nil.
+ *
+ * An atomic command belongs to a command group which has a parent command.
+ */
+@property (nonatomic, readonly) id <COTrackNode> parentNode;
+/**
+ * Returns nil.
+ */
+@property (nonatomic, readonly) id <COTrackNode> mergeParentNode;
 
 
 /** @taskunit Applying and Reverting Changes */

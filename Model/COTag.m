@@ -8,8 +8,6 @@
 #import "COTag.h"
 #import "COPersistentRoot.h"
 
-#pragma GCC diagnostic ignored "-Wprotocol"
-
 @implementation COTag
 
 + (ETEntityDescription *) newEntityDescription

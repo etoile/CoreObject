@@ -45,4 +45,7 @@ static COEndOfUndoTrackPlaceholderNode *singleton;
 	return _(@"Initial state");
 }
 
+- (id <COTrackNode>)parentNode { return nil; }
+- (id <COTrackNode>)mergeParentNode { return nil; }
+
 @end

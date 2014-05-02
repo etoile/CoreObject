@@ -100,6 +100,14 @@
  * See -[COCommitDescriptor localizedShortDescriptionWithArguments:]
  */
 - (NSString *)localizedShortDescription;
+/**
+ * Returns -parentRevision.
+ */
+- (id <COTrackNode>)parentNode;
+/**
+ * Returns -mergeParentRevision.
+ */
+- (id<COTrackNode>)mergeParentNode;
 
 
 /** @taskunit History Graph Inspection */

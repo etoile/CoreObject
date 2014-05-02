@@ -7,8 +7,6 @@
 
 #import "COSmartGroup.h"
 
-#pragma GCC diagnostic ignored "-Wprotocol"
-
 @implementation COSmartGroup
 
 @synthesize targetCollection, query, contentBlock;

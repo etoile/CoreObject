@@ -7,8 +7,6 @@
 
 #import "COGroup.h"
 
-#pragma GCC diagnostic ignored "-Wprotocol"
-
 @implementation COGroup
 
 + (ETEntityDescription *)newEntityDescription

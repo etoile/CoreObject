@@ -7,8 +7,6 @@
 
 #import "COBookmark.h"
 
-#pragma GCC diagnostic ignored "-Wprotocol"
-
 @implementation COBookmark
 
 @synthesize URL = _URL, lastVisitedDate = _lastVisitedDate, favIconData = _favIconData;

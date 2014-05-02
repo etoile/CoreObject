@@ -100,6 +100,17 @@
  * The commit order in the Undo track store.
  */
 @property (nonatomic, readwrite) int64_t sequenceNumber;
+/**
+ * The parent command, see -parentUUID.
+ * 
+ * For the first command, returns nil. Take note that this first command is 
+ * preceded by a placeholder node in -[COUndoTrack nodes].
+ */
+@property (nonatomic, readonly) id <COTrackNode> parentNode;
+/**
+ * Returns nil.
+ */
+@property (nonatomic, readonly) id <COTrackNode> mergeParentNode;
 
 
 /** @taskunit Applying and Reverting Changes */

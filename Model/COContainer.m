@@ -8,8 +8,6 @@
 #import "COContainer.h"
 #import "COGroup.h"
 
-#pragma GCC diagnostic ignored "-Wprotocol"
-
 @implementation COContainer
 
 + (ETEntityDescription *) newEntityDescription
