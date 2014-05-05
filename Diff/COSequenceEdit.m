@@ -7,6 +7,10 @@
 
 #import "COSequenceEdit.h"
 
+#import "COSequenceDeletion.h"
+#import "COSequenceInsertion.h"
+#import "COSequenceModification.h"
+
 static BOOL COOverlappingRanges(NSRange r1, NSRange r2)
 {
 	return (r1.location >= r2.location && r1.location < (r2.location + r2.length) && r1.length > 0)
@@ -27,6 +31,18 @@ static BOOL COOverlappingRanges(NSRange r1, NSRange r2)
 	return self;
 }
 
+static NSDictionary *classSortOrder;
+
++ (void) initialize
+{
+	if (self == [COSequenceEdit class])
+	{
+		classSortOrder = @{ NSStringFromClass([COSequenceDeletion class]) : @0,
+							NSStringFromClass([COSequenceModification class]) : @0,
+							NSStringFromClass([COSequenceInsertion class]) : @1 };
+	}
+}
+
 - (NSComparisonResult) compare: (COSequenceEdit*)other
 {
 	if ([other range].location > [self range].location)
@@ -35,7 +51,24 @@ static BOOL COOverlappingRanges(NSRange r1, NSRange r2)
 	}
 	if ([other range].location == [self range].location)
 	{
-		return NSOrderedSame;
+		NSNumber *selfOrder = classSortOrder[NSStringFromClass([self class])];
+		NSNumber *otherOrder = classSortOrder[NSStringFromClass([other class])];
+		
+		assert(selfOrder != nil);
+		assert(otherOrder != nil);
+		
+		if ([selfOrder intValue] > [otherOrder intValue])
+		{
+			return NSOrderedDescending;
+		}
+		else if ([selfOrder intValue] < [otherOrder intValue])
+		{
+			return NSOrderedAscending;
+		}
+		else
+		{
+			return NSOrderedSame;
+		}
 	}
 	else
 	{

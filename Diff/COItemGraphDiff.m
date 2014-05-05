@@ -665,9 +665,9 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 			}
 		}
         
-        NSArray *editsSorted = [[edits allObjects] sortedArrayUsingSelector: @selector(compare:)];
+        NSArray *editsUnsorted = [edits allObjects];
         NSArray *originalArray = [anItem valueForAttribute: [anyEdit attribute]];
-        NSArray *newArray = COArrayByApplyingEditsToArray(originalArray, editsSorted);
+        NSArray *newArray = COArrayByApplyingEditsToArray(originalArray, editsUnsorted);
         
         [anItem setValue: newArray
             forAttribute: [anyEdit attribute]

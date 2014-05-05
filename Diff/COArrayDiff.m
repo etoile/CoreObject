@@ -61,6 +61,8 @@ void CODiffArrays(NSArray *a, NSArray *b, id<CODiffArraysDelegate>delegate, id u
  */
 void COApplyEditsToArray(NSMutableArray *array, NSArray *edits)
 {
+	edits = [edits sortedArrayUsingSelector: @selector(compare:)];
+	
 	//NSArray *uniqueEdits = COEditsByUniquingNonconflictingDuplicates(edits);
 	
     const NSUInteger editsCount = [edits count];

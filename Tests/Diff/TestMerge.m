@@ -870,4 +870,56 @@
 	}
 }
 
+- (void) testSelectiveUndoDragAndDrop
+{
+	OutlineItem *doc = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+    [ctx1 setRootObject: doc];
+		
+	OutlineItem *group1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+	OutlineItem *group2 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+	OutlineItem *item1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+	OutlineItem *item2 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+	
+	doc.contents = @[group1, group2, item1, item2];
+	
+	// snapshot the state [group1, group2, item1, item2] into ctx3
+	[ctx3 setItemGraph: ctx1];
+
+	group2.contents = @[item1];
+	UKObjectsEqual(A(group1, group2, item2), [doc contents]);
+	
+	// snapshot the state [group1, group2=[item1], item2] into ctx2
+	[ctx2 setItemGraph: ctx1];
+	
+	group1.contents = @[item2];
+	UKObjectsEqual(A(group1, group2), [doc contents]);
+	
+	// the state [group1=[item2], group2=[item1]] is in ctx1
+	
+	// compute diff(ctx2->ctx3) + diff(ctx2->ctx1)
+	//
+	// this is supposed to selectively undo inserting item1 into group2
+		
+    COItemGraphDiff *diff23 = [COItemGraphDiff diffItemTree: ctx2 withItemTree: ctx3 sourceIdentifier: @"diff23"];
+    COItemGraphDiff *diff21 = [COItemGraphDiff diffItemTree: ctx2 withItemTree: ctx1 sourceIdentifier: @"diff21"];
+	COItemGraphDiff *merged = [diff23 itemTreeDiffByMergingWithDiff: diff21];
+	
+    UKFalse([merged hasConflicts]);
+	[merged applyTo: ctx2];
+	
+	// expecting the state [group1=[item2], group2, item1] into ctx2
+	
+	{
+		OutlineItem *docCtx2 = [ctx2 loadedObjectForUUID: doc.UUID];
+		OutlineItem *group1Ctx2 = [ctx2 loadedObjectForUUID: group1.UUID];
+		OutlineItem *group2Ctx2 = [ctx2 loadedObjectForUUID: group2.UUID];
+		OutlineItem *item1Ctx2 = [ctx2 loadedObjectForUUID: item1.UUID];
+		OutlineItem *item2Ctx2 = [ctx2 loadedObjectForUUID: item2.UUID];
+		
+		UKObjectsEqual(A(group1Ctx2, group2Ctx2, item1Ctx2), docCtx2.contents);
+		UKObjectsEqual(A(item2Ctx2), group1Ctx2.contents);
+		UKObjectsEqual(A(), group2Ctx2.contents);
+	}
+}
+
 @end

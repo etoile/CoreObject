@@ -61,6 +61,20 @@
 	UKObjectsEqual(@[@"y"], array);
 }
 
+/**
+ * Same as above, edits in reversed order
+ */
+- (void) testApplyWithOverlappingDeletionAndInsertion2
+{
+	NSArray *edits = @[[self insertObjects: @[@"y"] atIndex: 0],
+					   [self deleteRange: NSMakeRange(0, 1)]];
+	
+	NSMutableArray *array = [@[@"x"] mutableCopy];
+	COApplyEditsToArray(array, edits);
+	
+	UKObjectsEqual(@[@"y"], array);
+}
+
 - (void) testApplyWithManyDeletions
 {
 	NSArray *edits = @[[self deleteRange: NSMakeRange(0, 1)],
