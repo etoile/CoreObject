@@ -202,10 +202,23 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	return ok;
 }
 
+- (id<COTrackNode>) parentOfCommandOrPlaceholderIfNoParent: (COCommandGroup *)aCommand
+{
+	ETUUID *parentUUID = [aCommand parentUUID];
+	if (parentUUID != nil)
+	{
+		return [self commandForUUID: parentUUID];
+	}
+	else
+	{
+		return [COEndOfUndoTrackPlaceholderNode sharedInstance];
+	}
+}
+
 - (NSArray *) nodesFromNode: (id <COTrackNode>)node toTargetNode: (id <COTrackNode>)targetNode
 {
 	NSMutableArray *result = [NSMutableArray new];
-	for (id <COTrackNode> temp = targetNode; temp != nil; temp = [self commandForUUID: [(COCommandGroup *)temp parentUUID]])
+	for (id <COTrackNode> temp = targetNode; temp != nil; temp = [self parentOfCommandOrPlaceholderIfNoParent: (COCommandGroup *)temp])
 	{
 		if ([temp isEqual: node])
 		{
@@ -225,10 +238,10 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	ETAssert(![_nodesOnCurrentUndoBranch containsObject: node]);
 	ETAssert(![node isEqual: [self currentNode]]);
 	
-	// TODO: Handle special case when [self currentNode] == [COEndOfTrack..
 	ETUUID *commonAncestorUUID = [self commonAncestorForCommandWithUUID: [[self currentNode] UUID]
 													 andCommandWithUUID: [node UUID]];
-	COCommandGroup *commonAncestor = [self commandForUUID: commonAncestorUUID];
+	COCommandGroup *commonAncestor = commonAncestorUUID != nil ?
+		[self commandForUUID: commonAncestorUUID] : [COEndOfUndoTrackPlaceholderNode sharedInstance];
 	const NSUInteger commonAncestorIndex = [_nodesOnCurrentUndoBranch indexOfObject: commonAncestor];
 	const NSUInteger currentIndex = [_nodesOnCurrentUndoBranch indexOfObject: [self currentNode]];
 	ETAssert(commonAncestorIndex != NSNotFound);

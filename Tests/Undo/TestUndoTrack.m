@@ -48,6 +48,18 @@
 	return self;
 }
 
+- (void) testEmptyTrack
+{
+	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance]), [_track nodes]);
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], _track.currentNode);
+}
+
+- (void) testEmptyTrackSetCurrentNode
+{
+	UKDoesNotRaiseException([_track setCurrentNode: [COEndOfUndoTrackPlaceholderNode sharedInstance]]);
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], _track.currentNode);	
+}
+
 - (void) testSingleRecord
 {
 	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance]), [_track nodes]);
@@ -155,6 +167,46 @@
 	[_track setCurrentNode: group1a];
 
 	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1, group1a), [_track nodes]);
+}
+
+- (void) testDivergentNodesWhereCommonAncestorIsPlaceholderNode
+{
+	COCommandGroup *group1a = [[COCommandGroup alloc] init];
+	COCommandGroup *group1b = [[COCommandGroup alloc] init];
+	
+	[_track recordCommand: group1a];
+	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1a), [_track nodes]);
+	UKObjectsEqual(group1a, _track.currentNode);
+	
+	[_track setCurrentNode: [COEndOfUndoTrackPlaceholderNode sharedInstance]];
+	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1a), [_track nodes]);
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], _track.currentNode);
+	
+	[_track recordCommand: group1b];
+	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1b), [_track nodes]);
+	UKObjectsEqual(group1b, _track.currentNode);
+	
+	[_track setCurrentNode: group1a];
+	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1a), [_track nodes]);
+	UKObjectsEqual(group1a, _track.currentNode);
+}
+
+- (void) testNavigateToDivergentNodesFromPlaceholderNode
+{
+	COCommandGroup *group1a = [[COCommandGroup alloc] init];
+	COCommandGroup *group1b = [[COCommandGroup alloc] init];
+	
+	[_track recordCommand: group1a];
+	[_track setCurrentNode: [COEndOfUndoTrackPlaceholderNode sharedInstance]];
+	[_track recordCommand: group1b];
+	[_track setCurrentNode: [COEndOfUndoTrackPlaceholderNode sharedInstance]];
+	
+	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1b), [_track nodes]);
+	
+	[_track setCurrentNode: group1a];
+	
+	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1a), [_track nodes]);
+	UKObjectsEqual(group1a, _track.currentNode);
 }
 
 - (void) testUndoOnPatternTrack
