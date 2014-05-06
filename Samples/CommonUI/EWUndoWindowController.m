@@ -273,7 +273,9 @@ static NSArray *sortTrackNodes(NSArray *commits)
 - (NSArray *) allOrderedNodesToDisplayForTrack: (id<COTrack>)aTrack
 {
 	NSArray *allCommands = [_track allCommands];
-	return sortTrackNodes(allCommands);
+	NSArray *allCommandsSorted = sortTrackNodes(allCommands);
+	
+	return [allCommandsSorted arrayByAddingObject: [COEndOfUndoTrackPlaceholderNode sharedInstance]];
 }
 
 - (NSColor *) colorForNode: (id<COTrack>)aTrack isCurrentOrAncestorOfCurrent: (BOOL)current

@@ -10,11 +10,17 @@
 @implementation COEndOfUndoTrackPlaceholderNode
 
 static COEndOfUndoTrackPlaceholderNode *singleton;
+static ETUUID *uuid;
 
 + (void) initialize
 {
 	NSAssert([COEndOfUndoTrackPlaceholderNode class] == self, @"Cannot subclass COEndOfUndoTrackPlaceholderNode");
     singleton = [[self alloc] init];
+	
+	// Even though COEndOfUndoTrackPlaceholderNode is an imaginary node,
+	// give it a fixed UUID anyway, this makes it easier to draw a graph of
+	// COTrackNode
+	uuid = [ETUUID UUIDWithString: @"443D4D2D-2E9D-4560-8C00-01329290DA27"];
 }
 
 + (COEndOfUndoTrackPlaceholderNode *) sharedInstance
@@ -30,7 +36,7 @@ static COEndOfUndoTrackPlaceholderNode *singleton;
 }
 
 - (NSDictionary *)metadata { return nil; }
-- (ETUUID *)UUID { return nil; }
+- (ETUUID *)UUID { return uuid; }
 - (ETUUID *)persistentRootUUID { return nil; }
 - (ETUUID *)branchUUID { return nil; }
 - (NSDate *)date { return nil; }
