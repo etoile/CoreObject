@@ -62,9 +62,6 @@
 
 - (void) testSingleRecord
 {
-	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance]), [_track nodes]);
-	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [_track currentNode]);
-		
 	COCommandGroup *group = [[COCommandGroup alloc] init];
 	[_track recordCommand: group];
 
