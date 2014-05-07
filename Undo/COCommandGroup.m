@@ -60,9 +60,13 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 	_metadata = aCommand.metadata;
 	_UUID = aCommand.UUID;
 	if (aCommand.parentUUID == nil)
+	{
 		_parentUUID = [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID];
+	}
 	else
+	{
 		_parentUUID = aCommand.parentUUID;
+	}
 	_timestamp = aCommand.timestamp;
 	_sequenceNumber = aCommand.sequenceNumber;
 	_trackName = aCommand.trackName;
@@ -76,9 +80,13 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 	cmd.metadata = _metadata;
 	cmd.UUID = _UUID;
 	if ([_parentUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
+	{
 		cmd.parentUUID = nil;
+	}
 	else
+	{
 		cmd.parentUUID = _parentUUID;
+	}
 	cmd.trackName = _trackName;
 	cmd.timestamp = _timestamp;
 	cmd.sequenceNumber = _sequenceNumber;
@@ -271,6 +279,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 	
 	if ([self.parentUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
 		return [COEndOfUndoTrackPlaceholderNode sharedInstance];
+	
 	return [_parentUndoTrack commandForUUID: self.parentUUID];
 }
 

@@ -345,9 +345,13 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		
 	// Set aCommand's parent pointer
 	if (state.currentCommandUUID == nil)
+	{
 		aCommand.parentUUID = [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID];
+	}
 	else
+	{
 		aCommand.parentUUID = state.currentCommandUUID;
+	}
 
 	ETUUID *coalescedCommandUUIDToDelete = nil;
 	if (_coalescing)
