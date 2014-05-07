@@ -89,7 +89,10 @@
  * this point, the last undo and the previously created commands that follow it, 
  * don't appear in the Undo track unless divergent commands are explicitly shown.
  *
- * For the first command in an Undo track, returns nil.
+ * The first command in a track is always a non-persistent COEndOfUndoTrackPlaceholderNode
+ * instance; its parent UUID is nil. The first persistent commands in a track
+ * have a parent UUID equal to 
+ * [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID].
  */
 @property (nonatomic, readwrite) ETUUID *parentUUID;
 /**
@@ -102,9 +105,9 @@
 @property (nonatomic, readwrite) int64_t sequenceNumber;
 /**
  * The parent command, see -parentUUID.
- * 
- * For the first command, returns nil. Take note that this first command is 
- * preceded by a placeholder node in -[COUndoTrack nodes].
+ *
+ * Returns [COEndOfUndoTrackPlaceholderNode sharedInstance] for the first
+ * COCommandGroup(s) on a track.
  */
 @property (nonatomic, readonly) id <COTrackNode> parentNode;
 /**

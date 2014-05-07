@@ -202,23 +202,10 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	return ok;
 }
 
-- (id<COTrackNode>) parentOfCommandOrPlaceholderIfNoParent: (COCommandGroup *)aCommand
-{
-	ETUUID *parentUUID = [aCommand parentUUID];
-	if (parentUUID != nil)
-	{
-		return [self commandForUUID: parentUUID];
-	}
-	else
-	{
-		return [COEndOfUndoTrackPlaceholderNode sharedInstance];
-	}
-}
-
 - (NSArray *) nodesFromNode: (id <COTrackNode>)node toTargetNode: (id <COTrackNode>)targetNode
 {
 	NSMutableArray *result = [NSMutableArray new];
-	for (id <COTrackNode> temp = targetNode; temp != nil; temp = [self parentOfCommandOrPlaceholderIfNoParent: (COCommandGroup *)temp])
+	for (id <COTrackNode> temp = targetNode; temp != nil; temp = [temp parentNode])
 	{
 		if ([temp isEqual: node])
 		{
@@ -238,10 +225,9 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	ETAssert(![_nodesOnCurrentUndoBranch containsObject: node]);
 	ETAssert(![node isEqual: [self currentNode]]);
 	
-	ETUUID *commonAncestorUUID = [self commonAncestorForCommandWithUUID: [[self currentNode] UUID]
-													 andCommandWithUUID: [node UUID]];
-	COCommandGroup *commonAncestor = commonAncestorUUID != nil ?
-		[self commandForUUID: commonAncestorUUID] : [COEndOfUndoTrackPlaceholderNode sharedInstance];
+	id<COTrackNode> commonAncestor = [self commonAncestorForNode: [self currentNode]
+														 andNode: node];
+	
 	const NSUInteger commonAncestorIndex = [_nodesOnCurrentUndoBranch indexOfObject: commonAncestor];
 	const NSUInteger currentIndex = [_nodesOnCurrentUndoBranch indexOfObject: [self currentNode]];
 	ETAssert(commonAncestorIndex != NSNotFound);
@@ -358,7 +344,14 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	}
 		
 	// Set aCommand's parent pointer
-	aCommand.parentUUID = state.currentCommandUUID;
+	if (state.currentCommandUUID == nil)
+	{
+		aCommand.parentUUID = [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID];
+	}
+	else
+	{
+		aCommand.parentUUID = state.currentCommandUUID;
+	}
 
 	ETUUID *coalescedCommandUUIDToDelete = nil;
 	if (_coalescing)
@@ -462,28 +455,32 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
             return YES;
         }
         rev = [[self commandForUUID: rev] parentUUID];
+		if ([rev isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
+			rev = nil;
     }
     return NO;
 }
 
-- (ETUUID *) commonAncestorForCommandWithUUID: (ETUUID *)commitA andCommandWithUUID: (ETUUID *)commitB
+- (id<COTrackNode>) commonAncestorForNode: (id<COTrackNode>)commitA andNode: (id<COTrackNode>)commitB
 {
-	NSMutableSet *ancestorsOfA = [NSMutableSet set];
+	NSMutableSet *ancestorUUIDsOfA = [NSMutableSet set];
 	
-	for (ETUUID *temp = commitA; temp != nil; temp = [[self commandForUUID: temp] parentUUID])
+	for (id<COTrackNode> temp = commitA; temp != nil; temp = [temp parentNode])
 	{
-		[ancestorsOfA addObject: temp];
+		[ancestorUUIDsOfA addObject: temp.UUID];
 	}
 	
-	for (ETUUID *temp = commitB; temp != nil; temp = [[self commandForUUID: temp] parentUUID])
+	ETAssert([ancestorUUIDsOfA containsObject: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+	
+	for (id<COTrackNode> temp = commitB; temp != nil; temp = [temp parentNode])
 	{
-		if ([ancestorsOfA containsObject: temp])
+		if ([ancestorUUIDsOfA containsObject: temp.UUID])
 		{
 			return temp;
 		}
 	}
 	
-	// No common ancestor
+	ETAssertUnreachable();
 	return nil;
 }
 
@@ -559,6 +556,9 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	
 	// FIgure out the new current and head UUIDS
 	ETUUID *newCurrentNodeUUID = inverse ? aCommand.parentUUID : aCommand.UUID;
+	if ([newCurrentNodeUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
+		newCurrentNodeUUID = nil;
+	
 	ETUUID *newHeadNodeUUID;
 	if (newCurrentNodeUUID == nil
 		|| [self isCommandUUID: newCurrentNodeUUID equalToOrParentOfCommandUUID: currentTrackState.headCommandUUID])
@@ -638,7 +638,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		{
 			NSMutableArray *targetArray = redoNodes;
 			ETUUID *commandUUID = trackState.headCommandUUID;
-			while (commandUUID != nil)
+			while (commandUUID != nil && ![commandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
 			{
 				if ([commandUUID isEqual: trackState.currentCommandUUID])
 					targetArray = undoNodes;
@@ -704,6 +704,9 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
  */
 - (COCommandGroup *) commandForUUID:(ETUUID *)aUUID
 {
+	NILARG_EXCEPTION_TEST(aUUID);
+	ETAssert(![aUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+	
 	COCommandGroup *command = _commandsByUUID[aUUID];
 	if (command == nil)
 	{
@@ -794,7 +797,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
     [[NSNotificationCenter defaultCenter] postNotificationName: COUndoTrackDidChangeNotification
                                                         object: self
                                                       userInfo: userInfo];
-    
+    // FIXME: Implement distributed notification support
     //    [[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
     //                                                                   object: [[self UUID] stringValue]
     //                                                                 userInfo: userInfo

@@ -62,9 +62,6 @@
 
 - (void) testSingleRecord
 {
-	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance]), [_track nodes]);
-	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [_track currentNode]);
-		
 	COCommandGroup *group = [[COCommandGroup alloc] init];
 	[_track recordCommand: group];
 
@@ -77,6 +74,15 @@
 	UKObjectsNotSame(_track, secondTrackInstance);
 	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group), [secondTrackInstance nodes]);
 	UKObjectsEqual(group, [secondTrackInstance currentNode]);
+}
+
+- (void) testFirstCommandParent
+{
+	COCommandGroup *group = [[COCommandGroup alloc] init];
+	[_track recordCommand: group];
+	
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [group parentNode]);
+	UKObjectsEqual([[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID], [group parentUUID]);
 }
 
 - (void) testTwoRecords
@@ -122,7 +128,8 @@
 		COUndoTrack *secondTrackInstance = [COUndoTrack trackForName: TEST_TRACK withEditingContext: ctx];
 		UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1, group2), [secondTrackInstance nodes]);
 		UKObjectsEqual(group1, [secondTrackInstance currentNode]);
-		UKNil([(COCommandGroup *)[secondTrackInstance currentNode] parentUUID]);
+		UKObjectsEqual([[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID],
+					   [(COCommandGroup *)[secondTrackInstance currentNode] parentUUID]);
 	}
 
 	[_track setCurrentNode: group2];
@@ -162,6 +169,14 @@
 	[_track setCurrentNode: group1];
 	[_track recordCommand: group1b];
 	
+	UKObjectsEqual(group1, group1a.parentNode);
+	UKObjectsEqual(group1, group1b.parentNode);
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], group1.parentNode);
+
+	UKObjectsEqual(group1.UUID, group1a.parentUUID);
+	UKObjectsEqual(group1.UUID, group1b.parentUUID);
+	UKObjectsEqual([[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID], group1.parentUUID);
+
 	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1, group1b), [_track nodes]);
 
 	[_track setCurrentNode: group1a];
@@ -175,6 +190,8 @@
 	COCommandGroup *group1b = [[COCommandGroup alloc] init];
 	
 	[_track recordCommand: group1a];
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], group1a.parentNode);
+	UKObjectsEqual([[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID], group1a.parentUUID);
 	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1a), [_track nodes]);
 	UKObjectsEqual(group1a, _track.currentNode);
 	
@@ -183,6 +200,8 @@
 	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], _track.currentNode);
 	
 	[_track recordCommand: group1b];
+	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], group1b.parentNode);
+	UKObjectsEqual([[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID], group1b.parentUUID);
 	UKObjectsEqual(A([COEndOfUndoTrackPlaceholderNode sharedInstance], group1b), [_track nodes]);
 	UKObjectsEqual(group1b, _track.currentNode);
 	

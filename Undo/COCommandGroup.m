@@ -14,6 +14,7 @@
 #import "CODateSerialization.h"
 #import "COUndoTrackStore.h"
 #import "COUndoTrack.h"
+#import "COEndOfUndoTrackPlaceholderNode.h"
 #import <EtoileFoundation/Macros.h>
 
 NSString * const kCOCommandUUID = @"COCommandUUID";
@@ -58,7 +59,14 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 							   parentUndoTrack: anOwner];
 	_metadata = aCommand.metadata;
 	_UUID = aCommand.UUID;
-	_parentUUID = aCommand.parentUUID;
+	if (aCommand.parentUUID == nil)
+	{
+		_parentUUID = [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID];
+	}
+	else
+	{
+		_parentUUID = aCommand.parentUUID;
+	}
 	_timestamp = aCommand.timestamp;
 	_sequenceNumber = aCommand.sequenceNumber;
 	_trackName = aCommand.trackName;
@@ -71,7 +79,14 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 	cmd.JSONData = [self commandsPropertyList];
 	cmd.metadata = _metadata;
 	cmd.UUID = _UUID;
-	cmd.parentUUID = _parentUUID;
+	if ([_parentUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
+	{
+		cmd.parentUUID = nil;
+	}
+	else
+	{
+		cmd.parentUUID = _parentUUID;
+	}
 	cmd.trackName = _trackName;
 	cmd.timestamp = _timestamp;
 	cmd.sequenceNumber = _sequenceNumber;
@@ -260,8 +275,11 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (id<COTrackNode>)parentNode
 {
-	if (self.parentUUID == nil)
-		return nil;
+	ETAssert(self.parentUUID != nil);
+	
+	if ([self.parentUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
+		return [COEndOfUndoTrackPlaceholderNode sharedInstance];
+	
 	return [_parentUndoTrack commandForUUID: self.parentUUID];
 }
 

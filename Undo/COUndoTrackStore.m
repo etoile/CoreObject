@@ -12,6 +12,7 @@
 #import "FMDatabaseAdditions.h"
 #import "COCommand.h"
 #import "CODateSerialization.h"
+#import "COEndOfUndoTrackPlaceholderNode.h"
 
 NSString * const COUndoTrackStoreTrackDidChangeNotification = @"COUndoTrackStoreTrackDidChangeNotification";
 NSString * const COUndoTrackStoreTrackName = @"COUndoTrackStoreTrackName";
@@ -202,6 +203,9 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 		result.currentCommandUUID = [rs dataForColumn: @"currentuuid"] != nil
 									? [ETUUID UUIDWithData: [rs dataForColumn: @"currentuuid"]]
 									: nil;
+		
+		ETAssert(![result.currentCommandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+		ETAssert(![result.headCommandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
     }
     [rs close];
     return result;
@@ -210,6 +214,9 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 - (void) setTrackState: (COUndoTrackState *)aState
 {
 	ETAssert([_db inTransaction]);
+	ETAssert(![aState.headCommandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+	ETAssert(![aState.currentCommandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+	
 	[_db executeUpdate: @"INSERT OR REPLACE INTO tracks (trackname, headid, currentid) "
 						@"VALUES (?, (SELECT id FROM commands WHERE uuid = ?), (SELECT id FROM commands WHERE uuid = ?))",
 						aState.trackName, [aState.headCommandUUID dataValue], [aState.currentCommandUUID dataValue]];
@@ -246,6 +253,9 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 
 - (void) addCommand: (COUndoTrackSerializedCommand *)aCommand
 {
+	ETAssert(![aCommand.parentUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+	ETAssert(![aCommand.UUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+	
 	[_db executeUpdate: @"INSERT INTO commands(uuid, parentid, trackname, data, metadata, timestamp) "
 						@"VALUES(?, (SELECT id FROM commands WHERE uuid = ?), ?, ?, ?, ?)",
 		[aCommand.UUID dataValue],
@@ -270,9 +280,11 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 		result.JSONData = [self deserialize: [rs dataForColumn: @"data"]];
 		result.metadata = [self deserialize: [rs dataForColumn: @"metadata"]];
 		result.UUID = aUUID;
+		ETAssert(![result.UUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
 		if ([rs dataForColumn: @"parentuuid"] != nil)
 		{
 			result.parentUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"parentuuid"]];
+			ETAssert(![result.parentUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
 		}
 		result.trackName = [rs stringForColumn: @"trackname"];
 		result.timestamp = CODateFromJavaTimestamp([rs numberForColumn: @"timestamp"]);
