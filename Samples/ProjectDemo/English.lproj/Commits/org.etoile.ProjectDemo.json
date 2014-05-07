@@ -111,7 +111,13 @@
 		"drop":
 		{
 			"type": "copy",
-			"shortDescription": "Drop items"
+			"shortDescription": "Drag \"%@\" from \"%@\" to \"%@\""
+		},
+		
+		"drop-copy":
+		{
+			"type": "copy",
+			"shortDescription": "Drag a copy of \"%@\" from \"%@\" to \"%@\""
 		},
 		
 		"draw-shape":

@@ -584,6 +584,27 @@ static NSString *implode(NSArray *array, NSString *separator)
 						   pasteCopy: [info draggingSourceOperationMask] == NSDragOperationCopy];
 }
 
+- (NSArray *) commitDescriptorArgsForItem: (OutlineItem *)outlineItem
+								oldParent: (OutlineItem *)oldParent
+								newParent: (OutlineItem *)newParent
+{
+	NSString *itemLabel = [outlineItem label];
+	
+	NSString *fromLabel = [oldParent label];
+	if ([oldParent parent] == nil)
+	{
+		fromLabel = [[oldParent persistentRoot] name];
+	}
+	
+	NSString *toLabel = [newParent label];
+	if ([newParent parent] == nil)
+	{
+		toLabel = [[newParent persistentRoot] name];
+	}
+	
+	return @[itemLabel, fromLabel, toLabel];
+}
+
 - (BOOL) pasteFromPasteboard: (NSPasteboard *)pasteboard atItem:(id)newParent childIndex:(NSInteger)index pasteLink: (BOOL)pasteLink pasteCopy: (BOOL)pasteCopy
 {
 	if (nil == newParent) { newParent = [self rootObject]; }
@@ -646,12 +667,17 @@ static NSString *implode(NSArray *array, NSString *separator)
 	
 	for (OutlineItem *outlineItem in outlineItems)
 	{
+		OutlineItem *oldParent = [outlineItem parent];
+	
+		NSArray *commitDescriptorArgs = [self commitDescriptorArgsForItem: outlineItem
+																oldParent: oldParent
+																newParent: newParent];
+		
         if ([[outlineItem persistentRoot] isEqual: self.persistentRoot]
 			&& !pasteCopy)
         {
 			// Move within persistent root
-			
-            OutlineItem *oldParent = [outlineItem parent];
+			         
             NSUInteger oldIndex = [[oldParent contents] indexOfObject: outlineItem];
             
             NSLog(@"Dropping %@ from %@", [outlineItem label], [oldParent label]);
@@ -667,12 +693,14 @@ static NSString *implode(NSArray *array, NSString *separator)
                 [oldParent removeItemAtIndex: oldIndex];
                 [newParent addItem: outlineItem atIndex: insertionIndex++];
             }
-            
-            [self commitWithIdentifier: @"drop"];
+			
+			[self commitWithIdentifier: @"drop" descriptionArguments: commitDescriptorArgs];
         }
         else
         {
-            // User dragged cross-peristent root
+            // User dragged cross-peristent root, or pasted a copy
+			
+			NSString * const commitDescriptor = pasteCopy ? @"drop-copy" : @"drop";
             
             COCopier *copier = [[COCopier alloc] init];
 			
@@ -690,7 +718,7 @@ static NSString *implode(NSArray *array, NSString *separator)
 			if (![[self class] isProjectUndo])
 			{
 				// Only commit the source and destination persistent roots separately if we're in "document undo" mode
-				[self commitWithIdentifier: @"drop"];
+				[self commitWithIdentifier: commitDescriptor descriptionArguments: commitDescriptorArgs];
 			}
             
             // Remove from source
@@ -710,13 +738,13 @@ static NSString *implode(NSArray *array, NSString *separator)
 			if (![[self class] isProjectUndo])
 			{
 				// Only commit the source and destination persistent roots separately if we're in "document undo" mode
-				[sourceController commitWithIdentifier: @"drop"];
+				[sourceController commitWithIdentifier: commitDescriptor descriptionArguments: commitDescriptorArgs];
 			}
 			else
 			{
 				// Commit both persistent roots in one commit
-				[self.editingContext commitWithIdentifier: @"org.etoile.ProjectDemo.drop"
-												 metadata: @{}
+				[self.editingContext commitWithIdentifier: [@"org.etoile.ProjectDemo." stringByAppendingString: commitDescriptor]
+												 metadata: @{ kCOCommitMetadataShortDescriptionArguments : commitDescriptorArgs}
 												undoTrack: [self undoTrack]
 													error: NULL];
 			}
