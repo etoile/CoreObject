@@ -29,6 +29,8 @@
 		667A9A9018A5A34E009A2F0E /* document_stroke.icns in Resources */ = {isa = PBXBuildFile; fileRef = 667A9A8F18A5A34E009A2F0E /* document_stroke.icns */; };
 		668E942318D57C1400531C43 /* EWUndoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 668E942218D57C1400531C43 /* EWUndoManager.m */; };
 		66A080F118C7C1A50008739A /* EWTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 66A080F018C7C1A50008739A /* EWTableView.m */; };
+		66A4840B191AF24F00D28106 /* Preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66A48408191AF24F00D28106 /* Preferences.xib */; };
+		66A4840C191AF24F00D28106 /* PreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66A4840A191AF24F00D28106 /* PreferencesController.m */; };
 		66B7DB3518A96FD200010BCB /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 663EFD9318A180170030BD2F /* CoreObject.framework */; };
 		66B7DB3618A96FD400010BCB /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66B7DB2C18A96F9100010BCB /* EtoileFoundation.framework */; };
 		66B7DB3718A96FD900010BCB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 663EFD2C18A17E270030BD2F /* Cocoa.framework */; };
@@ -190,6 +192,9 @@
 		668E942218D57C1400531C43 /* EWUndoManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWUndoManager.m; path = ../CommonUI/EWUndoManager.m; sourceTree = "<group>"; };
 		66A080EF18C7C1A50008739A /* EWTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWTableView.h; sourceTree = SOURCE_ROOT; };
 		66A080F018C7C1A50008739A /* EWTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWTableView.m; sourceTree = SOURCE_ROOT; };
+		66A48408191AF24F00D28106 /* Preferences.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Preferences.xib; sourceTree = SOURCE_ROOT; };
+		66A48409191AF24F00D28106 /* PreferencesController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreferencesController.h; sourceTree = SOURCE_ROOT; };
+		66A4840A191AF24F00D28106 /* PreferencesController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreferencesController.m; sourceTree = SOURCE_ROOT; };
 		66B7DB1C18A96F2900010BCB /* EtoileFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EtoileFoundation.framework; path = "../../../../../../../../Library/Developer/Xcode/DerivedData/Typewriter-ewqruishaxmvlhhefeyihtxobbmk/Build/Products/Debug/EtoileFoundation.framework"; sourceTree = "<group>"; };
 		66B7DB2218A96F9100010BCB /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = ../../../EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
 		66BA3D5618DA81FE00641D40 /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = TODO.md; sourceTree = SOURCE_ROOT; };
@@ -276,6 +281,9 @@
 				662599F118B5776300235B65 /* PrioritySplitViewDelegate.m */,
 				663EFD7318A17FB30030BD2F /* EWTypewriterWindowController.h */,
 				663EFD7418A17FB30030BD2F /* EWTypewriterWindowController.m */,
+				66A48408191AF24F00D28106 /* Preferences.xib */,
+				66A48409191AF24F00D28106 /* PreferencesController.h */,
+				66A4840A191AF24F00D28106 /* PreferencesController.m */,
 				663EFD7718A17FB30030BD2F /* main.m */,
 				663EFD7818A17FB30030BD2F /* Typewriter-Info.plist */,
 				663EFD7918A17FB30030BD2F /* Typewriter-Prefix.pch */,
@@ -512,6 +520,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				665880BC18F31BB1004B03D6 /* DiffWindow.xib in Resources */,
+				66A4840B191AF24F00D28106 /* Preferences.xib in Resources */,
 				663EFD7E18A17FB30030BD2F /* MainMenu.xib in Resources */,
 				664CC9E818A4607F002F04B7 /* Commits in Resources */,
 				663EFD7D18A17FB30030BD2F /* InfoPlist.strings in Resources */,
@@ -548,6 +557,7 @@
 				66EDFEDB18ACA7BC00B29CFE /* EWNoteListDataSource.m in Sources */,
 				663EFD8018A17FB30030BD2F /* EWAppDelegate.m in Sources */,
 				662599F218B5776300235B65 /* PrioritySplitViewDelegate.m in Sources */,
+				66A4840C191AF24F00D28106 /* PreferencesController.m in Sources */,
 				66EDFEC318ABFF9E00B29CFE /* EWUtilityWindowController.m in Sources */,
 				663EFD8618A17FB30030BD2F /* main.m in Sources */,
 				663EFD8318A17FB30030BD2F /* EWTextView.m in Sources */,

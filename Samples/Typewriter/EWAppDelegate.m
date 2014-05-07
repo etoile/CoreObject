@@ -99,4 +99,15 @@
 	[utilityWindowControllers removeObject: aController];
 }
 
+- (IBAction) orderFrontPreferences: (id)sender
+{
+	prefsController = [[PreferencesController alloc] init];
+	[prefsController showWindow: nil];
+}
+
+- (void) clearUndo
+{
+	[windowController.undoTrack clear];
+}
+
 @end
