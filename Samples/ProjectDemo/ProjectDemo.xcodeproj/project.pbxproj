@@ -94,6 +94,8 @@
 		668E941318D579CF00531C43 /* History.xib in Resources */ = {isa = PBXBuildFile; fileRef = 668E940C18D579CF00531C43 /* History.xib */; };
 		668E941418D579CF00531C43 /* Undo.xib in Resources */ = {isa = PBXBuildFile; fileRef = 668E940D18D579CF00531C43 /* Undo.xib */; };
 		66A313611828C5CA00CE0B0D /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 66A3135F1828C5CA00CE0B0D /* Commits */; };
+		66A48425191AF6EB00D28106 /* EtoileFoundation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 664697FF17CFF8A200A1B767 /* EtoileFoundation.framework */; };
+		66A48426191AF6F000D28106 /* CoreObject.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 664697EA17CFF7FD00A1B767 /* CoreObject.framework */; };
 		66C33D71128F395400E5B15B /* ItemReference.m in Resources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66C33D90128F449400E5B15B /* ItemReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66C3F7F1183EB6BA0044F5E1 /* EWDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3F7F0183EB6BA0044F5E1 /* EWDocumentWindowController.m */; };
@@ -227,6 +229,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				66A48426191AF6F000D28106 /* CoreObject.framework in CopyFiles */,
+				66A48425191AF6EB00D28106 /* EtoileFoundation.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1333,6 +1337,7 @@
 					/usr/include/libxml2,
 				);
 				INFOPLIST_FILE = "ProjectDemo-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/XMPPFramework/Vendor/libidn",
@@ -1353,6 +1358,7 @@
 					/usr/include/libxml2,
 				);
 				INFOPLIST_FILE = "ProjectDemo-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/XMPPFramework/Vendor/libidn",
