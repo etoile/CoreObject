@@ -44,6 +44,18 @@
 					 gives: @"abbc"];
 }
 
+// FIXME: Support this case
+#if 0
+- (void) testMergeOverlappingDeletions
+{
+	[self checkMergingBase: @"abcd"
+			   withBranchA: @"abc"
+			   withBranchB: @""
+					 gives: @""];
+}
+#endif
+
+
 - (void) testMergeConflictingInserts
 {
 	COObjectGraphContext *ctx1 = [self makeAttributedString];
