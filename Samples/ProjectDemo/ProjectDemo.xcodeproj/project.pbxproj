@@ -96,6 +96,7 @@
 		66A313611828C5CA00CE0B0D /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 66A3135F1828C5CA00CE0B0D /* Commits */; };
 		66A48425191AF6EB00D28106 /* EtoileFoundation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 664697FF17CFF8A200A1B767 /* EtoileFoundation.framework */; };
 		66A48426191AF6F000D28106 /* CoreObject.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 664697EA17CFF7FD00A1B767 /* CoreObject.framework */; };
+		66BC6A21191C50A200AD08F7 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 66BC6A1F191C50A200AD08F7 /* Localizable.strings */; };
 		66C33D71128F395400E5B15B /* ItemReference.m in Resources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66C33D90128F449400E5B15B /* ItemReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66C3F7F1183EB6BA0044F5E1 /* EWDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3F7F0183EB6BA0044F5E1 /* EWDocumentWindowController.m */; };
@@ -401,6 +402,7 @@
 		6698320312691F970011C7FC /* SCRATCHPAD */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = SCRATCHPAD; sourceTree = "<group>"; };
 		66A313601828C5CA00CE0B0D /* English */ = {isa = PBXFileReference; lastKnownFileType = folder; name = English; path = English.lproj/Commits; sourceTree = "<group>"; };
 		66A313621828C5D600CE0B0D /* org.etoile.ProjectDemo.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = org.etoile.ProjectDemo.json; path = English.lproj/Commits/org.etoile.ProjectDemo.json; sourceTree = "<group>"; };
+		66BC6A20191C50A200AD08F7 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		66C33D6F128F395400E5B15B /* ItemReference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ItemReference.h; sourceTree = "<group>"; };
 		66C33D70128F395400E5B15B /* ItemReference.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ItemReference.m; sourceTree = "<group>"; };
 		66C33DEF1290BC7700E5B15B /* SKTCircle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SKTCircle.h; sourceTree = "<group>"; };
@@ -482,6 +484,7 @@
 		29B97314FDCFA39411CA2CEA /* ObjectMerging */ = {
 			isa = PBXGroup;
 			children = (
+				66BC6A1F191C50A200AD08F7 /* Localizable.strings */,
 				6646988617D407A000A1B767 /* AppKit.framework */,
 				664697F517CFF8A100A1B767 /* EtoileFoundation.xcodeproj */,
 				664697DF17CFF7FC00A1B767 /* CoreObject.xcodeproj */,
@@ -1173,6 +1176,7 @@
 				79F122AB128A48DF00EC0255 /* edit-undo.tiff in Resources */,
 				79F122B1128A49FE00EC0255 /* history.tiff in Resources */,
 				79F122C4128A4B7800EC0255 /* format-indent-less.tiff in Resources */,
+				66BC6A21191C50A200AD08F7 /* Localizable.strings in Resources */,
 				79F122C5128A4B7800EC0255 /* format-indent-more.tiff in Resources */,
 				79F122C6128A4B7800EC0255 /* list-add.tiff in Resources */,
 				66C33D71128F395400E5B15B /* ItemReference.m in Resources */,
@@ -1320,6 +1324,14 @@
 				66A313601828C5CA00CE0B0D /* English */,
 			);
 			name = Commits;
+			sourceTree = "<group>";
+		};
+		66BC6A1F191C50A200AD08F7 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				66BC6A20191C50A200AD08F7 /* English */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

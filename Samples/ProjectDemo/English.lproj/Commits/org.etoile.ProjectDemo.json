@@ -123,31 +123,31 @@
 		"draw-shape":
 		{
 			"type": "creation",
-			"shortDescription": "Draw shape"
+			"shortDescription": "Draw %@"
 		},
 		
 		"resize-shape":
 		{
 			"type": "modification",
-			"shortDescription": "Resize shape"
+			"shortDescription": "Resize %@"
 		},
 		
 		"move-shape":
 		{
 			"type": "modification",
-			"shortDescription": "Move shape"
+			"shortDescription": "Move %@"
 		},
 		
 		"change-shape-color":
 		{
 			"type": "modification",
-			"shortDescription": "Change color of shape"
+			"shortDescription": "Change color of %@"
 		},
 
 		"delete-shape":
 		{
 			"type": "deletion",
-			"shortDescription": "Delete shape"
+			"shortDescription": "Delete %@"
 		},
 		
 		"insert-text":

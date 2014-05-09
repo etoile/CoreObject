@@ -366,6 +366,32 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
     _verticalRulerLineRect = NSZeroRect;
 }
 
+- (NSArray *)descriptionArgsForGraphic: (SKTGraphic *)graphic
+{
+	NSString *localized = NSLocalizedString(NSStringFromClass([graphic class]), @"");
+
+	if (localized == nil)
+		localized = @"Shape";
+	
+	return @[localized];
+}
+
+- (NSArray *)descriptionArgsForGraphics: (NSArray *)graphics
+{
+	if ([graphics count] == 0)
+	{
+		return @[@"No Shapes"];
+	}
+	else if ([graphics count] == 1)
+	{
+		return [self descriptionArgsForGraphic: graphics[0]];
+	}
+	else
+	{
+		return @[@"Multiple Shapes"];
+	}
+}
+
 - (void)createGraphicOfClass:(Class)theClass withEvent:(NSEvent *)theEvent {
     SKTDrawDocument *document = [self drawDocument];
     _creatingGraphic = [[theClass alloc] initWithObjectGraphContext: [document objectGraphContext]];
@@ -375,7 +401,8 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
         if ([_creatingGraphic isEditable]) {
             [self startEditingGraphic:_creatingGraphic withEvent:nil ];
         }
-        [_drawingController commitWithIdentifier: @"draw-shape"];
+        [_drawingController commitWithIdentifier: @"draw-shape"
+							descriptionArguments: [self descriptionArgsForGraphic: _creatingGraphic]];
     }
 	else
 	{
@@ -423,7 +450,8 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
 
     [graphic stopBoundsManipulation];
 
-    [_drawingController commitWithIdentifier: @"resize-shape"];
+    [_drawingController commitWithIdentifier: @"resize-shape"
+						descriptionArguments: [self descriptionArgsForGraphic: graphic]];
 }
 
 - (void)rubberbandSelectWithEvent:(NSEvent *)theEvent {
@@ -549,7 +577,8 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
 
         if (didMove) {
             // Only if we really moved.
-            [_drawingController commitWithIdentifier: @"move-shape"];
+            [_drawingController commitWithIdentifier: @"move-shape"
+								descriptionArguments: [self descriptionArgsForGraphics: selGraphics]];
         }
     }
 }
@@ -811,7 +840,8 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
             [curGraphic setFillColor:color];
             [curGraphic setDrawsFill:YES];
         }
-        [_drawingController commitWithIdentifier: @"change-shape-color"];
+        [_drawingController commitWithIdentifier: @"change-shape-color"
+							descriptionArguments: [self descriptionArgsForGraphics: selGraphics]];
     }
 }
 
@@ -829,7 +859,8 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
     if ([selCopy count] > 0) {
         [[self drawDocument] performSelector:@selector(removeGraphic:) withEachObjectInArray:selCopy];
 
-        [_drawingController commitWithIdentifier: @"delete-shape"];
+        [_drawingController commitWithIdentifier: @"delete-shape"
+							descriptionArguments: [self descriptionArgsForGraphics: selCopy]];
     }
 }
 
