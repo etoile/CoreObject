@@ -23,7 +23,8 @@ Code Organization
 
 - Use #pragma mark Accessing All Persistent Roots - in @implementation 
 
-- Use \n\n/** @taskunit Accessing All Persistent Roots */\n\n in @interface
+- Use /** @taskunit Accessing All Persistent Roots */ in @interface (put two 
+blank lines before and two other ones after)
 
 
 Control Flow
@@ -75,10 +76,10 @@ Initialization
 - Use SUPERINIT macro (for calling the superclass -init), otherwise use this 
 pattern:
 
-	self = [super designedInitializedWithArgument: arg];
-	if (self == nil)
-		return nil;
-	
+		self = [super designedInitializedWithArgument: arg];
+		if (self == nil)
+			return nil;
+
 - Always override -init to call the designated initializer (raising an exception 
 is better than returning an invalid object if -init is unsupported)
 
@@ -149,7 +150,7 @@ retain attributes
 
 - readwrite must be used for properties not declared as readonly
 
-- the ordering must be <atomicity>, <writability>, <memory-management>
+- the ordering must be: atomicity, writability, memory-management
 
 ### Examples
 
@@ -165,7 +166,7 @@ retain attributes
 
 	@property (nonatomic, readonly, weak) id owner;
 	@property (nonatomic, readonly) id derivedOwner;
-	@property (nonatomic, readonly, strong) id derivedOwner;
+	@property (nonatomic, readonly, strong) id owned;
 
 	@property (nonatomic, readwrite, copy) NSString *name;
 	@property (nonatomic, readwrite, copy) NSDictionary *elementsByName;
@@ -188,10 +189,10 @@ Blocks
 
 - Blocks in argument should be written be split on several lines:
 
-    return [collection filteredCollectionWithBlock: ^(id obj)
-	{
-		return (BOOL)![obj isDeleted];
-	}];
+		return [collection filteredCollectionWithBlock: ^(id obj)
+		{
+			return (BOOL)![obj isDeleted];
+		}];
 	
 Take note that the opening brace must be on a newline.
 
@@ -203,15 +204,15 @@ Take note that the opening brace must be on a newline.
 
 - Block variable
 
-	NSObject * (^blockVar)(id, NSDictionary *) = ^(id object, NSDictionary *bindings) 
-	{
-		// whatever
-	};
+		NSObject * (^blockVar)(id, NSDictionary *) = ^(id object, NSDictionary *bindings) 
+		{
+			// whatever
+		};
 
 - Block typedef
 
-	typedef NSArray * (^COContentBlock)(void);
+		typedef NSArray * (^COContentBlock)(void);
 
 - Block type used as argument type (but it's better to use a block typedef usually)
 
-	+ (id)actionWithBlock: (NSObject * (^)(id object, NSDictionary *bindings))aBlock;
+		+ (id)actionWithBlock: (NSObject * (^)(id object, NSDictionary *bindings))aBlock;
