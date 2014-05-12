@@ -25,19 +25,19 @@ NSString * const COUndoTrackStoreTrackHeadCommandUUID;
 NSString * const COUndoTrackStoreTrackCurrentCommandUUID;
 
 @interface COUndoTrackSerializedCommand : NSObject
-@property (readwrite, nonatomic) id JSONData;
-@property (readwrite, nonatomic) NSDictionary *metadata;
-@property (readwrite, nonatomic) ETUUID *UUID;
-@property (readwrite, nonatomic) ETUUID *parentUUID;
-@property (readwrite, nonatomic) NSString *trackName;
-@property (readwrite, nonatomic) NSDate *timestamp;
-@property (readwrite, nonatomic) int64_t sequenceNumber;
+@property (nonatomic, readwrite, strong) id JSONData;
+@property (nonatomic, readwrite, strong) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy) ETUUID *UUID;
+@property (nonatomic, readwrite, copy) ETUUID *parentUUID;
+@property (nonatomic, readwrite, copy) NSString *trackName;
+@property (nonatomic, readwrite, copy) NSDate *timestamp;
+@property (nonatomic, readwrite, assign) int64_t sequenceNumber;
 @end
 
 @interface COUndoTrackState : NSObject <NSCopying>
-@property (readwrite, nonatomic) NSString *trackName;
-@property (readwrite, nonatomic) ETUUID *headCommandUUID;
-@property (readwrite, nonatomic) ETUUID *currentCommandUUID;
+@property (nonatomic, readwrite, copy) NSString *trackName;
+@property (nonatomic, readwrite, copy) ETUUID *headCommandUUID;
+@property (nonatomic, readwrite, copy) ETUUID *currentCommandUUID;
 @end
 
 @interface COUndoTrackStore : NSObject

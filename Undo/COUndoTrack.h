@@ -124,7 +124,7 @@ extern NSString * const kCOUndoTrackName;
  * For example, use this if you want to record the user's name
  * in revisions they commit using the undo track.
  */
-@property (nonatomic, readwrite) NSDictionary *customRevisionMetadata;
+@property (nonatomic, readwrite, copy) NSDictionary *customRevisionMetadata;
 
 /** @taskunit Clearing and Coalescing Commands */
 
