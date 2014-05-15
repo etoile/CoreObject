@@ -44,7 +44,7 @@
 					 gives: @"abbc"];
 }
 
-// FIXME: Support this case
+// FIXME: Support these cases
 #if 0
 - (void) testMergeOverlappingDeletions
 {
@@ -53,8 +53,15 @@
 			   withBranchB: @""
 					 gives: @""];
 }
-#endif
 
+- (void) testMergeBothSidesDelete
+{
+	[self checkMergingBase: @"abcd"
+			   withBranchA: @"ad"
+			   withBranchB: @"ad"
+					 gives: @"ad"];
+}
+#endif
 
 - (void) testMergeConflictingInserts
 {
