@@ -347,17 +347,17 @@
 	<script src="js/jquery.magnific-popup.js"></script>
 
 	<script type="text/javascript">
+$(document).on('click', '.navbar-collapse.in', function(e)
+{
+    if ($(e.target).is('a'))
+	{
+        $(this).collapse('hide');
+    }
+});
 $(document).ready(function()
 {
 	$('#menu').onePageNav({
-		currentClass: 'active',
-		begin: function() {
-        	// Hack so you can click other menu items after the initial click
-        	$('body').append('<div id="device-dummy" style="height: 1px;"></div>');
-    	},
-    	end: function() {
-        	$('#device-dummy').remove();
-    	}
+		currentClass: 'active'
 	});
 });
 	</script>
