@@ -633,15 +633,22 @@ img
 }
 
 #splashline
-{
-	padding-top: 30px;
-	padding-bottom: 30px;
+{	
+    padding-bottom: 30px;
 
 	text-align: right;
 	font-family: 'Raleway', sans-serif;
 	font-weight: 400;
 	font-size: 1em;
 	color: #585858;
+}
+
+@media (min-width: 992px)
+{
+    #splashline
+    {
+        padding: 30px;
+    }
 }
 
 @media (max-width: 992px) 
@@ -708,9 +715,15 @@ img
 .videoline
 {
 	padding-top: 30px;
-	padding-bottom: 50px;
-
 	text-align: center;
+}
+
+@media (min-width: 768px)
+{
+    .videoline
+    {
+        padding: 30px;
+    }
 }
 
 #video .container
@@ -726,8 +739,16 @@ img
 
 	font-family: 'Raleway', sans-serif;
 	font-weight: 200;
-	font-size: 1.3em;
+	font-size: 1.0em;
 	color: #585858;
+}
+
+@media (min-width: 768px)
+{
+    .container .videoline a:link, .container .videoline a:hover
+    {
+        font-size: 1.3em;
+    }
 }
 
 .videoline .glyphicon
