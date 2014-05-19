@@ -129,5 +129,35 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
+	
+	<!-- One Page Nav  -->
+	<!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>-->
+	<script type="text/javascript" charset="utf-8" src="js/jquery.scrollTo.js"></script>
+	<script type="text/javascript" charset="utf-8" src="js/one-page-nav/jquery.nav.js"></script>
+
+	<script type="text/javascript">
+$(document).on('click', '.navbar-collapse.in', function(e)
+{
+    if ($(e.target).is('a'))
+	{
+        $(this).collapse('hide');
+    }
+});
+$(document).ready(function()
+{
+	$('#menu').onePageNav({
+		currentClass: 'active',
+		scrollOffset: -50,
+		begin: function() {
+        	// Hack so you can click other menu items after the initial click
+        	$('body').append('<div id="device-dummy" style="height: 1px;"></div>');
+    	},
+    	end: function() {
+        	$('#device-dummy').remove();
+    	}
+	});
+});
+	</script>
+	
   </body>
 </html>
