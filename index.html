@@ -354,10 +354,14 @@ $(document).on('click', '.navbar-collapse.in', function(e)
         $(this).collapse('hide');
     }
 });
+
+$('html, body').hide();
+
 $(document).ready(function()
 {
 	$('#menu').onePageNav({
 		currentClass: 'active',
+		changeHash: true,
 		scrollOffset: -50,
 		begin: function() {
         	// Hack so you can click other menu items after the initial click
@@ -367,6 +371,25 @@ $(document).ready(function()
         	$('#device-dummy').remove();
     	}
 	});
+
+	// For a navbar link clicked on another page e.g. contact.html, we want to
+	// smooth scroll to the anchor as OnePageNav does inside the main page.
+	if (location.hash)
+	{
+		setTimeout(function() {
+			// For $('html, body').scrollTop(0).show(), Firefox doesn't report 
+			// the hash location as scrollPosition and not 0 as it should.
+			$('html, body').show();
+			$('html, body').scrollTop(0);
+			$('html,body').animate({
+				scrollTop: $(location.hash).offset().top - 50
+			}, 1000);
+		}, 0);
+	}
+	else
+	{
+		$('html, body').show();
+	}
 });
 	</script>
 
