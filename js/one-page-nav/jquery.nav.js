@@ -161,7 +161,10 @@
 				self.scrollTo(newLoc, function() {
 					//Do we need to change the hash?
 					if(self.config.changeHash) {
+						// $('html, body').scrollTop() doesn't work  with WebKit
+						var scrollPosition = $(window).scrollTop();
 						window.location.hash = newLoc;
+						$('html, body').scrollTop(scrollPosition);
 					}
 
 					//Add the auto-adjust on scroll back in
