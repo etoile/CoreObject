@@ -358,7 +358,14 @@ $(document).ready(function()
 {
 	$('#menu').onePageNav({
 		currentClass: 'active',
-		scrollOffset: -50
+		scrollOffset: -50,
+		begin: function() {
+        	// Hack so you can click other menu items after the initial click
+        	$('body').append('<div id="device-dummy" style="height: 1px;"></div>');
+    	},
+    	end: function() {
+        	$('#device-dummy').remove();
+    	}
 	});
 });
 	</script>
