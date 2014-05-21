@@ -411,7 +411,7 @@
 - (IBAction) branch: (id)sender
 {
     COBranch *branch = [self.editingBranch makeBranchWithLabel: @"Untitled"];
-    [self.persistentRoot setCurrentBranch: branch];
+	self.pinnedBranch = branch;
     [self commitWithIdentifier: @"add-branch" descriptionArguments: @[ branch.label ]];
 }
 
