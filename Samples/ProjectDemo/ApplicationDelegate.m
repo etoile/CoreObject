@@ -224,15 +224,17 @@
 		
 		ETAssert(proot.isCopy);
 		
+		COPersistentRoot *parent = proot.parentPersistentRoot;
 		// FIXME: This is a private method. The ability to create a branch at an arbitrary
 		// revision should probably be exposed by COPersistentRoot
-		COBranch *reattachedBranch = [proot.parentPersistentRoot makeBranchWithLabel: proot.name
+		COBranch *reattachedBranch = [parent makeBranchWithLabel: proot.name
 																		  atRevision: proot.currentRevision
 																		parentBranch: nil];
 		
 		proot.deleted = YES;
 		
 		[context commit];
+		[self  controllerForPersistentRoot: parent].pinnedBranch = reattachedBranch;
 	}
 }
 
