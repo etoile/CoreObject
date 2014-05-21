@@ -1,33 +1,6 @@
 TODO
 ====
 
-First alpha release blockers
-----------------------------
-
-- Check and update all Core, Model, Undo and Utilities API documentation (underway)
-
-    - talk about how we automatically synchronize COEditingContexts (in the same process or different processes), we should explicitly talk about cross references
-
-    - talk about change notifications in the class descriptions. mention the notifications we support for each class description.
-
-
-	- Already reviewed classes
-
-		- Core: COObjectGraphContext, COEditingContext, COBranch, CORevision, COQuery
-		- Model: all
-		- Undo: all 
-		- Utitilies: none
-		- Storage Data Model: all (not fully documented though)
-
-- Check code quality for all Core classes (underway)
-
-	- Already reviewed classes: COObjectGraphContext, COEditingContext, COBranch
-
-- Finish ProjectDemo features needed for a demo; record a demo video
-
-- Update website
-
-
 Major Missing Features
 ----------------------
 
@@ -439,6 +412,18 @@ the following situations at least:
 
   - Once all COCommand class hierarchy appear in the API documentation, their @group should be changed to 'Undo Actions' to ensure COUndoTrack and COTrack don't get lost among all these subclasses.
 
+  - Check and update all Core, Model, Undo and Utilities API documentation (underway)
+
+    - Reviewed classes
+      - Core: COObjectGraphContext, COEditingContext, COBranch, CORevision, COQuery
+      - Model: all
+      - Undo: all, but needs to be checked again due to Undo-tree rewrite
+	  - Utilities: none
+
+    - talk about how we automatically synchronize COEditingContexts (in the same process or different processes), we should explicitly talk about cross references
+
+    - talk about change notifications in the class descriptions. mention the notifications we support for each class description.
+
 
 - EtoileUI
 
@@ -448,3 +433,7 @@ the following situations at least:
 
   - Remove deprecated -type and -shortDescription in CORevision (all EtoileUI-based applications need to be check)
 
+
+- Code Quality
+
+	- Reviewed classes: none (COObjectGraphContext, COEditingContext, COBranch underwent a preliminary review)
