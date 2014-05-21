@@ -80,7 +80,9 @@
 	[self resetBranchesMenu];
 	[self resetBranchesCheckbox];
 	[self resetTitle];
-	
+
+	[self objectGraphDidChange];
+
 	_sharingDrawer = [[NSDrawer alloc] initWithContentSize: NSMakeSize(280, 100) preferredEdge: NSMaxXEdge];
 	_sharingDrawerViewController = [[SharingDrawerViewController alloc] initWithParent: self];
 	
