@@ -391,6 +391,7 @@ the following situations at least:
     - what else?
  
   - Write commit descriptor tests (localization is untested at this time)
+  - Implement .strings file loading (required for localization)
 	
   - Implement copying commit descriptor plist and string files to ~/Library/CoreObject/Commits, in order to support browsing changes done by applications uninstalled from the system
   - Integrate COCommitDescriptor with Schema Upgrade 
@@ -418,7 +419,7 @@ the following situations at least:
       - Core: COObjectGraphContext, COEditingContext, COBranch, CORevision, COQuery
       - Model: all
       - Undo: all, but needs to be checked again due to Undo-tree rewrite
-	  - Utilities: none
+      - Utilities: COCommitDescriptor
 
     - talk about how we automatically synchronize COEditingContexts (in the same process or different processes), we should explicitly talk about cross references
 

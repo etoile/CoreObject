@@ -19,13 +19,60 @@
  * Each commit descriptor describes a persistent change or operation. A 
  * persistent change is usually bound to a user action. 
  *
- * Commit descriptors must be registered at the application launch, before 
- * giving the control to the user. For example, on 
- * -[NSApplicationDelegate applicationDidFinishLaunching:] (explain how they 
- * can be automatically registered by declaring in a .json file).
+ * @section Registration
  *
- * For committing localizable metadatas, pass -[COCommitDescriptor identifier]
- * to COEditingContext commit methods:
+ * Commit descriptors are automatically registered at the application launch, 
+ * before giving the control to the user. COCommitDescriptor searches all the 
+ * bundles (this includes the main bundle and framework bundles), for 'Commits' 
+ * directories in the Resources directory, and loads the .json files inside.
+ *
+ * To register commit descriptors, you bundle them as JSON files along the 
+ * CoreObject model. Each JSON file name must be in the reverse DNS scheme. 
+ * To take an example, for an 'Object Manager' application, put 
+ * <em>org.etoile-project.ObjectManager.json</em>  in 'Object Manager.app/English.lproj/Commits'.
+ *
+ * @section JSON Schema
+ *
+ * The JSON format must contain two dictionaries:
+ *
+ * <deflist>
+ * <term>types</term><desc>Commit types -> Commit type descriptions</desc>
+ * <term>descriptors</term><desc>Commit names -> Commit 
+ * descriptor objects</desc>
+ * </deflist>
+ *
+ * A commit identifier contains two parts: <em>the commit domain</em> (the JSON 
+ * document name minus the .json suffix) + <em>the commit name</em>. For a more 
+ * detailed explanation, see -identifier.
+ *
+ * Here is a more detailed schema where placeholder elements are prefixed with $:
+ * 
+ * <example>
+ * // For dictionary keys declared with a placeholder element, this means the key-value 
+ * // pair in the schema can be instantiated multiple times in the final JSON document.
+ * {
+ * 	"types" (string - required): 
+ * 	{ 
+ * 		$commit-type (string): $type-description (string), 
+ * 	},
+ * 	"descriptors" (string - required): 
+ *	{
+ *		$commit-name (string):
+ * 		{
+ *			"type" (string - required): $commit-type,
+ * 			"shortDescription" (string - required) : $commit-description,
+ *		},
+ *	},
+ * }
+ * </example>
+ *
+ * For a concrete example, check this
+ * (JSON document)[https://github.com/etoile/ObjectManager/blob/master/English.lproj/Commits/org.etoile-project.ObjectManager.json].
+ *
+ * @section Commit Integration
+ *
+ * For committing localizable metadatas, pass the -identifier to 
+ * COEditingContext commit methods:
  *
  * <example>
  * NSString *objType = @"Folder";
@@ -40,16 +87,46 @@
  * </example>
  *
  * For the previous example, the commit short description is going to be 
- * "Create New Folder" based on a localizable template "Create New %@" provided 
- * in a .strings file.
+ * <em>Create New Folder</em> based on a localizable template <em>Create New 
+ * %@</em> provided in a .json file (or a .strings file if localized).
+ *
+ * @section Localization
  *
  * Localized descriptions that appear in the UI are transient metadata and are 
  * not included in the committed metadata. The CoreObject store doesn't contain 
  * them, but -[COCommitDescriptor shortDescription] can recreate them at 
- * run-time by combining -[CORevision metadata] and localized strings (explain a 
- * bit more... e.g.format for .string files and how they are located).
+ * run-time by combining -[CORevision metadata] and localized strings.
  *
- * You can use  -[ETPropertyDescription setPersistencyDescriptor:] (not yet 
+ * You can add a 'Commits' directory in each Language directory (e.g. 
+ * French.lproj), and put .strings files in it. Each .strings file should use 
+ * the same name than the .json file it translates.
+ *
+ * These .strings files can contain keys that represent a key path in the 
+ * JSON document, the value side contains the translation. For now, two 
+ * COCommitDescriptor properties are localizable:
+ *
+ * <deflist>
+ * <term>-typeDescription</term><desc>types/<em>$commit-type</em>/TypeDescription</desc>
+ * <term>-shortDescription</term><desc>descriptors/<em>$commit-name</em>/ShortDescription</desc>
+ * </deflist>
+ *
+ * In the .strings file, valid keys are based on these template keys. For example:
+ *
+ * <example>
+ * // TODO: Link the ObjectManager .strings file rather than including this example.
+ *
+ * types/create/TypeDescrition = "Object Creation";
+ * types/delete/TypeDescription = "Object Deletion";
+ * descriptors/group-creation/ShortDescription = "Created a new group named %@";
+ * descriptors/group-deletion/ShortDescription = "Deleted group named %@";
+ * descriptors/library-creation/ShortDescription = "Created a new library named %@";
+ * </example>
+ *
+ * Note: Loading the .strings files is not yet implemented.
+ *
+ * @section Metamodel Integration
+ *
+ * You can use  -[ETPropertyDescription setCommitDescriptor:] (not yet 
  * implemented) to attach a commit descriptor to the metamodel, then retrieve it 
  * at a commit time.
  */
