@@ -97,8 +97,7 @@
 
 /**
  * @group Query
- *
- * Protocol to search objects directly in memory with COQuery.
+ * @abstract Protocol to search objects directly in memory with COQuery.
  */
 @protocol COObjectMatching
 /**
