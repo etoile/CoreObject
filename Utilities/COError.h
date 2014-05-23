@@ -10,14 +10,12 @@
 
 /** 
  * @group Utilities
- * @abstract NSError subclass to report multiple errors
- *
- * COError is used to collect suberrors with -errors. A suberror can contain 
- * other suberrors.
+ * @abstract NSError subclass to report multiple errors or a validation result
  *
  * <list>
- * <item>An aggregate error contains -errors.</item>
- * <item>A validation error contains -validationResult.</item>
+ * <item>An aggregate error contains suberrors in -errors (a suberror can 
+ * contain other suberrors).</item>
+ * <item>A validation error contains a validation issue in -validationResult.</item>
  * </list>
  *
  * COError is used by CoreObject validation support such as 
