@@ -479,7 +479,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
                     metadata: (NSDictionary *)additionalMetadata
 				   undoTrack: (COUndoTrack *)undoTrack
-                       error: (NSError **)anError;
+                       error: (COError **)anError;
 /**
  * Commits this persistent root changes to the store and returns whether it 
  * succeeds.

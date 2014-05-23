@@ -53,7 +53,7 @@
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
 restrictedToPersistentRoots: (NSArray *)persistentRoots
 			 withUndoTrack: (COUndoTrack *)track
-					 error: (NSError **)anError;
+					 error: (COError **)anError;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

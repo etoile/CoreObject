@@ -399,6 +399,8 @@ the following situations at least:
     - adjust to support versioned descriptors 
     - multiple commit descriptor versions can present per domain in ~/Library/CoreObject/Commits
 
+  - COError API will probably need adjustements once we report more errors through the core API (for now, we just report validation errors at commit time) 
+
 
 - Documentation
 
@@ -419,7 +421,7 @@ the following situations at least:
       - Core: COObjectGraphContext, COEditingContext, COBranch, CORevision, COQuery
       - Model: all
       - Undo: all, but needs to be checked again due to Undo-tree rewrite
-      - Utilities: COCommitDescriptor
+      - Utilities: COCommitDescriptor, COError
 
     - talk about how we automatically synchronize COEditingContexts (in the same process or different processes), we should explicitly talk about cross references
 

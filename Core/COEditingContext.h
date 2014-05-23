@@ -11,6 +11,7 @@
 
 @class COSQLiteStore, COEditingContext, COPersistentRoot, COBranch, COObjectGraphContext, COObject;
 @class COUndoTrack, COCommandGroup, CORevisionCache;
+@class COError;
 
 /**
  * @group Core
@@ -300,7 +301,7 @@
  */
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
 				   undoTrack: (COUndoTrack *)undoTrack
-                       error: (NSError **)anError;
+                       error: (COError **)anError;
 /**
  * Commits the current changes to the store, bound to a commit descriptor 
  * identifier along the additional metadatas, and returns whether it 
@@ -308,6 +309,13 @@
  *
  * The metadata dictionary must be a valid property list or nil, otherwise a
  * serialization exception is raised.
+ *
+ * The changed objects are validated with -[COObject validate], and an aggregate 
+ * validation error per object is returned in <code>[anError errors]</code>. 
+ * For each aggregate validation error, -[COError errors] will return 
+ * validation suberrors. For example, 
+ * <code>[[[anError errors] firstObject] errors] mappedCollection] validationResult]</code> 
+ * returns validation issues that pertain to the first validated object.
  *
  * If the method returns NO, the error argument is set, otherwise it is nil.
  *
@@ -322,7 +330,7 @@
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
 					metadata: (NSDictionary *)additionalMetadata
 				   undoTrack: (COUndoTrack *)undoTrack
-                       error: (NSError **)anError;
+                       error: (COError **)anError;
 /**
  * Commits the current changes to the store along the metadatas and returns 
  * whether it succeeds.
@@ -341,7 +349,7 @@
  */
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
 				 undoTrack: (COUndoTrack *)undoTrack
-                     error: (NSError **)anError;
+                     error: (COError **)anError;
 /**
  * Commits the current changes to the store and returns whether it succeeds.
  *

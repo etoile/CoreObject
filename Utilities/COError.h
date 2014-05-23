@@ -10,11 +10,21 @@
 
 /** 
  * @group Utilities
- * @abstract NSError subclass to collect and report validation results
+ * @abstract NSError subclass to report multiple errors
+ *
+ * COError is used to collect suberrors with -errors. A suberror can contain 
+ * other suberrors.
+ *
+ * <list>
+ * <item>An aggregate error contains -errors.</item>
+ * <item>A validation error contains -validationResult.</item>
+ * </list>
  *
  * COError is used by CoreObject validation support such as 
- * -[COObject validateForUpdate] and -[COEditingContext error] which reports 
- * errors related to the last commit attempt.
+ * -[COObject validate] and COEditingContext commit methods such as 
+ * -[COEditingContext commitWithIdentifier:metadata:undoTrack:error:].
+ *
+ * -[COError domain] returns kCOCoreObjectErrorDomain.
  */
 @interface COError : NSError
 {
@@ -54,16 +64,34 @@
 
 /**
  * Returns the suberrors.
+ *
+ * An error that reports a -validationResult will return always an empty array.
+ *
+ * When the suberrors are validation errors, -code returns   
+ * kCOValidationMultipleErrorsError.
  */
 @property (nonatomic, readonly) NSArray *errors;
 /**
- * Returns an validation result if the receiver is a validation error.
+ * Returns a validation result.
+ *
+ * An error that contains suberrors with -errors will always return nil.
+ *
+ * When the validation result is not nil, -code returns kCOValidationError.
  */
 @property (nonatomic, readonly) ETValidationResult *validationResult;
 
 @end
 
-
+/**
+ * The error domain to identity errors emitted by CoreObject itself, and not 
+ * some other layers such as Foundation or POSIX.
+ */
 extern NSString *kCOCoreObjectErrorDomain;
+/**
+ * See -[COError validationResult].
+ */
 extern NSInteger kCOValidationError;
+/**
+ * See -[COError errors].
+ */
 extern NSInteger kCOValidationMultipleErrorsError;

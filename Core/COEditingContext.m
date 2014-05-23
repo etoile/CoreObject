@@ -411,7 +411,7 @@
 #pragma mark Validation -
 
 /* Both COPersistentRoot or COEditingContext objects are valid arguments. */
-- (BOOL)validateChangedObjectsForContext: (id)aContext error: (NSError **)error
+- (BOOL)validateChangedObjectsForContext: (id)aContext error: (COError **)error
 {
 	NSMutableArray *validationErrors = [NSMutableArray array];
 
@@ -432,7 +432,7 @@
 
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
 				   undoTrack: (COUndoTrack *)undoTrack
-                       error: (NSError **)anError
+                       error: (COError **)anError
 {
 	return [self commitWithIdentifier: aCommitDescriptorId
 	                         metadata: nil
@@ -443,7 +443,7 @@
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
 					metadata: (NSDictionary *)additionalMetadata
 				   undoTrack: (COUndoTrack *)undoTrack
-                       error: (NSError **)anError
+                       error: (COError **)anError
 {
 	NILARG_EXCEPTION_TEST(aCommitDescriptorId);
 	INVALIDARG_EXCEPTION_TEST(additionalMetadata, [additionalMetadata containsKey: aCommitDescriptorId] == NO);
@@ -463,7 +463,7 @@
 
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
 				 undoTrack: (COUndoTrack *)undoTrack
-                     error: (NSError **)anError
+                     error: (COError **)anError
 {
 	return [self commitWithMetadata: metadata
 	    restrictedToPersistentRoots: [_loadedPersistentRoots allValues]
@@ -522,7 +522,7 @@
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
 restrictedToPersistentRoots: (NSArray *)persistentRoots
 			 withUndoTrack: (COUndoTrack *)track
-					 error: (NSError **)anError
+					 error: (COError **)anError
 {
 	if (_inCommit)
 	{

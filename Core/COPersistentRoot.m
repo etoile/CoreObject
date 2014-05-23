@@ -525,7 +525,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
 					metadata: (NSDictionary *)additionalMetadata
 				   undoTrack: (COUndoTrack *)undoTrack
-                       error: (NSError **)anError
+                       error: (COError **)anError
 {
 	NILARG_EXCEPTION_TEST(aCommitDescriptorId);
 	INVALIDARG_EXCEPTION_TEST(additionalMetadata,
