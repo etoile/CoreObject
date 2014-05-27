@@ -50,7 +50,8 @@ extern NSString * const kCOUndoTrackName;
  * <list>
  * <item>store structure history (represented as custom commands e.g. 
  * COCommandDeleteBranch etc.)</item>
- * <item>branch history (represented as COCommandNewRevisionForBranch)</item>
+ * <item>branch history (new revisions represented as 
+ * COCommandSetVersionForBranch)</item>
  * </list>
  *
  * Undo tracks can track all these changes or a subset per application or per 
