@@ -8,8 +8,6 @@
 #import <Foundation/Foundation.h>
 
 /**
- * @group Storage Data Model
- * @abstract
  * Each key/value pair of a COItem has a COType associated with it.
  *
  * The type defines the set of permissible values which can be set for
@@ -20,10 +18,13 @@
  * UUIDs, and the array has a restriction that its elements must be unique.
  *
  * COType is designed with a few things in mind:
- *  - being able to store the values of a COItem in an SQL database,
- *    so the primitive types map cleanly to SQL types.
- *  - validation of ObjC objects against the schema
- *  - plist import/export of ObjC objects of a known COType
+ *
+ * <list>
+ * <item>being able to store the values of a COItem in an SQL database, so the 
+ * primitive types map cleanly to SQL types</item>
+ * <item>validation of ObjC objects against the schema</item>
+ * <item>plist import/export of ObjC objects of a known COType</item>
+ * </list>
  */
 typedef int32_t COType;
 
