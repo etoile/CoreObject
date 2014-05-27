@@ -17,6 +17,16 @@ extern NSString *kCOObjectIsSharedProperty;
 
 /**
  * @group Core
+ * @abstract Additions to convert inner objects into a "semi-serialized" 
+ * representation.
+ *
+ * COObjectGraphContext uses -storeItem to serialize a COObject into a COItem,  
+ * and -setStoreItem: to deserialize in the reverse way.
+ *
+ * For debugging a serialization/deserialization cycle, see 
+ * -roundTripValueForProperty:.
+ *
+ * NOTE: The rest of the API is unstable and incomplete.
  */
 @interface COObject (COSerialization)
 
