@@ -115,7 +115,17 @@ Key Features
 Build and Install
 -----------------
 
-Read INSTALL.Cocoa or INSTALL.GNUstep documents.
+Clone CoreObject and its dependencies into the same directory (or extract a release .tgz which contains all 3 projects):
+
+    git clone https://github.com/etoile/CoreObject.git
+	git clone https://github.com/etoile/EtoileFoundation.git
+	git clone https://github.com/etoile/UnitKit.git
+	
+On Mac OS X, you can run the test suite by opening CoreObject/CoreObject.xcodeproj in Xcode and choosing the TestCoreObject scheme.
+
+To try the demo apps, open CoreObject/Samples/ProjectDemo/ProjectDemo.xcodeproj or CoreObject/Samples/Typewriter/Typerwriter.xcodeproj.
+
+For more details, see INSTALL.Cocoa or INSTALL.GNUstep.
 
 
 Mac OS X support
