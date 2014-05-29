@@ -11,6 +11,11 @@
 @class COObject, CORevision, COPersistentRoot, COBranchInfo, COObjectGraphContext, COEditingContext;
 @class CODiffManager, COMergeInfo;
 
+/**
+ * The key that corresponds to the branch name in -[COBranch metadatata].
+ *
+ * See also -[COBranch name].
+ */
 extern NSString * const kCOBranchLabel;
 
 /**

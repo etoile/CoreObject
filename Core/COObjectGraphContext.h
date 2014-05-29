@@ -14,12 +14,18 @@
 @class COItemGraph, COItem;
 
 /**
- * This notification is sent by the context during 
- * -[COObjectGraphContext acceptAllChanges].
+ * Posted during -[COObjectGraphContext acceptAllChanges].
  *
- * It will tell you about all possible mutations that can happen to a
- * COObjectGraphContext over its lifetime (inserting objects, updating objects,
- * reverting changes**, reloading a new state).
+ * This notifcation will tell you about all possible mutations that can happen 
+ * to a COObjectGraphContext over its lifetime (inserting objects, updating 
+ * objects, reverting changes**, reloading a new state).
+ *
+ * The userInfo dictionary contains the following keys:
+ *
+ * <deflist>
+ * <term>COInsertedObjectsKey</term><desc>the inserted object UUIDs</desc>
+ * <term>COUpdatedObjectsKey</term><desc>the updated object UUIDs</desc>
+ * </deflist>
  *
  *   ** It's not totally clear if this should cause a notification to be sent
  *      or not, since the graph is reverted to the state it was in when the
@@ -27,25 +33,46 @@
  *      See -[TestObjectGraphContext testNotificationAfterDiscardForPersistentContext]
  *
  * TODO: Rename to DidAcceptChangesNotification
+ *
+ * See also COObjectGraphContextWillRelinquishObjectsNotification.
  */
 extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
 /**
  * User info dictionary key for COObjectGraphContextObjectsDidChangeNotification.
+ *
  * The value is an NSSet of ETUUID objects.
  */
 extern NSString * const COInsertedObjectsKey;
 /**
  * User info dictionary key for COObjectGraphContextObjectsDidChangeNotification.
+ *
  * The value is an NSSet of ETUUID objects.
  */
 extern NSString * const COUpdatedObjectsKey;
 
 /**
- * Sent before objects are relinquished by COObjectGraphContext
+ * Posted when a garbage collection phase is run by COObjectGraphContext.
+ *
+ * This notification will tell you about the objects to be relinquished 
+ * by the object graph context, under the key CORelinquishedObjectsKey.
+ *
+ * You must use it to discard all non-persistent references hold on these 
+ * objects, just before these references become invalid. For example, 
+ * UI controllers must usually observe this notification.
+ *
+ * Object graph context changes reported by 
+ * COObjectGraphContextDidChangeNotification can result in objects to be 
+ * relinquished, on the next garbage collection phase.
  */
 extern NSString * const COObjectGraphContextWillRelinquishObjectsNotification;
 /**
- * Array of COObjects
+ * User info dictionary key for COObjectGraphContextWillRelinquishObjectsNotification.
+ *
+ * The value is a NSArray of COObjects.
+ *
+ * The relinquished objects are objects to be released by the object graph 
+ * context, during a garbage collection phase, because they are not referenced 
+ * in a persistent relationship for the current state.
  */
 extern NSString * const CORelinquishedObjectsKey;
 
