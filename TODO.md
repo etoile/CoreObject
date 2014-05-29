@@ -4,8 +4,6 @@ TODO
 Major Missing Features
 ----------------------
 
-- The undo system should support user-defined actions that track state not managed by CoreObject
-
 - Supporting broken cross-references. Since we don't support it, you must not permanently delete anything from a store (with `-[COSQLiteStore finalizeDeletionsForPersistentRoot:error:]`) unless your application doesn't use cross-references.
 
 - COUndoTrack doesn't cope with attempts by the user to undo changes in persistent roots that are not present in the store (assetions will fail)
@@ -366,6 +364,8 @@ the following situations at least:
 
 	[a nodes] will not equal [b nodes] but I would expect them to be the equal
 
+  - Maybe support user-defined actions that track state not managed by CoreObject
+
 
 - Model objects (COObject subclasses included with CoreObject for convenience)
 
@@ -440,3 +440,7 @@ the following situations at least:
 - Code Quality
 
 	- Reviewed classes: none (COObjectGraphContext, COEditingContext, COBranch underwent a preliminary review)
+
+- COAttributedString
+
+    - Automatically split chunks longer than X characters
