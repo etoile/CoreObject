@@ -14,7 +14,7 @@ Command line arguments example:
     -XMPPJID foo@bar.com
     -XMPPPassword password
 
-The library is saved in ~/ProjectDemo.coreobject by default
+The library is saved in ~/Library/CoreObjectProjectDemo/Store.coreobjectstore by default
 
 What's working:
 

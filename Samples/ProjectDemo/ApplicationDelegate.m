@@ -16,8 +16,15 @@
 {
 	if (self == [ApplicationDelegate class])
 	{
+		NSArray *libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+		
+		NSString *dir = [[libraryDirs[0]
+						  stringByAppendingPathComponent: @"CoreObjectProjectDemo"]
+						 stringByAppendingPathComponent: @"Store.coreobjectstore"];
+		
+		
 		[[NSUserDefaults standardUserDefaults] registerDefaults:
-		 @{ @"storeURL" : @"~/ProjectDemo.coreobject"}];
+		 @{ @"storeURL" : dir }];
 	}
 }
 
