@@ -418,7 +418,7 @@ the following situations at least:
   - Check and update all Core, Model, Undo and Utilities API documentation (underway)
 
     - Reviewed classes
-      - Core: COObjectGraphContext, COEditingContext, COBranch, CORevision, COQuery
+      - Core: COObjectGraphContext, COEditingContext, COBranch, CORevision, COQuery, COObject
       - Model: all
       - Undo: all, but needs to be checked again due to Undo-tree rewrite
       - Utilities: COCommitDescriptor, COError

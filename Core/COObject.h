@@ -767,15 +767,40 @@
  * has changed. 
  *
  * By default, notifies the editing context about the receiver change and 
- * triggers Key-Value-Observing notifications by calling -didChangeValueForKey:.
+ * triggers Key-Value Observing notifications by calling -didChangeValueForKey:.
  *
  * Can be overriden, but the superclass implementation must be called.
  */
 - (void)didChangeValueForProperty: (NSString *)key;
+/**
+ * Tells the receiver that the value of the multivalued property (transient or 
+ * persistent) is about to change.
+ *
+ * By default, limited to calling 
+ * -willchangevalueforkey:atindexes:withObjects:mutationkind:.
+ *
+ * To know more about the arguments, see 
+ * -willchangevalueforkey:atindexes:withObjects:mutationkind:.
+ *
+ * Can be overriden, but the superclass implementation must be called.
+ */
 - (void)willChangeValueForProperty: (NSString *)property
                          atIndexes: (NSIndexSet *)indexes
                        withObjects: (NSArray *)objects
                       mutationKind: (ETCollectionMutationKind)mutationKind;
+/**
+ * Tells the receiver that the value of the multivalued property (transient or 
+ * persistent) has changed. 
+ *
+ * By default, notifies the editing context about the receiver change and 
+ * triggers Key-Value Observing notifications by calling 
+ * -didChangeValueForKey:atIndexes:withObjects:mutationKind:.
+ *
+ * To know more about the arguments, see 
+ * -didChangeValueForKey:atIndexes:withObjects:mutationKind:.
+ *
+ * Can be overriden, but the superclass implementation must be called.
+ */
 - (void)didChangeValueForProperty: (NSString *)property
                         atIndexes: (NSIndexSet *)indexes
                       withObjects: (NSArray *)objects
