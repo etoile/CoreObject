@@ -98,7 +98,8 @@ int main(int argc, char **argv)
 {
 	@autoreleasepool
 	{
-		NSURL *url = [NSURL fileURLWithPath: @"TestStore.db"];
+		NSURL *url = [[NSURL fileURLWithPath: NSTemporaryDirectory() isDirectory: YES]
+					  URLByAppendingPathComponent: @"TestStore.db"];
 		
 		// Create a new calendar and appointment and persist them
 
