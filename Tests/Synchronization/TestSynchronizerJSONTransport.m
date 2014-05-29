@@ -67,8 +67,8 @@
 }
 @end
 
-#define CLIENT1_STORE_URL [NSURL fileURLWithPath: [@"~/TestStore2.sqlite" stringByExpandingTildeInPath]]
-#define CLIENT2_STORE_URL [NSURL fileURLWithPath: [@"~/TestStore3.sqlite" stringByExpandingTildeInPath]]
+#define CLIENT1_STORE_URL [NSURL fileURLWithPath: [NSTemporaryDirectory() stringByAppendingPathComponent: @"TestStore2.sqlite"]]
+#define CLIENT2_STORE_URL [NSURL fileURLWithPath: [NSTemporaryDirectory() stringByAppendingPathComponent: @"TestStore3.sqlite"]]
 
 @implementation TestSynchronizerJSONTransport
 

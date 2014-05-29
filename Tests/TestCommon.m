@@ -109,7 +109,7 @@ doesNotPostNotification: (NSString *)notif
 #ifdef IN_MEMORY_STORE
 	return [NSURL fileURLWithPath: @"/tmp/coreobject-ramdisk/TestStore.sqlite"];
 #else
-	return [NSURL fileURLWithPath: [@"~/TestStore.sqlite" stringByExpandingTildeInPath]];
+	return [NSURL fileURLWithPath: [NSTemporaryDirectory() stringByAppendingPathComponent: @"TestStore.sqlite"]];
 #endif
 }
 

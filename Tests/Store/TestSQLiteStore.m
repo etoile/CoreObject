@@ -534,9 +534,8 @@ static ETUUID *childUUID2;
     
     NSString *internalPath = [[store URLForAttachmentID: hash] path];
     
-    UKTrue([path hasPrefix: NSTemporaryDirectory()]);
-    UKFalse([internalPath hasPrefix: NSTemporaryDirectory()]);
-    
+	UKObjectsNotEqual(path, internalPath);
+	
     NSLog(@"external path: %@", path);
     NSLog(@"internal path: %@", internalPath);
     

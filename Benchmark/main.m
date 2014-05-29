@@ -14,6 +14,8 @@
 int main (int argc, const char *argv[])
 {
     @autoreleasepool {
+		NSLog(@"Store URL: %@", [EditingContextTestCase storeURL]);
+		
 		UKRunner *runner = [UKRunner new];
 		
 		UKTestHandler *handler = [UKTestHandler handler];

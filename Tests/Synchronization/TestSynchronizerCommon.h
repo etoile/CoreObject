@@ -12,7 +12,7 @@
 #import "COSynchronizerFakeMessageTransport.h"
 #import "TestAttributedStringCommon.h"
 
-#define CLIENT_STORE_URL [NSURL fileURLWithPath: [@"~/TestStore2.sqlite" stringByExpandingTildeInPath]]
+#define CLIENT_STORE_URL [NSURL fileURLWithPath: [NSTemporaryDirectory() stringByAppendingPathComponent: @"TestStore2.sqlite"]]
 
 @interface TestSynchronizerCommon : EditingContextTestCase <UKTest>
 {
