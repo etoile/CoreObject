@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CoreObject - Tech Notes</title>
+
+    <!-- Bootstrap -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+	
+    <!-- Custom styles -->
+	<link href="../css/coreobject.css" rel="stylesheet">
+	<link href="../css/about.css" rel="stylesheet">
+	
+	<link href='http://fonts.googleapis.com/css?family=Raleway:400,100,200,300,500,600,700,900,800' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Raleway+Dots' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,700,800,300' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+	<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+  
+  <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="index.html">CoreObject</a>
+        </div>
+
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="../#features">Features</a></li>
+            <li><a href="../#download">Download</a></li>
+            <li><a href="http://etoileos.com/dev/api/CoreObject/">Documentation</a></li>
+            <li class="active"><a href=".">Tech Notes</a></li>
+            <li><a href="../contact.html">Contact</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+
+      </div>
+    </div>
+
+	<div class="container">
+
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#architecture">Architecture</a></li>
+<li><a href="#store">Store</a><ul>
+<li><a href="#object-graph">Object Graph</a></li>
+<li><a href="#delta-storage">Delta Storage</a></li>
+<li><a href="#attachments">Attachments</a></li>
+<li><a href="#persistent-roots-branches">Persistent Roots &amp; Branches</a></li>
+<li><a href="#deletion">Deletion</a></li>
+</ul></li>
+<li><a href="#diffmerge">Diff/Merge</a></li>
+<li><a href="#editing-context">Editing Context</a></li>
+<li><a href="#undo">Undo</a></li>
+<li><a href="#collaborative-editing">Collaborative Editing</a></li>
+</ul>
+
+<p>CoreObject Tech Notes</p>
+<h2 id="overview">Overview</h2>
+<p>The main ideas of CoreObject are:</p>
+<ul>
+<li><p>Object graph persistence similar to <a href="http://en.wikipedia.org/wiki/Core_Data">CoreData</a>, <a href="http://jackrabbit.apache.org">Apache Jackrabbit</a></p></li>
+<li><p>All objects are UUID-labeled</p></li>
+<li><p>Object graphs are partitioned into persistent roots; each persistent root acts as an isolated DVCS repository to keep track of the history of its object graph</p></li>
+<li><p>DVCS doesn’t use file/directory abstractions</p></li>
+<li><p>The DVCS is optimized for writing small commits (changing a few objects in an object graph), because commits are intended to map rougly to UI actions</p></li>
+<li><p>Having UUID labels on all objects at a fine granularity makes diff/merge easy and accurate</p></li>
+<li><p>A DVCS is an ideal base on which to implement undo/redo and collaborative editing</p></li>
+</ul>
+<h2 id="architecture">Architecture</h2>
+<p>Here is the rough layout of the CoreObject framework:</p>
+<div class="figure">
+<img src="store.004.png" />
+</div>
+<h2 id="store">Store</h2>
+<p>The store is the bottom level in the CoreObject codebase. It implements the DVCS part and low-level object serialization.</p>
+<p>A store is an unordered container of <em>persistent roots</em> which are stored in the same directory on disk and can share data internally. Conceptually, the store is an implementation detail in CoreObject whose only purpose is to represent persistent roots in a filesystem.</p>
+<div class="figure">
+<img src="store.005.png" />
+</div>
+<p>A <em>persistent root</em> is the &quot;DVCS repository” part of CoreObject: it has a revision graph, and each revision is a snapshot of the object graph represented by the persistent root. We borrowed the term <em>persistent root</em> from object-oriented databases. You can also think of a persistent root as a versioned document.</p>
+<h3 id="object-graph">Object Graph</h3>
+<p>We use the term “item graph” to mean a serialized object graph, and object graph to mean the mutable in-memory representation.</p>
+<p>Unlike most DVCS’s, we don’t use a directory/file abstraction in CoreObject, and there’s no facility for checking out a working copy of a persistent root into a filesystem. The item graph is intended to subsume the role of a filesystem, handling the file organization features that you would use a filesystem for, and also handle the role of a structured file format like JSON.</p>
+<p>An item graph starts with a <em>root item</em> and consists of that item plus all items reachable by following references.</p>
+<p>Here’s an example item graph that could be stored in a persistent root:</p>
+<div class="figure">
+<img src="store.012.png" />
+</div>
+<p>The items in the item graph follow our own object model. Why invent a new object model instead of using e.g. JSON?</p>
+<p>We felt is was necessary to have:</p>
+<ul>
+<li><p>UUIDs on every item. This facilitates diffing item graphs, and incremental saves (writing out exactly the set of modified items)</p></li>
+<li><p>First class UUID-based references (the purple arrows above). First-class meaning they are strongly-typed object reference, not stored in a string or integer like you’d do in JSON.<br /><br /> For item graph diff/merge to be useful, it needs to be aware of references. Likewise, we explicitly support unordered and ordered collections at this level so the diffs are semantically meaningful, and provide good input for the merge algorithm.</p></li>
+</ul>
+<p>Less importantly, it was convenient to be able to make attachments a first-class type, so we can garbage-collect them.</p>
+<p>CoreObject would be more convenient to use if it used a standard format like JSON, but the resulting system couldn’t meet our end goals without following the above conventions, so we decided it was cleaner to force them on all data stored in CoreObject by having our own object model.</p>
+<p>Once we decided to have our own object model, it was natural to make a custom binary serialization format. The result is fast and the code is simple. Here is the binary serialization of the root item from the diagram above:</p>
+<div class="figure">
+<img src="store.003.png" />
+</div>
+<p>Note that the item’s attributes are sorted; this ensures there is only one valid binary serialization for a given item. (If you use the unordered set multivalued type, the elements in the set are sorted at serialization time for the same reason). Strings are UTF-8, integers are little-endian.</p>
+<p>The binary serialization of the entire item graph is essentially the serialization of each item concatenated together.</p>
+<h3 id="delta-storage">Delta Storage</h3>
+<p>One of our design guidelines was that commits had to be very fast, since we wanted to be able to make them after almost every UI action. A solution involving serializing the entire document the user is editing on every commit wouldn’t scale with large documents.</p>
+<p>The solution we came up with is, when you write a new revision of a persistent root, you just pass in the set of <em>items</em> which were modified since the parent revision. This requires the API user to track which objects were modified and pass in the correct ones. (Occasionally, the store will decide to write out a full save; this is transparent to the user of the store API. This is inspired by Mercurial’s <a href="http://mercurial.selenic.com/wiki/Presentations?action=AttachFile&amp;do=get&amp;target=ols-mercurial-paper.pdf">revlogs</a>.)</p>
+<p>Here’s an example of how a revision graph with 5 revisions might be represented in the store. Recall that the content in a revision is an item graph; the blue “item” boxes in the diagram represent binary-serialized items. The three darkened purple rectangles are the revisions that would be needed in order to reconstruct the item graph of revision r4.</p>
+<div class="figure">
+<img src="store.001.png" />
+</div>
+<h3 id="attachments">Attachments</h3>
+<p>CoreObject supports attaching large files to a store (images, movies, etc.) Attachments must be referenced through a special <em>attachment reference</em> type in an item, because CoreObject tracks references to attachments and garbage-collects them when there are no remaining references.</p>
+<div class="figure">
+<img src="store.006.png" />
+</div>
+<p>This arrangement has several nice characteristics:</p>
+<ul>
+<li><p>since they're store by hash value, attachments are automatically de-duplicated</p></li>
+<li><p>copying an item with a reference to an attachment doesn't require copying the attachment data</p></li>
+<li><p>they don't introduce any new behaviour with respect to deletion</p></li>
+</ul>
+<h3 id="persistent-roots-branches">Persistent Roots &amp; Branches</h3>
+<p>Here's a more complete picture of the state associated with a persistent root:</p>
+<div class="figure">
+<img src="store.007.png" />
+</div>
+<p>A persistent root can have several <em>branches</em>. Branches are much like in git; they are named pointers to revisions. Each persistent root also has a <em>current branch</em>, just like a git repository's HEAD.</p>
+<p>Branches are designed so that you can ignore them if you don’t need them, but if they make sense in your application (for working on several variations of a document, for example), they’re available.</p>
+<p>CoreObject also supports copying persistent roots, such that the copy uses the same revision graph as the persistent root it was copied from - so we call it a cheap copy. There’s no danger of the copies interfering with each other, because the revision graph is immutable (except when a store is garbage-collected.)</p>
+<p>At a deep level, a cheap copy is not much different from a branch, so if desired you can expose this in an application - ProjectDemo allows the user to turn a branch into a copy, and vice-versa.</p>
+<h3 id="deletion">Deletion</h3>
+<div class="figure">
+<img src="store.008.png" />
+</div>
+<p>Persistent roots and branches must be explicitly deleted by the user, analogous to deleting a file.</p>
+<p>However, we wanted to design for the use case of a user deleting a persistent root by accident - almost every change in CoreObject is undoable. To implement this, each persistent root and each branch has a deletion flag, so initially when you delete a persistent root, nothing is actually deleted, but it's trivial to undo the deletion.</p>
+<p>To actually free up disk space, there is a “finalize deletions” command you can perform on a store. This permanently ereases all persistent roots and branches that were marked as deleted, and is non-reversible.</p>
+<p>Revisions, unlike persistent roots and branches, are garbage collected, and users have no explicit control over their lifetime. There are a few motivations for this behaviour:</p>
+<ul>
+<li><p>Ordinary use of CoreObject-based apps is expected to create divergent revisions. (e.g. in a text editor: &quot;type, undo, type, type, type” would create a divergent revision.) If the user doesn’t go back and save these divergent revisions by creating branches for them, it makes sense to automatically delete them</p></li>
+<li><p>Fits well with the overall conceptual design of CoreObject. Revisions are not a concept users need to worry about - branches and persistent roots are - so it makes to garbage collect revisions, but use explicit deletion for branches and persistent roots</p></li>
+<li><p>Consistent with git’s design</p></li>
+</ul>
+<p>Something we want to support, but is not yet implemented, is the ability to erase the distant past history of a persistent root’s revision graph (e.g. &quot;delete history older than 6 months&quot;).</p>
+<p>Finally, items in a revision’s item graph are garbage collected. This let us define an item graph as “a root item, plus the set of items reachable by following references”. One nice side-effect of this definition is, it’s acceptable to have have extra “garbage” items in a set of items that makes up an item graph - they will simply be ignored - and the store exploits this (see the Delta Storage section) to simplify its implementation. Another nice side effect is, when diffing two item graphs, we don’t need to consider deletion as a special case. If all references to an item are removed, the item ceases to be a part of the item graph; we don’t need to pollute diffs/merges with special “delete item” commands.</p>
+<h2 id="diffmerge">Diff/Merge</h2>
+<p>The main difficulty in diffing two pieces of structured data is figuring out a correspondence between objects in the two documents (a lot of research on diffing arbitrary XML boiled down to heuristics for identifying the “same” object in the two document versions being compared). CoreObject sidesteps this problem by forcing all objects to have a UUID label.</p>
+<p>Given the knowledge of the correspondence between objects in two documents, the remaining diff algorithm is pretty trivial. Our diff algorithm looks something like this:</p>
+<ul>
+<li><p>for each object O in B but not A, record it as an object insertion</p></li>
+<li><p>for each object O in B that is modified vs. that object in A:</p>
+<ul>
+<li><p>for each attribute attr of O that is modified in B vs. A</p>
+<ul>
+<li><p>if attr is an unordered multivalued attribute or relationship (i.e. a set), record an &quot;unordered multivalued edit”, along with the set differences B[O].attr - A[O].attr (i.e. elements added to the set) and A[O].attr - B[O].attr (i.e. elements removed from the set)</p></li>
+<li><p>if attr is an ordered multivalued attribute or relationship (i.e. an array), invoke the Myers LCS algorithm on the two arrays, and record the resulting array edits</p></li>
+<li><p>otherwise, attr must be a univalued attribute or relationship, record an edit “O.attr = &lt;new value&gt;&quot;</p></li>
+</ul></li>
+</ul></li>
+</ul>
+<p>Merge essentially involves combining all edits from the two diffs together, then marking conflicts. Presenting a visualization of this type of diff (and any conflicts) in a UI is still an open question.</p>
+<p>Here’s a pair of item graphs and the resulting diff:</p>
+<div class="figure">
+<img src="store.011.png" />
+</div>
+<p>We also support plugging in alternative diff/merge algorithms for particular item types when the default one isn’t suitable. CoreObject includes an example of this, a unfinished prototype of attributed string (i.e. styled text) diff/merge.</p>
+<h2 id="editing-context">Editing Context</h2>
+<p>You can use the Store API on its own, but it's quite cumbersome. The Editing Context layer of CoreObject just presents a store as a set of mutable objects, which track changes you make to them, so when you call the -commit method, the editing context builds up an appropriate transaction and commits it to the store.</p>
+<ul>
+<li><p>COEditingContext is a mutable facade for a store</p></li>
+<li><p>COPersistentRoot is a mutable facade for a persistent root</p></li>
+<li><p>COBranch is a mutable facade for a branch</p></li>
+<li><p>COObjectGraphContext is a mutable facade for an item graph</p></li>
+<li><p>COObject is a mutable facade for a single item in an item graph</p></li>
+</ul>
+<p>Like other object databases and object graph persistence systems, you must define a schema/metamodel for your model objects to follow (see class ETEntityDescription and ETPropertyDescription). Each item in an item graph has a “entity name” property which determines which entity description it uses. You also need to make a subclass COObject for each entity type.</p>
+<h2 id="undo">Undo</h2>
+<p>CoreObject comes with a ready-made undo system to use in your applications. Superficially, it's quite ordinary; based on the Gang of Four command pattern, but it also has some unusual features.</p>
+<p>First, the commands and undo stacks are persisted in a SQLite database (separate from the CoreObject store.) This makes application restarts transparent.</p>
+<p>Second, while most undo systems would have a set of command objects that track changes to the application’s model objects, the CoreObject commands track things one level of abstraction higher up; they record mutations made to a CoreObject store. The nice thing about this is the complete list of commands is:</p>
+<ul>
+<li><p>Persistent Root</p>
+<ul>
+<li><p>Create, Delete, Undelete</p></li>
+<li><p>Change Metadata</p></li>
+<li><p>Set Current Branch</p></li>
+</ul></li>
+<li><p>Branch</p>
+<ul>
+<li><p>Create, Delete, Undelete</p></li>
+<li><p>Change Metadata</p></li>
+<li><p>Set Current Revision</p></li>
+</ul></li>
+</ul>
+<p>which cover all possible changes you can make to a CoreObject store (except invoking garbage collection, which is destructive and non-undoable.)</p>
+<p>Another unusual feature: all of these commands can be applied to a store that’s in a different state than when the command was recorded. The most common command, &quot;Set Current Revision”, represents the user committing a change to a branch, or reverting some changes, and the command contains the initial and final revision UUID’s. If the user asks for the command to be undone (or redone), and the branch doesn’t have the same current revision as when the command was recorded, CoreObject generates a new revision which cherry-picks or reverts the required changes. This is what gives us per-user undo in collaborative editing for free, and the ability to have an undo stack per viewport with multiple viewports on the same document for free.</p>
+<p>Finally, we allow branches in the undo command graphs, rather than restricting it to a stack. This is not a major feature (in fact it was a late addition), but gives you an extra layer of security against losing a change.</p>
+<p>Here’s an example undo store showing two undo tracks and their undo commands:</p>
+<div class="figure">
+<img src="store.009.png" />
+</div>
+<h2 id="collaborative-editing">Collaborative Editing</h2>
+<p><a href="https://github.com/etoile/CoreObject/tree/master/Synchronization">Collaborative editing support</a> was the last part of CoreObject we wrote.</p>
+<p>On one hand we had vague ideas of transparently supporting collaborative editing of any document from the start, but other than having the general idea in mind, no collaboration-specific features were added to the main parts of CoreObject.</p>
+<p>The syncing algorithm is inspired by <a href="https://neil.fraser.name/writing/sync/">https://neil.fraser.name/writing/sync/</a>, but instead of syncing diffs of the application model objects (e.g. character-level diffs for a text document), the collaborative editing code syncs persistent root revisions (following the same philosophy as the undo system.)</p>
+<p>This lets all users see the same sequence of revisions, see who made which changes, and lets the CoreObject undo system work seamlessly, so each user can undo his or her own changes.</p>
+<p>Of course, at the end of the day, we still have to merge character-level changes (for a text document) the same way OT does. We just consider it (and implement it) as a regular usage of CoreObject’s diff/merge code, and not part of the collaborative editing algorihm.</p>
+<p>Here’s an example of how the collaborative editing system handles two users making an edit simultaneously:</p>
+<div class="figure">
+<img src="store.010.png" />
+</div>
+
+	</div> <!-- #content -->
+
+    <div id="footer">
+      <div class="container">
+			<div class="row">
+				<div class="col-md-5">
+					<h2>Part of Étoilé</h2>
+				</div>
+				<div class="col-md-2">
+					<p>&#9733;</p>
+				</div>
+				<div class="col-md-5">
+					<div id="splashline">CoreObject is <em>open source and MIT licensed</em>.<small>Copyright 2014 Étoilé.</small></div>
+				</div>
+			</div>
+      </div>
+		<div class="container-full"></div>
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+  </body>
+</html>
