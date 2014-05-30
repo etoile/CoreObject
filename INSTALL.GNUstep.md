@@ -21,7 +21,7 @@ You also need to have the SQLite and EtoileFoundation libraries installed:
   - libsqlite 3.7.7, see <http://www.sqlite.org/>
   - EtoileFoundation, see <https://github.com/etoile/EtoileFoundation>
 
-**Note:** If you have the entire (Etoile repository)[https://github.com/etoile/Etoile], 
+**Note:** If you have the entire [Etoile repository](https://github.com/etoile/Etoile), 
 EtoileFoundation is built together with CoreObject, by running 'make' in 
 Frameworks or any other parent directories.
 
