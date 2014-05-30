@@ -19,8 +19,8 @@
 		NSArray *libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
 		
 		NSString *dir = [[libraryDirs[0]
-						  stringByAppendingPathComponent: @"CoreObjectProjectDemo"]
-						 stringByAppendingPathComponent: @"Store.coreobjectstore"];
+						  stringByAppendingPathComponent: @"CoreObject"]
+						 stringByAppendingPathComponent: @"ProjectDemo.coreobjectstore"];
 		
 		
 		[[NSUserDefaults standardUserDefaults] registerDefaults:

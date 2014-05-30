@@ -73,8 +73,8 @@
 	NSArray *libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
 	
     NSString *dir = [[[libraryDirs objectAtIndex: 0]
-                      stringByAppendingPathComponent: @"CoreObjectTypewriter"]
-					 stringByAppendingPathComponent: @"Store.coreobjectstore"];
+                      stringByAppendingPathComponent: @"CoreObject"]
+					 stringByAppendingPathComponent: @"Typewriter.coreobjectstore"];
 	
     [[NSFileManager defaultManager] createDirectoryAtPath: dir
                               withIntermediateDirectories: YES
