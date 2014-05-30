@@ -11,8 +11,8 @@
 #import "TestCommon.h"
 #import "COSynchronizerFakeMessageTransport.h"
 
-#define CLIENT1_STORE_URL [NSURL fileURLWithPath: [NSTemporaryDirectory() stringByAppendingPathComponent: @"TestStore2.sqlite"]]
-#define CLIENT2_STORE_URL [NSURL fileURLWithPath: [NSTemporaryDirectory() stringByAppendingPathComponent: @"TestStore3.sqlite"]]
+#define CLIENT1_STORE_URL [[SQLiteStoreTestCase temporaryURLForTestStorage]  URLByAppendingPathComponent: @"TestStore2.sqlite"]
+#define CLIENT2_STORE_URL [[SQLiteStoreTestCase temporaryURLForTestStorage] URLByAppendingPathComponent: @"TestStore3.sqlite"]
 
 @interface TestSynchronizerMultiUser : EditingContextTestCase <UKTest>
 {

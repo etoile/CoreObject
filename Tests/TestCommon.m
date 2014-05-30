@@ -104,13 +104,23 @@ doesNotPostNotification: (NSString *)notif
 	}
 }
 
-+ (NSURL *) storeURL
++ (NSURL *) temporaryURLForTestStorage
+{
+	return [NSURL fileURLWithPath: [self temporaryPathForTestStorage]];
+}
+
++ (NSString *) temporaryPathForTestStorage
 {
 #ifdef IN_MEMORY_STORE
-	return [NSURL fileURLWithPath: @"/tmp/coreobject-ramdisk/TestStore.sqlite"];
+	return @"/tmp/coreobject-ramdisk";
 #else
-	return [NSURL fileURLWithPath: [NSTemporaryDirectory() stringByAppendingPathComponent: @"TestStore.sqlite"]];
+	return NSTemporaryDirectory();
 #endif
+}
+
++ (NSURL *) storeURL
+{
+	return [[self temporaryURLForTestStorage] URLByAppendingPathComponent: @"TestStore.sqlite"];
 }
 
 - (void) checkPersistentRoot: (ETUUID *)aPersistentRoot

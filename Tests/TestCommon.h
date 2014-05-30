@@ -114,7 +114,19 @@ doesNotPostNotification: (NSString *)notif;
 }
 
 /**
+ * Returns the base URL in which all temporary files/stores used during
+ * the test should be stored in.
+ */
++ (NSURL *) temporaryURLForTestStorage;
+
+/**
+ * Same as +temporaryURLForTestStorage but returns a NSString path
+ */
++ (NSString *) temporaryPathForTestStorage;
+
+/**
  * Returns the URL used for the store.
+ * This is a subdirectory of +temporaryDirectoryForTestStorage.
  */
 + (NSURL *)storeURL;
 
