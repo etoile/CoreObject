@@ -25,7 +25,7 @@
 - (COAttachmentID *) createAttachment
 {
     NSString *fakeAttachment1 = @"this is a large attachment";
-    NSString *path1 = [NSTemporaryDirectory() stringByAppendingPathComponent: @"coreobject-test1.txt"];
+    NSString *path1 = [[SQLiteStoreTestCase temporaryPathForTestStorage] stringByAppendingPathComponent: @"coreobject-test1.txt"];
     
     [fakeAttachment1 writeToFile: path1
                       atomically: YES

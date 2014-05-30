@@ -2,6 +2,7 @@
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
 #import <EtoileFoundation/EtoileFoundation.h>
+#import "TestCommon.h"
 
 @implementation BenchmarkCommon
 
@@ -28,7 +29,7 @@
 	if (result == 0)
 	{
 		FMDatabase *tempDatabase = [FMDatabase databaseWithPath:
-									[NSTemporaryDirectory() stringByAppendingPathComponent: [[ETUUID UUID] stringValue]]];
+									[[SQLiteStoreTestCase temporaryPathForTestStorage] stringByAppendingPathComponent: [[ETUUID UUID] stringValue]]];
 		ETAssert([tempDatabase open]);
 		ETAssert([[tempDatabase stringForQuery: @"PRAGMA journal_mode=WAL"] isEqual: @"wal"]);
 		ETAssert([tempDatabase executeUpdate: @"CREATE TABLE test(blob BLOB)"]);

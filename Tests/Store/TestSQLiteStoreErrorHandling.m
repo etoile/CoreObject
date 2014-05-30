@@ -43,7 +43,7 @@ static ETUUID *rootUUID;
 
 - (NSString *) tempPathWithName: (NSString *)aName
 {
-    return [NSTemporaryDirectory() stringByAppendingPathComponent:
+    return [[SQLiteStoreTestCase temporaryPathForTestStorage] stringByAppendingPathComponent:
                 [NSString stringWithFormat: @"%@-%@", aName, [ETUUID UUID]]];
 }
 

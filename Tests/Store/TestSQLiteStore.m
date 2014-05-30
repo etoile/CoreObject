@@ -491,8 +491,8 @@ static ETUUID *childUUID2;
 {
     NSString *fakeAttachment1 = @"this is a large attachment";
     NSString *fakeAttachment2 = @"this is another large attachment";
-    NSString *path1 = [NSTemporaryDirectory() stringByAppendingPathComponent: @"coreobject-test1.txt"];
-    NSString *path2 = [NSTemporaryDirectory() stringByAppendingPathComponent: @"coreobject-test2.txt"];
+    NSString *path1 = [[SQLiteStoreTestCase temporaryPathForTestStorage] stringByAppendingPathComponent: @"coreobject-test1.txt"];
+    NSString *path2 = [[SQLiteStoreTestCase temporaryPathForTestStorage] stringByAppendingPathComponent: @"coreobject-test2.txt"];
     
     [fakeAttachment1 writeToFile: path1
                       atomically: YES
@@ -522,7 +522,7 @@ static ETUUID *childUUID2;
 - (void) testAttachmentsGCDoesNotCollectReferenced
 {
     NSString *fakeAttachment = @"this is a large attachment";
-    NSString *path = [NSTemporaryDirectory() stringByAppendingPathComponent: @"cotest.txt"];
+    NSString *path = [[SQLiteStoreTestCase temporaryPathForTestStorage] stringByAppendingPathComponent: @"cotest.txt"];
     
     UKTrue([fakeAttachment writeToFile: path
                             atomically: YES
@@ -579,7 +579,7 @@ static ETUUID *childUUID2;
 - (void) testAttachmentsGCCollectsUnReferenced
 {
     NSString *fakeAttachment = @"this is a large attachment";
-    NSString *path = [NSTemporaryDirectory() stringByAppendingPathComponent: @"cotest.txt"];
+    NSString *path = [[SQLiteStoreTestCase temporaryPathForTestStorage] stringByAppendingPathComponent: @"cotest.txt"];
     [fakeAttachment writeToFile: path
                      atomically: YES
                        encoding: NSUTF8StringEncoding

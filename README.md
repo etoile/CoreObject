@@ -121,11 +121,19 @@ Clone CoreObject and its dependencies into the same directory (or extract a rele
 	git clone https://github.com/etoile/EtoileFoundation.git
 	git clone https://github.com/etoile/UnitKit.git
 	
-On Mac OS X, you can run the test suite by opening CoreObject/CoreObject.xcodeproj in Xcode and choosing the TestCoreObject scheme.
+The Xcode projects and schemes of interest are:
 
-To try the demo apps, open CoreObject/Samples/ProjectDemo/ProjectDemo.xcodeproj or CoreObject/Samples/Typewriter/Typerwriter.xcodeproj.
+- CoreObject/CoreObject.xcodeproj
+  - CoreObject - builds the framework itself
+  -	BasicPersistence - a minimal example app
+  - TestCoreObject - the test suite
+  - BenchmarkCoreObject - the benchmark
+- CoreObject/Samples/ProjectDemo/ProjectDemo.xcodeproj
+   - ProjectDemo - an experimental testbed application with a drawing editor, outliner, and collaborative editing support used in the [demo videos](http://coreobject.org)
+- CoreObject/Samples/Typewriter/Typerwriter.xcodeproj
+   - Typewriter - a reasonably polished note manager that uses CoreObject
 
-For more details, see INSTALL.Cocoa or INSTALL.GNUstep.
+For more details, see [INSTALL.Cocoa](INSTALL.Cocoa.md) or [INSTALL.GNUstep](INSTALL.GNUstep.md).
 
 
 Mac OS X support

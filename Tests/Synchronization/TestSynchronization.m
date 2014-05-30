@@ -10,7 +10,7 @@
 #import <EtoileFoundation/ETModelDescriptionRepository.h>
 #import "TestCommon.h"
 
-#define SERVER_STORE_URL [NSURL fileURLWithPath: [NSTemporaryDirectory() stringByAppendingPathComponent: @"TestStore2.sqlite"]]
+#define SERVER_STORE_URL [[SQLiteStoreTestCase temporaryURLForTestStorage] URLByAppendingPathComponent: @"TestStore2.sqlite"]
 
 @interface TestSynchronization : EditingContextTestCase <UKTest>
 {
