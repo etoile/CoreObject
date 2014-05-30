@@ -133,7 +133,7 @@ The Xcode projects and schemes of interest are:
 - CoreObject/Samples/Typewriter/Typerwriter.xcodeproj
    - Typewriter - a reasonably polished note manager that uses CoreObject
 
-For more details, see [INSTALL.Cocoa](INSTALL.Cocoa) or [INSTALL.GNUstep](INSTALL.GNUstep).
+For more details, see [INSTALL.Cocoa](INSTALL.Cocoa.md) or [INSTALL.GNUstep](INSTALL.GNUstep.md).
 
 
 Mac OS X support
