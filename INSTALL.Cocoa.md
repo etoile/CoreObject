@@ -12,23 +12,25 @@ CoreObject requires the following:
   - [EtoileFoundation](https://github.com/etoile/EtoileFoundation)
   - [UnitKit](https://github.com/etoile/UnitKit) (Only required for running the test suite)
 
-The Xcode projects require the CoreObject, EtoileFoundation, and UnitKit directories
-to be siblings; e.g., a layout like the following:
+You can either get CoreObject and its dependencies from git:
 
-    ~/dev/CoreObject
-	~/dev/EtoileFoundation
-	~/dev/UnitKit
+    git clone https://github.com/etoile/CoreObject.git
+	git clone https://github.com/etoile/EtoileFoundation.git
+	git clone https://github.com/etoile/UnitKit.git
 
-EtoileFoundation and UnitKit will be built together with CoreObject (as a workspace subproject).
+(The Xcode projects require that these three repos are cloned into the same directory.)
+
+Or, get the entire [Étoilé repository](https://github.com/etoile/Etoile), which has
+a script to check out CoreObject and all of the other Etoile frameworks.
 
 **Warning:** There is no iOS support yet.
 
 
-Building
---------
+Build and Install
+-----------------
 
 For a simple build, open CoreObject.xcodeproj and choose CoreObject in the 
-Scheme menu.
+Scheme menu. EtoileFoundation and UnitKit will be built together with CoreObject (as workspace subprojects).
 
 To run a simple example, open CoreObject.xcodeproj and choose BasicPersistence 
 in the Scheme menu.
@@ -36,8 +38,8 @@ in the Scheme menu.
 For a more complex demo, open Samples/ProjectDemo/ProjectDemo.xcodeproj and 
 choose ProjectDemo in the Scheme menu.
 
-Installation
-------------
+Framework Installation
+----------------------
 
 We don't recommend installing frameworks on OS X, but if you want to,
 the following shell command will install CoreObject.framework in /Library/Frameworks:
