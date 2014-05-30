@@ -1,5 +1,3 @@
-CoreObject Tech Notes
-
 ## Overview
 
 The main ideas of CoreObject are:
