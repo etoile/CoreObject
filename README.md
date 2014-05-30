@@ -133,8 +133,4 @@ Mac OS X support
 
 CoreObject is supported on Mac OS X (10.7 or higher), and iOS support is coming soon.
 
-An Xcode project is bundled to build CoreObject on Mac OS X. 
-
-Another Xcode project to build the CoreObject demo application can be found in Samples/ProjectDemo.
-
-**Warning:** Xcode 4.6 or higher is required to build these projects.
+**Warning:** Xcode 4.6 or higher is required to build the Xcode projects.
