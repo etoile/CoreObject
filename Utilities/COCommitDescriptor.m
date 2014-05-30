@@ -62,15 +62,35 @@ static NSMutableDictionary *descriptorTypeTable = nil;
                            typeTable: (NSMutableDictionary *)aTypeTable
 {
 	NSMutableArray *commitsFiles = [NSMutableArray array];
+	/* For the test suite on GNUstep, resources are packaged in the test bundle 
+	   (it doesn't link the CoreObject framework) */
+	NSBundle *coreObjectBundle = [NSBundle bundleForClass: self];
 	NSArray *bundles =
-		[A([NSBundle mainBundle]) arrayByAddingObjectsFromArray: [NSBundle allFrameworks]];
-
-	bundles = [bundles arrayByAddingObjectsFromArray: [NSBundle allBundles]];
+		[A([NSBundle mainBundle], coreObjectBundle) arrayByAddingObjectsFromArray: [NSBundle allFrameworks]];
 
 	for (NSBundle *bundle in bundles)
 	{
-		[commitsFiles addObjectsFromArray: [bundle pathsForResourcesOfType: @"json"
-		                                                       inDirectory: @"Commits"]];
+		// FIXME: Once -[NSBundle pathsForResourcesOfType:inDirectory:] searches 
+		// language directories correctly on GNUstep, remove this inner loop.
+		for (NSString *lang in [bundle localizations])
+		{
+			NSString *localizedDirectory = [[[bundle resourcePath] stringByAppendingPathComponent: 
+				[lang stringByAppendingPathExtension: @"lproj"]] stringByAppendingPathComponent: @"Commits"];
+			NSFileManager *fileManager = [NSFileManager defaultManager];
+			BOOL isDir = NO;
+
+			if (![fileManager fileExistsAtPath: localizedDirectory isDirectory: &isDir] || !isDir)
+				continue;
+
+			NSArray *localizedFiles = [fileManager contentsOfDirectoryAtPath: localizedDirectory error: NULL];
+			ETAssert(localizedFiles != nil);
+			localizedFiles = [localizedFiles mappedCollectionWithBlock: ^ (NSString *subpath)
+			{
+				return [localizedDirectory stringByAppendingPathComponent: subpath];
+			}];
+
+			[commitsFiles addObjectsFromArray: [localizedFiles pathsMatchingExtensions: A(@"json")]];	
+		}
 	}
 	
 	for (NSString *file in commitsFiles)
