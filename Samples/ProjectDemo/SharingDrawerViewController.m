@@ -24,7 +24,9 @@
 	
 	[[controller roster] addDelegate: self delegateQueue: dispatch_get_main_queue()];
 	[self xmppRosterDidChange: (XMPPRosterMemoryStorage *)[[[XMPPController sharedInstance] roster] xmppRosterStorage]];
-	[xmppAccountLabel setStringValue: [[controller.xmppStream myJID] bare]];
+	
+	NSString *bareJid = [[controller.xmppStream myJID] bare];
+	[xmppAccountLabel setStringValue: bareJid != nil ? bareJid : @""];
 }
 
 - (void)xmppRosterDidChange:(XMPPRosterMemoryStorage *)sender
