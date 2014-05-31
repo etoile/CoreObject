@@ -80,10 +80,15 @@
 				</div>
 				<div class="hidden-xs col-sm-1"></div>
 			</div>
-		</section>
+		</section><!-- #community -->
 
-		<section class="container-full blue-section" id="team">
-		<div class="container">
+		<!-- We cannot resize the section width to 100% to support the colored background, because this means the left and right padding must be set to 15px or more, 
+		     but CSS 'auto' doesn't accept a min value to constrain it.
+		     
+			 For the colored section background, we use a div wrapper, plus Boostrap 'container' class:
+			 { margin-left: auto; margin-right: auto; padding-left: 15px padding-right: 15px } -->
+		<div class="container-full blue-section">
+		<section class="container" id="team">
 
 			<h1>Team</h1>
 			<div class="tagline">CoreObject is developed and supported by a two-person team under the <a href="http://www.etoile-project.org">Étoilé</a> project umbrella.</div>
@@ -104,8 +109,8 @@
 			</div>
 			<div class="small-tagline">We would like to thank all the people who participated over the years, especially <em>Yen-Ju Chen</em> and <em>David Chisnall</em> who wrote <span class="highlighted-text">early CoreObject prototypes</span>, and <em>Christopher Armstrong</em> who more recently contributed <span class="highlighted-text">code and ideas</span> that helped shape the current CoreObject version. We also would like to mention <em>Nicolas Roard</em>, <em>Jesse Ross</em>, <em>Banlu Kemiyatorn</em> and other people involved in Étoilé, who  proposed <span class="highlighted-text">early ideas</span>, and took a role in CoreObject's birth in some way.</div>
 	
-		</div>
 		</section>
+		</div>
 		
 	</div> <!-- #content -->
 

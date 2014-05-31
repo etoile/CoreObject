@@ -113,6 +113,29 @@ body
 .container-full 
 {
 	margin: 0;
+	padding: 0;
+	width: 100%;
+}
+
+.blue-section
+{
+	background-color: #6cf;
+}
+
+.orange-section
+{
+	background-color: #ef4832;
+	background-color: #F05C44; /* #F07057; #E74C3C; */
+	background-color: #ff9933;
+	
+	background-color: #F56432;
+	background-color: #F35C32;
+	background-color: #F46032;
+
+	background-color: #FF7A4C;
+
+	/*background: radial-gradient(circle at center,#E4542D,#8B190C);
+	background: radial-gradient(circle at center,#FF7A4C,#ef4832);*/
 }
 
 section
@@ -678,16 +701,14 @@ img
 }
 
 #introduction
-{	/* Override section element */
-	padding-top: 0px;
+{
 	border-bottom: dotted 1px lightgray;
 	border-bottom: dotted 1px #e4e4e4;
 	border-bottom: solid 1px #ededed;	
 }
 
 #video
-{	/* Override section element */
-	padding-top: 0px;
+{
 	padding-bottom: 50px;
 	border-bottom: dotted 6px white;
 	border-bottom: dotted 1px lightgray;
@@ -724,13 +745,6 @@ img
     {
         padding: 30px;
     }
-}
-
-#video .container
-{
-	padding-top: 50px;
-	
-	/*border-top: dotted 1px lightgray;*/
 }
 
 .container .videoline a:link, .container .videoline a:hover
@@ -808,14 +822,6 @@ img
 	text-shadow: 0px 3px 4px rgba(0, 0, 0, 0.06);
 }
 
-#features 
-{
-	margin: 0 auto;
-	width: 100%;
-
-	background-color: #6cf;
-}
-
 /*
  * Framework
  * =========
@@ -833,25 +839,6 @@ img
  * Download
  * ========
  */
-
-#download
-{
-	margin: 0 auto;
-	width: 100%;
-
-	background-color: #ef4832;
-	background-color: #F05C44; /* #F07057; #E74C3C; */
-	background-color: #ff9933;
-	
-	background-color: #F56432;
-	background-color: #F35C32;
-	background-color: #F46032;
-
-	background-color: #FF7A4C;
-
-	/*background: radial-gradient(circle at center,#E4542D,#8B190C);
-	background: radial-gradient(circle at center,#FF7A4C,#ef4832);*/
-}
 
 #download h2
 {
@@ -1043,7 +1030,7 @@ img
 #community
 {
 	/* Additional sections on the same page uses a bit less padding (50px) at the top */
-	padding-top: 70px;
+	margin-top: 55px;
 }
 
 #community h2
@@ -1070,14 +1057,6 @@ img
 {
  	color: #686868;
 	text-shadow: 0px 3px 4px rgba(0, 0, 0, 0.06);
-}
-
-#team
-{
-	margin: 0 auto;
-	width: 100%;
-
-	background-color: #6cf;
 }
 
 @media (max-width: 768px)

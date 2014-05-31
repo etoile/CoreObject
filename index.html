@@ -67,8 +67,7 @@
 			</div>
 		</div>
 
- 		<div class="container-full" id="introduction">
-		<div class="container">
+		<div class="container" id="introduction">
 			<div class="row">
 				<div class="col-md-5">
 					<div class="videoline"><a class="btn btn-info popup-youtube" href="https://www.youtube.com/watch?v=KD8xa3ku1qA"><span class="fa fa-youtube-play"></span> Watch our Introduction video</a></div>
@@ -80,10 +79,8 @@
 				<div class="hidden-xs col-md-1"></div>
 			</div>
 		</div>
-		</div>
 
-		<section class="container-full" id="video">
-		<div class="container">
+		<section class="container" id="video">
 			<div class="row">
 				<div class="hidden-xs col-sm-2"></div>
 				<div class="col-sm-2 ">
@@ -104,11 +101,10 @@
 				</div>
 				<div class="hidden-xs col-sm-2"></div>
 			</div>
-
-		</div><!-- inner container -->
-		</section><!-- video -->
+		</section><!-- #video -->
 	
 		<section class="container" id="userexperience">
+
 			<h1>User Experience</h1>
 			<div class="tagline">CoreObject came from imagining how we would use <em>first principles of UI design</em> to write <span class="highlighted-text">better creativity and productivity apps</span> without being bound by legacy compatibility.</div>
 			<!--
@@ -175,8 +171,14 @@
 		
 		</section><!-- #userexperience -->
 
-		<section class="container-full blue-section" id="features">
-		<div class="container">
+		<!-- We cannot resize the section width to 100% to support the colored background, because this means the left and right padding must be set to 15px or more, 
+		     but CSS 'auto' doesn't accept a min value to constrain it.
+		     
+			 For the colored section background, we use a div wrapper, plus Boostrap 'container' class:
+			 { margin-left: auto; margin-right: auto; padding-left: 15px padding-right: 15px } -->
+		<div class="container-full blue-section">
+		<section class="container" id="features">
+
 			<h1>Features</h1>
 			<div class="tagline">CoreObject is a <em>pragmatic <a href="http://en.wikipedia.org/wiki/Object_database">OODB</a></em> with a <span class="highlighted-text">homegrown <a href="http://en.wikipedia.org/wiki/Distributed_version_control_system">DVCS</a></span>, leveraging <a href="http://sqlite.org/">SQLite</a> for transactional storage and indexing.</div>
 			<!--
@@ -251,10 +253,11 @@
 				</div>
 			</div><!-- row -->
 	
-		</div><!-- inner container -->
 		</section><!-- #features -->
+		</div>
 
 		<section class="container" id="overall-design">
+
 			<h1>Framework</h1>
 			<div class="tagline">CoreObject has <em>slowly evolved</em> to its current shape. We started discussing the ideas behind it back when <a href="http://www.etoile-project.org">Étoilé</a> was founded.</div>
 
@@ -283,10 +286,10 @@
 
 			<img class="big-screenshot" src="images/projectdemo5.png" alt="ProjectDemo history screenshot">
 
-		</section><!-- #framework -->
+		</section><!-- #overall-design -->
 
-		<section class="container-full orange-section" id="download">
-		<div class="container">
+		<div class="container-full orange-section">
+		<section class="container" id="download">
 			<h1>Download</h1>
 			<div class="tagline">The package includes the <a href="https://github.com/etoile/EtoileFoundation">EtoileFoundation</a> dependency, the <a href="https://github.com/etoile/UnitKit">UnitKit</a> test framework, and supports both <em>Cocoa and GNUstep</em> as development environments.</div>
 
@@ -312,10 +315,10 @@
 
 			<div class="small-tagline">To grab the latest source: <!--, view our GitHub repository, or clone it with this command: --><div class="codewrapper"><span class="code">git clone https://github.com/etoile/CoreObject.git</span></div></div>
 
-		</div><!-- inner container -->
 		</section><!-- #download -->
+		</div>
 
-	</div> <!-- #content-->
+	</div><!-- #content-->
 
     <div id="footer">
       <div class="container">
