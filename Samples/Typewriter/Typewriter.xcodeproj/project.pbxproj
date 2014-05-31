@@ -36,6 +36,7 @@
 		66B7DB3718A96FD900010BCB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 663EFD2C18A17E270030BD2F /* Cocoa.framework */; };
 		66B7DB3818A96FEE00010BCB /* CoreObject.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 663EFD9318A180170030BD2F /* CoreObject.framework */; };
 		66B7DB3918A96FF500010BCB /* EtoileFoundation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66B7DB2C18A96F9100010BCB /* EtoileFoundation.framework */; };
+		66C4588E1939509A00F57A24 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 66C4588C1939509A00F57A24 /* Credits.rtf */; };
 		66E6821518B723AD003294EB /* plus_8x8@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 66E6821418B723AD003294EB /* plus_8x8@2x.png */; };
 		66E6822018B72428003294EB /* plus_8x8-grey.png in Resources */ = {isa = PBXBuildFile; fileRef = 66E6821E18B72427003294EB /* plus_8x8-grey.png */; };
 		66E6822118B72428003294EB /* plus_8x8-grey@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 66E6821F18B72428003294EB /* plus_8x8-grey@2x.png */; };
@@ -198,6 +199,7 @@
 		66B7DB1C18A96F2900010BCB /* EtoileFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EtoileFoundation.framework; path = "../../../../../../../../Library/Developer/Xcode/DerivedData/Typewriter-ewqruishaxmvlhhefeyihtxobbmk/Build/Products/Debug/EtoileFoundation.framework"; sourceTree = "<group>"; };
 		66B7DB2218A96F9100010BCB /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = ../../../EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
 		66BA3D5618DA81FE00641D40 /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = TODO.md; sourceTree = SOURCE_ROOT; };
+		66C4588D1939509A00F57A24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = SOURCE_ROOT; };
 		66E6821418B723AD003294EB /* plus_8x8@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plus_8x8@2x.png"; sourceTree = "<group>"; };
 		66E6821E18B72427003294EB /* plus_8x8-grey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plus_8x8-grey.png"; sourceTree = "<group>"; };
 		66E6821F18B72428003294EB /* plus_8x8-grey@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plus_8x8-grey@2x.png"; sourceTree = "<group>"; };
@@ -330,6 +332,7 @@
 		664CC9EE18A4A321002F04B7 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				66C4588C1939509A00F57A24 /* Credits.rtf */,
 				66E6821E18B72427003294EB /* plus_8x8-grey.png */,
 				66E6821F18B72428003294EB /* plus_8x8-grey@2x.png */,
 				664CC9F118A4A3FC002F04B7 /* plus_8x8.png */,
@@ -524,6 +527,7 @@
 				663EFD7E18A17FB30030BD2F /* MainMenu.xib in Resources */,
 				664CC9E818A4607F002F04B7 /* Commits in Resources */,
 				663EFD7D18A17FB30030BD2F /* InfoPlist.strings in Resources */,
+				66C4588E1939509A00F57A24 /* Credits.rtf in Resources */,
 				66E6821518B723AD003294EB /* plus_8x8@2x.png in Resources */,
 				66E6822018B72428003294EB /* plus_8x8-grey.png in Resources */,
 				6642F88E18C16C2700E30BFF /* History.xib in Resources */,
@@ -618,6 +622,14 @@
 				665880BB18F31BB1004B03D6 /* en */,
 			);
 			name = DiffWindow.xib;
+			sourceTree = "<group>";
+		};
+		66C4588C1939509A00F57A24 /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				66C4588D1939509A00F57A24 /* en */,
+			);
+			name = Credits.rtf;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
