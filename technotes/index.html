@@ -81,11 +81,11 @@
 <p>The main ideas of CoreObject are:</p>
 <ul>
 <li><p>Object graph persistence similar to <a href="http://en.wikipedia.org/wiki/Core_Data">CoreData</a>, <a href="http://jackrabbit.apache.org">Apache Jackrabbit</a></p></li>
-<li><p>All objects are UUID-labeled</p></li>
 <li><p>Object graphs are partitioned into persistent roots; each persistent root acts as an isolated DVCS repository to keep track of the history of its object graph</p></li>
 <li><p>DVCS doesn’t use file/directory abstractions</p></li>
 <li><p>The DVCS is optimized for writing small commits (changing a few objects in an object graph), because commits are intended to map rougly to UI actions</p></li>
-<li><p>Having UUID labels on all objects at a fine granularity makes diff/merge easy and accurate</p></li>
+<li><p>All store/DVCS constructs are UUID-labelled</p></li>
+<li><p>All objects are UUID-labelled at fine granularity, to facilitate incremental saves, and make diff/merge easy and accurate</p></li>
 <li><p>A DVCS is an ideal base on which to implement undo/redo and collaborative editing</p></li>
 </ul>
 <h2 id="architecture">Architecture</h2>
@@ -95,13 +95,13 @@
 </div>
 <h2 id="store">Store</h2>
 <p>The store is the bottom level in the CoreObject codebase. It implements the DVCS part and low-level object serialization.</p>
-<p>A store is an unordered container of <em>persistent roots</em> which are stored in the same directory on disk and can share data internally. Conceptually, the store is an implementation detail in CoreObject whose only purpose is to represent persistent roots in a filesystem.</p>
+<p>A store is an unordered container of <em>persistent roots</em> which are stored in the same directory on disk and can share data internally. Conceptually, the store is an implementation detail in CoreObject whose only purpose is to represent persistent roots in an SQLite database in the host filesystem.</p>
 <div class="figure">
 <img src="store.005.png" />
 </div>
 <p>A <em>persistent root</em> is the &quot;DVCS repository” part of CoreObject: it has a revision graph, and each revision is a snapshot of the object graph represented by the persistent root. We borrowed the term <em>persistent root</em> from object-oriented databases. You can also think of a persistent root as a versioned document.</p>
 <h3 id="object-graph">Object Graph</h3>
-<p>We use the term “item graph” to mean a serialized object graph, and object graph to mean the mutable in-memory representation.</p>
+<p>We use the term “item graph” to mean a serialized object graph (either in store or in memory), and object graph to mean the mutable in-memory representation.</p>
 <p>Unlike most DVCS’s, we don’t use a directory/file abstraction in CoreObject, and there’s no facility for checking out a working copy of a persistent root into a filesystem. The item graph is intended to subsume the role of a filesystem, handling the file organization features that you would use a filesystem for, and also handle the role of a structured file format like JSON.</p>
 <p>An item graph starts with a <em>root item</em> and consists of that item plus all items reachable by following references.</p>
 <p>Here’s an example item graph that could be stored in a persistent root:</p>
@@ -112,10 +112,10 @@
 <p>We felt is was necessary to have:</p>
 <ul>
 <li><p>UUIDs on every item. This facilitates diffing item graphs, and incremental saves (writing out exactly the set of modified items)</p></li>
-<li><p>First class UUID-based references (the purple arrows above). First-class meaning they are strongly-typed object reference, not stored in a string or integer like you’d do in JSON.<br /><br /> For item graph diff/merge to be useful, it needs to be aware of references. Likewise, we explicitly support unordered and ordered collections at this level so the diffs are semantically meaningful, and provide good input for the merge algorithm.</p></li>
+<li><p>First class UUID-based references (the purple arrows above). First-class meaning they are strongly-typed object reference, not stored in a string or integer like you’d do in JSON.<br /><br /> For item graph diff/merge to be useful, it needs to be aware of references. Likewise, we explicitly support unordered and ordered collections at this level so the diffs are semantically meaningful, and provide good input for the merge algorithm.<br /><br /> We also support first-class references which point to another persistent root in the store; these links are what allow CoreObject to take over the organizational role of a filesystem (Tags or folders, serialized as items in one persistent root, can contain links to other persistent roots which are documents, for example.)</p></li>
 </ul>
 <p>Less importantly, it was convenient to be able to make attachments a first-class type, so we can garbage-collect them.</p>
-<p>CoreObject would be more convenient to use if it used a standard format like JSON, but the resulting system couldn’t meet our end goals without following the above conventions, so we decided it was cleaner to force them on all data stored in CoreObject by having our own object model.</p>
+<p>CoreObject would be more compatible with the outside world if it used a standard format like JSON, but the resulting system couldn’t meet our end goals without following the above conventions, so we decided it was cleaner to force them on all data stored in CoreObject by having our own object model.</p>
 <p>Once we decided to have our own object model, it was natural to make a custom binary serialization format. The result is fast and the code is simple. Here is the binary serialization of the root item from the diagram above:</p>
 <div class="figure">
 <img src="store.003.png" />
@@ -160,13 +160,13 @@
 <ul>
 <li><p>Ordinary use of CoreObject-based apps is expected to create divergent revisions. (e.g. in a text editor: &quot;type, undo, type, type, type” would create a divergent revision.) If the user doesn’t go back and save these divergent revisions by creating branches for them, it makes sense to automatically delete them</p></li>
 <li><p>Fits well with the overall conceptual design of CoreObject. Revisions are not a concept users need to worry about - branches and persistent roots are - so it makes to garbage collect revisions, but use explicit deletion for branches and persistent roots</p></li>
-<li><p>Consistent with git’s design</p></li>
 </ul>
 <p>Something we want to support, but is not yet implemented, is the ability to erase the distant past history of a persistent root’s revision graph (e.g. &quot;delete history older than 6 months&quot;).</p>
 <p>Finally, items in a revision’s item graph are garbage collected. This let us define an item graph as “a root item, plus the set of items reachable by following references”. One nice side-effect of this definition is, it’s acceptable to have have extra “garbage” items in a set of items that makes up an item graph - they will simply be ignored - and the store exploits this (see the Delta Storage section) to simplify its implementation. Another nice side effect is, when diffing two item graphs, we don’t need to consider deletion as a special case. If all references to an item are removed, the item ceases to be a part of the item graph; we don’t need to pollute diffs/merges with special “delete item” commands.</p>
 <h2 id="diffmerge">Diff/Merge</h2>
 <p>The main difficulty in diffing two pieces of structured data is figuring out a correspondence between objects in the two documents (a lot of research on diffing arbitrary XML boiled down to heuristics for identifying the “same” object in the two document versions being compared). CoreObject sidesteps this problem by forcing all objects to have a UUID label.</p>
 <p>Given the knowledge of the correspondence between objects in two documents, the remaining diff algorithm is pretty trivial. Our diff algorithm looks something like this:</p>
+<p>Given an original item graph A and modified item graph B,</p>
 <ul>
 <li><p>for each object O in B but not A, record it as an object insertion</p></li>
 <li><p>for each object O in B that is modified vs. that object in A:</p>
@@ -184,6 +184,7 @@
 <div class="figure">
 <img src="store.011.png" />
 </div>
+<p>For more details and background, see the paper <a href="http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.219.6748">Difference and Union of Models</a>.</p>
 <p>We also support plugging in alternative diff/merge algorithms for particular item types when the default one isn’t suitable. CoreObject includes an example of this, a unfinished prototype of attributed string (i.e. styled text) diff/merge.</p>
 <h2 id="editing-context">Editing Context</h2>
 <p>You can use the Store API on its own, but it's quite cumbersome. The Editing Context layer of CoreObject just presents a store as a set of mutable objects, which track changes you make to them, so when you call the -commit method, the editing context builds up an appropriate transaction and commits it to the store.</p>
@@ -194,11 +195,11 @@
 <li><p>COObjectGraphContext is a mutable facade for an item graph</p></li>
 <li><p>COObject is a mutable facade for a single item in an item graph</p></li>
 </ul>
-<p>Like other object databases and object graph persistence systems, you must define a schema/metamodel for your model objects to follow (see class ETEntityDescription and ETPropertyDescription). Each item in an item graph has a “entity name” property which determines which entity description it uses. You also need to make a subclass COObject for each entity type.</p>
+<p>Like other object databases and object graph persistence systems, you must define a schema/metamodel for your model objects to follow (see class ETEntityDescription and ETPropertyDescription). Each item in an item graph has a “entity name” property which determines which entity description it uses.</p>
 <h2 id="undo">Undo</h2>
 <p>CoreObject comes with a ready-made undo system to use in your applications. Superficially, it's quite ordinary; based on the Gang of Four command pattern, but it also has some unusual features.</p>
 <p>First, the commands and undo stacks are persisted in a SQLite database (separate from the CoreObject store.) This makes application restarts transparent.</p>
-<p>Second, while most undo systems would have a set of command objects that track changes to the application’s model objects, the CoreObject commands track things one level of abstraction higher up; they record mutations made to a CoreObject store. The nice thing about this is the complete list of commands is:</p>
+<p>Second, while most undo systems would have a set of command objects that track changes to the application’s model objects, the CoreObject commands track things one level of abstraction higher up; they record mutations made to a CoreObject store. The nice thing about this is, the complete list of commands is:</p>
 <ul>
 <li><p>Persistent Root</p>
 <ul>
@@ -214,7 +215,7 @@
 </ul></li>
 </ul>
 <p>which cover all possible changes you can make to a CoreObject store (except invoking garbage collection, which is destructive and non-undoable.)</p>
-<p>Another unusual feature: all of these commands can be applied to a store that’s in a different state than when the command was recorded. The most common command, &quot;Set Current Revision”, represents the user committing a change to a branch, or reverting some changes, and the command contains the initial and final revision UUID’s. If the user asks for the command to be undone (or redone), and the branch doesn’t have the same current revision as when the command was recorded, CoreObject generates a new revision which cherry-picks or reverts the required changes. This is what gives us per-user undo in collaborative editing for free, and the ability to have an undo stack per viewport with multiple viewports on the same document for free.</p>
+<p>Another unusual feature: all of these commands can be applied to a store that’s in a different state than when the command was recorded. The most common command, &quot;Set Current Revision”, represents the user committing a change to a branch, or reverting some changes, and the command contains the initial and final revision UUID’s. If the user asks for the command to be undone (or redone), and the branch doesn’t have the same current revision as when the command was recorded, CoreObject generates a new revision which cherry-picks or reverts the required changes. This is what gives us selective undo, per-user undo in collaborative editing for free, and the ability to have an undo stack per viewport with multiple viewports on the same document for free.</p>
 <p>Finally, we allow branches in the undo command graphs, rather than restricting it to a stack. This is not a major feature (in fact it was a late addition), but gives you an extra layer of security against losing a change.</p>
 <p>Here’s an example undo store showing two undo tracks and their undo commands:</p>
 <div class="figure">

@@ -5,8 +5,6 @@ The main ideas of CoreObject are:
 -   Object graph persistence similar to [CoreData][], [Apache
     Jackrabbit][]
 
--   All objects are UUID-labeled
-
 -   Object graphs are partitioned into persistent roots; each persistent
     root acts as an isolated DVCS repository to keep track of the
     history of its object graph
@@ -17,8 +15,10 @@ The main ideas of CoreObject are:
     objects in an object graph), because commits are intended to map
     rougly to UI actions
 
--   Having UUID labels on all objects at a fine granularity makes
-    diff/merge easy and accurate
+-   All store/DVCS constructs are UUID-labelled
+
+-   All objects are UUID-labelled at fine granularity, to facilitate
+    incremental saves, and make diff/merge easy and accurate
 
 -   A DVCS is an ideal base on which to implement undo/redo and
     collaborative editing
@@ -37,7 +37,8 @@ the DVCS part and low-level object serialization.
 A store is an unordered container of *persistent roots* which are stored
 in the same directory on disk and can share data internally.
 Conceptually, the store is an implementation detail in CoreObject whose
-only purpose is to represent persistent roots in a filesystem.
+only purpose is to represent persistent roots in an SQLite database in
+the host filesystem.
 
 ![][1]
 
@@ -49,8 +50,9 @@ root as a versioned document.
 
 ### Object Graph
 
-We use the term “item graph” to mean a serialized object graph, and
-object graph to mean the mutable in-memory representation.
+We use the term “item graph” to mean a serialized object graph (either
+in store or in memory), and object graph to mean the mutable in-memory
+representation.
 
 Unlike most DVCS’s, we don’t use a directory/file abstraction in
 CoreObject, and there’s no facility for checking out a working copy of a
@@ -78,18 +80,25 @@ We felt is was necessary to have:
     First-class meaning they are strongly-typed object reference, not
     stored in a string or integer like you’d do in JSON.\
     \
-    For item graph diff/merge to be useful, it needs to be aware of
+     For item graph diff/merge to be useful, it needs to be aware of
     references. Likewise, we explicitly support unordered and ordered
     collections at this level so the diffs are semantically meaningful,
-    and provide good input for the merge algorithm.
+    and provide good input for the merge algorithm.\
+    \
+    We also support first-class references which point to another
+    persistent root in the store; these links are what allow CoreObject
+    to take over the organizational role of a filesystem (Tags or
+    folders, serialized as items in one persistent root, can contain
+    links to other persistent roots which are documents, for example.)
 
 Less importantly, it was convenient to be able to make attachments a
 first-class type, so we can garbage-collect them.
 
-CoreObject would be more convenient to use if it used a standard format
-like JSON, but the resulting system couldn’t meet our end goals without
-following the above conventions, so we decided it was cleaner to force
-them on all data stored in CoreObject by having our own object model.
+CoreObject would be more compatible with the outside world if it used a
+standard format like JSON, but the resulting system couldn’t meet our
+end goals without following the above conventions, so we decided it was
+cleaner to force them on all data stored in CoreObject by having our own
+object model.
 
 Once we decided to have our own object model, it was natural to make a
 custom binary serialization format. The result is fast and the code is
@@ -207,8 +216,6 @@ motivations for this behaviour:
     persistent roots are - so it makes to garbage collect revisions, but
     use explicit deletion for branches and persistent roots
 
--   Consistent with git’s design
-
 Something we want to support, but is not yet implemented, is the ability
 to erase the distant past history of a persistent root’s revision graph
 (e.g. "delete history older than 6 months").
@@ -238,6 +245,8 @@ Given the knowledge of the correspondence between objects in two
 documents, the remaining diff algorithm is pretty trivial. Our diff
 algorithm looks something like this:
 
+Given an original item graph A and modified item graph B,
+
 -   for each object O in B but not A, record it as an object insertion
 
 -   for each object O in B that is modified vs. that object in A:
@@ -264,6 +273,9 @@ type of diff (and any conflicts) in a UI is still an open question.
 Here’s a pair of item graphs and the resulting diff:
 
 ![][8]
+
+For more details and background, see the paper [Difference and Union of
+Models][].
 
 We also support plugging in alternative diff/merge algorithms for
 particular item types when the default one isn’t suitable. CoreObject
@@ -292,8 +304,7 @@ Like other object databases and object graph persistence systems, you
 must define a schema/metamodel for your model objects to follow (see
 class ETEntityDescription and ETPropertyDescription). Each item in an
 item graph has a “entity name” property which determines which entity
-description it uses. You also need to make a subclass COObject for each
-entity type.
+description it uses.
 
 ## Undo
 
@@ -308,7 +319,7 @@ transparent.
 Second, while most undo systems would have a set of command objects that
 track changes to the application’s model objects, the CoreObject
 commands track things one level of abstraction higher up; they record
-mutations made to a CoreObject store. The nice thing about this is the
+mutations made to a CoreObject store. The nice thing about this is, the
 complete list of commands is:
 
 -   Persistent Root
@@ -339,9 +350,9 @@ the initial and final revision UUID’s. If the user asks for the command
 to be undone (or redone), and the branch doesn’t have the same current
 revision as when the command was recorded, CoreObject generates a new
 revision which cherry-picks or reverts the required changes. This is
-what gives us per-user undo in collaborative editing for free, and the
-ability to have an undo stack per viewport with multiple viewports on
-the same document for free.
+what gives us selective undo, per-user undo in collaborative editing for
+free, and the ability to have an undo stack per viewport with multiple
+viewports on the same document for free.
 
 Finally, we allow branches in the undo command graphs, rather than
 restricting it to a stack. This is not a major feature (in fact it was a
@@ -395,6 +406,7 @@ users making an edit simultaneously:
   [6]: store.007.png
   [7]: store.008.png
   [8]: store.011.png
+  [Difference and Union of Models]: http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.219.6748
   [9]: store.009.png
   [Collaborative editing support]: https://github.com/etoile/CoreObject/tree/master/Synchronization
   [10]: store.010.png
