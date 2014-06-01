@@ -109,8 +109,18 @@ body
 	}
 }
 
+.other-page-content
+{
+	padding-top: 55px;
+}
+
+.main-page-content
+{
+	padding-top: 0;
+}
+
 /* Stretchable container that extends horizontally all the way to the page border */
-.container-full 
+.colored-background 
 {
 	margin: 0;
 	padding: 0;
@@ -231,14 +241,14 @@ section
  * =====
  */
 
-.content a:not(.btn):link, .content a:not(.btn):visited
+.basic-content a:not(.btn):link, .basic-content a:not(.btn):visited
 {
 	font-weight: 600;
 	text-decoration: none;
 	/* color: #222; */
 }
 
-.content a:not(.btn):hover, .content a:not(.btn):active
+.basic-content a:not(.btn):hover, .basic-content a:not(.btn):active
 {
 	font-weight: 600;
 	text-decoration: none;
@@ -344,7 +354,7 @@ section
 	font-size: 2em;
 }
 
-.container-full h1
+.colored-background h1
 {
 	text-transform:uppercase;
 	color: #F8F8FF;
@@ -458,7 +468,7 @@ h2
  * =====================
  */
 
-#content ul
+.basic-content ul
 {
 	margin: 0;
 	padding: 0;
@@ -466,7 +476,7 @@ h2
 	list-style-type: none;
 }
 
-#content li
+.basic-content li
 {
 	margin-top: .5em;
 	margin-bottom: .5em;
@@ -1027,11 +1037,6 @@ img
  * =========
  */
 
-#community
-{
-	/* Additional sections on the same page uses a bit less padding (50px) at the top */
-	margin-top: 55px;
-}
 
 #community h2
 {
@@ -1100,7 +1105,7 @@ img
 }
 
 /* Pattern container */
-#footer .container-full
+#footer .colored-background
 {
 	height: 80px;
 	vertical-align: center;
