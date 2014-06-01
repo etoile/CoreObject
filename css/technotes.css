@@ -1,4 +1,16 @@
-.figure img 
+.note-content h2
+{
+	margin-top: 50px;
+	margin-bottom: 20px;
+}
+
+.note-content h3
+{
+	margin-top: 25px;
+	margin-bottom: 15px;
+}
+
+.figure img
 {
 	display: block;
 	margin-left: auto;
