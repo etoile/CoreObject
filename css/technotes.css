@@ -1,8 +1,23 @@
-.container img {
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 2.5em;
-  margin-bottom: 2.5em;
+.figure img 
+{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
 }
 
+.figure
+{
+	margin-top: 2.5em;
+	margin-bottom: 2.5em;
+}
+
+#content > .container > *:last-child
+{
+	margin-bottom: 0;
+}
+
+#footer
+{
+	/* Based on #video bottom border */
+	border-top: dotted 1px lightgray;
+}
