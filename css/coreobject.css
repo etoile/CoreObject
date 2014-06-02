@@ -360,6 +360,11 @@ section
 	color: #F8F8FF;
 }
 
+.colored-background h2 a
+{
+	color: #FFFFFF !important; /* HACK */
+}
+
 h2
 {
 	margin-top: 0;
