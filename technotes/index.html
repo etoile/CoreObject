@@ -101,7 +101,7 @@
 </div>
 <p>A <em>persistent root</em> is the &quot;DVCS repository” part of CoreObject: it has a revision graph, and each revision is a snapshot of the object graph represented by the persistent root. We borrowed the term <em>persistent root</em> from object-oriented databases. You can also think of a persistent root as a versioned document.</p>
 <h3 id="object-graph">Object Graph</h3>
-<p>We use the term “item graph” to mean a serialized object graph (either in store or in memory), and object graph to mean the mutable in-memory representation.</p>
+<p>We use the term “item graph” to mean a serialized object graph (either in store or <a href="https://github.com/etoile/CoreObject/blob/master/StorageDataModel/COItemGraph.h">in memory</a>), and object graph to mean the mutable in-memory representation.</p>
 <p>Unlike most DVCS’s, we don’t use a directory/file abstraction in CoreObject, and there’s no facility for checking out a working copy of a persistent root into a filesystem. The item graph is intended to subsume the role of a filesystem, handling the file organization features that you would use a filesystem for, and also handle the role of a structured file format like JSON.</p>
 <p>An item graph starts with a <em>root item</em> and consists of that item plus all items reachable by following references.</p>
 <p>Here’s an example item graph that could be stored in a persistent root:</p>
@@ -189,11 +189,11 @@
 <h2 id="editing-context">Editing Context</h2>
 <p>You can use the Store API on its own, but it's quite cumbersome. The Editing Context layer of CoreObject just presents a store as a set of mutable objects, which track changes you make to them, so when you call the -commit method, the editing context builds up an appropriate transaction and commits it to the store.</p>
 <ul>
-<li><p>COEditingContext is a mutable facade for a store</p></li>
-<li><p>COPersistentRoot is a mutable facade for a persistent root</p></li>
-<li><p>COBranch is a mutable facade for a branch</p></li>
-<li><p>COObjectGraphContext is a mutable facade for an item graph</p></li>
-<li><p>COObject is a mutable facade for a single item in an item graph</p></li>
+<li><p><a href="https://github.com/etoile/CoreObject/blob/master/Core/COEditingContext.h">COEditingContext</a> is a mutable facade for a store</p></li>
+<li><p><a href="https://github.com/etoile/CoreObject/blob/master/Core/COPersistentRoot.h">COPersistentRoot</a> is a mutable facade for a persistent root</p></li>
+<li><p><a href="https://github.com/etoile/CoreObject/blob/master/Core/COBranch.h">COBranch</a> is a mutable facade for a branch</p></li>
+<li><p><a href="https://github.com/etoile/CoreObject/blob/master/Core/COObjectGraphContext.h">COObjectGraphContext</a> is a mutable facade for an item graph</p></li>
+<li><p><a href="https://github.com/etoile/CoreObject/blob/master/Core/COObject.h">COObject</a> is a mutable facade for a single item in an item graph</p></li>
 </ul>
 <p>Like other object databases and object graph persistence systems, you must define a schema/metamodel for your model objects to follow (see class ETEntityDescription and ETPropertyDescription). Each item in an item graph has a “entity name” property which determines which entity description it uses.</p>
 <h2 id="undo">Undo</h2>

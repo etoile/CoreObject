@@ -51,8 +51,8 @@ root as a versioned document.
 ### Object Graph
 
 We use the term “item graph” to mean a serialized object graph (either
-in store or in memory), and object graph to mean the mutable in-memory
-representation.
+in store or [in memory][]), and object graph to mean the mutable
+in-memory representation.
 
 Unlike most DVCS’s, we don’t use a directory/file abstraction in
 CoreObject, and there’s no facility for checking out a working copy of a
@@ -85,7 +85,7 @@ We felt is was necessary to have:
     collections at this level so the diffs are semantically meaningful,
     and provide good input for the merge algorithm.\
     \
-    We also support first-class references which point to another
+     We also support first-class references which point to another
     persistent root in the store; these links are what allow CoreObject
     to take over the organizational role of a filesystem (Tags or
     folders, serialized as items in one persistent root, can contain
@@ -290,15 +290,15 @@ mutable objects, which track changes you make to them, so when you call
 the -commit method, the editing context builds up an appropriate
 transaction and commits it to the store.
 
--   COEditingContext is a mutable facade for a store
+-   [COEditingContext][] is a mutable facade for a store
 
--   COPersistentRoot is a mutable facade for a persistent root
+-   [COPersistentRoot][] is a mutable facade for a persistent root
 
--   COBranch is a mutable facade for a branch
+-   [COBranch][] is a mutable facade for a branch
 
--   COObjectGraphContext is a mutable facade for an item graph
+-   [COObjectGraphContext][] is a mutable facade for an item graph
 
--   COObject is a mutable facade for a single item in an item graph
+-   [COObject][] is a mutable facade for a single item in an item graph
 
 Like other object databases and object graph persistence systems, you
 must define a schema/metamodel for your model objects to follow (see
@@ -398,6 +398,7 @@ users making an edit simultaneously:
   [Apache Jackrabbit]: http://jackrabbit.apache.org
   []: store.004.png
   [1]: store.005.png
+  [in memory]: https://github.com/etoile/CoreObject/blob/master/StorageDataModel/COItemGraph.h
   [2]: store.012.png
   [3]: store.003.png
   [revlogs]: http://mercurial.selenic.com/wiki/Presentations?action=AttachFile&do=get&target=ols-mercurial-paper.pdf
@@ -407,6 +408,11 @@ users making an edit simultaneously:
   [7]: store.008.png
   [8]: store.011.png
   [Difference and Union of Models]: http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.219.6748
+  [COEditingContext]: https://github.com/etoile/CoreObject/blob/master/Core/COEditingContext.h
+  [COPersistentRoot]: https://github.com/etoile/CoreObject/blob/master/Core/COPersistentRoot.h
+  [COBranch]: https://github.com/etoile/CoreObject/blob/master/Core/COBranch.h
+  [COObjectGraphContext]: https://github.com/etoile/CoreObject/blob/master/Core/COObjectGraphContext.h
+  [COObject]: https://github.com/etoile/CoreObject/blob/master/Core/COObject.h
   [9]: store.009.png
   [Collaborative editing support]: https://github.com/etoile/CoreObject/tree/master/Synchronization
   [10]: store.010.png
