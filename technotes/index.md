@@ -342,6 +342,9 @@ which cover all possible changes you can make to a CoreObject store
 (except invoking garbage collection, which is destructive and
 non-undoable.)
 
+This means as your application evolves, as long as you store all of your
+state in CoreObject, you’ll never have to write another undo command.
+
 Another unusual feature: all of these commands can be applied to a store
 that’s in a different state than when the command was recorded. The most
 common command, "Set Current Revision”, represents the user committing a
@@ -398,7 +401,7 @@ users making an edit simultaneously:
   [Apache Jackrabbit]: http://jackrabbit.apache.org
   []: store.004.png
   [1]: store.005.png
-  [in memory]: https://github.com/etoile/CoreObject/blob/master/StorageDataModel/COItemGraph.h
+  [in memory]: http://etoileos.com/dev/api/CoreObject/COItemGraph.html
   [2]: store.012.png
   [3]: store.003.png
   [revlogs]: http://mercurial.selenic.com/wiki/Presentations?action=AttachFile&do=get&target=ols-mercurial-paper.pdf
@@ -408,13 +411,13 @@ users making an edit simultaneously:
   [7]: store.008.png
   [8]: store.011.png
   [Difference and Union of Models]: http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.219.6748
-  [COEditingContext]: https://github.com/etoile/CoreObject/blob/master/Core/COEditingContext.h
-  [COPersistentRoot]: https://github.com/etoile/CoreObject/blob/master/Core/COPersistentRoot.h
-  [COBranch]: https://github.com/etoile/CoreObject/blob/master/Core/COBranch.h
-  [COObjectGraphContext]: https://github.com/etoile/CoreObject/blob/master/Core/COObjectGraphContext.h
-  [COObject]: https://github.com/etoile/CoreObject/blob/master/Core/COObject.h
-  [ETEntityDescription]: https://github.com/etoile/EtoileFoundation/blob/master/Headers/ETEntityDescription.h
-  [ETPropertyDescription]: https://github.com/etoile/EtoileFoundation/blob/master/Headers/ETPropertyDescription.h
+  [COEditingContext]: http://etoileos.com/dev/api/CoreObject/COEditingContext.html
+  [COPersistentRoot]: http://etoileos.com/dev/api/CoreObject/COPersistentRoot.html
+  [COBranch]: http://etoileos.com/dev/api/CoreObject/COBranch.html
+  [COObjectGraphContext]: http://etoileos.com/dev/api/CoreObject/COObjectGraphContext.html
+  [COObject]: http://etoileos.com/dev/api/CoreObject/COObject.html
+  [ETEntityDescription]: http://etoileos.com/dev/api/EtoileFoundation/ETEntityDescription.html
+  [ETPropertyDescription]: http://etoileos.com/dev/api/EtoileFoundation/ETPropertyDescription.html
   [9]: store.009.png
   [Collaborative editing support]: https://github.com/etoile/CoreObject/tree/master/Synchronization
   [10]: store.010.png
