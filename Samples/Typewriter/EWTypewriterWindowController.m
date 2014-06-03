@@ -294,8 +294,11 @@ NSString * EWTagDragType = @"org.etoile.Typewriter.Tag";
 	COTagGroup *targetTagGroup = [self tagGroupOfSelectedRow];
 	if (targetTagGroup == nil)
 	{
-		NSLog(@"Couldn't create tag; no tag group to insert it in to");
-		return;
+		// no tag group to insert it in to, so make a new one
+		[self addTagGroup: sender];
+		
+		targetTagGroup = [self tagGroupOfSelectedRow];
+		ETAssert(targetTagGroup != nil);
 	}
 
 	__block COTag *newTag = nil;

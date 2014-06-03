@@ -100,6 +100,7 @@
 		66C33D71128F395400E5B15B /* ItemReference.m in Resources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66C33D90128F449400E5B15B /* ItemReference.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C33D70128F395400E5B15B /* ItemReference.m */; };
 		66C3F7F1183EB6BA0044F5E1 /* EWDocumentWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66C3F7F0183EB6BA0044F5E1 /* EWDocumentWindowController.m */; };
+		66C458991939568000F57A24 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 66C458971939568000F57A24 /* Credits.rtf */; };
 		66CA1844181A3E5B00DE6AFB /* Search.xib in Resources */ = {isa = PBXBuildFile; fileRef = 66CA1843181A3E5B00DE6AFB /* Search.xib */; };
 		66CA184E181A3F4F00DE6AFB /* SearchWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66CA184D181A3F4F00DE6AFB /* SearchWindowController.m */; };
 		66DBB3781813B1A80047301A /* PreferencesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 66DBB3771813B1A80047301A /* PreferencesController.m */; };
@@ -433,6 +434,7 @@
 		66C33E0C1290BC7700E5B15B /* SKTInspectorController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SKTInspectorController.m; sourceTree = "<group>"; };
 		66C3F7EF183EB6BA0044F5E1 /* EWDocumentWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWDocumentWindowController.h; sourceTree = "<group>"; };
 		66C3F7F0183EB6BA0044F5E1 /* EWDocumentWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWDocumentWindowController.m; sourceTree = "<group>"; };
+		66C458981939568000F57A24 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = English; path = English.lproj/Credits.rtf; sourceTree = "<group>"; };
 		66CA1843181A3E5B00DE6AFB /* Search.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = Search.xib; sourceTree = "<group>"; };
 		66CA184C181A3F4F00DE6AFB /* SearchWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchWindowController.h; sourceTree = "<group>"; };
 		66CA184D181A3F4F00DE6AFB /* SearchWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchWindowController.m; sourceTree = "<group>"; };
@@ -831,6 +833,7 @@
 				6698320312691F970011C7FC /* SCRATCHPAD */,
 				6627EEDC1278A55A00E06946 /* README.md */,
 				66568C69189399A80075FD9A /* TODO.md */,
+				66C458971939568000F57A24 /* Credits.rtf */,
 				79911A0712CD974A009D28C0 /* Application.h */,
 				79911A0812CD974A009D28C0 /* Application.m */,
 				79FC088E12DBE8E300DE3C18 /* TagWindowController.h */,
@@ -1192,6 +1195,7 @@
 				6638C026181852FD008341E6 /* ProjectNav.xib in Resources */,
 				79911A6512CDB215009D28C0 /* Line.tiff in Resources */,
 				6689D9891859050600EC48FB /* SharingDrawer.xib in Resources */,
+				66C458991939568000F57A24 /* Credits.rtf in Resources */,
 				79911A6612CDB215009D28C0 /* Rectangle.tiff in Resources */,
 				661211901821A482003AEC29 /* README.txt in Resources */,
 				79911A6712CDB215009D28C0 /* TextGraphic.tiff in Resources */,
@@ -1332,6 +1336,14 @@
 				66BC6A20191C50A200AD08F7 /* English */,
 			);
 			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		66C458971939568000F57A24 /* Credits.rtf */ = {
+			isa = PBXVariantGroup;
+			children = (
+				66C458981939568000F57A24 /* English */,
+			);
+			name = Credits.rtf;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
