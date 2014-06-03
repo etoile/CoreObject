@@ -302,9 +302,9 @@ transaction and commits it to the store.
 
 Like other object databases and object graph persistence systems, you
 must define a schema/metamodel for your model objects to follow (see
-class ETEntityDescription and ETPropertyDescription). Each item in an
-item graph has a “entity name” property which determines which entity
-description it uses.
+class [ETEntityDescription][] and [ETPropertyDescription][]). Each item
+in an item graph has a “entity name” property which determines which
+entity description it uses.
 
 ## Undo
 
@@ -413,6 +413,8 @@ users making an edit simultaneously:
   [COBranch]: https://github.com/etoile/CoreObject/blob/master/Core/COBranch.h
   [COObjectGraphContext]: https://github.com/etoile/CoreObject/blob/master/Core/COObjectGraphContext.h
   [COObject]: https://github.com/etoile/CoreObject/blob/master/Core/COObject.h
+  [ETEntityDescription]: https://github.com/etoile/EtoileFoundation/blob/master/Headers/ETEntityDescription.h
+  [ETPropertyDescription]: https://github.com/etoile/EtoileFoundation/blob/master/Headers/ETPropertyDescription.h
   [9]: store.009.png
   [Collaborative editing support]: https://github.com/etoile/CoreObject/tree/master/Synchronization
   [10]: store.010.png

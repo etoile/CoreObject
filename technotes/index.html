@@ -195,7 +195,7 @@
 <li><p><a href="https://github.com/etoile/CoreObject/blob/master/Core/COObjectGraphContext.h">COObjectGraphContext</a> is a mutable facade for an item graph</p></li>
 <li><p><a href="https://github.com/etoile/CoreObject/blob/master/Core/COObject.h">COObject</a> is a mutable facade for a single item in an item graph</p></li>
 </ul>
-<p>Like other object databases and object graph persistence systems, you must define a schema/metamodel for your model objects to follow (see class ETEntityDescription and ETPropertyDescription). Each item in an item graph has a “entity name” property which determines which entity description it uses.</p>
+<p>Like other object databases and object graph persistence systems, you must define a schema/metamodel for your model objects to follow (see class <a href="https://github.com/etoile/EtoileFoundation/blob/master/Headers/ETEntityDescription.h">ETEntityDescription</a> and <a href="https://github.com/etoile/EtoileFoundation/blob/master/Headers/ETPropertyDescription.h">ETPropertyDescription</a>). Each item in an item graph has a “entity name” property which determines which entity description it uses.</p>
 <h2 id="undo">Undo</h2>
 <p>CoreObject comes with a ready-made undo system to use in your applications. Superficially, it's quite ordinary; based on the Gang of Four command pattern, but it also has some unusual features.</p>
 <p>First, the commands and undo stacks are persisted in a SQLite database (separate from the CoreObject store.) This makes application restarts transparent.</p>
