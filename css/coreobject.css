@@ -377,6 +377,18 @@ h2
 	color: #585858;
 }
 
+h3
+{
+	margin-top: 0;
+
+	text-align: left;
+	text-transform: uppercase;
+	font-family: 'Raleway', sans-serif;
+	font-weight: 700;
+	font-size: 1.000em;
+	color: #585858;
+}
+
 @media (max-width: 992px)
 {
 	.container h1
