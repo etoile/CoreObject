@@ -12,6 +12,10 @@
 #import "COType.h"
 #import "COAttachmentID.h"
 
+NSString *kCOObjectEntityNameProperty = @"org.etoile-project.coreobject.entityname";
+NSString *kCOObjectAdditionalStoreItemUUIDsProperty = @"org.etoile-project.coreObject.additionalStoreItemUUIDs";
+NSString *kCOObjectIsSharedProperty = @"isShared";
+
 static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 {
 	NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
@@ -137,7 +141,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	
 	if (COTypeIsUnivalued([self typeForAttribute: attribute]))
 	{
-		return [NSArray arrayWithObject: value];
+		return ([value isEqual: [NSNull null]] ? [NSArray array] : [NSArray arrayWithObject: value]);
 	}
 	else
 	{
@@ -218,6 +222,11 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 		}
 	}
 	return [NSSet setWithSet: result];
+}
+
+- (NSSet *) additionalStoreItemUUIDs
+{
+	return [values objectForKey: kCOObjectAdditionalStoreItemUUIDsProperty];
 }
 
 // Helper methods for doing GC

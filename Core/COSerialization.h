@@ -12,9 +12,6 @@
 
 @class COItem;
 
-extern NSString *kCOObjectEntityNameProperty;
-extern NSString *kCOObjectIsSharedProperty;
-
 /**
  * @group Core
  * @abstract Additions to convert inner objects into a "semi-serialized" 
@@ -55,6 +52,7 @@ extern NSString *kCOObjectIsSharedProperty;
 
 /** @taskunit Serialization */
 
+- (id)serializedReferenceForObject: (COObject *)value;
 - (id)serializedValueForValue: (id)aValue;
 - (id)serializedTypeForPropertyDescription: (ETPropertyDescription *)aPropertyDesc value: (id)value;
 - (SEL)serializationGetterForProperty: (NSString *)property;
@@ -66,6 +64,8 @@ extern NSString *kCOObjectIsSharedProperty;
 
 /** @taskunit Deserialization */
 
+- (COObject *)objectForSerializedReference: (id)value
+                       propertyDescription: (ETPropertyDescription *)aPropertyDesc;
 - (id)valueForSerializedValue: (id)value
                        ofType: (COType)type
           propertyDescription: (ETPropertyDescription *)aPropertyDesc;

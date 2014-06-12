@@ -10,6 +10,11 @@
 
 @class ETUUID;
 
+// TODO: Rename these variables to be prefixed by COItem and not COObject
+extern NSString *kCOObjectEntityNameProperty;
+extern NSString *kCOObjectAdditionalStoreItemUUIDsProperty;
+extern NSString *kCOObjectIsSharedProperty;
+
 /**
  * @group Storage Data Model
  * @abstract 
@@ -73,6 +78,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 - (NSSet *) compositeReferencedItemUUIDs;
 - (NSSet *) referencedItemUUIDs;
 - (NSSet *) allInnerReferencedItemUUIDs;
+- (NSSet *) additionalStoreItemUUIDs;
 
 // GC helper methods
 - (NSArray *) attachments;

@@ -77,14 +77,16 @@
                                        toGraph: (id<COItemGraph>)dest
 {
     NSSet *compositeObjectCopySet = [self itemAndAllDescendents: aUUID fromGraph: source];
- 
+
     NSMutableSet *result = [NSMutableSet setWithSet: compositeObjectCopySet];
     
     for (ETUUID *uuid in compositeObjectCopySet)
     {
+		COItem *item = [source itemForUUID: uuid];
+	
 		// FIXME: This isn't intuitive... we just copy one layer deep of non-composite references 		
 		// FIXME: referencedItemUUIDs ignores composite references, which sounds wrong! Test!
-        for (ETUUID *referenced in [[source itemForUUID: uuid] referencedItemUUIDs])
+        for (ETUUID *referenced in [item referencedItemUUIDs])
         {
             if (![compositeObjectCopySet containsObject: referenced])
             {
@@ -95,6 +97,16 @@
                 }
             }
         }
+
+		/* Additional store items must be copied even when they exist in the 
+		   destination, to ensure their object representation (e.g. NSDictionary) 
+		   is treated as a value and not a relationship. An additional store 
+		   item can represent a relationship (e.g. a dictionary containing 
+		   COObjects), but its object representation is never a relationship.  
+		   If we don't do that, changes that exists in the source could be lost 
+		   (not copied) or the state in the source could be overwritten by 
+		   changes in the destination. */
+		[result unionSet: [item additionalStoreItemUUIDs]];
     }
     return result;
 }
