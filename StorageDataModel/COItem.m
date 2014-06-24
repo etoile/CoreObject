@@ -334,42 +334,28 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 		
 		if (COTypeIsUnivalued(type))
 		{
-			if ([value isKindOfClass: [ETUUID class]])
-			{
-				if ([aMapping objectForKey: value] != nil)
-				{
-					[aCopy setValue: [aMapping objectForKey: value]
-					   forAttribute: attr
-							   type: type];
-				}
-			}
-			if ([value isKindOfClass: [COPath class]])
-			{
-				[aCopy setValue: value
-				   forAttribute: attr
-						   type: type];
+            /* For COPath and primitive values, the mapping is not used */
+			if ([value isKindOfClass: [ETUUID class]] && [aMapping objectForKey: value] != nil)
+            {
+                [aCopy setValue: [aMapping objectForKey: value]
+                   forAttribute: attr
+				           type: type];
 			}
 		}
 		else
 		{
 			id newCollection = [value mutableCopy];
 			[newCollection removeAllObjects];
-			
-			for (id subValue in value)
+    
+            for (id subValue in value)
 			{
-				if ([subValue isKindOfClass: [ETUUID class]])
+				if ([subValue isKindOfClass: [ETUUID class]] && [aMapping objectForKey: subValue] != nil)
 				{
-					if ([aMapping objectForKey: subValue] != nil)
-					{
-						[newCollection addObject: [aMapping objectForKey: subValue]];
-					}
-					else
-					{
-						[newCollection addObject: subValue];
-					}
+                    [newCollection addObject: [aMapping objectForKey: subValue]];
 				}
-				else if ([subValue isKindOfClass: [COPath class]])
+				else
 				{
+                    /* For COPath and primitive values */
 					[newCollection addObject: subValue];
 				}
 			}

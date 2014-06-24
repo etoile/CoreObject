@@ -419,10 +419,12 @@ serialization. */
 		/* Don't serialize NSDictionary as multivalue but as CODictionary reference */
 		if ([aPropertyDesc isKeyed])
 		{
+			ETAssert([value isKindOfClass: [NSDictionary class]]);
 			type = kCOTypeReference;
 		}
 		else if ([aPropertyDesc isOrdered])
 		{
+			ETAssert([value isKindOfClass: [NSArray class]]);
 			// HACK: The ofValue param should be removed.
 			// Should not need to infer type based on an element of the collection.
 			COType elementType = [self serializedTypeForUnivaluedPropertyDescription: aPropertyDesc
@@ -431,6 +433,7 @@ serialization. */
 		}
 		else
 		{
+			ETAssert([value isKindOfClass: [NSSet class]]);
 			COType elementType = [self serializedTypeForUnivaluedPropertyDescription: aPropertyDesc
 			                                                                 ofValue: [value anyObject]];
 			type = (kCOTypeSet | elementType);
