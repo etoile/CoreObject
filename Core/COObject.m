@@ -318,17 +318,22 @@ See +[NSObject typePrefix]. */
 - (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
              objectGraphContext: (COObjectGraphContext *)aContext
 {
-	self = [self prepareWithUUID: [ETUUID UUID]
+	return [self initWithEntityDescription: anEntityDesc
+	                                  UUID: [ETUUID UUID]
+	                    objectGraphContext: aContext];
+}
+
+- (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
+                           UUID: (ETUUID *)aUUID
+             objectGraphContext: (COObjectGraphContext *)aContext
+{
+	self = [self prepareWithUUID: aUUID
 	           entityDescription: anEntityDesc
 	          objectGraphContext: aContext
 	                       isNew: YES];
 
 	/* For subclasses that override the designated initializer */
-	self = [self initWithObjectGraphContext: aContext];
-	if (self == nil)
-		return nil;
-
-	return self;
+	return [self initWithObjectGraphContext: aContext];
 }
 
 // TODO: Maybe add convenience copying method, - (COObject *) copyWithCopier: (COCopier *)aCopier

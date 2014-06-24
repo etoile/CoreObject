@@ -472,6 +472,9 @@
  */
 - (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
              objectGraphContext: (COObjectGraphContext *)aContext;
+- (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
+                           UUID: (ETUUID *)aUUID
+             objectGraphContext: (COObjectGraphContext *)aContext;
 
 
 /** @taskunit Persistency Attributes */
