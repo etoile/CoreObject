@@ -576,6 +576,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	{
 		COObject *obj = [self loadedObjectForUUID: uuid];
 		[objectsToDiscard addObject: obj];
+        [obj willDiscard];
 	}
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName: COObjectGraphContextWillRelinquishObjectsNotification

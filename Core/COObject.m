@@ -1341,6 +1341,11 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	
 }
 
+- (void)willDiscard
+{
+    
+}
+
 #pragma mark - Equality
 
 - (BOOL)isTemporallyEqual: (id)anObject
