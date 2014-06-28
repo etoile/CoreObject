@@ -55,6 +55,9 @@ static NSColor *ColorFromString(NSString *color)
 
 - (id)transformedValue: (id)value
 {
+    if (value == nil)
+        return  nil;
+
 	ETAssert([value isKindOfClass: [NSColor class]]);
 	NSColor *color = value;
 	
@@ -64,6 +67,9 @@ static NSColor *ColorFromString(NSString *color)
 
 - (id)reverseTransformedValue: (id)value
 {
+    if (value == nil)
+        return nil;
+
 	ETAssert([value isKindOfClass: [NSString class]]);
 	NSString *string = value;
 	
