@@ -237,6 +237,13 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		if (propDesc.valueTransformerName != nil)
 		{
 			NSValueTransformer *transformer = [NSValueTransformer valueTransformerForName: propDesc.valueTransformerName];
+            if (transformer == nil)
+            {
+                [NSException raise: NSInternalInconsistencyException
+                            format: @"Found no value transformer registered "
+                                     "for %@, attached to %@",
+                                     propDesc.valueTransformerName, propDesc.fullName];
+            }
 			id result = [transformer transformedValue: value];
 			
 			ETEntityDescription *resultEntityDesc = [[[self objectGraphContext] modelDescriptionRepository]
