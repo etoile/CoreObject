@@ -199,7 +199,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 
 		for (id element in value)
 		{
-			[array addObject: [self serializedValueForValue: element]];
+			[array addObject: [self serializedValueForValue: element propertyName: aProperty]];
 		}
 		return array;
 	}
@@ -209,7 +209,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		
 		for (id element in value)
 		{
-			[set addObject: [self serializedValueForValue: element]];
+            [set addObject: [self serializedValueForValue: element propertyName: aProperty]];
 		}
 		return set;
 	}
