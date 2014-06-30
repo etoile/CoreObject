@@ -41,7 +41,8 @@
 			  key, dict);
 	
 		id value = [dict objectForKey: key];
-		id serializedValue = [self serializedValueForValue: value];
+        id serializedValue = [self serializedValueForValue: value
+                                       propertyDescription: aPropertyDesc];
 		COType serializedType = [self serializedTypeForUnivaluedPropertyDescription: aPropertyDesc
 		                                                                    ofValue: serializedValue];
 	

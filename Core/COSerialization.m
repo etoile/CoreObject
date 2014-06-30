@@ -170,11 +170,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 }
 
 - (id)serializedValueForValue: (id)value
-{
-	return [self serializedValueForValue: value propertyName: nil];
-}
-
-- (id)serializedValueForValue: (id)value propertyName: (NSString *)aProperty
+          propertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
 	if (value == nil)
 	{
@@ -199,7 +195,8 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 
 		for (id element in value)
 		{
-			[array addObject: [self serializedValueForValue: element propertyName: aProperty]];
+			[array addObject: [self serializedValueForValue: element
+                                        propertyDescription: aPropertyDesc]];
 		}
 		return array;
 	}
@@ -209,13 +206,14 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		
 		for (id element in value)
 		{
-            [set addObject: [self serializedValueForValue: element propertyName: aProperty]];
+            [set addObject: [self serializedValueForValue: element
+                                      propertyDescription: aPropertyDesc]];
 		}
 		return set;
 	}
 	else if ([value isKindOfClass: [NSDictionary class]])
 	{
-		return [_additionalStoreItemUUIDs objectForKey: aProperty];
+		return [_additionalStoreItemUUIDs objectForKey: [aPropertyDesc name]];
 	}
 	else if ([self isSerializablePrimitiveValue: value])
 	{
@@ -233,23 +231,22 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	else
 	{
 		// Try value transformer
-		ETPropertyDescription *propDesc = [[self entityDescription] propertyDescriptionForName: aProperty];
-		if (propDesc.valueTransformerName != nil)
+		if (aPropertyDesc.valueTransformerName != nil)
 		{
-			NSValueTransformer *transformer = [NSValueTransformer valueTransformerForName: propDesc.valueTransformerName];
+			NSValueTransformer *transformer = [NSValueTransformer valueTransformerForName: aPropertyDesc.valueTransformerName];
             if (transformer == nil)
             {
                 [NSException raise: NSInternalInconsistencyException
                             format: @"Found no value transformer registered "
                                      "for %@, attached to %@",
-                                     propDesc.valueTransformerName, propDesc.fullName];
+                                     aPropertyDesc.valueTransformerName, aPropertyDesc.fullName];
             }
 			id result = [transformer transformedValue: value];
 			
 			ETEntityDescription *resultEntityDesc = [[[self objectGraphContext] modelDescriptionRepository]
 				entityDescriptionForClass: [result class]];
-			ETAssert([resultEntityDesc isKindOfEntity: [propDesc persistentType]]);
-			ETAssert([self isSerializablePersistentType: propDesc]);
+			ETAssert([resultEntityDesc isKindOfEntity: [aPropertyDesc persistentType]]);
+			ETAssert([self isSerializablePersistentType: aPropertyDesc]);
 			
 			return result;
 		}
@@ -386,7 +383,8 @@ serialization. */
 
 			   For such property, a serialization getter must be implemented to 
 			   return nil when the value is not a persistent COObject instance 
-			   (otherwise -serializedValueForValue: raises an exception). */
+			   (otherwise -serializedValueForValue:propertyDescription: raises 
+               an exception). */
 			return kCOTypeReference;
 		}
 		else if (value == nil)
@@ -520,7 +518,7 @@ serialization. */
 		// -serializedValueForProperty: once we remove the previous serialization support
 		id value = [self serializedValueForPropertyDescription: propertyDesc];
 		id serializedValue = [self serializedValueForValue: value
-		                                      propertyName: [propertyDesc name]];
+		                               propertyDescription: propertyDesc];
 		NSNumber *serializedType = [self serializedTypeForPropertyDescription: propertyDesc
 		                                                                value: value];
 	
@@ -923,7 +921,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	ETPropertyDescription *propertyDesc = [[self entityDescription] propertyDescriptionForName: key];
 	ETAssert([propertyDesc isPersistent]);
 	id value = [self serializedValueForPropertyDescription: propertyDesc];
-	id serializedValue = [self serializedValueForValue: value propertyName: key];
+	id serializedValue = [self serializedValueForValue: value propertyDescription: propertyDesc];
 	NSNumber *serializedType = [self serializedTypeForPropertyDescription: propertyDesc
 	                                                                value: value];
 	BOOL isSerializedAsAdditionalItem = [[_additionalStoreItemUUIDs allValues] containsObject: serializedValue];

@@ -53,7 +53,8 @@
 /** @taskunit Serialization */
 
 - (id)serializedReferenceForObject: (COObject *)value;
-- (id)serializedValueForValue: (id)aValue;
+- (id)serializedValueForValue: (id)aValue
+          propertyDescription: (ETPropertyDescription *)aPropertyDesc;
 - (id)serializedTypeForPropertyDescription: (ETPropertyDescription *)aPropertyDesc value: (id)value;
 - (SEL)serializationGetterForProperty: (NSString *)property;
 - (COItem *)storeItemWithUUID: (ETUUID *)aUUID
@@ -80,8 +81,8 @@
  * -setSerializedValue:forPropertyDescription:.
  *
  * The property value is retrieved with -serializedValueForPropertyDescription:, 
- * serialized using -serializedValueForValue: and deserialized using
- * -valueForSerializedValue:ofType:propertyDescription:.
+ * serialized using -serializedValueForValue:propertyDescription: and 
+ * deserialized using -valueForSerializedValue:ofType:propertyDescription:.
  */
 - (id)roundTripValueForProperty: (NSString *)key;
 
