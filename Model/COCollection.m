@@ -53,7 +53,17 @@
 		[NSException raise: NSGenericException
 		            format: @"Attempt to initialize abstract class %@", [self class]];
 	}
-	return [super initWithObjectGraphContext: aContext];
+
+	self = [super initWithObjectGraphContext: aContext];
+    if (self == nil)
+        return nil;
+
+    if ([[self entityDescription] propertyDescriptionForName: [self contentKey]] == nil)
+    {
+        [NSException raise: NSInternalInconsistencyException
+                    format: @"Found no property description for -contentKey %@", [self contentKey]];
+    }
+    return self;
 }
 
 - (ETUTI *)objectType
