@@ -169,8 +169,45 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		}
 }
 
+- (id) serializedValueForValue: (id)value
+multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
+{
+    NSAssert(value != nil, @"Multivalued properties must not be nil");
+
+    /* Don't serialize NSDictionary as multivalue but as CODictionary reference */
+    if ([aPropertyDesc isKeyed])
+    {
+        ETAssert([value isKindOfClass: [NSDictionary class]]);
+        return [_additionalStoreItemUUIDs objectForKey: [aPropertyDesc name]];
+    }
+    else if ([aPropertyDesc isOrdered])
+    {
+        ETAssert([value isKindOfClass: [NSArray class]]);
+		NSMutableArray *array = [NSMutableArray arrayWithCapacity: [value count]];
+
+		for (id element in value)
+		{
+			[array addObject: [self serializedValueForValue: element
+                               univaluedPropertyDescription: aPropertyDesc]];
+		}
+		return array;
+    }
+    else
+    {
+        ETAssert([value isKindOfClass: [NSSet class]]);
+        NSMutableSet *set = [NSMutableSet setWithCapacity: [value count]];
+		
+		for (id element in value)
+		{
+            [set addObject: [self serializedValueForValue: element
+                             univaluedPropertyDescription: aPropertyDesc]];
+		}
+		return set;
+    }
+}
+
 - (id)serializedValueForValue: (id)value
-          propertyDescription: (ETPropertyDescription *)aPropertyDesc
+ univaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
 	if (value == nil)
 	{
@@ -189,32 +226,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	{
 		return [self serializedReferenceForObject: value];
 	}
-	else if ([value isKindOfClass: [NSArray class]])
-	{
-		NSMutableArray *array = [NSMutableArray arrayWithCapacity: [value count]];
 
-		for (id element in value)
-		{
-			[array addObject: [self serializedValueForValue: element
-                                        propertyDescription: aPropertyDesc]];
-		}
-		return array;
-	}
-	else if ([value isKindOfClass: [NSSet class]])
-	{
-		NSMutableSet *set = [NSMutableSet setWithCapacity: [value count]];
-		
-		for (id element in value)
-		{
-            [set addObject: [self serializedValueForValue: element
-                                      propertyDescription: aPropertyDesc]];
-		}
-		return set;
-	}
-	else if ([value isKindOfClass: [NSDictionary class]])
-	{
-		return [_additionalStoreItemUUIDs objectForKey: [aPropertyDesc name]];
-	}
 	else if ([self isSerializablePrimitiveValue: value])
 	{
 		return value;
@@ -254,6 +266,21 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 		NSAssert2(NO, @"Unsupported serialization type %@ for %@", [value class], value);
 	}
 	return nil;
+}
+
+- (id)serializedValueForValue: (id)value
+          propertyDescription: (ETPropertyDescription *)aPropertyDesc
+{
+    if ([aPropertyDesc isMultivalued])
+    {
+		return [self serializedValueForValue: value
+		      multivaluedPropertyDescription: aPropertyDesc];
+    }
+	else
+	{
+		return [self serializedValueForValue: value
+		        univaluedPropertyDescription: aPropertyDesc];
+	}
 }
 
 - (BOOL) isCoreObjectEntityType: (ETEntityDescription *)aType

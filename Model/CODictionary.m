@@ -11,6 +11,8 @@
 
 @interface COObject ()
 - (id)serializedValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc;
+- (id)serializedValueForValue: (id)value
+ univaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc;
 - (COType)serializedTypeForUnivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
                                                 ofValue: (id)aValue;
 - (id)valueForSerializedValue: (id)value
@@ -42,7 +44,7 @@
 	
 		id value = [dict objectForKey: key];
         id serializedValue = [self serializedValueForValue: value
-                                       propertyDescription: aPropertyDesc];
+                              univaluedPropertyDescription: aPropertyDesc];
 		COType serializedType = [self serializedTypeForUnivaluedPropertyDescription: aPropertyDesc
 		                                                                    ofValue: serializedValue];
 	
