@@ -7,6 +7,7 @@
 
 #import "COCollection.h"
 #import "COEditingContext.h"
+#import "COObjectGraphContext.h"
 #import "COObject+Private.h"
 #import "COPersistentRoot.h"
 
@@ -58,7 +59,13 @@
     if (self == nil)
         return nil;
 
-    if ([[self entityDescription] propertyDescriptionForName: [self contentKey]] == nil)
+    ETEntityDescription *coreObjectEntity =
+        [[aContext modelDescriptionRepository] entityDescriptionForClass: [COObject class]];
+
+    // NOTE: COCollection is abstract, so subclasses uses either COObject or
+    // a COCollection subentity.
+    if (![[self entityDescription] isEqual: coreObjectEntity]
+      && [[self entityDescription] propertyDescriptionForName: [self contentKey]] == nil)
     {
         [NSException raise: NSInternalInconsistencyException
                     format: @"Found no property description for -contentKey %@", [self contentKey]];
