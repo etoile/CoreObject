@@ -246,6 +246,10 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		if (aPropertyDesc.valueTransformerName != nil)
 		{
 			NSValueTransformer *transformer = [NSValueTransformer valueTransformerForName: aPropertyDesc.valueTransformerName];
+            ETModelDescriptionRepository *repo = [[self objectGraphContext] modelDescriptionRepository];
+            ETEntityDescription *valueEntity = [repo entityDescriptionForClass: [value class]];
+            ETAssert([valueEntity isKindOfEntity: [aPropertyDesc type]]);
+
             if (transformer == nil)
             {
                 [NSException raise: NSInternalInconsistencyException
@@ -255,8 +259,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
             }
 			id result = [transformer transformedValue: value];
 			
-			ETEntityDescription *resultEntityDesc = [[[self objectGraphContext] modelDescriptionRepository]
-				entityDescriptionForClass: [result class]];
+			ETEntityDescription *resultEntityDesc = [repo entityDescriptionForClass: [result class]];
 			ETAssert([resultEntityDesc isKindOfEntity: [aPropertyDesc persistentType]]);
 			ETAssert([self isSerializablePersistentType: aPropertyDesc]);
 			
@@ -312,13 +315,14 @@ serialization. */
 - (COType)serializedTypeForUnivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
                                                 ofValue: (id)value
 {
-	ETEntityDescription *type = [aPropertyDesc type];
+	ETEntityDescription *type = [aPropertyDesc persistentType];
+    ETAssert(type != nil);
 	NSString *typeName = [type name];
 
 	if (aPropertyDesc.valueTransformerName != nil)
 	{
-		ETAssert(aPropertyDesc.persistentType != nil);
-		return [self.serializablePersistentTypes[aPropertyDesc.persistentType.name] intValue];
+		ETAssert(![type isEqual: aPropertyDesc.type]);
+		return [self.serializablePersistentTypes[type.name] intValue];
 	}
 	
 	if ([self isCoreObjectEntityType: type])
@@ -662,7 +666,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 	// Even when we add support for broken references, object will still
 	// be non null, so this assertion should always hold.
 	ETAssert(object != nil);
-	ETAssert([[object entityDescription] isKindOfEntity: [aPropertyDesc type]]);
+	ETAssert([[object entityDescription] isKindOfEntity: [aPropertyDesc persistentType]]);
 	
 	return object;
 }
@@ -745,18 +749,22 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
                        ofType: (COType)type
  univaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
-	NSString *typeName = [[aPropertyDesc type] name];
+	NSString *typeName = [[aPropertyDesc persistentType] name];
 
 	if (aPropertyDesc.valueTransformerName != nil)
 	{
+        BOOL isNull = [value isEqual: [NSNull null]];
+        ETModelDescriptionRepository *repo = [[self objectGraphContext] modelDescriptionRepository];
+        ETEntityDescription *valueEntity = [repo entityDescriptionForClass: [value class]];
+        ETAssert(isNull || [valueEntity isKindOfEntity: [aPropertyDesc persistentType]]);
 		ETAssert([self.serializablePersistentTypes containsObject: @(COTypePrimitivePart(type))]);
 		ETAssert([value isKindOfClass: [NSNull class]]
 			|| [value isKindOfClass: [NSString class]] || [value isKindOfClass: [NSData class]]);
 		
 		NSValueTransformer *transformer = [NSValueTransformer valueTransformerForName: aPropertyDesc.valueTransformerName];
-		id result = [transformer reverseTransformedValue: ([value isEqual: [NSNull null]] ? nil : value)];
+		id result = [transformer reverseTransformedValue: (isNull ? nil : value)];
 		
-		ETEntityDescription *resultEntityDesc = [[[self objectGraphContext] modelDescriptionRepository] entityDescriptionForClass: [result class]];
+		ETEntityDescription *resultEntityDesc = [repo entityDescriptionForClass: [result class]];
 		ETAssert(result == nil || [resultEntityDesc isKindOfEntity: [aPropertyDesc type]]);
 		
 		return result;
