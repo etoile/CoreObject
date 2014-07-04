@@ -978,8 +978,18 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	if (singleValue == nil)
 		return;
 	
-	ETEntityDescription *newValueEntityDesc = [[_objectGraphContext modelDescriptionRepository]
-		entityDescriptionForClass: [singleValue class]];
+	ETEntityDescription *newValueEntityDesc;
+	if ([singleValue isKindOfClass: [COObject class]])
+	{
+		// special case to support the case when we're using COObject class
+		// and not a user-supplied subclass
+		newValueEntityDesc = [(COObject *)singleValue entityDescription];
+	}
+	else
+	{
+		newValueEntityDesc = [[_objectGraphContext modelDescriptionRepository]
+							  entityDescriptionForClass: [singleValue class]];
+	}
 	ETAssert(newValueEntityDesc != nil);
 	
 	if ([[propertyDesc type] isValidValue: singleValue type: newValueEntityDesc])
