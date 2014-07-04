@@ -10,7 +10,7 @@
 /**
  * This is meant to be a spec for corner cases in the metamodel;
  */
-@interface TestMetamodelCornerCases : TestCase <UKTest>
+@interface TestMetamodelCornerCases : EditingContextTestCase <UKTest>
 @end
 
 
@@ -62,7 +62,7 @@
 /**
  * do we support one:many relationships with opposite that are not composite?
  */
-- (void) testOneManyWithOppositeNotComposite
+- (void) testOneToManyWithOppositeNotComposite
 {
 	ETEntityDescription *entity = [self nonCompositeOneToManyWithOppositeEntityDescription];
 	
@@ -70,19 +70,20 @@
 	[repo addUnresolvedDescription: entity];
 	[repo resolveNamedObjectReferences];
 
-#if 0
 	UKFalse([[entity propertyDescriptionForName: @"contents"] isComposite]);
 	UKFalse([[entity propertyDescriptionForName: @"parent"] isContainer]);
-#endif
 	
-	COObjectGraphContext *ctx = [COObjectGraphContext new];
-	COObject *a = [ctx insertObjectWithEntityName: @"NonCompositeOneToManyWithOpposite"];
-	COObject *b = [ctx insertObjectWithEntityName: @"NonCompositeOneToManyWithOpposite"];
+	COObjectGraphContext *graph = [COObjectGraphContext new];
+	COObject *a = [graph insertObjectWithEntityName: @"NonCompositeOneToManyWithOpposite"];
+	COObject *b = [graph insertObjectWithEntityName: @"NonCompositeOneToManyWithOpposite"];
+	COPersistentRoot *proot = [ctx insertNewPersistentRootWithRootObject: a];
 	
-	[a setValue: S(a, b) forKey: @"contents"];
+	[a setValue: S(a, b) forProperty: @"contents"];
 	
-	// TODO: Commit to trigger validation
+	UKTrue([ctx commit]);
 }
+
+
 
 /*
  *  - do we support unidirectional aggregate / composites references?
