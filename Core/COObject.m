@@ -968,6 +968,22 @@ See +[NSObject typePrefix]. */
 	[_objectGraphContext markObjectAsUpdated: self forProperty: prop];
 }
 
+// TODO: Move this method to ETModelDescriptionRepository
+- (ETEntityDescription *) entityDescriptionForObject: (id)anObject
+{
+	if ([anObject isKindOfClass: [COObject class]])
+	{
+		// special case to support the case when we're using COObject class
+		// and not a user-supplied subclass
+		return [(COObject *)anObject entityDescription];
+	}
+	else
+	{
+		return [[_objectGraphContext modelDescriptionRepository]
+				entityDescriptionForClass: [anObject class]];
+	}
+}
+
 - (void)  validateSingleValue: (id)singleValue
 conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 {
@@ -978,18 +994,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	if (singleValue == nil)
 		return;
 	
-	ETEntityDescription *newValueEntityDesc;
-	if ([singleValue isKindOfClass: [COObject class]])
-	{
-		// special case to support the case when we're using COObject class
-		// and not a user-supplied subclass
-		newValueEntityDesc = [(COObject *)singleValue entityDescription];
-	}
-	else
-	{
-		newValueEntityDesc = [[_objectGraphContext modelDescriptionRepository]
-							  entityDescriptionForClass: [singleValue class]];
-	}
+	ETEntityDescription *newValueEntityDesc = [self entityDescriptionForObject: singleValue];
 	ETAssert(newValueEntityDesc != nil);
 	
 	if ([[propertyDesc type] isValidValue: singleValue type: newValueEntityDesc])

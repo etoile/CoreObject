@@ -746,4 +746,37 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 #endif
 }
 
+- (void) doPreCommitChecks
+{
+	// Possibly garbage-collect the context we are going to commit.
+	//
+	// This only happens every 1000 commits in release builds, or every commit in debug builds
+	// Skip the garbage collection if there are no changes to commit.
+	//
+	// Rationale:
+	//
+	// In debug builds, we want to make sure application developers don't
+	// rely on garbage objects remaining uncollected, since it could lead to
+	// incorrect application code that works most of the time.
+	//
+	// However, in release builds, it's worth only doing the garbage collection
+	// occassionally, since the garbage collection requires looking at every
+	// object and not just the modified ones being committed.
+	//
+	// The only caveat is, if you modify objects and detached them from the graph
+	// in the same transaction, they still get committed. This isn't a big deal
+	// becuase this should be rare (only a strange app would do this), and the
+	// detached objects will be ignored at reloading time.
+	if ([self hasChanges])
+	{
+		if ([self incrementCommitCounterAndCheckIfGCNeeded])
+		{
+			[self removeUnreachableObjects];
+		}
+	}
+	
+	// Check for composite cycles - see [TestOrderedCompositeRelationship testCompositeCycleWithThreeObjects]
+	[self checkForCyclesInCompositeRelationshipsInChangedObjects];
+}
+
 @end
