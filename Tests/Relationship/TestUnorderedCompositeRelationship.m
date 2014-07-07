@@ -131,4 +131,29 @@
 	UKRaisesException([parent setContents: S([NSNull null])]);
 }
 
+- (void) testCompositeCycleWithOneObject
+{
+	parent.contents = S(parent);
+	
+	UKRaisesException([ctx commit]);
+}
+
+- (void) testCompositeCycleWithOneObjectWithNoCOObjectSubclass
+{
+	registerFolderWithNoClassEntityDescriptionIfNeeded();
+	
+	ETEntityDescription *entity = [[ETModelDescriptionRepository mainRepository] descriptionForName: @"FolderWithNoClass"];
+	UKTrue([[entity propertyDescriptionForName: @"contents"] isComposite]);
+	UKTrue([[entity propertyDescriptionForName: @"parent"] isContainer]);
+	
+	COObjectGraphContext *graph = [COObjectGraphContext new];
+	COObject *a = [graph insertObjectWithEntityName: @"FolderWithNoClass"];
+	COObject *b = [graph insertObjectWithEntityName: @"FolderWithNoClass"];
+	COPersistentRoot *proot = [ctx insertNewPersistentRootWithRootObject: a];
+	
+	[a setValue: S(a) forProperty: @"contents"];
+	
+	UKRaisesException([ctx commit]);
+}
+
 @end

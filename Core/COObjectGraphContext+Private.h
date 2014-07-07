@@ -117,4 +117,9 @@
  */
 - (BOOL) incrementCommitCounterAndCheckIfGCNeeded;
 
+/**
+ * Perform tasks needed before each commit. (GC, check for cycles in composites)
+ */
+- (void) doPreCommitChecks;
+
 @end

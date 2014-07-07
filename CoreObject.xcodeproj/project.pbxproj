@@ -125,6 +125,8 @@
 		6633F11C185516B5009CE6F7 /* COBezierPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 6633F11A185516B5009CE6F7 /* COBezierPath.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6633F11D185516B5009CE6F7 /* COBezierPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 6633F11B185516B5009CE6F7 /* COBezierPath.m */; };
 		6633F12218552570009CE6F7 /* TestAttributedStringDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 6633F12118552570009CE6F7 /* TestAttributedStringDiff.m */; };
+		6634B3E5196B15AE00C7AD6A /* FolderWithNoClass.h in Headers */ = {isa = PBXBuildFile; fileRef = 6634B3E3196B15AE00C7AD6A /* FolderWithNoClass.h */; };
+		6634B3E6196B15AE00C7AD6A /* FolderWithNoClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 6634B3E4196B15AE00C7AD6A /* FolderWithNoClass.m */; };
 		66392DD019122B4F006299EB /* COBranch+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646975517CDA94000A1B767 /* COBranch+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		663CE29517C07ED800E729F5 /* COCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28717C07ED800E729F5 /* COCommand.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		663CE29617C07ED800E729F5 /* COCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE28817C07ED800E729F5 /* COCommand.m */; };
@@ -684,6 +686,8 @@
 		6633F11A185516B5009CE6F7 /* COBezierPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COBezierPath.h; sourceTree = "<group>"; };
 		6633F11B185516B5009CE6F7 /* COBezierPath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COBezierPath.m; sourceTree = "<group>"; };
 		6633F12118552570009CE6F7 /* TestAttributedStringDiff.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAttributedStringDiff.m; sourceTree = "<group>"; };
+		6634B3E3196B15AE00C7AD6A /* FolderWithNoClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FolderWithNoClass.h; path = Tests/TestModelObjects/FolderWithNoClass.h; sourceTree = "<group>"; };
+		6634B3E4196B15AE00C7AD6A /* FolderWithNoClass.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FolderWithNoClass.m; path = Tests/TestModelObjects/FolderWithNoClass.m; sourceTree = "<group>"; };
 		663CE28717C07ED800E729F5 /* COCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommand.h; sourceTree = "<group>"; };
 		663CE28817C07ED800E729F5 /* COCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = COCommand.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		663CE28B17C07ED800E729F5 /* COCommandDeleteBranch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COCommandDeleteBranch.h; sourceTree = "<group>"; };
@@ -1695,6 +1699,8 @@
 				6621BF191847F077000809CF /* Child.m */,
 				6621BF2418482159000809CF /* Folder.h */,
 				6621BF2518482159000809CF /* Folder.m */,
+				6634B3E3196B15AE00C7AD6A /* FolderWithNoClass.h */,
+				6634B3E4196B15AE00C7AD6A /* FolderWithNoClass.m */,
 				66101153184D89A4001A3E24 /* OrderedGroupNoOpposite.h */,
 				66101154184D89A4001A3E24 /* OrderedGroupNoOpposite.m */,
 				66101156184D8ACB001A3E24 /* UnivaluedGroupNoOpposite.h */,
@@ -1869,6 +1875,7 @@
 				6680848A178DAFE3003A3CC6 /* COArrayDiff.h in Headers */,
 				66D96CBA178B717200D1553C /* COItem+Binary.h in Headers */,
 				6680848C178DAFE3003A3CC6 /* COItemGraphDiff.h in Headers */,
+				6634B3E5196B15AE00C7AD6A /* FolderWithNoClass.h in Headers */,
 				66D96CB7178B717200D1553C /* COBinaryReader.h in Headers */,
 				66D96CCA178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h in Headers */,
 				66808493178DAFE3003A3CC6 /* diff.h in Headers */,
@@ -2351,6 +2358,7 @@
 				663CE2BD17C15A4800E729F5 /* COCommandGroup.m in Sources */,
 				662FFB8017C2026000BA3F2F /* COCommandUndeletePersistentRoot.m in Sources */,
 				66A00A2A187E7BA1005CFE16 /* CORevision+Graphviz.m in Sources */,
+				6634B3E6196B15AE00C7AD6A /* FolderWithNoClass.m in Sources */,
 				662FFB9F17C2DE8100BA3F2F /* COCommandUndeleteBranch.m in Sources */,
 				6646976417CDB94300A1B767 /* COUndoTrack.m in Sources */,
 				6646977C17CE7CAC00A1B767 /* COSynchronizationClient.m in Sources */,
