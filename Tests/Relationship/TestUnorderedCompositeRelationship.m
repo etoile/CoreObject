@@ -20,38 +20,6 @@
 
 @implementation TestUnorderedCompositeRelationship
 
-+ (ETEntityDescription *)newUnorderedReflexiveCompositeOneToManyEntityDescription
-{
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"UnorderedReflexiveCompositeOneToMany"];
-    [entity setParent: (id)@"Anonymous.COObject"];
-	
-	ETPropertyDescription *contentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
-																					type: (id)@"Anonymous.UnorderedReflexiveCompositeOneToMany"];
-    [contentsProperty setPersistent: YES];
-    [contentsProperty setMultivalued: YES];
-	[contentsProperty setOpposite: (id)@"Anonymous.UnorderedReflexiveCompositeOneToMany.parent"];
-	
-	ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
-																				  type: (id)@"Anonymous.UnorderedReflexiveCompositeOneToMany"];
-    [parentProperty setMultivalued: NO];
-	[parentProperty setOpposite: (id)@"Anonymous.UnorderedReflexiveCompositeOneToMany.contents"];
-	[parentProperty setDerived: YES];
-	
-	[entity setPropertyDescriptions: @[contentsProperty, parentProperty]];
-	
-    return entity;
-}
-
-+ (void) initialize
-{
-	if (self == [TestUnorderedCompositeRelationship class])
-	{
-		ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
-		[repo addUnresolvedDescription: [self newUnorderedReflexiveCompositeOneToManyEntityDescription]];
-		[repo resolveNamedObjectReferences];
-	}
-}
-
 - (id) init
 {
 	self = [super init];
@@ -170,15 +138,17 @@
 	UKRaisesException([ctx commit]);
 }
 
-- (void) testUnorderedReflexiveCompositeOneToManyEntityDescription
+- (void) testCompositeCycleWithOneObjectWithNoCOObjectSubclass
 {
-	ETEntityDescription *entity = [[ETModelDescriptionRepository mainRepository] descriptionForName: @"UnorderedReflexiveCompositeOneToMany"];
+	registerFolderWithNoClassEntityDescriptionIfNeeded();
+	
+	ETEntityDescription *entity = [[ETModelDescriptionRepository mainRepository] descriptionForName: @"FolderWithNoClass"];
 	UKTrue([[entity propertyDescriptionForName: @"contents"] isComposite]);
 	UKTrue([[entity propertyDescriptionForName: @"parent"] isContainer]);
 	
 	COObjectGraphContext *graph = [COObjectGraphContext new];
-	COObject *a = [graph insertObjectWithEntityName: @"UnorderedReflexiveCompositeOneToMany"];
-	COObject *b = [graph insertObjectWithEntityName: @"UnorderedReflexiveCompositeOneToMany"];
+	COObject *a = [graph insertObjectWithEntityName: @"FolderWithNoClass"];
+	COObject *b = [graph insertObjectWithEntityName: @"FolderWithNoClass"];
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithRootObject: a];
 	
 	[a setValue: S(a) forProperty: @"contents"];
