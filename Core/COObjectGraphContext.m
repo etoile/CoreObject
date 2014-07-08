@@ -673,7 +673,12 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 	for (ETUUID *UUID in UUIDs)
 	{
-		[objects addObject: [self loadedObjectForUUID: UUID]];
+        COObject *obj = [self loadedObjectForUUID: UUID];
+
+        if (obj == nil)
+            continue;
+
+		[objects addObject: obj];
 	}
 	return objects;
 }
