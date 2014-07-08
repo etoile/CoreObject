@@ -23,6 +23,12 @@ Major Missing Features
 
   - Add -persistentEntityDescription (for a partially loaded person object, -persistentEntityDescription would return COPerson when -entityDescription returns COObject)
 
+
+        - (ETEntityDescription *)persistentEntityDescription
+        {
+            return  [[[self objectGraphContext] modelDescriptionRepository] descriptionForName: @"COObject"];
+        }
+
 - Schema Upgrade
 
 - Better query support (in-memory and in-store as sketched in COQuery)
