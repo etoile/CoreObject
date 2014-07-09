@@ -206,9 +206,46 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
     }
 }
 
-- (id)serializedValueForValue: (id)value
+- (ETEntityDescription *)entityDescriptionForObject: (id)value
+{
+	if (value == nil)
+		return nil;
+
+    ETModelDescriptionRepository *repo = self.objectGraphContext.modelDescriptionRepository;
+    
+    return [repo entityDescriptionForClass: [value class]];
+}
+
+- (id)transformedValue: (id)value
+ ofPropertyDescription: (ETPropertyDescription *)aPropertyDesc
+{
+	if (aPropertyDesc.valueTransformerName == nil)
+		return value;
+
+	// TODO: Move in the caller
+	ETAssert([self isSerializablePersistentType: aPropertyDesc]);
+
+	ETEntityDescription *valueEntity = [self entityDescriptionForObject: value];
+	
+	ETAssert(value == nil || [valueEntity isKindOfEntity: aPropertyDesc.type]);
+
+	NSValueTransformer *transformer =
+		[self valueTransformerForPropertyDescription: aPropertyDesc];
+	id result = [transformer transformedValue: value];
+
+	ETEntityDescription *resultEntity = [self entityDescriptionForObject: result];
+	
+	ETAssert(result == nil || [resultEntity isKindOfEntity: aPropertyDesc.persistentType]);
+	ETAssert(result == nil || [self isSerializablePrimitiveValue: result]);
+	return result;
+}
+
+- (id)serializedValueForValue: (id)aValue
  univaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
+	id value = [self transformedValue: aValue
+                ofPropertyDescription: aPropertyDesc];
+ 
 	if (value == nil)
 	{
 		return [NSNull null];
@@ -242,30 +279,6 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	}
 	else
 	{
-		// Try value transformer
-		if (aPropertyDesc.valueTransformerName != nil)
-		{
-			NSValueTransformer *transformer = [NSValueTransformer valueTransformerForName: aPropertyDesc.valueTransformerName];
-            ETModelDescriptionRepository *repo = [[self objectGraphContext] modelDescriptionRepository];
-            ETEntityDescription *valueEntity = [repo entityDescriptionForClass: [value class]];
-            ETAssert([valueEntity isKindOfEntity: [aPropertyDesc type]]);
-
-            if (transformer == nil)
-            {
-                [NSException raise: NSInternalInconsistencyException
-                            format: @"Found no value transformer registered "
-                                     "for %@, attached to %@",
-                                     aPropertyDesc.valueTransformerName, aPropertyDesc.fullName];
-            }
-			id result = [transformer transformedValue: value];
-			
-			ETEntityDescription *resultEntityDesc = [repo entityDescriptionForClass: [result class]];
-			ETAssert([resultEntityDesc isKindOfEntity: [aPropertyDesc persistentType]]);
-			ETAssert([self isSerializablePersistentType: aPropertyDesc]);
-			
-			return result;
-		}
-		
 		NSAssert2(NO, @"Unsupported serialization type %@ for %@", [value class], value);
 	}
 	return nil;
@@ -745,30 +758,56 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	}
 }
 
-- (id)valueForSerializedValue: (id)value
+- (NSValueTransformer *)valueTransformerForPropertyDescription: (ETPropertyDescription *)aPropertyDesc
+{
+	NSValueTransformer *transformer =
+		[NSValueTransformer valueTransformerForName: aPropertyDesc.valueTransformerName];
+
+	if (transformer == nil)
+	{
+		[NSException raise: NSInternalInconsistencyException
+		            format: @"Found no value transformer registered "
+		                     "for %@, attached to %@",
+		                     aPropertyDesc.valueTransformerName, aPropertyDesc.fullName];
+	}
+	return transformer;
+}
+
+- (id)reverseTransformedValue: (id)value
+        ofPropertyDescription: (ETPropertyDescription *)aPropertyDesc
+{
+	if (aPropertyDesc.valueTransformerName == nil)
+		return value;
+	
+	// TODO: Move in the caller
+	ETAssert([self isSerializablePersistentType: aPropertyDesc]);
+
+	BOOL isNull = [value isEqual: [NSNull null]];
+	ETEntityDescription *valueEntity = [self entityDescriptionForObject: value];
+
+	ETAssert(isNull || [valueEntity isKindOfEntity: [aPropertyDesc persistentType]]);
+	ETAssert(isNull || [self isSerializablePrimitiveValue: value]);
+	// TODO: Move in the caller probably
+	//ETAssert([self.serializablePersistentTypes containsObject: @(COTypePrimitivePart(type))]);
+
+	NSValueTransformer *transformer =
+		[self valueTransformerForPropertyDescription: aPropertyDesc];
+	id result = [transformer reverseTransformedValue: (isNull ? nil : value)];
+
+	ETEntityDescription *resultEntityDesc = [self entityDescriptionForObject: result];
+
+	ETAssert(result == nil || [resultEntityDesc isKindOfEntity: [aPropertyDesc type]]);
+	
+	return result;
+}
+
+- (id)valueForSerializedValue: (id)aValue
                        ofType: (COType)type
  univaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
 	NSString *typeName = [[aPropertyDesc persistentType] name];
-
-	if (aPropertyDesc.valueTransformerName != nil)
-	{
-        BOOL isNull = [value isEqual: [NSNull null]];
-        ETModelDescriptionRepository *repo = [[self objectGraphContext] modelDescriptionRepository];
-        ETEntityDescription *valueEntity = [repo entityDescriptionForClass: [value class]];
-        ETAssert(isNull || [valueEntity isKindOfEntity: [aPropertyDesc persistentType]]);
-		ETAssert([self.serializablePersistentTypes containsObject: @(COTypePrimitivePart(type))]);
-		ETAssert([value isKindOfClass: [NSNull class]]
-			|| [value isKindOfClass: [NSString class]] || [value isKindOfClass: [NSData class]]);
-		
-		NSValueTransformer *transformer = [NSValueTransformer valueTransformerForName: aPropertyDesc.valueTransformerName];
-		id result = [transformer reverseTransformedValue: (isNull ? nil : value)];
-		
-		ETEntityDescription *resultEntityDesc = [repo entityDescriptionForClass: [result class]];
-		ETAssert(result == nil || [resultEntityDesc isKindOfEntity: [aPropertyDesc type]]);
-		
-		return result;
-	}
+	id value = [self reverseTransformedValue: aValue
+	                   ofPropertyDescription: aPropertyDesc];
 	
 	if ([value isEqual: [NSNull null]])
 	{
@@ -802,21 +841,11 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	else if (type == kCOTypeBlob)
 	{
 		NSParameterAssert([value isKindOfClass: [NSData class]]);
-
-		if ([typeName isEqualToString: @"NSData"] == NO)
-		{
-			ETAssert([self respondsToSelector: [self serializationSetterForProperty: [aPropertyDesc name]]]);
-		}
 		return value;
 	}
 	else if (type == kCOTypeAttachment)
 	{
 		NSParameterAssert([value isKindOfClass: [COAttachmentID class]]);
-		
-		if ([typeName isEqualToString: @"COAttachmentID"] == NO)
-		{
-			ETAssert([self respondsToSelector: [self serializationSetterForProperty: [aPropertyDesc name]]]);
-		}
 		return value;
 	}
 	else
