@@ -790,17 +790,16 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	// TODO: Move in the caller
 	ETAssert([self isSerializablePersistentType: aPropertyDesc]);
 
-	BOOL isNull = [value isEqual: [NSNull null]];
 	ETEntityDescription *valueEntity = [self entityDescriptionForObject: value];
 
-	ETAssert(isNull || [valueEntity isKindOfEntity: [aPropertyDesc persistentType]]);
-	ETAssert(isNull || [self isSerializablePrimitiveValue: value]);
+	ETAssert(value == nil || [valueEntity isKindOfEntity: [aPropertyDesc persistentType]]);
+	ETAssert(value == nil || [self isSerializablePrimitiveValue: value]);
 	// TODO: Move in the caller probably
 	//ETAssert([self.serializablePersistentTypes containsObject: @(COTypePrimitivePart(type))]);
 
 	NSValueTransformer *transformer =
 		[self valueTransformerForPropertyDescription: aPropertyDesc];
-	id result = [transformer reverseTransformedValue: (isNull ? nil : value)];
+	id result = [transformer reverseTransformedValue: value];
 
 	ETEntityDescription *resultEntityDesc = [self entityDescriptionForObject: result];
 
@@ -809,18 +808,18 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	return result;
 }
 
-- (id)valueForSerializedValue: (id)aValue
+- (id)valueForSerializedValue: (id)value
                        ofType: (COType)type
  univaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
 	NSString *typeName = [[aPropertyDesc persistentType] name];
-	id value = [self reverseTransformedValue: aValue
-	                   ofPropertyDescription: aPropertyDesc];
-	
-	if ([value isEqual: [NSNull null]])
+	BOOL isNull = [value isEqual: [NSNull null]];
+	id result = value;
+
+	if (isNull)
 	{
 		ETAssert(COTypeIsValid(type));
-		return nil;
+		result = nil;
 	}
 	else if (type == kCOTypeReference || type == kCOTypeCompositeReference)
 	{
@@ -832,37 +831,35 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	{
 		if ([typeName isEqualToString: @"NSDate"])
 		{
-			return CODateFromJavaTimestamp(value);
+			result = CODateFromJavaTimestamp(value);
 		}
-		return value;
 	}
 	else if (type == kCOTypeDouble)
 	{
-		return value;
+
 	}
 	else if (type == kCOTypeString)
 	{
 		if ([self isSerializableScalarTypeName: typeName])
 		{
-			return [self scalarValueForSerializedValue: value typeName: typeName];
+			result = [self scalarValueForSerializedValue: value typeName: typeName];
 		}
-		return value;
 	}
 	else if (type == kCOTypeBlob)
 	{
 		NSParameterAssert([value isKindOfClass: [NSData class]]);
-		return value;
 	}
 	else if (type == kCOTypeAttachment)
 	{
 		NSParameterAssert([value isKindOfClass: [COAttachmentID class]]);
-		return value;
 	}
 	else
 	{
 		NSAssert2(NO, @"Unsupported serialization type %@ for %@", COTypeDescription(type), value);
-		return nil;
 	}
+	
+	return [self reverseTransformedValue: result
+	               ofPropertyDescription: aPropertyDesc];
 }
 
 - (id)valueForSerializedValue: (id)value
