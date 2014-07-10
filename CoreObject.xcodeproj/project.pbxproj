@@ -364,6 +364,7 @@
 		66E725CE18AF50610032F28F /* TestUndoTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E725CD18AF50610032F28F /* TestUndoTrack.m */; };
 		66EEB2B7186D3CBA003695E6 /* TestItemGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EEB2B6186D3CBA003695E6 /* TestItemGraph.m */; };
 		66EF4276186251A800E15C59 /* TestDiffCAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EF4275186251A800E15C59 /* TestDiffCAPI.m */; };
+		66F1985919667265001EAEB0 /* TestMetamodelCornerCases.m in Sources */ = {isa = PBXBuildFile; fileRef = 66F1985819667265001EAEB0 /* TestMetamodelCornerCases.m */; };
 		66FB15DA17AB31F6003BFC9B /* COObject+Accessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB15D817AB31F5003BFC9B /* COObject+Accessors.m */; };
 		66FD348B1830B84C00898381 /* COSynchronizerJSONServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FD34891830B84C00898381 /* COSynchronizerJSONServer.m */; };
 		66FD348E1830BB3800898381 /* COSynchronizerJSONClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 66FD348C1830BB3800898381 /* COSynchronizerJSONClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -931,6 +932,7 @@
 		66E725CD18AF50610032F28F /* TestUndoTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUndoTrack.m; sourceTree = "<group>"; };
 		66EEB2B6186D3CBA003695E6 /* TestItemGraph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestItemGraph.m; sourceTree = "<group>"; };
 		66EF4275186251A800E15C59 /* TestDiffCAPI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestDiffCAPI.m; sourceTree = "<group>"; };
+		66F1985819667265001EAEB0 /* TestMetamodelCornerCases.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestMetamodelCornerCases.m; sourceTree = "<group>"; };
 		66FB15D817AB31F5003BFC9B /* COObject+Accessors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObject+Accessors.m"; path = "Core/COObject+Accessors.m"; sourceTree = "<group>"; };
 		66FD34881830B84C00898381 /* COSynchronizerJSONServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSynchronizerJSONServer.h; path = Synchronization/COSynchronizerJSONServer.h; sourceTree = "<group>"; };
 		66FD34891830B84C00898381 /* COSynchronizerJSONServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSynchronizerJSONServer.m; path = Synchronization/COSynchronizerJSONServer.m; sourceTree = "<group>"; };
@@ -1616,6 +1618,7 @@
 			children = (
 				66E40D3D1836D08D00E5B4A7 /* TestCollection.m */,
 				66ACABB0190B180900341D72 /* TestLibrary.m */,
+				66F1985819667265001EAEB0 /* TestMetamodelCornerCases.m */,
 			);
 			name = Model;
 			path = Tests/Model;
@@ -2455,6 +2458,7 @@
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
 				66E451D617CC461F00205679 /* OutlineItem.m in Sources */,
 				66E40D641836D08D00E5B4A7 /* TestPersistentRoot.m in Sources */,
+				66F1985919667265001EAEB0 /* TestMetamodelCornerCases.m in Sources */,
 				66101164184D8C67001A3E24 /* UnivaluedGroupWithOpposite.m in Sources */,
 				66E40D7B1836D08E00E5B4A7 /* TestUndoUseCases.m in Sources */,
 				66E40D711836D08D00E5B4A7 /* TestSynchronization.m in Sources */,
