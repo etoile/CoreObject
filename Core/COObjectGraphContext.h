@@ -311,6 +311,8 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  *
  * This marks the corresponding objects as inserted/object.
  * and does not call -acceptAllChanges.
+ *
+ * For a nil argument, raises a NSInvalidArgumentException.
  */
 - (void)insertOrUpdateItems: (NSArray *)items;
 /**
@@ -321,7 +323,10 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * at the root object.
  *
  * As a special case, if both the receiver and aTree have a nil root object, 
- * loads all objects from aTree.
+ * loads all objects from aTree. If <code>[aTree rootItemUUID]</code> is not nil, 
+ * it must match -rootItemUUID, otherwise a NSInvalidArgumentException is raised.
+ *
+ * For a nil argument, raises a NSInvalidArgumentException.
  *
  * FIXME: Document more corner cases (what causes exceptions to be thrown)
  */

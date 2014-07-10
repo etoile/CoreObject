@@ -343,32 +343,49 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
  *
  * -awakeFromDeserialization is called on the owner object.
  */
-- (void)reloadOwnerForAdditionalItemIfNeeded: (COItem *)item
+- (void)addAdditionalItem: (COItem *)item
 {
+	NSParameterAssert(item != nil);
+	NSParameterAssert(item.isAdditionalItem);
+	ETAssert(_loadingItemGraph != nil);
+
 	COObject *owner = _objectsByAdditionalItemUUIDs[item.UUID];
-	BOOL needsForcedReload = (_loadingItemGraph == nil
-		|| (owner != nil && [_loadingItemGraph itemForUUID: owner.UUID] == nil));
-	
+	/* When the owner is nil, this means the additional item is loaded for the 
+	   first time, and the owner item is present in the loading item graph, but
+	   its UUID cannot be known until it is deserialized. */
+	BOOL needsForcedReload =
+		(owner != nil && [_loadingItemGraph itemForUUID: owner.UUID] == nil);
+
 	if (needsForcedReload)
 	{
+		/* Force owner item deserialization to get the additional item looked up
+		   in the loading item graph, and deserialized into a property. For
+		   example, see -dictionaryFromStoreItem:propertyDescription: call in 
+		   COSerialization. */
 		[self addItem: [self itemForUUID: owner.UUID]];
-		// TODO: Perhaps send -didLoadObjectGraph to the owner when _loadingItemGraph is not nil
+
+		// TODO: Could send -didLoadObjectGraph by returning the owner UUID
+		// and pass it to -finishLoadingObjectsWithUUIDs:.
 	}
+}
+
+- (void)updateMappingFromAdditionalItemsToObject: (COObject *)currentObject
+{
+	for (ETUUID *itemUUID in [[currentObject additionalStoreItemUUIDs] objectEnumerator])
+	{
+		[_objectsByAdditionalItemUUIDs setObject: currentObject forKey: itemUUID];
+	}
+	ETAssert([[_objectsByAdditionalItemUUIDs allKeys] containsCollection: [[currentObject additionalStoreItemUUIDs] allValues]]);
 }
 
 /**
  * Caller must handle marking the item as inserted/updated, if desired.
- * Note that this may call itself recursively
  */
 - (void)addItem: (COItem *)item
 {
     NSParameterAssert(item != nil);
-
-	if ([item isAdditionalItem])
-	{
-		[self reloadOwnerForAdditionalItemIfNeeded: item];
-		return;
-	}
+	NSParameterAssert(!item.isAdditionalItem);
+	ETAssert(_loadingItemGraph != nil);
 
     ETUUID *uuid = [item UUID];
     COObject *currentObject = [_loadedObjects objectForKey: uuid];
@@ -382,16 +399,13 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
         [currentObject setStoreItem: item];
     }
 
-	for (ETUUID *itemUUID in [[currentObject additionalStoreItemUUIDs] objectEnumerator])
-	{
-		[_objectsByAdditionalItemUUIDs setObject: currentObject forKey: itemUUID];
-	}
-	ETAssert([[_objectsByAdditionalItemUUIDs allKeys] containsCollection: [[currentObject additionalStoreItemUUIDs] allValues]]);
+	[self updateMappingFromAdditionalItemsToObject: currentObject];
 }
 
 - (void)addItemsFromItemGraph: (id <COItemGraph>)itemGraph
                 loadableUUIDs: (NSSet *)itemUUIDs
 {
+	NSParameterAssert(itemGraph != nil);
 	NSParameterAssert(itemUUIDs != nil);
 
 	// NOTE: To prevent caching the item graph during the loading, a better
@@ -417,7 +431,16 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
     for (ETUUID *UUID in itemUUIDs)
     {
-		[self addItem: [itemGraph itemForUUID: UUID]];
+		COItem *item = [itemGraph itemForUUID: UUID];
+		
+		if ([item isAdditionalItem])
+		{
+			[self addAdditionalItem: item];
+		}
+		else
+		{
+			[self addItem: item];
+		}
     }
 	[self finishLoadingObjectsWithUUIDs: itemUUIDs];
 	
@@ -426,6 +449,8 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (void)insertOrUpdateItems: (NSArray *)items
 {
+	NILARG_EXCEPTION_TEST(items);
+
     if ([items count] == 0)
         return;
 
@@ -452,9 +477,9 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	[[NSNotificationCenter defaultCenter] postNotificationName: COObjectGraphContextBeginBatchChangeNotification
 														object: self];
 	
-	NSParameterAssert(aTree != nil);
+	NILARG_EXCEPTION_TEST(aTree);
 	// i.e., the root object can be set once and never changed.
-	NSParameterAssert(_rootObjectUUID == nil || [_rootObjectUUID isEqual: [aTree rootItemUUID]]);
+	INVALIDARG_EXCEPTION_TEST(aTree, _rootObjectUUID == nil || [_rootObjectUUID isEqual: [aTree rootItemUUID]]);
     _rootObjectUUID =  [aTree rootItemUUID];
     
 	NSSet *aTreeReachableUUIDs = COItemGraphReachableUUIDs(aTree);
