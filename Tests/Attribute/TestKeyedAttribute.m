@@ -38,31 +38,34 @@
 	UKStringsEqual(@"entries", [keyedProperties firstObject]);
 }
 
-// TODO: We should possibly add a ownerUUID attribute to dictionary items,
-// and use an assertion in -addItem:markAsInserted: that ensure the loading
-// item graph contains the owner UUID each time an additional item is encountered.
-//
-// if ([anItem isAdditionalItem])
-// {
-//   ETAssert([[_loadingItemGraph itemUUIDs] containsObject: [anItem ownerUUID]]);
-//   return;
-// }
-//
-// Or model the dictionary relationship as a to-one bidirectional and implicitly
-// composite.
-- (void)testItemGraphProtocol
+- (ETUUID *)dictionaryItemUUID
 {
-	ETUUID *dictUUID = [[[model additionalStoreItemUUIDs] allValues] firstObject];
-	COItem *dictItem = [[model objectGraphContext] itemForUUID: dictUUID];
-	COItem *modelItem = [[model objectGraphContext] itemForUUID: [model UUID]];
+	return [[[model additionalStoreItemUUIDs] allValues] firstObject];
+}
 
-	UKObjectsEqual(dictUUID, [dictItem UUID]);
-	UKStringsEqual(@"CODictionary", [dictItem valueForAttribute: kCOObjectEntityNameProperty]);
+- (COItem *)dictionaryItem
+{
+	return [[model objectGraphContext] itemForUUID: [self dictionaryItemUUID]];
+}
 
-	UKObjectsEqual([model UUID], [modelItem UUID]);
-	UKObjectsEqual(dictUUID, [modelItem valueForAttribute: @"entries"]);
+- (COItem *)modelItem
+{
+	return [[model objectGraphContext] itemForUUID: [model UUID]];
+}
 
-	COMutableItem *newDictItem = [dictItem mutableCopy];
+- (void) testDictionaryAndModelItems
+{
+	UKObjectsEqual([self dictionaryItemUUID], [[self dictionaryItem] UUID]);
+	UKStringsEqual(@"CODictionary",
+		[[self dictionaryItem] valueForAttribute: kCOObjectEntityNameProperty]);
+	
+	UKObjectsEqual([model UUID], [[self modelItem] UUID]);
+	UKObjectsEqual([self dictionaryItemUUID], [[self modelItem] valueForAttribute: @"entries"]);
+}
+
+- (void)testInsertOrUpdateItems
+{
+	COMutableItem *newDictItem = [[self dictionaryItem] mutableCopy];
 	
 	/* Dictionary Item Insertion */
 	
@@ -86,7 +89,7 @@
 
 	/* Model Item Update */
 	
-	[[model objectGraphContext] insertOrUpdateItems: A(modelItem)];
+	[[model objectGraphContext] insertOrUpdateItems: A([self modelItem])];
 
 	UKObjectsEqual(D(@"boum", @"sound"), [model valueForProperty: @"entries"]);
 	
@@ -96,7 +99,7 @@
 	         forAttribute: @"location"
 	                 type: kCOTypeString];
 
-	[[model objectGraphContext] insertOrUpdateItems: A(newDictItem, modelItem)];
+	[[model objectGraphContext] insertOrUpdateItems: A(newDictItem, [self modelItem])];
 
 	UKObjectsEqual(D(@"boum", @"sound", @"here", @"location"), [model valueForProperty: @"entries"]);
 }
