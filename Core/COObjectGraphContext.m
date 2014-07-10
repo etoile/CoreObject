@@ -339,6 +339,24 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 }
 
 /**
+ * Additional items are deserialized by their owner object deserialization. 
+ *
+ * -awakeFromDeserialization is called on the owner object.
+ */
+- (void)reloadOwnerForAdditionalItemIfNeeded: (COItem *)item
+{
+	COObject *owner = _objectsByAdditionalItemUUIDs[item.UUID];
+	BOOL needsForcedReload = (_loadingItemGraph == nil
+		|| (owner != nil && [_loadingItemGraph itemForUUID: owner.UUID] == nil));
+	
+	if (needsForcedReload)
+	{
+		[self addItem: [self itemForUUID: owner.UUID]];
+		// TODO: Perhaps send -didLoadObjectGraph to the owner when _loadingItemGraph is not nil
+	}
+}
+
+/**
  * Caller must handle marking the item as inserted/updated, if desired.
  * Note that this may call itself recursively
  */
@@ -346,10 +364,12 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 {
     NSParameterAssert(item != nil);
 
-	/* Additional items are deserialized by their owner object deserialization */
 	if ([item isAdditionalItem])
+	{
+		[self reloadOwnerForAdditionalItemIfNeeded: item];
 		return;
-    
+	}
+
     ETUUID *uuid = [item UUID];
     COObject *currentObject = [_loadedObjects objectForKey: uuid];
     

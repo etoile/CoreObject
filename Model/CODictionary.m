@@ -68,8 +68,7 @@
 
 	for (NSString *property in [aStoreItem attributeNames])
 	{
-        if ([property isEqualToString: kCOObjectEntityNameProperty]
-		 || [property isEqualToString: kCOObjectAdditionalStoreItemUUIDsProperty])
+        if ([property isEqualToString: kCOObjectEntityNameProperty])
         {
             // HACK
             continue;

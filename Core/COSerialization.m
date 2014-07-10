@@ -456,7 +456,7 @@ serialization. */
 		if ([aPropertyDesc isKeyed])
 		{
 			ETAssert([value isKindOfClass: [NSDictionary class]]);
-			type = kCOTypeReference;
+			type = kCOTypeCompositeReference;
 		}
 		else if ([aPropertyDesc isOrdered])
 		{
@@ -521,13 +521,6 @@ serialization. */
 {
     [values setObject: anEntityName forKey: kCOObjectEntityNameProperty];
 	[types setObject: [NSNumber numberWithInt: kCOTypeString] forKey: kCOObjectEntityNameProperty];
-	if (![_additionalStoreItemUUIDs isEmpty])
-	{
-		[values setObject: [NSSet setWithArray: [_additionalStoreItemUUIDs allValues]]
-		           forKey: kCOObjectAdditionalStoreItemUUIDsProperty];
-		[types setObject: @(kCOTypeSet | kCOTypeReference)
-		          forKey: kCOObjectAdditionalStoreItemUUIDsProperty];
-	}
 	
 	return [[COItem alloc] initWithUUID: aUUID
 	                 typesForAttributes: types
@@ -671,6 +664,20 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 	return object;
 }
 
+// TODO: Could replace -loadingItemGraph as a semi-private COObjectGraphContext API.
+- (COItem *) itemForUUIDDuringLoading: (ETUUID *)aUUID
+{
+	COItem *item = [[[self objectGraphContext] loadingItemGraph] itemForUUID: aUUID];
+
+	if (item == nil)
+	{
+		item = [self.objectGraphContext itemForUUID: aUUID];
+	}
+	NSAssert1(item != nil, @"Found no item %@", aUUID);
+
+	return item;
+}
+
 - (id) valueForSerializedValue: (id)value
                         ofType: (COType)type
 multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
@@ -713,7 +720,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		// FIXME: Make read-only if needed
 		return resultCollection;
 	}
-	else if (type == kCOTypeReference)
+	else if (type == kCOTypeCompositeReference)
 	{
 		NSParameterAssert([value isKindOfClass: [ETUUID class]]);
 		NSAssert([aPropertyDesc isKeyed] && [aPropertyDesc isOrdered] == NO && [aPropertyDesc isMultivalued],
@@ -726,16 +733,14 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		{
 			[_additionalStoreItemUUIDs setObject: value forKey: [aPropertyDesc name]];
 		}
-		else /* Additional deserializations targeting the same object */
+		else /* Future deserializations targeting the same object */
 		{
 			NSAssert([itemUUID isEqual: value], @"Additional store item UUIDs must remain constant");
 		}
 
-		COItem *item = [[[self objectGraphContext] loadingItemGraph] itemForUUID: value];
-		NSAssert1(item != nil, @"Dictionary store item missing in item graph %@",
-			[[self objectGraphContext] loadingItemGraph]);
-
-		return [self dictionaryFromStoreItem: item
+		/* Set the dictionary now to ensure attribute dictionaries are already
+		   loaded when -awakeFromDeserialization is called. */
+		return [self dictionaryFromStoreItem: [self itemForUUIDDuringLoading: value]
 		              forPropertyDescription: aPropertyDesc];
 	}
 	else
@@ -830,11 +835,14 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
                        ofType: (COType)type
           propertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
-	// NOTE: For a dictionary, type is kCOTypeReference.
-	// For the elements in a dictionary, type is the key type (e.g. kCOTypeString)
-	// In both cases, [aPropertyDesc isKeyed] is YES.
-    if (COTypeIsMultivalued(type) || (type == kCOTypeReference && [aPropertyDesc isKeyed]))
+	// NOTE: For the elements in a dictionary, type is the key type (e.g.
+	// kCOTypeString). In both cases, aPropertyDesc.isKeyed is YES.
+    if (COTypeIsMultivalued(type) || [aPropertyDesc isKeyed])
     {
+		if (aPropertyDesc.isKeyed)
+		{
+			ETAssert(type == kCOTypeCompositeReference);
+		}
 		return [self valueForSerializedValue: value
 		                              ofType: type
 		      multivaluedPropertyDescription: aPropertyDesc];
@@ -919,8 +927,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	
 	for (NSString *property in [aStoreItem attributeNames])
 	{
-        if ([property isEqualToString: kCOObjectEntityNameProperty]
-		 || [property isEqualToString: kCOObjectAdditionalStoreItemUUIDsProperty])
+        if ([property isEqualToString: kCOObjectEntityNameProperty])
         {
             // HACK
             continue;
@@ -964,7 +971,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	if (isSerializedAsAdditionalItem)
 	{
 		ETAssert([serializedValue isKindOfClass: [ETUUID class]]);
-		ETAssert([serializedType intValue] == kCOTypeReference);
+		ETAssert([serializedType intValue] == kCOTypeCompositeReference);
 
 		return [self dictionaryFromStoreItem: [self additionalStoreItemForUUID: serializedValue]
 		              forPropertyDescription: propertyDesc];

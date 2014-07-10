@@ -38,21 +38,18 @@
 	UKStringsEqual(@"entries", [keyedProperties firstObject]);
 }
 
-/**
- * Dictionaries are always marked as damaged, and (de)serialized at the same
- * time than their owner object. As a result, deserializing a single object 
- * and no other objects, either the model or the dictionary using 
- * -[COObjectGraphContext insertOrUpdateItems:], is a border case. 
- * 
- * For now, we don't support it to prevent breaking -awakeFromDeserialization 
- * (all non-relationship collections must be deserialized and valid inside 
- * -awakeFromDeserialization).
- *
- * It is possible to respect -[COItemGraph insertOrUpdatedItems:] in all cases, 
- * but this means some extra complexity in COObjectGraphContext, and no 
- * reports/exceptions about incorrect additional item loading (a dictionary item 
- * missing an owner or the reverse).
- */
+// TODO: We should possibly add a ownerUUID attribute to dictionary items,
+// and use an assertion in -addItem:markAsInserted: that ensure the loading
+// item graph contains the owner UUID each time an additional item is encountered.
+//
+// if ([anItem isAdditionalItem])
+// {
+//   ETAssert([[_loadingItemGraph itemUUIDs] containsObject: [anItem ownerUUID]]);
+//   return;
+// }
+//
+// Or model the dictionary relationship as a to-one bidirectional and implicitly
+// composite.
 - (void)testItemGraphProtocol
 {
 	ETUUID *dictUUID = [[[model additionalStoreItemUUIDs] allValues] firstObject];
@@ -64,35 +61,44 @@
 
 	UKObjectsEqual([model UUID], [modelItem UUID]);
 	UKObjectsEqual(dictUUID, [modelItem valueForAttribute: @"entries"]);
-	
-	/* Test Dictionary Item Insertion */
 
-	[model setValue: D(@"boum", @"sound") forProperty: @"entries"];
+	COMutableItem *newDictItem = [dictItem mutableCopy];
 	
-	// TODO: We should possibly add a ownerUUID attribute to dictionary items,
-	// and use an assertion in -addItem:markAsInserted: that ensure the loading
-	// item graph contains the owner UUID each time an additional item is encountered.
-	//
-	// if ([anItem isAdditionalItem])
-	// {
-	//   ETAssert([[_loadingItemGraph itemUUIDs] containsObject: [anItem ownerUUID]]);
-	//   return;
-	// }
-	UKDoesNotRaiseException([[model objectGraphContext] insertOrUpdateItems: A(dictItem)]);
+	/* Dictionary Item Insertion */
+	
+	[newDictItem setValue: @"tic"
+	         forAttribute: @"sound"
+	                 type: kCOTypeString];
+
+	[[model objectGraphContext] insertOrUpdateItems: A(newDictItem)];
+
+	UKObjectsEqual(D(@"tic", @"sound"), [model valueForProperty: @"entries"]);
+	
+	/* Dictionary Item Update */
+	
+	[newDictItem setValue: @"boum"
+	         forAttribute: @"sound"
+	                 type: kCOTypeString];
+
+	[[model objectGraphContext] insertOrUpdateItems: A(newDictItem)];
+	
 	UKObjectsEqual(D(@"boum", @"sound"), [model valueForProperty: @"entries"]);
 
-	/* Test KeyedAttributeModel Item Insertion */
-
-	[model setValue: D(@"boum", @"sound") forProperty: @"entries"];
+	/* Model Item Update */
 	
-	/* Test that an exception is thrown when updating modelItem without including dictItem */
+	[[model objectGraphContext] insertOrUpdateItems: A(modelItem)];
 
-	// FIXME: This clashes with COItemGraph as a delta mechanism.. unless I am missing some
-	// details, if dictItem is not present in the array passed to -insertOrUpdateItems:,
-	// the already loaded copy should be used.
-	
-	UKRaisesException([[model objectGraphContext] insertOrUpdateItems: A(modelItem)]);
 	UKObjectsEqual(D(@"boum", @"sound"), [model valueForProperty: @"entries"]);
+	
+	/* Mixed Item Update */
+
+	[newDictItem setValue: @"here"
+	         forAttribute: @"location"
+	                 type: kCOTypeString];
+
+	[[model objectGraphContext] insertOrUpdateItems: A(newDictItem, modelItem)];
+
+	UKObjectsEqual(D(@"boum", @"sound", @"here", @"location"), [model valueForProperty: @"entries"]);
 }
 
 - (void)testKeyedAttributeModelInitialization

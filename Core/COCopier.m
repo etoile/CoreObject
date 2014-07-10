@@ -97,16 +97,6 @@
                 }
             }
         }
-
-		/* Additional store items must be copied even when they exist in the 
-		   destination, to ensure their object representation (e.g. NSDictionary) 
-		   is treated as a value and not a relationship. An additional store 
-		   item can represent a relationship (e.g. a dictionary containing 
-		   COObjects), but its object representation is never a relationship.  
-		   If we don't do that, changes that exists in the source could be lost 
-		   (not copied) or the state in the source could be overwritten by 
-		   changes in the destination. */
-		[result unionSet: [item additionalStoreItemUUIDs]];
     }
     return result;
 }

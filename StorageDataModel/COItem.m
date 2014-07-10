@@ -13,7 +13,6 @@
 #import "COAttachmentID.h"
 
 NSString *kCOObjectEntityNameProperty = @"org.etoile-project.coreobject.entityname";
-NSString *kCOObjectAdditionalStoreItemUUIDsProperty = @"org.etoile-project.coreObject.additionalStoreItemUUIDs";
 NSString *kCOObjectIsSharedProperty = @"isShared";
 
 static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
@@ -222,11 +221,6 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 		}
 	}
 	return [NSSet setWithSet: result];
-}
-
-- (NSSet *) additionalStoreItemUUIDs
-{
-	return [values objectForKey: kCOObjectAdditionalStoreItemUUIDsProperty];
 }
 
 // Helper methods for doing GC
