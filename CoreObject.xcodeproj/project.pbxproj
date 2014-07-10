@@ -25,6 +25,8 @@
 		607EB349178881E60024B34D /* CODictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 607EB347178881E60024B34D /* CODictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		607EB34A178881E60024B34D /* CODictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 607EB348178881E60024B34D /* CODictionary.m */; };
 		60884D411837B09800C5C7C9 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60884D401837B09800C5C7C9 /* AppKit.framework */; };
+		608D25F6192B475200BB7461 /* COObjectToArchivedData.h in Headers */ = {isa = PBXBuildFile; fileRef = 608D25F4192B475200BB7461 /* COObjectToArchivedData.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		608D25F7192B475200BB7461 /* COObjectToArchivedData.m in Sources */ = {isa = PBXBuildFile; fileRef = 608D25F5192B475200BB7461 /* COObjectToArchivedData.m */; };
 		609C00651704C24C00D01AAB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00541704C24C00D01AAB /* main.m */; };
 		609C00801704C2BA00D01AAB /* CORevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00781704C2BA00D01AAB /* CORevision.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C00811704C2BA00D01AAB /* CORevision.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00791704C2BA00D01AAB /* CORevision.m */; };
@@ -52,6 +54,8 @@
 		609C00C11704C3FF00D01AAB /* COBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00B91704C3FF00D01AAB /* COBranch.m */; };
 		609C00E81704C42200D01AAB /* COError.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00E21704C42200D01AAB /* COError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C00E91704C42200D01AAB /* COError.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00E31704C42200D01AAB /* COError.m */; };
+		60C81D0B195DA82200AEEC68 /* COClassToString.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C81D0A195DA82200AEEC68 /* COClassToString.m */; };
+		60C81D19195DA83F00AEEC68 /* COClassToString.h in Headers */ = {isa = PBXBuildFile; fileRef = 60C81D18195DA83F00AEEC68 /* COClassToString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60C8BC5416322E2C00A2B4EE /* libz.1.2.5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 669965351162E17500359BE6 /* libz.1.2.5.dylib */; };
 		60C8BC5516322E3200A2B4EE /* libcrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6699653F1162E1C000359BE6 /* libcrypto.dylib */; };
 		60C913B6165BBED000E0C5F4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60C913B5165BBED000E0C5F4 /* Foundation.framework */; };
@@ -569,6 +573,8 @@
 		607EB347178881E60024B34D /* CODictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CODictionary.h; path = Model/CODictionary.h; sourceTree = "<group>"; };
 		607EB348178881E60024B34D /* CODictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CODictionary.m; path = Model/CODictionary.m; sourceTree = "<group>"; };
 		60884D401837B09800C5C7C9 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		608D25F4192B475200BB7461 /* COObjectToArchivedData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COObjectToArchivedData.h; sourceTree = "<group>"; };
+		608D25F5192B475200BB7461 /* COObjectToArchivedData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COObjectToArchivedData.m; sourceTree = "<group>"; };
 		60951A2518884A3700687CF0 /* INSTALL.Cocoa.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = INSTALL.Cocoa.md; sourceTree = "<group>"; };
 		60951A2618884A3800687CF0 /* INSTALL.GNUstep.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = INSTALL.GNUstep.md; sourceTree = "<group>"; };
 		60988F16163B6B7A009C4F21 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
@@ -601,6 +607,8 @@
 		609C00B91704C3FF00D01AAB /* COBranch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBranch.m; path = Core/COBranch.m; sourceTree = "<group>"; };
 		609C00E21704C42200D01AAB /* COError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COError.h; path = Utilities/COError.h; sourceTree = "<group>"; };
 		609C00E31704C42200D01AAB /* COError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COError.m; path = Utilities/COError.m; sourceTree = "<group>"; };
+		60C81D0A195DA82200AEEC68 /* COClassToString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COClassToString.m; sourceTree = "<group>"; };
+		60C81D18195DA83F00AEEC68 /* COClassToString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COClassToString.h; sourceTree = "<group>"; };
 		60C913AD165BBE9E00E0C5F4 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = main.m; path = Samples/BasicPersistence/main.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		60C913B3165BBED000E0C5F4 /* BasicPersistence */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BasicPersistence; sourceTree = BUILT_PRODUCTS_DIR; };
 		60C913B5165BBED000E0C5F4 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -1173,8 +1181,12 @@
 		6633F109185515F1009CE6F7 /* ValueTransformers */ = {
 			isa = PBXGroup;
 			children = (
+				60C81D18195DA83F00AEEC68 /* COClassToString.h */,
+				60C81D0A195DA82200AEEC68 /* COClassToString.m */,
 				6633F10A185515F1009CE6F7 /* COColorToHTMLString.h */,
 				6633F10B185515F1009CE6F7 /* COColorToHTMLString.m */,
+				608D25F4192B475200BB7461 /* COObjectToArchivedData.h */,
+				608D25F5192B475200BB7461 /* COObjectToArchivedData.m */,
 				6633F10C185515F1009CE6F7 /* CORectToString.h */,
 				6633F10D185515F1009CE6F7 /* CORectToString.m */,
 			);
@@ -1850,6 +1862,7 @@
 				609C00B01704C3EF00D01AAB /* COContainer.h in Headers */,
 				609C00B21704C3EF00D01AAB /* COGroup.h in Headers */,
 				609C00B41704C3EF00D01AAB /* COLibrary.h in Headers */,
+				60C81D19195DA83F00AEEC68 /* COClassToString.h in Headers */,
 				609C00B61704C3EF00D01AAB /* COTag.h in Headers */,
 				609C00C01704C3FF00D01AAB /* COBranch.h in Headers */,
 				609C00E81704C42200D01AAB /* COError.h in Headers */,
@@ -1962,6 +1975,7 @@
 				607335B418AB96A6008A02DC /* COSmartGroup.h in Headers */,
 				663CE2A117C07ED800E729F5 /* COUndoTrackStore.h in Headers */,
 				66392DD019122B4F006299EB /* COBranch+Private.h in Headers */,
+				608D25F6192B475200BB7461 /* COObjectToArchivedData.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2397,11 +2411,13 @@
 				66457FC617E8BFE5003C51A8 /* COStoreUndeleteBranch.m in Sources */,
 				66457FC817E8BFE5003C51A8 /* COStoreUndeletePersistentRoot.m in Sources */,
 				66457FCA17E8BFE5003C51A8 /* COStoreWriteRevision.m in Sources */,
+				60C81D0B195DA82200AEEC68 /* COClassToString.m in Sources */,
 				66457FED17E9683F003C51A8 /* CORevisionCache.m in Sources */,
 				601C1D50180C115D00CED07E /* COObjectGraphContext+GarbageCollection.m in Sources */,
 				60EBC19C184CA38200F751F5 /* COPrimitiveCollection.m in Sources */,
 				600F72C01858A71200CB6AC5 /* COPersistentObjectContext.m in Sources */,
 				607335B518AB96A6008A02DC /* COSmartGroup.m in Sources */,
+				608D25F7192B475200BB7461 /* COObjectToArchivedData.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -33,11 +33,11 @@
  */
 - (ETUUID*) copyItemWithUUID: (ETUUID*)aUUID
                    fromGraph: (id<COItemGraph>)source
-                     toGraph: (id<COItemGraph>)dest;
+                     toGraph: (id<COItemGraph>)dest NS_RETURNS_NOT_RETAINED;
 
 - (NSArray*) copyItemsWithUUIDs: (NSArray*)uuids
 					  fromGraph: (id<COItemGraph>)source
-						toGraph: (id<COItemGraph>)dest;
+						toGraph: (id<COItemGraph>)dest NS_RETURNS_NOT_RETAINED;
 
 
 @end

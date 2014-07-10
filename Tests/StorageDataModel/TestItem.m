@@ -142,20 +142,27 @@
 
 - (void) testBlob
 {
+    NSUInteger big = UINT8_MAX * 2;
+    void *buffer = malloc(big);
+
     NSData *threeBytes = [NSData dataWithBytes: "xyz" length: 3];
     NSData *zeroBytes = [NSData data];
+    NSData *bigBlob = [NSData dataWithBytes: buffer length: big];
     
+    free(buffer);
+    ETAssert([bigBlob length] > UINT8_MAX);
+
 	COMutableItem *item = [COMutableItem item];
     [item setValue: zeroBytes forAttribute: @"zeroBytes" type: kCOTypeBlob];
     [item setValue: threeBytes forAttribute: @"xyz" type: kCOTypeBlob];
     [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeBlob];
     
-    [item setValue: A(zeroBytes, threeBytes)
-      forAttribute: @"[zeroBytes, xyz]"
+    [item setValue: A(zeroBytes, threeBytes, bigBlob)
+      forAttribute: @"[zeroBytes, xyz, bigBlob]"
               type: kCOTypeArray | kCOTypeBlob];
     
-    [item setValue: S(zeroBytes, threeBytes)
-      forAttribute: @"(zeroBytes, xyz)"
+    [item setValue: S(zeroBytes, threeBytes, bigBlob)
+      forAttribute: @"(zeroBytes, xyz, bigBlob)"
               type: kCOTypeSet | kCOTypeBlob];
     
     [self validateRoundTrips: item];

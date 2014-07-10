@@ -23,6 +23,12 @@ Major Missing Features
 
   - Add -persistentEntityDescription (for a partially loaded person object, -persistentEntityDescription would return COPerson when -entityDescription returns COObject)
 
+
+        - (ETEntityDescription *)persistentEntityDescription
+        {
+            return  [[[self objectGraphContext] modelDescriptionRepository] descriptionForName: @"COObject"];
+        }
+
 - Schema Upgrade
 
 - Better query support (in-memory and in-store as sketched in COQuery)
@@ -327,6 +333,11 @@ the following situations at least:
     
     (Well, use a simple wrapper class instead of std::pair.) NOTE: using
 	SEL as a map key won't work on libobjc2.
+
+  - Write tests that ensure we correctly copy (see -mutableCopyWithNameMapping:):
+
+    - relationships (mixing UUIDs and COPath)
+    - collections of value objects
 
 
 - Collaboration

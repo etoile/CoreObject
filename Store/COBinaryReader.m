@@ -56,6 +56,7 @@ size_t co_reader_length_of_token(const unsigned char *bytes)
 		case 'd':
 			return 2 + readUint8(&bytes[1]);
 		case 'D':
+			return 5 + readUint32(&bytes[1]);
 		case '#':
 			return 17;
 		case '{':

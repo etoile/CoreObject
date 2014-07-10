@@ -77,14 +77,16 @@
                                        toGraph: (id<COItemGraph>)dest
 {
     NSSet *compositeObjectCopySet = [self itemAndAllDescendents: aUUID fromGraph: source];
- 
+
     NSMutableSet *result = [NSMutableSet setWithSet: compositeObjectCopySet];
     
     for (ETUUID *uuid in compositeObjectCopySet)
     {
+		COItem *item = [source itemForUUID: uuid];
+	
 		// FIXME: This isn't intuitive... we just copy one layer deep of non-composite references 		
 		// FIXME: referencedItemUUIDs ignores composite references, which sounds wrong! Test!
-        for (ETUUID *referenced in [[source itemForUUID: uuid] referencedItemUUIDs])
+        for (ETUUID *referenced in [item referencedItemUUIDs])
         {
             if (![compositeObjectCopySet containsObject: referenced])
             {

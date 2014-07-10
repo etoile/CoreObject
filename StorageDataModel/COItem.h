@@ -10,6 +10,10 @@
 
 @class ETUUID;
 
+// TODO: Rename these variables to be prefixed by COItem and not COObject
+extern NSString *kCOObjectEntityNameProperty;
+extern NSString *kCOObjectIsSharedProperty;
+
 /**
  * @group Storage Data Model
  * @abstract 

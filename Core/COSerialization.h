@@ -12,9 +12,6 @@
 
 @class COItem;
 
-extern NSString *kCOObjectEntityNameProperty;
-extern NSString *kCOObjectIsSharedProperty;
-
 /**
  * @group Core
  * @abstract Additions to convert inner objects into a "semi-serialized" 
@@ -55,7 +52,9 @@ extern NSString *kCOObjectIsSharedProperty;
 
 /** @taskunit Serialization */
 
-- (id)serializedValueForValue: (id)aValue;
+- (id)serializedReferenceForObject: (COObject *)value;
+- (id)serializedValueForValue: (id)aValue
+          propertyDescription: (ETPropertyDescription *)aPropertyDesc;
 - (id)serializedTypeForPropertyDescription: (ETPropertyDescription *)aPropertyDesc value: (id)value;
 - (SEL)serializationGetterForProperty: (NSString *)property;
 - (COItem *)storeItemWithUUID: (ETUUID *)aUUID
@@ -66,6 +65,9 @@ extern NSString *kCOObjectIsSharedProperty;
 
 /** @taskunit Deserialization */
 
+- (COObject *)objectForSerializedReference: (id)value
+									ofType: (COType)type
+                       propertyDescription: (ETPropertyDescription *)aPropertyDesc;
 - (id)valueForSerializedValue: (id)value
                        ofType: (COType)type
           propertyDescription: (ETPropertyDescription *)aPropertyDesc;
@@ -80,8 +82,8 @@ extern NSString *kCOObjectIsSharedProperty;
  * -setSerializedValue:forPropertyDescription:.
  *
  * The property value is retrieved with -serializedValueForPropertyDescription:, 
- * serialized using -serializedValueForValue: and deserialized using
- * -valueForSerializedValue:ofType:propertyDescription:.
+ * serialized using -serializedValueForValue:propertyDescription: and 
+ * deserialized using -valueForSerializedValue:ofType:propertyDescription:.
  */
 - (id)roundTripValueForProperty: (NSString *)key;
 

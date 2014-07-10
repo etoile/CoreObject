@@ -109,6 +109,10 @@
  * is declared as unreachable, and will be deleted by the COObjectGraphContext  
  * garbage collection (usually on a future commit).
  *
+ * Persistent relationships cannot be accessed in -dealloc. For discarded 
+ * objects, -willDiscard can be overriden to propagate changes related to
+ * persistent relationships just before they become invalid.
+ *
  * @section Properties
  *
  * By default, COObject stores its properties in a variable storage, similar to 
@@ -472,6 +476,9 @@
  */
 - (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
              objectGraphContext: (COObjectGraphContext *)aContext;
+- (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
+                           UUID: (ETUUID *)aUUID
+             objectGraphContext: (COObjectGraphContext *)aContext;
 
 
 /** @taskunit Persistency Attributes */
@@ -807,7 +814,7 @@
                      mutationKind: (ETCollectionMutationKind)mutationKind;
 
 
-/** @taskunit Overridable Loading Notifications */
+/** @taskunit Overridable Loading and Discarding Notifications */
 
 
 /**
@@ -862,6 +869,22 @@
  * first.
  */
 - (void)didLoadObjectGraph;
+/**
+ * <override-dummy />
+ * For an object graph context discarding changes, tells the receiver that some 
+ * inner objects including the receiver, are going to be discarded.
+ *
+ * You can override this method, to update transient or external state related
+ * to persistent relationships, or tear down complex persistent relationships 
+ * explicitly. Persistent relationships cannot be accessed in -dealloc.
+ *
+ * If you override this method, the superclass implementation must be called
+ * last.
+ *
+ * See -[COObjectGraphContext discardAllChanges] and 
+ * COObjectGraphContextWillRelinquishObjectsNotification.
+ */
+- (void)willDiscard;
 
 
 /** @taskunit Object Equality */

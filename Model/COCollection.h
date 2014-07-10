@@ -16,7 +16,8 @@
  *
  * COCollection represents a mutable collection, but subclasses can be immutable.
  *
- * The collection content is stored in the property returned by -contentKey.
+ * The collection content is stored in the property returned by -contentKey. 
+ * If the content property is not 'objects', -contentKey must be overriden.
  *
  * COCollection adopts the collection protocols. Which means you can mutate 
  * COCollection subclass instances using ETCollectionMutation methods such 
