@@ -641,18 +641,21 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 }
 
 - (COObject *)objectForSerializedReference: (id)value
+									ofType: (COType)type
                propertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
 	COObject *object = nil;
 
 	if ([value isKindOfClass: [ETUUID class]])
 	{
+		NSParameterAssert(COTypePrimitivePart(type) == kCOTypeReference
+						  || COTypePrimitivePart(type) == kCOTypeCompositeReference);
 		/* Look up a inner object reference in the receiver persistent root */
 		object = [[self objectGraphContext] objectReferenceWithUUID: value];
 	}
 	else /* COPath */
 	{
-		// FIXME: NSParameterAssert(type != kCOTypeCompositeReference);
+		NSParameterAssert(COTypePrimitivePart(type) == kCOTypeReference);
 		object = [[[self persistentRoot] parentContext] crossPersistentRootReferenceWithPath: (COPath *)value];
 	}
 
@@ -782,7 +785,9 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	}
 	else if (type == kCOTypeReference || type == kCOTypeCompositeReference)
 	{
-		return [self objectForSerializedReference: value propertyDescription: aPropertyDesc];
+		return [self objectForSerializedReference: value
+										   ofType: type
+							  propertyDescription: aPropertyDesc];
 	}
     else if (type == kCOTypeInt64)
 	{

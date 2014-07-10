@@ -66,6 +66,7 @@
 /** @taskunit Deserialization */
 
 - (COObject *)objectForSerializedReference: (id)value
+									ofType: (COType)type
                        propertyDescription: (ETPropertyDescription *)aPropertyDesc;
 - (id)valueForSerializedValue: (id)value
                        ofType: (COType)type
