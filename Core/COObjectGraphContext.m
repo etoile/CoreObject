@@ -285,6 +285,8 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
  *
  * The root object (if deserialized), is the last object to receive 
  * -didLoadObjectGraph.
+ *
+ * The item UUIDs must not included UUIDs corresponding to additional items.
  */
 - (void)finishLoadingObjectsWithUUIDs: (NSSet *)itemUUIDs
 {
@@ -297,8 +299,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 			continue;
 		
 		COObject *object = [self loadedObjectForUUID: UUID];
-		// TODO: Don't include the additional item UUIDs in the UUIDs argument
-		ETAssert(object != nil || [[_loadingItemGraph itemForUUID: UUID] isAdditionalItem]);
+		ETAssert(object != nil);
 
 		[object didLoadObjectGraph];
 	}
@@ -339,34 +340,32 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 }
 
 /**
- * Additional items are deserialized by their owner object deserialization. 
+ * Returns the owner item to load or reload to get the additional item looked up
+ * in the loading item graph, and deserialized into a property. 
  *
- * -awakeFromDeserialization is called on the owner object.
+ * For example, see -dictionaryFromStoreItem:propertyDescription: call in
+ * COSerialization.
+ * 
+ * Additional items are deserialized by their owner object deserialization, to
+ * ensure -awakeFromDeserialization is called on the owner object.
  */
-- (void)addAdditionalItem: (COItem *)item
+- (COItem *)ownerItemForAdditionalItem: (COItem *)item
 {
 	NSParameterAssert(item != nil);
 	NSParameterAssert(item.isAdditionalItem);
 	ETAssert(_loadingItemGraph != nil);
 
-	COObject *owner = _objectsByAdditionalItemUUIDs[item.UUID];
 	/* When the owner is nil, this means the additional item is loaded for the 
 	   first time, and the owner item is present in the loading item graph, but
 	   its UUID cannot be known until it is deserialized. */
-	BOOL needsForcedReload =
-		(owner != nil && [_loadingItemGraph itemForUUID: owner.UUID] == nil);
+	COObject *owner = _objectsByAdditionalItemUUIDs[item.UUID];
+	COItem *ownerItem = [_loadingItemGraph itemForUUID: owner.UUID];
 
-	if (needsForcedReload)
+	if (ownerItem == nil && owner != nil)
 	{
-		/* Force owner item deserialization to get the additional item looked up
-		   in the loading item graph, and deserialized into a property. For
-		   example, see -dictionaryFromStoreItem:propertyDescription: call in 
-		   COSerialization. */
-		[self addItem: [self itemForUUID: owner.UUID]];
-
-		// TODO: Could send -didLoadObjectGraph by returning the owner UUID
-		// and pass it to -finishLoadingObjectsWithUUIDs:.
+		ownerItem = [self itemForUUID: owner.UUID];
 	}
+	return ownerItem;
 }
 
 - (void)updateMappingFromAdditionalItemsToObject: (COObject *)currentObject
@@ -402,6 +401,28 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	[self updateMappingFromAdditionalItemsToObject: currentObject];
 }
 
+- (NSSet *)mainItemsFromItemGraph: (id <COItemGraph>)itemGraph
+                    loadableUUIDs: (NSSet *)itemUUIDs
+{
+	NSMutableSet *items = [NSMutableSet setWithCapacity: [itemUUIDs count]];
+	
+	for (ETUUID *UUID in itemUUIDs)
+	{
+		COItem *item = [itemGraph itemForUUID: UUID];
+		
+		if (item.isAdditionalItem)
+		{
+			item = [self ownerItemForAdditionalItem: item];
+		}
+		if (item == nil)
+			continue;
+
+		[items addObject: item];
+	}
+
+	return items;
+}
+
 - (void)addItemsFromItemGraph: (id <COItemGraph>)itemGraph
                 loadableUUIDs: (NSSet *)itemUUIDs
 {
@@ -414,6 +435,8 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	// itemGraph during the loading rather than the loaded objects (but that's
 	// roughly the same than we do currently).
 	_loadingItemGraph = itemGraph;
+	
+	// TODO: Decide how we update the change tracking in regard to additional items.
 
 	// Update change tracking
 	for (ETUUID *UUID in itemUUIDs)
@@ -428,21 +451,15 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 			[_insertedObjectUUIDs addObject: UUID];
 		}
 	}
+	
+	NSSet *mainItems = [self mainItemsFromItemGraph: itemGraph
+									  loadableUUIDs: itemUUIDs];
 
-    for (ETUUID *UUID in itemUUIDs)
+	for (COItem *item in mainItems)
     {
-		COItem *item = [itemGraph itemForUUID: UUID];
-		
-		if ([item isAdditionalItem])
-		{
-			[self addAdditionalItem: item];
-		}
-		else
-		{
-			[self addItem: item];
-		}
+		[self addItem: item];
     }
-	[self finishLoadingObjectsWithUUIDs: itemUUIDs];
+	[self finishLoadingObjectsWithUUIDs: (id)[[mainItems mappedCollection] UUID]];
 	
 	_loadingItemGraph = nil;
 }
