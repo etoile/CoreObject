@@ -36,7 +36,11 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 
 - (NSPointerArray *) makeBacking
 {
+#if TARGET_OS_IPHONE
+	return [NSPointerArray strongObjectsPointerArray];
+#else
 	return [NSPointerArray pointerArrayWithStrongObjects];
+#endif
 }
 
 - (instancetype)init
@@ -116,7 +120,11 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 
 - (NSPointerArray *) makeBacking
 {
+#if TARGET_OS_IPHONE
+	return [NSPointerArray weakObjectsPointerArray];
+#else
 	return [NSPointerArray pointerArrayWithWeakObjects];
+#endif
 }
 
 @end
@@ -191,7 +199,11 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 
 - (NSHashTable *) makeBacking
 {
+#if TARGET_OS_IPHONE
+	return [NSHashTable weakObjectsHashTable];
+#else
 	return [NSHashTable hashTableWithWeakObjects];
+#endif
 }
 
 @end

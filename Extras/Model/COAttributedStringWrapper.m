@@ -397,17 +397,34 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		
 		NSMutableDictionary *result = [NSMutableDictionary new];
 		
+#if TARGET_OS_IPHONE
+		UIFont *font = [UIFont systemFontOfSize: 12];
+#else
 		NSFont *font = [NSFont userFontOfSize: 12];
-		
+#endif
 		for (COAttributedStringAttribute *attr in target.attributes)
 		{
 			if ([attr.styleKey isEqualToString: @"font-weight"] && [attr.styleValue isEqualToString: @"bold"])
 			{
+#if TARGET_OS_IPHONE
+				UIFontDescriptor *bold = [[font fontDescriptor]
+					fontDescriptorWithSymbolicTraits: UIFontDescriptorTraitBold];
+				font = [UIFont fontWithDescriptor: bold
+				                             size: bold.pointSize];
+#else
 				font = [[NSFontManager sharedFontManager] convertFont: font toHaveTrait: NSFontBoldTrait];
+#endif
 			}
 			if ([attr.styleKey isEqualToString: @"font-style"] && [attr.styleValue isEqualToString: @"oblique"])
 			{
+#if TARGET_OS_IPHONE
+				UIFontDescriptor *italic = [[font fontDescriptor]
+					fontDescriptorWithSymbolicTraits: UIFontDescriptorTraitItalic];
+				font = [UIFont fontWithDescriptor: italic
+				                             size: italic.pointSize];
+#else
 				font = [[NSFontManager sharedFontManager] convertFont: font toHaveTrait: NSFontItalicTrait];
+#endif
 			}
 			if ([attr.styleKey isEqualToString: @"text-decoration"] && [attr.styleValue isEqualToString: @"underline"])
 			{

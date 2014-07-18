@@ -311,12 +311,13 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 	[[NSNotificationCenter defaultCenter] postNotificationName: COUndoTrackStoreTrackDidChangeNotification
 	                                                    object: self
 	                                                  userInfo: userInfo];
-	
+#if !(TARGET_OS_IPHONE)
 	[[NSDistributedNotificationCenter defaultCenter]
 	 postNotificationName: COUndoTrackStoreTrackDidChangeNotification
 	 object: [_db databasePath]
 	 userInfo: userInfo
 	 deliverImmediately: YES];
+#endif
 }
 
 - (void) postCommitNotifications

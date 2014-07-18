@@ -28,6 +28,8 @@
 		6083223019793D2D008D9F9D /* COClassToString.h in Headers */ = {isa = PBXBuildFile; fileRef = 60C81D18195DA83F00AEEC68 /* COClassToString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6083223719795D18008D9F9D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6083223619795D18008D9F9D /* CoreGraphics.framework */; };
 		6083223919795D21008D9F9D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6083223819795D21008D9F9D /* UIKit.framework */; };
+		6083223D19797DE2008D9F9D /* COCocoaTouchCompatibility.h in Headers */ = {isa = PBXBuildFile; fileRef = 6083223C19797DE2008D9F9D /* COCocoaTouchCompatibility.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6083223E19797DE2008D9F9D /* COCocoaTouchCompatibility.h in Headers */ = {isa = PBXBuildFile; fileRef = 6083223C19797DE2008D9F9D /* COCocoaTouchCompatibility.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60884D411837B09800C5C7C9 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60884D401837B09800C5C7C9 /* AppKit.framework */; };
 		608D25F6192B475200BB7461 /* COObjectToArchivedData.h in Headers */ = {isa = PBXBuildFile; fileRef = 608D25F4192B475200BB7461 /* COObjectToArchivedData.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		608D25F7192B475200BB7461 /* COObjectToArchivedData.m in Sources */ = {isa = PBXBuildFile; fileRef = 608D25F5192B475200BB7461 /* COObjectToArchivedData.m */; };
@@ -812,6 +814,7 @@
 		607EB348178881E60024B34D /* CODictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CODictionary.m; path = Model/CODictionary.m; sourceTree = "<group>"; };
 		6083223619795D18008D9F9D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		6083223819795D21008D9F9D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		6083223C19797DE2008D9F9D /* COCocoaTouchCompatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCocoaTouchCompatibility.h; path = iOS/COCocoaTouchCompatibility.h; sourceTree = SOURCE_ROOT; };
 		60884D401837B09800C5C7C9 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		608D25F4192B475200BB7461 /* COObjectToArchivedData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COObjectToArchivedData.h; sourceTree = "<group>"; };
 		608D25F5192B475200BB7461 /* COObjectToArchivedData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COObjectToArchivedData.m; sourceTree = "<group>"; };
@@ -1316,6 +1319,7 @@
 				663CE28617C07ED800E729F5 /* Undo */,
 				6686BDC712592C1B0065DE1A /* Utilities */,
 				6646977017CE789700A1B767 /* Synchronization */,
+				6083223B19797DB7008D9F9D /* iOS */,
 				6686BDB212592C1B0065DE1A /* Supporting Files */,
 				60C913AC165BBE7500E0C5F4 /* Samples */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
@@ -1355,6 +1359,15 @@
 				6048466118B6C03E006E4EDC /* TestUnitKit.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		6083223B19797DB7008D9F9D /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				6083223C19797DE2008D9F9D /* COCocoaTouchCompatibility.h */,
+			);
+			name = iOS;
+			path = English.lproj;
 			sourceTree = "<group>";
 		};
 		60C913AC165BBE7500E0C5F4 /* Samples */ = {
@@ -2188,6 +2201,7 @@
 				60E08D2C19792FFA00D1B7AD /* COCommandSetCurrentBranch.h in Headers */,
 				60E08D0319792FFA00D1B7AD /* COCollection.h in Headers */,
 				60E08D6D19792FFA00D1B7AD /* COEditingContext+Private.h in Headers */,
+				6083223E19797DE2008D9F9D /* COCocoaTouchCompatibility.h in Headers */,
 				60E08D2F19792FFA00D1B7AD /* COCommandGroup.h in Headers */,
 				60E08D2619792FFA00D1B7AD /* diff.h in Headers */,
 				60E08D0F19792FFA00D1B7AD /* COItem.h in Headers */,
@@ -2278,6 +2292,7 @@
 				66808494178DAFE3003A3CC6 /* diff.hh in Headers */,
 				668084ED1791FBA2003A3CC6 /* COObject+RelationshipCache.h in Headers */,
 				663CE29517C07ED800E729F5 /* COCommand.h in Headers */,
+				6083223D19797DE2008D9F9D /* COCocoaTouchCompatibility.h in Headers */,
 				663CE29917C07ED800E729F5 /* COCommandDeleteBranch.h in Headers */,
 				663CE29B17C07ED800E729F5 /* COCommandSetBranchMetadata.h in Headers */,
 				663CE29D17C07ED800E729F5 /* COCommandSetCurrentBranch.h in Headers */,
