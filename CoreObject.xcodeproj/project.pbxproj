@@ -72,8 +72,6 @@
 		60C913C8165BBFBE00E0C5F4 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97324FDCFA39411CA2CEA /* AppKit.framework */; };
 		60E08C8119792EEF00D1B7AD /* libEtoileFoundation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048464818B6C03E006E4EDC /* libEtoileFoundation.a */; };
 		60E08C8219792EEF00D1B7AD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B1D3F919791F8800ACAC9C /* Foundation.framework */; };
-		60E08C8519792EF000D1B7AD /* libcommonCrypto.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60E08C8319792EF000D1B7AD /* libcommonCrypto.dylib */; };
-		60E08C8619792EF000D1B7AD /* libsqlite3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60E08C8419792EF000D1B7AD /* libsqlite3.0.dylib */; };
 		60E08C8719792F4600D1B7AD /* COCommandDeletePersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2B217C09DE700E729F5 /* COCommandDeletePersistentRoot.m */; };
 		60E08C8819792F4600D1B7AD /* COSynchronizerResponseToClientForSentRevisionsMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 660179CF182AFA6B006E7D7B /* COSynchronizerResponseToClientForSentRevisionsMessage.m */; };
 		60E08C8C19792F4600D1B7AD /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 791B4E6C1299C90900CCF472 /* FMDatabase.m */; };
@@ -1223,8 +1221,6 @@
 			files = (
 				6083223919795D21008D9F9D /* UIKit.framework in Frameworks */,
 				6083223719795D18008D9F9D /* CoreGraphics.framework in Frameworks */,
-				60E08C8519792EF000D1B7AD /* libcommonCrypto.dylib in Frameworks */,
-				60E08C8619792EF000D1B7AD /* libsqlite3.0.dylib in Frameworks */,
 				60E08C8119792EEF00D1B7AD /* libEtoileFoundation.a in Frameworks */,
 				60E08C8219792EEF00D1B7AD /* Foundation.framework in Frameworks */,
 			);
