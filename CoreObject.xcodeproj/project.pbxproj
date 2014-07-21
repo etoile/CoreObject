@@ -30,6 +30,13 @@
 		6083223919795D21008D9F9D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6083223819795D21008D9F9D /* UIKit.framework */; };
 		6083223D19797DE2008D9F9D /* COCocoaTouchCompatibility.h in Headers */ = {isa = PBXBuildFile; fileRef = 6083223C19797DE2008D9F9D /* COCocoaTouchCompatibility.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6083223E19797DE2008D9F9D /* COCocoaTouchCompatibility.h in Headers */ = {isa = PBXBuildFile; fileRef = 6083223C19797DE2008D9F9D /* COCocoaTouchCompatibility.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60882F17197D509B00484033 /* COAttributedStringDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D3FCD81860EB61009BDF50 /* COAttributedStringDiff.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60882F18197D50B400484033 /* COColorToHTMLString.h in Headers */ = {isa = PBXBuildFile; fileRef = 6633F10A185515F1009CE6F7 /* COColorToHTMLString.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60882F19197D50B700484033 /* COColorToHTMLString.m in Sources */ = {isa = PBXBuildFile; fileRef = 6633F10B185515F1009CE6F7 /* COColorToHTMLString.m */; };
+		60882F1A197D50BD00484033 /* COObjectToArchivedData.h in Headers */ = {isa = PBXBuildFile; fileRef = 608D25F4192B475200BB7461 /* COObjectToArchivedData.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60882F1B197D50C000484033 /* COObjectToArchivedData.m in Sources */ = {isa = PBXBuildFile; fileRef = 608D25F5192B475200BB7461 /* COObjectToArchivedData.m */; };
+		60882F1C197D50CA00484033 /* CORectToString.m in Sources */ = {isa = PBXBuildFile; fileRef = 6633F10D185515F1009CE6F7 /* CORectToString.m */; };
+		60882F1D197D50CE00484033 /* CORectToString.h in Headers */ = {isa = PBXBuildFile; fileRef = 6633F10C185515F1009CE6F7 /* CORectToString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60884D411837B09800C5C7C9 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60884D401837B09800C5C7C9 /* AppKit.framework */; };
 		608D25F6192B475200BB7461 /* COObjectToArchivedData.h in Headers */ = {isa = PBXBuildFile; fileRef = 608D25F4192B475200BB7461 /* COObjectToArchivedData.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		608D25F7192B475200BB7461 /* COObjectToArchivedData.m in Sources */ = {isa = PBXBuildFile; fileRef = 608D25F5192B475200BB7461 /* COObjectToArchivedData.m */; };
@@ -289,6 +296,107 @@
 		60E08D7119792FFA00D1B7AD /* COPersistentObjectContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 600F72BD1858A71200CB6AC5 /* COPersistentObjectContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60EBC19B184CA38200F751F5 /* COPrimitiveCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 60EBC199184CA38200F751F5 /* COPrimitiveCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60EBC19C184CA38200F751F5 /* COPrimitiveCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 60EBC19A184CA38200F751F5 /* COPrimitiveCollection.m */; };
+		60F91ECA197D2B0B009F47D7 /* libCoreObject.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60E08C6219792BEA00D1B7AD /* libCoreObject.a */; };
+		60F91ECB197D2B13009F47D7 /* libUnitKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048465F18B6C03E006E4EDC /* libUnitKit.a */; };
+		60F91ECC197D2B23009F47D7 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B1D3FB19791F9400ACAC9C /* libsqlite3.dylib */; };
+		60F91ECE197D2B45009F47D7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6083223619795D18008D9F9D /* CoreGraphics.framework */; };
+		60F91ECF197D2B4B009F47D7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B1D3F919791F8800ACAC9C /* Foundation.framework */; };
+		60F91ED0197D2B51009F47D7 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6083223819795D21008D9F9D /* UIKit.framework */; };
+		60F91ED1197D2B80009F47D7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 60F91EC6197D1D1C009F47D7 /* main.m */; };
+		60F91ED7197D2CA2009F47D7 /* libSystem.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F91ED6197D2CA2009F47D7 /* libSystem.dylib */; };
+		60F91EDF197D324B009F47D7 /* TestCustomTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D4F1836D08D00E5B4A7 /* TestCustomTrack.m */; };
+		60F91EE0197D324B009F47D7 /* TestHistoryTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D501836D08D00E5B4A7 /* TestHistoryTrack.m */; };
+		60F91EE1197D324B009F47D7 /* TestUndo.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D511836D08D00E5B4A7 /* TestUndo.m */; };
+		60F91EE2197D324B009F47D7 /* TestUndoStackFailedNavigation.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D521836D08D00E5B4A7 /* TestUndoStackFailedNavigation.m */; };
+		60F91EE3197D324B009F47D7 /* TestUndoTrackStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D531836D08D00E5B4A7 /* TestUndoTrackStore.m */; };
+		60F91EE4197D324B009F47D7 /* TestUndoTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E725CD18AF50610032F28F /* TestUndoTrack.m */; };
+		60F91EE5197D324B009F47D7 /* TestUndoStackTrackProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D541836D08D00E5B4A7 /* TestUndoStackTrackProtocol.m */; };
+		60F91EE6197D324B009F47D7 /* TestUndoUseCases.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D551836D08D00E5B4A7 /* TestUndoUseCases.m */; };
+		60F91EE7197D3263009F47D7 /* TestSynchronization.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D4A1836D08D00E5B4A7 /* TestSynchronization.m */; };
+		60F91EE8197D3263009F47D7 /* TestSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D4B1836D08D00E5B4A7 /* TestSynchronizer.m */; };
+		60F91EE9197D3263009F47D7 /* TestSynchronizerJSONTransport.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D4C1836D08D00E5B4A7 /* TestSynchronizerJSONTransport.m */; };
+		60F91EEA197D3263009F47D7 /* TestSynchronizerMultiUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D4D1836D08D00E5B4A7 /* TestSynchronizerMultiUser.m */; };
+		60F91EEB197D3263009F47D7 /* TestSynchronizerCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 664F2799188E2DC900DF36FC /* TestSynchronizerCommon.m */; };
+		60F91EEC197D3269009F47D7 /* COSynchronizerFakeMessageTransport.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D491836D08D00E5B4A7 /* COSynchronizerFakeMessageTransport.m */; };
+		60F91EED197D326D009F47D7 /* TestBinaryReadWrite.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D421836D08D00E5B4A7 /* TestBinaryReadWrite.m */; };
+		60F91EEE197D326D009F47D7 /* TestSQLiteStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D431836D08D00E5B4A7 /* TestSQLiteStore.m */; };
+		60F91EEF197D326D009F47D7 /* TestSQLiteStoreErrorHandling.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D441836D08D00E5B4A7 /* TestSQLiteStoreErrorHandling.m */; };
+		60F91EF0197D326D009F47D7 /* TestSQLiteStoreMultiPersistentRoots.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D451836D08D00E5B4A7 /* TestSQLiteStoreMultiPersistentRoots.m */; };
+		60F91EF1197D326D009F47D7 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D461836D08D00E5B4A7 /* TestSQLiteStoreSharedPersistentRoots.m */; };
+		60F91EF2197D326D009F47D7 /* TestSQLiteStoreRevisionInfos.m in Sources */ = {isa = PBXBuildFile; fileRef = 664F27A3188F4E9600DF36FC /* TestSQLiteStoreRevisionInfos.m */; };
+		60F91EF3197D3273009F47D7 /* TestItemStableSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 66BBB3BB18516ABC005430B1 /* TestItemStableSerialization.m */; };
+		60F91EF4197D3273009F47D7 /* TestItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D401836D08D00E5B4A7 /* TestItem.m */; };
+		60F91EF5197D3273009F47D7 /* TestItemGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EEB2B6186D3CBA003695E6 /* TestItemGraph.m */; };
+		60F91EF6197D3282009F47D7 /* TestBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D2A1836D08D00E5B4A7 /* TestBranch.m */; };
+		60F91EF7197D3282009F47D7 /* TestConcurrentChanges.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D2B1836D08D00E5B4A7 /* TestConcurrentChanges.m */; };
+		60F91EF8197D3282009F47D7 /* TestCOObjectSynthesizedAccessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D2C1836D08D00E5B4A7 /* TestCOObjectSynthesizedAccessors.m */; };
+		60F91EF9197D3282009F47D7 /* TestCopier.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D2D1836D08D00E5B4A7 /* TestCopier.m */; };
+		60F91EFA197D3282009F47D7 /* TestCopierWithIsShared.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D2E1836D08D00E5B4A7 /* TestCopierWithIsShared.m */; };
+		60F91EFB197D3282009F47D7 /* TestCopierWithIsSharedFalseAndMultipleReferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D2F1836D08D00E5B4A7 /* TestCopierWithIsSharedFalseAndMultipleReferences.m */; };
+		60F91EFC197D3282009F47D7 /* TestCrossPersistentRootReferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D301836D08D00E5B4A7 /* TestCrossPersistentRootReferences.m */; };
+		60F91EFD197D3282009F47D7 /* TestEditingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D311836D08D00E5B4A7 /* TestEditingContext.m */; };
+		60F91EFE197D3282009F47D7 /* TestHistoryInspection.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D321836D08D00E5B4A7 /* TestHistoryInspection.m */; };
+		60F91EFF197D3282009F47D7 /* TestNotifications.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D331836D08D00E5B4A7 /* TestNotifications.m */; };
+		60F91F00197D3282009F47D7 /* TestObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D341836D08D00E5B4A7 /* TestObject.m */; };
+		60F91F01197D3282009F47D7 /* TestObjectGraphContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D351836D08D00E5B4A7 /* TestObjectGraphContext.m */; };
+		60F91F02197D3282009F47D7 /* TestObjectUpdate.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D361836D08D00E5B4A7 /* TestObjectUpdate.m */; };
+		60F91F03197D3282009F47D7 /* TestPersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D371836D08D00E5B4A7 /* TestPersistentRoot.m */; };
+		60F91F04197D3282009F47D7 /* TestRevisionNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D381836D08D00E5B4A7 /* TestRevisionNumber.m */; };
+		60F91F05197D3282009F47D7 /* TestSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 6660B3951839522B009007FD /* TestSerialization.m */; };
+		60F91F06197D3282009F47D7 /* TestItemGraphDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D3A1836D08D00E5B4A7 /* TestItemGraphDiff.m */; };
+		60F91F07197D3282009F47D7 /* TestMerge.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D3B1836D08D00E5B4A7 /* TestMerge.m */; };
+		60F91F08197D3282009F47D7 /* TestArrayDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 662CF34D1858547800B90D10 /* TestArrayDiff.m */; };
+		60F91F09197D3282009F47D7 /* TestDiffCAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EF4275186251A800E15C59 /* TestDiffCAPI.m */; };
+		60F91F0A197D3282009F47D7 /* TestDiffManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B6DC5B187A020900870370 /* TestDiffManager.m */; };
+		60F91F0B197D3282009F47D7 /* TestCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D3D1836D08D00E5B4A7 /* TestCollection.m */; };
+		60F91F0C197D3282009F47D7 /* TestLibrary.m in Sources */ = {isa = PBXBuildFile; fileRef = 66ACABB0190B180900341D72 /* TestLibrary.m */; };
+		60F91F0D197D3282009F47D7 /* TestMetamodelCornerCases.m in Sources */ = {isa = PBXBuildFile; fileRef = 66F1985819667265001EAEB0 /* TestMetamodelCornerCases.m */; };
+		60F91F0E197D3282009F47D7 /* TestValueTransformerAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E62255185BECF0002A22C1 /* TestValueTransformerAttribute.m */; };
+		60F91F0F197D3290009F47D7 /* TestKeyedAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610112B184D2D8A001A3E24 /* TestKeyedAttribute.m */; };
+		60F91F10197D3290009F47D7 /* TestOrderedAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610112C184D2D8A001A3E24 /* TestOrderedAttribute.m */; };
+		60F91F11197D3290009F47D7 /* TestUnivaluedAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610112D184D2D8A001A3E24 /* TestUnivaluedAttribute.m */; };
+		60F91F12197D3290009F47D7 /* TestUnorderedAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610112E184D2D8A001A3E24 /* TestUnorderedAttribute.m */; };
+		60F91F13197D3290009F47D7 /* TestOrderedCompositeRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDA4184887C30003E803 /* TestOrderedCompositeRelationship.m */; };
+		60F91F14197D3290009F47D7 /* TestUnivaluedCompositeRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDA5184887C30003E803 /* TestUnivaluedCompositeRelationship.m */; };
+		60F91F15197D3290009F47D7 /* TestUnorderedCompositeRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDA6184887C30003E803 /* TestUnorderedCompositeRelationship.m */; };
+		60F91F16197D3291009F47D7 /* TestOrderedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDAB184887E70003E803 /* TestOrderedRelationship.m */; };
+		60F91F17197D3291009F47D7 /* TestUnivaluedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDAE184887F60003E803 /* TestUnivaluedRelationship.m */; };
+		60F91F18197D3291009F47D7 /* TestUnorderedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDB1184888050003E803 /* TestUnorderedRelationship.m */; };
+		60F91F19197D3291009F47D7 /* TestOrderedRelationshipWithOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 666888101849961300DBEB10 /* TestOrderedRelationshipWithOpposite.m */; };
+		60F91F1A197D3291009F47D7 /* TestUnivaluedRelationshipWithOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 666888111849961300DBEB10 /* TestUnivaluedRelationshipWithOpposite.m */; };
+		60F91F1B197D3291009F47D7 /* TestUnorderedRelationshipWithOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 666888121849961300DBEB10 /* TestUnorderedRelationshipWithOpposite.m */; };
+		60F91F1C197D3291009F47D7 /* TestKeyedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 661E2B79184C4C0200226D3D /* TestKeyedRelationship.m */; };
+		60F91F1D197D3294009F47D7 /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00591704C24C00D01AAB /* TestCommon.m */; };
+		60F91F1E197D32C5009F47D7 /* FolderWithNoClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 6634B3E4196B15AE00C7AD6A /* FolderWithNoClass.m */; };
+		60F91F1F197D32E2009F47D7 /* OutlineItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E451D517CC461F00205679 /* OutlineItem.m */; };
+		60F91F20197D32E2009F47D7 /* Tag.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E451D817CC565100205679 /* Tag.m */; };
+		60F91F21197D32E2009F47D7 /* Parent.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF0F1847F06D000809CF /* Parent.m */; };
+		60F91F22197D32E2009F47D7 /* Child.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF191847F077000809CF /* Child.m */; };
+		60F91F23197D32E2009F47D7 /* Folder.m in Sources */ = {isa = PBXBuildFile; fileRef = 6621BF2518482159000809CF /* Folder.m */; };
+		60F91F24197D32E2009F47D7 /* FolderWithNoClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 6634B3E4196B15AE00C7AD6A /* FolderWithNoClass.m */; };
+		60F91F25197D32E2009F47D7 /* OrderedGroupNoOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101154184D89A4001A3E24 /* OrderedGroupNoOpposite.m */; };
+		60F91F26197D32E2009F47D7 /* UnivaluedGroupNoOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101157184D8ACB001A3E24 /* UnivaluedGroupNoOpposite.m */; };
+		60F91F27197D32E2009F47D7 /* UnorderedGroupNoOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610115A184D8B9E001A3E24 /* UnorderedGroupNoOpposite.m */; };
+		60F91F28197D32E2009F47D7 /* OrderedGroupWithOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610115D184D8C30001A3E24 /* OrderedGroupWithOpposite.m */; };
+		60F91F29197D32E2009F47D7 /* OrderedGroupContent.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101160184D8C4C001A3E24 /* OrderedGroupContent.m */; };
+		60F91F2A197D32E2009F47D7 /* UnivaluedGroupWithOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101163184D8C67001A3E24 /* UnivaluedGroupWithOpposite.m */; };
+		60F91F2B197D32E2009F47D7 /* UnivaluedGroupContent.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101166184D8C83001A3E24 /* UnivaluedGroupContent.m */; };
+		60F91F2C197D32E2009F47D7 /* UnorderedGroupWithOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101169184D8CA6001A3E24 /* UnorderedGroupWithOpposite.m */; };
+		60F91F2D197D32E2009F47D7 /* UnorderedGroupContent.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610116C184D8CB0001A3E24 /* UnorderedGroupContent.m */; };
+		60F91F2E197D32E2009F47D7 /* KeyedRelationshipModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610116F184D8E2D001A3E24 /* KeyedRelationshipModel.m */; };
+		60F91F2F197D32E2009F47D7 /* KeyedAttributeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101172184D8E7F001A3E24 /* KeyedAttributeModel.m */; };
+		60F91F30197D32E2009F47D7 /* OrderedAttributeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101175184D8EE5001A3E24 /* OrderedAttributeModel.m */; };
+		60F91F31197D32E2009F47D7 /* UnivaluedAttributeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101178184D8EF0001A3E24 /* UnivaluedAttributeModel.m */; };
+		60F91F32197D32E2009F47D7 /* UnorderedAttributeModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6610117B184D8EFD001A3E24 /* UnorderedAttributeModel.m */; };
+		60F91F33197D32E2009F47D7 /* OverriddenIsEqualObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 664F8B0118741011001AD224 /* OverriddenIsEqualObject.m */; };
+		60F91F34197D32E9009F47D7 /* TestAttributedStringCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 660EE3B1186E3DA600E8C22C /* TestAttributedStringCommon.m */; };
+		60F91F35197D32E9009F47D7 /* TestAttributedString.m in Sources */ = {isa = PBXBuildFile; fileRef = 66B1FC71187377ED00745859 /* TestAttributedString.m */; };
+		60F91F36197D32E9009F47D7 /* TestAttributedStringMerge.m in Sources */ = {isa = PBXBuildFile; fileRef = 66A00A20187DFA8D005CFE16 /* TestAttributedStringMerge.m */; };
+		60F91F37197D32E9009F47D7 /* TestAttributedStringWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 660EE3AE186E3D8700E8C22C /* TestAttributedStringWrapper.m */; };
+		60F91F38197D32E9009F47D7 /* TestAttributedStringAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 66BA3D6218DACFAC00641D40 /* TestAttributedStringAttribute.m */; };
+		60F91F39197D32F2009F47D7 /* 1a.json in Resources */ = {isa = PBXBuildFile; fileRef = 664E075C18C9592700CBFF74 /* 1a.json */; };
+		60F91F3A197D32F2009F47D7 /* 1b.json in Resources */ = {isa = PBXBuildFile; fileRef = 664E075D18C9592700CBFF74 /* 1b.json */; };
+		60F91F3B197D32FF009F47D7 /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 669A728D1885C43B00E98795 /* Commits */; };
 		60FB089813C3076200C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		60FB09D313C3079000C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		660179C8182AFA4B006E7D7B /* COSynchronizerRevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 660179C6182AFA4B006E7D7B /* COSynchronizerRevision.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -352,7 +460,6 @@
 		6633F11C185516B5009CE6F7 /* COBezierPath.h in Headers */ = {isa = PBXBuildFile; fileRef = 6633F11A185516B5009CE6F7 /* COBezierPath.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6633F11D185516B5009CE6F7 /* COBezierPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 6633F11B185516B5009CE6F7 /* COBezierPath.m */; };
 		6633F12218552570009CE6F7 /* TestAttributedStringDiff.m in Sources */ = {isa = PBXBuildFile; fileRef = 6633F12118552570009CE6F7 /* TestAttributedStringDiff.m */; };
-		6634B3E6196B15AE00C7AD6A /* FolderWithNoClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 6634B3E4196B15AE00C7AD6A /* FolderWithNoClass.m */; };
 		66392DD019122B4F006299EB /* COBranch+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 6646975517CDA94000A1B767 /* COBranch+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		663CE29517C07ED800E729F5 /* COCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE28717C07ED800E729F5 /* COCommand.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		663CE29617C07ED800E729F5 /* COCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE28817C07ED800E729F5 /* COCommand.m */; };
@@ -696,6 +803,20 @@
 			remoteGlobalIDString = 602E12AD18B3A10E004F171B;
 			remoteInfo = "EtoileFoundation (iOS)";
 		};
+		60F91ED2197D2BDE009F47D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 60E08C6119792BEA00D1B7AD;
+			remoteInfo = "CoreObject (iOS)";
+		};
+		60F91ED4197D2C47009F47D7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3D01D08A1646BEF400917AC8 /* UnitKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 60A71B4118B505DA0038CE05;
+			remoteInfo = "UnitKit (iOS)";
+		};
 		60FB087A13C3066300C2AB94 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */;
@@ -861,6 +982,20 @@
 		60E08C8419792EF000D1B7AD /* libsqlite3.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.0.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/usr/lib/libsqlite3.0.dylib; sourceTree = DEVELOPER_DIR; };
 		60EBC199184CA38200F751F5 /* COPrimitiveCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COPrimitiveCollection.h; path = Core/COPrimitiveCollection.h; sourceTree = "<group>"; };
 		60EBC19A184CA38200F751F5 /* COPrimitiveCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COPrimitiveCollection.m; path = Core/COPrimitiveCollection.m; sourceTree = "<group>"; };
+		60F91E9D197D1B8F009F47D7 /* TestCoreObject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestCoreObject.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		60F91EA0197D1B8F009F47D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		60F91EA1197D1B8F009F47D7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		60F91EA3197D1B8F009F47D7 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		60F91EA4197D1B8F009F47D7 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		60F91EA6197D1B8F009F47D7 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		60F91EA7197D1B8F009F47D7 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		60F91EAA197D1B8F009F47D7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		60F91EAC197D1B8F009F47D7 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		60F91EB7197D1B8F009F47D7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		60F91EB8197D1B8F009F47D7 /* TestCoreObject__iOS_Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestCoreObject__iOS_Tests.m; sourceTree = "<group>"; };
+		60F91EC6197D1D1C009F47D7 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = iOS/main.m; sourceTree = SOURCE_ROOT; };
+		60F91EC8197D1D7F009F47D7 /* TestCoreObject-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "TestCoreObject-Info.plist"; path = "iOS/TestCoreObject-Info.plist"; sourceTree = SOURCE_ROOT; };
+		60F91ED6197D2CA2009F47D7 /* libSystem.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSystem.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/usr/lib/libSystem.dylib; sourceTree = DEVELOPER_DIR; };
 		6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = ../EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
 		660179C6182AFA4B006E7D7B /* COSynchronizerRevision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSynchronizerRevision.h; path = Synchronization/Messages/COSynchronizerRevision.h; sourceTree = "<group>"; };
 		660179C7182AFA4B006E7D7B /* COSynchronizerRevision.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSynchronizerRevision.m; path = Synchronization/Messages/COSynchronizerRevision.m; sourceTree = "<group>"; };
@@ -1226,6 +1361,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		60F91E9A197D1B8F009F47D7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				60F91ED7197D2CA2009F47D7 /* libSystem.dylib in Frameworks */,
+				60F91ED0197D2B51009F47D7 /* UIKit.framework in Frameworks */,
+				60F91ECF197D2B4B009F47D7 /* Foundation.framework in Frameworks */,
+				60F91ECE197D2B45009F47D7 /* CoreGraphics.framework in Frameworks */,
+				60F91ECC197D2B23009F47D7 /* libsqlite3.dylib in Frameworks */,
+				60F91ECB197D2B13009F47D7 /* libUnitKit.a in Frameworks */,
+				60F91ECA197D2B0B009F47D7 /* libCoreObject.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		66550BEA17D51C8800327657 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1292,6 +1441,7 @@
 				60C913B3165BBED000E0C5F4 /* BasicPersistence */,
 				66550BED17D51C8800327657 /* BenchmarkCoreObject */,
 				60E08C6219792BEA00D1B7AD /* libCoreObject.a */,
+				60F91E9D197D1B8F009F47D7 /* TestCoreObject.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1318,6 +1468,8 @@
 				6083223B19797DB7008D9F9D /* iOS */,
 				6686BDB212592C1B0065DE1A /* Supporting Files */,
 				60C913AC165BBE7500E0C5F4 /* Samples */,
+				60F91E9E197D1B8F009F47D7 /* TestCoreObject (iOS) */,
+				60F91EB5197D1B8F009F47D7 /* TestCoreObject (iOS)Tests */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 			);
@@ -1327,6 +1479,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				60F91ED6197D2CA2009F47D7 /* libSystem.dylib */,
 				6083223819795D21008D9F9D /* UIKit.framework */,
 				6083223619795D18008D9F9D /* CoreGraphics.framework */,
 				60E08C8319792EF000D1B7AD /* libcommonCrypto.dylib */,
@@ -1361,6 +1514,8 @@
 			isa = PBXGroup;
 			children = (
 				6083223C19797DE2008D9F9D /* COCocoaTouchCompatibility.h */,
+				60F91EC6197D1D1C009F47D7 /* main.m */,
+				60F91EC8197D1D7F009F47D7 /* TestCoreObject-Info.plist */,
 			);
 			name = iOS;
 			path = English.lproj;
@@ -1381,6 +1536,46 @@
 				60C913AD165BBE9E00E0C5F4 /* main.m */,
 			);
 			name = BasicPersistence;
+			sourceTree = "<group>";
+		};
+		60F91E9E197D1B8F009F47D7 /* TestCoreObject (iOS) */ = {
+			isa = PBXGroup;
+			children = (
+				60F91EA3197D1B8F009F47D7 /* AppDelegate.h */,
+				60F91EA4197D1B8F009F47D7 /* AppDelegate.m */,
+				60F91EA6197D1B8F009F47D7 /* ViewController.h */,
+				60F91EA7197D1B8F009F47D7 /* ViewController.m */,
+				60F91EA9197D1B8F009F47D7 /* Main.storyboard */,
+				60F91EAC197D1B8F009F47D7 /* Images.xcassets */,
+				60F91E9F197D1B8F009F47D7 /* Supporting Files */,
+			);
+			path = "TestCoreObject (iOS)";
+			sourceTree = "<group>";
+		};
+		60F91E9F197D1B8F009F47D7 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				60F91EA0197D1B8F009F47D7 /* Info.plist */,
+				60F91EA1197D1B8F009F47D7 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		60F91EB5197D1B8F009F47D7 /* TestCoreObject (iOS)Tests */ = {
+			isa = PBXGroup;
+			children = (
+				60F91EB8197D1B8F009F47D7 /* TestCoreObject__iOS_Tests.m */,
+				60F91EB6197D1B8F009F47D7 /* Supporting Files */,
+			);
+			path = "TestCoreObject (iOS)Tests";
+			sourceTree = "<group>";
+		};
+		60F91EB6197D1B8F009F47D7 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				60F91EB7197D1B8F009F47D7 /* Info.plist */,
+			);
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		60FB087413C3066300C2AB94 /* Products */ = {
@@ -2147,6 +2342,7 @@
 				60E08D3A19792FFA00D1B7AD /* COSequenceModification.h in Headers */,
 				60E08D0119792FFA00D1B7AD /* COQuery.h in Headers */,
 				60E08D0819792FFA00D1B7AD /* COTag.h in Headers */,
+				60882F1A197D50BD00484033 /* COObjectToArchivedData.h in Headers */,
 				60E08D6419792FFA00D1B7AD /* COTrack.h in Headers */,
 				60E08D1219792FFA00D1B7AD /* COSynchronizationServer.h in Headers */,
 				60E08D4D19792FFA00D1B7AD /* COEndOfUndoTrackPlaceholderNode.h in Headers */,
@@ -2167,6 +2363,7 @@
 				60E08D3619792FFA00D1B7AD /* COSetDeletion.h in Headers */,
 				60E08D3C19792FFA00D1B7AD /* COSynchronizerUtils.h in Headers */,
 				60E08CFD19792FFA00D1B7AD /* CORevision.h in Headers */,
+				60882F1D197D50CE00484033 /* CORectToString.h in Headers */,
 				60E08D6019792FFA00D1B7AD /* CORevisionCache.h in Headers */,
 				60E08D4819792FFA00D1B7AD /* COAttributedStringWrapper.h in Headers */,
 				60E08CFE19792FFA00D1B7AD /* COEditingContext.h in Headers */,
@@ -2230,8 +2427,10 @@
 				60E08D6619792FFA00D1B7AD /* COSynchronizerServer.h in Headers */,
 				60E08D4E19792FFA00D1B7AD /* COPersistentRoot+Private.h in Headers */,
 				60E08D6A19792FFA00D1B7AD /* COObjectGraphContext.h in Headers */,
+				60882F17197D509B00484033 /* COAttributedStringDiff.h in Headers */,
 				60E08D1419792FFA00D1B7AD /* COSerialization.h in Headers */,
 				60E08D7119792FFA00D1B7AD /* COPersistentObjectContext.h in Headers */,
+				60882F18197D50B400484033 /* COColorToHTMLString.h in Headers */,
 				60E08D3F19792FFA00D1B7AD /* COSynchronizerRevision.h in Headers */,
 				60E08D6519792FFA00D1B7AD /* COAttachmentID.h in Headers */,
 				60E08D1E19792FFA00D1B7AD /* COPath.h in Headers */,
@@ -2412,6 +2611,25 @@
 			productReference = 60E08C6219792BEA00D1B7AD /* libCoreObject.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		60F91E9C197D1B8F009F47D7 /* TestCoreObject (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 60F91EBA197D1B8F009F47D7 /* Build configuration list for PBXNativeTarget "TestCoreObject (iOS)" */;
+			buildPhases = (
+				60F91E99197D1B8F009F47D7 /* Sources */,
+				60F91E9A197D1B8F009F47D7 /* Frameworks */,
+				60F91E9B197D1B8F009F47D7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				60F91ED5197D2C47009F47D7 /* PBXTargetDependency */,
+				60F91ED3197D2BDE009F47D7 /* PBXTargetDependency */,
+			);
+			name = "TestCoreObject (iOS)";
+			productName = "TestCoreObject (iOS)";
+			productReference = 60F91E9D197D1B8F009F47D7 /* TestCoreObject.app */;
+			productType = "com.apple.product-type.application";
+		};
 		66550BEC17D51C8800327657 /* BenchmarkCoreObject */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 66550BF317D51C8800327657 /* Build configuration list for PBXNativeTarget "BenchmarkCoreObject" */;
@@ -2484,6 +2702,9 @@
 					60E08C6119792BEA00D1B7AD = {
 						CreatedOnToolsVersion = 6.0;
 					};
+					60F91E9C197D1B8F009F47D7 = {
+						CreatedOnToolsVersion = 6.0;
+					};
 				};
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "CoreObject" */;
@@ -2496,6 +2717,7 @@
 				French,
 				German,
 				en,
+				Base,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* ObjectMerging */;
 			projectDirPath = "";
@@ -2516,6 +2738,7 @@
 				66550BEC17D51C8800327657 /* BenchmarkCoreObject */,
 				60C913B2165BBED000E0C5F4 /* BasicPersistence */,
 				60E08C6119792BEA00D1B7AD /* CoreObject (iOS) */,
+				60F91E9C197D1B8F009F47D7 /* TestCoreObject (iOS) */,
 			);
 		};
 /* End PBXProject section */
@@ -2615,6 +2838,16 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		60F91E9B197D1B8F009F47D7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				60F91F3B197D32FF009F47D7 /* Commits in Resources */,
+				60F91F3A197D32F2009F47D7 /* 1b.json in Resources */,
+				60F91F39197D32F2009F47D7 /* 1a.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		6686BDA812592BDA0065DE1A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2787,8 +3020,10 @@
 				60E08CE719792F4600D1B7AD /* COAttributedString.m in Sources */,
 				60E08CC319792F4600D1B7AD /* COSynchronizerPushedRevisionsFromClientMessage.m in Sources */,
 				60E08CC419792F4600D1B7AD /* COBranchInfo.m in Sources */,
+				60882F1C197D50CA00484033 /* CORectToString.m in Sources */,
 				60E08CD619792F4600D1B7AD /* COSetAttribute.m in Sources */,
 				60E08CB019792F4600D1B7AD /* COSearchResult.m in Sources */,
+				60882F1B197D50C000484033 /* COObjectToArchivedData.m in Sources */,
 				60E08CB119792F4600D1B7AD /* COSQLiteStore.m in Sources */,
 				60E08CAE19792F4600D1B7AD /* COItem+Binary.m in Sources */,
 				60E08CEF19792F4600D1B7AD /* COStoreSetCurrentRevision.m in Sources */,
@@ -2814,8 +3049,106 @@
 				60E08CDA19792F4600D1B7AD /* COSequenceEdit.m in Sources */,
 				60E08C9019792F4600D1B7AD /* FMDatabaseAdditions.m in Sources */,
 				60E08C9D19792F4600D1B7AD /* COLibrary.m in Sources */,
+				60882F19197D50B700484033 /* COColorToHTMLString.m in Sources */,
 				60E08CC019792F4600D1B7AD /* COObject+Accessors.m in Sources */,
 				60E08CDC19792F4600D1B7AD /* COSynchronizerUtils.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		60F91E99197D1B8F009F47D7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				60F91F30197D32E2009F47D7 /* OrderedAttributeModel.m in Sources */,
+				60F91F20197D32E2009F47D7 /* Tag.m in Sources */,
+				60F91EE6197D324B009F47D7 /* TestUndoUseCases.m in Sources */,
+				60F91F22197D32E2009F47D7 /* Child.m in Sources */,
+				60F91F0A197D3282009F47D7 /* TestDiffManager.m in Sources */,
+				60F91EF0197D326D009F47D7 /* TestSQLiteStoreMultiPersistentRoots.m in Sources */,
+				60F91EEF197D326D009F47D7 /* TestSQLiteStoreErrorHandling.m in Sources */,
+				60F91F2B197D32E2009F47D7 /* UnivaluedGroupContent.m in Sources */,
+				60F91F37197D32E9009F47D7 /* TestAttributedStringWrapper.m in Sources */,
+				60F91F08197D3282009F47D7 /* TestArrayDiff.m in Sources */,
+				60F91F26197D32E2009F47D7 /* UnivaluedGroupNoOpposite.m in Sources */,
+				60F91EEE197D326D009F47D7 /* TestSQLiteStore.m in Sources */,
+				60F91EDF197D324B009F47D7 /* TestCustomTrack.m in Sources */,
+				60F91EEB197D3263009F47D7 /* TestSynchronizerCommon.m in Sources */,
+				60F91F07197D3282009F47D7 /* TestMerge.m in Sources */,
+				60F91F2A197D32E2009F47D7 /* UnivaluedGroupWithOpposite.m in Sources */,
+				60F91EE3197D324B009F47D7 /* TestUndoTrackStore.m in Sources */,
+				60F91F19197D3291009F47D7 /* TestOrderedRelationshipWithOpposite.m in Sources */,
+				60F91EE9197D3263009F47D7 /* TestSynchronizerJSONTransport.m in Sources */,
+				60F91F2D197D32E2009F47D7 /* UnorderedGroupContent.m in Sources */,
+				60F91EE5197D324B009F47D7 /* TestUndoStackTrackProtocol.m in Sources */,
+				60F91F09197D3282009F47D7 /* TestDiffCAPI.m in Sources */,
+				60F91F27197D32E2009F47D7 /* UnorderedGroupNoOpposite.m in Sources */,
+				60F91EF6197D3282009F47D7 /* TestBranch.m in Sources */,
+				60F91F24197D32E2009F47D7 /* FolderWithNoClass.m in Sources */,
+				60F91EF2197D326D009F47D7 /* TestSQLiteStoreRevisionInfos.m in Sources */,
+				60F91F0B197D3282009F47D7 /* TestCollection.m in Sources */,
+				60F91F1A197D3291009F47D7 /* TestUnivaluedRelationshipWithOpposite.m in Sources */,
+				60F91F34197D32E9009F47D7 /* TestAttributedStringCommon.m in Sources */,
+				60F91EE7197D3263009F47D7 /* TestSynchronization.m in Sources */,
+				60F91F0F197D3290009F47D7 /* TestKeyedAttribute.m in Sources */,
+				60F91EEC197D3269009F47D7 /* COSynchronizerFakeMessageTransport.m in Sources */,
+				60F91F02197D3282009F47D7 /* TestObjectUpdate.m in Sources */,
+				60F91F18197D3291009F47D7 /* TestUnorderedRelationship.m in Sources */,
+				60F91F23197D32E2009F47D7 /* Folder.m in Sources */,
+				60F91F1B197D3291009F47D7 /* TestUnorderedRelationshipWithOpposite.m in Sources */,
+				60F91F33197D32E2009F47D7 /* OverriddenIsEqualObject.m in Sources */,
+				60F91F38197D32E9009F47D7 /* TestAttributedStringAttribute.m in Sources */,
+				60F91F11197D3290009F47D7 /* TestUnivaluedAttribute.m in Sources */,
+				60F91F0C197D3282009F47D7 /* TestLibrary.m in Sources */,
+				60F91F1F197D32E2009F47D7 /* OutlineItem.m in Sources */,
+				60F91EF8197D3282009F47D7 /* TestCOObjectSynthesizedAccessors.m in Sources */,
+				60F91F0D197D3282009F47D7 /* TestMetamodelCornerCases.m in Sources */,
+				60F91EF3197D3273009F47D7 /* TestItemStableSerialization.m in Sources */,
+				60F91F1C197D3291009F47D7 /* TestKeyedRelationship.m in Sources */,
+				60F91EF1197D326D009F47D7 /* TestSQLiteStoreSharedPersistentRoots.m in Sources */,
+				60F91F0E197D3282009F47D7 /* TestValueTransformerAttribute.m in Sources */,
+				60F91ED1197D2B80009F47D7 /* main.m in Sources */,
+				60F91F01197D3282009F47D7 /* TestObjectGraphContext.m in Sources */,
+				60F91F00197D3282009F47D7 /* TestObject.m in Sources */,
+				60F91F14197D3290009F47D7 /* TestUnivaluedCompositeRelationship.m in Sources */,
+				60F91EF9197D3282009F47D7 /* TestCopier.m in Sources */,
+				60F91EE0197D324B009F47D7 /* TestHistoryTrack.m in Sources */,
+				60F91EE4197D324B009F47D7 /* TestUndoTrack.m in Sources */,
+				60F91F31197D32E2009F47D7 /* UnivaluedAttributeModel.m in Sources */,
+				60F91F25197D32E2009F47D7 /* OrderedGroupNoOpposite.m in Sources */,
+				60F91EFC197D3282009F47D7 /* TestCrossPersistentRootReferences.m in Sources */,
+				60F91F04197D3282009F47D7 /* TestRevisionNumber.m in Sources */,
+				60F91F12197D3290009F47D7 /* TestUnorderedAttribute.m in Sources */,
+				60F91F29197D32E2009F47D7 /* OrderedGroupContent.m in Sources */,
+				60F91F28197D32E2009F47D7 /* OrderedGroupWithOpposite.m in Sources */,
+				60F91F10197D3290009F47D7 /* TestOrderedAttribute.m in Sources */,
+				60F91EFE197D3282009F47D7 /* TestHistoryInspection.m in Sources */,
+				60F91EE2197D324B009F47D7 /* TestUndoStackFailedNavigation.m in Sources */,
+				60F91EED197D326D009F47D7 /* TestBinaryReadWrite.m in Sources */,
+				60F91EFF197D3282009F47D7 /* TestNotifications.m in Sources */,
+				60F91F35197D32E9009F47D7 /* TestAttributedString.m in Sources */,
+				60F91F2F197D32E2009F47D7 /* KeyedAttributeModel.m in Sources */,
+				60F91F13197D3290009F47D7 /* TestOrderedCompositeRelationship.m in Sources */,
+				60F91F1D197D3294009F47D7 /* TestCommon.m in Sources */,
+				60F91F17197D3291009F47D7 /* TestUnivaluedRelationship.m in Sources */,
+				60F91EFB197D3282009F47D7 /* TestCopierWithIsSharedFalseAndMultipleReferences.m in Sources */,
+				60F91F16197D3291009F47D7 /* TestOrderedRelationship.m in Sources */,
+				60F91F15197D3290009F47D7 /* TestUnorderedCompositeRelationship.m in Sources */,
+				60F91EFD197D3282009F47D7 /* TestEditingContext.m in Sources */,
+				60F91EF7197D3282009F47D7 /* TestConcurrentChanges.m in Sources */,
+				60F91EF5197D3273009F47D7 /* TestItemGraph.m in Sources */,
+				60F91EFA197D3282009F47D7 /* TestCopierWithIsShared.m in Sources */,
+				60F91EE1197D324B009F47D7 /* TestUndo.m in Sources */,
+				60F91F36197D32E9009F47D7 /* TestAttributedStringMerge.m in Sources */,
+				60F91EEA197D3263009F47D7 /* TestSynchronizerMultiUser.m in Sources */,
+				60F91F2E197D32E2009F47D7 /* KeyedRelationshipModel.m in Sources */,
+				60F91F05197D3282009F47D7 /* TestSerialization.m in Sources */,
+				60F91F32197D32E2009F47D7 /* UnorderedAttributeModel.m in Sources */,
+				60F91EE8197D3263009F47D7 /* TestSynchronizer.m in Sources */,
+				60F91F2C197D32E2009F47D7 /* UnorderedGroupWithOpposite.m in Sources */,
+				60F91F03197D3282009F47D7 /* TestPersistentRoot.m in Sources */,
+				60F91F21197D32E2009F47D7 /* Parent.m in Sources */,
+				60F91EF4197D3273009F47D7 /* TestItem.m in Sources */,
+				60F91F06197D3282009F47D7 /* TestItemGraphDiff.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2921,7 +3254,6 @@
 				663CE2BD17C15A4800E729F5 /* COCommandGroup.m in Sources */,
 				662FFB8017C2026000BA3F2F /* COCommandUndeletePersistentRoot.m in Sources */,
 				66A00A2A187E7BA1005CFE16 /* CORevision+Graphviz.m in Sources */,
-				6634B3E6196B15AE00C7AD6A /* FolderWithNoClass.m in Sources */,
 				662FFB9F17C2DE8100BA3F2F /* COCommandUndeleteBranch.m in Sources */,
 				6646976417CDB94300A1B767 /* COUndoTrack.m in Sources */,
 				6646977C17CE7CAC00A1B767 /* COSynchronizationClient.m in Sources */,
@@ -2996,6 +3328,7 @@
 				6610117C184D8EFD001A3E24 /* UnorderedAttributeModel.m in Sources */,
 				66E40D601836D08D00E5B4A7 /* TestNotifications.m in Sources */,
 				6699DDA9184887C30003E803 /* TestUnorderedCompositeRelationship.m in Sources */,
+				60F91F1E197D32C5009F47D7 /* FolderWithNoClass.m in Sources */,
 				66101179184D8EF0001A3E24 /* UnivaluedAttributeModel.m in Sources */,
 				66B1FC72187377ED00745859 /* TestAttributedString.m in Sources */,
 				66E40D5F1836D08D00E5B4A7 /* TestHistoryInspection.m in Sources */,
@@ -3084,6 +3417,16 @@
 			name = "EtoileFoundation (iOS)";
 			targetProxy = 60E08C7F19792ECA00D1B7AD /* PBXContainerItemProxy */;
 		};
+		60F91ED3197D2BDE009F47D7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 60E08C6119792BEA00D1B7AD /* CoreObject (iOS) */;
+			targetProxy = 60F91ED2197D2BDE009F47D7 /* PBXContainerItemProxy */;
+		};
+		60F91ED5197D2C47009F47D7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "UnitKit (iOS)";
+			targetProxy = 60F91ED4197D2C47009F47D7 /* PBXContainerItemProxy */;
+		};
 		60FB0A1B13C3264E00C2AB94 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = EtoileFoundation;
@@ -3107,6 +3450,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		60F91EA9197D1B8F009F47D7 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				60F91EAA197D1B8F009F47D7 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
 		669A728D1885C43B00E98795 /* Commits */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -3130,7 +3481,6 @@
 		60C913BF165BBED100E0C5F4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -3138,7 +3488,6 @@
 		60C913C0165BBED100E0C5F4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_ENABLE_OBJC_ARC = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -3171,9 +3520,8 @@
 					"-DSQLITE_ENABLTE_ENABLE_FTS3_PARENTHESIS",
 				);
 				OTHER_LDFLAGS = (
+					"-lz",
 					"-ObjC",
-					"-framework",
-					EtoileFoundation,
 				);
 				PRODUCT_NAME = CoreObject;
 				SDKROOT = iphoneos;
@@ -3212,9 +3560,8 @@
 					"-DSQLITE_ENABLTE_ENABLE_FTS3_PARENTHESIS",
 				);
 				OTHER_LDFLAGS = (
+					"-lz",
 					"-ObjC",
-					"-framework",
-					EtoileFoundation,
 				);
 				PRODUCT_NAME = CoreObject;
 				SDKROOT = iphoneos;
@@ -3226,6 +3573,81 @@
 					"-Wno-sign-compare",
 					"-Wno-unused-parameter",
 					"-Wno-arc-performSelector-leaks",
+				);
+			};
+			name = Release;
+		};
+		60F91EBB197D1B8F009F47D7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "iOS/TestCoreObject-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/usr/lib/system",
+				);
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-lz",
+					"-lstdc++",
+					"-ObjC",
+				);
+				PRODUCT_NAME = TestCoreObject;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wno-unused-variable",
+					"-Wno-unused-value",
+				);
+			};
+			name = Debug;
+		};
+		60F91EBC197D1B8F009F47D7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "iOS/TestCoreObject-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/usr/lib/system",
+				);
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-lz",
+					"-lstdc++",
+					"-ObjC",
+				);
+				PRODUCT_NAME = TestCoreObject;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wno-unused-variable",
+					"-Wno-unused-value",
 				);
 			};
 			name = Release;
@@ -3352,7 +3774,7 @@
 		C01FCF5008A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -3392,6 +3814,15 @@
 			buildConfigurations = (
 				60E08C7419792BEB00D1B7AD /* Debug */,
 				60E08C7519792BEB00D1B7AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		60F91EBA197D1B8F009F47D7 /* Build configuration list for PBXNativeTarget "TestCoreObject (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				60F91EBB197D1B8F009F47D7 /* Debug */,
+				60F91EBC197D1B8F009F47D7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

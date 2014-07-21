@@ -10,6 +10,7 @@
 #	import <CoreObject/COCocoaTouchCompatibility.h>
 #else
 #	import <AppKit/AppKit.h>
+#	define NSTextStorageEditActions NSUInteger
 #endif
 
 @class COAttributedString;

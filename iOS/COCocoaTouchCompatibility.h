@@ -11,6 +11,8 @@
 #import <CoreText/CoreText.h>
 #import <UIKit/UIKit.h>
 
+#define NSApplication UIApplication
+
 /* Font and CoreText */
 
 #define NSFont UIFont
@@ -22,5 +24,9 @@
 /* Color */
 
 #define NSColor UIColor
+
+/* Views */
+
+#define NSTextView UITextView
 
 #endif

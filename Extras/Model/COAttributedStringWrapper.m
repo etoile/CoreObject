@@ -720,16 +720,10 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	}
 }
 
-#if !(TARGET_OS_IPHONE)
-#define NSTextStorageEditActions NSUInteger
-#endif
-
 - (void) edited: (NSTextStorageEditActions)editedMask range: (NSRange)range changeInLength: (NSInteger)delta
 {
 	_lengthDeltaInBatch += delta;
 	[super edited: editedMask range: range changeInLength: delta];
 }
-
-
 
 @end

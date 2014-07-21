@@ -36,11 +36,17 @@ static CGFloat FractionFromHex(NSString *twoChars)
 
 static NSString *ColorToString(NSColor *color)
 {
-	NSColor *rgbColor = [color colorUsingColorSpaceName: NSCalibratedRGBColorSpace];
+	NSColor *rgbColor = color;
 	CGFloat a, r, g, b;
+
+	// NOTE: iOS does not support device-independent or generic color spaces
+#if !(TARGET_OS_IPHONE)
+	rgbColor = [color colorUsingColorSpaceName: NSCalibratedRGBColorSpace];
+#endif
 	[rgbColor getRed: &r green: &g blue: &b alpha: &a];
 	
-	return [NSString stringWithFormat: @"#%@%@%@%@", HexFromFraction(a), HexFromFraction(r), HexFromFraction(g), HexFromFraction(b)];
+	return [NSString stringWithFormat: @"#%@%@%@%@",
+		HexFromFraction(a), HexFromFraction(r), HexFromFraction(g), HexFromFraction(b)];
 }
 
 static NSColor *ColorFromString(NSString *color)
@@ -49,8 +55,12 @@ static NSColor *ColorFromString(NSString *color)
 	CGFloat r = FractionFromHex([color substringWithRange: NSMakeRange(3, 2)]);
 	CGFloat g = FractionFromHex([color substringWithRange: NSMakeRange(5, 2)]);
 	CGFloat b = FractionFromHex([color substringWithRange: NSMakeRange(7, 2)]);
-	
+
+#if TARGET_OS_IPHONE
+	return [UIColor colorWithRed: r green: g blue: b alpha: a];
+#else
 	return [NSColor colorWithCalibratedRed: r green: g blue: b alpha: a];
+#endif
 }
 
 - (id)transformedValue: (id)value
