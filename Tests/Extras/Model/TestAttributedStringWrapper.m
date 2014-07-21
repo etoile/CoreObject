@@ -38,7 +38,7 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 
 @implementation COAttributedStringWrapperTestExtensions
 
-- (void) edited: (NSUInteger)editedMask range: (NSRange)range changeInLength: (NSInteger)delta
+- (void) edited: (NSTextStorageEditActions)editedMask range: (NSRange)range changeInLength: (NSInteger)delta
 {
 	LogEditedCall(editedMask, range, delta);
 	[super edited: editedMask range: range changeInLength: delta];
@@ -85,7 +85,7 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	[self edited: NSTextStorageEditedAttributes range: aRange changeInLength: 0];
 }
 
-- (void) edited: (NSUInteger)editedMask range: (NSRange)range changeInLength: (NSInteger)delta
+- (void) edited: (NSTextStorageEditActions)editedMask range: (NSRange)range changeInLength: (NSInteger)delta
 {
 	LogEditedCall(editedMask, range, delta);
 	[super edited: editedMask range: range changeInLength: delta];
