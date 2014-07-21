@@ -91,10 +91,16 @@ See +[NSObject typePrefix]. */
 	//-[COObject propertyNames]... See -[NSObject propertyNames] and remove
 	// some properties in -basicPropertyNames (e.g. hash or superclass).
 
-#ifndef GNUSTEP 
+#if TARGET_OS_IPHONE
+	NSString *imageType = @"UIImage";
+#else
+	NSString *imageType = @"NSImage";
+#endif
+
+#ifndef GNUSTEP
 	// FIXME: We don't link NSImage on GNUstep because AppKit won't work
 	ETPropertyDescription *icon = 
-		[ETPropertyDescription descriptionWithName: @"icon" type: (id)@"NSImage"];
+		[ETPropertyDescription descriptionWithName: @"icon" type: (id)imageType];
 #endif
 	ETPropertyDescription *displayName = 
 		[ETPropertyDescription descriptionWithName: @"displayName" type: (id)@"NSString"];
