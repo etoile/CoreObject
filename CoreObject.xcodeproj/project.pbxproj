@@ -37,6 +37,9 @@
 		60882F1B197D50C000484033 /* COObjectToArchivedData.m in Sources */ = {isa = PBXBuildFile; fileRef = 608D25F5192B475200BB7461 /* COObjectToArchivedData.m */; };
 		60882F1C197D50CA00484033 /* CORectToString.m in Sources */ = {isa = PBXBuildFile; fileRef = 6633F10D185515F1009CE6F7 /* CORectToString.m */; };
 		60882F1D197D50CE00484033 /* CORectToString.h in Headers */ = {isa = PBXBuildFile; fileRef = 6633F10C185515F1009CE6F7 /* CORectToString.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60882F20197E629F00484033 /* NSDistributedNotificationCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 60882F1E197E629F00484033 /* NSDistributedNotificationCenter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60882F21197E629F00484033 /* NSDistributedNotificationCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 60882F1F197E629F00484033 /* NSDistributedNotificationCenter.m */; };
+		60882F22197E62FC00484033 /* NSDistributedNotificationCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 60882F1E197E629F00484033 /* NSDistributedNotificationCenter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60884D411837B09800C5C7C9 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60884D401837B09800C5C7C9 /* AppKit.framework */; };
 		608D25F6192B475200BB7461 /* COObjectToArchivedData.h in Headers */ = {isa = PBXBuildFile; fileRef = 608D25F4192B475200BB7461 /* COObjectToArchivedData.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		608D25F7192B475200BB7461 /* COObjectToArchivedData.m in Sources */ = {isa = PBXBuildFile; fileRef = 608D25F5192B475200BB7461 /* COObjectToArchivedData.m */; };
@@ -934,6 +937,8 @@
 		6083223619795D18008D9F9D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		6083223819795D21008D9F9D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		6083223C19797DE2008D9F9D /* COCocoaTouchCompatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCocoaTouchCompatibility.h; path = iOS/COCocoaTouchCompatibility.h; sourceTree = SOURCE_ROOT; };
+		60882F1E197E629F00484033 /* NSDistributedNotificationCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSDistributedNotificationCenter.h; path = iOS/NSDistributedNotificationCenter.h; sourceTree = SOURCE_ROOT; };
+		60882F1F197E629F00484033 /* NSDistributedNotificationCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSDistributedNotificationCenter.m; path = iOS/NSDistributedNotificationCenter.m; sourceTree = SOURCE_ROOT; };
 		60884D401837B09800C5C7C9 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		608D25F4192B475200BB7461 /* COObjectToArchivedData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COObjectToArchivedData.h; sourceTree = "<group>"; };
 		608D25F5192B475200BB7461 /* COObjectToArchivedData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COObjectToArchivedData.m; sourceTree = "<group>"; };
@@ -1514,6 +1519,8 @@
 			isa = PBXGroup;
 			children = (
 				6083223C19797DE2008D9F9D /* COCocoaTouchCompatibility.h */,
+				60882F1E197E629F00484033 /* NSDistributedNotificationCenter.h */,
+				60882F1F197E629F00484033 /* NSDistributedNotificationCenter.m */,
 				60F91EC6197D1D1C009F47D7 /* main.m */,
 				60F91EC8197D1D7F009F47D7 /* TestCoreObject-Info.plist */,
 			);
@@ -2401,6 +2408,7 @@
 				60E08D3019792FFA00D1B7AD /* COCommandUndeletePersistentRoot.h in Headers */,
 				60E08D0219792FFA00D1B7AD /* COBookmark.h in Headers */,
 				60E08D3219792FFA00D1B7AD /* COItemGraphEdit.h in Headers */,
+				60882F20197E629F00484033 /* NSDistributedNotificationCenter.h in Headers */,
 				60E08D6119792FFA00D1B7AD /* COObjectGraphContext+GarbageCollection.h in Headers */,
 				60E08D5C19792FFA00D1B7AD /* COStoreWriteRevision.h in Headers */,
 				60E08D4619792FFA00D1B7AD /* COAttributedStringAttribute.h in Headers */,
@@ -2442,6 +2450,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60882F22197E62FC00484033 /* NSDistributedNotificationCenter.h in Headers */,
 				609C00801704C2BA00D01AAB /* CORevision.h in Headers */,
 				609C00941704C3DA00D01AAB /* COEditingContext.h in Headers */,
 				609C00981704C3DA00D01AAB /* COObject.h in Headers */,
@@ -2997,6 +3006,7 @@
 				60E08C9719792F4600D1B7AD /* COQuery.m in Sources */,
 				60E08CB419792F4600D1B7AD /* COSQLiteStorePersistentRootBackingStore.m in Sources */,
 				60E08CE119792F4600D1B7AD /* COLeastCommonAncestor.m in Sources */,
+				60882F21197E629F00484033 /* NSDistributedNotificationCenter.m in Sources */,
 				60E08CAB19792F4600D1B7AD /* CODictionary.m in Sources */,
 				60E08CDF19792F4600D1B7AD /* COSequenceModification.m in Sources */,
 				60E08CBF19792F4600D1B7AD /* COAttributedStringDiff.m in Sources */,

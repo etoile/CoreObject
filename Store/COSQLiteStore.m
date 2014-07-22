@@ -18,6 +18,7 @@
 #import "COPersistentRootInfo.h"
 #import "COStoreTransaction.h"
 #import "COStoreAction.h"
+#import "NSDistributedNotificationCenter.h"
 
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
@@ -1032,13 +1033,11 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 	                                                    object: self
 	                                                  userInfo: userInfo];
 
-#if !(TARGET_OS_IPHONE)
 	[[NSDistributedNotificationCenter defaultCenter]
 		postNotificationName: COStorePersistentRootsDidChangeNotification
 		              object: [[self UUID] stringValue]
 		            userInfo: userInfo
 		  deliverImmediately: YES];
-#endif
 }
 
 - (void) postCommitNotificationsWithTransactionIDForPersistentRootUUID: (NSDictionary *)txnIDForPersistentRoot

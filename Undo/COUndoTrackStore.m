@@ -13,6 +13,7 @@
 #import "COCommand.h"
 #import "CODateSerialization.h"
 #import "COEndOfUndoTrackPlaceholderNode.h"
+#import "NSDistributedNotificationCenter.h"
 
 NSString * const COUndoTrackStoreTrackDidChangeNotification = @"COUndoTrackStoreTrackDidChangeNotification";
 NSString * const COUndoTrackStoreTrackName = @"COUndoTrackStoreTrackName";
@@ -311,13 +312,12 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 	[[NSNotificationCenter defaultCenter] postNotificationName: COUndoTrackStoreTrackDidChangeNotification
 	                                                    object: self
 	                                                  userInfo: userInfo];
-#if !(TARGET_OS_IPHONE)
+
 	[[NSDistributedNotificationCenter defaultCenter]
 	 postNotificationName: COUndoTrackStoreTrackDidChangeNotification
 	 object: [_db databasePath]
 	 userInfo: userInfo
 	 deliverImmediately: YES];
-#endif
 }
 
 - (void) postCommitNotifications

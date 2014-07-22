@@ -21,6 +21,7 @@
 #import "COEditingContext+Private.h"
 #import "CORevisionCache.h"
 #import "COStoreTransaction.h"
+#import "NSDistributedNotificationCenter.h"
 
 @implementation COEditingContext
 
@@ -73,13 +74,12 @@
                                              selector: @selector(storePersistentRootsDidChange:)
                                                  name: COStorePersistentRootsDidChangeNotification
                                                object: _store];
-#if !(TARGET_OS_IPHONE)
+
 	[[NSDistributedNotificationCenter defaultCenter]
 		addObserver: self
 	       selector: @selector(distributedStorePersistentRootsDidChange:)
 		       name: COStorePersistentRootsDidChangeNotification
 		     object: nil];
-#endif
 
 	for (ETUUID *uuid in [_store persistentRootUUIDs])
     {
@@ -102,9 +102,7 @@
 
 - (void)dealloc
 {
-#if !(TARGET_OS_IPHONE)
 	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
-#endif
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 }
 
