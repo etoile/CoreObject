@@ -407,8 +407,10 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 			if ([attr.styleKey isEqualToString: @"font-weight"] && [attr.styleValue isEqualToString: @"bold"])
 			{
 #if TARGET_OS_IPHONE
-				UIFontDescriptor *bold = [[font fontDescriptor]
-					fontDescriptorWithSymbolicTraits: UIFontDescriptorTraitBold];
+				UIFontDescriptorSymbolicTraits traits =
+					(font.fontDescriptor.symbolicTraits | UIFontDescriptorTraitBold);
+				UIFontDescriptor *bold =
+					[font.fontDescriptor fontDescriptorWithSymbolicTraits: traits];
 				font = [UIFont fontWithDescriptor: bold
 				                             size: bold.pointSize];
 #else
@@ -418,8 +420,10 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 			if ([attr.styleKey isEqualToString: @"font-style"] && [attr.styleValue isEqualToString: @"oblique"])
 			{
 #if TARGET_OS_IPHONE
-				UIFontDescriptor *italic = [[font fontDescriptor]
-					fontDescriptorWithSymbolicTraits: UIFontDescriptorTraitItalic];
+				UIFontDescriptorSymbolicTraits traits =
+					(font.fontDescriptor.symbolicTraits | UIFontDescriptorTraitItalic);
+				UIFontDescriptor *italic =
+					[font.fontDescriptor fontDescriptorWithSymbolicTraits: traits];
 				font = [UIFont fontWithDescriptor: italic
 				                             size: italic.pointSize];
 #else
