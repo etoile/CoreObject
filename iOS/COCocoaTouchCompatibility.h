@@ -16,6 +16,7 @@
 /* Font and CoreText */
 
 #define NSFont UIFont
+#define NSFontDescriptor UIFontDescriptor
 #define NSFontSymbolicTraits UIFontDescriptorSymbolicTraits
 #define NSFontBoldTrait UIFontDescriptorTraitBold
 #define NSFontItalicTrait UIFontDescriptorTraitItalic

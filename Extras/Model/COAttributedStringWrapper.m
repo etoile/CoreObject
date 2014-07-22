@@ -379,6 +379,15 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	return _cachedString;
 }
 
+- (NSFont *)convertFont: (NSFont *)font toHaveTrait: (NSFontSymbolicTraits)aTrait
+{
+	NSFontSymbolicTraits traits = (font.fontDescriptor.symbolicTraits | aTrait);
+	NSFontDescriptor *desc = [font.fontDescriptor fontDescriptorWithSymbolicTraits: traits];
+
+	return [NSFont fontWithDescriptor: desc
+	                             size: desc.pointSize];
+}
+
 - (NSDictionary *)attributesAtIndex: (NSUInteger)anIndex effectiveRange: (NSRangePointer)aRangeOut
 {
 	//NSLog(@"%p (%@) attributesAtIndex %d", self, [self string], (int)anIndex);
@@ -406,29 +415,11 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		{
 			if ([attr.styleKey isEqualToString: @"font-weight"] && [attr.styleValue isEqualToString: @"bold"])
 			{
-#if TARGET_OS_IPHONE
-				UIFontDescriptorSymbolicTraits traits =
-					(font.fontDescriptor.symbolicTraits | UIFontDescriptorTraitBold);
-				UIFontDescriptor *bold =
-					[font.fontDescriptor fontDescriptorWithSymbolicTraits: traits];
-				font = [UIFont fontWithDescriptor: bold
-				                             size: bold.pointSize];
-#else
-				font = [[NSFontManager sharedFontManager] convertFont: font toHaveTrait: NSFontBoldTrait];
-#endif
+				font = [self convertFont: font toHaveTrait: NSFontBoldTrait];
 			}
 			if ([attr.styleKey isEqualToString: @"font-style"] && [attr.styleValue isEqualToString: @"oblique"])
 			{
-#if TARGET_OS_IPHONE
-				UIFontDescriptorSymbolicTraits traits =
-					(font.fontDescriptor.symbolicTraits | UIFontDescriptorTraitItalic);
-				UIFontDescriptor *italic =
-					[font.fontDescriptor fontDescriptorWithSymbolicTraits: traits];
-				font = [UIFont fontWithDescriptor: italic
-				                             size: italic.pointSize];
-#else
-				font = [[NSFontManager sharedFontManager] convertFont: font toHaveTrait: NSFontItalicTrait];
-#endif
+				font = [self convertFont: font toHaveTrait: NSFontItalicTrait];
 			}
 			if ([attr.styleKey isEqualToString: @"text-decoration"] && [attr.styleValue isEqualToString: @"underline"])
 			{
