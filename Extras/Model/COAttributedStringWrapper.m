@@ -379,13 +379,24 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	return _cachedString;
 }
 
+/**
+ * According to the Apple API doc: "The symbolic traits supersede the existing 
+ * NSFontTraitMask type used by NSFontManager. The corresponding values are kept 
+ * compatible between NSFontTraitMask and NSFontSymbolicTraits. 
+ */
 - (NSFont *)convertFont: (NSFont *)font toHaveTrait: (NSFontSymbolicTraits)aTrait
 {
+#if TARGET_OS_IPHONE
+	// NOTE: This code should work on Mac OS X, but -fontWithDescriptor:size: is broken.
 	NSFontSymbolicTraits traits = (font.fontDescriptor.symbolicTraits | aTrait);
 	NSFontDescriptor *desc = [font.fontDescriptor fontDescriptorWithSymbolicTraits: traits];
 
 	return [NSFont fontWithDescriptor: desc
 	                             size: desc.pointSize];
+#else
+	return [[NSFontManager sharedFontManager] convertFont: font
+	                                          toHaveTrait: aTrait];
+#endif
 }
 
 - (NSDictionary *)attributesAtIndex: (NSUInteger)anIndex effectiveRange: (NSRangePointer)aRangeOut
