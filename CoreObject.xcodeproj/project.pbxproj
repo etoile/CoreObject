@@ -19,6 +19,7 @@
 		6002E290197FD91A00AC9150 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C913AD165BBE9E00E0C5F4 /* main.m */; };
 		600F72BF1858A71200CB6AC5 /* COPersistentObjectContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 600F72BD1858A71200CB6AC5 /* COPersistentObjectContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		600F72C01858A71200CB6AC5 /* COPersistentObjectContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 600F72BE1858A71200CB6AC5 /* COPersistentObjectContext.m */; };
+		6019CD75197FDF10009EDAFB /* NEWS.md in Sources */ = {isa = PBXBuildFile; fileRef = 6019CD74197FDF10009EDAFB /* NEWS.md */; };
 		601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D44180C0F5300CED07E /* COObject+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		601C1D4F180C115D00CED07E /* COObjectGraphContext+GarbageCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D4D180C115900CED07E /* COObjectGraphContext+GarbageCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		601C1D50180C115D00CED07E /* COObjectGraphContext+GarbageCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */; };
@@ -929,6 +930,7 @@
 		600F72BD1858A71200CB6AC5 /* COPersistentObjectContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COPersistentObjectContext.h; path = Utilities/COPersistentObjectContext.h; sourceTree = "<group>"; };
 		600F72BE1858A71200CB6AC5 /* COPersistentObjectContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COPersistentObjectContext.m; path = Utilities/COPersistentObjectContext.m; sourceTree = "<group>"; };
 		601977FB1860A52200635BE2 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
+		6019CD74197FDF10009EDAFB /* NEWS.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = NEWS.md; sourceTree = "<group>"; };
 		601C1D44180C0F5300CED07E /* COObject+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObject+Private.h"; path = "Core/COObject+Private.h"; sourceTree = "<group>"; };
 		601C1D4D180C115900CED07E /* COObjectGraphContext+GarbageCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+GarbageCollection.h"; path = "Core/COObjectGraphContext+GarbageCollection.h"; sourceTree = "<group>"; };
 		601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObjectGraphContext+GarbageCollection.m"; path = "Core/COObjectGraphContext+GarbageCollection.m"; sourceTree = "<group>"; };
@@ -1933,6 +1935,7 @@
 				601977FB1860A52200635BE2 /* README.md */,
 				60951A2518884A3700687CF0 /* INSTALL.Cocoa.md */,
 				60951A2618884A3800687CF0 /* INSTALL.GNUstep.md */,
+				6019CD74197FDF10009EDAFB /* NEWS.md */,
 				601FD946188944360002F957 /* HACKING.md */,
 				66982A1F11EBC2A0007154CD /* TODO.md */,
 				66618A8B1811C065001FA004 /* TERMINOLOGY */,
@@ -3273,6 +3276,7 @@
 				60C81D0B195DA82200AEEC68 /* COClassToString.m in Sources */,
 				66457FED17E9683F003C51A8 /* CORevisionCache.m in Sources */,
 				601C1D50180C115D00CED07E /* COObjectGraphContext+GarbageCollection.m in Sources */,
+				6019CD75197FDF10009EDAFB /* NEWS.md in Sources */,
 				60EBC19C184CA38200F751F5 /* COPrimitiveCollection.m in Sources */,
 				600F72C01858A71200CB6AC5 /* COPersistentObjectContext.m in Sources */,
 				607335B518AB96A6008A02DC /* COSmartGroup.m in Sources */,
