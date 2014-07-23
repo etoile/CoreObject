@@ -9,6 +9,14 @@
 /* Begin PBXBuildFile section */
 		6002E21D197FD6B200AC9150 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60882F24197EA24900484033 /* AppKit.framework */; };
 		6002E21E197FD73A00AC9150 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60882F24197EA24900484033 /* AppKit.framework */; };
+		6002E280197FD90300AC9150 /* libSystem.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F91ED6197D2CA2009F47D7 /* libSystem.dylib */; };
+		6002E281197FD90300AC9150 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6083223819795D21008D9F9D /* UIKit.framework */; };
+		6002E282197FD90300AC9150 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B1D3F919791F8800ACAC9C /* Foundation.framework */; };
+		6002E283197FD90300AC9150 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6083223619795D18008D9F9D /* CoreGraphics.framework */; };
+		6002E284197FD90300AC9150 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B1D3FB19791F9400ACAC9C /* libsqlite3.dylib */; };
+		6002E286197FD90300AC9150 /* libCoreObject.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60E08C6219792BEA00D1B7AD /* libCoreObject.a */; };
+		6002E288197FD90300AC9150 /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 669A728D1885C43B00E98795 /* Commits */; };
+		6002E290197FD91A00AC9150 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C913AD165BBE9E00E0C5F4 /* main.m */; };
 		600F72BF1858A71200CB6AC5 /* COPersistentObjectContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 600F72BD1858A71200CB6AC5 /* COPersistentObjectContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		600F72C01858A71200CB6AC5 /* COPersistentObjectContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 600F72BE1858A71200CB6AC5 /* COPersistentObjectContext.m */; };
 		601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D44180C0F5300CED07E /* COObject+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -718,6 +726,13 @@
 			remoteGlobalIDString = 603647AB0E409244003377E0;
 			remoteInfo = EtoileFoundation;
 		};
+		6002E223197FD90300AC9150 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 60E08C6119792BEA00D1B7AD;
+			remoteInfo = "CoreObject (iOS)";
+		};
 		6048464718B6C03E006E4EDC /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */;
@@ -910,6 +925,7 @@
 
 /* Begin PBXFileReference section */
 		3D01D08A1646BEF400917AC8 /* UnitKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = UnitKit.xcodeproj; path = ../UnitKit/UnitKit.xcodeproj; sourceTree = "<group>"; };
+		6002E28E197FD90300AC9150 /* BasicPersistence.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BasicPersistence.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		600F72BD1858A71200CB6AC5 /* COPersistentObjectContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COPersistentObjectContext.h; path = Utilities/COPersistentObjectContext.h; sourceTree = "<group>"; };
 		600F72BE1858A71200CB6AC5 /* COPersistentObjectContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COPersistentObjectContext.m; path = Utilities/COPersistentObjectContext.m; sourceTree = "<group>"; };
 		601977FB1860A52200635BE2 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
@@ -1317,6 +1333,19 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		6002E27F197FD90300AC9150 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6002E280197FD90300AC9150 /* libSystem.dylib in Frameworks */,
+				6002E281197FD90300AC9150 /* UIKit.framework in Frameworks */,
+				6002E282197FD90300AC9150 /* Foundation.framework in Frameworks */,
+				6002E283197FD90300AC9150 /* CoreGraphics.framework in Frameworks */,
+				6002E284197FD90300AC9150 /* libsqlite3.dylib in Frameworks */,
+				6002E286197FD90300AC9150 /* libCoreObject.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		60C913B0165BBED000E0C5F4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1406,6 +1435,7 @@
 				66550BED17D51C8800327657 /* BenchmarkCoreObject */,
 				60E08C6219792BEA00D1B7AD /* libCoreObject.a */,
 				60F91E9D197D1B8F009F47D7 /* TestCoreObject.app */,
+				6002E28E197FD90300AC9150 /* BasicPersistence.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2486,6 +2516,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		6002E21F197FD90300AC9150 /* BasicPersistence (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6002E28B197FD90300AC9150 /* Build configuration list for PBXNativeTarget "BasicPersistence (iOS)" */;
+			buildPhases = (
+				6002E224197FD90300AC9150 /* Sources */,
+				6002E27F197FD90300AC9150 /* Frameworks */,
+				6002E287197FD90300AC9150 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6002E222197FD90300AC9150 /* PBXTargetDependency */,
+			);
+			name = "BasicPersistence (iOS)";
+			productName = "TestCoreObject (iOS)";
+			productReference = 6002E28E197FD90300AC9150 /* BasicPersistence.app */;
+			productType = "com.apple.product-type.application";
+		};
 		60C913B2165BBED000E0C5F4 /* BasicPersistence */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 60C913BE165BBED100E0C5F4 /* Build configuration list for PBXNativeTarget "BasicPersistence" */;
@@ -2654,6 +2702,7 @@
 				60C913B2165BBED000E0C5F4 /* BasicPersistence */,
 				60E08C6119792BEA00D1B7AD /* CoreObject (iOS) */,
 				60F91E9C197D1B8F009F47D7 /* TestCoreObject (iOS) */,
+				6002E21F197FD90300AC9150 /* BasicPersistence (iOS) */,
 			);
 		};
 /* End PBXProject section */
@@ -2753,6 +2802,14 @@
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
+		6002E287197FD90300AC9150 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6002E288197FD90300AC9150 /* Commits in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		60F91E9B197D1B8F009F47D7 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2844,6 +2901,14 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		6002E224197FD90300AC9150 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6002E290197FD91A00AC9150 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		60C913AF165BBED000E0C5F4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3323,6 +3388,11 @@
 			name = EtoileFoundation;
 			targetProxy = 3D01D0511646BE2900917AC8 /* PBXContainerItemProxy */;
 		};
+		6002E222197FD90300AC9150 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 60E08C6119792BEA00D1B7AD /* CoreObject (iOS) */;
+			targetProxy = 6002E223197FD90300AC9150 /* PBXContainerItemProxy */;
+		};
 		60C913C3165BBEED00E0C5F4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 6686BDAB12592BDA0065DE1A /* CoreObject */;
@@ -3377,6 +3447,79 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		6002E28C197FD90300AC9150 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "iOS/TestCoreObject-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/usr/lib/system",
+				);
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-lstdc++",
+					"-ObjC",
+				);
+				PRODUCT_NAME = BasicPersistence;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wno-unused-variable",
+					"-Wno-unused-value",
+				);
+			};
+			name = Debug;
+		};
+		6002E28D197FD90300AC9150 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "iOS/TestCoreObject-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/usr/lib/system",
+				);
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-lstdc++",
+					"-ObjC",
+				);
+				PRODUCT_NAME = BasicPersistence;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wno-unused-variable",
+					"-Wno-unused-value",
+				);
+			};
+			name = Release;
+		};
 		60C913BF165BBED100E0C5F4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -3418,10 +3561,7 @@
 					"-DSQLITE_ENABLE_FTS3",
 					"-DSQLITE_ENABLTE_ENABLE_FTS3_PARENTHESIS",
 				);
-				OTHER_LDFLAGS = (
-					"-lz",
-					"-ObjC",
-				);
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = CoreObject;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3458,10 +3598,7 @@
 					"-DSQLITE_ENABLE_FTS3",
 					"-DSQLITE_ENABLTE_ENABLE_FTS3_PARENTHESIS",
 				);
-				OTHER_LDFLAGS = (
-					"-lz",
-					"-ObjC",
-				);
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = CoreObject;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3500,7 +3637,6 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
-					"-lz",
 					"-lstdc++",
 					"-ObjC",
 				);
@@ -3535,7 +3671,6 @@
 				);
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
-					"-lz",
 					"-lstdc++",
 					"-ObjC",
 				);
@@ -3661,7 +3796,6 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				OTHER_CFLAGS = "-DDEBUG";
-				OTHER_LDFLAGS = "-lz";
 				SDKROOT = macosx;
 				WARNING_CFLAGS = (
 					"-Wall",
@@ -3688,7 +3822,6 @@
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
-				OTHER_LDFLAGS = "-lz";
 				SDKROOT = macosx;
 				WARNING_CFLAGS = (
 					"-Wall",
@@ -3701,6 +3834,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		6002E28B197FD90300AC9150 /* Build configuration list for PBXNativeTarget "BasicPersistence (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6002E28C197FD90300AC9150 /* Debug */,
+				6002E28D197FD90300AC9150 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		60C913BE165BBED100E0C5F4 /* Build configuration list for PBXNativeTarget "BasicPersistence" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
