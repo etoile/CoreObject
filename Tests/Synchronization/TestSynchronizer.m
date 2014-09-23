@@ -12,11 +12,6 @@
 
 @implementation TestSynchronizer
 
-+ (Class) messageTransportClass
-{
-	return [FakeMessageTransport class];
-}
-
 - (void) testPersistentRootMetadataReplicated
 {
 	UKObjectsEqual([self persistentRootMetadataForTest], clientPersistentRoot.metadata);

@@ -42,9 +42,7 @@
 
 + (Class) messageTransportClass
 {
-	// abstract method
-	ETAssertUnreachable();
-	return Nil;
+	return [FakeMessageTransport class];
 }
 
 - (void)dealloc
