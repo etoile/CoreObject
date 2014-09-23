@@ -99,6 +99,14 @@
 	persistentRoot = [_ctx persistentRootForUUID: message.persistentRootUUID];
 	ETAssert(persistentRoot != nil);
 	_branch = [persistentRoot branchForUUID: message.branchUUID];
+	
+	if ([_branch hasChanges])
+	{
+		[NSException raise: NSGenericException
+		 format: @"-[%@ %@] called but the branch has uncommitted changes. You should ensure all changes are committed before feeding the synchronizer a message.",
+			NSStringFromClass([self class]), NSStringFromSelector(_cmd)];
+	}
+
 	_branch.supportsRevert = NO;
 	ETAssert(_branch != nil);
 	_lastRevisionUUIDFromServer = message.currentRevision.revisionUUID;
@@ -243,6 +251,13 @@
 	{
 		return;
 	}
+
+	if ([_branch hasChanges])
+	{
+		[NSException raise: NSGenericException
+		 format: @"-[%@ %@] called but the branch has uncommitted changes. You should ensure all changes are committed before feeding the synchronizer a message.",
+			NSStringFromClass([self class]), NSStringFromSelector(_cmd)];
+	}
 	
 	[self handleRevisionsFromServer: aMessage.revisions];
 }
@@ -252,6 +267,13 @@
 	if (![aMessage.lastRevisionUUIDSentByClient isEqual: [self lastRevisionUUIDInTransitToServer]])
 	{
 		return;
+	}
+
+	if ([_branch hasChanges])
+	{
+		[NSException raise: NSGenericException
+		 format: @"-[%@ %@] called but the branch has uncommitted changes. You should ensure all changes are committed before feeding the synchronizer a message.",
+			NSStringFromClass([self class]), NSStringFromSelector(_cmd)];
 	}
 
 	// Benchmarking:

@@ -141,6 +141,13 @@
 
 - (void) handlePushedRevisionsFromClient: (COSynchronizerPushedRevisionsFromClientMessage *)aMessage
 {
+	if ([branch hasChanges])
+	{
+		[NSException raise: NSGenericException
+		 format: @"-[%@ %@] called but the branch has uncommitted changes. You should ensure all changes are committed before feeding the synchronizer a message.",
+			NSStringFromClass([self class]), NSStringFromSelector(_cmd)];
+	}
+
 	ETAssert(aMessage.lastRevisionUUIDSentByServer != nil);
 	lastSentRevisionForClientID[aMessage.clientID] = aMessage.lastRevisionUUIDSentByServer;
 	[self handleRevisions: aMessage.revisions fromClient: aMessage.clientID];
