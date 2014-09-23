@@ -366,6 +366,8 @@
 		66E6824118B972C4003294EB /* BenchmarkCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E6824018B972C4003294EB /* BenchmarkCommon.m */; };
 		66E6826118BA9B5D003294EB /* TestObjectPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E6826018BA9B5D003294EB /* TestObjectPerformance.m */; };
 		66E725CE18AF50610032F28F /* TestUndoTrack.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E725CD18AF50610032F28F /* TestUndoTrack.m */; };
+		66EE9FEC19D1E5B4005A35DE /* COSynchronizerImmediateMessageTransport.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE9FEB19D1E5B4005A35DE /* COSynchronizerImmediateMessageTransport.m */; };
+		66EEA00A19D1ECB8005A35DE /* TestSynchronizerImmediateDelivery.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EE9FF919D1E7D4005A35DE /* TestSynchronizerImmediateDelivery.m */; };
 		66EEB2B7186D3CBA003695E6 /* TestItemGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EEB2B6186D3CBA003695E6 /* TestItemGraph.m */; };
 		66EF4276186251A800E15C59 /* TestDiffCAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EF4275186251A800E15C59 /* TestDiffCAPI.m */; };
 		66F1985919667265001EAEB0 /* TestMetamodelCornerCases.m in Sources */ = {isa = PBXBuildFile; fileRef = 66F1985819667265001EAEB0 /* TestMetamodelCornerCases.m */; };
@@ -938,6 +940,10 @@
 		66E6824018B972C4003294EB /* BenchmarkCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BenchmarkCommon.m; path = Benchmark/BenchmarkCommon.m; sourceTree = "<group>"; };
 		66E6826018BA9B5D003294EB /* TestObjectPerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestObjectPerformance.m; path = Benchmark/TestObjectPerformance.m; sourceTree = "<group>"; };
 		66E725CD18AF50610032F28F /* TestUndoTrack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUndoTrack.m; sourceTree = "<group>"; };
+		66EE9FEA19D1E5B4005A35DE /* COSynchronizerImmediateMessageTransport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COSynchronizerImmediateMessageTransport.h; sourceTree = "<group>"; };
+		66EE9FEB19D1E5B4005A35DE /* COSynchronizerImmediateMessageTransport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COSynchronizerImmediateMessageTransport.m; sourceTree = "<group>"; };
+		66EE9FF919D1E7D4005A35DE /* TestSynchronizerImmediateDelivery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestSynchronizerImmediateDelivery.m; sourceTree = "<group>"; };
+		66EE9FFD19D1EA77005A35DE /* COSynchronizerMessageTransport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COSynchronizerMessageTransport.h; sourceTree = "<group>"; };
 		66EEB2B6186D3CBA003695E6 /* TestItemGraph.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestItemGraph.m; sourceTree = "<group>"; };
 		66EF4275186251A800E15C59 /* TestDiffCAPI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestDiffCAPI.m; sourceTree = "<group>"; };
 		66F1985819667265001EAEB0 /* TestMetamodelCornerCases.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestMetamodelCornerCases.m; sourceTree = "<group>"; };
@@ -1664,10 +1670,14 @@
 		66E40D471836D08D00E5B4A7 /* Synchronization */ = {
 			isa = PBXGroup;
 			children = (
+				66EE9FFD19D1EA77005A35DE /* COSynchronizerMessageTransport.h */,
 				66E40D481836D08D00E5B4A7 /* COSynchronizerFakeMessageTransport.h */,
 				66E40D491836D08D00E5B4A7 /* COSynchronizerFakeMessageTransport.m */,
+				66EE9FEA19D1E5B4005A35DE /* COSynchronizerImmediateMessageTransport.h */,
+				66EE9FEB19D1E5B4005A35DE /* COSynchronizerImmediateMessageTransport.m */,
 				66E40D4A1836D08D00E5B4A7 /* TestSynchronization.m */,
 				66E40D4B1836D08D00E5B4A7 /* TestSynchronizer.m */,
+				66EE9FF919D1E7D4005A35DE /* TestSynchronizerImmediateDelivery.m */,
 				66E40D4C1836D08D00E5B4A7 /* TestSynchronizerJSONTransport.m */,
 				66E40D4D1836D08D00E5B4A7 /* TestSynchronizerMultiUser.m */,
 				664F2798188E2DC900DF36FC /* TestSynchronizerCommon.h */,
@@ -2454,6 +2464,7 @@
 				66B1FC72187377ED00745859 /* TestAttributedString.m in Sources */,
 				66E40D5F1836D08D00E5B4A7 /* TestHistoryInspection.m in Sources */,
 				66101131184D2D8A001A3E24 /* TestUnivaluedAttribute.m in Sources */,
+				66EE9FEC19D1E5B4005A35DE /* COSynchronizerImmediateMessageTransport.m in Sources */,
 				666888151849961300DBEB10 /* TestUnorderedRelationshipWithOpposite.m in Sources */,
 				609C00651704C24C00D01AAB /* main.m in Sources */,
 				66101132184D2D8A001A3E24 /* TestUnorderedAttribute.m in Sources */,
@@ -2516,6 +2527,7 @@
 				6610112F184D2D8A001A3E24 /* TestKeyedAttribute.m in Sources */,
 				66E40D6B1836D08D00E5B4A7 /* TestBinaryReadWrite.m in Sources */,
 				664F27A4188F4E9600DF36FC /* TestSQLiteStoreRevisionInfos.m in Sources */,
+				66EEA00A19D1ECB8005A35DE /* TestSynchronizerImmediateDelivery.m in Sources */,
 				6621BF101847F06D000809CF /* Parent.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

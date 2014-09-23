@@ -121,6 +121,21 @@
 
 - (void) handleRevisionsFromServer: (NSArray *)revs
 {
+	if ([[[revs lastObject] revisionUUID] isEqual: [[[self branch] currentRevision] UUID]])
+	{
+		// Bail out early without doing anything in the trivial case when there are no further changes
+		// since we last sent something to the server.. this prevents the TestSynchronizerImmediateDelivery tests from failing.
+		
+		// TODO: It's kind of ugly that in the simple case, when a client commits something, sends it to the server,
+		// the server replies back with the full content that the client sent (even though it knows it's unnecessary
+		// to send that.) We still need to send the receipts though.
+		
+		_lastRevisionUUIDFromServer = [[revs lastObject] revisionUUID];
+		_lastRevisionUUIDInTransitToServer = nil;
+		return;
+	}
+
+
 	ETUUID *lastServerRevUUID = [self lastRevisionUUIDFromServer];
 		
 	NSUInteger i = [revs indexOfObjectPassingTest: ^(id obj, NSUInteger idx, BOOL *stop)
