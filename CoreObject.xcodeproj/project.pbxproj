@@ -86,6 +86,9 @@
 		609C00C11704C3FF00D01AAB /* COBranch.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00B91704C3FF00D01AAB /* COBranch.m */; };
 		609C00E81704C42200D01AAB /* COError.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00E21704C42200D01AAB /* COError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C00E91704C42200D01AAB /* COError.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00E31704C42200D01AAB /* COError.m */; };
+		60B1568D19B860C8006D5EEF /* COUndoTrackStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE29317C07ED800E729F5 /* COUndoTrackStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60B1568E19B861BF006D5EEF /* COEditingContext+Debugging.h in Headers */ = {isa = PBXBuildFile; fileRef = 601FD94418893ED50002F957 /* COEditingContext+Debugging.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60B1568F19B861D3006D5EEF /* COObjectGraphContext+Debugging.h in Headers */ = {isa = PBXBuildFile; fileRef = 66A00A18187DDB6A005CFE16 /* COObjectGraphContext+Debugging.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60C81D0B195DA82200AEEC68 /* COClassToString.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C81D0A195DA82200AEEC68 /* COClassToString.m */; };
 		60C81D19195DA83F00AEEC68 /* COClassToString.h in Headers */ = {isa = PBXBuildFile; fileRef = 60C81D18195DA83F00AEEC68 /* COClassToString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60C913C4165BBF2B00E0C5F4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C913AD165BBE9E00E0C5F4 /* main.m */; };
@@ -2315,6 +2318,7 @@
 				60E08D3119792FFA00D1B7AD /* COCommandUndeleteBranch.h in Headers */,
 				60E08CFF19792FFA00D1B7AD /* COObject.h in Headers */,
 				60E08D3819792FFA00D1B7AD /* COSequenceDeletion.h in Headers */,
+				60B1568E19B861BF006D5EEF /* COEditingContext+Debugging.h in Headers */,
 				60E08D3419792FFA00D1B7AD /* CODeleteAttribute.h in Headers */,
 				60E08D5419792FFA00D1B7AD /* COStoreDeleteBranch.h in Headers */,
 				60E08D3319792FFA00D1B7AD /* COSetAttribute.h in Headers */,
@@ -2347,6 +2351,7 @@
 				60E08D0219792FFA00D1B7AD /* COBookmark.h in Headers */,
 				60E08D3219792FFA00D1B7AD /* COItemGraphEdit.h in Headers */,
 				60882F20197E629F00484033 /* NSDistributedNotificationCenter.h in Headers */,
+				60B1568F19B861D3006D5EEF /* COObjectGraphContext+Debugging.h in Headers */,
 				60E08D6119792FFA00D1B7AD /* COObjectGraphContext+GarbageCollection.h in Headers */,
 				60E08D5C19792FFA00D1B7AD /* COStoreWriteRevision.h in Headers */,
 				60E08D4619792FFA00D1B7AD /* COAttributedStringAttribute.h in Headers */,
@@ -2380,6 +2385,7 @@
 				60E08D3F19792FFA00D1B7AD /* COSynchronizerRevision.h in Headers */,
 				60E08D6519792FFA00D1B7AD /* COAttachmentID.h in Headers */,
 				60E08D1E19792FFA00D1B7AD /* COPath.h in Headers */,
+				60B1568D19B860C8006D5EEF /* COUndoTrackStore.h in Headers */,
 				60E08D2D19792FFA00D1B7AD /* COCommandSetCurrentVersionForBranch.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2847,7 +2853,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Based on https://github.com/jverkoey/iOS-Framework\n\nset -e\n\nmkdir -p \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Versions/A/Headers\"\n\n# Link the \"Current\" version to \"A\"\n/bin/ln -sfh A \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Versions/Current\"\n/bin/ln -sfh Versions/Current/Headers \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Headers\"\n/bin/ln -sfh \"Versions/Current/${PRODUCT_NAME}\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/${PRODUCT_NAME}\"\n";
+			shellScript = "# Based on https://github.com/jverkoey/iOS-Framework\n\nset -e\n\nmkdir -p \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Versions/A/Headers\"\n\n# Link the \"Current\" version to \"A\"\n/bin/ln -sfh A \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Versions/Current\"\n/bin/ln -sfh Versions/Current/Headers \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Headers\"\n/bin/ln -sfh \"Versions/Current/${PRODUCT_NAME}\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/${PRODUCT_NAME}\"\n\n# The -a ensures that the headers maintain the source modification date so that we don't constantly\n# cause propagating rebuilds of files that import these headers.\n/bin/cp -a \"${TARGET_BUILD_DIR}/${PUBLIC_HEADERS_FOLDER_PATH}/\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Versions/A/Headers\"\n\ncp -a \"${BUILT_PRODUCTS_DIR}/lib${PRODUCT_NAME}.a\" \"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.framework/Versions/A/${PRODUCT_NAME}\"";
 		};
 		662FE52818779807005D04AC /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3454,7 +3460,7 @@
 		6002E28C197FD90300AC9150 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -3466,7 +3472,6 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "iOS/TestCoreObject-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3475,8 +3480,8 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
-					"-lstdc++",
 					"-ObjC",
+					"-lc++",
 				);
 				PRODUCT_NAME = BasicPersistence;
 				SDKROOT = iphoneos;
@@ -3492,7 +3497,7 @@
 		6002E28D197FD90300AC9150 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -3501,7 +3506,6 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "iOS/TestCoreObject-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3509,8 +3513,8 @@
 				);
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
-					"-lstdc++",
 					"-ObjC",
+					"-lc++",
 				);
 				PRODUCT_NAME = BasicPersistence;
 				SDKROOT = iphoneos;
@@ -3541,13 +3545,15 @@
 		60E08C7419792BEB00D1B7AD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				DEAD_CODE_STRIPPING = NO;
 				DYLIB_COMPATIBILITY_VERSION = 0;
 				DYLIB_CURRENT_VERSION = 6;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_GENERATE_TEST_COVERAGE_FILES = NO;
+				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -3555,7 +3561,6 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = CoreObjectInfo.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
@@ -3565,7 +3570,10 @@
 					"-DSQLITE_ENABLE_FTS3",
 					"-DSQLITE_ENABLTE_ENABLE_FTS3_PARENTHESIS",
 				);
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-lc++",
+				);
 				PRODUCT_NAME = CoreObject;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3582,7 +3590,7 @@
 		60E08C7519792BEB00D1B7AD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				DEAD_CODE_STRIPPING = NO;
@@ -3593,7 +3601,6 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = CoreObjectInfo.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
@@ -3602,7 +3609,10 @@
 					"-DSQLITE_ENABLE_FTS3",
 					"-DSQLITE_ENABLTE_ENABLE_FTS3_PARENTHESIS",
 				);
-				OTHER_LDFLAGS = "-ObjC";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-lc++",
+				);
 				PRODUCT_NAME = CoreObject;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3620,7 +3630,7 @@
 		60F91EBB197D1B8F009F47D7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -3632,7 +3642,6 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "iOS/TestCoreObject-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3641,8 +3650,8 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
-					"-lstdc++",
 					"-ObjC",
+					"-lc++",
 				);
 				PRODUCT_NAME = TestCoreObject;
 				SDKROOT = iphoneos;
@@ -3658,7 +3667,7 @@
 		60F91EBC197D1B8F009F47D7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -3667,7 +3676,6 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "iOS/TestCoreObject-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3675,8 +3683,8 @@
 				);
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
-					"-lstdc++",
 					"-ObjC",
+					"-lc++",
 				);
 				PRODUCT_NAME = TestCoreObject;
 				SDKROOT = iphoneos;
@@ -3792,7 +3800,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
 				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -3822,7 +3830,7 @@
 				CLANG_WARN_OBJC_MISSING_PROPERTY_SYNTHESIS = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
