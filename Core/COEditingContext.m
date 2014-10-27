@@ -210,7 +210,8 @@
 - (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName
 {
 	ETEntityDescription *desc = [[self modelDescriptionRepository] descriptionForName: anEntityName];
-    COObjectGraphContext *graph = [COObjectGraphContext objectGraphContext];
+    COObjectGraphContext *graph = [COObjectGraphContext
+		objectGraphContextWithModelDescriptionRepository: self.modelDescriptionRepository];
 
 	Class cls = [[self modelDescriptionRepository] classForEntityDescription: desc];
 	COObject *rootObject = [[cls alloc] initWithEntityDescription: desc

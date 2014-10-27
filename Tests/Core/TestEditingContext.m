@@ -22,6 +22,17 @@
     return self;
 }
 
+- (void)testCustomModelDescriptionRepository
+{
+	ETModelDescriptionRepository *repo = [ETModelDescriptionRepository new];
+
+	[repo collectEntityDescriptionsFromClass: [NSObject class]
+	                         excludedClasses: nil
+	                              resolveNow: YES];
+	ctx = [[COEditingContext alloc] initWithStore: store modelDescriptionRepository: repo];
+
+	UKDoesNotRaiseException([ctx insertNewPersistentRootWithEntityName: @"OutlineItem"]);
+}
 
 - (void)testDeleteUncommittedPersistentRoot
 {
