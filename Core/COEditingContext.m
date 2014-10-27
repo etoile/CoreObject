@@ -21,6 +21,7 @@
 #import "COEditingContext+Private.h"
 #import "CORevisionCache.h"
 #import "COStoreTransaction.h"
+#import "NSDistributedNotificationCenter.h"
 
 @implementation COEditingContext
 

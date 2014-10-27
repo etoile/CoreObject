@@ -18,9 +18,14 @@
 #import "COPersistentRootInfo.h"
 #import "COStoreTransaction.h"
 #import "COStoreAction.h"
+#import "NSDistributedNotificationCenter.h"
 
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
+
+/* For dispatch_get_current_queue() deprecated on iOS (to prevent to people to 
+   use it beside debugging) */
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
 NSString * const COStorePersistentRootsDidChangeNotification = @"COStorePersistentRootsDidChangeNotification";
 NSString * const kCOStorePersistentRootTransactionIDs = @"COPersistentRootTransactionIDs";
@@ -99,11 +104,14 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 		[db_ close];
 		db_ = nil;
 	});
+
+#if !(TARGET_OS_IPHONE)
 	// N.B.: We are using deployment target 10.7, so ARC does not manage libdispatch objects.
 	// If we switch to deployment target 10.8, ARC will manage libdispatch objects automatically.
 	// For GNUstep, ARC doesn't manage libdispatch objects since libobjc2 doesn't support it 
 	// currently (we compile CoreObject with -DOS_OBJECT_USE_OBJC=0).
 	dispatch_release(queue_);
+#endif
 }
 
 - (BOOL) setupSchema
