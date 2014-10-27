@@ -58,16 +58,22 @@
 			COAttributedString *root = [proot rootObject];
 			COAttributedStringChunk *chunk0 = root.chunks[0];
 			COAttributedStringChunk *chunk1 = root.chunks[1];
-			COAttributedStringAttribute *underlineAttr = [chunk1.attributes anyObject];
+
+			id underlineAttributesFilter = ^(id anAttribute) {
+				COAttributedStringAttribute *attr = anAttribute;
+				return [attr.styleKey isEqualToString: @"text-decoration"]
+					&& [attr.styleValue isEqualToString: @"underline"];
+			};
 
 			// Check that the object graph is correctly constructed
 			
 			UKObjectsEqual(@"x", chunk0.text);
 			UKObjectsEqual(@"y", chunk1.text);
-			//UKObjectsEqual(@"u", underlineAttr.htmlCode);
-			UKObjectsEqual(A(chunk0, chunk1), root.chunks);
-			UKObjectsEqual(S(), chunk0.attributes);
-			UKObjectsEqual(S(underlineAttr), chunk1.attributes);
+			UKIntsEqual(2, [root.chunks count]);
+	
+			// Check that chunk0 has no underline attribute, and chunk1 does
+			UKTrue([[chunk0.attributes filteredCollectionWithBlock: underlineAttributesFilter] isEmpty]);
+			UKFalse([[chunk1.attributes filteredCollectionWithBlock: underlineAttributesFilter] isEmpty]);
 			
 			// Check that the proper objects are marked as updated and inserted
 		}
