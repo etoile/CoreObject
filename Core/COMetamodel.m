@@ -6,15 +6,8 @@
  */
 
 #import "COMetamodel.h"
-#import "COAttachmentID.h"
 #import "COObject.h"
 #import "COLibrary.h"
-#if (TARGET_OS_IPHONE)
-#	import <CoreObject/COCocoaTouchCompatibility.h>
-#   define NSImage UIImage
-#else
-#	import <AppKit/AppKit.h>
-#endif
 
 void CORegisterAdditionalEntityDescriptions(ETModelDescriptionRepository *repo)
 {
