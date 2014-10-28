@@ -11,6 +11,7 @@
 #import "COError.h"
 #import "COObject.h"
 //#import "COObject+Private.h"
+#import "COMetamodel.h"
 #import "COSQLiteStore.h"
 #import "CORevision.h"
 #import "COBranch.h"
@@ -38,20 +39,6 @@
 	return [[self alloc] initWithStore: [[COSQLiteStore alloc] initWithURL: aURL]];
 }
 
-- (void)registerAdditionalEntityDescriptions
-{
-	NSSet *entityDescriptions = [COLibrary additionalEntityDescriptions];
-
-	for (ETEntityDescription *entity in entityDescriptions)
-	{
-		if ([[self modelDescriptionRepository] descriptionForName: [entity fullName]] != nil)
-			continue;
-			
-		[[self modelDescriptionRepository] addUnresolvedDescription: entity];
-	}
-	[[self modelDescriptionRepository] resolveNamedObjectReferences];
-}
-
 - (id)initWithStore: (COSQLiteStore *)store modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
 {
 	NILARG_EXCEPTION_TEST(store);
@@ -67,8 +54,8 @@
     _persistentRootsPendingUndeletion = [NSMutableSet new];
     _isRecordingUndo = YES;
 	_revisionCache = [[CORevisionCache alloc] initWithParentEditingContext: self];
-	
-	[self registerAdditionalEntityDescriptions];
+
+	CORegisterCoreObjectMetamodel(_modelDescriptionRepository);
 
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(storePersistentRootsDidChange:)

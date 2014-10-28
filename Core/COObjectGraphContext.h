@@ -213,6 +213,14 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 /**
  * Initializes a transient object graph context using the given model
  * description repository.
+ *
+ * To register your metamodel in the model description repository, see
+ * -[COEditingContext initWithStore:modelDescriptionRepository:]. This 
+ * initializer attempts to register COObject subclasses in the same way.
+ *
+ * If you intend to pass the object graph to 
+ * -[COEditingContext insertNewPersistentRootWithRootObject:], the repository 
+ * must be the same than the one used by the editing context.
  */
 - (id)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo;
 /**

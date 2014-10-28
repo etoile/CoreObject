@@ -44,6 +44,20 @@
     //UKNil([emptyContext rootObject]);
 }
 
+- (void)testCustomModelDescriptionRepository
+{
+	ETModelDescriptionRepository *repo = [ETModelDescriptionRepository new];
+
+	ctx1 = [COObjectGraphContext objectGraphContextWithModelDescriptionRepository: repo];
+	ctx1.rootObject = [self addObjectWithLabel: @"root" toContext: ctx1];
+
+	UKRaisesException([ctx insertNewPersistentRootWithRootObject: ctx1.rootObject]);
+	
+	ctx = [[COEditingContext alloc] initWithStore: store modelDescriptionRepository: repo];
+
+	UKDoesNotRaiseException([ctx insertNewPersistentRootWithRootObject: ctx1.rootObject]);
+}
+
 - (OutlineItem *) addObjectWithLabel: (NSString *)label toContext: (COObjectGraphContext *)aCtx
 {
     OutlineItem *obj = [aCtx insertObjectWithEntityName: @"OutlineItem"];

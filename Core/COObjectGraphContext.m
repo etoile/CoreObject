@@ -11,6 +11,7 @@
 #import "CORelationshipCache.h"
 #import "COObject+Private.h"
 #import "COObject+RelationshipCache.h"
+#import "COMetamodel.h"
 #import "COSerialization.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
@@ -78,6 +79,10 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
     {
         aRepo = [[_persistentRoot editingContext] modelDescriptionRepository];
     }
+	else
+	{
+		CORegisterCoreObjectMetamodel(aRepo);
+	}
     _modelDescriptionRepository =  aRepo;
     return self;
 }

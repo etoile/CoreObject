@@ -57,6 +57,10 @@
 		60882F2E197EA3F700484033 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		60882F2F197FD06300484033 /* CoreObject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6686BDAC12592BDA0065DE1A /* CoreObject.framework */; };
 		60882F30197FD06800484033 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
+		608B3F3F19FF045400304809 /* COMetamodel.h in Headers */ = {isa = PBXBuildFile; fileRef = 608B3F3D19FF045400304809 /* COMetamodel.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		608B3F4019FF045400304809 /* COMetamodel.h in Headers */ = {isa = PBXBuildFile; fileRef = 608B3F3D19FF045400304809 /* COMetamodel.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		608B3F4119FF045400304809 /* COMetamodel.m in Sources */ = {isa = PBXBuildFile; fileRef = 608B3F3E19FF045400304809 /* COMetamodel.m */; };
+		608B3F4219FF045400304809 /* COMetamodel.m in Sources */ = {isa = PBXBuildFile; fileRef = 608B3F3E19FF045400304809 /* COMetamodel.m */; };
 		608D25F6192B475200BB7461 /* COObjectToArchivedData.h in Headers */ = {isa = PBXBuildFile; fileRef = 608D25F4192B475200BB7461 /* COObjectToArchivedData.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		608D25F7192B475200BB7461 /* COObjectToArchivedData.m in Sources */ = {isa = PBXBuildFile; fileRef = 608D25F5192B475200BB7461 /* COObjectToArchivedData.m */; };
 		609C00651704C24C00D01AAB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00541704C24C00D01AAB /* main.m */; };
@@ -957,6 +961,8 @@
 		60882F24197EA24900484033 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		60882F26197EA25600484033 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		60882F28197EA26900484033 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
+		608B3F3D19FF045400304809 /* COMetamodel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COMetamodel.h; path = Core/COMetamodel.h; sourceTree = "<group>"; };
+		608B3F3E19FF045400304809 /* COMetamodel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COMetamodel.m; path = Core/COMetamodel.m; sourceTree = "<group>"; };
 		608D25F4192B475200BB7461 /* COObjectToArchivedData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COObjectToArchivedData.h; sourceTree = "<group>"; };
 		608D25F5192B475200BB7461 /* COObjectToArchivedData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COObjectToArchivedData.m; sourceTree = "<group>"; };
 		60951A2518884A3700687CF0 /* INSTALL.Cocoa.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = INSTALL.Cocoa.md; sourceTree = "<group>"; };
@@ -1708,6 +1714,8 @@
 				6609485C1787A1160049468B /* CORelationshipCache.m */,
 				66457FEA17E9683E003C51A8 /* CORevisionCache.h */,
 				66457FEB17E9683F003C51A8 /* CORevisionCache.m */,
+				608B3F3D19FF045400304809 /* COMetamodel.h */,
+				608B3F3E19FF045400304809 /* COMetamodel.m */,
 			);
 			name = Private;
 			sourceTree = "<group>";
@@ -2325,6 +2333,7 @@
 				60E08D6019792FFA00D1B7AD /* CORevisionCache.h in Headers */,
 				60E08D4819792FFA00D1B7AD /* COAttributedStringWrapper.h in Headers */,
 				60E08CFE19792FFA00D1B7AD /* COEditingContext.h in Headers */,
+				608B3F4019FF045400304809 /* COMetamodel.h in Headers */,
 				60E08D3119792FFA00D1B7AD /* COCommandUndeleteBranch.h in Headers */,
 				60E08CFF19792FFA00D1B7AD /* COObject.h in Headers */,
 				60E08D3819792FFA00D1B7AD /* COSequenceDeletion.h in Headers */,
@@ -2499,6 +2508,7 @@
 				66457FBF17E8BFE5003C51A8 /* COStoreSetCurrentBranch.h in Headers */,
 				66457FC117E8BFE5003C51A8 /* COStoreSetCurrentRevision.h in Headers */,
 				66457FC317E8BFE5003C51A8 /* COStoreTransaction.h in Headers */,
+				608B3F3F19FF045400304809 /* COMetamodel.h in Headers */,
 				66457FC517E8BFE5003C51A8 /* COStoreUndeleteBranch.h in Headers */,
 				66457FC717E8BFE5003C51A8 /* COStoreUndeletePersistentRoot.h in Headers */,
 				66457FC917E8BFE5003C51A8 /* COStoreWriteRevision.h in Headers */,
@@ -2952,6 +2962,7 @@
 				60E08CD119792F4600D1B7AD /* COCommandUndeleteBranch.m in Sources */,
 				60E08C9319792F4600D1B7AD /* COEditingContext.m in Sources */,
 				60E08CAD19792F4600D1B7AD /* COBinaryReader.m in Sources */,
+				608B3F4219FF045400304809 /* COMetamodel.m in Sources */,
 				60E08C9819792F4600D1B7AD /* COBookmark.m in Sources */,
 				60E08CEE19792F4600D1B7AD /* COStoreSetPersistentRootMetadata.m in Sources */,
 				60E08C8D19792F4600D1B7AD /* COSynchronizerRevision.m in Sources */,
@@ -3291,6 +3302,7 @@
 				66457FCA17E8BFE5003C51A8 /* COStoreWriteRevision.m in Sources */,
 				60C81D0B195DA82200AEEC68 /* COClassToString.m in Sources */,
 				66457FED17E9683F003C51A8 /* CORevisionCache.m in Sources */,
+				608B3F4119FF045400304809 /* COMetamodel.m in Sources */,
 				601C1D50180C115D00CED07E /* COObjectGraphContext+GarbageCollection.m in Sources */,
 				6019CD75197FDF10009EDAFB /* NEWS.md in Sources */,
 				60EBC19C184CA38200F751F5 /* COPrimitiveCollection.m in Sources */,
