@@ -316,6 +316,7 @@
 		60E08D7119792FFA00D1B7AD /* COPersistentObjectContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 600F72BD1858A71200CB6AC5 /* COPersistentObjectContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60EBC19B184CA38200F751F5 /* COPrimitiveCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 60EBC199184CA38200F751F5 /* COPrimitiveCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60EBC19C184CA38200F751F5 /* COPrimitiveCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 60EBC19A184CA38200F751F5 /* COPrimitiveCollection.m */; };
+		60F46A881A01426000BDDE8E /* COSmartGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 607335B218AB96A6008A02DC /* COSmartGroup.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60F91ECA197D2B0B009F47D7 /* libCoreObject.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60E08C6219792BEA00D1B7AD /* libCoreObject.a */; };
 		60F91ECB197D2B13009F47D7 /* libUnitKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048465F18B6C03E006E4EDC /* libUnitKit.a */; };
 		60F91ECC197D2B23009F47D7 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B1D3FB19791F9400ACAC9C /* libsqlite3.dylib */; };
@@ -2305,6 +2306,7 @@
 				60E08D1A19792FFA00D1B7AD /* COSearchResult.h in Headers */,
 				60E08D3E19792FFA00D1B7AD /* COSynchronizerResponseToClientForSentRevisionsMessage.h in Headers */,
 				60E08D4319792FFA00D1B7AD /* COSynchronizerJSONServer.h in Headers */,
+				60F46A881A01426000BDDE8E /* COSmartGroup.h in Headers */,
 				60E08D3A19792FFA00D1B7AD /* COSequenceModification.h in Headers */,
 				60E08D0119792FFA00D1B7AD /* COQuery.h in Headers */,
 				60E08D0819792FFA00D1B7AD /* COTag.h in Headers */,
