@@ -46,6 +46,16 @@
 	return group;	
 }
 
+- (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
+{
+	self = [super initWithObjectGraphContext: aContext];
+	if (self == nil)
+		return nil;
+
+	content = [NSArray new];
+	return self;
+}
+
 - (void)setTargetCollection: (id <ETCollection>)aGroup
 {
 	targetCollection =  (id)aGroup;

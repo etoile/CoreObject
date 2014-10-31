@@ -54,7 +54,7 @@
     _persistentRootsPendingUndeletion = [NSMutableSet new];
     _isRecordingUndo = YES;
 	_revisionCache = [[CORevisionCache alloc] initWithParentEditingContext: self];
-
+	_internalTransientObjectGraphContext = [[COObjectGraphContext alloc] initWithModelDescriptionRepository: aRepo];
 	CORegisterCoreObjectMetamodel(_modelDescriptionRepository);
 
     [[NSNotificationCenter defaultCenter] addObserver: self

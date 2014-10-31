@@ -65,7 +65,6 @@
 	UKFalse([[container contentArray] isMutable]);
 }
 
-#if 0
 - (void)testLibraryGroup
 {
 	UKTrue([[[ctx libraryGroup] content] isEmpty]);
@@ -114,7 +113,6 @@
 
 	UKTrue([library isOrdered]);
 }
-#endif								  
 
 - (void)testTagLibrary
 {
@@ -188,6 +186,13 @@
 	UKObjectsEqual(A(original, copy), [tag content]);
 	UKObjectsEqual(S(tag), [original tags]);
 	UKObjectsEqual(S(tag), [copy tags]);
+}
+
+- (void)testSmartGroup
+{
+	COSmartGroup *group = [[ctx insertNewPersistentRootWithEntityName: @"COSmartGroup"] rootObject];
+	
+	UKNotNil([group content]);
 }
 
 @end

@@ -135,6 +135,7 @@
 	CORevisionCache *_revisionCache;
 	/** Detect illegal recursive calls to commit */
 	BOOL _inCommit;
+	COObjectGraphContext *_internalTransientObjectGraphContext;
 }
 
 
