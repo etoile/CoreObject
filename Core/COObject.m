@@ -1354,12 +1354,14 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 - (void)awakeFromDeserialization
 {
 	ETAssert([[_additionalStoreItemUUIDs allValues] containsObject: [NSNull null]] == NO);
-    [self validateMultivaluedPropertiesUsingMetamodel];
 }
 
 - (void)didLoadObjectGraph
 {
-	
+	// NOTE: This must be called once all properties have been recreated including
+	// transient ones. Since -awakeFromDeserialization superclass implementation
+	// must be called first, calling it in -awakeFromDeserialization would be too early.
+	[self validateMultivaluedPropertiesUsingMetamodel];
 }
 
 - (void)willDiscard

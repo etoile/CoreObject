@@ -190,9 +190,15 @@
 
 - (void)testSmartGroup
 {
-	COSmartGroup *group = [[ctx insertNewPersistentRootWithEntityName: @"COSmartGroup"] rootObject];
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"COSmartGroup"];
 	
-	UKNotNil([group content]);
+	[ctx commit];
+
+	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
+	                                           inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	{
+		UKNotNil([[testPersistentRoot rootObject] content]);
+	}];
 }
 
 @end

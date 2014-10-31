@@ -6,6 +6,7 @@
  */
 
 #import "COSmartGroup.h"
+#import "COSerialization.h"
 
 @implementation COSmartGroup
 
@@ -54,6 +55,12 @@
 
 	content = [NSArray new];
 	return self;
+}
+
+- (void)awakeFromDeserialization
+{
+	[super awakeFromDeserialization];
+	content = [NSArray new];
 }
 
 - (void)setTargetCollection: (id <ETCollection>)aGroup
