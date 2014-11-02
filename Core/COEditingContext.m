@@ -197,9 +197,16 @@
 - (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName
 {
 	ETEntityDescription *desc = [[self modelDescriptionRepository] descriptionForName: anEntityName];
+	if (desc == nil)
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: @"Found not entity %@ in %@",
+		                    anEntityName, self.modelDescriptionRepository];
+	}
     COObjectGraphContext *graph = [COObjectGraphContext
 		objectGraphContextWithModelDescriptionRepository: self.modelDescriptionRepository];
 
+	// TODO: For a nil class, fall back on COObject or some other class as we do in COObjectGraphContext
 	Class cls = [[self modelDescriptionRepository] classForEntityDescription: desc];
 	COObject *rootObject = [[cls alloc] initWithEntityDescription: desc
                                                objectGraphContext: graph];

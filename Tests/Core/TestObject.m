@@ -254,6 +254,55 @@
 	UKTrue(bookmark->setterInvoked);
 }
 
+- (void) testTransientState
+{
+	ObjectWithTransientState *object =
+		[ctx insertNewPersistentRootWithEntityName: @"ObjectWithTransientState"].rootObject;
+
+	object.label = @"Whatever";
+	object.derivedOrderedCollection = @[@"One", @"Two"];
+	
+	[ctx commit];
+	
+	[self checkPersistentRootWithExistingAndNewContext: object.persistentRoot
+											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	{
+		ObjectWithTransientState *testObject = testPersistentRoot.rootObject;
+
+		if (isNewContext)
+		{
+			UKNil(testObject.label);
+			UKObjectsEqual(@[], testObject.orderedCollection);
+		}
+		else
+		{
+			UKStringsEqual(@"Whatever", testObject.label);
+			UKObjectsEqual(A(@"One", @"Two"), testObject.orderedCollection);
+		}
+		UKObjectsEqual(testObject.orderedCollection, testObject.derivedOrderedCollection);
+	}];
+}
+
+- (void) testExceptionOnTransientCollectionInvalidUpdate
+{
+	COPersistentRoot *persistentRoot =
+		[ctx insertNewPersistentRootWithEntityName: @"ObjectWithTransientState"];
+	
+	// FIXME: Turn on to match COObject class documentation
+	//UKRaisesException([persistentRoot.rootObject setValue: nil
+	//                                          forProperty: @"orderedCollection"]);
+}
+
+- (void) testExceptionOnInvalidTransientCollectionAfterDeserialization
+{
+	ObjectWithTransientState *object =
+		[ctx insertNewPersistentRootWithEntityName: @"ObjectWithTransientState"].rootObject;
+
+	[object setValue: nil forStorageKey: @"orderedCollection"];
+	
+	UKRaisesException([object.objectGraphContext insertOrUpdateItems: @[object.storeItem]]);
+}
+
 - (void) testUsingZombieObjectRaisesException
 {
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];

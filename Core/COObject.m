@@ -1333,10 +1333,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 			continue;
 
 		Class class = [self collectionClassForPropertyDescription: propDesc];
-		/* We must access the instance variable or the primitive value, and we 
-		   cannot use -valueForProperty:, because getters tend to return 
-		   defensive copies (immutable collections). */
-		id collection = [self valueForStorageKey: [propDesc name]];
+		id collection = [self valueForProperty: [propDesc name]];
 
 		if ([collection isKindOfClass: class] == NO)
 		{

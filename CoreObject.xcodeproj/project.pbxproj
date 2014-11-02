@@ -97,6 +97,8 @@
 		60C81D19195DA83F00AEEC68 /* COClassToString.h in Headers */ = {isa = PBXBuildFile; fileRef = 60C81D18195DA83F00AEEC68 /* COClassToString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60C913C4165BBF2B00E0C5F4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C913AD165BBE9E00E0C5F4 /* main.m */; };
 		60C913C6165BBF5200E0C5F4 /* CoreObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 60C913C5165BBF5000E0C5F4 /* CoreObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60CB08151A05075700C25B80 /* ObjectWithTransientState.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CB08141A05075700C25B80 /* ObjectWithTransientState.m */; };
+		60CB08201A05075F00C25B80 /* ObjectWithTransientState.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CB08141A05075700C25B80 /* ObjectWithTransientState.m */; };
 		60E08C8119792EEF00D1B7AD /* libEtoileFoundation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048464818B6C03E006E4EDC /* libEtoileFoundation.a */; };
 		60E08C8219792EEF00D1B7AD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B1D3F919791F8800ACAC9C /* Foundation.framework */; };
 		60E08C8719792F4600D1B7AD /* COCommandDeletePersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2B217C09DE700E729F5 /* COCommandDeletePersistentRoot.m */; };
@@ -1004,6 +1006,8 @@
 		60C913AD165BBE9E00E0C5F4 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = main.m; path = Samples/BasicPersistence/main.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		60C913B3165BBED000E0C5F4 /* BasicPersistence */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BasicPersistence; sourceTree = BUILT_PRODUCTS_DIR; };
 		60C913C5165BBF5000E0C5F4 /* CoreObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreObject.h; sourceTree = "<group>"; };
+		60CB08131A05075700C25B80 /* ObjectWithTransientState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ObjectWithTransientState.h; path = Tests/TestModelObjects/ObjectWithTransientState.h; sourceTree = "<group>"; };
+		60CB08141A05075700C25B80 /* ObjectWithTransientState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ObjectWithTransientState.m; path = Tests/TestModelObjects/ObjectWithTransientState.m; sourceTree = "<group>"; };
 		60E08C6219792BEA00D1B7AD /* libCoreObject.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCoreObject.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		60EBC199184CA38200F751F5 /* COPrimitiveCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COPrimitiveCollection.h; path = Core/COPrimitiveCollection.h; sourceTree = "<group>"; };
 		60EBC19A184CA38200F751F5 /* COPrimitiveCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COPrimitiveCollection.m; path = Core/COPrimitiveCollection.m; sourceTree = "<group>"; };
@@ -2180,6 +2184,8 @@
 				66101178184D8EF0001A3E24 /* UnivaluedAttributeModel.m */,
 				6610117A184D8EFD001A3E24 /* UnorderedAttributeModel.h */,
 				6610117B184D8EFD001A3E24 /* UnorderedAttributeModel.m */,
+				60CB08131A05075700C25B80 /* ObjectWithTransientState.h */,
+				60CB08141A05075700C25B80 /* ObjectWithTransientState.m */,
 				664F8B0018741011001AD224 /* OverriddenIsEqualObject.h */,
 				664F8B0118741011001AD224 /* OverriddenIsEqualObject.m */,
 			);
@@ -3081,6 +3087,7 @@
 				60F91EEF197D326D009F47D7 /* TestSQLiteStoreErrorHandling.m in Sources */,
 				60F91F2B197D32E2009F47D7 /* UnivaluedGroupContent.m in Sources */,
 				60F91F37197D32E9009F47D7 /* TestAttributedStringWrapper.m in Sources */,
+				60CB08201A05075F00C25B80 /* ObjectWithTransientState.m in Sources */,
 				60F91F08197D3282009F47D7 /* TestArrayDiff.m in Sources */,
 				60F91F26197D32E2009F47D7 /* UnivaluedGroupNoOpposite.m in Sources */,
 				60F91EEE197D326D009F47D7 /* TestSQLiteStore.m in Sources */,
@@ -3351,6 +3358,7 @@
 				66EE9FEC19D1E5B4005A35DE /* COSynchronizerImmediateMessageTransport.m in Sources */,
 				666888151849961300DBEB10 /* TestUnorderedRelationshipWithOpposite.m in Sources */,
 				609C00651704C24C00D01AAB /* main.m in Sources */,
+				60CB08151A05075700C25B80 /* ObjectWithTransientState.m in Sources */,
 				66101132184D2D8A001A3E24 /* TestUnorderedAttribute.m in Sources */,
 				66E40D791836D08E00E5B4A7 /* TestUndoTrackStore.m in Sources */,
 				66E40D611836D08D00E5B4A7 /* TestObject.m in Sources */,

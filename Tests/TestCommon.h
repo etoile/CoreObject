@@ -52,6 +52,8 @@
 #import "UnivaluedAttributeModel.h"
 #import "UnorderedAttributeModel.h"
 
+#import "ObjectWithTransientState.h"
+
 #import "OverriddenIsEqualObject.h"
 
 #import "COAttributedString.h"
