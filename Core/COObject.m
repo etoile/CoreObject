@@ -1353,6 +1353,11 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	ETAssert([[_additionalStoreItemUUIDs allValues] containsObject: [NSNull null]] == NO);
 }
 
+- (void)willLoadObjectGraph
+{
+
+}
+
 - (void)didLoadObjectGraph
 {
 	// NOTE: This must be called once all properties have been recreated including

@@ -285,8 +285,29 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 }
 
 /**
- * Sends -didLoadObjectGraph to the objects just deserialized from the given 
- * items.
+ * Sends -willLoadObjectGraph to the existing objects to be reloaded by 
+ * deserializing the given items.
+ *
+ * Objects loaded for the first time don't receive -willLoadObjectGraph.
+ *
+ * The item UUIDs must not included UUIDs corresponding to additional items.
+ */
+- (void)beginLoadingObjectsWithUUIDs: (NSSet *)itemUUIDs
+{
+	for (ETUUID *UUID in itemUUIDs)
+	{
+		COObject *object = [self loadedObjectForUUID: UUID];
+
+		if (object == nil)
+			continue;
+
+		[object willLoadObjectGraph];
+	}
+}
+
+/**
+ * Sends -didLoadObjectGraph to the objects just reloaded by deserializing the
+ * given items.
  *
  * The root object (if deserialized), is the last object to receive 
  * -didLoadObjectGraph.
@@ -459,12 +480,14 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	
 	NSSet *mainItems = [self mainItemsFromItemGraph: itemGraph
 									  loadableUUIDs: itemUUIDs];
+	NSSet *mainItemUUIDs = (id)[[mainItems mappedCollection] UUID];
 
+	[self beginLoadingObjectsWithUUIDs: mainItemUUIDs];
 	for (COItem *item in mainItems)
     {
 		[self addItem: item];
     }
-	[self finishLoadingObjectsWithUUIDs: (id)[[mainItems mappedCollection] UUID]];
+	[self finishLoadingObjectsWithUUIDs: mainItemUUIDs];
 	
 	_loadingItemGraph = nil;
 }
