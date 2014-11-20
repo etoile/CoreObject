@@ -19,9 +19,15 @@
 {
     ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"ValueTransformerModel"];
     [entity setParent: (id)@"COObject"];
-	
+
+#if TARGET_OS_IPHONE
+	NSString *colorType = @"UIColor";
+#else
+	NSString *colorType = @"NSColor";
+#endif
+
     ETPropertyDescription *colorProperty = [ETPropertyDescription descriptionWithName: @"color"
-																				 type: (id)@"NSColor"];
+																				 type: (id)colorType];
 	colorProperty.valueTransformerName = @"COColorToHTMLString";
 	colorProperty.persistentType = (id)@"NSString";
     colorProperty.persistent = YES;

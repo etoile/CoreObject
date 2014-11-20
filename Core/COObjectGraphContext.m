@@ -11,6 +11,7 @@
 #import "CORelationshipCache.h"
 #import "COObject+Private.h"
 #import "COObject+RelationshipCache.h"
+#import "COMetamodel.h"
 #import "COSerialization.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
@@ -78,6 +79,10 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
     {
         aRepo = [[_persistentRoot editingContext] modelDescriptionRepository];
     }
+	else
+	{
+		CORegisterCoreObjectMetamodel(aRepo);
+	}
     _modelDescriptionRepository =  aRepo;
     return self;
 }
@@ -280,13 +285,36 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 }
 
 /**
- * Sends -didLoadObjectGraph to the objects just deserialized from the given 
- * items.
+ * Sends -willLoadObjectGraph to the existing objects to be reloaded by 
+ * deserializing the given items.
+ *
+ * Objects loaded for the first time don't receive -willLoadObjectGraph.
+ *
+ * The item UUIDs must not included UUIDs corresponding to additional items.
+ */
+- (void)beginLoadingObjectsWithUUIDs: (NSSet *)itemUUIDs
+{
+	for (ETUUID *UUID in itemUUIDs)
+	{
+		COObject *object = [self loadedObjectForUUID: UUID];
+
+		if (object == nil)
+			continue;
+
+		[object willLoadObjectGraph];
+	}
+}
+
+/**
+ * Sends -didLoadObjectGraph to the objects just reloaded by deserializing the
+ * given items.
  *
  * The root object (if deserialized), is the last object to receive 
  * -didLoadObjectGraph.
+ *
+ * The item UUIDs must not included UUIDs corresponding to additional items.
  */
-- (void)finishLoadingObjectsWithUUIDs: (NSArray *)itemUUIDs
+- (void)finishLoadingObjectsWithUUIDs: (NSSet *)itemUUIDs
 {
 	for (ETUUID *UUID in itemUUIDs)
 	{
@@ -297,8 +325,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 			continue;
 		
 		COObject *object = [self loadedObjectForUUID: UUID];
-		// TODO: Don't include the additional item UUIDs in the UUIDs argument
-		ETAssert(object != nil || [[_loadingItemGraph itemForUUID: UUID] isAdditionalItem]);
+		ETAssert(object != nil);
 
 		[object didLoadObjectGraph];
 	}
@@ -339,36 +366,51 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 }
 
 /**
- * Additional items are deserialized by their owner object deserialization. 
+ * Returns the owner item to load or reload to get the additional item looked up
+ * in the loading item graph, and deserialized into a property. 
  *
- * -awakeFromDeserialization is called on the owner object.
+ * For example, see -dictionaryFromStoreItem:propertyDescription: call in
+ * COSerialization.
+ * 
+ * Additional items are deserialized by their owner object deserialization, to
+ * ensure -awakeFromDeserialization is called on the owner object.
  */
-- (void)reloadOwnerForAdditionalItemIfNeeded: (COItem *)item
+- (COItem *)ownerItemForAdditionalItem: (COItem *)item
 {
+	NSParameterAssert(item != nil);
+	NSParameterAssert(item.isAdditionalItem);
+	ETAssert(_loadingItemGraph != nil);
+
+	/* When the owner is nil, this means the additional item is loaded for the 
+	   first time, and the owner item is present in the loading item graph, but
+	   its UUID cannot be known until it is deserialized. */
 	COObject *owner = _objectsByAdditionalItemUUIDs[item.UUID];
-	BOOL needsForcedReload = (_loadingItemGraph == nil
-		|| (owner != nil && [_loadingItemGraph itemForUUID: owner.UUID] == nil));
-	
-	if (needsForcedReload)
+	COItem *ownerItem = [_loadingItemGraph itemForUUID: owner.UUID];
+
+	if (ownerItem == nil && owner != nil)
 	{
-		[self addItem: [self itemForUUID: owner.UUID]];
-		// TODO: Perhaps send -didLoadObjectGraph to the owner when _loadingItemGraph is not nil
+		ownerItem = [self itemForUUID: owner.UUID];
 	}
+	return ownerItem;
+}
+
+- (void)updateMappingFromAdditionalItemsToObject: (COObject *)currentObject
+{
+	for (ETUUID *itemUUID in [[currentObject additionalStoreItemUUIDs] objectEnumerator])
+	{
+		[_objectsByAdditionalItemUUIDs setObject: currentObject forKey: itemUUID];
+	}
+	ETAssert([[_objectsByAdditionalItemUUIDs allKeys] containsCollection: [[currentObject additionalStoreItemUUIDs] allValues]]);
 }
 
 /**
  * Caller must handle marking the item as inserted/updated, if desired.
- * Note that this may call itself recursively
  */
 - (void)addItem: (COItem *)item
 {
     NSParameterAssert(item != nil);
-
-	if ([item isAdditionalItem])
-	{
-		[self reloadOwnerForAdditionalItemIfNeeded: item];
-		return;
-	}
+	NSParameterAssert(!item.isAdditionalItem);
+	ETAssert(_loadingItemGraph != nil);
 
     ETUUID *uuid = [item UUID];
     COObject *currentObject = [_loadedObjects objectForKey: uuid];
@@ -382,47 +424,92 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
         [currentObject setStoreItem: item];
     }
 
-	for (ETUUID *itemUUID in [[currentObject additionalStoreItemUUIDs] objectEnumerator])
+	[self updateMappingFromAdditionalItemsToObject: currentObject];
+}
+
+- (NSSet *)mainItemsFromItemGraph: (id <COItemGraph>)itemGraph
+                    loadableUUIDs: (NSSet *)itemUUIDs
+{
+	NSMutableSet *items = [NSMutableSet setWithCapacity: [itemUUIDs count]];
+	
+	for (ETUUID *UUID in itemUUIDs)
 	{
-		[_objectsByAdditionalItemUUIDs setObject: currentObject forKey: itemUUID];
+		COItem *item = [itemGraph itemForUUID: UUID];
+		
+		if (item.isAdditionalItem)
+		{
+			item = [self ownerItemForAdditionalItem: item];
+		}
+		if (item == nil)
+			continue;
+
+		[items addObject: item];
 	}
-	ETAssert([[_objectsByAdditionalItemUUIDs allKeys] containsCollection: [[currentObject additionalStoreItemUUIDs] allValues]]);
+
+	return items;
+}
+
+- (void)addItemsFromItemGraph: (id <COItemGraph>)itemGraph
+                loadableUUIDs: (NSSet *)itemUUIDs
+{
+	NSParameterAssert(itemGraph != nil);
+	NSParameterAssert(itemUUIDs != nil);
+
+	// NOTE: To prevent caching the item graph during the loading, a better
+	// approach could be to allocate all the objects before loading them.
+	// We could also change -[COObjectGraphContext itemForUUID:] to search
+	// itemGraph during the loading rather than the loaded objects (but that's
+	// roughly the same than we do currently).
+	_loadingItemGraph = itemGraph;
+	
+	// TODO: Decide how we update the change tracking in regard to additional items.
+
+	// Update change tracking
+	for (ETUUID *UUID in itemUUIDs)
+	{
+		if ([_loadedObjects objectForKey: UUID] != nil)
+		{
+			// TODO: Check it the item is actually different?
+			[_updatedObjectUUIDs addObject: UUID];
+		}
+		else
+		{
+			[_insertedObjectUUIDs addObject: UUID];
+		}
+	}
+	
+	NSSet *mainItems = [self mainItemsFromItemGraph: itemGraph
+									  loadableUUIDs: itemUUIDs];
+	NSSet *mainItemUUIDs = (id)[[mainItems mappedCollection] UUID];
+
+	[self beginLoadingObjectsWithUUIDs: mainItemUUIDs];
+	for (COItem *item in mainItems)
+    {
+		[self addItem: item];
+    }
+	[self finishLoadingObjectsWithUUIDs: mainItemUUIDs];
+	
+	_loadingItemGraph = nil;
 }
 
 - (void)insertOrUpdateItems: (NSArray *)items
 {
+	NILARG_EXCEPTION_TEST(items);
+
     if ([items count] == 0)
         return;
 
 	[[NSNotificationCenter defaultCenter] postNotificationName: COObjectGraphContextBeginBatchChangeNotification
 														object: self];
-	
-	// Update change tracking
-	for (COItem *item in items)
-	{
-		if ([_loadedObjects objectForKey: item.UUID] != nil)
-		{
-			// TODO: Check it the item is actually different?
-			[_updatedObjectUUIDs addObject: item.UUID];
-		}
-		else
-		{
-			[_insertedObjectUUIDs addObject: item.UUID];
-		}
-	}
-    
-    // Wrap the items array in a COItemGraph, so they can be located by
+
+	// Wrap the items array in a COItemGraph, so they can be located by
     // -objectReferenceWithUUID:. The rootItemUUID is ignored.
-    _loadingItemGraph = [[COItemGraph alloc] initWithItems: items
-                                              rootItemUUID: [[items objectAtIndex: 0] UUID]];
-    
-    for (COItem *item in items)
-    {
-        [self addItem: item];
-    }
-	[self finishLoadingObjectsWithUUIDs: [_loadingItemGraph itemUUIDs]];
+    COItemGraph *itemGraph =
+		[[COItemGraph alloc] initWithItems: items
+                              rootItemUUID: [[items firstObject] UUID]];
 	
-	_loadingItemGraph = nil;
+	[self addItemsFromItemGraph: itemGraph
+	              loadableUUIDs: [NSSet setWithArray: [itemGraph itemUUIDs]]];
 	
 	// NOTE: -acceptAllChanges *not* called
 	
@@ -435,10 +522,9 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	[[NSNotificationCenter defaultCenter] postNotificationName: COObjectGraphContextBeginBatchChangeNotification
 														object: self];
 	
-	NSParameterAssert(aTree != nil);
-	
+	NILARG_EXCEPTION_TEST(aTree);
 	// i.e., the root object can be set once and never changed.
-	NSParameterAssert(_rootObjectUUID == nil || [_rootObjectUUID isEqual: [aTree rootItemUUID]]);
+	INVALIDARG_EXCEPTION_TEST(aTree, _rootObjectUUID == nil || [_rootObjectUUID isEqual: [aTree rootItemUUID]]);
     _rootObjectUUID =  [aTree rootItemUUID];
     
 	NSSet *aTreeReachableUUIDs = COItemGraphReachableUUIDs(aTree);
@@ -449,38 +535,11 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 		
 		aTreeReachableUUIDs = [NSSet setWithArray: [aTree itemUUIDs]];
 	}
-	
-	// Update change tracking
-	for (ETUUID *itemUUID in aTreeReachableUUIDs)
-	{
-		if ([_loadedObjects objectForKey: itemUUID] != nil)
-		{
-			// TODO: Check it the item is actually different?
-			[_updatedObjectUUIDs addObject: itemUUID];
-		}
-		else
-		{
-			[_insertedObjectUUIDs addObject: itemUUID];
-		}
-	}
-	
-	// NOTE: To prevent caching the item graph during the loading, a better
-	// approach could be to allocate all the objects before loading them.
-	// We could also change -[COObjectGraphContext itemForUUID:] to search aTree
-	// during the loading rather than the loaded objects (but that's roughly the
-	// same than we do currently).
-	_loadingItemGraph = aTree;
 
-    for (ETUUID *uuid in aTreeReachableUUIDs)
-    {
-        [self addItem: [aTree itemForUUID: uuid]];
-    }
-	[self finishLoadingObjectsWithUUIDs: [aTreeReachableUUIDs allObjects]];
-
-	_loadingItemGraph = nil;
+	[self addItemsFromItemGraph: aTree
+				  loadableUUIDs: aTreeReachableUUIDs];
     
     // Clear change tracking
-    
     [self acceptAllChanges];
 	
 	[[NSNotificationCenter defaultCenter] postNotificationName: COObjectGraphContextEndBatchChangeNotification
@@ -770,6 +829,39 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 #else
 	return NO;
 #endif
+}
+
+- (void) doPreCommitChecks
+{
+	// Possibly garbage-collect the context we are going to commit.
+	//
+	// This only happens every 1000 commits in release builds, or every commit in debug builds
+	// Skip the garbage collection if there are no changes to commit.
+	//
+	// Rationale:
+	//
+	// In debug builds, we want to make sure application developers don't
+	// rely on garbage objects remaining uncollected, since it could lead to
+	// incorrect application code that works most of the time.
+	//
+	// However, in release builds, it's worth only doing the garbage collection
+	// occassionally, since the garbage collection requires looking at every
+	// object and not just the modified ones being committed.
+	//
+	// The only caveat is, if you modify objects and detached them from the graph
+	// in the same transaction, they still get committed. This isn't a big deal
+	// becuase this should be rare (only a strange app would do this), and the
+	// detached objects will be ignored at reloading time.
+	if ([self hasChanges])
+	{
+		if ([self incrementCommitCounterAndCheckIfGCNeeded])
+		{
+			[self removeUnreachableObjects];
+		}
+	}
+	
+	// Check for composite cycles - see [TestOrderedCompositeRelationship testCompositeCycleWithThreeObjects]
+	[self checkForCyclesInCompositeRelationshipsInChangedObjects];
 }
 
 @end

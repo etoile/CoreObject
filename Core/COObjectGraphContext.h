@@ -213,6 +213,14 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 /**
  * Initializes a transient object graph context using the given model
  * description repository.
+ *
+ * To register your metamodel in the model description repository, see
+ * -[COEditingContext initWithStore:modelDescriptionRepository:]. This 
+ * initializer attempts to register COObject subclasses in the same way.
+ *
+ * If you intend to pass the object graph to 
+ * -[COEditingContext insertNewPersistentRootWithRootObject:], the repository 
+ * must be the same than the one used by the editing context.
  */
 - (id)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo;
 /**
@@ -311,6 +319,8 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  *
  * This marks the corresponding objects as inserted/object.
  * and does not call -acceptAllChanges.
+ *
+ * For a nil argument, raises a NSInvalidArgumentException.
  */
 - (void)insertOrUpdateItems: (NSArray *)items;
 /**
@@ -321,7 +331,10 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * at the root object.
  *
  * As a special case, if both the receiver and aTree have a nil root object, 
- * loads all objects from aTree.
+ * loads all objects from aTree. If <code>[aTree rootItemUUID]</code> is not nil, 
+ * it must match -rootItemUUID, otherwise a NSInvalidArgumentException is raised.
+ *
+ * For a nil argument, raises a NSInvalidArgumentException.
  *
  * FIXME: Document more corner cases (what causes exceptions to be thrown)
  */

@@ -834,7 +834,8 @@
  *
  * The object graph context reuse existing objects (based on their UUID idendity) 
  * accross reloads, so be cautious to reset all transient state in 
- * -awakeFromDeserialization (or adjust it to match the last deserialized state).
+ * -willLoadObjectGraph or -awakeFromDeserialization (or adjust it to match the 
+ * last deserialized state).
  *
  * This method is also called for object graph copies inside the current object 
  * graph context (see COCopier).
@@ -845,6 +846,38 @@
 - (void)awakeFromDeserialization;
 /**
  * <override-dummy />
+ * For an object graph context loading (or reloading), tells the receiver that
+ * all the inner objects, which were not yet loaded or for which a new state was
+ * needed, are going to be deserialized.
+ *
+ * You can override this method, to discard transient state related to
+ * persistent relationships. It is better to reset transient state in
+ * -awakeFromDeserialization or -didLoadObjectGraph, but time to time some 
+ * external transient state might have been put in another persistent object
+ * (usually when a persistent relationship to it was established) or some
+ * object connected to it. This external transient state needs to be discarded 
+ * earlier, otherwise it can become unreachable, in case the persistent 
+ * relationships to traverse are updated during the deserialization.
+ *
+ * An overriden implementation must make no assumptions about
+ * -willLoadObjectGraph in other COObject subclasses, because 
+ * -willLoadObjectGraph is sent to inner objects in a random order.
+ *
+ * Each inner object that will receive -awakeFromDeserialization, receives
+ * -willLoadObjectGraph first.
+ *
+ * You must make no assumptions about -willLoadObjectGraph in other subclasses, 
+ * because -willLoadObjectGraph is sent to inner objects in a random order.
+ *
+ * If you override this method, the superclass implementation must be called
+ * first.
+ *
+ * For more details about which inner objects receive -willLoadObjectGraph,
+ * see -didLoadObjectGraph.
+ */
+- (void)willLoadObjectGraph;
+/**
+ * <override-dummy />
  * For an object graph context loading (or reloading), tells the receiver that 
  * all the inner objects, which were not yet loaded or for which a new state was 
  * needed, have been deserialized.
@@ -853,17 +886,22 @@
  * persistent relationships, or react to a partial or entire object graph 
  * loading.
  *
- * Each inner object that has received -awakeFromDeserialization, receives 
- * -didLoadObjectGraph. The root object is always the last to receive 
- * -didLoadObjectGraph (if the root object was loaded or reloaded).
+ * An overriden implementation must make no assumptions about
+ * -didLoadObjectGraph in other COObject subclasses, because -didLoadObjectGraph 
+ * is sent to inner objects in a random order.
  *
- * Don't forget that you shouldn't expect all inner objects to receive
- * -awakeFromDeserialization and -didLoadObjectGraph during a loading. For a 
- * reloading, the object graph context doesn't discard the existing objects but 
- * reuse them (based on their UUID idendity).<br />
+ * Each inner object that has received -willLoadObjectGraph and 
+ * -awakeFromDeserialization, receives -didLoadObjectGraph. The root object is 
+ * always the last to receive -didLoadObjectGraph (if the root object was loaded 
+ * or reloaded).
+ *
+ * Don't forget that you shouldn't expect all inner objects to receive 
+ * -willLoadObjectGraph, -awakeFromDeserialization and -didLoadObjectGraph 
+ * during a loading. For a reloading, the object graph context doesn't discard 
+ * the existing objects but reuse them (based on their UUID idendity).<br />
  * For an object graph copy (see COCopier), the object copies receive 
- * -awakeFromDeserialization and -didLoadObjectGraph, but all other inner 
- * objects don't.
+ * -willLoadObjectGraph, -awakeFromDeserialization and -didLoadObjectGraph, but 
+ * all other inner objects don't.
  *
  * If you override this method, the superclass implementation must be called 
  * first.

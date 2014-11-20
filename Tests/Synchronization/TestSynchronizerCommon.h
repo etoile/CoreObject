@@ -9,7 +9,9 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/ETModelDescriptionRepository.h>
 #import "TestCommon.h"
+#import "COSynchronizerMessageTransport.h"
 #import "COSynchronizerFakeMessageTransport.h"
+#import "COSynchronizerImmediateMessageTransport.h"
 #import "TestAttributedStringCommon.h"
 
 #define CLIENT_STORE_URL [[SQLiteStoreTestCase temporaryURLForTestStorage] URLByAppendingPathComponent: @"TestStore2.sqlite"]
@@ -20,13 +22,18 @@
 	COPersistentRoot *serverPersistentRoot;
 	COBranch *serverBranch;
 	
-	FakeMessageTransport *transport;
+	id<MessageTransport> transport;
 	
 	COSynchronizerClient *client;
 	COEditingContext *clientCtx;
 	COPersistentRoot *clientPersistentRoot;
 	COBranch *clientBranch;
 }
+
+/**
+ * Override return the message transport to use for the tests.
+ */
++ (Class) messageTransportClass;
 
 - (UnorderedGroupNoOpposite *) addAndCommitServerChild;
 - (UnorderedGroupNoOpposite *) addAndCommitClientChild;

@@ -23,7 +23,7 @@
 	[ctx commit];
 	
 	server = [[COSynchronizerServer alloc] initWithBranch: serverBranch];
-	transport = [[FakeMessageTransport alloc] initWithSynchronizerServer: server];
+	transport = [[[[self class] messageTransportClass] alloc] initWithSynchronizerServer: server];
 	
 	clientCtx = [COEditingContext contextWithURL: CLIENT_STORE_URL];
 	client = [[COSynchronizerClient alloc] initWithClientID: @"client" editingContext: clientCtx];
@@ -38,6 +38,11 @@
 	ETAssert(clientBranch != nil);
 	
 	return self;
+}
+
++ (Class) messageTransportClass
+{
+	return [FakeMessageTransport class];
 }
 
 - (void)dealloc

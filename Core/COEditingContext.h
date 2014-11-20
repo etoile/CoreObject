@@ -54,10 +54,9 @@
  * objects (see -[COObjectGraphContext modelDescriptionRepository])
  *
  * To register a new entity description that describe a COObject subclass, 
- * override +[NSObject newEntityDescription], and ETModelDescriptionRepository 
- * will automatically register it on launch in 
- * +[ETModelDescriptionRepository mainRepository] (the default repository used 
- * by +contextWithURL:).
+ * override +[NSObject newEntityDescription], and COEditingContext will
+ * automatically register it in
+ * -[COEditingContext initWithStore:modelDescriptionRepository:].
  *
  * To register a new entity description without writing a COObject subclass, 
  * see ETModelDescriptionRepository documentation. To instantiate the correct 
@@ -136,6 +135,7 @@
 	CORevisionCache *_revisionCache;
 	/** Detect illegal recursive calls to commit */
 	BOOL _inCommit;
+	COObjectGraphContext *_internalTransientObjectGraphContext;
 }
 
 
@@ -161,6 +161,18 @@
  * <init />
  * Initializes a context which persists its content in the given store, and 
  * manages it using the metamodel provided by the model description repository.
+ *
+ * When COObject entity description doesn't appear in the repository, this 
+ * initializer invokes +newEntityDescription on COObject and its subclasses, 
+ * then it registers the resulting entity descriptions.
+ *
+ * For attribute types not directly supported by CoreObject (transient or
+ * serialized with a value transformer), ETModelDescriptionRepository will 
+ * attempt to register entity descriptions corresponding to these types,
+ * by invoking +[NSObject newEntityDescription] on the class with the same name.
+ *
+ * To register types bound to classes manually, see
+ * -[ETModelDescriptionRepository registerEntityDescriptionsForClasses:resolveNow:].
  *
  * For a nil model repository, or a repository that doesn't a COObject entity 
  * description, raises a NSInvalidArgumentException.

@@ -35,6 +35,7 @@
 #import "Parent.h"
 #import "Child.h"
 #import "Folder.h"
+#import "FolderWithNoClass.h"
 #import "OrderedGroupNoOpposite.h"
 #import "UnivaluedGroupNoOpposite.h"
 #import "UnorderedGroupNoOpposite.h"
@@ -50,6 +51,8 @@
 #import "OrderedAttributeModel.h"
 #import "UnivaluedAttributeModel.h"
 #import "UnorderedAttributeModel.h"
+
+#import "ObjectWithTransientState.h"
 
 #import "OverriddenIsEqualObject.h"
 

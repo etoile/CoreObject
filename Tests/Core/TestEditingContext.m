@@ -22,6 +22,14 @@
     return self;
 }
 
+- (void)testCustomModelDescriptionRepository
+{
+	ETModelDescriptionRepository *repo = [ETModelDescriptionRepository new];
+
+	ctx = [[COEditingContext alloc] initWithStore: store modelDescriptionRepository: repo];
+
+	UKDoesNotRaiseException([ctx insertNewPersistentRootWithEntityName: @"OutlineItem"]);
+}
 
 - (void)testDeleteUncommittedPersistentRoot
 {

@@ -111,6 +111,8 @@ Key Features
 			COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
 			[persistentRoot commit];
 
+Note: Viewing object graphs as PDF diagrams is not supported on iOS.
+
 
 Build and Install
 -----------------
@@ -129,16 +131,18 @@ The Xcode projects and schemes of interest are:
   - TestCoreObject - the test suite
   - BenchmarkCoreObject - the benchmark
 - CoreObject/Samples/ProjectDemo/ProjectDemo.xcodeproj
-   - ProjectDemo - an experimental testbed application with a drawing editor, outliner, and collaborative editing support used in the [demo videos](http://coreobject.org)
+   - ProjectDemo - an experimental testbed application with a drawing editor, outliner, and collaborative editing support used in the [demo videos](hthttps://github.com/etoile/CoreObject/blob/master/INSTALL.Cocoa.mdtp://coreobject.org)
 - CoreObject/Samples/Typewriter/Typerwriter.xcodeproj
    - Typewriter - a reasonably polished note manager that uses CoreObject
 
-For more details, see [INSTALL.Cocoa](https://github.com/etoile/CoreObject/blob/master/INSTALL.Cocoa.md) or [INSTALL.GNUstep](https://github.com/etoile/CoreObject/blob/master/INSTALL.GNUstep.md).
+Note: ProjectDemo and Typewriter cannot be run on iOS.
+
+For more details, see [INSTALL.Cocoa]() or [INSTALL.GNUstep](https://github.com/etoile/CoreObject/blob/master/INSTALL.GNUstep.md).
 
 
-Mac OS X support
-----------------
+Mac OS X and iOS support
+------------------------
 
-CoreObject is supported on Mac OS X (10.7 or higher), and iOS support is coming soon.
+CoreObject is supported on Mac OS X (10.7 or higher), and iOS (7 or higher).
 
 **Warning:** Xcode 4.6 or higher is required to build the Xcode projects.

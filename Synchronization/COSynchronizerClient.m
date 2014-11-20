@@ -99,6 +99,14 @@
 	persistentRoot = [_ctx persistentRootForUUID: message.persistentRootUUID];
 	ETAssert(persistentRoot != nil);
 	_branch = [persistentRoot branchForUUID: message.branchUUID];
+	
+	if ([_branch hasChanges])
+	{
+		[NSException raise: NSGenericException
+		 format: @"-[%@ %@] called but the branch has uncommitted changes. You should ensure all changes are committed before feeding the synchronizer a message.",
+			NSStringFromClass([self class]), NSStringFromSelector(_cmd)];
+	}
+
 	_branch.supportsRevert = NO;
 	ETAssert(_branch != nil);
 	_lastRevisionUUIDFromServer = message.currentRevision.revisionUUID;
@@ -121,6 +129,21 @@
 
 - (void) handleRevisionsFromServer: (NSArray *)revs
 {
+	if ([[[revs lastObject] revisionUUID] isEqual: [[[self branch] currentRevision] UUID]])
+	{
+		// Bail out early without doing anything in the trivial case when there are no further changes
+		// since we last sent something to the server.. this prevents the TestSynchronizerImmediateDelivery tests from failing.
+		
+		// TODO: It's kind of ugly that in the simple case, when a client commits something, sends it to the server,
+		// the server replies back with the full content that the client sent (even though it knows it's unnecessary
+		// to send that.) We still need to send the receipts though.
+		
+		_lastRevisionUUIDFromServer = [[revs lastObject] revisionUUID];
+		_lastRevisionUUIDInTransitToServer = nil;
+		return;
+	}
+
+
 	ETUUID *lastServerRevUUID = [self lastRevisionUUIDFromServer];
 		
 	NSUInteger i = [revs indexOfObjectPassingTest: ^(id obj, NSUInteger idx, BOOL *stop)
@@ -228,6 +251,13 @@
 	{
 		return;
 	}
+
+	if ([_branch hasChanges])
+	{
+		[NSException raise: NSGenericException
+		 format: @"-[%@ %@] called but the branch has uncommitted changes. You should ensure all changes are committed before feeding the synchronizer a message.",
+			NSStringFromClass([self class]), NSStringFromSelector(_cmd)];
+	}
 	
 	[self handleRevisionsFromServer: aMessage.revisions];
 }
@@ -237,6 +267,13 @@
 	if (![aMessage.lastRevisionUUIDSentByClient isEqual: [self lastRevisionUUIDInTransitToServer]])
 	{
 		return;
+	}
+
+	if ([_branch hasChanges])
+	{
+		[NSException raise: NSGenericException
+		 format: @"-[%@ %@] called but the branch has uncommitted changes. You should ensure all changes are committed before feeding the synchronizer a message.",
+			NSStringFromClass([self class]), NSStringFromSelector(_cmd)];
 	}
 
 	// Benchmarking:

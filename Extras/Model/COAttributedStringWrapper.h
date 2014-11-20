@@ -5,7 +5,13 @@
 	License:  MIT  (see COPYING)
  */
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
+#if (TARGET_OS_IPHONE)
+#	import <CoreObject/COCocoaTouchCompatibility.h>
+#else
+#	import <AppKit/AppKit.h>
+#	define NSTextStorageEditActions NSUInteger
+#endif
 
 @class COAttributedString;
 

@@ -158,7 +158,15 @@ ETUUID *AttributedString2UUID()
 
 - (void) setFontTraits: (NSFontSymbolicTraits)traits inRange: (NSRange)aRange inTextStorage: (NSTextStorage *)target
 {
+#if TARGET_OS_IPHONE
+	UIFontDescriptor *desc = [[[UIFont systemFontOfSize: 12] fontDescriptor]
+		fontDescriptorWithSymbolicTraits: traits];
+	UIFont *font = [UIFont fontWithDescriptor: desc
+	                                     size: desc.pointSize];
+#else
 	NSFont *font = [[NSFontManager sharedFontManager] convertFont: [NSFont userFontOfSize: 12] toHaveTrait: traits];
+#endif
+
 	[target addAttribute: NSFontAttributeName
 				   value: font
 				   range: aRange];

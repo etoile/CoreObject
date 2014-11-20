@@ -27,6 +27,7 @@
 #import <CoreObject/COGroup.h>
 #import <CoreObject/COLibrary.h>
 #import <CoreObject/COTag.h>
+#import <CoreObject/COSmartGroup.h>
 
 /* Diff Framework (the Diff API is very unstable) */
 

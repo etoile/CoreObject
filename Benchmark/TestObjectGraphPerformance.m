@@ -85,7 +85,7 @@
 	NSTimeInterval timeToCommit1KUsingSQLite = [BenchmarkCommon timeToCommit1KUsingSQLite];
 	
 	double coreObjectTimesWorse = timeToMakeIncrementalCommitToPersistentRoot / timeToCommit1KUsingSQLite;
-	UKTrue(coreObjectTimesWorse < 100);
+	UKTrue(coreObjectTimesWorse < 200);
 	
 	NSLog(@"Took %f ms to commit %d objects",
 		  timeToMakeInitialCommitToPersistentRoot * MS_PER_SECOND,

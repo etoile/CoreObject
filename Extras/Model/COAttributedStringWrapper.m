@@ -379,6 +379,26 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	return _cachedString;
 }
 
+/**
+ * According to the Apple API doc: "The symbolic traits supersede the existing 
+ * NSFontTraitMask type used by NSFontManager. The corresponding values are kept 
+ * compatible between NSFontTraitMask and NSFontSymbolicTraits. 
+ */
+- (NSFont *)convertFont: (NSFont *)font toHaveTrait: (NSFontSymbolicTraits)aTrait
+{
+#if TARGET_OS_IPHONE
+	// NOTE: This code should work on Mac OS X, but -fontWithDescriptor:size: is broken.
+	NSFontSymbolicTraits traits = (font.fontDescriptor.symbolicTraits | aTrait);
+	NSFontDescriptor *desc = [font.fontDescriptor fontDescriptorWithSymbolicTraits: traits];
+
+	return [NSFont fontWithDescriptor: desc
+	                             size: desc.pointSize];
+#else
+	return [[NSFontManager sharedFontManager] convertFont: font
+	                                          toHaveTrait: aTrait];
+#endif
+}
+
 - (NSDictionary *)attributesAtIndex: (NSUInteger)anIndex effectiveRange: (NSRangePointer)aRangeOut
 {
 	//NSLog(@"%p (%@) attributesAtIndex %d", self, [self string], (int)anIndex);
@@ -397,17 +417,20 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		
 		NSMutableDictionary *result = [NSMutableDictionary new];
 		
+#if TARGET_OS_IPHONE
+		UIFont *font = [UIFont systemFontOfSize: 12];
+#else
 		NSFont *font = [NSFont userFontOfSize: 12];
-		
+#endif
 		for (COAttributedStringAttribute *attr in target.attributes)
 		{
 			if ([attr.styleKey isEqualToString: @"font-weight"] && [attr.styleValue isEqualToString: @"bold"])
 			{
-				font = [[NSFontManager sharedFontManager] convertFont: font toHaveTrait: NSFontBoldTrait];
+				font = [self convertFont: font toHaveTrait: NSFontBoldTrait];
 			}
 			if ([attr.styleKey isEqualToString: @"font-style"] && [attr.styleValue isEqualToString: @"oblique"])
 			{
-				font = [[NSFontManager sharedFontManager] convertFont: font toHaveTrait: NSFontItalicTrait];
+				font = [self convertFont: font toHaveTrait: NSFontItalicTrait];
 			}
 			if ([attr.styleKey isEqualToString: @"text-decoration"] && [attr.styleValue isEqualToString: @"underline"])
 			{
@@ -703,12 +726,10 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	}
 }
 
-- (void) edited: (NSUInteger)editedMask range: (NSRange)range changeInLength: (NSInteger)delta
+- (void) edited: (NSTextStorageEditActions)editedMask range: (NSRange)range changeInLength: (NSInteger)delta
 {
 	_lengthDeltaInBatch += delta;
 	[super edited: editedMask range: range changeInLength: delta];
 }
-
-
 
 @end

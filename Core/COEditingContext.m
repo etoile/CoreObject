@@ -11,6 +11,7 @@
 #import "COError.h"
 #import "COObject.h"
 //#import "COObject+Private.h"
+#import "COMetamodel.h"
 #import "COSQLiteStore.h"
 #import "CORevision.h"
 #import "COBranch.h"
@@ -21,6 +22,7 @@
 #import "COEditingContext+Private.h"
 #import "CORevisionCache.h"
 #import "COStoreTransaction.h"
+#import "NSDistributedNotificationCenter.h"
 
 @implementation COEditingContext
 
@@ -35,20 +37,6 @@
 {
 	// TODO: Look up the store class based on the URL scheme and path extension
 	return [[self alloc] initWithStore: [[COSQLiteStore alloc] initWithURL: aURL]];
-}
-
-- (void)registerAdditionalEntityDescriptions
-{
-	NSSet *entityDescriptions = [COLibrary additionalEntityDescriptions];
-
-	for (ETEntityDescription *entity in entityDescriptions)
-	{
-		if ([[self modelDescriptionRepository] descriptionForName: [entity fullName]] != nil)
-			continue;
-			
-		[[self modelDescriptionRepository] addUnresolvedDescription: entity];
-	}
-	[[self modelDescriptionRepository] resolveNamedObjectReferences];
 }
 
 - (id)initWithStore: (COSQLiteStore *)store modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
@@ -66,8 +54,8 @@
     _persistentRootsPendingUndeletion = [NSMutableSet new];
     _isRecordingUndo = YES;
 	_revisionCache = [[CORevisionCache alloc] initWithParentEditingContext: self];
-	
-	[self registerAdditionalEntityDescriptions];
+	_internalTransientObjectGraphContext = [[COObjectGraphContext alloc] initWithModelDescriptionRepository: aRepo];
+	CORegisterCoreObjectMetamodel(_modelDescriptionRepository);
 
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(storePersistentRootsDidChange:)
@@ -209,8 +197,16 @@
 - (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName
 {
 	ETEntityDescription *desc = [[self modelDescriptionRepository] descriptionForName: anEntityName];
-    COObjectGraphContext *graph = [COObjectGraphContext objectGraphContext];
+	if (desc == nil)
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: @"Found not entity %@ in %@",
+		                    anEntityName, self.modelDescriptionRepository];
+	}
+    COObjectGraphContext *graph = [COObjectGraphContext
+		objectGraphContextWithModelDescriptionRepository: self.modelDescriptionRepository];
 
+	// TODO: For a nil class, fall back on COObject or some other class as we do in COObjectGraphContext
 	Class cls = [[self modelDescriptionRepository] classForEntityDescription: desc];
 	COObject *rootObject = [[cls alloc] initWithEntityDescription: desc
                                                objectGraphContext: graph];

@@ -83,11 +83,8 @@
 // application launches).
 - (COSmartGroup *)libraryGroup
 {
-	// FIXME: ARC Misuse below.. group's object graph context may be deallocated
-	// immediately.
-	
 	COSmartGroup *group = [[COSmartGroup alloc]
-		initWithObjectGraphContext: [COObjectGraphContext objectGraphContext]];
+		initWithObjectGraphContext: _internalTransientObjectGraphContext];
 	[group setName: _(@"All Objects")];
 	[group setTargetCollection: [[[[self persistentRoots] mappedCollection] rootObject] allObjects]];
 #ifdef GNUSTEP

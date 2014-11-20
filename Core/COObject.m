@@ -91,10 +91,16 @@ See +[NSObject typePrefix]. */
 	//-[COObject propertyNames]... See -[NSObject propertyNames] and remove
 	// some properties in -basicPropertyNames (e.g. hash or superclass).
 
-#ifndef GNUSTEP 
+#if TARGET_OS_IPHONE
+	NSString *imageType = @"UIImage";
+#else
+	NSString *imageType = @"NSImage";
+#endif
+
+#ifndef GNUSTEP
 	// FIXME: We don't link NSImage on GNUstep because AppKit won't work
 	ETPropertyDescription *icon = 
-		[ETPropertyDescription descriptionWithName: @"icon" type: (id)@"NSImage"];
+		[ETPropertyDescription descriptionWithName: @"icon" type: (id)imageType];
 #endif
 	ETPropertyDescription *displayName = 
 		[ETPropertyDescription descriptionWithName: @"displayName" type: (id)@"NSString"];
@@ -725,7 +731,7 @@ See +[NSObject typePrefix]. */
 	if ([results count] == 1 && [[results firstObject] isValid])
 		return YES;
 
-	*aValue = [[results lastObject] value];
+	*aValue = [(ETValidationResult *)[results lastObject] value];
 	if (anError != NULL)
 	{
 		*anError = [COError errorWithValidationResults: results];
@@ -973,6 +979,22 @@ See +[NSObject typePrefix]. */
 	[_objectGraphContext markObjectAsUpdated: self forProperty: prop];
 }
 
+// TODO: Move this method to ETModelDescriptionRepository
+- (ETEntityDescription *) entityDescriptionForObject: (id)anObject
+{
+	if ([anObject isKindOfClass: [COObject class]])
+	{
+		// special case to support the case when we're using COObject class
+		// and not a user-supplied subclass
+		return [(COObject *)anObject entityDescription];
+	}
+	else
+	{
+		return [[_objectGraphContext modelDescriptionRepository]
+				entityDescriptionForClass: [anObject class]];
+	}
+}
+
 - (void)  validateSingleValue: (id)singleValue
 conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 {
@@ -983,8 +1005,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	if (singleValue == nil)
 		return;
 	
-	ETEntityDescription *newValueEntityDesc = [[_objectGraphContext modelDescriptionRepository]
-		entityDescriptionForClass: [singleValue class]];
+	ETEntityDescription *newValueEntityDesc = [self entityDescriptionForObject: singleValue];
 	ETAssert(newValueEntityDesc != nil);
 	
 	if ([[propertyDesc type] isValidValue: singleValue type: newValueEntityDesc])
@@ -1312,10 +1333,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 			continue;
 
 		Class class = [self collectionClassForPropertyDescription: propDesc];
-		/* We must access the instance variable or the primitive value, and we 
-		   cannot use -valueForProperty:, because getters tend to return 
-		   defensive copies (immutable collections). */
-		id collection = [self valueForStorageKey: [propDesc name]];
+		id collection = [self valueForProperty: [propDesc name]];
 
 		if ([collection isKindOfClass: class] == NO)
 		{
@@ -1333,12 +1351,19 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 - (void)awakeFromDeserialization
 {
 	ETAssert([[_additionalStoreItemUUIDs allValues] containsObject: [NSNull null]] == NO);
-    [self validateMultivaluedPropertiesUsingMetamodel];
+}
+
+- (void)willLoadObjectGraph
+{
+
 }
 
 - (void)didLoadObjectGraph
 {
-	
+	// NOTE: This must be called once all properties have been recreated including
+	// transient ones. Since -awakeFromDeserialization superclass implementation
+	// must be called first, calling it in -awakeFromDeserialization would be too early.
+	[self validateMultivaluedPropertiesUsingMetamodel];
 }
 
 - (void)willDiscard

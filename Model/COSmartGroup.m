@@ -6,6 +6,7 @@
  */
 
 #import "COSmartGroup.h"
+#import "COSerialization.h"
 
 @implementation COSmartGroup
 
@@ -44,6 +45,22 @@
 	[group setPropertyDescriptions: A(content)];
 
 	return group;	
+}
+
+- (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
+{
+	self = [super initWithObjectGraphContext: aContext];
+	if (self == nil)
+		return nil;
+
+	content = [NSArray new];
+	return self;
+}
+
+- (void)awakeFromDeserialization
+{
+	[super awakeFromDeserialization];
+	content = [NSArray new];
 }
 
 - (void)setTargetCollection: (id <ETCollection>)aGroup
