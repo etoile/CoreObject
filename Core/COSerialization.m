@@ -206,16 +206,6 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
     }
 }
 
-- (ETEntityDescription *)entityDescriptionForObject: (id)value
-{
-	if (value == nil)
-		return nil;
-
-    ETModelDescriptionRepository *repo = self.objectGraphContext.modelDescriptionRepository;
-    
-    return [repo entityDescriptionForClass: [value class]];
-}
-
 - (id)transformedValue: (id)value
  ofPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
