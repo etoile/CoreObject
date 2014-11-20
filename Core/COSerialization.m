@@ -307,6 +307,59 @@ serialization. */
 	     || [aTypeName isEqualToString: @"NSRange"]);
 }
 
+- (COType)serializedTypeForNumber: (NSNumber *)value
+{
+	NSParameterAssert(value == nil || [value isKindOfClass: [NSNumber class]]);
+
+	// TODO: A bit ugly, would be better to add new entity descriptions
+	// such as NSBOOLNumber, NSCGFloatNumber etc.
+	if (value == nil)
+		return kCOTypeString;
+
+	if (strcmp([value objCType], @encode(BOOL)) == 0
+	 || strcmp([value objCType], @encode(NSInteger)) == 0
+	 || strcmp([value objCType], @encode(NSUInteger)) == 0)
+	{
+		return kCOTypeInt64;
+	}
+	else if (strcmp([value objCType], @encode(CGFloat)) == 0
+	      || strcmp([value objCType], @encode(double)) == 0
+	      || strcmp([value objCType], @encode(float)) == 0)
+	{
+		return kCOTypeDouble;
+	}
+	
+	// FIXME: Finish the above... we should handle all values that NSNumber can encode,
+	// except unsigned integers larger than the maximum value of int64_t.
+	ETAssertUnreachable();
+	return 0;
+}
+
+- (NSString *)primitiveTypeNameFromValue: (id)value
+{
+	if ([value isKindOfClass: [COObject class]])
+	{
+		return @"COObject";
+	}
+	else if ([value isKindOfClass: [NSString class]])
+	{
+		return @"NSString";
+	}
+	else if ([value isKindOfClass: [NSNumber class]])
+	{
+		return @"NSNumber";
+	}
+	else if ([value isKindOfClass: [NSData class]])
+	{
+		return @"NSData";
+	}
+	else if ([value isKindOfClass: [COAttachmentID class]])
+	{
+		return @"COAttachmentID";
+	}
+	return nil;
+}
+
 - (COType)serializedTypeForUnivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
                                                 ofValue: (id)value
 {
@@ -317,9 +370,22 @@ serialization. */
 	if (aPropertyDesc.valueTransformerName != nil)
 	{
 		ETAssert(![type isEqual: aPropertyDesc.type]);
-		return [self.serializablePersistentTypes[type.name] intValue];
+		return [self.serializablePersistentTypes[typeName] intValue];
 	}
-	
+
+	if ([typeName isEqualToString: @"NSObject"])
+	{
+		if (value != nil)
+		{
+			typeName = [self primitiveTypeNameFromValue: value];
+		}
+		else
+		{
+			// NOTE: We use an arbitrary type
+			return kCOTypeBlob;
+		}
+	}
+
 	if ([self isCoreObjectEntityType: type])
 	{
 		return ([aPropertyDesc isComposite] ? kCOTypeCompositeReference : kCOTypeReference);
@@ -331,7 +397,7 @@ serialization. */
 		return kCOTypeInt64;
 	}
 	else if ([typeName isEqualToString: @"CGFloat"]
-		 || [typeName isEqualToString: @"Double"])
+	      || [typeName isEqualToString: @"Double"])
 	{
 		return kCOTypeDouble;
 	}
@@ -341,29 +407,7 @@ serialization. */
 	}
 	else if ([typeName isEqualToString: @"NSNumber"])
 	{
-		NSParameterAssert(value == nil || [value isKindOfClass: [NSNumber class]]);
-
-		// TODO: A bit ugly, would be better to add new entity descriptions
-		// such as NSBOOLNumber, NSCGFloatNumber etc.
-		if (value == nil)
-			return kCOTypeString;
-
-		if (strcmp([value objCType], @encode(BOOL)) == 0
-		 || strcmp([value objCType], @encode(NSInteger)) == 0
-		 || strcmp([value objCType], @encode(NSUInteger)) == 0)
-		{
-			return kCOTypeInt64;
-		}
-		else if (strcmp([value objCType], @encode(CGFloat)) == 0
-		      || strcmp([value objCType], @encode(double)) == 0
-			  || strcmp([value objCType], @encode(float)) == 0)
-		{
-			return kCOTypeDouble;
-		}
-		
-		// FIXME: Finish the above... we should handle all values that NSNumber can encode,
-		// except unsigned integers larger than the maximum value of int64_t.
-		ETAssertUnreachable();
+		[self serializedTypeForNumber: value];
 	}
 	else if ([typeName isEqualToString: @"NSData"])
 	{
@@ -376,56 +420,6 @@ serialization. */
 	else if ([typeName isEqualToString: @"COAttachmentID"])
 	{
 		return kCOTypeAttachment;
-	}
-	else if ([self serializationGetterForProperty: [aPropertyDesc name]] != NULL)
-	{
-        // For a case like ETShape.pathResizeSelector, the COObject subclass
-		// implements -serializedPathResizeSelector to return an NSString.
-        // However, the typeName is "SEL".
-
-		/* Serialialization accessors can override the types declared in the 
-		   property description using either NSString or NSData, but no other 
-		   types.
-		   For a multivalued property, the same applies, since the property 
-		   description type is the element type. For example, a serialization 
-		   getter can return an array of ETUTI objects as an array of NSString 
-		   objects. */
-        if ([value isKindOfClass: [NSString class]])
-        {
-            return kCOTypeString;
-        }
-        else if ([value isKindOfClass: [NSData class]])
-		{
-			return kCOTypeBlob;
-		}
-		else if ([value isKindOfClass: [COObject class]])
-		{
-			ETAssert([typeName isEqualToString: @"NSObject"]);
-
-			/* For persistent relationship such as -[ETLayoutItem representedObject], 
-			   where the value must be a COObject entity type (or some derived kind) 
-			   to be persisted. For other NSObject derived instances, the 
-			   relationship is treated as transient.
-
-			   For such property, a serialization getter must be implemented to 
-			   return nil when the value is not a persistent COObject instance 
-			   (otherwise -serializedValueForValue:propertyDescription: raises 
-               an exception). */
-			return kCOTypeReference;
-		}
-		else if (value == nil)
-		{
-			// NOTE: We use an arbitrary type
-			return kCOTypeBlob;
-		}
-		else
-		{
-			NSString *getterString =
-				NSStringFromSelector([self serializationGetterForProperty: [aPropertyDesc name]]);
-
-			NSAssert3(NO, @"Unsupported serialization type %@ for %@ returned by "
-				"serialization getter %@", type, value, getterString);
-		}
 	}
 	else if ([typeName isEqualToString: @"NSDate"])
 	{
