@@ -119,54 +119,52 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 
 - (id)serializedReferenceForObject: (COObject *)value
 {
-		/* Some root object relationships are special in the sense the value can be 
-		   a core object but its persistency isn't enabled. We interpret these 
-		   one-to-one relationships as transient.
-		   Usually a root object belongs to some other objects at run-time, in some
-		   cases the root object  want to hold a backward pointer (inverse
-		   relationship) to those non-persistent object(s).
-		   For example, a root object can be a layout item whose parent item is the
-		   window group... In such a case, we don't want to persist the window
-		   group, but ignore it. At deseserialiation time, the app is responsible
-		   to add the item back to the window group (the parent item would be
-		   restored then). */
-		if ([value isPersistent] || [value objectGraphContext] == [self objectGraphContext])
+	/* Some root object relationships are special in the sense the value can be
+	   a core object but its persistency isn't enabled. We interpret these 
+	   one-to-one relationships as transient.
+	   Usually a root object belongs to some other objects at run-time, in some
+	   cases the root object  want to hold a backward pointer (inverse
+	   relationship) to those non-persistent object(s).
+	   For example, a root object can be a layout item whose parent item is the
+	   window group... In such a case, we don't want to persist the window
+	   group, but ignore it. At deseserialiation time, the app is responsible
+	   to add the item back to the window group (the parent item would be
+	   restored then). */
+	if (![value isPersistent] && [value objectGraphContext] != [self objectGraphContext])
+	{
+		ETAssert([value isRoot]);
+		return [NSNull null];
+	}
+
+	if ([value persistentRoot] == [self persistentRoot])
+	{
+		return [value UUID];
+	}
+	else
+	{
+		// Serialize this cross-persistent root reference as a COPath
+		
+		NSAssert([value isRoot], @"A property must point to a root object "
+			"for references accross persistent roots");
+		
+		COPersistentRoot *referencedPersistentRoot = [value persistentRoot];
+		COObjectGraphContext *referencedPersistentRootCurrentBranchGraph =
+			[referencedPersistentRoot objectGraphContext];
+		COObjectGraphContext *referencedObjectGraph = [value objectGraphContext];
+		COBranch *referencedBranch = [value branch];
+		
+		if (referencedObjectGraph == referencedPersistentRootCurrentBranchGraph)
 		{
-			if ([value persistentRoot] == [self persistentRoot])
-			{
-				return [value UUID];
-			}
-			else
-			{
-				// Serialize this cross-persistent root reference as a COPath
-				
-				NSAssert([value isRoot], @"A property must point to a root object "
-					"for references accross persistent roots");
-				
-				COPersistentRoot *referencedPersistentRoot = [value persistentRoot];
-				COObjectGraphContext *referencedPersistentRootCurrentBranchGraph =
-					[referencedPersistentRoot objectGraphContext];
-				COObjectGraphContext *referencedObjectGraph = [value objectGraphContext];
-				COBranch *referencedBranch = [value branch];
-				
-				if (referencedObjectGraph == referencedPersistentRootCurrentBranchGraph)
-				{
-					// Serialize as a reference to the current branch
-					return [COPath pathWithPersistentRoot: [referencedPersistentRoot UUID]];
-				}
-				else
-				{
-					// Serialize as a reference to a specific branch
-					return [COPath pathWithPersistentRoot: [referencedPersistentRoot UUID]
-												   branch: [referencedBranch UUID]];
-				}
-			}
+			// Serialize as a reference to the current branch
+			return [COPath pathWithPersistentRoot: [referencedPersistentRoot UUID]];
 		}
 		else
 		{
-			ETAssert([value isRoot]);
-			return [NSNull null];
+			// Serialize as a reference to a specific branch
+			return [COPath pathWithPersistentRoot: [referencedPersistentRoot UUID]
+			                               branch: [referencedBranch UUID]];
 		}
+	}
 }
 
 - (id) serializedValueForValue: (id)value
@@ -240,20 +238,14 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	{
 		return [NSNull null];
 	}
-	else if ([value isKindOfClass: [ETUUID class]]
-             || [value isKindOfClass: [COPath class]])
+	else if ([value isKindOfClass: [COObject class]])
 	{
-        return value;
+		return [self serializedReferenceForObject: value];
 	}
 	else if ([value isKindOfClass: [COAttachmentID class]])
 	{
 		return value;
 	}
-	else if ([value isKindOfClass: [COObject class]])
-	{
-		return [self serializedReferenceForObject: value];
-	}
-
 	else if ([self isSerializablePrimitiveValue: value])
 	{
 		return value;
