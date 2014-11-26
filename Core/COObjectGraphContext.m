@@ -339,6 +339,14 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 }
 
 #pragma mark -
+#pragma mark Loading Status
+
+- (BOOL)isLoading
+{
+	return _loadingItemGraph != nil;
+}
+
+#pragma mark -
 #pragma mark Item Graph Protocol
 
 - (ETUUID *)rootItemUUID

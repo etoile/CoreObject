@@ -341,6 +341,12 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 - (void)setItemGraph: (id <COItemGraph>)aTree;
 
 
+/** @taskunit Loading Status */
+
+
+@property (nonatomic, readonly) BOOL isLoading;
+
+
 /** @taskunit Accessing the Root Object */
 
 
