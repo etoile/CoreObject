@@ -132,7 +132,6 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	   restored then). */
 	if (![value isPersistent] && [value objectGraphContext] != [self objectGraphContext])
 	{
-		ETAssert([value isRoot]);
 		return [NSNull null];
 	}
 
