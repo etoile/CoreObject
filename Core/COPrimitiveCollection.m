@@ -8,6 +8,8 @@
 #import "COPrimitiveCollection.h"
 #import "COObject.h"
 
+#pragma clang diagnostic ignored "-Wobjc-designated-initializers"
+
 @implementation COWeakRef
 
 - (instancetype) initWithObject: (COObject *)anObject
