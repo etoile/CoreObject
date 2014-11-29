@@ -336,7 +336,12 @@ serialization. */
 
 - (NSString *)primitiveTypeNameFromValue: (id)value
 {
-	if ([value isKindOfClass: [COObject class]])
+	if (value == nil)
+	{
+		// NOTE: We use an arbitrary type
+		return @"NSData";
+	}
+	else if ([value isKindOfClass: [COObject class]])
 	{
 		return @"COObject";
 	}
@@ -356,7 +361,11 @@ serialization. */
 	{
 		return @"COAttachmentID";
 	}
-	return nil;
+	else
+	{
+		NSAssert1(NO, @"Unsupported dynamic serialization type for %@", value);
+		return nil;
+	}
 }
 
 - (COType)serializedTypeForUnivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
@@ -372,17 +381,16 @@ serialization. */
 		return [self.serializablePersistentTypes[typeName] intValue];
 	}
 
-	if ([typeName isEqualToString: @"NSObject"])
+	BOOL isDynamicType = [typeName isEqualToString: @"NSObject"];
+
+	/* For a dynamic type, we get the type from the value directly, rather than
+	   from the metamodel, then we return a COType exactly as we would for a
+	   type declared in the metamodel.
+	   For a nil value, we return an arbitrary type since we cannot get a type 
+	   from the value. */
+	if (isDynamicType)
 	{
-		if (value != nil)
-		{
-			typeName = [self primitiveTypeNameFromValue: value];
-		}
-		else
-		{
-			// NOTE: We use an arbitrary type
-			return kCOTypeBlob;
-		}
+		typeName = [self primitiveTypeNameFromValue: value];
 	}
 
 	if ([self isCoreObjectEntityType: type])
@@ -406,7 +414,7 @@ serialization. */
 	}
 	else if ([typeName isEqualToString: @"NSNumber"])
 	{
-		[self serializedTypeForNumber: value];
+		return [self serializedTypeForNumber: value];
 	}
 	else if ([typeName isEqualToString: @"NSData"])
 	{
@@ -428,8 +436,8 @@ serialization. */
 	else
 	{
 		NSAssert2(NO, @"Unsupported serialization type %@ for %@", type, value);
+		return 0;
 	}
-	return 0;
 }
 
 - (id)serializedTypeForPropertyDescription: (ETPropertyDescription *)aPropertyDesc value: (id)value
