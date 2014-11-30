@@ -45,6 +45,10 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
+- (ETEntityDescription *)entityDescriptionForObject: (id)anObject;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
 - (NSDictionary *)additionalStoreItemUUIDs;
 /**
  * This method is only exposed to be used internally by CoreObject.

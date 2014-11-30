@@ -42,6 +42,52 @@
  *
  * -storeItem is also useful to inspect the serialized representation that goes
  * into the store.
+ *
+ * @section Persistent Properties
+ *
+ * For CoreObject, properties are either:
+ *
+ * <list>
+ * <item>univalued attribute</item>
+ * <item>multivalued attribute</item>
+ * <item>univalued or to-one relationship</item>
+ * <item>multivalued or to-many relationship</item>
+ *
+ * You use the metamodel to set a property as attribute/relationship with
+ * -[ETPropertyDescription type], and as univalued/multivalued with 
+ * -[ETPropertyDescription multivalued].
+ *
+ * Internally, these distinctions are mirrored in the storage data model, see 
+ * COType.
+ *
+ * @section Univalued Persistent Types
+ *
+ *
+ * COObject serialization supports the same univalued types than COItem (see
+ * COType), plus some extra types such as NSDate or NSRect that it automatically
+ * converts to a COType.
+ *
+ * For univalued properties, the supported persistent types are:
+ *
+ * <deflist>
+ * <term>attachment</term><desc>COAttachmentID</desc>
+ * <term>reference to an inner object or outer root object</term><desc>COObject</desc>
+ * <term>string</term><desc>NSString</desc>
+ * <term>data</term><desc>NSData</desc>
+ * <term>integer</term><desc>NSNumber or C types whose value fits into an int64_t</desc>
+ * <term>double</term>NSNumber or C types whose value fits into a double</desc>
+ * <term>date</term><desc>NSDate (serialized as an int64_t using Java timestamp format)</desc>
+ * <term>common scalar values</term><desc>CORect, COSize, COPoint, CORange</desc>
+ * </deflist>
+ *
+ * For all univalued types, a null value is supported, it is equal to nil, 
+ * except for numbers (zero is used in this role) and scalar values
+ * (CONullRect, CONullPoint, CONullSize, CONullRange are used).
+ *
+ * Depending on the preprocessor flags and the compilation target 
+ * (iOS, AppKit etc.), CoreObject scalar types are mapped to CoreGraphics types 
+ * or AppKit types, but the storage representation remains the same in all
+ * cases.
  */
 @property (nonatomic, copy) COItem *storeItem;
 

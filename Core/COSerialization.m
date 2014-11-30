@@ -119,54 +119,51 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 
 - (id)serializedReferenceForObject: (COObject *)value
 {
-		/* Some root object relationships are special in the sense the value can be 
-		   a core object but its persistency isn't enabled. We interpret these 
-		   one-to-one relationships as transient.
-		   Usually a root object belongs to some other objects at run-time, in some
-		   cases the root object  want to hold a backward pointer (inverse
-		   relationship) to those non-persistent object(s).
-		   For example, a root object can be a layout item whose parent item is the
-		   window group... In such a case, we don't want to persist the window
-		   group, but ignore it. At deseserialiation time, the app is responsible
-		   to add the item back to the window group (the parent item would be
-		   restored then). */
-		if ([value isPersistent] || [value objectGraphContext] == [self objectGraphContext])
+	/* Some root object relationships are special in the sense the value can be
+	   a core object but its persistency isn't enabled. We interpret these 
+	   one-to-one relationships as transient.
+	   Usually a root object belongs to some other objects at run-time, in some
+	   cases the root object  want to hold a backward pointer (inverse
+	   relationship) to those non-persistent object(s).
+	   For example, a root object can be a layout item whose parent item is the
+	   window group... In such a case, we don't want to persist the window
+	   group, but ignore it. At deseserialiation time, the app is responsible
+	   to add the item back to the window group (the parent item would be
+	   restored then). */
+	if (![value isPersistent] && [value objectGraphContext] != [self objectGraphContext])
+	{
+		return [NSNull null];
+	}
+
+	if ([value persistentRoot] == [self persistentRoot])
+	{
+		return [value UUID];
+	}
+	else
+	{
+		// Serialize this cross-persistent root reference as a COPath
+		
+		NSAssert([value isRoot], @"A property must point to a root object "
+			"for references accross persistent roots");
+		
+		COPersistentRoot *referencedPersistentRoot = [value persistentRoot];
+		COObjectGraphContext *referencedPersistentRootCurrentBranchGraph =
+			[referencedPersistentRoot objectGraphContext];
+		COObjectGraphContext *referencedObjectGraph = [value objectGraphContext];
+		COBranch *referencedBranch = [value branch];
+		
+		if (referencedObjectGraph == referencedPersistentRootCurrentBranchGraph)
 		{
-			if ([value persistentRoot] == [self persistentRoot])
-			{
-				return [value UUID];
-			}
-			else
-			{
-				// Serialize this cross-persistent root reference as a COPath
-				
-				NSAssert([value isRoot], @"A property must point to a root object "
-					"for references accross persistent roots");
-				
-				COPersistentRoot *referencedPersistentRoot = [value persistentRoot];
-				COObjectGraphContext *referencedPersistentRootCurrentBranchGraph =
-					[referencedPersistentRoot objectGraphContext];
-				COObjectGraphContext *referencedObjectGraph = [value objectGraphContext];
-				COBranch *referencedBranch = [value branch];
-				
-				if (referencedObjectGraph == referencedPersistentRootCurrentBranchGraph)
-				{
-					// Serialize as a reference to the current branch
-					return [COPath pathWithPersistentRoot: [referencedPersistentRoot UUID]];
-				}
-				else
-				{
-					// Serialize as a reference to a specific branch
-					return [COPath pathWithPersistentRoot: [referencedPersistentRoot UUID]
-												   branch: [referencedBranch UUID]];
-				}
-			}
+			// Serialize as a reference to the current branch
+			return [COPath pathWithPersistentRoot: [referencedPersistentRoot UUID]];
 		}
 		else
 		{
-			ETAssert([value isRoot]);
-			return [NSNull null];
+			// Serialize as a reference to a specific branch
+			return [COPath pathWithPersistentRoot: [referencedPersistentRoot UUID]
+			                               branch: [referencedBranch UUID]];
 		}
+	}
 }
 
 - (id) serializedValueForValue: (id)value
@@ -206,27 +203,48 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
     }
 }
 
-- (id)serializedValueForValue: (id)value
+- (id)transformedValue: (id)value
+ ofPropertyDescription: (ETPropertyDescription *)aPropertyDesc
+{
+	if (aPropertyDesc.valueTransformerName == nil)
+		return value;
+
+	// TODO: Move in the caller
+	ETAssert([self isSerializablePersistentType: aPropertyDesc]);
+
+	ETEntityDescription *valueEntity = [self entityDescriptionForObject: value];
+	
+	ETAssert(value == nil || [valueEntity isKindOfEntity: aPropertyDesc.type]);
+
+	NSValueTransformer *transformer =
+		[self valueTransformerForPropertyDescription: aPropertyDesc];
+	id result = [transformer transformedValue: value];
+
+	ETEntityDescription *resultEntity = [self entityDescriptionForObject: result];
+	
+	ETAssert(result == nil || [resultEntity isKindOfEntity: aPropertyDesc.persistentType]);
+	ETAssert(result == nil || [self isSerializablePrimitiveValue: result]);
+	return result;
+}
+
+- (id)serializedValueForValue: (id)aValue
  univaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
+	id value = [self transformedValue: aValue
+                ofPropertyDescription: aPropertyDesc];
+ 
 	if (value == nil)
 	{
 		return [NSNull null];
-	}
-	else if ([value isKindOfClass: [ETUUID class]]
-             || [value isKindOfClass: [COPath class]])
-	{
-        return value;
-	}
-	else if ([value isKindOfClass: [COAttachmentID class]])
-	{
-		return value;
 	}
 	else if ([value isKindOfClass: [COObject class]])
 	{
 		return [self serializedReferenceForObject: value];
 	}
-
+	else if ([value isKindOfClass: [COAttachmentID class]])
+	{
+		return value;
+	}
 	else if ([self isSerializablePrimitiveValue: value])
 	{
 		return value;
@@ -242,30 +260,6 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	}
 	else
 	{
-		// Try value transformer
-		if (aPropertyDesc.valueTransformerName != nil)
-		{
-			NSValueTransformer *transformer = [NSValueTransformer valueTransformerForName: aPropertyDesc.valueTransformerName];
-            ETModelDescriptionRepository *repo = [[self objectGraphContext] modelDescriptionRepository];
-            ETEntityDescription *valueEntity = [repo entityDescriptionForClass: [value class]];
-            ETAssert([valueEntity isKindOfEntity: [aPropertyDesc type]]);
-
-            if (transformer == nil)
-            {
-                [NSException raise: NSInternalInconsistencyException
-                            format: @"Found no value transformer registered "
-                                     "for %@, attached to %@",
-                                     aPropertyDesc.valueTransformerName, aPropertyDesc.fullName];
-            }
-			id result = [transformer transformedValue: value];
-			
-			ETEntityDescription *resultEntityDesc = [repo entityDescriptionForClass: [result class]];
-			ETAssert([resultEntityDesc isKindOfEntity: [aPropertyDesc persistentType]]);
-			ETAssert([self isSerializablePersistentType: aPropertyDesc]);
-			
-			return result;
-		}
-		
 		NSAssert2(NO, @"Unsupported serialization type %@ for %@", [value class], value);
 	}
 	return nil;
@@ -312,6 +306,68 @@ serialization. */
 	     || [aTypeName isEqualToString: @"NSRange"]);
 }
 
+- (COType)serializedTypeForNumber: (NSNumber *)value
+{
+	NSParameterAssert(value == nil || [value isKindOfClass: [NSNumber class]]);
+
+	// TODO: A bit ugly, would be better to add new entity descriptions
+	// such as NSBOOLNumber, NSCGFloatNumber etc.
+	if (value == nil)
+		return kCOTypeString;
+
+	if (strcmp([value objCType], @encode(BOOL)) == 0
+	 || strcmp([value objCType], @encode(NSInteger)) == 0
+	 || strcmp([value objCType], @encode(NSUInteger)) == 0)
+	{
+		return kCOTypeInt64;
+	}
+	else if (strcmp([value objCType], @encode(CGFloat)) == 0
+	      || strcmp([value objCType], @encode(double)) == 0
+	      || strcmp([value objCType], @encode(float)) == 0)
+	{
+		return kCOTypeDouble;
+	}
+	
+	// FIXME: Finish the above... we should handle all values that NSNumber can encode,
+	// except unsigned integers larger than the maximum value of int64_t.
+	ETAssertUnreachable();
+	return 0;
+}
+
+- (NSString *)primitiveTypeNameFromValue: (id)value
+{
+	if (value == nil)
+	{
+		// NOTE: We use an arbitrary type
+		return @"NSData";
+	}
+	else if ([value isKindOfClass: [COObject class]])
+	{
+		return @"COObject";
+	}
+	else if ([value isKindOfClass: [NSString class]])
+	{
+		return @"NSString";
+	}
+	else if ([value isKindOfClass: [NSNumber class]])
+	{
+		return @"NSNumber";
+	}
+	else if ([value isKindOfClass: [NSData class]])
+	{
+		return @"NSData";
+	}
+	else if ([value isKindOfClass: [COAttachmentID class]])
+	{
+		return @"COAttachmentID";
+	}
+	else
+	{
+		NSAssert1(NO, @"Unsupported dynamic serialization type for %@", value);
+		return nil;
+	}
+}
+
 - (COType)serializedTypeForUnivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
                                                 ofValue: (id)value
 {
@@ -322,9 +378,21 @@ serialization. */
 	if (aPropertyDesc.valueTransformerName != nil)
 	{
 		ETAssert(![type isEqual: aPropertyDesc.type]);
-		return [self.serializablePersistentTypes[type.name] intValue];
+		return [self.serializablePersistentTypes[typeName] intValue];
 	}
-	
+
+	BOOL isDynamicType = [typeName isEqualToString: @"NSObject"];
+
+	/* For a dynamic type, we get the type from the value directly, rather than
+	   from the metamodel, then we return a COType exactly as we would for a
+	   type declared in the metamodel.
+	   For a nil value, we return an arbitrary type since we cannot get a type 
+	   from the value. */
+	if (isDynamicType)
+	{
+		typeName = [self primitiveTypeNameFromValue: value];
+	}
+
 	if ([self isCoreObjectEntityType: type])
 	{
 		return ([aPropertyDesc isComposite] ? kCOTypeCompositeReference : kCOTypeReference);
@@ -336,7 +404,7 @@ serialization. */
 		return kCOTypeInt64;
 	}
 	else if ([typeName isEqualToString: @"CGFloat"]
-		 || [typeName isEqualToString: @"Double"])
+	      || [typeName isEqualToString: @"Double"])
 	{
 		return kCOTypeDouble;
 	}
@@ -346,29 +414,7 @@ serialization. */
 	}
 	else if ([typeName isEqualToString: @"NSNumber"])
 	{
-		NSParameterAssert(value == nil || [value isKindOfClass: [NSNumber class]]);
-
-		// TODO: A bit ugly, would be better to add new entity descriptions
-		// such as NSBOOLNumber, NSCGFloatNumber etc.
-		if (value == nil)
-			return kCOTypeString;
-
-		if (strcmp([value objCType], @encode(BOOL)) == 0
-		 || strcmp([value objCType], @encode(NSInteger)) == 0
-		 || strcmp([value objCType], @encode(NSUInteger)) == 0)
-		{
-			return kCOTypeInt64;
-		}
-		else if (strcmp([value objCType], @encode(CGFloat)) == 0
-		      || strcmp([value objCType], @encode(double)) == 0
-			  || strcmp([value objCType], @encode(float)) == 0)
-		{
-			return kCOTypeDouble;
-		}
-		
-		// FIXME: Finish the above... we should handle all values that NSNumber can encode,
-		// except unsigned integers larger than the maximum value of int64_t.
-		ETAssertUnreachable();
+		return [self serializedTypeForNumber: value];
 	}
 	else if ([typeName isEqualToString: @"NSData"])
 	{
@@ -382,56 +428,6 @@ serialization. */
 	{
 		return kCOTypeAttachment;
 	}
-	else if ([self serializationGetterForProperty: [aPropertyDesc name]] != NULL)
-	{
-        // For a case like ETShape.pathResizeSelector, the COObject subclass
-		// implements -serializedPathResizeSelector to return an NSString.
-        // However, the typeName is "SEL".
-
-		/* Serialialization accessors can override the types declared in the 
-		   property description using either NSString or NSData, but no other 
-		   types.
-		   For a multivalued property, the same applies, since the property 
-		   description type is the element type. For example, a serialization 
-		   getter can return an array of ETUTI objects as an array of NSString 
-		   objects. */
-        if ([value isKindOfClass: [NSString class]])
-        {
-            return kCOTypeString;
-        }
-        else if ([value isKindOfClass: [NSData class]])
-		{
-			return kCOTypeBlob;
-		}
-		else if ([value isKindOfClass: [COObject class]])
-		{
-			ETAssert([typeName isEqualToString: @"NSObject"]);
-
-			/* For persistent relationship such as -[ETLayoutItem representedObject], 
-			   where the value must be a COObject entity type (or some derived kind) 
-			   to be persisted. For other NSObject derived instances, the 
-			   relationship is treated as transient.
-
-			   For such property, a serialization getter must be implemented to 
-			   return nil when the value is not a persistent COObject instance 
-			   (otherwise -serializedValueForValue:propertyDescription: raises 
-               an exception). */
-			return kCOTypeReference;
-		}
-		else if (value == nil)
-		{
-			// NOTE: We use an arbitrary type
-			return kCOTypeBlob;
-		}
-		else
-		{
-			NSString *getterString =
-				NSStringFromSelector([self serializationGetterForProperty: [aPropertyDesc name]]);
-
-			NSAssert3(NO, @"Unsupported serialization type %@ for %@ returned by "
-				"serialization getter %@", type, value, getterString);
-		}
-	}
 	else if ([typeName isEqualToString: @"NSDate"])
 	{
 		/** For convenience, serialize NSDate as a int64_t using Java semantics. */
@@ -440,8 +436,8 @@ serialization. */
 	else
 	{
 		NSAssert2(NO, @"Unsupported serialization type %@ for %@", type, value);
+		return 0;
 	}
-	return 0;
 }
 
 - (id)serializedTypeForPropertyDescription: (ETPropertyDescription *)aPropertyDesc value: (id)value
@@ -753,35 +749,60 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	}
 }
 
+- (NSValueTransformer *)valueTransformerForPropertyDescription: (ETPropertyDescription *)aPropertyDesc
+{
+	NSValueTransformer *transformer =
+		[NSValueTransformer valueTransformerForName: aPropertyDesc.valueTransformerName];
+
+	if (transformer == nil)
+	{
+		[NSException raise: NSInternalInconsistencyException
+		            format: @"Found no value transformer registered "
+		                     "for %@, attached to %@",
+		                     aPropertyDesc.valueTransformerName, aPropertyDesc.fullName];
+	}
+	return transformer;
+}
+
+- (id)reverseTransformedValue: (id)value
+        ofPropertyDescription: (ETPropertyDescription *)aPropertyDesc
+{
+	if (aPropertyDesc.valueTransformerName == nil)
+		return value;
+	
+	// TODO: Move in the caller
+	ETAssert([self isSerializablePersistentType: aPropertyDesc]);
+
+	ETEntityDescription *valueEntity = [self entityDescriptionForObject: value];
+
+	ETAssert(value == nil || [valueEntity isKindOfEntity: [aPropertyDesc persistentType]]);
+	ETAssert(value == nil || [self isSerializablePrimitiveValue: value]);
+	// TODO: Move in the caller probably
+	//ETAssert([self.serializablePersistentTypes containsObject: @(COTypePrimitivePart(type))]);
+
+	NSValueTransformer *transformer =
+		[self valueTransformerForPropertyDescription: aPropertyDesc];
+	id result = [transformer reverseTransformedValue: value];
+
+	ETEntityDescription *resultEntityDesc = [self entityDescriptionForObject: result];
+
+	ETAssert(result == nil || [resultEntityDesc isKindOfEntity: [aPropertyDesc type]]);
+	
+	return result;
+}
+
 - (id)valueForSerializedValue: (id)value
                        ofType: (COType)type
  univaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
 	NSString *typeName = [[aPropertyDesc persistentType] name];
+	BOOL isNull = [value isEqual: [NSNull null]];
+	id result = value;
 
-	if (aPropertyDesc.valueTransformerName != nil)
-	{
-        BOOL isNull = [value isEqual: [NSNull null]];
-        ETModelDescriptionRepository *repo = [[self objectGraphContext] modelDescriptionRepository];
-        ETEntityDescription *valueEntity = [repo entityDescriptionForClass: [value class]];
-        ETAssert(isNull || [valueEntity isKindOfEntity: [aPropertyDesc persistentType]]);
-		ETAssert([self.serializablePersistentTypes containsObject: @(COTypePrimitivePart(type))]);
-		ETAssert([value isKindOfClass: [NSNull class]]
-			|| [value isKindOfClass: [NSString class]] || [value isKindOfClass: [NSData class]]);
-		
-		NSValueTransformer *transformer = [NSValueTransformer valueTransformerForName: aPropertyDesc.valueTransformerName];
-		id result = [transformer reverseTransformedValue: (isNull ? nil : value)];
-		
-		ETEntityDescription *resultEntityDesc = [repo entityDescriptionForClass: [result class]];
-		ETAssert(result == nil || [resultEntityDesc isKindOfEntity: [aPropertyDesc type]]);
-		
-		return result;
-	}
-	
-	if ([value isEqual: [NSNull null]])
+	if (isNull)
 	{
 		ETAssert(COTypeIsValid(type));
-		return nil;
+		result = nil;
 	}
 	else if (type == kCOTypeReference || type == kCOTypeCompositeReference)
 	{
@@ -793,47 +814,35 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	{
 		if ([typeName isEqualToString: @"NSDate"])
 		{
-			return CODateFromJavaTimestamp(value);
+			result = CODateFromJavaTimestamp(value);
 		}
-		return value;
 	}
 	else if (type == kCOTypeDouble)
 	{
-		return value;
+
 	}
 	else if (type == kCOTypeString)
 	{
 		if ([self isSerializableScalarTypeName: typeName])
 		{
-			return [self scalarValueForSerializedValue: value typeName: typeName];
+			result = [self scalarValueForSerializedValue: value typeName: typeName];
 		}
-		return value;
 	}
 	else if (type == kCOTypeBlob)
 	{
 		NSParameterAssert([value isKindOfClass: [NSData class]]);
-
-		if ([typeName isEqualToString: @"NSData"] == NO)
-		{
-			ETAssert([self respondsToSelector: [self serializationSetterForProperty: [aPropertyDesc name]]]);
-		}
-		return value;
 	}
 	else if (type == kCOTypeAttachment)
 	{
 		NSParameterAssert([value isKindOfClass: [COAttachmentID class]]);
-		
-		if ([typeName isEqualToString: @"COAttachmentID"] == NO)
-		{
-			ETAssert([self respondsToSelector: [self serializationSetterForProperty: [aPropertyDesc name]]]);
-		}
-		return value;
 	}
 	else
 	{
 		NSAssert2(NO, @"Unsupported serialization type %@ for %@", COTypeDescription(type), value);
-		return nil;
 	}
+	
+	return [self reverseTransformedValue: result
+	               ofPropertyDescription: aPropertyDesc];
 }
 
 - (id)valueForSerializedValue: (id)value
