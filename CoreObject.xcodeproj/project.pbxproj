@@ -32,6 +32,10 @@
 		606E3DC21787A07E00ED42DA /* COSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 606E3DC01787A07E00ED42DA /* COSerialization.m */; };
 		607335B418AB96A6008A02DC /* COSmartGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 607335B218AB96A6008A02DC /* COSmartGroup.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		607335B518AB96A6008A02DC /* COSmartGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 607335B318AB96A6008A02DC /* COSmartGroup.m */; };
+		6076D0FF1A31E4110023C97A /* COSchemaMigration.h in Headers */ = {isa = PBXBuildFile; fileRef = 6076D0FD1A31E4110023C97A /* COSchemaMigration.h */; };
+		6076D1001A31E4110023C97A /* COSchemaMigration.h in Headers */ = {isa = PBXBuildFile; fileRef = 6076D0FD1A31E4110023C97A /* COSchemaMigration.h */; };
+		6076D1011A31E4110023C97A /* COSchemaMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 6076D0FE1A31E4110023C97A /* COSchemaMigration.m */; };
+		6076D1021A31E4110023C97A /* COSchemaMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 6076D0FE1A31E4110023C97A /* COSchemaMigration.m */; };
 		607EB349178881E60024B34D /* CODictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 607EB347178881E60024B34D /* CODictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		607EB34A178881E60024B34D /* CODictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 607EB348178881E60024B34D /* CODictionary.m */; };
 		6083222F19793D27008D9F9D /* COClassToString.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C81D0A195DA82200AEEC68 /* COClassToString.m */; };
@@ -954,6 +958,8 @@
 		606E3DC01787A07E00ED42DA /* COSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSerialization.m; path = Core/COSerialization.m; sourceTree = "<group>"; };
 		607335B218AB96A6008A02DC /* COSmartGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSmartGroup.h; path = Model/COSmartGroup.h; sourceTree = "<group>"; };
 		607335B318AB96A6008A02DC /* COSmartGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSmartGroup.m; path = Model/COSmartGroup.m; sourceTree = "<group>"; };
+		6076D0FD1A31E4110023C97A /* COSchemaMigration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSchemaMigration.h; path = SchemaMigration/COSchemaMigration.h; sourceTree = SOURCE_ROOT; };
+		6076D0FE1A31E4110023C97A /* COSchemaMigration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSchemaMigration.m; path = SchemaMigration/COSchemaMigration.m; sourceTree = SOURCE_ROOT; };
 		607EB347178881E60024B34D /* CODictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CODictionary.h; path = Model/CODictionary.h; sourceTree = "<group>"; };
 		607EB348178881E60024B34D /* CODictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CODictionary.m; path = Model/CODictionary.m; sourceTree = "<group>"; };
 		6083223619795D18008D9F9D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
@@ -1471,7 +1477,8 @@
 				6699633B115F0C4200359BE6 /* Documentation */,
 				66550BE717D51C5000327657 /* Benchmark */,
 				791B4DF41299C56900CCF472 /* Tests */,
-				6675F8B91785C02A001E5622 /* StorageDataModel */,
+				6675F8B91785C02A001E5622 /* Storage Data Model */,
+				6076D0F21A31E3D50023C97A /* Schema Migration */,
 				6686BDB612592C1B0065DE1A /* Core */,
 				66D09D58129CE477006BEDC3 /* Model */,
 				791B4E501299C8AF00CCF472 /* Store (Low-level API) */,
@@ -1511,6 +1518,16 @@
 				6048466118B6C03E006E4EDC /* TestUnitKit.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		6076D0F21A31E3D50023C97A /* Schema Migration */ = {
+			isa = PBXGroup;
+			children = (
+				6076D0FD1A31E4110023C97A /* COSchemaMigration.h */,
+				6076D0FE1A31E4110023C97A /* COSchemaMigration.m */,
+			);
+			name = "Schema Migration";
+			path = StorageDataModel;
 			sourceTree = "<group>";
 		};
 		6083223B19797DB7008D9F9D /* iOS */ = {
@@ -1821,7 +1838,7 @@
 			name = Benchmark;
 			sourceTree = "<group>";
 		};
-		6675F8B91785C02A001E5622 /* StorageDataModel */ = {
+		6675F8B91785C02A001E5622 /* Storage Data Model */ = {
 			isa = PBXGroup;
 			children = (
 				6675F8BA1785C02A001E5622 /* COItem.h */,
@@ -1839,6 +1856,7 @@
 				6660B39E1839659D009007FD /* COAttachmentID.h */,
 				6660B39F1839659D009007FD /* COAttachmentID.m */,
 			);
+			name = "Storage Data Model";
 			path = StorageDataModel;
 			sourceTree = "<group>";
 		};
@@ -2310,6 +2328,7 @@
 				60E08D2B19792FFA00D1B7AD /* COCommandSetBranchMetadata.h in Headers */,
 				60E08D0419792FFA00D1B7AD /* COContainer.h in Headers */,
 				60E08D1A19792FFA00D1B7AD /* COSearchResult.h in Headers */,
+				6076D1001A31E4110023C97A /* COSchemaMigration.h in Headers */,
 				60E08D3E19792FFA00D1B7AD /* COSynchronizerResponseToClientForSentRevisionsMessage.h in Headers */,
 				60E08D4319792FFA00D1B7AD /* COSynchronizerJSONServer.h in Headers */,
 				60F46A881A01426000BDDE8E /* COSmartGroup.h in Headers */,
@@ -2429,6 +2448,7 @@
 				609C009C1704C3DA00D01AAB /* COQuery.h in Headers */,
 				609C00AC1704C3EF00D01AAB /* COBookmark.h in Headers */,
 				609C00AE1704C3EF00D01AAB /* COCollection.h in Headers */,
+				6076D0FF1A31E4110023C97A /* COSchemaMigration.h in Headers */,
 				609C00B01704C3EF00D01AAB /* COContainer.h in Headers */,
 				609C00B21704C3EF00D01AAB /* COGroup.h in Headers */,
 				609C00B41704C3EF00D01AAB /* COLibrary.h in Headers */,
@@ -3031,6 +3051,7 @@
 				60E08CA619792F4600D1B7AD /* COItemGraph.m in Sources */,
 				60E08CA319792F4600D1B7AD /* COCommitDescriptor.m in Sources */,
 				60E08CCB19792F4600D1B7AD /* COUndoTrackStore.m in Sources */,
+				6076D1021A31E4110023C97A /* COSchemaMigration.m in Sources */,
 				60E08CF219792F4600D1B7AD /* COStoreUndeletePersistentRoot.m in Sources */,
 				60E08CF119792F4600D1B7AD /* COStoreUndeleteBranch.m in Sources */,
 				60E08CC119792F4600D1B7AD /* CODiffManager.m in Sources */,
@@ -3258,6 +3279,7 @@
 				668084EC1791FBA2003A3CC6 /* COObject+RelationshipCache.m in Sources */,
 				668084F11791FBAB003A3CC6 /* COObjectGraphContext.m in Sources */,
 				66D3FCDE1860EB61009BDF50 /* COAttributedStringDiff.m in Sources */,
+				6076D1011A31E4110023C97A /* COSchemaMigration.m in Sources */,
 				66FB15DA17AB31F6003BFC9B /* COObject+Accessors.m in Sources */,
 				664F8B1718762411001AD224 /* CODiffManager.m in Sources */,
 				66FD348B1830B84C00898381 /* COSynchronizerJSONServer.m in Sources */,
