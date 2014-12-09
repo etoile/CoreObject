@@ -55,7 +55,8 @@
 	return [self storeItemWithUUID: [_additionalStoreItemUUIDs objectForKey: [aPropertyDesc name]]
 	                         types: types
 	                        values: values
-	                    entityName: @"CODictionary"];
+	                    entityName: @"CODictionary"
+	                 schemaVersion: _objectGraphContext.schemaVersion];
 }
 
 - (NSDictionary *)dictionaryFromStoreItem: (COItem *)aStoreItem
@@ -68,7 +69,8 @@
 
 	for (NSString *property in [aStoreItem attributeNames])
 	{
-        if ([property isEqualToString: kCOObjectEntityNameProperty])
+        if ([property isEqualToString: kCOObjectEntityNameProperty]
+		 || [property isEqualToString: kCOObjectSchemaVersionProperty])
         {
             // HACK
             continue;

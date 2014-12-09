@@ -106,7 +106,8 @@
 - (COItem *)storeItemWithUUID: (ETUUID *)aUUID
                         types: (NSMutableDictionary *)types
                        values: (NSMutableDictionary *)values
-                   entityName: (NSString *)anEntityName;
+                   entityName: (NSString *)anEntityName
+				schemaVersion: (int64_t)aVersion;
 - (COItem *)additionalStoreItemForUUID: (ETUUID *)anItemUUID;
 
 /** @taskunit Deserialization */

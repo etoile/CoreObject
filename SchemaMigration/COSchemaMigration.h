@@ -6,6 +6,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <EtoileFoundation/EtoileFoundation.h>
 
 @class COSchemaMigration;
 
@@ -76,7 +77,8 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
 @interface COSchemaMigration : NSObject
 {
 	@private
-	NSInteger _destinationVersion;
+	NSString *_domain;
+	int64_t _destinationVersion;
 	COMigrationBlock _migrationBlock;
 }
 
@@ -98,12 +100,19 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  *
  * See +registerMigration: and -destinationVersion.
  */
-+ (COSchemaMigration *)migrationForDestinationVersion: (NSInteger)version;
++ (COSchemaMigration *)migrationForDomain: (NSString *)domain
+                       destinationVersion: (NSInteger)version;
 
 
 /** @taskunit Targeted Versions */
 
 
+/**
+ * The domain that must correspond to a package name in the metamodel.
+ *
+ * See -[ETPackageDescription name] and -[COCommitDescriptor domain].
+ */
+@property (nonatomic, copy) NSString *domain;
 /**
  * The new schema version.
  *
@@ -111,7 +120,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  *
  * See -sourceVersion.
  */
-@property (nonatomic, assign) NSUInteger destinationVersion;
+@property (nonatomic, assign) int64_t destinationVersion;
 /**
  * The old schema version, one version behind -destinationVersion.
  *
@@ -120,7 +129,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  * A source schema version is included in each item passed to -migrateItems:,
  * both values must match to carry the migration out.
  */
-@property (nonatomic, readonly) NSUInteger sourceVersion;
+@property (nonatomic, readonly) int64_t sourceVersion;
 /**
  * A migration block called by -migrateItems:.
  *
@@ -142,4 +151,9 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  */
 - (NSArray *)migrateItems: (NSArray *)storeItems;
 
+
+/** @taskunit Migrating to an Arbitrary Future Version */
+
+
++ (NSArray *)migrateItems: (NSArray *)storeItems withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
 @end

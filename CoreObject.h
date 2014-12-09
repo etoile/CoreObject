@@ -15,6 +15,7 @@
 #import <CoreObject/COBranch.h>
 #import <CoreObject/COQuery.h>
 #import <CoreObject/CORevision.h>
+#import <CoreObject/COSchemaMigration.h>
 #import <CoreObject/COSerialization.h>
 #import <CoreObject/COSQLiteStore.h>
 

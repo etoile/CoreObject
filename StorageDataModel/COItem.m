@@ -13,6 +13,7 @@
 #import "COAttachmentID.h"
 
 NSString *kCOObjectEntityNameProperty = @"org.etoile-project.coreobject.entityname";
+NSString *kCOObjectSchemaVersionProperty = @"org.etoile-project.coreobject.schemaversion";
 NSString *kCOObjectIsSharedProperty = @"isShared";
 
 static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)

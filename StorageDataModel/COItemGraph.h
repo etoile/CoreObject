@@ -37,6 +37,12 @@
  */
 - (NSArray *) itemUUIDs;
 /**
+ * Returns all the items in the graph.
+ *
+ * The returned item count is the same than -itemUUIDs.
+ */
+- (NSArray *) items;
+/**
  * Inserts the items in the graph, or updates existing items when the graph 
  * contains items with matching UUIDs.
  *

@@ -514,10 +514,13 @@ serialization. */
                         types: (NSMutableDictionary *)types
                        values: (NSMutableDictionary *)values
                    entityName: (NSString *)anEntityName
+				schemaVersion: (int64_t)aVersion
 {
     [values setObject: anEntityName forKey: kCOObjectEntityNameProperty];
-	[types setObject: [NSNumber numberWithInt: kCOTypeString] forKey: kCOObjectEntityNameProperty];
-	
+	[types setObject: @(kCOTypeString) forKey: kCOObjectEntityNameProperty];
+	[values setObject: @(aVersion) forKey: kCOObjectSchemaVersionProperty];
+	[types setObject: @(kCOTypeInt64) forKey: kCOObjectSchemaVersionProperty];
+
 	return [[COItem alloc] initWithUUID: aUUID
 	                 typesForAttributes: types
 	                valuesForAttributes: values];
@@ -549,7 +552,8 @@ serialization. */
 	return [self storeItemWithUUID: [self UUID]
 	                         types: types
 	                        values: values
-	                    entityName: [[self entityDescription] name]];
+	                    entityName: [[self entityDescription] name]
+	                 schemaVersion: [_objectGraphContext schemaVersion]];
 }
 
 - (COItem *)additionalStoreItemForUUID: (ETUUID *)anItemUUID
@@ -941,7 +945,8 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	
 	for (NSString *property in [aStoreItem attributeNames])
 	{
-        if ([property isEqualToString: kCOObjectEntityNameProperty])
+        if ([property isEqualToString: kCOObjectEntityNameProperty]
+		 || [property isEqualToString: kCOObjectSchemaVersionProperty])
         {
             // HACK
             continue;
