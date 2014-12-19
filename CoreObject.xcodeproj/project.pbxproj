@@ -426,6 +426,8 @@
 		60F91F39197D32F2009F47D7 /* 1a.json in Resources */ = {isa = PBXBuildFile; fileRef = 664E075C18C9592700CBFF74 /* 1a.json */; };
 		60F91F3A197D32F2009F47D7 /* 1b.json in Resources */ = {isa = PBXBuildFile; fileRef = 664E075D18C9592700CBFF74 /* 1b.json */; };
 		60F91F3B197D32FF009F47D7 /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 669A728D1885C43B00E98795 /* Commits */; };
+		60FA55E01A447A8600A2D8A7 /* COSchemaMigrationDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 60FA55DE1A447A8600A2D8A7 /* COSchemaMigrationDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60FA55E11A447A8600A2D8A7 /* COSchemaMigrationDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 60FA55DF1A447A8600A2D8A7 /* COSchemaMigrationDriver.m */; };
 		60FB09D313C3079000C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		660179C8182AFA4B006E7D7B /* COSynchronizerRevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 660179C6182AFA4B006E7D7B /* COSynchronizerRevision.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		660179C9182AFA4B006E7D7B /* COSynchronizerRevision.m in Sources */ = {isa = PBXBuildFile; fileRef = 660179C7182AFA4B006E7D7B /* COSynchronizerRevision.m */; };
@@ -1024,6 +1026,8 @@
 		60F91EC6197D1D1C009F47D7 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = iOS/main.m; sourceTree = SOURCE_ROOT; };
 		60F91EC8197D1D7F009F47D7 /* TestCoreObject-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "TestCoreObject-Info.plist"; path = "iOS/TestCoreObject-Info.plist"; sourceTree = SOURCE_ROOT; };
 		60F91ED6197D2CA2009F47D7 /* libSystem.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libSystem.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/usr/lib/libSystem.dylib; sourceTree = DEVELOPER_DIR; };
+		60FA55DE1A447A8600A2D8A7 /* COSchemaMigrationDriver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSchemaMigrationDriver.h; path = SchemaMigration/COSchemaMigrationDriver.h; sourceTree = SOURCE_ROOT; };
+		60FA55DF1A447A8600A2D8A7 /* COSchemaMigrationDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSchemaMigrationDriver.m; path = SchemaMigration/COSchemaMigrationDriver.m; sourceTree = SOURCE_ROOT; };
 		6600AED3112E746F00C525BB /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = ../EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
 		660179C6182AFA4B006E7D7B /* COSynchronizerRevision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSynchronizerRevision.h; path = Synchronization/Messages/COSynchronizerRevision.h; sourceTree = "<group>"; };
 		660179C7182AFA4B006E7D7B /* COSynchronizerRevision.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSynchronizerRevision.m; path = Synchronization/Messages/COSynchronizerRevision.m; sourceTree = "<group>"; };
@@ -1537,6 +1541,8 @@
 			children = (
 				6076D0FD1A31E4110023C97A /* COSchemaMigration.h */,
 				6076D0FE1A31E4110023C97A /* COSchemaMigration.m */,
+				60FA55DE1A447A8600A2D8A7 /* COSchemaMigrationDriver.h */,
+				60FA55DF1A447A8600A2D8A7 /* COSchemaMigrationDriver.m */,
 			);
 			name = "Schema Migration";
 			path = StorageDataModel;
@@ -2493,6 +2499,7 @@
 				6680846D178CD526003A3CC6 /* COCopier.h in Headers */,
 				6680848A178DAFE3003A3CC6 /* COArrayDiff.h in Headers */,
 				66D96CBA178B717200D1553C /* COItem+Binary.h in Headers */,
+				60FA55E01A447A8600A2D8A7 /* COSchemaMigrationDriver.h in Headers */,
 				6680848C178DAFE3003A3CC6 /* COItemGraphDiff.h in Headers */,
 				66D96CB7178B717200D1553C /* COBinaryReader.h in Headers */,
 				66D96CCA178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h in Headers */,
@@ -3243,6 +3250,7 @@
 				66A00A39187E7D12005CFE16 /* COBranch+Graphviz.m in Sources */,
 				791B4E721299C90900CCF472 /* FMDatabase.m in Sources */,
 				660179C9182AFA4B006E7D7B /* COSynchronizerRevision.m in Sources */,
+				60FA55E11A447A8600A2D8A7 /* COSchemaMigrationDriver.m in Sources */,
 				66FD348F1830BB3800898381 /* COSynchronizerJSONClient.m in Sources */,
 				66E6225E185BEECE002A22C1 /* COObjectGraphContext+Graphviz.m in Sources */,
 				791B4E741299C90900CCF472 /* FMDatabaseAdditions.m in Sources */,

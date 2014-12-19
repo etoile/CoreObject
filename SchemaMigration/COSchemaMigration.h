@@ -104,6 +104,13 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
                        destinationVersion: (NSInteger)version;
 
 
+/** @taskunit Migrating to Future Versions */
+
+
++ (NSArray *)migrateItems: (NSArray *)storeItems
+withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
+
+
 /** @taskunit Targeted Versions */
 
 
@@ -151,9 +158,4 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  */
 - (NSArray *)migrateItems: (NSArray *)storeItems;
 
-
-/** @taskunit Migrating to an Arbitrary Future Version */
-
-
-+ (NSArray *)migrateItems: (NSArray *)storeItems withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
 @end
