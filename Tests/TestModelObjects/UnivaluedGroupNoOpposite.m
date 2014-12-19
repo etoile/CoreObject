@@ -23,8 +23,10 @@ static NSUInteger DeallocCalls;
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"UnivaluedGroupNoOpposite"];
-    [entity setParent: (id)@"Anonymous.COObject"];
+	ETEntityDescription *entity = [self newBasicEntityDescription];
+	
+	if (![entity.name isEqual: [UnivaluedGroupNoOpposite className]])
+		return entity;
 	
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                  type: (id)@"Anonymous.NSString"];

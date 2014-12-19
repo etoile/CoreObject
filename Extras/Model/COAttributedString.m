@@ -20,8 +20,10 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"COAttributedString"];
-    [entity setParent: (id)@"COObject"];
+	ETEntityDescription *entity = [self newBasicEntityDescription];
+
+	if (![entity.name isEqual: [COAttributedString className]])
+		return entity;
 	
 	ETPropertyDescription *chunksProperty = [ETPropertyDescription descriptionWithName: @"chunks"
 																				  type: (id)@"COAttributedStringChunk"];

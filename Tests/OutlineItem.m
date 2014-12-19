@@ -11,8 +11,10 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *outlineEntity = [ETEntityDescription descriptionWithName: @"OutlineItem"];
-    [outlineEntity setParent: (id)@"Anonymous.COContainer"];
+	ETEntityDescription *entity = [self newBasicEntityDescription];
+	
+	if (![entity.name isEqual: [OutlineItem className]])
+		return entity;
 
 	ETPropertyDescription *isShared = [ETPropertyDescription descriptionWithName: @"isShared"
                                                                                  type: (id)@"BOOL"];
@@ -47,9 +49,9 @@
     [ETPropertyDescription descriptionWithName: @"attachmentID" type: (id)@"Anonymous.COAttachmentID"];
 	[attachmentProperty setPersistent: YES];
     
-    [outlineEntity setPropertyDescriptions: A(isShared, labelProperty, contentsProperty, parentContainerProperty, parentCollectionsProperty, attachmentProperty)];
+    [entity setPropertyDescriptions: A(isShared, labelProperty, contentsProperty, parentContainerProperty, parentCollectionsProperty, attachmentProperty)];
 
-    return outlineEntity;
+    return entity;
 }
 
 - (NSString *)contentKey
@@ -85,8 +87,10 @@
 
 + (ETEntityDescription *)newEntityDescription
 {
-    ETEntityDescription *outlineEntity = [ETEntityDescription descriptionWithName: @"TransientOutlineItem"];
-    [outlineEntity setParent: (id)@"COObject"];
+	ETEntityDescription *entity = [self newBasicEntityDescription];
+	
+	if (![entity.name isEqual: [TransientOutlineItem className]])
+		return entity;
 
     ETPropertyDescription *contentsProperty =
 		[ETPropertyDescription descriptionWithName: @"contents" type: (id)@"TransientOutlineItem"];
@@ -101,9 +105,9 @@
     [parentContainerProperty setMultivalued: NO];
     [parentContainerProperty setOpposite: (id)@"TransientOutlineItem.contents"];
        
-    [outlineEntity setPropertyDescriptions: A(contentsProperty, parentContainerProperty)];
+    [entity setPropertyDescriptions: A(contentsProperty, parentContainerProperty)];
 
-    return outlineEntity;
+    return entity;
 }
 
 - (NSString *)contentKey

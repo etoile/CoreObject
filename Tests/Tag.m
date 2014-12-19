@@ -11,8 +11,10 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *tagEntity = [ETEntityDescription descriptionWithName: @"Tag"];
-    [tagEntity setParent: (id)@"Anonymous.COGroup"];
+	ETEntityDescription *entity = [self newBasicEntityDescription];
+
+	if (![entity.name isEqual: [Tag className]])
+		return entity;
 
     ETPropertyDescription *tagLabelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                 type: (id)@"Anonymous.NSString"];
@@ -38,8 +40,8 @@
 	ETAssert([childTagsProperty isComposite]);
 	ETAssert([parentTagProperty isContainer]);
     
-    [tagEntity setPropertyDescriptions: A(tagLabelProperty, contentsProperty, childTagsProperty, parentTagProperty)];
-    return tagEntity;
+    [entity setPropertyDescriptions: A(tagLabelProperty, contentsProperty, childTagsProperty, parentTagProperty)];
+    return entity;
 }
 
 - (NSString *)contentKey
