@@ -13,7 +13,8 @@
 #import "COAttachmentID.h"
 
 NSString *kCOObjectEntityNameProperty = @"org.etoile-project.coreobject.entityname";
-NSString *kCOObjectSchemaVersionProperty = @"org.etoile-project.coreobject.schemaversion";
+NSString *kCOObjectVersionsProperty = @"org.etoile-project.coreobject.versions";
+NSString *kCOObjectDomainsProperty = @"org.etoile-project.coreobject.domains";
 NSString *kCOObjectIsSharedProperty = @"isShared";
 
 static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
@@ -134,6 +135,19 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 }
 
 /** @taskunit convenience */
+
+- (NSDictionary *)versionsByDomain
+{
+	NSArray *versions = [values objectForKey: kCOObjectVersionsProperty];
+	NSArray *domains = [values objectForKey: kCOObjectDomainsProperty];
+
+	return [NSDictionary dictionaryWithObjects: versions forKeys: domains];
+}
+
+- (int64_t)versionForDomain: (NSString *)aDomain
+{
+	return [self.versionsByDomain[aDomain] longLongValue];
+}
 
 - (NSArray *) allObjectsForAttribute: (NSString *)attribute
 {
@@ -447,6 +461,18 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 }
 
 /** @taskunit convenience */
+
+- (void) setVersion: (int64_t)aVersion
+          forDomain: (NSString *)aDomain
+{
+	NSMutableArray *versions = [[values objectForKey: kCOObjectVersionsProperty] mutableCopy];
+	NSArray *domains = [values objectForKey: kCOObjectDomainsProperty];
+	
+	[versions replaceObjectAtIndex: [domains indexOfObject: aDomain]
+	                    withObject: @(aVersion)];
+	
+	[self setValue: versions forAttribute: kCOObjectVersionsProperty];
+}
 
 - (void) setValue: (id)aValue
 	 forAttribute: (NSString*)anAttribute

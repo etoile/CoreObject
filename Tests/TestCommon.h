@@ -71,7 +71,7 @@
 #import "COStoreTransaction.h"
 #import "COObjectGraphContext+Graphviz.h"
 #import "COEditingContext+Private.h"
-#import "COCommandGroup.h"
+#import "COMetamodel.h"
 
 #import "diff.h"
 

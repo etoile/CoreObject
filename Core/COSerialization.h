@@ -107,7 +107,7 @@
                         types: (NSMutableDictionary *)types
                        values: (NSMutableDictionary *)values
                    entityName: (NSString *)anEntityName
-				schemaVersion: (int64_t)aVersion;
+          packageDescriptions: (NSArray *)packages;
 - (COItem *)additionalStoreItemForUUID: (ETUUID *)anItemUUID;
 
 /** @taskunit Deserialization */

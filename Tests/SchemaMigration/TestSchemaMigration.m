@@ -32,61 +32,103 @@
 - (void) prepareNewMigrationContextForDestinationVersion: (int64_t)version
 {
 	ETModelDescriptionRepository *repo = [ETModelDescriptionRepository new];
+	CORegisterCoreObjectMetamodel(repo);
 
-	repo.anonymousPackageDescription.version = version;
+	ETPackageDescription *testPackage = [repo descriptionForName: @"Test"];
+	ETAssert(testPackage != nil);
+	ETPackageDescription *coreObjectPackage =
+		[repo descriptionForName: @"org.etoile-project.CoreObject"];
+	ETAssert(coreObjectPackage != nil);
+
+	testPackage.version = 1;
+	ETAssert(coreObjectPackage.version == 0);
+
 	migrationCtx = [[COEditingContext alloc] initWithStore: ctx.store
 	                            modelDescriptionRepository: repo];
 }
 
-- (void) testSchemaVersion
+- (void) testItemVersionsFromSerialization
 {
-	[self checkPersistentRootWithExistingAndNewContext: [parent persistentRoot]
-	                                           inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	[self checkObjectGraphBeforeAndAfterSerializationRoundtrip: parent.objectGraphContext
+	                                                   inBlock: ^(COObjectGraphContext *testGraph, id testRootObject, BOOL isObjectGraphCopy)
 	{
-		OutlineItem *newParent = [testPersistentRoot rootObject];
+		OutlineItem *newParent = testRootObject;
 		OutlineItem *newChild = [[newParent content] firstObject];
 	
-		UKIntsEqual(0, [newParent.objectGraphContext schemaVersion]);
-		UKIntsEqual(0, [[newParent.storeItem valueForAttribute: kCOObjectSchemaVersionProperty] longLongValue]);
-		UKIntsEqual(0, [[newChild.storeItem valueForAttribute: kCOObjectSchemaVersionProperty] longLongValue]);
+		UKObjectsEqual(A(@(0), @(0)), [newParent.storeItem valueForAttribute: kCOObjectVersionsProperty]);
+		UKObjectsEqual(A(@(0), @(0)), [newChild.storeItem valueForAttribute: kCOObjectVersionsProperty]);
+
+		UKObjectsEqual(A(@"Test", @"org.etoile-project.CoreObject"), [newParent.storeItem valueForAttribute: kCOObjectDomainsProperty]);
+		UKObjectsEqual(A(@"Test", @"org.etoile-project.CoreObject"), [newChild.storeItem valueForAttribute: kCOObjectDomainsProperty]);
 	}];
 }
 
-#if 0
+- (COSchemaMigration *) registerMigrationWithVersion: (int64_t)version domain: (NSString *)domain
+{
+	COSchemaMigration *migration = [COSchemaMigration new];
+	
+	migration.domain = domain;
+	migration.destinationVersion = version;
+	
+	[COSchemaMigration registerMigration: migration];
+	return migration;
+}
+
+- (void)testSchemaMigrationRegistration
+{
+	COSchemaMigration *migration1 = [self registerMigrationWithVersion: 500 domain: @"Test"];
+	COSchemaMigration *migration2 = [self registerMigrationWithVersion: 501 domain: @"Test"];
+	COSchemaMigration *migration3 =
+		[self registerMigrationWithVersion: 500 domain: @"org.etoile-project.CoreObject"];
+
+	UKObjectsEqual(migration1, [COSchemaMigration migrationForDomain: @"Test" destinationVersion: 500]);
+	UKObjectsEqual(migration2, [COSchemaMigration migrationForDomain: @"Test" destinationVersion: 501]);
+	UKObjectsEqual(migration3, [COSchemaMigration migrationForDomain: @"org.etoile-project.CoreObject"
+	                                              destinationVersion: 500]);
+	UKNil([COSchemaMigration migrationForDomain: @"org.etoile-project.CoreObject"
+							 destinationVersion: 501]);
+}
+
 - (void) testBasicMigrationWithoutMetamodelChanges
 {
-	[ctx commit];
-	[self prepareNewMigrationContextForDestinationVersion: 1];
-
-	COObjectGraphContext *context = parent.objectGraphContext;
 	COSchemaMigration *migration = [COSchemaMigration new];
 
-	migration.domain = @"org.etoile-project.CoreObject";
+	migration.domain = @"Test";
 	migration.destinationVersion = 1;
 	migration.migrationBlock = ^(COSchemaMigration *migration, NSArray *storeItems) {
 		NSMutableArray *migratedItems = [NSMutableArray new];
 
-		for (COMutableItem *item in [[storeItems mappedCollection] mutableCopy])
+		for (COMutableItem *oldItem in storeItems)
 		{
-			[item setValue: @"Untitled" forAttribute: @"name"];
+			COMutableItem *newItem = [oldItem mutableCopy];
+	
+			[newItem setVersion: migration.destinationVersion
+				      forDomain: migration.domain];
 
-			[migratedItems addObject: item];
+			[newItem setValue: @"Untitled" forAttribute: @"label"];
+
+			[migratedItems addObject: newItem];
 		}
 		return migratedItems;
 	};
 	[COSchemaMigration registerMigration: migration];
+
+	[ctx commit];
+	[self prepareNewMigrationContextForDestinationVersion: 1];
 
 	COObjectGraphContext *migratedContext =
 		[migrationCtx persistentRootForUUID: parent.persistentRoot.UUID].objectGraphContext;
 	OutlineItem *migratedParent = [migratedContext loadedObjectForUUID: parent.UUID];
 	OutlineItem *migratedChild = [migratedContext loadedObjectForUUID: child.UUID];
 
-	UKIntsEqual(1, migratedContext.schemaVersion);
+	UKIntsEqual(0, [migratedParent.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [migratedParent.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(0, [migratedChild.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [migratedChild.storeItem versionForDomain: @"Test"]);
 	UKStringsEqual(@"Untitled", migratedParent.label);
 	UKStringsEqual(@"Untitled", migratedChild.label);
 	UKObjectsEqual(migratedParent, migratedChild.parentContainer);
 }
-#endif
 
 - (void) testInsertOrUpdateItemsWithoutMigration
 {
@@ -105,7 +147,7 @@
 {
 	COMutableItem *parentItem = [parent.storeItem mutableCopy];
 
-	[parentItem setValue: @(1) forAttribute: kCOObjectSchemaVersionProperty];
+	[parentItem setVersion: 1 forDomain: @"Test"];
 
 	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: A(parentItem)]);
 }
@@ -114,7 +156,7 @@
 {
 	COMutableItem *parentItem = [parent.storeItem mutableCopy];
 
-	[parentItem setValue: @(-1) forAttribute: kCOObjectSchemaVersionProperty];
+	[parentItem setVersion: -1 forDomain: @"Test"];
 
 	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: A(parentItem)]);
 }

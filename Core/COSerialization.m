@@ -514,12 +514,24 @@ serialization. */
                         types: (NSMutableDictionary *)types
                        values: (NSMutableDictionary *)values
                    entityName: (NSString *)anEntityName
-				schemaVersion: (int64_t)aVersion
+		  packageDescriptions: (NSArray *)packages
 {
     [values setObject: anEntityName forKey: kCOObjectEntityNameProperty];
 	[types setObject: @(kCOTypeString) forKey: kCOObjectEntityNameProperty];
-	[values setObject: @(aVersion) forKey: kCOObjectSchemaVersionProperty];
-	[types setObject: @(kCOTypeInt64) forKey: kCOObjectSchemaVersionProperty];
+
+	NSMutableArray *versions = [NSMutableArray new];
+	NSMutableArray *domains = [NSMutableArray new];
+
+	for (ETPackageDescription *package in packages)
+	{
+		[versions addObject: @(package.version)];
+		[domains addObject: package.name];
+	}
+
+	[values setObject: versions forKey: kCOObjectVersionsProperty];
+	[types setObject: @(kCOTypeArray | kCOTypeInt64) forKey: kCOObjectVersionsProperty];
+	[values setObject: domains forKey: kCOObjectDomainsProperty];
+	[types setObject: @(kCOTypeArray | kCOTypeString) forKey: kCOObjectDomainsProperty];
 
 	return [[COItem alloc] initWithUUID: aUUID
 	                 typesForAttributes: types
@@ -553,7 +565,7 @@ serialization. */
 	                         types: types
 	                        values: values
 	                    entityName: [[self entityDescription] name]
-	                 schemaVersion: [_objectGraphContext schemaVersion]];
+	           packageDescriptions: _entityDescription.allPackageDescriptions];
 }
 
 - (COItem *)additionalStoreItemForUUID: (ETUUID *)anItemUUID
@@ -946,7 +958,8 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	for (NSString *property in [aStoreItem attributeNames])
 	{
         if ([property isEqualToString: kCOObjectEntityNameProperty]
-		 || [property isEqualToString: kCOObjectSchemaVersionProperty])
+		 || [property isEqualToString: kCOObjectVersionsProperty]
+         || [property isEqualToString: kCOObjectDomainsProperty])
         {
             // HACK
             continue;

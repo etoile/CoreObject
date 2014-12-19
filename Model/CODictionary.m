@@ -52,11 +52,14 @@
 		[types setObject: @(serializedType) forKey: key];
 	}
 
+	ETEntityDescription *rootCoreObjectEntity =
+		[_objectGraphContext.modelDescriptionRepository entityDescriptionForClass: [COObject class]];
+
 	return [self storeItemWithUUID: [_additionalStoreItemUUIDs objectForKey: [aPropertyDesc name]]
 	                         types: types
 	                        values: values
 	                    entityName: @"CODictionary"
-	                 schemaVersion: _objectGraphContext.schemaVersion];
+			   packageDescriptions: rootCoreObjectEntity.allPackageDescriptions];
 }
 
 - (NSDictionary *)dictionaryFromStoreItem: (COItem *)aStoreItem
@@ -70,7 +73,8 @@
 	for (NSString *property in [aStoreItem attributeNames])
 	{
         if ([property isEqualToString: kCOObjectEntityNameProperty]
-		 || [property isEqualToString: kCOObjectSchemaVersionProperty])
+		 || [property isEqualToString: kCOObjectVersionsProperty]
+         || [property isEqualToString: kCOObjectDomainsProperty])
         {
             // HACK
             continue;

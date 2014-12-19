@@ -8,9 +8,18 @@
 #import "COSchemaMigration.h"
 #import "COItem.h"
 
+@interface ETEntityDescription (COSchemaMigration)
+- (NSArray *)persistentPropertyDescriptionNamesForPackageDescription: (ETPackageDescription *)aPackage;
+@end
+
+@interface COItem (COSchemaMigration)
+@property (nonatomic, readonly) NSString *entityName;
+@end
+
+
 @implementation COSchemaMigration
 
-@synthesize domain, destinationVersion, migrationBlock;
+@synthesize domain = _domain, destinationVersion = _destinationVersion, migrationBlock = _migrationBlock;
 
 static NSMutableDictionary *migrations;
 
@@ -49,21 +58,17 @@ static NSMutableDictionary *migrations;
 
 #pragma mark Migration Process -
 
-// TODO: Perhaps replace this by -[COItem schemaVersion]
-static inline int64_t versionFromItem(COItem *item)
-{
-	return [[item valueForAttribute: kCOObjectSchemaVersionProperty] longLongValue];
-}
-
 - (void)validateItems: (NSArray *)storeItems
 {
 	for (COItem *item in storeItems)
 	{
-		if (versionFromItem(item) != self.sourceVersion)
+		int64_t itemVersion = [item.versionsByDomain[self.domain] longLongValue];
+
+		if (itemVersion != self.sourceVersion)
 		{
 			[NSException raise: NSInvalidArgumentException
 		                format: @"Item version %lld doesn't match migration source version %lld",
-			                    versionFromItem(item), self.sourceVersion];
+			                    itemVersion, self.sourceVersion];
 		}
 	}
 }
@@ -96,55 +101,109 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	[value addObject: object];
 }
 
-+ (void)      addItem: (COItem *)item
++ (BOOL)needsMigrationForItem: (COItem *)item
+        withEntityDescription: (ETEntityDescription *)anEntity
+{
+	for (ETPackageDescription *package in anEntity.allPackageDescriptions)
+	{
+		if ([item.versionsByDomain[package.name] longLongValue] != (int64_t)package.version)
+			return YES;
+	}
+	return NO;
+}
+
++ (BOOL)      addItem: (COItem *)item
 withEntityDescription: (ETEntityDescription *)anEntity
       toItemsByDomain: (NSMutableDictionary *)itemsToMigrate
 {
-	ETEntityDescription *entity = anEntity;
-	ETPackageDescription *package = nil;
-
-	while (![entity isRoot])
+	if (![self needsMigrationForItem: item withEntityDescription: anEntity])
+		return NO;
+	
+	for (ETPackageDescription *package in anEntity.allPackageDescriptions)
 	{
-		if (package == nil || entity.owner != package)
-		{
-			package = entity.owner;
-			addObjectForKey(itemsToMigrate, item, package.name);
-		}
-		entity = entity.parent;
+		addObjectForKey(itemsToMigrate, item, package.name);
 	}
+	return YES;
 }
 
 + (NSArray *)migrateItems: (NSArray *)storeItems withModelDescriptionRepository: (ETModelDescriptionRepository *)repo
 {
 	NSMutableDictionary *itemsToMigrate = [NSMutableDictionary new];
+	NSMutableArray *upToDateItems = [NSMutableArray new];
 
 	for (COItem *item in storeItems)
 	{
-		NSString *entityName = [item valueForAttribute: kCOObjectEntityNameProperty];
-		ETEntityDescription *entity = [repo descriptionForName: entityName];
-		ETPackageDescription *package = entity.owner;
-	
-		if (versionFromItem(item) == (int64_t)package.version)
-			continue;
+		BOOL migrated = [self addItem: item
+		        withEntityDescription: [repo descriptionForName: item.entityName]
+		              toItemsByDomain: itemsToMigrate];
 		
-		        [self addItem: item
-		withEntityDescription: entity
-		      toItemsByDomain: itemsToMigrate];
+		if (!migrated)
+		{
+			[upToDateItems addObject: item];
+		}
 	}
 	
-	return [self migrateItemsByDomain: itemsToMigrate
-	   withModelDescriptionRepository: repo];
+	NSArray *migratedItems = [self migrateItemsByDomain: itemsToMigrate
+	                     withModelDescriptionRepository: repo];
+	return [upToDateItems arrayByAddingObjectsFromArray: migratedItems];
 }
 
-+ (NSArray *)flattenedItemsFromMigratedItems: (NSDictionary *)migratedItems
+static inline void copyAttributesFromItemTo(NSArray *attributes, COItem *sourceItem, COMutableItem *destinationItem)
 {
-	NSMutableSet *flattenedItems = [NSMutableSet new];
-	
-	for (NSArray *items in migratedItems)
+	for (NSString *attribute in attributes)
 	{
-		[flattenedItems addObjectsFromArray: items];
+		[destinationItem setValue: [sourceItem valueForAttribute: attribute]
+		             forAttribute: attribute
+		                     type: [sourceItem typeForAttribute: attribute]];
 	}
-	return flattenedItems.allObjects;
+}
+
+static inline COMutableItem *pristineMutableItemFrom(COItem *item)
+{
+	COMutableItem *pristineItem = [COMutableItem itemWithUUID: item.UUID];
+
+	[pristineItem setValue: [item valueForAttribute: kCOObjectEntityNameProperty]
+	          forAttribute: kCOObjectEntityNameProperty
+	                  type: [item typeForAttribute: kCOObjectEntityNameProperty]];
+	[pristineItem setValue: [item valueForAttribute: kCOObjectDomainsProperty]
+	          forAttribute: kCOObjectDomainsProperty
+	                  type: [item typeForAttribute: kCOObjectDomainsProperty]];
+	[pristineItem setValue: [item valueForAttribute: kCOObjectVersionsProperty]
+	          forAttribute: kCOObjectVersionsProperty
+	                  type: [item typeForAttribute: kCOObjectVersionsProperty]];
+
+	return pristineItem;
+}
+
++ (NSArray *)combineMigratedItems: (NSDictionary *)migratedItems
+   withModelDescriptionRepository: (ETModelDescriptionRepository *)repo
+{
+	NSMutableDictionary *combinedItems = [NSMutableDictionary new];
+	
+	for (NSString *packageName in migratedItems)
+	{
+		ETPackageDescription *package = [repo descriptionForName: packageName];
+
+		for (COItem *item in migratedItems[packageName])
+		{
+			ETEntityDescription *entity = [repo descriptionForName: item.entityName];
+			NSArray *attributes = [entity persistentPropertyDescriptionNamesForPackageDescription: package];
+
+			COMutableItem *combinedItem = combinedItems[item.UUID];
+			
+			if (combinedItem == nil)
+			{
+				combinedItem = pristineMutableItemFrom(item);
+				combinedItems[item.UUID] = combinedItem;
+			}
+			
+			copyAttributesFromItemTo(attributes, item, combinedItem);
+			//[combinedItem setVersion: package.version
+			//               forDomain: packageName];
+		}
+	}
+
+	return [combinedItems allValues];
 }
 
 + (NSArray *)migrateItemsByDomain: (NSDictionary *)itemsToMigrate
@@ -160,16 +219,18 @@ withEntityDescription: (ETEntityDescription *)anEntity
 		migratedItems[packageName] = [self migrateItems: itemsToMigrate[packageName]
 		                                       inDomain: packageName
 											  toVersion: (int64_t)package.version];
+		
 	}
 
-	return [self flattenedItemsFromMigratedItems: migratedItems];
+	return [self combineMigratedItems: migratedItems
+	   withModelDescriptionRepository: repo];
 }
 
 + (NSArray *)migrateItems: (NSArray *)storeItems
 				 inDomain: (NSString *)packageName
                 toVersion: (int64_t)destinationVersion
 {
-	int64_t proposedVersion = versionFromItem(storeItems.firstObject);
+	int64_t proposedVersion = [[storeItems.firstObject versionsByDomain][packageName] longLongValue];
 	NSArray *proposedItems = storeItems;
 
 	if (proposedVersion < 0)
@@ -192,10 +253,39 @@ withEntityDescription: (ETEntityDescription *)anEntity
 			[COSchemaMigration migrationForDomain: packageName
 			                   destinationVersion: proposedVersion];
 		
+		if (migration == nil)
+		{
+			[NSException raise: NSInternalInconsistencyException
+			            format: @"Missing schema migration from %lld to %lld in %@",
+			                    proposedVersion - 1, proposedVersion, packageName];
+		}
+
 		proposedItems = [migration migrateItems: proposedItems];
 	}
 
 	return proposedItems;
+}
+
+@end
+
+
+@implementation ETEntityDescription (COSchemaMigration)
+
+- (NSArray *)persistentPropertyDescriptionNamesForPackageDescription: (ETPackageDescription *)aPackage
+{
+	NSMutableArray *descs = [self.allPersistentPropertyDescriptions mutableCopy];
+	[[[[descs filter] owner] owner] isEqual: aPackage];
+	return (id)[[descs mappedCollection] name];
+}
+
+@end
+
+
+@implementation COItem (COSchemaMigration)
+
+- (NSString *)entityName
+{
+	return [self valueForAttribute: kCOObjectEntityNameProperty];
 }
 
 @end
