@@ -108,7 +108,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	}
 	else
 	{
-		_currentBranchObjectGraph = [[COObjectGraphContext alloc] init];
+		_currentBranchObjectGraph = [[COObjectGraphContext alloc]
+			initWithModelDescriptionRepository: aCtxt.modelDescriptionRepository];
 	}
 	[_currentBranchObjectGraph setPersistentRoot: self];
 	
