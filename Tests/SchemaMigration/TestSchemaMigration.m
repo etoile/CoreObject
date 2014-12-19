@@ -9,6 +9,10 @@
 #import <Foundation/Foundation.h>
 #import "TestCommon.h"
 
+@interface COSchemaMigration ()
++ (void)clearRegisteredMigrations;
+@end
+
 @interface TestSchemaMigration : EditingContextTestCase <UKTest>
 {
 	COEditingContext *migrationCtx;
@@ -22,6 +26,7 @@
 
 - (id)init
 {
+	[COSchemaMigration clearRegisteredMigrations];
 	SUPERINIT;
 	parent = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
 	child = [[OutlineItem alloc] initWithObjectGraphContext: parent.objectGraphContext];
@@ -29,7 +34,12 @@
 	return self;
 }
 
-- (void) prepareNewMigrationContextForDestinationVersion: (int64_t)version
+- (void)dealloc
+{
+	[COSchemaMigration clearRegisteredMigrations];
+}
+
+- (void)prepareNewMigrationContextForDestinationVersion: (int64_t)version
 {
 	ETModelDescriptionRepository *repo = [ETModelDescriptionRepository new];
 	CORegisterCoreObjectMetamodel(repo);
@@ -47,7 +57,7 @@
 	                            modelDescriptionRepository: repo];
 }
 
-- (void) testItemVersionsFromSerialization
+- (void)testItemVersionsFromSerialization
 {
 	[self checkObjectGraphBeforeAndAfterSerializationRoundtrip: parent.objectGraphContext
 	                                                   inBlock: ^(COObjectGraphContext *testGraph, id testRootObject, BOOL isObjectGraphCopy)
@@ -63,7 +73,7 @@
 	}];
 }
 
-- (COSchemaMigration *) registerMigrationWithVersion: (int64_t)version domain: (NSString *)domain
+- (COSchemaMigration *)registerMigrationWithVersion: (int64_t)version domain: (NSString *)domain
 {
 	COSchemaMigration *migration = [COSchemaMigration new];
 	
@@ -89,7 +99,7 @@
 							 destinationVersion: 501]);
 }
 
-- (void) testBasicMigrationWithoutMetamodelChanges
+- (void)testBasicMigrationWithoutMetamodelChanges
 {
 	COSchemaMigration *migration = [COSchemaMigration new];
 
@@ -130,7 +140,7 @@
 	UKObjectsEqual(migratedParent, migratedChild.parentContainer);
 }
 
-- (void) testInsertOrUpdateItemsWithoutMigration
+- (void)testInsertOrUpdateItemsWithoutMigration
 {
 	COObjectGraphContext *context = parent.objectGraphContext;
 	
@@ -161,9 +171,20 @@
 	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: A(parentItem)]);
 }
 
-- (void)textExceptionOnMissingMigration
+- (void)testExceptionOnMissingMigration
 {
+	ETModelDescriptionRepository *repo = [ETModelDescriptionRepository new];
+	CORegisterCoreObjectMetamodel(repo);
+	ETPackageDescription *testPackage = [repo descriptionForName: @"Test"];
+	ETAssert(testPackage != nil);
+
+	testPackage.version = 1;
+
+	COMutableItem *childItem = [child.storeItem mutableCopy];
+	COObjectGraphContext *migratedContext =
+		[COObjectGraphContext objectGraphContextWithModelDescriptionRepository: repo];
 	
+	UKRaisesException([migratedContext insertOrUpdateItems: A(childItem)]);
 }
 
 /*- (void) testInsertOrUpdateItemsWithoutMigration

@@ -41,6 +41,12 @@ static NSMutableDictionary *migrations;
 	return migrations[S(domain, @(version))];
 }
 
+// NOTE: For unit testing purpose
++ (void)clearRegisteredMigrations
+{
+	[migrations removeAllObjects];
+}
+
 #pragma mark - Triggering a Migration
 
 + (NSArray *)migrateItems: (NSArray *)storeItems withModelDescriptionRepository: (ETModelDescriptionRepository *)repo
