@@ -136,6 +136,11 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 /** @taskunit convenience */
 
+- (NSString *)entityName
+{
+	return [self valueForAttribute: kCOObjectEntityNameProperty];
+}
+
 - (NSDictionary *)versionsByDomain
 {
 	NSArray *versions = [values objectForKey: kCOObjectVersionsProperty];

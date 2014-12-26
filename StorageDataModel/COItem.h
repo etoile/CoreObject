@@ -72,6 +72,11 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 
 /** @taskunit Convenience */
 
+
+/**
+ * Returns the entity name corresponding to -[COObject entityDescription].
+ */
+@property (nonatomic, readonly) NSString *entityName;
 /**
  * Returns the schema versions by package names.
  */

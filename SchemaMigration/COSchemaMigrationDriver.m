@@ -13,10 +13,6 @@
 - (NSArray *)persistentPropertyDescriptionNamesForPackageDescription: (ETPackageDescription *)aPackage;
 @end
 
-@interface COItem (COSchemaMigration)
-@property (nonatomic, readonly) NSString *entityName;
-@end
-
 
 @implementation COSchemaMigrationDriver
 
@@ -37,6 +33,11 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 - (BOOL)needsMigrationForItem: (COItem *)item
         withEntityDescription: (ETEntityDescription *)anEntity
 {
+	BOOL isDeletedEntity = (anEntity == nil);
+
+	if (isDeletedEntity)
+		return YES;
+
 	for (ETPackageDescription *package in anEntity.allPackageDescriptions)
 	{
 		if ([item.versionsByDomain[package.name] longLongValue] != (int64_t)package.version)
@@ -45,14 +46,33 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	return NO;
 }
 
-- (BOOL)      addItem: (COItem *)item
-withEntityDescription: (ETEntityDescription *)anEntity
-      toItemsByDomain: (NSMutableDictionary *)itemsToMigrate
+- (BOOL)               addItem: (COItem *)item
+withModelDescriptionRepository: (ETModelDescriptionRepository *)repo
+               toItemsByDomain: (NSMutableDictionary *)itemsToMigrate
 {
-	if (![self needsMigrationForItem: item withEntityDescription: anEntity])
+	NSParameterAssert(repo != nil);
+	ETEntityDescription *entity = [repo descriptionForName: item.entityName];
+
+	if (![self needsMigrationForItem: item withEntityDescription: entity])
 		return NO;
-	
-	for (ETPackageDescription *package in anEntity.allPackageDescriptions)
+
+	NSArray *packages = entity.allPackageDescriptions;
+	BOOL isDeletedEntity = (entity == nil);
+
+	if (isDeletedEntity)
+	{
+		/* The first domain is the one owning the entity, the remaining domains
+		   own the parent entities. */
+		NSString *domain = [[item valueForAttribute: kCOObjectDomainsProperty] firstObject];
+		ETPackageDescription *package = [repo descriptionForName: domain];
+		
+		// TODO: Don't look up the package as we do, but use the package name
+		// as a key in itemsToMigrate. This would allow to support package deletion.
+		ETAssert(package != nil);
+		packages = A(package);
+	}
+
+	for (ETPackageDescription *package in packages)
 	{
 		addObjectForKey(itemsToMigrate, item, package.name);
 	}
@@ -70,8 +90,8 @@ withModelDescriptionRepository: (ETModelDescriptionRepository *)repo
 	for (COItem *item in storeItems)
 	{
 		BOOL migrated = [self addItem: item
-		        withEntityDescription: [repo descriptionForName: item.entityName]
-		              toItemsByDomain: itemsToMigrate];
+	   		withModelDescriptionRepository: repo
+			               toItemsByDomain: itemsToMigrate];
 		
 		if (!migrated)
 		{
@@ -226,16 +246,6 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 	NSMutableArray *descs = [self.allPersistentPropertyDescriptions mutableCopy];
 	[[[[descs filter] owner] owner] isEqual: aPackage];
 	return (id)[[descs mappedCollection] name];
-}
-
-@end
-
-
-@implementation COItem (COSchemaMigration)
-
-- (NSString *)entityName
-{
-	return [self valueForAttribute: kCOObjectEntityNameProperty];
 }
 
 @end
