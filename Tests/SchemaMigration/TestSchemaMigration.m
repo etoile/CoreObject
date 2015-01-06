@@ -13,6 +13,9 @@
 + (void)clearRegisteredMigrations;
 @end
 
+@interface OutlineNode : COContainer
+@end
+
 @interface TestSchemaMigration : EditingContextTestCase <UKTest>
 {
 	COEditingContext *migrationCtx;
@@ -736,6 +739,212 @@
 	UKNil(migratedTag);
 	UKTrue(migratedParent.parentCollections.isEmpty);
 	UKRaisesException([migrationCtx insertNewPersistentRootWithEntityName: @"Tag"]);
+}
+
+- (COSchemaMigration *)registerOutlineItemRenamingMigrationWithVersion: (int64_t)version
+{
+	COMigrationBlock block = ^(COSchemaMigration *migration, NSArray *storeItems) {
+		NSMutableArray *migratedItems = [NSMutableArray new];
+
+		for (COMutableItem *oldItem in storeItems)
+		{
+			COMutableItem *newItem = [oldItem mutableCopy];
+	
+			[newItem setVersion: migration.destinationVersion
+				      forDomain: migration.domain];
+
+			if ([newItem.entityName isEqualToString: @"OutlineItem"])
+			{
+				newItem.entityName = @"OutlineNode";
+			}
+			[migratedItems addObject: newItem];
+		}
+		return migratedItems;
+	};
+
+	return [self registerMigrationWithVersion: version
+	                                   domain: @"Test"
+	                                    block: block];
+}
+
+- (ETModelDescriptionRepository *)registerOutlineItemRenamingInMetamodelWithVersion: (int64_t)version
+{
+	ETModelDescriptionRepository *repo = [self modelDescriptionRepositoryForDestinationVersions:
+		@{@"Test" : @(version), @"org.etoile-project.CoreObject" : @(0)}];
+	ETEntityDescription *tagEntity = [repo descriptionForName: @"Tag"];
+	ETEntityDescription *outlineEntity = [repo descriptionForName: @"OutlineItem"];
+
+	for (ETPropertyDescription *desc in outlineEntity.propertyDescriptions)
+	{
+		[repo removeDescription: desc];
+	}
+	[repo removeDescription: outlineEntity];
+	
+	outlineEntity.name = @"OutlineNode";
+
+	for (ETPropertyDescription *desc in outlineEntity.propertyDescriptions)
+	{
+		[repo addDescription: desc];
+	}
+	[repo addDescription: outlineEntity];
+	
+	return [self validateModelDescriptionRepository: repo];
+}
+
+- (void)testEntityRenaming
+{
+	COSchemaMigration *testMigration = [self registerOutlineItemRenamingMigrationWithVersion: 1];
+	
+	[ctx commit];
+	[self prepareNewMigrationContextWithModelDescriptionRepository:
+		[self registerOutlineItemRenamingInMetamodelWithVersion: 1]];
+	
+	COObjectGraphContext *migratedContext =
+	[migrationCtx persistentRootForUUID: parent.persistentRoot.UUID].objectGraphContext;
+	Tag *migratedTag = [migratedContext loadedObjectForUUID: tag.UUID];
+	OutlineItem *migratedParent = [migratedContext loadedObjectForUUID: parent.UUID];
+	OutlineItem *migratedChild = [migratedContext loadedObjectForUUID: child.UUID];
+
+	UKIntsEqual(0, [migratedTag.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [migratedParent.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [migratedChild.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [migratedTag.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(1, [migratedParent.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(1, [migratedChild.storeItem versionForDomain: @"Test"]);
+
+	ETEntityDescription *outlineEntity =
+		[migratedContext.modelDescriptionRepository descriptionForName: @"OutlineNode"];
+	ETEntityDescription *tagEntity =
+		[migratedContext.modelDescriptionRepository descriptionForName: @"Tag"];
+
+	UKObjectsEqual(tagEntity, migratedTag.entityDescription);
+	UKObjectsEqual(outlineEntity, migratedParent.entityDescription);
+	UKObjectsEqual(outlineEntity, migratedChild.entityDescription);
+	UKRaisesException([migrationCtx insertNewPersistentRootWithEntityName: @"OutlineItem"]);
+	
+	UKObjectsEqual(S(migratedTag), migratedParent.parentCollections);
+	UKObjectsEqual(migratedParent, migratedChild.parentContainer);
+}
+
+- (COSchemaMigration *)registerTestOutlineItemMoveMigrationWithVersion: (int64_t)version
+{
+	COMigrationBlock block = ^(COSchemaMigration *migration, NSArray *storeItems) {
+		NSMutableArray *migratedItems = [NSMutableArray new];
+
+		for (COMutableItem *oldItem in storeItems)
+		{
+			COMutableItem *newItem = [oldItem mutableCopy];
+	
+			[newItem setVersion: migration.destinationVersion
+				      forDomain: migration.domain];
+
+			if ([newItem.entityName isEqualToString: @"OutlineItem"])
+			{
+				NSMutableArray *domains =
+					[[newItem valueForAttribute: kCOObjectDomainsProperty] mutableCopy];
+				NSMutableArray *versions =
+					[[newItem valueForAttribute: kCOObjectVersionsProperty]  mutableCopy];
+				NSInteger oldDomainIndex = [domains indexOfObject: @"Test"];
+
+				[domains removeObjectAtIndex: oldDomainIndex];
+				[versions removeObjectAtIndex: oldDomainIndex];
+				
+				[newItem setValue: domains forAttribute: kCOObjectDomainsProperty];
+				[newItem setValue: versions forAttribute: kCOObjectVersionsProperty];
+			}
+			[migratedItems addObject: newItem];
+		}
+		return migratedItems;
+	};
+
+	return [self registerMigrationWithVersion: version
+	                                   domain: @"Test"
+	                                    block: block];
+}
+
+- (COSchemaMigration *)registerCoreObjectOutlineItemMoveMigrationWithVersion: (int64_t)version
+{
+	return [self registerMigrationWithVersion: version
+	                                   domain: @"org.etoile-project.CoreObject"
+	                                    block: NULL];
+}
+
+- (ETModelDescriptionRepository *)registerOutlineItemMoveInMetamodelWithVersion: (int64_t)version
+{
+	ETModelDescriptionRepository *repo = [self modelDescriptionRepositoryForDestinationVersions:
+		@{@"Test" : @(version), @"org.etoile-project.CoreObject" : @(version)}];
+	ETEntityDescription *outlineEntity = [repo descriptionForName: @"OutlineItem"];
+	ETPackageDescription *coreObjectPackage =
+		[repo descriptionForName: @"org.etoile-project.CoreObject"];
+
+	for (ETPropertyDescription *desc in outlineEntity.propertyDescriptions)
+	{
+		[repo removeDescription: desc];
+	}
+	[repo removeDescription: outlineEntity];
+	
+	outlineEntity.owner = coreObjectPackage;
+
+	for (ETPropertyDescription *desc in outlineEntity.propertyDescriptions)
+	{
+		[repo addDescription: desc];
+	}
+	[repo addDescription: outlineEntity];
+	
+	return [self validateModelDescriptionRepository: repo];
+}
+
+- (void)testEntityMoveAccrossDomains
+{
+	// Entity deletion in Test package
+	COSchemaMigration *testMigration =
+		[self registerTestOutlineItemMoveMigrationWithVersion: 1];
+	// Entity addition in CoreObject package
+	COSchemaMigration *coreObjectMigration =
+		[self registerCoreObjectOutlineItemMoveMigrationWithVersion: 1];
+
+	[ctx commit];
+	[self prepareNewMigrationContextWithModelDescriptionRepository:
+		[self registerOutlineItemMoveInMetamodelWithVersion: 1]];
+	
+	COObjectGraphContext *migratedContext =
+	[migrationCtx persistentRootForUUID: parent.persistentRoot.UUID].objectGraphContext;
+	Tag *migratedTag = [migratedContext loadedObjectForUUID: tag.UUID];
+	OutlineItem *migratedParent = [migratedContext loadedObjectForUUID: parent.UUID];
+	OutlineItem *migratedChild = [migratedContext loadedObjectForUUID: child.UUID];
+
+	UKIntsEqual(1, [migratedTag.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [migratedParent.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [migratedChild.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [migratedTag.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(-1, [migratedParent.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(-1, [migratedChild.storeItem versionForDomain: @"Test"]);
+
+	ETEntityDescription *outlineEntity =
+		[migratedContext.modelDescriptionRepository descriptionForName: @"OutlineItem"];
+	ETEntityDescription *tagEntity =
+		[migratedContext.modelDescriptionRepository descriptionForName: @"Tag"];
+
+	UKObjectsEqual(tagEntity, migratedTag.entityDescription);
+	UKObjectsEqual(outlineEntity, migratedParent.entityDescription);
+	UKObjectsEqual(outlineEntity, migratedChild.entityDescription);
+	UKDoesNotRaiseException([migrationCtx insertNewPersistentRootWithEntityName: @"OutlineItem"]);
+	
+	UKObjectsEqual(S(migratedTag), migratedParent.parentCollections);
+	UKObjectsEqual(migratedParent, migratedChild.parentContainer);
+}
+
+// TODO: Package Renaming, Package Deletion (no need to test Package Addition 
+// since there is no related items to migrate in this case).
+
+@end
+
+
+@implementation OutlineNode
+
+- (NSString *)contentKey
+{
+	return @"contents";
 }
 
 @end

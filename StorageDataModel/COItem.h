@@ -146,6 +146,9 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 
 /** @taskunit Convenience */
 
+
+@property (nonatomic, readwrite) NSString *entityName;
+
 - (void) setVersion: (int64_t)aVersion
           forDomain: (NSString *)aDomain;
 - (void) setValue: (id)aValue

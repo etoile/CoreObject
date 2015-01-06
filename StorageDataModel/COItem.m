@@ -151,7 +151,13 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 - (int64_t)versionForDomain: (NSString *)aDomain
 {
-	return [self.versionsByDomain[aDomain] longLongValue];
+	NILARG_EXCEPTION_TEST(aDomain);
+	NSNumber *version = self.versionsByDomain[aDomain];
+	
+	if (version == nil)
+		return -1;
+
+	return [version longLongValue];
 }
 
 - (NSArray *) allObjectsForAttribute: (NSString *)attribute
@@ -466,6 +472,13 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 }
 
 /** @taskunit convenience */
+
+- (void)setEntityName: (NSString *)entityName
+{
+	[self setValue: entityName
+	  forAttribute: kCOObjectEntityNameProperty
+	          type: kCOTypeString];
+}
 
 - (void) setVersion: (int64_t)aVersion
           forDomain: (NSString *)aDomain
