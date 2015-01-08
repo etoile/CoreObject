@@ -7,13 +7,16 @@
 
 #import "COSchemaMigration.h"
 #import "COItem.h"
+#import "COModelElementMove.h"
 #import "COSchemaMigrationDriver.h"
 
 @implementation COSchemaMigration
 
 @synthesize domain = _domain, destinationVersion = _destinationVersion, migrationBlock = _migrationBlock;
+@synthesize entityMoves = _entityMoves, propertyMoves = _propertyMoves;
 
 static NSMutableDictionary *migrations;
+static NSMutableDictionary *dependencies;
 
 + (void)initialize
 {
@@ -31,6 +34,7 @@ static NSMutableDictionary *migrations;
 	INVALIDARG_EXCEPTION_TEST(migration, migration.destinationVersion > 0);
 
 	migrations[S(migration.domain, @(migration.destinationVersion))] = migration;
+	dependencies = nil;
 }
 
 + (COSchemaMigration *)migrationForDomain: (NSString *)domain destinationVersion: (NSInteger)version
@@ -45,14 +49,45 @@ static NSMutableDictionary *migrations;
 + (void)clearRegisteredMigrations
 {
 	[migrations removeAllObjects];
+	dependencies = nil;
+}
+
++ (NSDictionary *)dependencies
+{
+	if (dependencies != nil)
+		return dependencies;
+	
+	dependencies = [NSMutableDictionary new];
+
+	for (COSchemaMigration *migration in [migrations objectEnumerator])
+	{
+		NSSet *migrationMoves =
+			[migration.entityMoves setByAddingObjectsFromSet: migration.propertyMoves];
+
+		for (COModelElementMove *move in migrationMoves)
+		{
+			ETKeyValuePair *pair = [ETKeyValuePair pairWithKey: move.domain
+			                                             value: @(move.version)];
+
+			if (dependencies[pair] == nil)
+			{
+				dependencies[pair] = [NSMutableArray new];
+			}
+			[(NSMutableArray *)dependencies[pair] addObject: migration];
+		}
+		
+	}
+	// TODO: Check there is no cycle with a topological sort.
+	
+	return dependencies;
 }
 
 #pragma mark - Triggering a Migration
 
 + (NSArray *)migrateItems: (NSArray *)storeItems withModelDescriptionRepository: (ETModelDescriptionRepository *)repo
 {
-	return [[COSchemaMigrationDriver new] migrateItems: storeItems
-						withModelDescriptionRepository: repo];
+	return [[[COSchemaMigrationDriver alloc]
+		initWithModelDescriptionRepository: repo] migrateItems: storeItems];
 }
 
 #pragma mark Targeted Versions -

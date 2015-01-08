@@ -7,6 +7,7 @@
 
 #import "COSchemaMigrationDriver.h"
 #import "COItem.h"
+#import "COModelElementMove.h"
 #import "COSchemaMigration.h"
 
 @interface ETEntityDescription (COSchemaMigration)
@@ -15,6 +16,16 @@
 
 
 @implementation COSchemaMigrationDriver
+
+#pragma mark Initialization -
+
+- (instancetype)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)repo
+{
+	NILARG_EXCEPTION_TEST(repo);
+	SUPERINIT;
+	_modelDescriptionRepository = repo;
+	return self;
+}
 
 #pragma mark Grouping Item by Packages -
 
@@ -30,78 +41,81 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	[value addObject: object];
 }
 
-- (BOOL)needsMigrationForItem: (COItem *)item
-        withEntityDescription: (ETEntityDescription *)anEntity
+- (NSSet *)domainsToMigrateForItem: (COItem *)item
 {
-	BOOL isDeletedEntity = (anEntity == nil);
-
-	if (isDeletedEntity)
-		return YES;
-
-	for (ETPackageDescription *package in anEntity.allPackageDescriptions)
-	{
-		if ([item.versionsByDomain[package.name] longLongValue] != (int64_t)package.version)
-			return YES;
-	}
-	return NO;
-}
-
-- (BOOL)               addItem: (COItem *)item
-withModelDescriptionRepository: (ETModelDescriptionRepository *)repo
-               toItemsByDomain: (NSMutableDictionary *)itemsToMigrate
-{
-	NSParameterAssert(repo != nil);
-	ETEntityDescription *entity = [repo descriptionForName: item.entityName];
-
-	if (![self needsMigrationForItem: item withEntityDescription: entity])
-		return NO;
-
-	NSArray *packages = entity.allPackageDescriptions;
+	NSArray *domains = [item valueForAttribute: kCOObjectDomainsProperty];
+	ETEntityDescription *entity = [_modelDescriptionRepository descriptionForName: item.entityName];
 	BOOL isDeletedEntity = (entity == nil);
-
+	
+	/* For a deleted entity, the domain versions match between item and packages */
 	if (isDeletedEntity)
 	{
 		/* The first domain is the one owning the entity, the remaining domains
 		   own the parent entities. */
-		NSString *domain = [[item valueForAttribute: kCOObjectDomainsProperty] firstObject];
-		ETPackageDescription *package = [repo descriptionForName: domain];
-		
-		// TODO: Don't look up the package as we do, but use the package name
-		// as a key in itemsToMigrate. This would allow to support package deletion.
-		ETAssert(package != nil);
-		packages = A(package);
+		return S([domains firstObject]);
 	}
 
-	for (ETPackageDescription *package in packages)
+	NSMutableSet *domainsToMigrate = [NSMutableSet new];
+
+	for (NSString *domain in domains)
 	{
-		addObjectForKey(itemsToMigrate, item, package.name);
+		ETPackageDescription *package = [_modelDescriptionRepository descriptionForName: domain];
+		BOOL isDeletedPackage = (package == nil);
+
+		if (isDeletedPackage || [item versionForDomain: domain] != (int64_t)package.version)
+		{
+			[domainsToMigrate addObject: domain];
+		}
 	}
-	return YES;
+	return domainsToMigrate;
+}
+
+- (BOOL)addItem: (COItem *)item
+{
+	ETAssert(_modelDescriptionRepository != nil);
+	NSSet *domainsToMigrate = [self domainsToMigrateForItem: item];
+
+	for (NSString *domain in domainsToMigrate)
+	{
+		addObjectForKey(itemsToMigrate, item, domain);
+	}
+	return ![domainsToMigrate isEmpty];
 }
 
 #pragma mark Triggering a Migration -
 
-- (NSArray *)     migrateItems: (NSArray *)storeItems
-withModelDescriptionRepository: (ETModelDescriptionRepository *)repo
+- (NSArray *)prepareMigrationForItems: (NSArray *)storeItems
 {
-	NSMutableDictionary *itemsToMigrate = [NSMutableDictionary new];
 	NSMutableArray *upToDateItems = [NSMutableArray new];
-
+	
 	for (COItem *item in storeItems)
 	{
-		BOOL migrated = [self addItem: item
-	   		withModelDescriptionRepository: repo
-			               toItemsByDomain: itemsToMigrate];
+		BOOL migrate = [self addItem: item];
 		
-		if (!migrated)
+		if (!migrate)
 		{
 			[upToDateItems addObject: item];
 		}
 	}
-	
-	NSArray *migratedItems = [self migrateItemsByDomain: itemsToMigrate
-	                     withModelDescriptionRepository: repo];
-	return [upToDateItems arrayByAddingObjectsFromArray: migratedItems];
+	return upToDateItems;
+}
+
+- (NSArray *)migrateItems: (NSArray *)storeItems
+{
+	itemsToMigrate = [NSMutableDictionary new];
+	NSArray *upToDateItems = [self prepareMigrationForItems: storeItems];
+
+	for (NSString *packageName in [itemsToMigrate allKeys])
+	{
+		ETPackageDescription *package = [_modelDescriptionRepository descriptionForName: packageName];
+		ETAssert(package != nil);
+
+		// NOTE: Or -migrateItems:boundToPackageNamed:inRepository:
+		[self migrateItemsInDomain: packageName
+						 toVersion: (int64_t)package.version];
+	}
+
+	return [upToDateItems arrayByAddingObjectsFromArray: [self combineMigratedItems: itemsToMigrate]];
 }
 
 #pragma mark Ungrouping Items by Packages -
@@ -140,17 +154,16 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
  * domain are merged into a final item per item UUID.
  */
 - (NSArray *)combineMigratedItems: (NSDictionary *)migratedItems
-   withModelDescriptionRepository: (ETModelDescriptionRepository *)repo
 {
 	NSMutableDictionary *combinedItems = [NSMutableDictionary new];
 	
 	for (NSString *packageName in migratedItems)
 	{
-		ETPackageDescription *package = [repo descriptionForName: packageName];
+		ETPackageDescription *package = [_modelDescriptionRepository descriptionForName: packageName];
 
 		for (COItem *item in migratedItems[packageName])
 		{
-			ETEntityDescription *entity = [repo descriptionForName: item.entityName];
+			ETEntityDescription *entity = [_modelDescriptionRepository descriptionForName: item.entityName];
 			NSArray *attributes = [entity persistentPropertyDescriptionNamesForPackageDescription: package];
 
 			COMutableItem *combinedItem = combinedItems[item.UUID];
@@ -170,36 +183,13 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 	return [combinedItems allValues];
 }
 
-#pragma mark Migrating Items to Metamodel Versions -
-
-- (NSArray *)migrateItemsByDomain: (NSDictionary *)itemsToMigrate
-   withModelDescriptionRepository: (ETModelDescriptionRepository *)repo
-{
-	NSMutableDictionary *migratedItems = [NSMutableDictionary new];
-
-	for (NSString *packageName in itemsToMigrate)
-	{
-		ETPackageDescription *package = [repo descriptionForName: packageName];
-
-		// NOTE: Or -migrateItems:boundToPackageNamed:inRepository:
-		migratedItems[packageName] = [self migrateItems: itemsToMigrate[packageName]
-		                                       inDomain: packageName
-											  toVersion: (int64_t)package.version];
-		
-	}
-
-	return [self combineMigratedItems: migratedItems
-	   withModelDescriptionRepository: repo];
-}
-
 #pragma mark Migrating an Item Domain to a Future Version -
 
-- (NSArray *)migrateItems: (NSArray *)storeItems
-				 inDomain: (NSString *)packageName
-                toVersion: (int64_t)destinationVersion
+- (void)migrateItemsInDomain: (NSString *)packageName
+                   toVersion: (int64_t)destinationVersion
 {
-	int64_t proposedVersion = [[storeItems.firstObject versionsByDomain][packageName] longLongValue];
-	NSArray *proposedItems = storeItems;
+	COItem *randomItem = [itemsToMigrate[packageName] firstObject];
+	int64_t proposedVersion = [[randomItem versionsByDomain][packageName] longLongValue];
 
 	if (proposedVersion < 0)
 	{
@@ -228,10 +218,120 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 			                    proposedVersion - 1, proposedVersion, packageName];
 		}
 
-		proposedItems = [migration migrateItems: proposedItems];
-	}
+		[self runDependentMigrationsForMigration: migration];
 
-	return proposedItems;
+		itemsToMigrate[packageName] = [migration migrateItems: itemsToMigrate[packageName]];
+		
+		[self moveEntitiesForMigration: migration];
+		[self movePropertiesForMigration: migration];
+	}
+}
+
+#pragma mark Moving Entities and Properties Accross Packages -
+
+- (void)moveEntitiesForMigration: (COSchemaMigration *)migration
+{
+	NSMutableArray *sourceItems = (NSMutableArray *)itemsToMigrate[migration.domain];
+
+	for (COModelElementMove *move in migration.entityMoves)
+	{
+		ETAssert(move.name != nil);
+		ETAssert(move.ownerName == nil);
+		ETAssert(move.domain != nil);
+		ETAssert(move.version != -1);
+		NSMutableArray *destinationItems = (NSMutableArray *)itemsToMigrate[move.domain];
+
+		if (destinationItems == nil)
+		{
+			destinationItems = [NSMutableArray new];
+			itemsToMigrate[move.domain] = destinationItems;
+		}
+		NSUInteger initialItemCount = sourceItems.count + destinationItems.count;
+
+		for (COItem *item in [NSArray arrayWithArray: sourceItems])
+		{
+			if (![item.entityName isEqualToString: move.name])
+				continue;
+
+			COMutableItem *newItem = [item mutableCopy];
+			NSMutableArray *domains =
+				[[newItem valueForAttribute: kCOObjectDomainsProperty] mutableCopy];
+			NSMutableArray *versions =
+				[[newItem valueForAttribute: kCOObjectVersionsProperty] mutableCopy];
+			NSInteger oldDomainIndex = [domains indexOfObject: migration.domain];
+
+			[domains replaceObjectAtIndex: oldDomainIndex withObject: move.domain];
+			[versions replaceObjectAtIndex: oldDomainIndex withObject: @(move.version)];
+	
+			[newItem setValue: domains forAttribute: kCOObjectDomainsProperty];
+			[newItem setValue: versions forAttribute: kCOObjectVersionsProperty];
+
+			[destinationItems addObject: newItem];
+			[sourceItems removeObject: item];
+		}
+		
+		ETAssert(initialItemCount == sourceItems.count + destinationItems.count);
+	}
+}
+
+- (void)movePropertiesForMigration: (COSchemaMigration *)migration
+{
+	NSMutableArray *sourceItems = (NSMutableArray *)itemsToMigrate[migration.domain];
+
+	for (COModelElementMove *move in migration.propertyMoves)
+	{
+		ETAssert(move.name != nil);
+		ETAssert(move.ownerName != nil);
+		ETAssert(move.domain != nil);
+		ETAssert(move.version != -1);
+		NSMutableArray *destinationItems = (NSMutableArray *)itemsToMigrate[move.domain];
+		NSMutableArray *selectedSourceItems = [NSMutableArray new];
+		NSMutableDictionary *selectedDestItems = [NSMutableDictionary new];
+
+		for (COItem *item in sourceItems)
+		{
+			if (![item.entityName isEqualToString: move.ownerName])
+				continue;
+			
+			[selectedSourceItems addObject: item];
+		}
+		
+		for (COItem *item in destinationItems)
+		{
+			if (![item.entityName isEqualToString: move.ownerName])
+				continue;
+
+			selectedDestItems[item.UUID] = item;
+		}
+	
+		for (COItem *sourceItem in selectedSourceItems)
+		{
+			COMutableItem *destinationItem = [selectedDestItems[sourceItem.UUID] mutableCopy];
+			
+			[destinationItem setValue: [sourceItem valueForAttribute: move.name]
+						 forAttribute: move.name];
+			
+			NSUInteger index =
+				[destinationItems indexOfObject: selectedDestItems[sourceItem.UUID]];
+			
+			[destinationItems replaceObjectAtIndex: index
+								        withObject: destinationItem];
+		}
+	}
+}
+
+- (void)runDependentMigrationsForMigration: (COSchemaMigration *)aMigration
+{
+	ETKeyValuePair *pair = [ETKeyValuePair pairWithKey: aMigration.domain
+	                                             value: @(aMigration.destinationVersion)];
+	NSArray *dependencies = [COSchemaMigration dependencies][pair];
+	
+	for (COSchemaMigration *migration in dependencies)
+	{
+		/* Run enumerated migration and all preceding migrations not yet run */
+		[self migrateItemsInDomain: migration.domain
+		                 toVersion: migration.destinationVersion];
+	}
 }
 
 @end

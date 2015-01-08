@@ -9,6 +9,21 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 
 @interface COSchemaMigrationDriver : NSObject
-- (NSArray *)migrateItems: (NSArray *)storeItems
-withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
+{
+	ETModelDescriptionRepository *_modelDescriptionRepository;
+	NSMutableDictionary *itemsToMigrate;
+}
+
+
+/** @taskunit Initialization */
+
+
+- (instancetype)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
+
+
+/** @taskunit Triggering a Migration */
+
+
+- (NSArray *)migrateItems: (NSArray *)storeItems;
+
 @end

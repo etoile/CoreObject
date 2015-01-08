@@ -102,6 +102,14 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  */
 + (COSchemaMigration *)migrationForDomain: (NSString *)domain
                        destinationVersion: (NSInteger)version;
+/**
+ * Returns a dictionary that contains dependent migrations to be run before a 
+ * specific migration. 
+ *
+ * The dictionary keys are key-value pair, where -[ETKeyValue key] returns the 
+ * domain and -[ETKeyValue value] returns the destination version.
+ */
++ (NSDictionary *)dependencies;
 
 
 /** @taskunit Migrating to Future Versions */
@@ -144,6 +152,13 @@ withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
  * subclass and overriding -migrateItems:.
  */
 @property (nonatomic, copy) COMigrationBlock migrationBlock;
+
+
+/** @task Move Operations Accross Domains */
+
+
+@property (nonatomic, copy) NSSet *entityMoves;
+@property (nonatomic, copy) NSSet *propertyMoves;
 
 
 /** @taskunit Migration Process */

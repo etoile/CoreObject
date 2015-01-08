@@ -934,8 +934,134 @@
 	UKObjectsEqual(migratedParent, migratedChild.parentContainer);
 }
 
-// TODO: Package Renaming, Package Deletion (no need to test Package Addition 
-// since there is no related items to migrate in this case).
+- (COSchemaMigration *)registerPackageRenamingMigrationWithVersion: (int64_t)version
+{
+	COMigrationBlock block = ^(COSchemaMigration *migration, NSArray *storeItems) {
+		NSMutableArray *migratedItems = [NSMutableArray new];
+
+		for (COMutableItem *oldItem in storeItems)
+		{
+			COMutableItem *newItem = [oldItem mutableCopy];
+	
+			[newItem setVersion: migration.destinationVersion
+				      forDomain: migration.domain];
+
+			[migratedItems addObject: newItem];
+		}
+		return migratedItems;
+	};
+
+	COSchemaMigration *migration = [self registerMigrationWithVersion: version
+	                                                           domain: @"Test"
+	                                                            block: block];
+	COModelElementMove *tagMove = [COModelElementMove new];
+	COModelElementMove *outlineMove = [COModelElementMove new];
+
+	tagMove.name = @"Tag";
+	tagMove.domain = @"RenamedTest";
+	tagMove.version = 0;
+	
+	outlineMove.name = @"OutlineItem";
+	outlineMove.domain = @"RenamedTest";
+	outlineMove.version = 0;
+	
+	migration.entityMoves = S(tagMove, outlineMove);
+	
+	return migration;
+}
+
+- (ETModelDescriptionRepository *)registerPackageRenamingInMetamodelWithVersion: (int64_t)version
+{
+	ETModelDescriptionRepository *repo = [self modelDescriptionRepositoryForDestinationVersions:
+		@{@"Test" : @(version), @"org.etoile-project.CoreObject" : @(0)}];
+	ETEntityDescription *outlineEntity = [repo descriptionForName: @"OutlineItem"];
+	ETPackageDescription *testPackage = [repo descriptionForName: @"Test"];
+	ETPackageDescription *renamedTestPackage = [ETPackageDescription descriptionWithName: @"RenamedTest"];
+
+	// NOTE: For CoreObject, we don't support property extensions (extending
+	// entities with categories).
+	ETAssert([[testPackage propertyDescriptions] isEmpty]);
+
+	for (ETEntityDescription *entity in testPackage.entityDescriptions)
+	{
+		for (ETPropertyDescription *property in entity.propertyDescriptions)
+		{
+			[repo removeDescription: property];
+		}
+		[repo removeDescription: entity];
+	}
+
+	renamedTestPackage.entityDescriptions = testPackage.entityDescriptions;
+	ETAssert(testPackage.entityDescriptions.isEmpty);
+
+	for (ETEntityDescription *entity in renamedTestPackage.entityDescriptions)
+	{
+		for (ETPropertyDescription *property in entity.propertyDescriptions)
+		{
+			[repo addDescription: property];
+		}
+		[repo addDescription: entity];
+	}
+	[repo addDescription: renamedTestPackage];
+	
+	return [self validateModelDescriptionRepository: repo];
+}
+
+/**
+ * We don't support package deletion and renaming, but we can simulate renaming
+ * by adding a new package and moving entities to it, while keeping their old
+ * package around.
+ *
+ * We must keep the old package around to support migrating old items to this 
+ * package version (this concerns items serialized before the package was 
+ * "renamed" and not yet migrated).
+ */
+- (void)testPackageRenaming
+{
+	COSchemaMigration *testMigration =
+		[self registerPackageRenamingMigrationWithVersion: 1];
+
+	[ctx commit];
+	[self prepareNewMigrationContextWithModelDescriptionRepository:
+		[self registerPackageRenamingInMetamodelWithVersion: 1]];
+	
+	COObjectGraphContext *migratedContext =
+		[migrationCtx persistentRootForUUID: parent.persistentRoot.UUID].objectGraphContext;
+	Tag *migratedTag = [migratedContext loadedObjectForUUID: tag.UUID];
+	OutlineItem *migratedParent = [migratedContext loadedObjectForUUID: parent.UUID];
+	OutlineItem *migratedChild = [migratedContext loadedObjectForUUID: child.UUID];
+
+	UKNotNil([migratedContext.modelDescriptionRepository descriptionForName: @"Test"]);
+	UKNotNil([migratedContext.modelDescriptionRepository descriptionForName: @"RenamedTest"]);
+	UKNil([migratedContext.modelDescriptionRepository descriptionForName: @"Test.OutlineItem"]);
+	UKNotNil([migratedContext.modelDescriptionRepository descriptionForName: @"RenamedTest.OutlineItem"]);
+	UKNil([migratedContext.modelDescriptionRepository descriptionForName: @"Test.OutlineItem.label"]);
+	UKNotNil([migratedContext.modelDescriptionRepository descriptionForName: @"RenamedTest.OutlineItem.label"]);
+
+	UKIntsEqual(0, [migratedTag.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [migratedParent.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [migratedChild.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
+	/* The 'Test' domain has been removed in the migrated items */
+	UKIntsEqual(-1, [migratedTag.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(-1, [migratedParent.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(-1, [migratedChild.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(0, [migratedTag.storeItem versionForDomain: @"RenamedTest"]);
+	UKIntsEqual(0, [migratedParent.storeItem versionForDomain: @"RenamedTest"]);
+	UKIntsEqual(0, [migratedChild.storeItem versionForDomain: @"RenamedTest"]);
+
+	ETEntityDescription *outlineEntity =
+		[migratedContext.modelDescriptionRepository descriptionForName: @"OutlineItem"];
+	ETEntityDescription *tagEntity =
+		[migratedContext.modelDescriptionRepository descriptionForName: @"Tag"];
+
+	UKObjectsEqual(tagEntity, migratedTag.entityDescription);
+	UKObjectsEqual(outlineEntity, migratedParent.entityDescription);
+	UKObjectsEqual(outlineEntity, migratedChild.entityDescription);
+	UKDoesNotRaiseException([migrationCtx insertNewPersistentRootWithEntityName: @"OutlineItem"]);
+	
+	UKObjectsEqual(S(migratedTag), migratedParent.parentCollections);
+	UKObjectsEqual(migratedParent, migratedChild.parentContainer);
+}
 
 @end
 
