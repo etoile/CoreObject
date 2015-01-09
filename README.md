@@ -137,7 +137,7 @@ The Xcode projects and schemes of interest are:
 
 Note: ProjectDemo and Typewriter cannot be run on iOS.
 
-For more details, see [INSTALL.Cocoa]() or [INSTALL.GNUstep](https://github.com/etoile/CoreObject/blob/master/INSTALL.GNUstep.md).
+For more details, see [INSTALL.Cocoa](https://github.com/etoile/CoreObject/blob/master/INSTALL.Cocoa.md) or [INSTALL.GNUstep](https://github.com/etoile/CoreObject/blob/master/INSTALL.GNUstep.md).
 
 
 Mac OS X and iOS support
