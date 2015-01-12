@@ -6,6 +6,7 @@
  */
 
 #import "COSchemaMigrationDriver.h"
+#import "CODictionary.h"
 #import "COItem.h"
 #import "COModelElementMove.h"
 #import "COSchemaMigration.h"
@@ -147,7 +148,20 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 	return pristineItem;
 }
 
-/** 
+- (NSArray *)attributesForPackage: (ETPackageDescription *)package inItem: (COItem *)item
+{
+	if ([item isAdditionalItem])
+	{
+		return [item.attributeNames arrayByRemovingObjectsInArray:
+			@[kCOObjectEntityNameProperty, kCOObjectDomainsProperty, kCOObjectVersionsProperty]];
+	}
+
+	ETEntityDescription *entity = [_modelDescriptionRepository descriptionForName: item.entityName];
+	ETAssert(entity != nil);
+	return [entity persistentPropertyDescriptionNamesForPackageDescription: package];
+}
+
+/**
  * Combines migrated items with the same UUID.
  *
  * For each domain, items are enumerated, and properties that belong to this
@@ -163,9 +177,9 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 
 		for (COItem *item in migratedItems[packageName])
 		{
-			ETEntityDescription *entity = [_modelDescriptionRepository descriptionForName: item.entityName];
-			NSArray *attributes = [entity persistentPropertyDescriptionNamesForPackageDescription: package];
-
+			NSArray *attributes = [self attributesForPackage: package
+			                                          inItem: item];
+			ETAssert(attributes != nil);
 			COMutableItem *combinedItem = combinedItems[item.UUID];
 			
 			if (combinedItem == nil)
