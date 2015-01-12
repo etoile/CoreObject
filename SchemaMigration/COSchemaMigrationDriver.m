@@ -222,6 +222,12 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 
 		itemsToMigrate[packageName] = [migration migrateItems: itemsToMigrate[packageName]];
 		
+		/* Moving entities and properties after -[COSchemaMigration migrateItems:]
+		   ensures that:
+		   - an incorrect domain/version increment on a entity concerned by a 
+		     move is discarded
+		   - a moved entity or property can be changed (without requiring
+		     another migration bound to the destination package). */
 		[self moveEntitiesForMigration: migration];
 		[self movePropertiesForMigration: migration];
 	}
