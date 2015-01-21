@@ -45,14 +45,37 @@
  * By default, this is background color for all nodes before the current node.
  *
  * The current node background color is based on this color too.
+ *
+ * See -suggestedColorForNode:.
  */
 @property (nonatomic, retain) UIColor *pastColor;
 /**
  * The color used to indicate the future history.
  *
  * By default, this is background color for all nodes after the current node.
+ *
+ * See -suggestedColorForNode:.
  */
 @property (nonatomic, retain) UIColor *futureColor;
+/**
+ * Returns either -pastColor or -futureColor based on where the node sits 
+ * relative to -[COTrack currentNode].
+ *
+ * Can be overriden to return a custom color.
+ */
+- (UIColor *)suggestedColorForNode: (id <COTrackNode>)node;
+/**
+ * Returns a new or reused cell ready to presented in the table view.
+ *
+ * The returned cell must be created with 
+ * -[UITableView dequeueReusableCellWithIdentifier:].
+ *
+ * By default, the cell label is set to -[COTrackNode localizedShortDescription]
+ * and the background color to -suggestedColorForNode:.
+ *
+ * Can be overriden to return a custom cell.
+ */
+- (UITableViewCell *)makeCellForNode: (id <COTrackNode>)node;
 
 
 /** @taskunit Undo and Redo */

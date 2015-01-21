@@ -90,13 +90,36 @@
 	return NO;
 }
 
+#pragma mark - Customizing Appearance
+
+- (UIColor *)suggestedColorForNode: (id <COTrackNode>)node
+{
+	return ([self isFutureNode: node] ? self.futureColor : self.pastColor);
+}
+
+- (UITableViewCell *)makeCellForNode: (id <COTrackNode>)node
+{
+	static NSString *TrackCellIdentifier = @"TrackCell";
+	UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier: TrackCellIdentifier];
+ 
+	if (cell == nil)
+	{
+		cell = [[UITableViewCell alloc] initWithStyle: UITableViewCellStyleDefault
+									  reuseIdentifier: TrackCellIdentifier];
+	}
+	
+	cell.textLabel.text = node.localizedShortDescription;
+	cell.backgroundColor = [self suggestedColorForNode: node];
+	
+	return cell;
+}
+
 #pragma mark - Reacting to Track Changes
 
 - (void)didUpdateTrack: (NSNotification *)notif
 {
 	[self.tableView reloadData];
 }
-
 
 #pragma mark - Actions
 
@@ -120,21 +143,8 @@
 - (UITableViewCell *)tableView: (UITableView *)tableView
          cellForRowAtIndexPath: (NSIndexPath *)indexPath
 {
-	static NSString *TrackCellIdentifier = @"TrackCell";
-	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier: TrackCellIdentifier];
- 
-	if (cell == nil)
-	{
-		cell = [[UITableViewCell alloc] initWithStyle: UITableViewCellStyleDefault
-		                              reuseIdentifier: TrackCellIdentifier];
-	}
-	id <COTrackNode> node = [self nodeForRowAtIndexPath: indexPath];
- 
-	cell.textLabel.text = node.localizedShortDescription;
-	cell.backgroundColor = ([self isFutureNode: node] ? self.futureColor : self.pastColor);
- 
-	return cell;
- 
+	ETAssert(self.tableView == tableView);
+	return [self makeCellForNode: [self nodeForRowAtIndexPath: indexPath]];
 }
 
 - (void)tableView: (UITableView *)tableView didSelectRowAtIndexPath: (NSIndexPath *)indexPath
