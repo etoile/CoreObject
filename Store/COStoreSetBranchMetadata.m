@@ -7,6 +7,7 @@
 
 #import "COStoreSetBranchMetadata.h"
 #import "COSQLiteStore+Private.h"
+#import "COJSONSerialization.h"
 
 @implementation COStoreSetBranchMetadata
 
@@ -17,10 +18,12 @@
     NSData *data = nil;
     if (meta != nil)
     {
-        data = [NSJSONSerialization dataWithJSONObject: meta options: 0 error: NULL];
+		NSError *error = nil;
+
+        data = CODataWithJSONObject(meta, &error);
         if (data == nil)
         {
-            NSLog(@"Error serializing branch metadata %@", metadata);
+            NSLog(@"Error serializing branch metadata %@ - %@", metadata, error);
         }
     }
     return data;

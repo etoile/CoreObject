@@ -13,6 +13,7 @@
 #import "COCommand.h"
 #import "CODateSerialization.h"
 #import "COEndOfUndoTrackPlaceholderNode.h"
+#import "COJSONSerialization.h"
 #import "NSDistributedNotificationCenter.h"
 
 NSString * const COUndoTrackStoreTrackDidChangeNotification = @"COUndoTrackStoreTrackDidChangeNotification";
@@ -241,14 +242,14 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 - (NSData *) serialize: (id)json
 {
 	if (json != nil)
-		return [NSJSONSerialization dataWithJSONObject: json options: 0 error: NULL];
+		return CODataWithJSONObject(json, NULL);
 	return nil;
 }
 
 - (id) deserialize: (NSData *)data
 {
 	if (data != nil)
-		return [NSJSONSerialization JSONObjectWithData: data options: 0 error: NULL];
+		return COJSONObjectWithData(data, NULL);
 	return nil;
 }
 

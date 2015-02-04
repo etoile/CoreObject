@@ -19,6 +19,7 @@
 #import "CORevisionInfo.h"
 #import "COSQLiteStore.h"
 #import "CODateSerialization.h"
+#import "COJSONSerialization.h"
 #ifdef GNUSTEP
 #	include <openssl/sha.h>
 #else
@@ -234,9 +235,7 @@
         NSData *data = [rs dataForColumnIndex: 4];
         if (data != nil)
         {
-            result.metadata = [NSJSONSerialization JSONObjectWithData: data
-                                                              options: 0
-                                                                error: NULL];
+            result.metadata = COJSONObjectWithData(data, NULL);
         }
         result.date = CODateFromJavaTimestamp([rs numberForColumnIndex: 5]);
 	}
@@ -548,7 +547,7 @@ static NSData *Sha1Data(NSData *data)
     NSData *metadataBlob = nil;
     if (metadata != nil)
     {
-        metadataBlob = [NSJSONSerialization dataWithJSONObject: metadata options: 0 error: NULL];
+        metadataBlob = CODataWithJSONObject(metadata, NULL);
     }
     
     BOOL ok = [db_ executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (revid, "
@@ -724,12 +723,7 @@ static NSData *Sha1Data(NSData *data)
 
 	if (data != nil)
 	{
-		// TODO: Handle error
-		NSError *error = nil;
-		metadata = [NSJSONSerialization JSONObjectWithData: data
-												   options: 0
-													 error: &error];
-		ETAssert(error == nil);
+		metadata = COJSONObjectWithData(data, NULL);
 	}
 	
 	CORevisionInfo *rev = [CORevisionInfo new];

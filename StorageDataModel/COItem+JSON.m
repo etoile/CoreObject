@@ -9,6 +9,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COPath.h"
 #import "COAttachmentID.h"
+#import "COJSONSerialization.h"
 
 @implementation COItem (JSON)
 
@@ -280,12 +281,12 @@ static COType importTypeFromPlist(id typeValuePair)
 - (NSData *) JSONData
 {
     id plist = [self JSONPlist];
-    return [NSJSONSerialization dataWithJSONObject: plist options: 0 error: NULL];
+    return CODataWithJSONObject(plist, NULL);
 }
 
 - (id) initWithJSONData: (NSData *)data
 {
-    id plist = [NSJSONSerialization JSONObjectWithData: data options:0 error: NULL];
+    id plist = COJSONObjectWithData(data, NULL);
     return [self initWithJSONPlist: plist];
 }
 

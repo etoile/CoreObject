@@ -11,6 +11,7 @@
 #import "COItem.h"
 #import "COItem+JSON.h"
 #import "COPath.h"
+#import "COJSONSerialization.h"
 
 @implementation COItemGraph
 
@@ -215,7 +216,7 @@ id COItemGraphToJSONPropertyList(id<COItemGraph> aGraph)
 NSData *COItemGraphToJSONData(id<COItemGraph> aGraph)
 {
     NSDictionary *graphDict = COItemGraphToJSONPropertyList(aGraph);    
-    return [NSJSONSerialization dataWithJSONObject: graphDict options: 0 error: NULL];
+    return CODataWithJSONObject(graphDict, NULL);
 }
 
 COItemGraph *COItemGraphFromJSONPropertyLisy(id plist)
@@ -238,7 +239,7 @@ COItemGraph *COItemGraphFromJSONPropertyLisy(id plist)
 
 COItemGraph *COItemGraphFromJSONData(NSData *json)
 {
-    id plist = [NSJSONSerialization JSONObjectWithData: json options:0 error: NULL];
+    id plist = COJSONObjectWithData(json, NULL);
     return COItemGraphFromJSONPropertyLisy(plist);
 }
 

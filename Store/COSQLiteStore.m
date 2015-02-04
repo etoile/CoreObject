@@ -15,6 +15,7 @@
 #import "COSQLiteStore+Attachments.h"
 #import "COSearchResult.h"
 #import "COBranchInfo.h"
+#import "COJSONSerialization.h"
 #import "COPersistentRootInfo.h"
 #import "COStoreTransaction.h"
 #import "COStoreAction.h"
@@ -838,9 +839,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 {
     if (data != nil)
     {
-        return [NSJSONSerialization JSONObjectWithData: data
-                                               options: 0
-                                                 error: NULL];
+        return COJSONObjectWithData(data, NULL);
     }
     return nil;
 }

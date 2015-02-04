@@ -11,6 +11,7 @@
 #import "CORevisionInfo.h"
 #import "COPersistentRootInfo.h"
 #import "COBranchInfo.h"
+#import "COJSONSerialization.h"
 #import <AppKit/AppKit.h>
 
 @implementation COSQLiteStore (Debugging)
@@ -33,7 +34,7 @@
 
 - (NSString *) labelForMetadata: (NSDictionary *)metadata
 {
-	NSString *escapedMetadata = [[NSString alloc] initWithData: [NSJSONSerialization dataWithJSONObject: metadata options: 0 error: NULL]
+	NSString *escapedMetadata = [[NSString alloc] initWithData: CODataWithJSONObject(metadata, NULL)
 													  encoding: NSUTF8StringEncoding];
 	// FIXME: escape escapedMetadata
 	return escapedMetadata;

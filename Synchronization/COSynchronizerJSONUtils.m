@@ -7,19 +7,20 @@
 
 #import "COSynchronizerJSONUtils.h"
 #import "COSynchronizerRevision.h"
+#import "COJSONSerialization.h"
 
 @implementation COSynchronizerJSONUtils
 
 + (NSString *) serializePropertyList: (id)plist
 {
-	NSData *data = [NSJSONSerialization dataWithJSONObject: plist options: 0 error: NULL];
+	NSData *data = CODataWithJSONObject(plist, NULL);
 	return [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
 }
 
 + (id) deserializePropertyList: (NSString *)aString
 {
 	NSData *data = [aString dataUsingEncoding: NSUTF8StringEncoding];
-	return [NSJSONSerialization JSONObjectWithData: data options:0 error: NULL];
+	return COJSONObjectWithData(data, NULL);
 }
 
 + (id) propertyListForRevisionsArray: (NSArray *)revs
