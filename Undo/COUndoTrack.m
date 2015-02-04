@@ -272,9 +272,10 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 
 - (void)undoNode: (id <COTrackNode>)aNode
 {
-	COUndoTrack *track = [COUndoTrack trackForName: ((COCommandGroup *)aNode).trackName withEditingContext: _editingContext];
-	ETAssert(track != nil);
-	
+	INVALIDARG_EXCEPTION_TEST(aNode,
+		[aNode isKindOfClass: [COCommand class]] || [aNode isKindOfClass: [COCommandGroup class]]);
+	INVALIDARG_EXCEPTION_TEST(aNode, [(COCommand *)aNode parentUndoTrack] == self);
+
 	COCommand *command = [(COCommand *)aNode inverse];
 	[command applyToContext: _editingContext];
 	
@@ -290,15 +291,16 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	
 	[_editingContext commitWithIdentifier: @"org.etoile.CoreObject.selective-undo"
 								 metadata: md
-								undoTrack: track
+								undoTrack: self
 									error: NULL];
 }
 
 - (void)redoNode: (id <COTrackNode>)aNode
 {
-	COUndoTrack *track = [COUndoTrack trackForName: ((COCommandGroup *)aNode).trackName withEditingContext: _editingContext];
-	ETAssert(track != nil);
-	
+	INVALIDARG_EXCEPTION_TEST(aNode,
+		[aNode isKindOfClass: [COCommand class]] || [aNode isKindOfClass: [COCommandGroup class]]);
+	INVALIDARG_EXCEPTION_TEST(aNode, [(COCommand *)aNode parentUndoTrack] == self);
+
 	COCommand *command = (COCommand *)aNode;
 	[command applyToContext: _editingContext];
 	
@@ -314,7 +316,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	
 	[_editingContext commitWithIdentifier: @"org.etoile.CoreObject.selective-redo"
 								 metadata: md
-								undoTrack: track
+								undoTrack: self
 									error: NULL];
 }
 
@@ -910,6 +912,24 @@ static void coalesceOps(NSMutableArray *ops)
 
 
 @implementation COPatternUndoTrack
+
+- (void)undoNode: (id <COTrackNode>)aNode
+{
+	COUndoTrack *track = [COUndoTrack trackForName: ((COCommandGroup *)aNode).trackName
+	                            withEditingContext: self.editingContext];
+	ETAssert(track != nil);
+	track.customRevisionMetadata = self.customRevisionMetadata;
+	[track undoNode: aNode];
+}
+
+- (void)redoNode: (id <COTrackNode>)aNode
+{
+	COUndoTrack *track = [COUndoTrack trackForName: ((COCommandGroup *)aNode).trackName
+	                            withEditingContext: self.editingContext];
+	ETAssert(track != nil);
+	track.customRevisionMetadata = self.customRevisionMetadata;
+	[track redoNode: aNode];
+}
 
 - (void) recordCommand: (COCommand *)aCommand
 {
