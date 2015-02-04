@@ -54,7 +54,7 @@
 	                                              object: _track];
  	_track = aTrack;
 	[[NSNotificationCenter defaultCenter] addObserver: self
-	                                         selector: @selector(didUpdateTrack:)
+	                                         selector: @selector(trackDidUpdate:)
 	                                             name: ETCollectionDidUpdateNotification
 	                                           object: aTrack];
 
@@ -153,7 +153,7 @@
 {
 	NSLog(@"Select row at %@", indexPath);
 	
-	/* Will trigger -didUpdateTrack: */
+	/* Will trigger -trackDidUpdate: */
 	self.track.currentNode = [self nodeForRowAtIndexPath: indexPath];
 }
 
