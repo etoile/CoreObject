@@ -57,6 +57,8 @@
 	                                         selector: @selector(didUpdateTrack:)
 	                                             name: ETCollectionDidUpdateNotification
 	                                           object: aTrack];
+
+	[self trackDidUpdate: nil];
 }
 
 - (id <COTrackNode>)nodeForRowAtIndexPath: (NSIndexPath *)indexPath
@@ -116,7 +118,7 @@
 
 #pragma mark - Reacting to Track Changes
 
-- (void)didUpdateTrack: (NSNotification *)notif
+- (void)trackDidUpdate: (NSNotification *)notif
 {
 	[self.tableView reloadData];
 }

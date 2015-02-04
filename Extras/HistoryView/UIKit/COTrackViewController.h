@@ -91,4 +91,17 @@
 - (IBAction)redo;
 
 
+/** @taskunit Reacting to Track Changes */
+
+
+/**
+ * Tells the receiver that the track content or current node changed.
+ *
+ * Can be overriden to update the UI (usually to control when undo and redo 
+ * buttons are enabled), but the superclass implementation must be called.
+ *
+ * The notification argument is a ETCollectionDidUpdateNotification or nil.
+ */
+- (void)trackDidUpdate: (NSNotification *)notif;
+
 @end
