@@ -259,13 +259,12 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	
 	[self undo: undo1 redo: redo1 undo: @[] redo: redo2];
 	
-	// FIXME: Not sure if we should need to call this explicitly
-	[self reloadNodesOnCurrentBranch];
-	
 	BOOL ok = [_store commitTransaction];
 	if (ok)
 	{
-		[self didUpdate];
+		// FIXME: Not sure if we should need to call this explicitly, calling
+		// -didUpdate could be enough.
+		[self reloadNodesOnCurrentBranch];
 	}
 	return ok;
 }
@@ -396,14 +395,9 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		[_store removeCommandForUUID: coalescedCommandUUIDToDelete];
 		[_commandsByUUID removeObjectForKey: coalescedCommandUUIDToDelete];
 	}
-	
-	// Finally, update our commands array
-	
-	[self reloadNodesOnCurrentBranch];
-	
+
 	ETAssert([_store commitTransaction]);
-	
-	[self didUpdate];
+	[self reloadNodesOnCurrentBranch];
 }
 
 -(void)clear
@@ -675,6 +669,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	{
 		[_nodesOnCurrentUndoBranch setArray: @[[COEndOfUndoTrackPlaceholderNode sharedInstance]]];
 	}
+	[self didUpdate];
 }
 
 - (void) reload

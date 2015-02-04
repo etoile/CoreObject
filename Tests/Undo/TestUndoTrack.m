@@ -18,6 +18,8 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	COUndoTrack *_patternTrack;
 	COPersistentRoot *_persistentRoot;
 	NSUInteger _trackNotificationCount;
+	NSUInteger _track2NotificationCount;
+	NSUInteger _patternTrackNotificationCount;
 }
 
 @end
@@ -45,9 +47,23 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 - (void)trackDidChange: (NSNotification *)notif
 {
 	UKStringsEqual(COUndoTrackDidChangeNotification, notif.name);
-	UKObjectsSame(_track, notif.object);
-
-	_trackNotificationCount++;
+	
+	if (notif.object == _track)
+	{
+		_trackNotificationCount++;
+	}
+	else if (notif.object == _track2)
+	{
+		_track2NotificationCount++;
+	}
+	else if (notif.object == _patternTrack)
+	{
+		_patternTrackNotificationCount++;
+	}
+	else
+	{
+		ETAssertUnreachable();
+	}
 }
 
 /**
@@ -106,10 +122,17 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 
 	_track2 = [COUndoTrack trackForName: TEST_TRACK @"2" withEditingContext: ctx];
 	[_track2 clear];
-	
+	[[NSNotificationCenter defaultCenter] addObserver: self
+	                                         selector: @selector(trackDidChange:)
+	                                             name: COUndoTrackDidChangeNotification
+	                                           object: _track2];
+
 	_patternTrack = [COUndoTrack trackForPattern: TEST_TRACK @"*" withEditingContext: ctx];
 	[_patternTrack clear];
-	
+	[[NSNotificationCenter defaultCenter] addObserver: self
+	                                         selector: @selector(trackDidChange:)
+	                                             name: COUndoTrackDidChangeNotification
+	                                           object: _patternTrack];
 	return self;
 }
 
@@ -137,6 +160,11 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 
 	UKObjectsEqual(A(placeholderNode, group), [_track nodes]);
 	UKObjectsEqual(group, [_track currentNode]);
+	
+	/* -recordCommand: reloads the track before recording the command */
+	UKIntsEqual(2, _trackNotificationCount);
+	UKIntsEqual(0, _track2NotificationCount);
+	UKIntsEqual(1, _patternTrackNotificationCount);
 		
 	// Check with a second COUndoTrack
 	
@@ -165,7 +193,12 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	UKObjectsEqual(A(placeholderNode, group1, group2), [_track nodes]);
 	UKObjectsEqual(group2, [_track currentNode]);
 	UKObjectsEqual(group1.UUID, group2.parentUUID);
-	
+
+	/* -recordCommand: reloads the track before recording the command */
+	UKIntsEqual(3, _trackNotificationCount);
+	UKIntsEqual(0, _track2NotificationCount);
+	UKIntsEqual(2, _patternTrackNotificationCount);
+
 	// Check with a second COUndoTrack
 	
 	COUndoTrack *secondTrackInstance = [COUndoTrack trackForName: TEST_TRACK withEditingContext: ctx];
@@ -192,6 +225,11 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	[_track setCurrentNode: group1];
 	
 	UKObjectsEqual(group1, [_track currentNode]);
+
+	/* -recordCommand: reloads the track before recording the command */
+	UKIntsEqual(4, _trackNotificationCount);
+	UKIntsEqual(0, _track2NotificationCount);
+	UKIntsEqual(3, _patternTrackNotificationCount);
 
 	// Check with a second COUndoTrack
 	{
@@ -391,7 +429,11 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 
 	UKObjectsEqual(A(placeholderNode, group1, group2, undoGroup1), [_track nodes]);
 	UKObjectsEqual(undoGroup1, [_track currentNode]);
-	UKIntsEqual(3, _trackNotificationCount);
+
+	/* -recordCommand: reloads the track before recording the command */
+	UKIntsEqual(4, _trackNotificationCount);
+	UKIntsEqual(0, _track2NotificationCount);
+	UKIntsEqual(3, _patternTrackNotificationCount);
 }
 
 - (void)testRedoNode
@@ -413,7 +455,11 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 
 	UKObjectsEqual(A(placeholderNode, group1, group2, redoGroup1), [_track nodes]);
 	UKObjectsEqual(redoGroup1, [_track currentNode]);
-	UKIntsEqual(3, _trackNotificationCount);
+
+	/* -recordCommand: reloads the track before recording the command */
+	UKIntsEqual(4, _trackNotificationCount);
+	UKIntsEqual(0, _track2NotificationCount);
+	UKIntsEqual(3, _patternTrackNotificationCount);
 }
 
 // TODO: Test mixing commands between tracks illegally
