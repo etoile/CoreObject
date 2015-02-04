@@ -768,10 +768,11 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	COUndoTrackState *notifState = [COUndoTrackState new];
 	notifState.trackName = userInfo[COUndoTrackStoreTrackName];
 	notifState.headCommandUUID = [ETUUID UUIDWithString: userInfo[COUndoTrackStoreTrackHeadCommandUUID]];
-	notifState.currentCommandUUID = userInfo[COUndoTrackStoreTrackCurrentCommandUUID] != [NSNull null]
-		? [ETUUID UUIDWithString: userInfo[COUndoTrackStoreTrackCurrentCommandUUID]]
-		: nil;
-		
+	if (userInfo[COUndoTrackStoreTrackCurrentCommandUUID] != nil)
+	{
+		notifState.currentCommandUUID = [ETUUID UUIDWithString: userInfo[COUndoTrackStoreTrackCurrentCommandUUID]];
+	}
+
 	if ([_store string: notifState.trackName matchesGlobPattern: _name])
 	{
 		COUndoTrackState *inMemoryState = _trackStateForName[notifState.trackName];
@@ -790,7 +791,9 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 - (void) postNotificationsForTrackName: (NSString *)aTrack
 {
     NSDictionary *userInfo = @{kCOUndoTrackName : aTrack};
-    
+	ETAssert([NSPropertyListSerialization propertyList: userInfo
+	                                  isValidForFormat: NSPropertyListXMLFormat_v1_0]);
+
     [[NSNotificationCenter defaultCenter] postNotificationName: COUndoTrackDidChangeNotification
                                                         object: self
                                                       userInfo: userInfo];

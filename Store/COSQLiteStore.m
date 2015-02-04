@@ -1027,6 +1027,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 - (void) postCommitNotificationsWithUserInfo: (NSDictionary *)userInfo
 {
 	ETAssert([NSThread isMainThread]);
+	ETAssert([NSPropertyListSerialization propertyList: userInfo
+	                                  isValidForFormat: NSPropertyListXMLFormat_v1_0]);
 
 	[[NSNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootsDidChangeNotification
 	                                                    object: self
