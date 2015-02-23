@@ -28,7 +28,7 @@
 {
 	NSString *query = [(NSSearchField *)sender stringValue];
 	
-	COSQLiteStore *store = [[[NSApp delegate] editingContext] store];
+	COSQLiteStore *store = [[(ApplicationDelegate *)[NSApp delegate] editingContext] store];
 	NSArray *results = [store searchResultsForQuery: query];
 	
 	searchResults = [[NSMutableArray alloc] init];
