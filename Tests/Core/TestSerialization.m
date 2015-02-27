@@ -59,4 +59,20 @@
 	UKObjectsEqual(@"COAttachmentID", [[[[deserializedObject entityDescription] propertyDescriptionForName: @"attachmentID"] type] name]);
 }
 
+- (void) testUnknowItemAttributes
+{
+	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *rootObject = [proot rootObject];
+	COMutableItem *item = [[rootObject storeItem] mutableCopy];
+	
+	[item setValue: @"foo" forAttribute: @"bar" type: kCOTypeString];
+	
+	COItemGraph *itemGr = [[COItemGraph alloc] initWithItems: @[item] rootItemUUID: item.UUID];
+	COObjectGraphContext *newCtx = [COObjectGraphContext new];
+	
+	// @"foo" : @"bar" should not cause a problem, it should be ignored
+	// during deserialization
+	UKDoesNotRaiseException([newCtx setItemGraph: itemGr]);
+}
+
 @end
