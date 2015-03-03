@@ -134,7 +134,7 @@
 	return result;
 }
 
-- (void) applyTo: (id<COItemGraph>)dest
+- (BOOL) applyTo: (id<COItemGraph>)dest
 {
 	NSMutableDictionary *itemsByUUID = [NSMutableDictionary new];
 	for (NSString *algorithmName in self.subDiffsByAlgorithmName)
@@ -148,12 +148,12 @@
 		
 		[itemsByUUID addEntriesFromDictionary: diffOutput];
 	}
-	
-	COItemGraph *preview = [[COItemGraph alloc] initWithItemGraph: dest];
-	[preview insertOrUpdateItems: [itemsByUUID allValues]];
-	
-	
+
+	//COItemGraph *preview = [[COItemGraph alloc] initWithItemGraph: dest];
+	//[preview insertOrUpdateItems: [itemsByUUID allValues]];
+
 	[dest insertOrUpdateItems: [itemsByUUID allValues]];
+	return ![itemsByUUID isEmpty];
 }
 
 - (BOOL) hasConflicts

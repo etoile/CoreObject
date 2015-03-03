@@ -53,7 +53,11 @@
 
 - (CODiffManager *) diffByMergingWithDiff: (CODiffManager *)otherDiff;
 
-- (void) applyTo: (id<COItemGraph>)dest;
+/**
+ * Applies the diff to the destination item graph, and returns whether the
+ * item graph was changed.
+ */
+- (BOOL) applyTo: (id<COItemGraph>)dest;
 
 - (BOOL) hasConflicts;
 - (void) resolveConflictsFavoringSourceIdentifier: (id)aSource;
