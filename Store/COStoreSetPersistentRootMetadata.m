@@ -7,6 +7,7 @@
 
 #import "COStoreSetPersistentRootMetadata.h"
 #import "COSQLiteStore+Private.h"
+#import "COJSONSerialization.h"
 
 @implementation COStoreSetPersistentRootMetadata
 
@@ -17,10 +18,12 @@
     NSData *data = nil;
     if (meta != nil)
     {
-        data = [NSJSONSerialization dataWithJSONObject: meta options: 0 error: NULL];
+		NSError *error = nil;
+
+        data = CODataWithJSONObject(meta, &error);
         if (data == nil)
         {
-            NSLog(@"Error serializing metadata %@", metadata);
+            NSLog(@"Error serializing metadata %@ - %@", metadata, error);
         }
     }
     return data;

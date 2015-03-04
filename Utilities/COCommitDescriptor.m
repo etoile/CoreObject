@@ -7,6 +7,7 @@
 
 #import <EtoileFoundation/NSString+Etoile.h>
 #import "COCommitDescriptor.h"
+#import "COJSONSerialization.h"
 
 @implementation COCommitDescriptor
 
@@ -32,10 +33,7 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 		[NSData dataWithContentsOfFile: aCommitFile options: 0 error: &dataError];
 	ETAssert(dataError == nil);
 #endif
-	NSError *JSONError = nil;
-	NSDictionary *plist =
-		[NSJSONSerialization JSONObjectWithData: JSONData options: 0 error: &JSONError];
-	ETAssert(JSONError == nil);
+	NSDictionary *plist = COJSONObjectWithData(JSONData, NULL);
 
 	[aTypeTable addEntriesFromDictionary: [plist objectForKey: @"types"]];
 

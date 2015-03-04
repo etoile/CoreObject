@@ -34,7 +34,7 @@
 	[[NSNotificationCenter defaultCenter] addObserver: self
 											 selector: @selector(editingContextChanged:)
 												 name: COEditingContextDidChangeNotification
-											   object: [[NSApp delegate] editingContext]];
+											   object: [(ApplicationDelegate *)[NSApp delegate] editingContext]];
 	
 	[outline expandItem: nil expandChildren: YES];
 }
@@ -107,7 +107,7 @@
 {
 	
 	[item setValue: object forProperty: @"name"];
-	[[[NSApp delegate] editingContext] commit];
+	[[(ApplicationDelegate *)[NSApp delegate] editingContext] commit];
 //	if (nil == item) { item = [self rootObject]; }
 //	
 //	if ([item isKindOfClass: [OutlineItem class]])

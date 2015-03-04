@@ -259,22 +259,22 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	
 	[self undo: undo1 redo: redo1 undo: @[] redo: redo2];
 	
-	// FIXME: Not sure if we should need to call this explicitly
-	[self reloadNodesOnCurrentBranch];
-	
 	BOOL ok = [_store commitTransaction];
 	if (ok)
 	{
-		[self didUpdate];
+		// FIXME: Not sure if we should need to call this explicitly, calling
+		// -didUpdate could be enough.
+		[self reloadNodesOnCurrentBranch];
 	}
 	return ok;
 }
 
 - (void)undoNode: (id <COTrackNode>)aNode
 {
-	COUndoTrack *track = [COUndoTrack trackForName: ((COCommandGroup *)aNode).trackName withEditingContext: _editingContext];
-	ETAssert(track != nil);
-	
+	INVALIDARG_EXCEPTION_TEST(aNode,
+		[aNode isKindOfClass: [COCommand class]] || [aNode isKindOfClass: [COCommandGroup class]]);
+	INVALIDARG_EXCEPTION_TEST(aNode, [(COCommand *)aNode parentUndoTrack] == self);
+
 	COCommand *command = [(COCommand *)aNode inverse];
 	[command applyToContext: _editingContext];
 	
@@ -290,15 +290,16 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	
 	[_editingContext commitWithIdentifier: @"org.etoile.CoreObject.selective-undo"
 								 metadata: md
-								undoTrack: track
+								undoTrack: self
 									error: NULL];
 }
 
 - (void)redoNode: (id <COTrackNode>)aNode
 {
-	COUndoTrack *track = [COUndoTrack trackForName: ((COCommandGroup *)aNode).trackName withEditingContext: _editingContext];
-	ETAssert(track != nil);
-	
+	INVALIDARG_EXCEPTION_TEST(aNode,
+		[aNode isKindOfClass: [COCommand class]] || [aNode isKindOfClass: [COCommandGroup class]]);
+	INVALIDARG_EXCEPTION_TEST(aNode, [(COCommand *)aNode parentUndoTrack] == self);
+
 	COCommand *command = (COCommand *)aNode;
 	[command applyToContext: _editingContext];
 	
@@ -314,7 +315,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	
 	[_editingContext commitWithIdentifier: @"org.etoile.CoreObject.selective-redo"
 								 metadata: md
-								undoTrack: track
+								undoTrack: self
 									error: NULL];
 }
 
@@ -394,14 +395,9 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		[_store removeCommandForUUID: coalescedCommandUUIDToDelete];
 		[_commandsByUUID removeObjectForKey: coalescedCommandUUIDToDelete];
 	}
-	
-	// Finally, update our commands array
-	
-	[self reloadNodesOnCurrentBranch];
-	
+
 	ETAssert([_store commitTransaction]);
-	
-	[self didUpdate];
+	[self reloadNodesOnCurrentBranch];
 }
 
 -(void)clear
@@ -673,6 +669,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	{
 		[_nodesOnCurrentUndoBranch setArray: @[[COEndOfUndoTrackPlaceholderNode sharedInstance]]];
 	}
+	[self didUpdate];
 }
 
 - (void) reload
@@ -771,10 +768,11 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	COUndoTrackState *notifState = [COUndoTrackState new];
 	notifState.trackName = userInfo[COUndoTrackStoreTrackName];
 	notifState.headCommandUUID = [ETUUID UUIDWithString: userInfo[COUndoTrackStoreTrackHeadCommandUUID]];
-	notifState.currentCommandUUID = userInfo[COUndoTrackStoreTrackCurrentCommandUUID] != [NSNull null]
-		? [ETUUID UUIDWithString: userInfo[COUndoTrackStoreTrackCurrentCommandUUID]]
-		: nil;
-		
+	if (userInfo[COUndoTrackStoreTrackCurrentCommandUUID] != nil)
+	{
+		notifState.currentCommandUUID = [ETUUID UUIDWithString: userInfo[COUndoTrackStoreTrackCurrentCommandUUID]];
+	}
+
 	if ([_store string: notifState.trackName matchesGlobPattern: _name])
 	{
 		COUndoTrackState *inMemoryState = _trackStateForName[notifState.trackName];
@@ -793,7 +791,9 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 - (void) postNotificationsForTrackName: (NSString *)aTrack
 {
     NSDictionary *userInfo = @{kCOUndoTrackName : aTrack};
-    
+	ETAssert([NSPropertyListSerialization propertyList: userInfo
+	                                  isValidForFormat: NSPropertyListXMLFormat_v1_0]);
+
     [[NSNotificationCenter defaultCenter] postNotificationName: COUndoTrackDidChangeNotification
                                                         object: self
                                                       userInfo: userInfo];
@@ -910,6 +910,24 @@ static void coalesceOps(NSMutableArray *ops)
 
 
 @implementation COPatternUndoTrack
+
+- (void)undoNode: (id <COTrackNode>)aNode
+{
+	COUndoTrack *track = [COUndoTrack trackForName: ((COCommandGroup *)aNode).trackName
+	                            withEditingContext: self.editingContext];
+	ETAssert(track != nil);
+	track.customRevisionMetadata = self.customRevisionMetadata;
+	[track undoNode: aNode];
+}
+
+- (void)redoNode: (id <COTrackNode>)aNode
+{
+	COUndoTrack *track = [COUndoTrack trackForName: ((COCommandGroup *)aNode).trackName
+	                            withEditingContext: self.editingContext];
+	ETAssert(track != nil);
+	track.customRevisionMetadata = self.customRevisionMetadata;
+	[track redoNode: aNode];
+}
 
 - (void) recordCommand: (COCommand *)aCommand
 {

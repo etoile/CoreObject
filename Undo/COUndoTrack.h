@@ -11,11 +11,14 @@
 @class COUndoTrackStore, COUndoTrackState, COEditingContext, COCommand, COCommandGroup;
 
 /**
- * Posted when a new undo track command is recorded, or the current command is 
- * changed.
+ * Posted when the undo track content or current command changes, this includes 
+ * changes done in another process or in related local track objects (e.g. a
+ * track instance with the same name or a pattern track matching the observed 
+ * track).
  *
- * This notification will tell you about COUndoTrack changes exposed through the 
- * COTrack protocol:
+ * This notification is posted every time the track is reloaded.
+ *
+ * It will tell you about COUndoTrack changes exposed through the COTrack protocol:
  *
  * <deflist>
  * <term>basic undo/redo or a move to a past or future state along the track</term>
@@ -24,10 +27,8 @@
  * <desc>a new node has been recorded in -[COTrack nodes]</desc>
  * </deflist>
  *
- * It is not posted when the track is reloaded. 
- *
  * The user info dictionary contains the key: kCOundoTrackName.
- * 
+ *
  * Note: tracks are append-only, so node removal is not supported.
  */
 extern NSString * const COUndoTrackDidChangeNotification;

@@ -738,10 +738,11 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	return insertedOrUpdated;
 }
 
-- (void) applyTo: (id<COItemGraph>)dest
+- (BOOL) applyTo: (id<COItemGraph>)dest
 {
 	NSDictionary *insertedOrUpdated = [self addedOrUpdatedItemsForApplyingTo: dest];
     [dest insertOrUpdateItems: [insertedOrUpdated allValues]];
+	return ![insertedOrUpdated isEmpty];
 }
 
 - (COItemGraph *) itemTreeWithDiffAppliedToItemGraph: (id<COItemGraph>)aGraph

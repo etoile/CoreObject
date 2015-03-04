@@ -13,6 +13,7 @@
 #import "COCommand.h"
 #import "CODateSerialization.h"
 #import "COEndOfUndoTrackPlaceholderNode.h"
+#import "COJSONSerialization.h"
 #import "NSDistributedNotificationCenter.h"
 
 NSString * const COUndoTrackStoreTrackDidChangeNotification = @"COUndoTrackStoreTrackDidChangeNotification";
@@ -241,14 +242,14 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 - (NSData *) serialize: (id)json
 {
 	if (json != nil)
-		return [NSJSONSerialization dataWithJSONObject: json options: 0 error: NULL];
+		return CODataWithJSONObject(json, NULL);
 	return nil;
 }
 
 - (id) deserialize: (NSData *)data
 {
 	if (data != nil)
-		return [NSJSONSerialization JSONObjectWithData: data options: 0 error: NULL];
+		return COJSONObjectWithData(data, NULL);
 	return nil;
 }
 
@@ -308,7 +309,9 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 - (void) postCommitNotificationsWithUserInfo: (NSDictionary *)userInfo
 {
 	ETAssert([NSThread isMainThread]);
-	
+	ETAssert([NSPropertyListSerialization propertyList: userInfo
+	                                  isValidForFormat: NSPropertyListXMLFormat_v1_0]);
+
 	[[NSNotificationCenter defaultCenter] postNotificationName: COUndoTrackStoreTrackDidChangeNotification
 	                                                    object: self
 	                                                  userInfo: userInfo];
@@ -325,14 +328,15 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 	for (NSString *modifiedTrack in _modifiedTrackStateForTrackName)
 	{
 		COUndoTrackState *state = _modifiedTrackStateForTrackName[modifiedTrack];
-		
-		id currentUUIDString = state.currentCommandUUID != nil
-			? [state.currentCommandUUID stringValue]
-			: [NSNull null];
-		
-		NSDictionary *userInfo = @{COUndoTrackStoreTrackName : modifiedTrack,
-								   COUndoTrackStoreTrackHeadCommandUUID : [state.headCommandUUID stringValue],
-								   COUndoTrackStoreTrackCurrentCommandUUID : currentUUIDString};
+		NSMutableDictionary *userInfo = [NSMutableDictionary new];
+  
+		userInfo[COUndoTrackStoreTrackName] = modifiedTrack;
+		userInfo[COUndoTrackStoreTrackHeadCommandUUID] = [state.headCommandUUID stringValue];
+		if (state.currentCommandUUID != nil)
+		{
+			userInfo[COUndoTrackStoreTrackCurrentCommandUUID] = [state.currentCommandUUID stringValue];
+		}
+
 		[self postCommitNotificationsWithUserInfo: userInfo];
 		
 	}

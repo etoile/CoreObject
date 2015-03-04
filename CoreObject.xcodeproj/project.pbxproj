@@ -109,12 +109,18 @@
 		60B1568D19B860C8006D5EEF /* COUndoTrackStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE29317C07ED800E729F5 /* COUndoTrackStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60B1568E19B861BF006D5EEF /* COEditingContext+Debugging.h in Headers */ = {isa = PBXBuildFile; fileRef = 601FD94418893ED50002F957 /* COEditingContext+Debugging.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60B1568F19B861D3006D5EEF /* COObjectGraphContext+Debugging.h in Headers */ = {isa = PBXBuildFile; fileRef = 66A00A18187DDB6A005CFE16 /* COObjectGraphContext+Debugging.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60B84C081A6E6F5F00418128 /* COTrackViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 60B84C061A6E6F5F00418128 /* COTrackViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60B84C091A6E6F5F00418128 /* COTrackViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60B84C071A6E6F5F00418128 /* COTrackViewController.m */; };
 		60C81D0B195DA82200AEEC68 /* COClassToString.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C81D0A195DA82200AEEC68 /* COClassToString.m */; };
 		60C81D19195DA83F00AEEC68 /* COClassToString.h in Headers */ = {isa = PBXBuildFile; fileRef = 60C81D18195DA83F00AEEC68 /* COClassToString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60C913C4165BBF2B00E0C5F4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C913AD165BBE9E00E0C5F4 /* main.m */; };
 		60C913C6165BBF5200E0C5F4 /* CoreObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 60C913C5165BBF5000E0C5F4 /* CoreObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60CB08151A05075700C25B80 /* ObjectWithTransientState.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CB08141A05075700C25B80 /* ObjectWithTransientState.m */; };
 		60CB08201A05075F00C25B80 /* ObjectWithTransientState.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CB08141A05075700C25B80 /* ObjectWithTransientState.m */; };
+		60DBD0A91A822AEE009F3935 /* COJSONSeralization.m in Sources */ = {isa = PBXBuildFile; fileRef = 60DBD0A71A822AEE009F3935 /* COJSONSeralization.m */; };
+		60DBD0AA1A822AEE009F3935 /* COJSONSeralization.m in Sources */ = {isa = PBXBuildFile; fileRef = 60DBD0A71A822AEE009F3935 /* COJSONSeralization.m */; };
+		60DBD0AB1A822AEE009F3935 /* COJSONSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 60DBD0A81A822AEE009F3935 /* COJSONSerialization.h */; };
+		60DBD0AC1A822AEE009F3935 /* COJSONSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 60DBD0A81A822AEE009F3935 /* COJSONSerialization.h */; };
 		60E08C8119792EEF00D1B7AD /* libEtoileFoundation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048464818B6C03E006E4EDC /* libEtoileFoundation.a */; };
 		60E08C8219792EEF00D1B7AD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B1D3F919791F8800ACAC9C /* Foundation.framework */; };
 		60E08C8719792F4600D1B7AD /* COCommandDeletePersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2B217C09DE700E729F5 /* COCommandDeletePersistentRoot.m */; };
@@ -1026,6 +1032,8 @@
 		609CB4CE1A5E9384003E8052 /* COTopologicalSort.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COTopologicalSort.m; path = Utilities/COTopologicalSort.m; sourceTree = "<group>"; };
 		60B1D3F919791F8800ACAC9C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		60B1D3FB19791F9400ACAC9C /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/usr/lib/libsqlite3.dylib; sourceTree = DEVELOPER_DIR; };
+		60B84C061A6E6F5F00418128 /* COTrackViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COTrackViewController.h; path = Extras/HistoryView/UIKit/COTrackViewController.h; sourceTree = SOURCE_ROOT; };
+		60B84C071A6E6F5F00418128 /* COTrackViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COTrackViewController.m; path = Extras/HistoryView/UIKit/COTrackViewController.m; sourceTree = SOURCE_ROOT; };
 		60C81D0A195DA82200AEEC68 /* COClassToString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COClassToString.m; sourceTree = "<group>"; };
 		60C81D18195DA83F00AEEC68 /* COClassToString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COClassToString.h; sourceTree = "<group>"; };
 		60C913AD165BBE9E00E0C5F4 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = main.m; path = Samples/BasicPersistence/main.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
@@ -1033,6 +1041,8 @@
 		60C913C5165BBF5000E0C5F4 /* CoreObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreObject.h; sourceTree = "<group>"; };
 		60CB08131A05075700C25B80 /* ObjectWithTransientState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ObjectWithTransientState.h; path = Tests/TestModelObjects/ObjectWithTransientState.h; sourceTree = "<group>"; };
 		60CB08141A05075700C25B80 /* ObjectWithTransientState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ObjectWithTransientState.m; path = Tests/TestModelObjects/ObjectWithTransientState.m; sourceTree = "<group>"; };
+		60DBD0A71A822AEE009F3935 /* COJSONSeralization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COJSONSeralization.m; path = Utilities/COJSONSeralization.m; sourceTree = "<group>"; };
+		60DBD0A81A822AEE009F3935 /* COJSONSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COJSONSerialization.h; path = Utilities/COJSONSerialization.h; sourceTree = "<group>"; };
 		60E08C6219792BEA00D1B7AD /* libCoreObject.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCoreObject.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		60EBC199184CA38200F751F5 /* COPrimitiveCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COPrimitiveCollection.h; path = Core/COPrimitiveCollection.h; sourceTree = "<group>"; };
 		60EBC19A184CA38200F751F5 /* COPrimitiveCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COPrimitiveCollection.m; path = Core/COPrimitiveCollection.m; sourceTree = "<group>"; };
@@ -1589,6 +1599,24 @@
 			name = iOS;
 			sourceTree = "<group>";
 		};
+		60B84BFA1A6E6E1C00418128 /* History View */ = {
+			isa = PBXGroup;
+			children = (
+				60B84C051A6E6F0300418128 /* UIKit */,
+			);
+			name = "History View";
+			path = ValueTransformers;
+			sourceTree = "<group>";
+		};
+		60B84C051A6E6F0300418128 /* UIKit */ = {
+			isa = PBXGroup;
+			children = (
+				60B84C061A6E6F5F00418128 /* COTrackViewController.h */,
+				60B84C071A6E6F5F00418128 /* COTrackViewController.m */,
+			);
+			name = UIKit;
+			sourceTree = "<group>";
+		};
 		60C913AC165BBE7500E0C5F4 /* Samples */ = {
 			isa = PBXGroup;
 			children = (
@@ -1653,6 +1681,7 @@
 				66D3FCD71860EB61009BDF50 /* Diff */,
 				6633F108185515F1009CE6F7 /* Model */,
 				6633F109185515F1009CE6F7 /* ValueTransformers */,
+				60B84BFA1A6E6E1C00418128 /* History View */,
 			);
 			path = Extras;
 			sourceTree = "<group>";
@@ -1950,6 +1979,8 @@
 				6043D4C817575D7A002103CC /* COCommitDescriptor.m */,
 				6612113E1821986B003AEC29 /* CODateSerialization.h */,
 				6612113F1821986B003AEC29 /* CODateSerialization.m */,
+				60DBD0A81A822AEE009F3935 /* COJSONSerialization.h */,
+				60DBD0A71A822AEE009F3935 /* COJSONSeralization.m */,
 				600F72BD1858A71200CB6AC5 /* COPersistentObjectContext.h */,
 				600F72BE1858A71200CB6AC5 /* COPersistentObjectContext.m */,
 				609CB4CD1A5E9384003E8052 /* COTopologicalSort.h */,
@@ -2393,6 +2424,7 @@
 				60E08D4219792FFA00D1B7AD /* COSynchronizerPushedRevisionsToClientMessage.h in Headers */,
 				60E08D1619792FFA00D1B7AD /* COBranchInfo.h in Headers */,
 				60E08D3619792FFA00D1B7AD /* COSetDeletion.h in Headers */,
+				60DBD0AC1A822AEE009F3935 /* COJSONSerialization.h in Headers */,
 				60E08D3C19792FFA00D1B7AD /* COSynchronizerUtils.h in Headers */,
 				60E08CFD19792FFA00D1B7AD /* CORevision.h in Headers */,
 				60882F1D197D50CE00484033 /* CORectToString.h in Headers */,
@@ -2424,6 +2456,7 @@
 				60E08D5219792FFA00D1B7AD /* COStoreCreatePersistentRoot.h in Headers */,
 				60E08D6919792FFA00D1B7AD /* COMergeInfo.h in Headers */,
 				60E08D2319792FFA00D1B7AD /* COItemGraphDiff.h in Headers */,
+				60B84C081A6E6F5F00418128 /* COTrackViewController.h in Headers */,
 				60E08D6C19792FFA00D1B7AD /* COObject+Private.h in Headers */,
 				60E08D1019792FFA00D1B7AD /* COUndoTrack.h in Headers */,
 				60E08D2C19792FFA00D1B7AD /* COCommandSetCurrentBranch.h in Headers */,
@@ -2562,6 +2595,7 @@
 				6633F1141855169E009CE6F7 /* COAttributedString.h in Headers */,
 				66539E0C1860472E0077FB18 /* COAttributedStringWrapper.h in Headers */,
 				6633F110185515F1009CE6F7 /* CORectToString.h in Headers */,
+				60DBD0AB1A822AEE009F3935 /* COJSONSerialization.h in Headers */,
 				66D3FCDC1860EB61009BDF50 /* COAttributedStringDiff.h in Headers */,
 				66E4CF4F1816F50300AAB0E6 /* COStoreSetPersistentRootMetadata.h in Headers */,
 				661211401821986B003AEC29 /* CODateSerialization.h in Headers */,
@@ -3066,6 +3100,7 @@
 				60E08CCA19792F4600D1B7AD /* COCommandSetCurrentVersionForBranch.m in Sources */,
 				60E08CE919792F4600D1B7AD /* COStoreDeleteBranch.m in Sources */,
 				60E08C9419792F4600D1B7AD /* COObject.m in Sources */,
+				60DBD0AA1A822AEE009F3935 /* COJSONSeralization.m in Sources */,
 				60E08CD819792F4600D1B7AD /* COSetInsertion.m in Sources */,
 				60E08CA119792F4600D1B7AD /* CODateSerialization.m in Sources */,
 				60E08CCC19792F4600D1B7AD /* COEditingContext+Undo.m in Sources */,
@@ -3096,6 +3131,7 @@
 				60E08C9F19792F4600D1B7AD /* COTag.m in Sources */,
 				60E08CA619792F4600D1B7AD /* COItemGraph.m in Sources */,
 				60E08CA319792F4600D1B7AD /* COCommitDescriptor.m in Sources */,
+				60B84C091A6E6F5F00418128 /* COTrackViewController.m in Sources */,
 				60E08CCB19792F4600D1B7AD /* COUndoTrackStore.m in Sources */,
 				6076D1021A31E4110023C97A /* COSchemaMigration.m in Sources */,
 				60E08CF219792F4600D1B7AD /* COStoreUndeletePersistentRoot.m in Sources */,
@@ -3302,6 +3338,7 @@
 				6675F8C21785C02A001E5622 /* COItem.m in Sources */,
 				6660B3A11839659D009007FD /* COAttachmentID.m in Sources */,
 				6675F8C41785C02A001E5622 /* COItemGraph.m in Sources */,
+				60DBD0A91A822AEE009F3935 /* COJSONSeralization.m in Sources */,
 				6675F8C61785C02A001E5622 /* COPath.m in Sources */,
 				66094847178794D40049468B /* COItem+JSON.m in Sources */,
 				606E3DC21787A07E00ED42DA /* COSerialization.m in Sources */,

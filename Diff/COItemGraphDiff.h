@@ -85,7 +85,11 @@
 					   toGraph: (id <COItemGraph>)b
 			  sourceIdentifier: (id)aSource;
 
-- (void) applyTo: (id<COItemGraph>)dest;
+/**
+ * Applies the diff to the destination item graph, and returns whether the
+ * item graph was changed.
+ */
+- (BOOL) applyTo: (id<COItemGraph>)dest;
 
 - (COItemGraph *) itemTreeWithDiffAppliedToItemGraph: (id<COItemGraph>)aSubtree;
 
