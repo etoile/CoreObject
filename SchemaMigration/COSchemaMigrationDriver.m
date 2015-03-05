@@ -49,13 +49,9 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
  */
 - (NSDictionary *) versionsByDomainForItem: (COItem *)item
 {
-	NSArray *versions = [item valueForAttribute: kCOObjectVersionsProperty];
-	NSArray *domains = [item valueForAttribute: kCOObjectDomainsProperty];
-
-	if (versions == nil || domains == nil)
-		return @{};
-
-	return [NSDictionary dictionaryWithObjects: versions forKeys: domains];
+	NSDictionary *versionsByDomainByEntityTuple = [COSchemaMigration versionsByDomainByEntityTuple];
+	NSArray *key = @[item.packageName, @(item.entityVersion), item.entityName];
+	return versionsByDomainByEntityTuple[key];
 }
 
 
