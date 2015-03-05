@@ -514,24 +514,14 @@ serialization. */
                         types: (NSMutableDictionary *)types
                        values: (NSMutableDictionary *)values
                    entityName: (NSString *)anEntityName
-		  packageDescriptions: (NSArray *)packages
+		   packageDescription: (ETPackageDescription *)package
 {
     [values setObject: anEntityName forKey: kCOObjectEntityNameProperty];
 	[types setObject: @(kCOTypeString) forKey: kCOObjectEntityNameProperty];
-
-	NSMutableArray *versions = [NSMutableArray new];
-	NSMutableArray *domains = [NSMutableArray new];
-
-	for (ETPackageDescription *package in packages)
-	{
-		[versions addObject: @(package.version)];
-		[domains addObject: package.name];
-	}
-
-	[values setObject: versions forKey: kCOObjectVersionsProperty];
-	[types setObject: @(kCOTypeArray | kCOTypeInt64) forKey: kCOObjectVersionsProperty];
-	[values setObject: domains forKey: kCOObjectDomainsProperty];
-	[types setObject: @(kCOTypeArray | kCOTypeString) forKey: kCOObjectDomainsProperty];
+	[values setObject: @(package.version) forKey: kCOObjectVersionsProperty];
+	[types setObject: @(kCOTypeInt64) forKey: kCOObjectVersionsProperty];
+	[values setObject: package.name forKey: kCOObjectDomainsProperty];
+	[types setObject: @(kCOTypeString) forKey: kCOObjectDomainsProperty];
 
 	return [[COItem alloc] initWithUUID: aUUID
 	                 typesForAttributes: types
@@ -565,7 +555,7 @@ serialization. */
 	                         types: types
 	                        values: values
 	                    entityName: [[self entityDescription] name]
-	           packageDescriptions: _entityDescription.allPackageDescriptions];
+				packageDescription: _entityDescription.owner];
 }
 
 - (COItem *)additionalStoreItemForUUID: (ETUUID *)anItemUUID

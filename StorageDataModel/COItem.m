@@ -143,20 +143,20 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 - (int64_t) entityVersion
 {
-	NSArray *versions = [values objectForKey: kCOObjectVersionsProperty];
-	if ([versions count] > 0)
+	NSNumber *version = [values objectForKey: kCOObjectVersionsProperty];
+	if (version != nil)
 	{
-		return [versions[0] longLongValue];
+		return [version longLongValue];
 	}
 	return -1;
 }
 
 - (NSString *) packageName
 {
-	NSArray *domains = [values objectForKey: kCOObjectDomainsProperty];
-	if ([domains count] > 0)
+	NSString *domain = [values objectForKey: kCOObjectDomainsProperty];
+	if (domain != nil)
 	{
-		return domains[0];
+		return domain;
 	}
 	return nil;
 }
@@ -483,38 +483,16 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 - (void)setEntityVersion:(int64_t)entityVersion
 {
-	NSMutableArray *versions = [[values objectForKey: kCOObjectVersionsProperty] mutableCopy];
-	if ([versions count] > 0)
-	{
-		versions[0] = @(entityVersion);
-		[self setValue: versions
-		  forAttribute: kCOObjectVersionsProperty
-				  type: kCOTypeInt64 | kCOTypeArray];
-	}
-	else
-	{
-		[self setValue: @[@(entityVersion)]
-		  forAttribute: kCOObjectVersionsProperty
-				  type: kCOTypeInt64 | kCOTypeArray];
-	}
+	[self setValue: @(entityVersion)
+	  forAttribute: kCOObjectVersionsProperty
+			  type: kCOTypeInt64];
 }
 
 - (void)setPackageName:(NSString *)packageName
 {
-	NSMutableArray *domains = [[values objectForKey: kCOObjectDomainsProperty] mutableCopy];
-	if ([domains count] > 0)
-	{
-		domains[0] = [packageName copy];
-		[self setValue: domains
-		  forAttribute: kCOObjectDomainsProperty
-				  type: kCOTypeString | kCOTypeArray];
-	}
-	else
-	{
-		[self setValue: @[[packageName copy]]
-		  forAttribute: kCOObjectDomainsProperty
-				  type: kCOTypeString | kCOTypeArray];
-	}
+	[self setValue: [packageName copy]
+	  forAttribute: kCOObjectDomainsProperty
+			  type: kCOTypeString];
 }
 
 - (void) setValue: (id)aValue

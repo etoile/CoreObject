@@ -59,7 +59,7 @@
 	                         types: types
 	                        values: values
 	                    entityName: @"CODictionary"
-			   packageDescriptions: rootCoreObjectEntity.allPackageDescriptions];
+				packageDescription: rootCoreObjectEntity.owner];
 }
 
 - (NSDictionary *)dictionaryFromStoreItem: (COItem *)aStoreItem
