@@ -77,6 +77,8 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
  * Returns the entity name corresponding to -[COObject entityDescription].
  */
 @property (nonatomic, readonly) NSString *entityName;
+@property (nonatomic, readonly) int64_t entityVersion;
+@property (nonatomic, readonly) NSString *packageName;
 /**
  * Returns the schema versions by package names.
  */
@@ -148,6 +150,8 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 
 
 @property (nonatomic, readwrite) NSString *entityName;
+@property (nonatomic, readwrite) int64_t entityVersion;
+@property (nonatomic, readwrite) NSString *packageName;
 
 - (void) setVersion: (int64_t)aVersion
           forDomain: (NSString *)aDomain;

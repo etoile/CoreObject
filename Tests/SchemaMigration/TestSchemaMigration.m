@@ -99,12 +99,18 @@
 	{
 		OutlineItem *newParent = [(Tag *)testRootObject contents].anyObject;
 		OutlineItem *newChild = [newParent.content firstObject];
-	
-		UKObjectsEqual(A(@(0), @(0)), [newParent.storeItem valueForAttribute: kCOObjectVersionsProperty]);
-		UKObjectsEqual(A(@(0), @(0)), [newChild.storeItem valueForAttribute: kCOObjectVersionsProperty]);
 
-		UKObjectsEqual(A(@"Test", @"org.etoile-project.CoreObject"), [newParent.storeItem valueForAttribute: kCOObjectDomainsProperty]);
-		UKObjectsEqual(A(@"Test", @"org.etoile-project.CoreObject"), [newChild.storeItem valueForAttribute: kCOObjectDomainsProperty]);
+		UKIntsEqual(0, newParent.storeItem.entityVersion);
+		UKIntsEqual(0, [[[[newParent entityDescription] parent] owner] version]);
+		UKIntsEqual(0, newChild.storeItem.entityVersion);
+		UKIntsEqual(0, [[[[newChild entityDescription] parent] owner] version]);
+		
+		UKObjectsEqual(@"Test", newParent.storeItem.packageName);
+		UKObjectsEqual(@"Test", newParent.entityDescription.owner.name);
+		UKObjectsEqual(@"org.etoile-project.CoreObject", newParent.entityDescription.parent.owner.name);
+		UKObjectsEqual(@"Test", newChild.storeItem.packageName);
+		UKObjectsEqual(@"Test", newChild.entityDescription.owner.name);
+		UKObjectsEqual(@"org.etoile-project.CoreObject", newChild.entityDescription.parent.owner.name);
 	}];
 }
 
