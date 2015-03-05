@@ -194,8 +194,9 @@
 {
 	COMutableItem *parentItem = [parent.storeItem mutableCopy];
 
-	[parentItem setVersion: 1 forDomain: @"Test"];
-
+	UKObjectsEqual(@"Test", parentItem.packageName);
+	parentItem.entityVersion = 1;
+	
 	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: A(parentItem)]);
 }
 					  
@@ -203,8 +204,9 @@
 {
 	COMutableItem *parentItem = [parent.storeItem mutableCopy];
 
-	[parentItem setVersion: -1 forDomain: @"Test"];
-
+	UKObjectsEqual(@"Test", parentItem.packageName);
+	parentItem.entityVersion = -1;
+	
 	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: A(parentItem)]);
 }
 
@@ -233,8 +235,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.entityVersion = migration.destinationVersion;
+			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -285,8 +289,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.entityVersion = migration.destinationVersion;
+			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -344,8 +350,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.entityVersion = migration.destinationVersion;
+			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -413,8 +421,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.entityVersion = migration.destinationVersion;
+			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -477,8 +487,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.entityVersion = migration.destinationVersion;
+			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -555,8 +567,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.entityVersion = migration.destinationVersion;
+			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -627,8 +641,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 
-			[newItem setVersion: migration.destinationVersion
-			          forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.entityVersion = migration.destinationVersion;
+			}
 
 			[migratedItems addObject: newItem];
 
@@ -646,9 +662,12 @@
 			[mediaItem setValue: [oldItem valueForAttribute: kCOObjectVersionsProperty]
 			       forAttribute: kCOObjectVersionsProperty
 						   type: [oldItem typeForAttribute: kCOObjectVersionsProperty]];
-			[mediaItem setVersion: migration.destinationVersion
-				        forDomain: migration.domain];
 
+			if ([mediaItem.packageName isEqual: migration.domain])
+			{
+				mediaItem.entityVersion = migration.destinationVersion;
+			}
+			
 			[newItem setValue: mediaItem.UUID
 			     forAttribute: @"media"
 			             type: kCOTypeReference];
@@ -727,8 +746,10 @@
 
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.entityVersion = migration.destinationVersion;
+			}
 
 			[migratedItems addObject: newItem];
 		}
@@ -784,8 +805,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.entityVersion = migration.destinationVersion;
+			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -869,8 +892,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.entityVersion = migration.destinationVersion;
+			}
 
 			[migratedItems addObject: newItem];
 		}
@@ -969,8 +994,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.entityVersion = migration.destinationVersion;
+			}
 
 			[migratedItems addObject: newItem];
 		}

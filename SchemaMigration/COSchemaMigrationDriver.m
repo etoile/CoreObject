@@ -49,13 +49,13 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
  */
 - (NSDictionary *) versionsByDomainForItem: (COItem *)item
 {
-	NSMutableDictionary *result = [NSMutableDictionary new];
+	NSArray *versions = [item valueForAttribute: kCOObjectVersionsProperty];
 	NSArray *domains = [item valueForAttribute: kCOObjectDomainsProperty];
-	for (NSString *domain in domains)
-	{
-		result[domain] = @([item versionForDomain: domain]);
-	}
-	return result;
+
+	if (versions == nil || domains == nil)
+		return @{};
+
+	return [NSDictionary dictionaryWithObjects: versions forKeys: domains];
 }
 
 - (NSSet *)domainsToMigrateForItem: (COItem *)item

@@ -169,17 +169,6 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	return [NSDictionary dictionaryWithObjects: versions forKeys: domains];
 }
 
-- (int64_t)versionForDomain: (NSString *)aDomain
-{
-	NILARG_EXCEPTION_TEST(aDomain);
-	NSNumber *version = self.versionsByDomain[aDomain];
-	
-	if (version == nil)
-		return -1;
-
-	return [version longLongValue];
-}
-
 - (NSArray *) allObjectsForAttribute: (NSString *)attribute
 {
 	id value = [self valueForAttribute: attribute];
@@ -534,18 +523,6 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 		  forAttribute: kCOObjectDomainsProperty
 				  type: kCOTypeString | kCOTypeArray];
 	}
-}
-
-- (void) setVersion: (int64_t)aVersion
-          forDomain: (NSString *)aDomain
-{
-	NSMutableArray *versions = [[values objectForKey: kCOObjectVersionsProperty] mutableCopy];
-	NSArray *domains = [values objectForKey: kCOObjectDomainsProperty];
-	
-	[versions replaceObjectAtIndex: [domains indexOfObject: aDomain]
-	                    withObject: @(aVersion)];
-	
-	[self setValue: versions forAttribute: kCOObjectVersionsProperty];
 }
 
 - (void) setValue: (id)aValue
