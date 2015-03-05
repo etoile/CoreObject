@@ -212,13 +212,15 @@
 {
 	COMutableItem *parentItem = [parent.storeItem mutableCopy];
 
+	// FIXME: -1 is used as a marker for "no version set", so I changed this test
+	// to use -2 as an invalid version.
 	UKObjectsEqual(@"Test", parentItem.packageName);
-	parentItem.entityVersion = -1;
+	parentItem.entityVersion = -2;
 	
-	[COSchemaMigration recordVersionsByDomain: @{ @"Test" : @(-1),
+	[COSchemaMigration recordVersionsByDomain: @{ @"Test" : @(-2),
 												  @"org.etoile-project.CoreObject" : @(0) }
 									forDomain: @"Test"
-									  version: -1
+									  version: -2
 								   entityName: @"OutlineItem"];
 	
 	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: A(parentItem)]);

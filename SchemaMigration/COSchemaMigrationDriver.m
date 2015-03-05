@@ -66,10 +66,38 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	{
 		return S(item.packageName);
 	}
-
-	NSMutableSet *domainsToMigrate = [NSMutableSet new];
+	
+	/* Early exit, the item has no version specified, or no package, (i.e.
+	   saved with an old version of CO) so we can't do any migration. */
+	if (item.entityVersion == -1 || item.packageName == nil)
+	{
+		return [NSSet set];
+	}
+	
+	/* Early exit, common case: the version in the item matches the package verion
+	   in the model description repository. In that case we have no migration to do */
+	if (entity.owner != nil
+		&& entity.owner.version == item.entityVersion)
+	{
+		return [NSSet set];
+	}
+	
+	/* At this point we are doing a migration for some domains for sure. */
 
 	NSDictionary *versionsByDomain = [self versionsByDomainForItem: item];
+	
+	if (versionsByDomain[@"org.etoile-project.CoreObject"] == nil)
+	{
+		[NSException raise: NSInternalInconsistencyException
+					format: @"Item with entityName '%@' version %d needs a migration, "
+							"but -versionsByDomainForItem: returned an incomplete "
+							"snapshot of the past version of the metamodel we need "
+							"(the org.etoile-project.CoreObject package was missing.)",
+							item.entityName, (int)item.entityVersion];
+	}
+	
+	NSMutableSet *domainsToMigrate = [NSMutableSet new];
+	
 	for (NSString *domain in [versionsByDomain allKeys])
 	{
 		ETPackageDescription *package = [_modelDescriptionRepository descriptionForName: domain];
