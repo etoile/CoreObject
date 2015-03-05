@@ -42,28 +42,45 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	[value addObject: object];
 }
 
+/**
+ * Returns some info on the metamodel state that the item entity/package/version
+ * comes from, namely the package/version pairs for the entity and all of its
+ * superclasses.
+ */
+- (NSDictionary *) versionsByDomainForItem: (COItem *)item
+{
+	NSMutableDictionary *result = [NSMutableDictionary new];
+	NSArray *domains = [item valueForAttribute: kCOObjectDomainsProperty];
+	for (NSString *domain in domains)
+	{
+		result[domain] = @([item versionForDomain: domain]);
+	}
+	return result;
+}
+
 - (NSSet *)domainsToMigrateForItem: (COItem *)item
 {
-	NSArray *domains = [item valueForAttribute: kCOObjectDomainsProperty];
 	ETEntityDescription *entity = [_modelDescriptionRepository descriptionForName: item.entityName];
 	BOOL isDeletedEntity = (entity == nil);
 	
 	/* For a deleted entity, the domain versions match between item and packages */
 	if (isDeletedEntity)
 	{
-		/* The first domain is the one owning the entity, the remaining domains
-		   own the parent entities. */
-		return S([domains firstObject]);
+		return S(item.packageName);
 	}
 
 	NSMutableSet *domainsToMigrate = [NSMutableSet new];
 
-	for (NSString *domain in domains)
+	NSDictionary *versionsByDomain = [self versionsByDomainForItem: item];
+	for (NSString *domain in [versionsByDomain allKeys])
 	{
 		ETPackageDescription *package = [_modelDescriptionRepository descriptionForName: domain];
 		BOOL isDeletedPackage = (package == nil);
+		int64_t version = versionsByDomain[domain] != nil
+			? (int64_t)[versionsByDomain[domain] longLongValue]
+			: (int64_t)-1;
 
-		if (isDeletedPackage || [item versionForDomain: domain] != (int64_t)package.version)
+		if (isDeletedPackage || version != (int64_t)package.version)
 		{
 			[domainsToMigrate addObject: domain];
 		}
