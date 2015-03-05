@@ -17,6 +17,7 @@
 
 static NSMutableDictionary *migrations;
 static NSMutableDictionary *dependencies;
+static NSMutableDictionary *versionsByDomainByEntityTuple;
 
 + (void)initialize
 {
@@ -24,6 +25,7 @@ static NSMutableDictionary *dependencies;
 		return;
 
 	migrations = [NSMutableDictionary new];
+	versionsByDomainByEntityTuple = [NSMutableDictionary new];
 }
 
 #pragma mark Schema Migration Registration -
@@ -50,6 +52,7 @@ static NSMutableDictionary *dependencies;
 {
 	[migrations removeAllObjects];
 	dependencies = nil;
+	[versionsByDomainByEntityTuple removeAllObjects];
 }
 
 + (NSDictionary *)dependencies
@@ -80,6 +83,20 @@ static NSMutableDictionary *dependencies;
 	// TODO: Check there is no cycle with a topological sort.
 	
 	return dependencies;
+}
+
++ (NSDictionary *)versionsByDomainByEntityTuple
+{
+	return versionsByDomainByEntityTuple;
+}
+
++ (void) recordVersionsByDomain: (NSDictionary *)versions
+					  forDomain: (NSString *)domain
+						version: (int64_t)version
+					 entityName: (NSString *)entity
+{
+	NSArray *tuple = @[domain, @(version), entity];
+	versionsByDomainByEntityTuple[tuple] = versions;
 }
 
 #pragma mark - Triggering a Migration

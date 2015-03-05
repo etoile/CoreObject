@@ -33,6 +33,8 @@
 	[COSchemaMigration clearRegisteredMigrations];
 	SUPERINIT;
 	[self prepareNewContextWithModelDescriptionRepository: [ETModelDescriptionRepository mainRepository]];
+	[self recordOutlineItemVersion0Metamodel];
+	[self recordTagVersion0Metamodel];
 	return self;
 }
 
@@ -197,6 +199,12 @@
 	UKObjectsEqual(@"Test", parentItem.packageName);
 	parentItem.entityVersion = 1;
 	
+	[COSchemaMigration recordVersionsByDomain: @{ @"Test" : @(1),
+												  @"org.etoile-project.CoreObject" : @(0) }
+									forDomain: @"Test"
+									  version: 1
+								   entityName: @"OutlineItem"];
+
 	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: A(parentItem)]);
 }
 					  
@@ -206,6 +214,12 @@
 
 	UKObjectsEqual(@"Test", parentItem.packageName);
 	parentItem.entityVersion = -1;
+	
+	[COSchemaMigration recordVersionsByDomain: @{ @"Test" : @(-1),
+												  @"org.etoile-project.CoreObject" : @(0) }
+									forDomain: @"Test"
+									  version: -1
+								   entityName: @"OutlineItem"];
 	
 	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: A(parentItem)]);
 }
@@ -252,9 +266,28 @@
 	return [self registerMigrationWithVersion: version domain: @"Test" block: block];
 }
 
+- (void)recordOutlineItemVersion0Metamodel
+{
+	[COSchemaMigration recordVersionsByDomain: @{ @"Test" : @(0),
+												  @"org.etoile-project.CoreObject" : @(0) }
+									forDomain: @"Test"
+									  version: 0
+								   entityName: @"OutlineItem"];
+}
+
+- (void)recordTagVersion0Metamodel
+{
+	[COSchemaMigration recordVersionsByDomain: @{ @"Test" : @(0),
+												  @"org.etoile-project.CoreObject" : @(0) }
+									forDomain: @"Test"
+									  version: 0
+								   entityName: @"Tag"];
+}
+
 - (void)testBasicMigrationWithoutMetamodelChanges
 {
 	COSchemaMigration *migration = [self registerLabelUpdateMigrationWithVersion: 1];
+
 
 	[ctx commit];
 	[self prepareNewMigrationContextForDestinationVersion: 1];

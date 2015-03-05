@@ -376,6 +376,10 @@ withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
  */
 @property (nonatomic, copy) COMigrationBlock migrationBlock;
 
++ (void) recordVersionsByDomain: (NSDictionary *)versions
+					  forDomain: (NSString *)domain
+						version: (int64_t)version
+					 entityName: (NSString *)entity;
 
 /** @task Move Operations Accross Domains */
 
@@ -401,5 +405,7 @@ withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
 /** @taskunit Private */
 
 @property (nonatomic, readwrite, weak) COSchemaMigrationDriver *migrationDriver;
+
++ (NSDictionary *)versionsByDomainByEntityTuple;
 
 @end
