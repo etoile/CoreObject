@@ -64,6 +64,8 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	/* For a deleted entity, the domain versions match between item and packages */
 	if (isDeletedEntity)
 	{
+		// FIXME: We hit this line when loading a CODictionary during the test suite,
+		// something must be wrong (but no tests fail).
 		return S(item.packageName);
 	}
 	
@@ -317,18 +319,14 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 			if (![item.entityName isEqualToString: move.name])
 				continue;
 
+			// TODO: This code path is not tested
 			COMutableItem *newItem = [item mutableCopy];
-			NSMutableArray *domains =
-				[[newItem valueForAttribute: kCOObjectDomainsProperty] mutableCopy];
-			NSMutableArray *versions =
-				[[newItem valueForAttribute: kCOObjectVersionsProperty] mutableCopy];
-			NSInteger oldDomainIndex = [domains indexOfObject: migration.domain];
-
-			[domains replaceObjectAtIndex: oldDomainIndex withObject: move.domain];
-			[versions replaceObjectAtIndex: oldDomainIndex withObject: @(move.version)];
-	
-			[newItem setValue: domains forAttribute: kCOObjectDomainsProperty];
-			[newItem setValue: versions forAttribute: kCOObjectVersionsProperty];
+			
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.packageName = move.domain;
+				newItem.entityVersion = move.version;
+			}
 
 			[destinationItems addObject: newItem];
 			[sourceItems removeObject: item];
