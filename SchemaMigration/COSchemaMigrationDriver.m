@@ -88,14 +88,22 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 
 	NSDictionary *versionsByDomain = [self versionsByDomainForItem: item];
 	
-	if (versionsByDomain[@"org.etoile-project.CoreObject"] == nil)
+	if (versionsByDomain == nil
+		|| versionsByDomain[@"org.etoile-project.CoreObject"] == nil
+		|| ![versionsByDomain[item.packageName] isEqual: @(item.entityVersion)])
 	{
+		// TODO: Test that we get this exception when forgetting to call  +[COSchemaMigration recordVersionsByDomain:...]
 		[NSException raise: NSInternalInconsistencyException
 					format: @"Item with entityName '%@' version %d needs a migration, "
 							"but -versionsByDomainForItem: returned an incomplete "
-							"snapshot of the past version of the metamodel we need "
-							"(the org.etoile-project.CoreObject package was missing.)",
-							item.entityName, (int)item.entityVersion];
+							"snapshot of the past version of the metamodel we need. "
+							"It returned: %@. \n"
+							"We require it to be a non-nil dictionary, have a "
+							"version set for the org.etoile-project.CoreObject "
+							"package, and include the same package/version as "
+							"the item being migrated. Probably, you forgot to "
+							"call +[COSchemaMigration recordVersionsByDomain:...]",
+							item.entityName, (int)item.entityVersion, versionsByDomain];
 	}
 	
 	NSMutableSet *domainsToMigrate = [NSMutableSet new];
