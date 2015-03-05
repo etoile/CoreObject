@@ -9,6 +9,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 
 @class COSchemaMigration;
+@class COSchemaMigrationDriver;
 
 typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *storeItems);
 
@@ -300,6 +301,8 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
 	NSString *_domain;
 	int64_t _destinationVersion;
 	COMigrationBlock _migrationBlock;
+	__weak COSchemaMigrationDriver *migrationDriver;
+
 }
 
 
@@ -392,5 +395,11 @@ withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
  * You must not call the superclass implementation.
  */
 - (NSArray *)migrateItems: (NSArray *)storeItems;
+
+
+
+/** @taskunit Private */
+
+@property (nonatomic, readwrite, weak) COSchemaMigrationDriver *migrationDriver;
 
 @end

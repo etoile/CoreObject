@@ -79,10 +79,6 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 @property (nonatomic, readonly) NSString *entityName;
 @property (nonatomic, readonly) int64_t entityVersion;
 @property (nonatomic, readonly) NSString *packageName;
-/**
- * Returns the schema versions by package names.
- */
-@property (nonatomic, readonly) NSDictionary *versionsByDomain;
 
 // allows treating primitive or container, unordered or ordered as NSArray
 - (NSArray*) allObjectsForAttribute: (NSString*)attribute;

@@ -161,14 +161,6 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	return nil;
 }
 
-- (NSDictionary *)versionsByDomain
-{
-	NSArray *versions = [values objectForKey: kCOObjectVersionsProperty];
-	NSArray *domains = [values objectForKey: kCOObjectDomainsProperty];
-
-	return [NSDictionary dictionaryWithObjects: versions forKeys: domains];
-}
-
 - (NSArray *) allObjectsForAttribute: (NSString *)attribute
 {
 	id value = [self valueForAttribute: attribute];

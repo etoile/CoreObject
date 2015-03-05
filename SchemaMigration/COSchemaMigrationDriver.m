@@ -58,6 +58,8 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	return [NSDictionary dictionaryWithObjects: versions forKeys: domains];
 }
 
+
+
 - (NSSet *)domainsToMigrateForItem: (COItem *)item
 {
 	ETEntityDescription *entity = [_modelDescriptionRepository descriptionForName: item.entityName];
@@ -220,8 +222,8 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
                    toVersion: (int64_t)destinationVersion
 {
 	COItem *randomItem = [itemsToMigrate[packageName] firstObject];
-	int64_t proposedVersion = [[randomItem versionsByDomain][packageName] longLongValue];
-
+	int64_t proposedVersion = [[self versionsByDomainForItem: randomItem][packageName] longLongValue];
+	
 	if (proposedVersion < 0)
 	{
 		[NSException raise: NSInvalidArgumentException
@@ -251,6 +253,7 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 
 		[self runDependentMigrationsForMigration: migration];
 
+		migration.migrationDriver = self;
 		itemsToMigrate[packageName] = [migration migrateItems: itemsToMigrate[packageName]];
 		
 		/* Moving entities and properties after -[COSchemaMigration migrateItems:]
