@@ -153,12 +153,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 - (NSString *) packageName
 {
-	NSString *domain = [values objectForKey: kCOObjectDomainsProperty];
-	if (domain != nil)
-	{
-		return domain;
-	}
-	return nil;
+	return [values objectForKey: kCOObjectDomainsProperty];
 }
 
 - (NSArray *) allObjectsForAttribute: (NSString *)attribute
