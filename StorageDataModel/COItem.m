@@ -13,8 +13,8 @@
 #import "COAttachmentID.h"
 
 NSString *kCOObjectEntityNameProperty = @"org.etoile-project.coreobject.entityname";
-NSString *kCOObjectVersionsProperty = @"org.etoile-project.coreobject.versions";
-NSString *kCOObjectDomainsProperty = @"org.etoile-project.coreobject.domains";
+NSString *kCOObjectEntityVersionProperty = @"org.etoile-project.coreobject.entityversion";
+NSString *kCOObjectPackageNameProperty = @"org.etoile-project.coreobject.packagename";
 NSString *kCOObjectIsSharedProperty = @"isShared";
 
 static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
@@ -143,7 +143,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 - (int64_t) entityVersion
 {
-	NSNumber *version = [values objectForKey: kCOObjectVersionsProperty];
+	NSNumber *version = [values objectForKey: kCOObjectEntityVersionProperty];
 	if (version != nil)
 	{
 		return [version longLongValue];
@@ -153,7 +153,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 - (NSString *) packageName
 {
-	return [values objectForKey: kCOObjectDomainsProperty];
+	return [values objectForKey: kCOObjectPackageNameProperty];
 }
 
 - (NSArray *) allObjectsForAttribute: (NSString *)attribute
@@ -479,14 +479,14 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 - (void)setEntityVersion:(int64_t)entityVersion
 {
 	[self setValue: @(entityVersion)
-	  forAttribute: kCOObjectVersionsProperty
+	  forAttribute: kCOObjectEntityVersionProperty
 			  type: kCOTypeInt64];
 }
 
 - (void)setPackageName:(NSString *)packageName
 {
 	[self setValue: [packageName copy]
-	  forAttribute: kCOObjectDomainsProperty
+	  forAttribute: kCOObjectPackageNameProperty
 			  type: kCOTypeString];
 }
 

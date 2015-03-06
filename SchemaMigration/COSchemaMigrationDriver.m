@@ -191,12 +191,12 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 	[pristineItem setValue: [item valueForAttribute: kCOObjectEntityNameProperty]
 	          forAttribute: kCOObjectEntityNameProperty
 	                  type: [item typeForAttribute: kCOObjectEntityNameProperty]];
-	[pristineItem setValue: [item valueForAttribute: kCOObjectDomainsProperty]
-	          forAttribute: kCOObjectDomainsProperty
-	                  type: [item typeForAttribute: kCOObjectDomainsProperty]];
-	[pristineItem setValue: [item valueForAttribute: kCOObjectVersionsProperty]
-	          forAttribute: kCOObjectVersionsProperty
-	                  type: [item typeForAttribute: kCOObjectVersionsProperty]];
+	[pristineItem setValue: [item valueForAttribute: kCOObjectPackageNameProperty]
+	          forAttribute: kCOObjectPackageNameProperty
+	                  type: [item typeForAttribute: kCOObjectPackageNameProperty]];
+	[pristineItem setValue: [item valueForAttribute: kCOObjectEntityVersionProperty]
+	          forAttribute: kCOObjectEntityVersionProperty
+	                  type: [item typeForAttribute: kCOObjectEntityVersionProperty]];
 
 	return pristineItem;
 }
@@ -206,7 +206,7 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 	if ([item isAdditionalItem])
 	{
 		return [item.attributeNames arrayByRemovingObjectsInArray:
-			@[kCOObjectEntityNameProperty, kCOObjectDomainsProperty, kCOObjectVersionsProperty]];
+			@[kCOObjectEntityNameProperty, kCOObjectPackageNameProperty, kCOObjectEntityVersionProperty]];
 	}
 
 	ETEntityDescription *entity = [_modelDescriptionRepository descriptionForName: item.entityName];

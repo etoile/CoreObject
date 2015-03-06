@@ -12,8 +12,8 @@
 
 // TODO: Rename these variables to be prefixed by COItem and not COObject
 extern NSString *kCOObjectEntityNameProperty;
-extern NSString *kCOObjectVersionsProperty;
-extern NSString *kCOObjectDomainsProperty;
+extern NSString *kCOObjectEntityVersionProperty;
+extern NSString *kCOObjectPackageNameProperty;
 extern NSString *kCOObjectIsSharedProperty;
 
 /**

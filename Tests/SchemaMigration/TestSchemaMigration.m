@@ -691,12 +691,12 @@
 			[mediaItem setValue: @"OutlineMedia"
 			       forAttribute: kCOObjectEntityNameProperty
 						   type: kCOTypeString];
-			[mediaItem setValue: [oldItem valueForAttribute: kCOObjectDomainsProperty]
-			       forAttribute: kCOObjectDomainsProperty
-						   type: [oldItem typeForAttribute: kCOObjectDomainsProperty]];
-			[mediaItem setValue: [oldItem valueForAttribute: kCOObjectVersionsProperty]
-			       forAttribute: kCOObjectVersionsProperty
-						   type: [oldItem typeForAttribute: kCOObjectVersionsProperty]];
+			[mediaItem setValue: [oldItem valueForAttribute: kCOObjectPackageNameProperty]
+			       forAttribute: kCOObjectPackageNameProperty
+						   type: [oldItem typeForAttribute: kCOObjectPackageNameProperty]];
+			[mediaItem setValue: [oldItem valueForAttribute: kCOObjectEntityVersionProperty]
+			       forAttribute: kCOObjectEntityVersionProperty
+						   type: [oldItem typeForAttribute: kCOObjectEntityVersionProperty]];
 
 			if ([mediaItem.packageName isEqual: migration.domain])
 			{

@@ -518,10 +518,10 @@ serialization. */
 {
     [values setObject: anEntityName forKey: kCOObjectEntityNameProperty];
 	[types setObject: @(kCOTypeString) forKey: kCOObjectEntityNameProperty];
-	[values setObject: @(package.version) forKey: kCOObjectVersionsProperty];
-	[types setObject: @(kCOTypeInt64) forKey: kCOObjectVersionsProperty];
-	[values setObject: package.name forKey: kCOObjectDomainsProperty];
-	[types setObject: @(kCOTypeString) forKey: kCOObjectDomainsProperty];
+	[values setObject: @(package.version) forKey: kCOObjectEntityVersionProperty];
+	[types setObject: @(kCOTypeInt64) forKey: kCOObjectEntityVersionProperty];
+	[values setObject: package.name forKey: kCOObjectPackageNameProperty];
+	[types setObject: @(kCOTypeString) forKey: kCOObjectPackageNameProperty];
 
 	return [[COItem alloc] initWithUUID: aUUID
 	                 typesForAttributes: types
@@ -948,8 +948,8 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	for (NSString *property in [aStoreItem attributeNames])
 	{
         if ([property isEqualToString: kCOObjectEntityNameProperty]
-		 || [property isEqualToString: kCOObjectVersionsProperty]
-         || [property isEqualToString: kCOObjectDomainsProperty])
+		 || [property isEqualToString: kCOObjectEntityVersionProperty]
+         || [property isEqualToString: kCOObjectPackageNameProperty])
         {
             // HACK
             continue;
