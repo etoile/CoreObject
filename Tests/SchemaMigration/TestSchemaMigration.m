@@ -106,9 +106,9 @@
 		/* Sanity check that the item package/version are in sync with the model
 		   description repository. */
 		UKObjectsEqual(item.packageName, anObject.entityDescription.owner.name);
-		UKIntsEqual(item.entityVersion, anObject.entityDescription.owner.version);
+		UKIntsEqual(item.packageVersion, anObject.entityDescription.owner.version);
 		
-		return item.entityVersion;
+		return item.packageVersion;
 	}
 
 	for (ETPackageDescription *package in [anObject.entityDescription allPackageDescriptions])
@@ -130,9 +130,9 @@
 		OutlineItem *newParent = [(Tag *)testRootObject contents].anyObject;
 		OutlineItem *newChild = [newParent.content firstObject];
 
-		UKIntsEqual(0, newParent.storeItem.entityVersion);
+		UKIntsEqual(0, newParent.storeItem.packageVersion);
 		UKIntsEqual(0, [[[[newParent entityDescription] parent] owner] version]);
-		UKIntsEqual(0, newChild.storeItem.entityVersion);
+		UKIntsEqual(0, newChild.storeItem.packageVersion);
 		UKIntsEqual(0, [[[[newChild entityDescription] parent] owner] version]);
 		
 		UKObjectsEqual(@"Test", newParent.storeItem.packageName);
@@ -197,7 +197,7 @@
 	COMutableItem *parentItem = [parent.storeItem mutableCopy];
 
 	UKObjectsEqual(@"Test", parentItem.packageName);
-	parentItem.entityVersion = 1;
+	parentItem.packageVersion = 1;
 	
 	[COSchemaMigration recordVersionsByDomain: @{ @"Test" : @(1),
 												  @"org.etoile-project.CoreObject" : @(0) }
@@ -215,7 +215,7 @@
 	// FIXME: -1 is used as a marker for "no version set", so I changed this test
 	// to use -2 as an invalid version.
 	UKObjectsEqual(@"Test", parentItem.packageName);
-	parentItem.entityVersion = -2;
+	parentItem.packageVersion = -2;
 	
 	[COSchemaMigration recordVersionsByDomain: @{ @"Test" : @(-2),
 												  @"org.etoile-project.CoreObject" : @(0) }
@@ -253,7 +253,7 @@
 
 			if ([newItem.packageName isEqual: migration.domain])
 			{
-				newItem.entityVersion = migration.destinationVersion;
+				newItem.packageVersion = migration.destinationVersion;
 			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
@@ -326,7 +326,7 @@
 	
 			if ([newItem.packageName isEqual: migration.domain])
 			{
-				newItem.entityVersion = migration.destinationVersion;
+				newItem.packageVersion = migration.destinationVersion;
 			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
@@ -387,7 +387,7 @@
 	
 			if ([newItem.packageName isEqual: migration.domain])
 			{
-				newItem.entityVersion = migration.destinationVersion;
+				newItem.packageVersion = migration.destinationVersion;
 			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
@@ -458,7 +458,7 @@
 	
 			if ([newItem.packageName isEqual: migration.domain])
 			{
-				newItem.entityVersion = migration.destinationVersion;
+				newItem.packageVersion = migration.destinationVersion;
 			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
@@ -524,7 +524,7 @@
 	
 			if ([newItem.packageName isEqual: migration.domain])
 			{
-				newItem.entityVersion = migration.destinationVersion;
+				newItem.packageVersion = migration.destinationVersion;
 			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
@@ -604,7 +604,7 @@
 	
 			if ([newItem.packageName isEqual: migration.domain])
 			{
-				newItem.entityVersion = migration.destinationVersion;
+				newItem.packageVersion = migration.destinationVersion;
 			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
@@ -678,7 +678,7 @@
 
 			if ([newItem.packageName isEqual: migration.domain])
 			{
-				newItem.entityVersion = migration.destinationVersion;
+				newItem.packageVersion = migration.destinationVersion;
 			}
 
 			[migratedItems addObject: newItem];
@@ -694,13 +694,13 @@
 			[mediaItem setValue: [oldItem valueForAttribute: kCOObjectPackageNameProperty]
 			       forAttribute: kCOObjectPackageNameProperty
 						   type: [oldItem typeForAttribute: kCOObjectPackageNameProperty]];
-			[mediaItem setValue: [oldItem valueForAttribute: kCOObjectEntityVersionProperty]
-			       forAttribute: kCOObjectEntityVersionProperty
-						   type: [oldItem typeForAttribute: kCOObjectEntityVersionProperty]];
+			[mediaItem setValue: [oldItem valueForAttribute: kCOObjectPackageVersionProperty]
+			       forAttribute: kCOObjectPackageVersionProperty
+						   type: [oldItem typeForAttribute: kCOObjectPackageVersionProperty]];
 
 			if ([mediaItem.packageName isEqual: migration.domain])
 			{
-				mediaItem.entityVersion = migration.destinationVersion;
+				mediaItem.packageVersion = migration.destinationVersion;
 			}
 			
 			[newItem setValue: mediaItem.UUID
@@ -783,7 +783,7 @@
 	
 			if ([newItem.packageName isEqual: migration.domain])
 			{
-				newItem.entityVersion = migration.destinationVersion;
+				newItem.packageVersion = migration.destinationVersion;
 			}
 
 			[migratedItems addObject: newItem];
@@ -842,7 +842,7 @@
 	
 			if ([newItem.packageName isEqual: migration.domain])
 			{
-				newItem.entityVersion = migration.destinationVersion;
+				newItem.packageVersion = migration.destinationVersion;
 			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
@@ -929,7 +929,7 @@
 	
 			if ([newItem.packageName isEqual: migration.domain])
 			{
-				newItem.entityVersion = migration.destinationVersion;
+				newItem.packageVersion = migration.destinationVersion;
 			}
 
 			[migratedItems addObject: newItem];
@@ -1031,7 +1031,7 @@
 	
 			if ([newItem.packageName isEqual: migration.domain])
 			{
-				newItem.entityVersion = migration.destinationVersion;
+				newItem.packageVersion = migration.destinationVersion;
 			}
 
 			[migratedItems addObject: newItem];

@@ -13,7 +13,7 @@
 #import "COAttachmentID.h"
 
 NSString *kCOObjectEntityNameProperty = @"org.etoile-project.coreobject.entityname";
-NSString *kCOObjectEntityVersionProperty = @"org.etoile-project.coreobject.entityversion";
+NSString *kCOObjectPackageVersionProperty = @"org.etoile-project.coreobject.entityversion";
 NSString *kCOObjectPackageNameProperty = @"org.etoile-project.coreobject.packagename";
 NSString *kCOObjectIsSharedProperty = @"isShared";
 
@@ -141,9 +141,9 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	return [self valueForAttribute: kCOObjectEntityNameProperty];
 }
 
-- (int64_t) entityVersion
+- (int64_t) packageVersion
 {
-	NSNumber *version = [values objectForKey: kCOObjectEntityVersionProperty];
+	NSNumber *version = [values objectForKey: kCOObjectPackageVersionProperty];
 	if (version != nil)
 	{
 		return [version longLongValue];
@@ -476,10 +476,10 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	          type: kCOTypeString];
 }
 
-- (void)setEntityVersion:(int64_t)entityVersion
+- (void)setPackageVersion:(int64_t)entityVersion
 {
 	[self setValue: @(entityVersion)
-	  forAttribute: kCOObjectEntityVersionProperty
+	  forAttribute: kCOObjectPackageVersionProperty
 			  type: kCOTypeInt64];
 }
 

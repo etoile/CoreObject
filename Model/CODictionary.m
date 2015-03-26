@@ -73,7 +73,7 @@
 	for (NSString *property in [aStoreItem attributeNames])
 	{
         if ([property isEqualToString: kCOObjectEntityNameProperty]
-		 || [property isEqualToString: kCOObjectEntityVersionProperty]
+		 || [property isEqualToString: kCOObjectPackageVersionProperty]
          || [property isEqualToString: kCOObjectPackageNameProperty])
         {
             // HACK

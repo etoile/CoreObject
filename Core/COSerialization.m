@@ -518,8 +518,8 @@ serialization. */
 {
     [values setObject: anEntityName forKey: kCOObjectEntityNameProperty];
 	[types setObject: @(kCOTypeString) forKey: kCOObjectEntityNameProperty];
-	[values setObject: @(package.version) forKey: kCOObjectEntityVersionProperty];
-	[types setObject: @(kCOTypeInt64) forKey: kCOObjectEntityVersionProperty];
+	[values setObject: @(package.version) forKey: kCOObjectPackageVersionProperty];
+	[types setObject: @(kCOTypeInt64) forKey: kCOObjectPackageVersionProperty];
 	[values setObject: package.name forKey: kCOObjectPackageNameProperty];
 	[types setObject: @(kCOTypeString) forKey: kCOObjectPackageNameProperty];
 
@@ -948,7 +948,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	for (NSString *property in [aStoreItem attributeNames])
 	{
         if ([property isEqualToString: kCOObjectEntityNameProperty]
-		 || [property isEqualToString: kCOObjectEntityVersionProperty]
+		 || [property isEqualToString: kCOObjectPackageVersionProperty]
          || [property isEqualToString: kCOObjectPackageNameProperty])
         {
             // HACK

@@ -50,7 +50,7 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 - (NSDictionary *) versionsByDomainForItem: (COItem *)item
 {
 	NSDictionary *versionsByDomainByEntityTuple = [COSchemaMigration versionsByDomainByEntityTuple];
-	NSArray *key = @[item.packageName, @(item.entityVersion), item.entityName];
+	NSArray *key = @[item.packageName, @(item.packageVersion), item.entityName];
 	return versionsByDomainByEntityTuple[key];
 }
 
@@ -71,7 +71,7 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	
 	/* Early exit, the item has no version specified, or no package, (i.e.
 	   saved with an old version of CO) so we can't do any migration. */
-	if (item.entityVersion == -1 || item.packageName == nil)
+	if (item.packageVersion == -1 || item.packageName == nil)
 	{
 		return [NSSet set];
 	}
@@ -79,7 +79,7 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	/* Early exit, common case: the version in the item matches the package verion
 	   in the model description repository. In that case we have no migration to do */
 	if (entity.owner != nil
-		&& entity.owner.version == item.entityVersion)
+		&& entity.owner.version == item.packageVersion)
 	{
 		return [NSSet set];
 	}
@@ -90,7 +90,7 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	
 	if (versionsByDomain == nil
 		|| versionsByDomain[@"org.etoile-project.CoreObject"] == nil
-		|| ![versionsByDomain[item.packageName] isEqual: @(item.entityVersion)])
+		|| ![versionsByDomain[item.packageName] isEqual: @(item.packageVersion)])
 	{
 		// TODO: Test that we get this exception when forgetting to call  +[COSchemaMigration recordVersionsByDomain:...]
 		[NSException raise: NSInternalInconsistencyException
@@ -103,7 +103,7 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 							"package, and include the same package/version as "
 							"the item being migrated. Probably, you forgot to "
 							"call +[COSchemaMigration recordVersionsByDomain:...]",
-							item.entityName, (int)item.entityVersion, versionsByDomain];
+							item.entityName, (int)item.packageVersion, versionsByDomain];
 	}
 	
 	NSMutableSet *domainsToMigrate = [NSMutableSet new];
@@ -194,9 +194,9 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 	[pristineItem setValue: [item valueForAttribute: kCOObjectPackageNameProperty]
 	          forAttribute: kCOObjectPackageNameProperty
 	                  type: [item typeForAttribute: kCOObjectPackageNameProperty]];
-	[pristineItem setValue: [item valueForAttribute: kCOObjectEntityVersionProperty]
-	          forAttribute: kCOObjectEntityVersionProperty
-	                  type: [item typeForAttribute: kCOObjectEntityVersionProperty]];
+	[pristineItem setValue: [item valueForAttribute: kCOObjectPackageVersionProperty]
+	          forAttribute: kCOObjectPackageVersionProperty
+	                  type: [item typeForAttribute: kCOObjectPackageVersionProperty]];
 
 	return pristineItem;
 }
@@ -206,7 +206,7 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 	if ([item isAdditionalItem])
 	{
 		return [item.attributeNames arrayByRemovingObjectsInArray:
-			@[kCOObjectEntityNameProperty, kCOObjectPackageNameProperty, kCOObjectEntityVersionProperty]];
+			@[kCOObjectEntityNameProperty, kCOObjectPackageNameProperty, kCOObjectPackageVersionProperty]];
 	}
 
 	ETEntityDescription *entity = [_modelDescriptionRepository descriptionForName: item.entityName];
@@ -333,7 +333,7 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 			if ([newItem.packageName isEqual: migration.domain])
 			{
 				newItem.packageName = move.domain;
-				newItem.entityVersion = move.version;
+				newItem.packageVersion = move.version;
 			}
 
 			[destinationItems addObject: newItem];
