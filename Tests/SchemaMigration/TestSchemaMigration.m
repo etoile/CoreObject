@@ -144,7 +144,7 @@
 
 - (COSchemaMigration *)registerMigrationWithVersion: (int64_t)version
                                              domain: (NSString *)domain
-				  dependentSourceVersionsByDomain: (NSDictionary *)deps
+					dependentSourceVersionsByDomain: (NSDictionary *)deps
                                               block: (COMigrationBlock)block
 {
 	COSchemaMigration *migration = [COSchemaMigration new];
@@ -165,6 +165,16 @@
 									   domain: domain
 			  dependentSourceVersionsByDomain: @{}
 										block: NULL];
+}
+
+- (COSchemaMigration *)registerMigrationWithTestDomainVersion: (int64_t)version
+														block: (COMigrationBlock)block
+{
+	// The Test domain depends on the CoreObject domain, v0
+	return [self registerMigrationWithVersion: version
+									   domain: @"Test"
+			  dependentSourceVersionsByDomain: @{ @"org.etoile-project.CoreObject" : @(0) }
+										block: block];
 }
 
 - (void)testSchemaMigrationRegistration
@@ -256,10 +266,8 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithVersion: version
-									   domain: @"Test"
-			dependentSourceVersionsByDomain: @{ @"org.etoile-project.CoreObject" : @(0) }
-										block: block];
+	return [self registerMigrationWithTestDomainVersion: version
+												  block: block];
 }
 
 - (void)testBasicMigrationWithoutMetamodelChanges
@@ -316,7 +324,7 @@
 
 	return [self registerMigrationWithVersion: version
 	                                   domain: @"org.etoile-project.CoreObject"
-			dependentSourceVersionsByDomain: @{}
+			  dependentSourceVersionsByDomain: @{}
 	                                    block: block];
 }
 
@@ -378,10 +386,8 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithVersion: version
-	                                   domain: @"Test"
-			dependentSourceVersionsByDomain: @{ @"org.etoile-project.CoreObject" : @(0) }
-	                                    block: block];
+	return [self registerMigrationWithTestDomainVersion: version
+												  block: block];
 }
 
 - (ETModelDescriptionRepository *)registerCommentAdditionInMetamodelWithVersion: (int64_t)version
@@ -448,10 +454,8 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithVersion: version
-	                                   domain: @"Test"
-			dependentSourceVersionsByDomain: @{ @"org.etoile-project.CoreObject" : @(0) }
-	                                    block: block];
+	return [self registerMigrationWithTestDomainVersion: version
+												  block: block];
 }
 
 - (ETModelDescriptionRepository *)registerLabelDeletionInMetamodelWithVersion: (int64_t)version
@@ -518,10 +522,8 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithVersion: version
-	                                   domain: @"Test"
-			dependentSourceVersionsByDomain: @{ @"org.etoile-project.CoreObject" : @(0) }
-	                                    block: block];
+	return [self registerMigrationWithTestDomainVersion: version
+												  block: block];
 }
 
 - (ETModelDescriptionRepository *)registerLabelRenamingInMetamodelWithVersion: (int64_t)version
@@ -601,10 +603,8 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithVersion: version
-	                                   domain: @"Test"
-			dependentSourceVersionsByDomain: @{ @"org.etoile-project.CoreObject" : @(0) }
-	                                    block: block];
+	return [self registerMigrationWithTestDomainVersion: version
+												  block: block];
 }
 
 - (ETModelDescriptionRepository *)registerNameOverridingInMetamodelWithVersion: (int64_t)version
@@ -693,10 +693,8 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithVersion: version
-	                                   domain: @"Test"
-			dependentSourceVersionsByDomain: @{ @"org.etoile-project.CoreObject" : @(0) }
-	                                    block: block];
+	return [self registerMigrationWithTestDomainVersion: version
+												  block: block];
 }
 
 - (ETModelDescriptionRepository *)registerOutlineMediaAdditionInMetamodelWithVersion: (int64_t)version
@@ -773,10 +771,8 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithVersion: version
-	                                   domain: @"Test"
-			dependentSourceVersionsByDomain: @{ @"org.etoile-project.CoreObject" : @(0) }
-	                                    block: block];
+	return [self registerMigrationWithTestDomainVersion: version
+												  block: block];
 }
 
 - (ETModelDescriptionRepository *)registerTagDeletionInMetamodelWithVersion: (int64_t)version
@@ -837,10 +833,8 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithVersion: version
-	                                   domain: @"Test"
-			dependentSourceVersionsByDomain: @{ @"org.etoile-project.CoreObject" : @(0) }
-	                                    block: block];
+	return [self registerMigrationWithTestDomainVersion: version
+												  block: block];
 }
 
 - (ETModelDescriptionRepository *)registerOutlineItemRenamingInMetamodelWithVersion: (int64_t)version
@@ -921,10 +915,8 @@
 		return migratedItems;
 	};
 
-	COSchemaMigration *migration = [self registerMigrationWithVersion: version
-															   domain: @"Test"
-									dependentSourceVersionsByDomain: @{ @"org.etoile-project.CoreObject" : @(0) }
-																block: NULL];
+	COSchemaMigration *migration = [self registerMigrationWithTestDomainVersion: version
+																		  block: NULL];
 	COModelElementMove *outlineMove = [COModelElementMove new];
 
 	outlineMove.name = @"OutlineItem";
@@ -1025,10 +1017,8 @@
 		return migratedItems;
 	};
 
-	COSchemaMigration *migration = [self registerMigrationWithVersion: version
-	                                                           domain: @"Test"
-									dependentSourceVersionsByDomain: @{ @"org.etoile-project.CoreObject" : @(0) }
-	                                                            block: block];
+	COSchemaMigration *migration = [self registerMigrationWithTestDomainVersion: version
+																		  block: block];
 	COModelElementMove *tagMove = [COModelElementMove new];
 	COModelElementMove *outlineMove = [COModelElementMove new];
 
