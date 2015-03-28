@@ -43,15 +43,24 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 }
 
 /**
- * Returns some info on the metamodel state that the item entity/package/version
+ * Returns some info on the metamodel state that the item package/version
  * comes from, namely the package/version pairs for the entity and all of its
  * superclasses.
  */
 - (NSDictionary *) versionsByDomainForItem: (COItem *)item
 {
-	NSDictionary *versionsByDomainByEntityTuple = [COSchemaMigration versionsByDomainByEntityTuple];
-	NSArray *key = @[item.packageName, @(item.packageVersion)];
-	return versionsByDomainByEntityTuple[key];
+	for (COSchemaMigration *migration in [COSchemaMigration migrations])
+	{
+		if ([item.packageName isEqual: migration.domain]
+			&& item.packageVersion == migration.sourceVersion)
+		{
+			NSDictionary *versionsByDomain = [migration.dependentSourceVersionsByDomain
+											  dictionaryByAddingEntriesFromDictionary:
+											  @{ migration.domain : @(migration.sourceVersion) }];
+			return versionsByDomain;
+		}
+	}
+	return @{};
 }
 
 
@@ -92,9 +101,9 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 		|| versionsByDomain[@"org.etoile-project.CoreObject"] == nil
 		|| ![versionsByDomain[item.packageName] isEqual: @(item.packageVersion)])
 	{
-		// TODO: Test that we get this exception when forgetting to call  +[COSchemaMigration recordVersionsByDomain:...]
+		// TODO: Test that we get this exception when needed
 		[NSException raise: NSInternalInconsistencyException
-					format: @"Item with entityName '%@' version %d needs a migration, "
+					format: @"Item with entityName '%@' domain '%@' version %d needs a migration, "
 							"but -versionsByDomainForItem: returned an incomplete "
 							"snapshot of the past version of the metamodel we need. "
 							"It returned: %@. \n"
@@ -102,8 +111,8 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 							"version set for the org.etoile-project.CoreObject "
 							"package, and include the same package/version as "
 							"the item being migrated. Probably, you forgot to "
-							"call +[COSchemaMigration recordVersionsByDomain:...]",
-							item.entityName, (int)item.packageVersion, versionsByDomain];
+							"set COSchemaMigration.dependentSourceVersionsByDomain.",
+							item.entityName, item.packageName, (int)item.packageVersion, versionsByDomain];
 	}
 	
 	NSMutableSet *domainsToMigrate = [NSMutableSet new];

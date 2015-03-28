@@ -14,10 +14,10 @@
 
 @synthesize domain = _domain, destinationVersion = _destinationVersion, migrationBlock = _migrationBlock;
 @synthesize entityMoves = _entityMoves, propertyMoves = _propertyMoves, migrationDriver = _migrationDriver;
+@synthesize dependentSourceVersionsByDomain = _dependentSourceVersionsByDomain;
 
 static NSMutableDictionary *migrations;
 static NSMutableDictionary *dependencies;
-static NSMutableDictionary *versionsByDomainByEntityTuple;
 
 + (void)initialize
 {
@@ -25,7 +25,6 @@ static NSMutableDictionary *versionsByDomainByEntityTuple;
 		return;
 
 	migrations = [NSMutableDictionary new];
-	versionsByDomainByEntityTuple = [NSMutableDictionary new];
 }
 
 #pragma mark Schema Migration Registration -
@@ -52,7 +51,6 @@ static NSMutableDictionary *versionsByDomainByEntityTuple;
 {
 	[migrations removeAllObjects];
 	dependencies = nil;
-	[versionsByDomainByEntityTuple removeAllObjects];
 }
 
 + (NSDictionary *)dependencies
@@ -85,18 +83,9 @@ static NSMutableDictionary *versionsByDomainByEntityTuple;
 	return dependencies;
 }
 
-+ (NSDictionary *)versionsByDomainByEntityTuple
++ (NSArray *)migrations
 {
-	return versionsByDomainByEntityTuple;
-}
-
-+ (void) recordVersionsByDomain: (NSDictionary *)versions
-					  forDomain: (NSString *)domain
-						version: (int64_t)version
-					 entityName: (NSString *)entity
-{
-	NSArray *tuple = @[domain, @(version)];
-	versionsByDomainByEntityTuple[tuple] = versions;
+	return [migrations allValues];
 }
 
 #pragma mark - Triggering a Migration

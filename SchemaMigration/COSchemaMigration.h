@@ -302,7 +302,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
 	int64_t _destinationVersion;
 	COMigrationBlock _migrationBlock;
 	__weak COSchemaMigrationDriver *migrationDriver;
-
+	NSDictionary *_dependentSourceVersionsByDomain;
 }
 
 
@@ -333,6 +333,11 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  * domain and -[ETKeyValue value] returns the destination version.
  */
 + (NSDictionary *)dependencies;
+
+/**
+ * Returns an array of all registered migrations.
+ */
++ (NSArray *)migrations;
 
 
 /** @taskunit Migrating to Future Versions */
@@ -375,11 +380,14 @@ withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
  * subclass and overriding -migrateItems:.
  */
 @property (nonatomic, copy) COMigrationBlock migrationBlock;
-
-+ (void) recordVersionsByDomain: (NSDictionary *)versions
-					  forDomain: (NSString *)domain
-						version: (int64_t)version
-					 entityName: (NSString *)entity;
+/**
+ * Domains depended on by the -sourceVersion of -domain, along with
+ * their versions.
+ *
+ * This acts as a snapshot of the necessary parts of the metamodel at 
+ * -sourceVersion.
+ */
+@property (nonatomic, copy) NSDictionary *dependentSourceVersionsByDomain;
 
 /** @task Move Operations Accross Domains */
 
@@ -405,7 +413,5 @@ withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
 /** @taskunit Private */
 
 @property (nonatomic, readwrite, weak) COSchemaMigrationDriver *migrationDriver;
-
-+ (NSDictionary *)versionsByDomainByEntityTuple;
 
 @end
