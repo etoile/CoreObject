@@ -962,10 +962,11 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	
 		if (propertyDesc == nil)
 		{
-			[NSException raise: NSInvalidArgumentException
-			            format: @"Tried to set serialized value %@ of type %@ "
-			                     "for property %@ missing in the metamodel %@",
-			                    serializedValue, COTypeDescription(serializedType), property, [self entityDescription]];
+			// Was an exception in 0.5, but that seems overly paranoid
+			NSLog(@"Warning: Tried to set serialized value %@ of type %@ "
+				   "for property %@ missing in the metamodel %@",
+				   serializedValue, COTypeDescription(serializedType), property, [self entityDescription]);
+			continue;
 		}
 
 		id value = [self valueForSerializedValue: serializedValue

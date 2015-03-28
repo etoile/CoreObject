@@ -17,7 +17,8 @@
 // This property name is reserved for JSON serialization and cannot be used
 // as an actual property name.
 NSString *kCOJSONObjectUUIDProperty = @"org.etoile-project.coreobject.uuid";
-
+NSString *kCOJSONFormatProperty = @"org.etoile-project.coreobject.json-format";
+NSString *kCOJSONFormat1_0 = @"1.0";
 // COType -> string
 
 static NSString *arraySuffix = @"-array";
@@ -247,6 +248,9 @@ static COType importTypeFromPlist(id typeValuePair)
 	ETAssert(plistValues[kCOJSONObjectUUIDProperty] == nil);
 	plistValues[kCOJSONObjectUUIDProperty] = [self.UUID stringValue];
 	
+	ETAssert(plistValues[kCOJSONFormatProperty] == nil);
+	plistValues[kCOJSONFormatProperty] = kCOJSONFormat1_0;
+	
     return plistValues;
 }
 
@@ -257,9 +261,19 @@ static COType importTypeFromPlist(id typeValuePair)
 	NSMutableDictionary *importedValues = [NSMutableDictionary dictionary];
 	NSMutableDictionary *importedTypes = [NSMutableDictionary dictionary];
 
+	// Check format
+	if (!(aPlist[kCOJSONFormatProperty] == nil // accept JSON written before format tag was added
+		  || [aPlist[kCOJSONFormatProperty] isEqual: kCOJSONFormat1_0]))
+	{
+		[NSException raise: NSInvalidArgumentException
+					format: @"Unknown COItem JSON format '%@'",
+		                    aPlist[kCOJSONFormatProperty]];
+	}
+	
 	for (NSString *key in aPlist)
 	{
-		if ([key isEqualToString: kCOJSONObjectUUIDProperty])
+		if ([key isEqualToString: kCOJSONObjectUUIDProperty]
+			|| [key isEqualToString: kCOJSONFormatProperty])
 			continue;
 		
 		id typeValuePair = aPlist[key];
