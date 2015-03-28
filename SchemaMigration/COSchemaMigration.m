@@ -95,7 +95,7 @@ static NSMutableDictionary *versionsByDomainByEntityTuple;
 						version: (int64_t)version
 					 entityName: (NSString *)entity
 {
-	NSArray *tuple = @[domain, @(version), entity];
+	NSArray *tuple = @[domain, @(version)];
 	versionsByDomainByEntityTuple[tuple] = versions;
 }
 
