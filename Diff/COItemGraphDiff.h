@@ -90,6 +90,10 @@
  * item graph was changed.
  */
 - (BOOL) applyTo: (id<COItemGraph>)dest;
+/**
+ * Returns whether the diff contains any edits.
+ */
+- (BOOL) isEmpty;
 
 - (COItemGraph *) itemTreeWithDiffAppliedToItemGraph: (id<COItemGraph>)aSubtree;
 

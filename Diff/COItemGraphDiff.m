@@ -745,6 +745,11 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	return ![insertedOrUpdated isEmpty];
 }
 
+- (BOOL) isEmpty
+{
+	return [[self allEdits] isEmpty];
+}
+
 - (COItemGraph *) itemTreeWithDiffAppliedToItemGraph: (id<COItemGraph>)aGraph
 {
     COItemGraph *result = [[COItemGraph alloc] initWithItemGraph: aGraph];    

@@ -428,6 +428,11 @@ static void coalesceOps(NSMutableArray *ops)
 	}
 }
 
+- (BOOL) isEmpty
+{
+	return [_operations isEmpty];
+}
+
 - (BOOL) hasConflicts
 {
 	// FIXME: Implement

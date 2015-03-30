@@ -156,6 +156,16 @@
 	return ![itemsByUUID isEmpty];
 }
 
+- (BOOL) isEmpty
+{
+	for (id<CODiffAlgorithm> diff in [subDiffsByAlgorithmName allValues])
+	{
+		if (![diff isEmpty])
+			return NO;
+	}
+	return YES;
+}
+
 - (BOOL) hasConflicts
 {
 	for (id<CODiffAlgorithm> diff in [subDiffsByAlgorithmName allValues])

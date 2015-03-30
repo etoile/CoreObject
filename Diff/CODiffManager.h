@@ -21,6 +21,10 @@
  * Returns ETUUID : COItem dictionary
  */
 - (NSDictionary *) addedOrUpdatedItemsForApplyingTo: (id<COItemGraph>)dest;
+/**
+ * Returns whether the diff contains any edits.
+ */
+- (BOOL) isEmpty;
 
 - (BOOL) hasConflicts;
 - (void) resolveConflictsFavoringSourceIdentifier: (id)aSource;
@@ -58,6 +62,10 @@
  * item graph was changed.
  */
 - (BOOL) applyTo: (id<COItemGraph>)dest;
+/**
+ * Returns whether the diff contains any edits.
+ */
+- (BOOL) isEmpty;
 
 - (BOOL) hasConflicts;
 - (void) resolveConflictsFavoringSourceIdentifier: (id)aSource;
