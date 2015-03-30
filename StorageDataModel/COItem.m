@@ -13,7 +13,7 @@
 #import "COAttachmentID.h"
 
 NSString *kCOObjectEntityNameProperty = @"org.etoile-project.coreobject.entityname";
-NSString *kCOObjectPackageVersionProperty = @"org.etoile-project.coreobject.entityversion";
+NSString *kCOObjectPackageVersionProperty = @"org.etoile-project.coreobject.packageversion";
 NSString *kCOObjectPackageNameProperty = @"org.etoile-project.coreobject.packagename";
 NSString *kCOObjectIsSharedProperty = @"isShared";
 
