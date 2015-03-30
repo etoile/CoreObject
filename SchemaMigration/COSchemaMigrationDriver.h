@@ -8,6 +8,8 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
+@class COItem;
+
 @interface COSchemaMigrationDriver : NSObject
 {
 	ETModelDescriptionRepository *_modelDescriptionRepository;
@@ -25,5 +27,10 @@
 
 
 - (NSArray *)migrateItems: (NSArray *)storeItems;
+
+
+/** @taskunit Framework private */
+
+- (NSDictionary *) versionsByDomainForItem: (COItem *)item;
 
 @end

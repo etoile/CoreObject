@@ -59,7 +59,7 @@
 	                         types: types
 	                        values: values
 	                    entityName: @"CODictionary"
-			   packageDescriptions: rootCoreObjectEntity.allPackageDescriptions];
+				packageDescription: rootCoreObjectEntity.owner];
 }
 
 - (NSDictionary *)dictionaryFromStoreItem: (COItem *)aStoreItem
@@ -73,8 +73,8 @@
 	for (NSString *property in [aStoreItem attributeNames])
 	{
         if ([property isEqualToString: kCOObjectEntityNameProperty]
-		 || [property isEqualToString: kCOObjectVersionsProperty]
-         || [property isEqualToString: kCOObjectDomainsProperty])
+		 || [property isEqualToString: kCOObjectPackageVersionProperty]
+         || [property isEqualToString: kCOObjectPackageNameProperty])
         {
             // HACK
             continue;

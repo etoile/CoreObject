@@ -13,7 +13,8 @@
 @implementation COSchemaMigration
 
 @synthesize domain = _domain, destinationVersion = _destinationVersion, migrationBlock = _migrationBlock;
-@synthesize entityMoves = _entityMoves, propertyMoves = _propertyMoves;
+@synthesize entityMoves = _entityMoves, propertyMoves = _propertyMoves, migrationDriver = _migrationDriver;
+@synthesize dependentSourceVersionsByDomain = _dependentSourceVersionsByDomain;
 
 static NSMutableDictionary *migrations;
 static NSMutableDictionary *dependencies;
@@ -82,6 +83,11 @@ static NSMutableDictionary *dependencies;
 	return dependencies;
 }
 
++ (NSArray *)migrations
+{
+	return [migrations allValues];
+}
+
 #pragma mark - Triggering a Migration
 
 + (NSArray *)migrateItems: (NSArray *)storeItems withModelDescriptionRepository: (ETModelDescriptionRepository *)repo
@@ -103,7 +109,9 @@ static NSMutableDictionary *dependencies;
 {
 	for (COItem *item in storeItems)
 	{
-		int64_t itemVersion = [item.versionsByDomain[self.domain] longLongValue];
+		ETAssert(self.migrationDriver != nil);
+		NSDictionary *versionsByDomain = [self.migrationDriver versionsByDomainForItem: item];
+		int64_t itemVersion = [versionsByDomain[self.domain] longLongValue];
 
 		if (itemVersion != self.sourceVersion)
 		{

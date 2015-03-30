@@ -12,8 +12,8 @@
 
 // TODO: Rename these variables to be prefixed by COItem and not COObject
 extern NSString *kCOObjectEntityNameProperty;
-extern NSString *kCOObjectVersionsProperty;
-extern NSString *kCOObjectDomainsProperty;
+extern NSString *kCOObjectPackageVersionProperty;
+extern NSString *kCOObjectPackageNameProperty;
 extern NSString *kCOObjectIsSharedProperty;
 
 /**
@@ -77,11 +77,8 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
  * Returns the entity name corresponding to -[COObject entityDescription].
  */
 @property (nonatomic, readonly) NSString *entityName;
-/**
- * Returns the schema versions by package names.
- */
-@property (nonatomic, readonly) NSDictionary *versionsByDomain;
-- (int64_t)versionForDomain: (NSString *)aDomain;
+@property (nonatomic, readonly) int64_t packageVersion;
+@property (nonatomic, readonly) NSString *packageName;
 
 // allows treating primitive or container, unordered or ordered as NSArray
 - (NSArray*) allObjectsForAttribute: (NSString*)attribute;
@@ -148,9 +145,9 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 
 
 @property (nonatomic, readwrite) NSString *entityName;
+@property (nonatomic, readwrite) int64_t packageVersion;
+@property (nonatomic, readwrite) NSString *packageName;
 
-- (void) setVersion: (int64_t)aVersion
-          forDomain: (NSString *)aDomain;
 - (void) setValue: (id)aValue
 	 forAttribute: (NSString*)anAttribute;
 

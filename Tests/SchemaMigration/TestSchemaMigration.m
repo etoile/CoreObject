@@ -92,6 +92,34 @@
 	[self prepareNewMigrationContextForDestinationVersions: @{@"Test" : @(version)}];
 }
 
+/**
+ * Returns the package version for the given domain of the object.
+ * (using the object's model description repository)
+ */
+- (int64_t) checkObject: (COObject *)anObject versionForDomain: (NSString *)aDomain
+{
+	COItem *item = anObject.storeItem;
+	if ([item.packageName isEqual: aDomain])
+	{
+		/* Sanity check that the item package/version are in sync with the model
+		   description repository. */
+		UKObjectsEqual(item.packageName, anObject.entityDescription.owner.name);
+		UKIntsEqual(item.packageVersion, anObject.entityDescription.owner.version);
+		
+		return item.packageVersion;
+	}
+
+	for (ETPackageDescription *package in [anObject.entityDescription allPackageDescriptions])
+	{
+		if ([package.name isEqual: aDomain])
+		{
+			return package.version;
+		}
+	}
+	
+	return -1;
+}
+
 - (void)testItemVersionsFromSerialization
 {
 	[self checkObjectGraphBeforeAndAfterSerializationRoundtrip: parent.objectGraphContext
@@ -99,17 +127,24 @@
 	{
 		OutlineItem *newParent = [(Tag *)testRootObject contents].anyObject;
 		OutlineItem *newChild = [newParent.content firstObject];
-	
-		UKObjectsEqual(A(@(0), @(0)), [newParent.storeItem valueForAttribute: kCOObjectVersionsProperty]);
-		UKObjectsEqual(A(@(0), @(0)), [newChild.storeItem valueForAttribute: kCOObjectVersionsProperty]);
 
-		UKObjectsEqual(A(@"Test", @"org.etoile-project.CoreObject"), [newParent.storeItem valueForAttribute: kCOObjectDomainsProperty]);
-		UKObjectsEqual(A(@"Test", @"org.etoile-project.CoreObject"), [newChild.storeItem valueForAttribute: kCOObjectDomainsProperty]);
+		UKIntsEqual(0, newParent.storeItem.packageVersion);
+		UKIntsEqual(0, [[[[newParent entityDescription] parent] owner] version]);
+		UKIntsEqual(0, newChild.storeItem.packageVersion);
+		UKIntsEqual(0, [[[[newChild entityDescription] parent] owner] version]);
+		
+		UKObjectsEqual(@"Test", newParent.storeItem.packageName);
+		UKObjectsEqual(@"Test", newParent.entityDescription.owner.name);
+		UKObjectsEqual(@"org.etoile-project.CoreObject", newParent.entityDescription.parent.owner.name);
+		UKObjectsEqual(@"Test", newChild.storeItem.packageName);
+		UKObjectsEqual(@"Test", newChild.entityDescription.owner.name);
+		UKObjectsEqual(@"org.etoile-project.CoreObject", newChild.entityDescription.parent.owner.name);
 	}];
 }
 
 - (COSchemaMigration *)registerMigrationWithVersion: (int64_t)version
                                              domain: (NSString *)domain
+					dependentSourceVersionsByDomain: (NSDictionary *)deps
                                               block: (COMigrationBlock)block
 {
 	COSchemaMigration *migration = [COSchemaMigration new];
@@ -117,6 +152,7 @@
 	migration.domain = domain;
 	migration.destinationVersion = version;
 	migration.migrationBlock = block;
+	migration.dependentSourceVersionsByDomain = deps;
 	
 	[COSchemaMigration registerMigration: migration];
 	return migration;
@@ -125,7 +161,20 @@
 - (COSchemaMigration *)registerMigrationWithVersion: (int64_t)version
                                              domain: (NSString *)domain
 {
-	return [self registerMigrationWithVersion: version domain: domain block: NULL];
+	return [self registerMigrationWithVersion: version
+									   domain: domain
+			  dependentSourceVersionsByDomain: @{}
+										block: NULL];
+}
+
+- (COSchemaMigration *)registerMigrationWithTestDomainVersion: (int64_t)version
+														block: (COMigrationBlock)block
+{
+	// The Test domain depends on the CoreObject domain, v0
+	return [self registerMigrationWithVersion: version
+									   domain: @"Test"
+			  dependentSourceVersionsByDomain: @{ @"org.etoile-project.CoreObject" : @(0) }
+										block: block];
 }
 
 - (void)testSchemaMigrationRegistration
@@ -160,8 +209,9 @@
 {
 	COMutableItem *parentItem = [parent.storeItem mutableCopy];
 
-	[parentItem setVersion: 1 forDomain: @"Test"];
-
+	UKObjectsEqual(@"Test", parentItem.packageName);
+	parentItem.packageVersion = 1;
+	
 	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: A(parentItem)]);
 }
 					  
@@ -169,8 +219,11 @@
 {
 	COMutableItem *parentItem = [parent.storeItem mutableCopy];
 
-	[parentItem setVersion: -1 forDomain: @"Test"];
-
+	// FIXME: -1 is used as a marker for "no version set", so I changed this test
+	// to use -2 as an invalid version.
+	UKObjectsEqual(@"Test", parentItem.packageName);
+	parentItem.packageVersion = -2;
+	
 	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: A(parentItem)]);
 }
 
@@ -199,8 +252,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.packageVersion = migration.destinationVersion;
+			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -211,12 +266,14 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithVersion: version domain: @"Test" block: block];
+	return [self registerMigrationWithTestDomainVersion: version
+												  block: block];
 }
 
 - (void)testBasicMigrationWithoutMetamodelChanges
 {
 	COSchemaMigration *migration = [self registerLabelUpdateMigrationWithVersion: 1];
+
 
 	[ctx commit];
 	[self prepareNewMigrationContextForDestinationVersion: 1];
@@ -227,12 +284,12 @@
 	OutlineItem *migratedParent = [migratedContext loadedObjectForUUID: parent.UUID];
 	OutlineItem *migratedChild = [migratedContext loadedObjectForUUID: child.UUID];
 
-	UKIntsEqual(0, [migratedTag.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedParent.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedChild.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(1, [migratedTag.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedParent.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedChild.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(0, [self checkObject: migratedTag versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedParent versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedChild versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [self checkObject: migratedTag versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedParent versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedChild versionForDomain: @"Test"]);
 
 	UKNil(migratedTag.label);
 	UKStringsEqual(@"Untitled", migratedParent.label);
@@ -251,8 +308,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.packageVersion = migration.destinationVersion;
+			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -265,6 +324,7 @@
 
 	return [self registerMigrationWithVersion: version
 	                                   domain: @"org.etoile-project.CoreObject"
+			  dependentSourceVersionsByDomain: @{}
 	                                    block: block];
 }
 
@@ -283,12 +343,12 @@
 	OutlineItem *migratedParent = [migratedContext loadedObjectForUUID: parent.UUID];
 	OutlineItem *migratedChild = [migratedContext loadedObjectForUUID: child.UUID];
 
-	UKIntsEqual(1, [migratedTag.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(1, [migratedParent.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(1, [migratedChild.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(1, [migratedTag.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedParent.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedChild.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedTag versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [self checkObject: migratedParent versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [self checkObject: migratedChild versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [self checkObject: migratedTag versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedParent versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedChild versionForDomain: @"Test"]);
 
 	UKNil(migratedTag.name);
 	UKStringsEqual(@"Unknown", migratedParent.name);
@@ -310,8 +370,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.packageVersion = migration.destinationVersion;
+			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -324,9 +386,8 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithVersion: version
-	                                   domain: @"Test"
-	                                    block: block];
+	return [self registerMigrationWithTestDomainVersion: version
+												  block: block];
 }
 
 - (ETModelDescriptionRepository *)registerCommentAdditionInMetamodelWithVersion: (int64_t)version
@@ -358,12 +419,12 @@
 	OutlineItem *migratedParent = [migratedContext loadedObjectForUUID: parent.UUID];
 	OutlineItem *migratedChild = [migratedContext loadedObjectForUUID: child.UUID];
 
-	UKIntsEqual(0, [migratedTag.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedParent.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedChild.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(1, [migratedTag.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedParent.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedChild.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(0, [self checkObject: migratedTag versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedParent versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedChild versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [self checkObject: migratedTag versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedParent versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedChild versionForDomain: @"Test"]);
 
 	UKRaisesException([migratedTag valueForProperty: @"comment"]);
 	UKStringsEqual(@"Type something", [migratedParent valueForProperty: @"comment"]);
@@ -379,8 +440,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.packageVersion = migration.destinationVersion;
+			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -391,9 +454,8 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithVersion: version
-	                                   domain: @"Test"
-	                                    block: block];
+	return [self registerMigrationWithTestDomainVersion: version
+												  block: block];
 }
 
 - (ETModelDescriptionRepository *)registerLabelDeletionInMetamodelWithVersion: (int64_t)version
@@ -422,12 +484,12 @@
 	OutlineItem *migratedParent = [migratedContext loadedObjectForUUID: parent.UUID];
 	OutlineItem *migratedChild = [migratedContext loadedObjectForUUID: child.UUID];
 
-	UKIntsEqual(0, [migratedTag.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedParent.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedChild.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(1, [migratedTag.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedParent.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedChild.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(0, [self checkObject: migratedTag versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedParent versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedChild versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [self checkObject: migratedTag versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedParent versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedChild versionForDomain: @"Test"]);
 
 	UKNil([migratedTag valueForProperty: @"label"]);
 	UKRaisesException([migratedParent valueForProperty: @"label"]);
@@ -443,8 +505,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.packageVersion = migration.destinationVersion;
+			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -458,9 +522,8 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithVersion: version
-	                                   domain: @"Test"
-	                                    block: block];
+	return [self registerMigrationWithTestDomainVersion: version
+												  block: block];
 }
 
 - (ETModelDescriptionRepository *)registerLabelRenamingInMetamodelWithVersion: (int64_t)version
@@ -497,12 +560,12 @@
 	OutlineItem *migratedParent = [migratedContext loadedObjectForUUID: parent.UUID];
 	OutlineItem *migratedChild = [migratedContext loadedObjectForUUID: child.UUID];
 	
-	UKIntsEqual(0, [migratedTag.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedParent.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedChild.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(1, [migratedTag.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedParent.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedChild.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(0, [self checkObject: migratedTag versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedParent versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedChild versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [self checkObject: migratedTag versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedParent versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedChild versionForDomain: @"Test"]);
 	
 	UKRaisesException([migratedTag valueForProperty: @"title"]);
 	UKStringsEqual(parent.label, [migratedParent valueForProperty: @"title"]);
@@ -521,8 +584,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.packageVersion = migration.destinationVersion;
+			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -538,9 +603,8 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithVersion: version
-	                                   domain: @"Test"
-	                                    block: block];
+	return [self registerMigrationWithTestDomainVersion: version
+												  block: block];
 }
 
 - (ETModelDescriptionRepository *)registerNameOverridingInMetamodelWithVersion: (int64_t)version
@@ -572,12 +636,12 @@
 	OutlineItem *migratedParent = [migratedContext loadedObjectForUUID: parent.UUID];
 	OutlineItem *migratedChild = [migratedContext loadedObjectForUUID: child.UUID];
 	
-	UKIntsEqual(0, [migratedTag.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedParent.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedChild.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(1, [migratedTag.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedParent.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedChild.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(0, [self checkObject: migratedTag versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedParent versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedChild versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [self checkObject: migratedTag versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedParent versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedChild versionForDomain: @"Test"]);
 
 	UKNil(migratedTag.name);
 	UKStringsEqual(@"Overriden", migratedParent.name);
@@ -593,8 +657,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 
-			[newItem setVersion: migration.destinationVersion
-			          forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.packageVersion = migration.destinationVersion;
+			}
 
 			[migratedItems addObject: newItem];
 
@@ -606,15 +672,18 @@
 			[mediaItem setValue: @"OutlineMedia"
 			       forAttribute: kCOObjectEntityNameProperty
 						   type: kCOTypeString];
-			[mediaItem setValue: [oldItem valueForAttribute: kCOObjectDomainsProperty]
-			       forAttribute: kCOObjectDomainsProperty
-						   type: [oldItem typeForAttribute: kCOObjectDomainsProperty]];
-			[mediaItem setValue: [oldItem valueForAttribute: kCOObjectVersionsProperty]
-			       forAttribute: kCOObjectVersionsProperty
-						   type: [oldItem typeForAttribute: kCOObjectVersionsProperty]];
-			[mediaItem setVersion: migration.destinationVersion
-				        forDomain: migration.domain];
+			[mediaItem setValue: [oldItem valueForAttribute: kCOObjectPackageNameProperty]
+			       forAttribute: kCOObjectPackageNameProperty
+						   type: [oldItem typeForAttribute: kCOObjectPackageNameProperty]];
+			[mediaItem setValue: [oldItem valueForAttribute: kCOObjectPackageVersionProperty]
+			       forAttribute: kCOObjectPackageVersionProperty
+						   type: [oldItem typeForAttribute: kCOObjectPackageVersionProperty]];
 
+			if ([mediaItem.packageName isEqual: migration.domain])
+			{
+				mediaItem.packageVersion = migration.destinationVersion;
+			}
+			
 			[newItem setValue: mediaItem.UUID
 			     forAttribute: @"media"
 			             type: kCOTypeReference];
@@ -624,9 +693,8 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithVersion: version
-	                                   domain: @"Test"
-	                                    block: block];
+	return [self registerMigrationWithTestDomainVersion: version
+												  block: block];
 }
 
 - (ETModelDescriptionRepository *)registerOutlineMediaAdditionInMetamodelWithVersion: (int64_t)version
@@ -665,12 +733,12 @@
 	OutlineItem *migratedParent = [migratedContext loadedObjectForUUID: parent.UUID];
 	OutlineItem *migratedChild = [migratedContext loadedObjectForUUID: child.UUID];
 	
-	UKIntsEqual(0, [migratedTag.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedParent.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedChild.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(1, [migratedTag.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedParent.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedChild.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(0, [self checkObject: migratedTag versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedParent versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedChild versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [self checkObject: migratedTag versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedParent versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedChild versionForDomain: @"Test"]);
 
 	ETEntityDescription *newEntity =
 		[migratedContext.modelDescriptionRepository descriptionForName: @"OutlineMedia"];
@@ -693,17 +761,18 @@
 
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.packageVersion = migration.destinationVersion;
+			}
 
 			[migratedItems addObject: newItem];
 		}
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithVersion: version
-	                                   domain: @"Test"
-	                                    block: block];
+	return [self registerMigrationWithTestDomainVersion: version
+												  block: block];
 }
 
 - (ETModelDescriptionRepository *)registerTagDeletionInMetamodelWithVersion: (int64_t)version
@@ -731,10 +800,10 @@
 	OutlineItem *migratedParent = [migratedContext loadedObjectForUUID: parent.UUID];
 	OutlineItem *migratedChild = [migratedContext loadedObjectForUUID: child.UUID];
 
-	UKIntsEqual(0, [migratedParent.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedChild.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(1, [migratedParent.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedChild.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(0, [self checkObject: migratedParent versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedChild versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [self checkObject: migratedParent versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedChild versionForDomain: @"Test"]);
 
 	UKNil(migratedTag);
 	UKTrue(migratedParent.parentCollections.isEmpty);
@@ -750,8 +819,10 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.packageVersion = migration.destinationVersion;
+			}
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -762,9 +833,8 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithVersion: version
-	                                   domain: @"Test"
-	                                    block: block];
+	return [self registerMigrationWithTestDomainVersion: version
+												  block: block];
 }
 
 - (ETModelDescriptionRepository *)registerOutlineItemRenamingInMetamodelWithVersion: (int64_t)version
@@ -805,12 +875,12 @@
 	OutlineItem *migratedParent = [migratedContext loadedObjectForUUID: parent.UUID];
 	OutlineItem *migratedChild = [migratedContext loadedObjectForUUID: child.UUID];
 
-	UKIntsEqual(0, [migratedTag.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedParent.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedChild.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(1, [migratedTag.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedParent.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(1, [migratedChild.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(0, [self checkObject: migratedTag versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedParent versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedChild versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [self checkObject: migratedTag versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedParent versionForDomain: @"Test"]);
+	UKIntsEqual(1, [self checkObject: migratedChild versionForDomain: @"Test"]);
 
 	ETEntityDescription *outlineEntity =
 		[migratedContext.modelDescriptionRepository descriptionForName: @"OutlineNode"];
@@ -835,22 +905,24 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.packageVersion = migration.destinationVersion;
+			}
 
 			[migratedItems addObject: newItem];
 		}
 		return migratedItems;
 	};
 
-	COSchemaMigration *migration = [self registerMigrationWithVersion: version
-															   domain: @"Test"];
+	COSchemaMigration *migration = [self registerMigrationWithTestDomainVersion: version
+																		  block: NULL];
 	COModelElementMove *outlineMove = [COModelElementMove new];
 
 	outlineMove.name = @"OutlineItem";
 	outlineMove.domain = @"org.etoile-project.CoreObject";
 	outlineMove.version = 0;
-	
+
 	migration.entityMoves = S(outlineMove);
 	
 	return migration;
@@ -905,12 +977,12 @@
 	OutlineItem *migratedParent = [migratedContext loadedObjectForUUID: parent.UUID];
 	OutlineItem *migratedChild = [migratedContext loadedObjectForUUID: child.UUID];
 
-	UKIntsEqual(0, [migratedTag.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedParent.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedChild.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(1, [migratedTag.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(-1, [migratedParent.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(-1, [migratedChild.storeItem versionForDomain: @"Test"]);
+	UKIntsEqual(0, [self checkObject: migratedTag versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedParent versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedChild versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(1, [self checkObject: migratedTag versionForDomain: @"Test"]);
+	UKIntsEqual(-1, [self checkObject: migratedParent versionForDomain: @"Test"]);
+	UKIntsEqual(-1, [self checkObject: migratedChild versionForDomain: @"Test"]);
 
 	ETEntityDescription *outlineEntity =
 		[migratedContext.modelDescriptionRepository descriptionForName: @"OutlineItem"];
@@ -935,17 +1007,18 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			[newItem setVersion: migration.destinationVersion
-				      forDomain: migration.domain];
+			if ([newItem.packageName isEqual: migration.domain])
+			{
+				newItem.packageVersion = migration.destinationVersion;
+			}
 
 			[migratedItems addObject: newItem];
 		}
 		return migratedItems;
 	};
 
-	COSchemaMigration *migration = [self registerMigrationWithVersion: version
-	                                                           domain: @"Test"
-	                                                            block: block];
+	COSchemaMigration *migration = [self registerMigrationWithTestDomainVersion: version
+																		  block: block];
 	COModelElementMove *tagMove = [COModelElementMove new];
 	COModelElementMove *outlineMove = [COModelElementMove new];
 
@@ -999,6 +1072,7 @@
 	return [self validateModelDescriptionRepository: repo];
 }
 
+
 /**
  * We don't support package deletion and renaming, but we can simulate renaming
  * by adding a new package and moving entities to it, while keeping their old
@@ -1030,16 +1104,16 @@
 	UKNil([migratedContext.modelDescriptionRepository descriptionForName: @"Test.OutlineItem.label"]);
 	UKNotNil([migratedContext.modelDescriptionRepository descriptionForName: @"RenamedTest.OutlineItem.label"]);
 
-	UKIntsEqual(0, [migratedTag.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedParent.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
-	UKIntsEqual(0, [migratedChild.storeItem versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedTag versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedParent versionForDomain: @"org.etoile-project.CoreObject"]);
+	UKIntsEqual(0, [self checkObject: migratedChild versionForDomain: @"org.etoile-project.CoreObject"]);
 	/* The 'Test' domain has been removed in the migrated items */
-	UKIntsEqual(-1, [migratedTag.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(-1, [migratedParent.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(-1, [migratedChild.storeItem versionForDomain: @"Test"]);
-	UKIntsEqual(0, [migratedTag.storeItem versionForDomain: @"RenamedTest"]);
-	UKIntsEqual(0, [migratedParent.storeItem versionForDomain: @"RenamedTest"]);
-	UKIntsEqual(0, [migratedChild.storeItem versionForDomain: @"RenamedTest"]);
+	UKIntsEqual(-1, [self checkObject: migratedTag versionForDomain: @"Test"]);
+	UKIntsEqual(-1, [self checkObject: migratedParent versionForDomain: @"Test"]);
+	UKIntsEqual(-1, [self checkObject: migratedChild versionForDomain: @"Test"]);
+	UKIntsEqual(0, [self checkObject: migratedTag versionForDomain: @"RenamedTest"]);
+	UKIntsEqual(0, [self checkObject: migratedParent versionForDomain: @"RenamedTest"]);
+	UKIntsEqual(0, [self checkObject: migratedChild versionForDomain: @"RenamedTest"]);
 
 	ETEntityDescription *outlineEntity =
 		[migratedContext.modelDescriptionRepository descriptionForName: @"OutlineItem"];

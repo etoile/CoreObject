@@ -514,24 +514,14 @@ serialization. */
                         types: (NSMutableDictionary *)types
                        values: (NSMutableDictionary *)values
                    entityName: (NSString *)anEntityName
-		  packageDescriptions: (NSArray *)packages
+		   packageDescription: (ETPackageDescription *)package
 {
     [values setObject: anEntityName forKey: kCOObjectEntityNameProperty];
 	[types setObject: @(kCOTypeString) forKey: kCOObjectEntityNameProperty];
-
-	NSMutableArray *versions = [NSMutableArray new];
-	NSMutableArray *domains = [NSMutableArray new];
-
-	for (ETPackageDescription *package in packages)
-	{
-		[versions addObject: @(package.version)];
-		[domains addObject: package.name];
-	}
-
-	[values setObject: versions forKey: kCOObjectVersionsProperty];
-	[types setObject: @(kCOTypeArray | kCOTypeInt64) forKey: kCOObjectVersionsProperty];
-	[values setObject: domains forKey: kCOObjectDomainsProperty];
-	[types setObject: @(kCOTypeArray | kCOTypeString) forKey: kCOObjectDomainsProperty];
+	[values setObject: @(package.version) forKey: kCOObjectPackageVersionProperty];
+	[types setObject: @(kCOTypeInt64) forKey: kCOObjectPackageVersionProperty];
+	[values setObject: package.name forKey: kCOObjectPackageNameProperty];
+	[types setObject: @(kCOTypeString) forKey: kCOObjectPackageNameProperty];
 
 	return [[COItem alloc] initWithUUID: aUUID
 	                 typesForAttributes: types
@@ -565,7 +555,7 @@ serialization. */
 	                         types: types
 	                        values: values
 	                    entityName: [[self entityDescription] name]
-	           packageDescriptions: _entityDescription.allPackageDescriptions];
+				packageDescription: _entityDescription.owner];
 }
 
 - (COItem *)additionalStoreItemForUUID: (ETUUID *)anItemUUID
@@ -958,8 +948,8 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	for (NSString *property in [aStoreItem attributeNames])
 	{
         if ([property isEqualToString: kCOObjectEntityNameProperty]
-		 || [property isEqualToString: kCOObjectVersionsProperty]
-         || [property isEqualToString: kCOObjectDomainsProperty])
+		 || [property isEqualToString: kCOObjectPackageVersionProperty]
+         || [property isEqualToString: kCOObjectPackageNameProperty])
         {
             // HACK
             continue;
@@ -972,10 +962,11 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	
 		if (propertyDesc == nil)
 		{
-			[NSException raise: NSInvalidArgumentException
-			            format: @"Tried to set serialized value %@ of type %@ "
-			                     "for property %@ missing in the metamodel %@",
-			                    serializedValue, COTypeDescription(serializedType), property, [self entityDescription]];
+			// Was an exception in 0.5, but that seems overly paranoid
+			NSLog(@"Warning: Tried to set serialized value %@ of type %@ "
+				   "for property %@ missing in the metamodel %@",
+				   serializedValue, COTypeDescription(serializedType), property, [self entityDescription]);
+			continue;
 		}
 
 		id value = [self valueForSerializedValue: serializedValue

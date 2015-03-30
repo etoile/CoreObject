@@ -9,6 +9,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 
 @class COSchemaMigration;
+@class COSchemaMigrationDriver;
 
 typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *storeItems);
 
@@ -300,6 +301,8 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
 	NSString *_domain;
 	int64_t _destinationVersion;
 	COMigrationBlock _migrationBlock;
+	__weak COSchemaMigrationDriver *migrationDriver;
+	NSDictionary *_dependentSourceVersionsByDomain;
 }
 
 
@@ -330,6 +333,11 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  * domain and -[ETKeyValue value] returns the destination version.
  */
 + (NSDictionary *)dependencies;
+
+/**
+ * Returns an array of all registered migrations.
+ */
++ (NSArray *)migrations;
 
 
 /** @taskunit Migrating to Future Versions */
@@ -372,7 +380,14 @@ withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
  * subclass and overriding -migrateItems:.
  */
 @property (nonatomic, copy) COMigrationBlock migrationBlock;
-
+/**
+ * Domains depended on by the -sourceVersion of -domain, along with
+ * their versions.
+ *
+ * This acts as a snapshot of the necessary parts of the metamodel at 
+ * -sourceVersion.
+ */
+@property (nonatomic, copy) NSDictionary *dependentSourceVersionsByDomain;
 
 /** @task Move Operations Accross Domains */
 
@@ -392,5 +407,11 @@ withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
  * You must not call the superclass implementation.
  */
 - (NSArray *)migrateItems: (NSArray *)storeItems;
+
+
+
+/** @taskunit Private */
+
+@property (nonatomic, readwrite, weak) COSchemaMigrationDriver *migrationDriver;
 
 @end

@@ -13,8 +13,8 @@
 #import "COAttachmentID.h"
 
 NSString *kCOObjectEntityNameProperty = @"org.etoile-project.coreobject.entityname";
-NSString *kCOObjectVersionsProperty = @"org.etoile-project.coreobject.versions";
-NSString *kCOObjectDomainsProperty = @"org.etoile-project.coreobject.domains";
+NSString *kCOObjectPackageVersionProperty = @"org.etoile-project.coreobject.packageversion";
+NSString *kCOObjectPackageNameProperty = @"org.etoile-project.coreobject.packagename";
 NSString *kCOObjectIsSharedProperty = @"isShared";
 
 static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
@@ -141,23 +141,19 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	return [self valueForAttribute: kCOObjectEntityNameProperty];
 }
 
-- (NSDictionary *)versionsByDomain
+- (int64_t) packageVersion
 {
-	NSArray *versions = [values objectForKey: kCOObjectVersionsProperty];
-	NSArray *domains = [values objectForKey: kCOObjectDomainsProperty];
-
-	return [NSDictionary dictionaryWithObjects: versions forKeys: domains];
+	NSNumber *version = [values objectForKey: kCOObjectPackageVersionProperty];
+	if (version != nil)
+	{
+		return [version longLongValue];
+	}
+	return -1;
 }
 
-- (int64_t)versionForDomain: (NSString *)aDomain
+- (NSString *) packageName
 {
-	NILARG_EXCEPTION_TEST(aDomain);
-	NSNumber *version = self.versionsByDomain[aDomain];
-	
-	if (version == nil)
-		return -1;
-
-	return [version longLongValue];
+	return [values objectForKey: kCOObjectPackageNameProperty];
 }
 
 - (NSArray *) allObjectsForAttribute: (NSString *)attribute
@@ -480,16 +476,18 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	          type: kCOTypeString];
 }
 
-- (void) setVersion: (int64_t)aVersion
-          forDomain: (NSString *)aDomain
+- (void)setPackageVersion:(int64_t)entityVersion
 {
-	NSMutableArray *versions = [[values objectForKey: kCOObjectVersionsProperty] mutableCopy];
-	NSArray *domains = [values objectForKey: kCOObjectDomainsProperty];
-	
-	[versions replaceObjectAtIndex: [domains indexOfObject: aDomain]
-	                    withObject: @(aVersion)];
-	
-	[self setValue: versions forAttribute: kCOObjectVersionsProperty];
+	[self setValue: @(entityVersion)
+	  forAttribute: kCOObjectPackageVersionProperty
+			  type: kCOTypeInt64];
+}
+
+- (void)setPackageName:(NSString *)packageName
+{
+	[self setValue: [packageName copy]
+	  forAttribute: kCOObjectPackageNameProperty
+			  type: kCOTypeString];
 }
 
 - (void) setValue: (id)aValue
