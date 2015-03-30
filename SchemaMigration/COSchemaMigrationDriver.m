@@ -51,26 +51,24 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 {
 	for (COSchemaMigration *migration in [COSchemaMigration migrations])
 	{
-		if ([item.packageName isEqual: migration.domain]
+		if ([item.packageName isEqual: migration.packageName]
 			&& item.packageVersion == migration.sourceVersion)
 		{
 			NSDictionary *versionsByDomain = [migration.dependentSourceVersionsByDomain
 											  dictionaryByAddingEntriesFromDictionary:
-											  @{ migration.domain : @(migration.sourceVersion) }];
+											  @{ migration.packageName : @(migration.sourceVersion) }];
 			return versionsByDomain;
 		}
 	}
 	return @{};
 }
 
-
-
-- (NSSet *)domainsToMigrateForItem: (COItem *)item
+- (NSSet *)packagesToMigrateForItem: (COItem *)item
 {
 	ETEntityDescription *entity = [_modelDescriptionRepository descriptionForName: item.entityName];
 	BOOL isDeletedEntity = (entity == nil);
 	
-	/* For a deleted entity, the domain versions match between item and packages */
+	/* For a deleted entity, the package versions match between item and packages */
 	if (isDeletedEntity)
 	{
 		// FIXME: We hit this line when loading a CODictionary during the test suite,
@@ -93,7 +91,7 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 		return [NSSet set];
 	}
 	
-	/* At this point we are doing a migration for some domains for sure. */
+	/* At this point we are doing a migration for some packages for sure. */
 
 	NSDictionary *versionsByDomain = [self versionsByDomainForItem: item];
 	
@@ -103,7 +101,7 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	{
 		// TODO: Test that we get this exception when needed
 		[NSException raise: NSInternalInconsistencyException
-					format: @"Item with entityName '%@' domain '%@' version %d needs a migration, "
+					format: @"Item with entityName '%@' package '%@' version %d needs a migration, "
 							"but -versionsByDomainForItem: returned an incomplete "
 							"snapshot of the past version of the metamodel we need. "
 							"It returned: %@. \n"
@@ -115,34 +113,34 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 							item.entityName, item.packageName, (int)item.packageVersion, versionsByDomain];
 	}
 	
-	NSMutableSet *domainsToMigrate = [NSMutableSet new];
+	NSMutableSet *packagesToMigrate = [NSMutableSet new];
 	
-	for (NSString *domain in [versionsByDomain allKeys])
+	for (NSString *package in [versionsByDomain allKeys])
 	{
-		ETPackageDescription *package = [_modelDescriptionRepository descriptionForName: domain];
-		BOOL isDeletedPackage = (package == nil);
-		int64_t version = versionsByDomain[domain] != nil
-			? (int64_t)[versionsByDomain[domain] longLongValue]
+		ETPackageDescription *packageDesc = [_modelDescriptionRepository descriptionForName: package];
+		BOOL isDeletedPackage = (packageDesc == nil);
+		int64_t version = versionsByDomain[package] != nil
+			? (int64_t)[versionsByDomain[package] longLongValue]
 			: (int64_t)-1;
 
-		if (isDeletedPackage || version != (int64_t)package.version)
+		if (isDeletedPackage || version != (int64_t)packageDesc.version)
 		{
-			[domainsToMigrate addObject: domain];
+			[packagesToMigrate addObject: package];
 		}
 	}
-	return domainsToMigrate;
+	return packagesToMigrate;
 }
 
 - (BOOL)addItem: (COItem *)item
 {
 	ETAssert(_modelDescriptionRepository != nil);
-	NSSet *domainsToMigrate = [self domainsToMigrateForItem: item];
+	NSSet *packagesToMigrate = [self packagesToMigrateForItem: item];
 
-	for (NSString *domain in domainsToMigrate)
+	for (NSString *package in packagesToMigrate)
 	{
-		addObjectForKey(itemsToMigrate, item, domain);
+		addObjectForKey(itemsToMigrate, item, package);
 	}
-	return ![domainsToMigrate isEmpty];
+	return ![packagesToMigrate isEmpty];
 }
 
 #pragma mark Triggering a Migration -
@@ -226,8 +224,8 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 /**
  * Combines migrated items with the same UUID.
  *
- * For each domain, items are enumerated, and properties that belong to this
- * domain are merged into a final item per item UUID.
+ * For each package, items are enumerated, and properties that belong to this
+ * package are merged into a final item per item UUID.
  */
 - (NSArray *)combineMigratedItems: (NSDictionary *)migratedItems
 {
@@ -284,7 +282,7 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 		proposedVersion++;
 
 		COSchemaMigration *migration =
-			[COSchemaMigration migrationForDomain: packageName
+			[COSchemaMigration migrationForPackageName: packageName
 			                   destinationVersion: proposedVersion];
 		
 		if (migration == nil)
@@ -301,7 +299,7 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 		
 		/* Moving entities and properties after -[COSchemaMigration migrateItems:]
 		   ensures that:
-		   - an incorrect domain/version increment on a entity concerned by a 
+		   - an incorrect package/version increment on a entity concerned by a 
 		     move is discarded
 		   - a moved entity or property can be changed (without requiring
 		     another migration bound to the destination package). */
@@ -314,20 +312,20 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 
 - (void)moveEntitiesForMigration: (COSchemaMigration *)migration
 {
-	NSMutableArray *sourceItems = (NSMutableArray *)itemsToMigrate[migration.domain];
+	NSMutableArray *sourceItems = (NSMutableArray *)itemsToMigrate[migration.packageName];
 
 	for (COModelElementMove *move in migration.entityMoves)
 	{
 		ETAssert(move.name != nil);
 		ETAssert(move.ownerName == nil);
-		ETAssert(move.domain != nil);
-		ETAssert(move.version != -1);
-		NSMutableArray *destinationItems = (NSMutableArray *)itemsToMigrate[move.domain];
+		ETAssert(move.packageName != nil);
+		ETAssert(move.packageVersion != -1);
+		NSMutableArray *destinationItems = (NSMutableArray *)itemsToMigrate[move.packageName];
 
 		if (destinationItems == nil)
 		{
 			destinationItems = [NSMutableArray new];
-			itemsToMigrate[move.domain] = destinationItems;
+			itemsToMigrate[move.packageName] = destinationItems;
 		}
 		NSUInteger initialItemCount = sourceItems.count + destinationItems.count;
 
@@ -339,10 +337,10 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 			// TODO: This code path is not tested
 			COMutableItem *newItem = [item mutableCopy];
 			
-			if ([newItem.packageName isEqual: migration.domain])
+			if ([newItem.packageName isEqual: migration.packageName])
 			{
-				newItem.packageName = move.domain;
-				newItem.packageVersion = move.version;
+				newItem.packageName = move.packageName;
+				newItem.packageVersion = move.packageVersion;
 			}
 
 			[destinationItems addObject: newItem];
@@ -355,15 +353,15 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 
 - (void)movePropertiesForMigration: (COSchemaMigration *)migration
 {
-	NSMutableArray *sourceItems = (NSMutableArray *)itemsToMigrate[migration.domain];
+	NSMutableArray *sourceItems = (NSMutableArray *)itemsToMigrate[migration.packageName];
 
 	for (COModelElementMove *move in migration.propertyMoves)
 	{
 		ETAssert(move.name != nil);
 		ETAssert(move.ownerName != nil);
-		ETAssert(move.domain != nil);
-		ETAssert(move.version != -1);
-		NSMutableArray *destinationItems = (NSMutableArray *)itemsToMigrate[move.domain];
+		ETAssert(move.packageName != nil);
+		ETAssert(move.packageVersion != -1);
+		NSMutableArray *destinationItems = (NSMutableArray *)itemsToMigrate[move.packageName];
 		NSMutableArray *selectedSourceItems = [NSMutableArray new];
 		NSMutableDictionary *selectedDestItems = [NSMutableDictionary new];
 
@@ -401,14 +399,14 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 
 - (void)runDependentMigrationsForMigration: (COSchemaMigration *)aMigration
 {
-	ETKeyValuePair *pair = [ETKeyValuePair pairWithKey: aMigration.domain
+	ETKeyValuePair *pair = [ETKeyValuePair pairWithKey: aMigration.packageName
 	                                             value: @(aMigration.destinationVersion)];
 	NSArray *dependencies = [COSchemaMigration dependencies][pair];
 	
 	for (COSchemaMigration *migration in dependencies)
 	{
 		/* Run enumerated migration and all preceding migrations not yet run */
-		[self migrateItemsInDomain: migration.domain
+		[self migrateItemsInDomain: migration.packageName
 		                 toVersion: migration.destinationVersion];
 	}
 }

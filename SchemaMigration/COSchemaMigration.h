@@ -38,7 +38,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  * </list>
  *
  * A migration process is triggered by -[COObjectGraphContext insertOrUpdatedItems:] 
- * or -[COObjectGraphContext setItemGraph:], the item domain versions are checked 
+ * or -[COObjectGraphContext setItemGraph:], the item package versions are checked 
  * and compared to the package versions present in -[COObjectGraphContext modelDescriptionRepository], 
  * when there is a mismatch the item is selected to be migrated.
  *
@@ -174,7 +174,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  * <example>
  * COSchemaMigration *migration = [COSchemaMigration new];
  *
- * migration.domain = @"com.company.PackageName"
+ * migration.packageName = @"com.company.PackageName"
  * migration.destinationVersion = 3
  * migration.migrationBlock = ^(COSchemaMigration *migration, NSArray *storeItems)
  * {
@@ -197,7 +197,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  * // Now COEditingContext or COObjectGraphContext can be created.
  * </example>
  *
- * You are responsible to update domain/package versions correctly for all the 
+ * You are responsible to update package names/versions correctly for all the
  * items in a migrated package.
  *
  * @section Supported Migration Operations
@@ -268,7 +268,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  * <example>
  * COSchemaMigration *migration = [COSchemaMigration new];
  *
- * migration.domain = @"com.company.Contact"
+ * migration.packageName = @"com.company.Contact"
  * migration.destinationVersion = 3
  * migration.migrationBlock = ^(COSchemaMigration *migration, NSArray *storeItems)
  * {
@@ -278,7 +278,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  *     {
  *         COItem *newItem = [item mutableCopy];
  *         [newItem setVersion: migration.destinationVersion
- *                   forDomain: migration.domain];
+ *                   forDomain: migration.packageName];
  *         [newItems addObject: newItem];
  *     }
  *
@@ -288,8 +288,8 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  * COModelElementMove *move = [COModelElementMove new];
  *
  * move.name = @"Person";
- * move.domain = @"com.company.AddressBook";
- * move.version = 5;
+ * move.packageName = @"com.company.AddressBook";
+ * move.packageVersion = 5;
  * migration.entityMoves = S(move);
  *
  * [COSchemaMigration registerMigration: migration];
@@ -298,7 +298,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
 @interface COSchemaMigration : NSObject
 {
 	@private
-	NSString *_domain;
+	NSString *_packageName;
 	int64_t _destinationVersion;
 	COMigrationBlock _migrationBlock;
 	__weak COSchemaMigrationDriver *migrationDriver;
@@ -323,14 +323,14 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  *
  * See +registerMigration: and -destinationVersion.
  */
-+ (COSchemaMigration *)migrationForDomain: (NSString *)domain
++ (COSchemaMigration *)migrationForPackageName: (NSString *)package
                        destinationVersion: (NSInteger)version;
 /**
  * Returns a dictionary that contains dependent migrations to be run before a 
  * specific migration. 
  *
  * The dictionary keys are key-value pair, where -[ETKeyValue key] returns the 
- * domain and -[ETKeyValue value] returns the destination version.
+ * package name and -[ETKeyValue value] returns the destination version.
  */
 + (NSDictionary *)dependencies;
 
@@ -351,11 +351,11 @@ withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
 
 
 /**
- * The domain that must correspond to a package name in the metamodel.
+ * The package name that must correspond to a package name in the metamodel.
  *
  * See -[ETPackageDescription name] and -[COCommitDescriptor domain].
  */
-@property (nonatomic, copy) NSString *domain;
+@property (nonatomic, copy) NSString *packageName;
 /**
  * The new schema version.
  *
@@ -381,7 +381,7 @@ withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
  */
 @property (nonatomic, copy) COMigrationBlock migrationBlock;
 /**
- * Domains depended on by the -sourceVersion of -domain, along with
+ * Domains depended on by the -sourceVersion of -packageName, along with
  * their versions.
  *
  * This acts as a snapshot of the necessary parts of the metamodel at 

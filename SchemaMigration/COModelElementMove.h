@@ -10,8 +10,8 @@
 
 /**
  * @group Schema Migration
- * @abstract Represents an entity or property move accross two packages or 
- * domains that can be attached to a schema migration.
+ * @abstract Represents an entity or property move accross two packages
+ * that can be attached to a schema migration.
  *
  * See -[COSchemaMigration entityMoves] and -[COSchemaMigration propertyMoves].
  */
@@ -20,8 +20,8 @@
 	@private
 	NSString *_name;
 	NSString *_ownerName;
-	NSString *_domain;
-	int64_t _version;
+	NSString *_packageName;
+	int64_t _packageVersion;
 }
 
 
@@ -42,23 +42,23 @@
 @property (nonatomic, copy) NSString *ownerName;
 
 
-/** @taskunit Targeted Domain and Version */
+/** @taskunit Targeted Package and Version */
 
 
 /**
- * The domain where we want to move the entity or property.
+ * The package where we want to move the entity or property.
  *
- * The domain must correspond to a package name in the metamodel.
+ * The package must correspond to a package name in the metamodel.
  *
  * See -[ETPackageDescription name] and -[COCommitDescriptor domain].
  */
-@property (nonatomic, copy) NSString *domain;
+@property (nonatomic, copy) NSString *packageName;
 /**
- * The domain version that requires the moved entity or property.
+ * The package version that requires the moved entity or property.
  *
- * For the migration registered under this domain/version pair, the entity or 
+ * For the migration registered under this package/version pair, the entity or
  * property move must have been done.
  */
-@property (nonatomic, assign) int64_t version;
+@property (nonatomic, assign) int64_t packageVersion;
 
 @end

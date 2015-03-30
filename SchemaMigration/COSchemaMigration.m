@@ -12,7 +12,7 @@
 
 @implementation COSchemaMigration
 
-@synthesize domain = _domain, destinationVersion = _destinationVersion, migrationBlock = _migrationBlock;
+@synthesize packageName = _packageName, destinationVersion = _destinationVersion, migrationBlock = _migrationBlock;
 @synthesize entityMoves = _entityMoves, propertyMoves = _propertyMoves, migrationDriver = _migrationDriver;
 @synthesize dependentSourceVersionsByDomain = _dependentSourceVersionsByDomain;
 
@@ -31,19 +31,19 @@ static NSMutableDictionary *dependencies;
 
 + (void)registerMigration: (COSchemaMigration *)migration
 {
-	INVALIDARG_EXCEPTION_TEST(migration, migration.domain != nil);
+	INVALIDARG_EXCEPTION_TEST(migration, migration.packageName != nil);
 	INVALIDARG_EXCEPTION_TEST(migration, migration.destinationVersion > 0);
 
-	migrations[S(migration.domain, @(migration.destinationVersion))] = migration;
+	migrations[S(migration.packageName, @(migration.destinationVersion))] = migration;
 	dependencies = nil;
 }
 
-+ (COSchemaMigration *)migrationForDomain: (NSString *)domain destinationVersion: (NSInteger)version
++ (COSchemaMigration *)migrationForPackageName: (NSString *)package destinationVersion: (NSInteger)version
 {
-	NILARG_EXCEPTION_TEST(domain);
+	NILARG_EXCEPTION_TEST(package);
 	INVALIDARG_EXCEPTION_TEST(version, version > 0);
 
-	return migrations[S(domain, @(version))];
+	return migrations[S(package, @(version))];
 }
 
 // NOTE: For unit testing purpose
@@ -67,8 +67,8 @@ static NSMutableDictionary *dependencies;
 
 		for (COModelElementMove *move in migrationMoves)
 		{
-			ETKeyValuePair *pair = [ETKeyValuePair pairWithKey: move.domain
-			                                             value: @(move.version)];
+			ETKeyValuePair *pair = [ETKeyValuePair pairWithKey: move.packageName
+			                                             value: @(move.packageVersion)];
 
 			if (dependencies[pair] == nil)
 			{
@@ -111,7 +111,7 @@ static NSMutableDictionary *dependencies;
 	{
 		ETAssert(self.migrationDriver != nil);
 		NSDictionary *versionsByDomain = [self.migrationDriver versionsByDomainForItem: item];
-		int64_t itemVersion = [versionsByDomain[self.domain] longLongValue];
+		int64_t itemVersion = [versionsByDomain[self.packageName] longLongValue];
 
 		if (itemVersion != self.sourceVersion)
 		{

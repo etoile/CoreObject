@@ -9,6 +9,6 @@
 
 @implementation COModelElementMove
 
-@synthesize name = _name, ownerName = _ownerName, domain = _domain, version = _version;
+@synthesize name = _name, ownerName = _ownerName, packageName = _packageName, packageVersion = _packageVersion;
 
 @end
