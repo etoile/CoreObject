@@ -302,7 +302,7 @@ COItemGraph *COItemGraphFromBinaryData(NSData *binarydata)
         [NSException raise: NSInvalidArgumentException format: @"Expected version 1"];
     }
     
-    // Get UUID
+    // Get root item UUID
     ETUUID *rootItemUUID = [ETUUID UUIDWithData:uuidData];
     
     // Parse [UUID, item data] blocks
@@ -313,10 +313,9 @@ COItemGraph *COItemGraphFromBinaryData(NSData *binarydata)
     NSMutableDictionary *resultDict = [NSMutableDictionary dictionary];
     for (ETUUID *uuid in dataForUUID)
     {
-        NSData *data = [dataForUUID objectForKey: uuid];
+        NSData *data = dataForUUID[uuid];
         COItem *item = [[COItem alloc] initWithData: data];
-        [resultDict setObject: item
-                       forKey: uuid];
+        resultDict[uuid] = item;
     }
     
     COItemGraph *result = [[COItemGraph alloc] initWithItemForUUID: resultDict
