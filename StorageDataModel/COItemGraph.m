@@ -10,8 +10,11 @@
 #import <EtoileFoundation/ETUUID.h>
 #import "COItem.h"
 #import "COItem+JSON.h"
+#import "COItem+Binary.h"
 #import "COPath.h"
 #import "COJSONSerialization.h"
+#import "COSQLiteStorePersistentRootBackingStoreBinaryFormats.h"
+#import "COSQLiteStorePersistentRootBackingStore.h"
 
 @implementation COItemGraph
 
@@ -241,6 +244,83 @@ COItemGraph *COItemGraphFromJSONData(NSData *json)
 {
     id plist = COJSONObjectWithData(json, NULL);
     return COItemGraphFromJSONPropertyLisy(plist);
+}
+
+static const NSString *BinaryHeaderString = @"CoreObjectBinaryItemGraph";
+
+NSData *COItemGraphToBinaryData(id<COItemGraph> aGraph)
+{
+    // format:
+    // 'CoreObjectBinaryItemGraph' (ASCII)
+    // 1 (version number - uint32, little endian)
+    // 16-byte UUID of root item
+    // [ item data block, same format as used for COSQLiteStore ]
+
+    if (aGraph == nil)
+    {
+        [NSException raise: NSInvalidArgumentException format: @"Expected aGraph != nil"];
+    }
+    
+    NSMutableData *result = [NSMutableData data];
+    [result appendData: [BinaryHeaderString dataUsingEncoding: NSUTF8StringEncoding]];
+    
+    const uint32_t version = NSSwapHostIntToLittle(1);
+    [result appendBytes: &version length: sizeof(version)];
+    [result appendData: [[aGraph rootItemUUID] dataValue]];
+    [result appendData: contentsBLOBWithItemTree(aGraph)];
+    return result;
+}
+
+COItemGraph *COItemGraphFromBinaryData(NSData *binarydata)
+{
+    const NSUInteger formatLen = [BinaryHeaderString length];
+    const NSUInteger versionLen = 4;
+    const NSUInteger uuidLen = 16;
+    
+    NSUInteger pos = 0;
+    NSData *formatData = [binarydata subdataWithRange: NSMakeRange(pos, formatLen)];
+    pos += formatLen;
+    NSData *versionData = [binarydata subdataWithRange: NSMakeRange(pos, versionLen)];
+    pos += versionLen;
+    NSData *uuidData = [binarydata subdataWithRange: NSMakeRange(pos, uuidLen)];
+    pos += uuidLen;
+    NSData *itemsData = [binarydata subdataWithRange: NSMakeRange(pos, [binarydata length] - pos)];
+    
+    // Check format
+    NSString *formatStr = [[NSString alloc] initWithData: formatData encoding: NSUTF8StringEncoding];
+    if(![formatStr isEqual: BinaryHeaderString])
+    {
+        [NSException raise: NSInvalidArgumentException format: @"Incorrect header"];
+    }
+    
+    // Check version
+    uint32_t version;
+    [versionData getBytes:&version length:versionLen];
+    version = NSSwapLittleIntToHost(version);
+    if (version != 1)
+    {
+        [NSException raise: NSInvalidArgumentException format: @"Expected version 1"];
+    }
+    
+    // Get root item UUID
+    ETUUID *rootItemUUID = [ETUUID UUIDWithData:uuidData];
+    
+    // Parse [UUID, item data] blocks
+    NSMutableDictionary *dataForUUID = [NSMutableDictionary dictionary];
+    ParseCombinedCommitDataInToUUIDToItemDataDictionary(dataForUUID, itemsData, NO, nil);
+    
+    // Parse the COItem instances from n
+    NSMutableDictionary *resultDict = [NSMutableDictionary dictionary];
+    for (ETUUID *uuid in dataForUUID)
+    {
+        NSData *data = dataForUUID[uuid];
+        COItem *item = [[COItem alloc] initWithData: data];
+        resultDict[uuid] = item;
+    }
+    
+    COItemGraph *result = [[COItemGraph alloc] initWithItemForUUID: resultDict
+                                                      rootItemUUID: rootItemUUID];
+    return result;
 }
 
 /**

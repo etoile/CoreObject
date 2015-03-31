@@ -128,6 +128,9 @@ NSData *COItemGraphToJSONData(id<COItemGraph> aGraph);
 COItemGraph *COItemGraphFromJSONPropertyLisy(id plist);
 COItemGraph *COItemGraphFromJSONData(NSData *json);
 
+NSData *COItemGraphToBinaryData(id<COItemGraph> aGraph);
+COItemGraph *COItemGraphFromBinaryData(NSData *binarydata);
+
 BOOL COItemGraphEqualToItemGraph(id<COItemGraph> first, id<COItemGraph> second);
 
 /**
