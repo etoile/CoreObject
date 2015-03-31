@@ -117,6 +117,17 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 
 - (BOOL) setupSchema
 {
+    // Version history:
+    //
+    // 1 - initial release
+    // 2 - Schema migration adds two new keys to COItem:
+    //     "org.etoile-project.coreobject.packageversion"
+    //     "org.etoile-project.coreobject.packagename"
+    //     This wouldn't normally require bumping the store schema version,
+    //     but the initial CoreObject release will refuse to load COItem's
+    //     with extra keys.
+    const NSNumber *currentVersion = @(2);
+    
     [db_ beginDeferredTransaction];
     
     /* Store Metadata tables (including schema version) */
@@ -125,14 +136,22 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     {
         _uuid =  [ETUUID UUID];
         [db_ executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER, uuid BLOB)"];
-        [db_ executeUpdate: @"INSERT INTO storeMetadata VALUES(1, ?)", [_uuid dataValue]];
+        [db_ executeUpdate: @"INSERT INTO storeMetadata VALUES(?, ?)", currentVersion, [_uuid dataValue]];
     }
     else
     {
         int version = [db_ intForQuery: @"SELECT version FROM storeMetadata"];
-        if (1 != version)
+        if (version == 1)
         {
-            NSLog(@"Error, store version %d, only version 1 is supported", version);
+            NSLog(@"Migrating store version from 1 to 2");
+            [db_ executeUpdate: @"UPDATE storeMetadata SET version=?", currentVersion];
+        }
+        else if (version == 2)
+        {
+        }
+        else
+        {
+            NSLog(@"Error, store version %d, only versions 1 and 2 are supported", version);
             [db_ rollback];
             return NO;
         }
