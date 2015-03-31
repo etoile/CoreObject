@@ -314,6 +314,8 @@
     COItemGraph *graph = COItemGraphFromJSONData(data);
     
     UKTrue(COItemGraphEqualToItemGraph(ctx1, graph));
+    UKObjectsEqual([root1 UUID], [graph rootItemUUID]);
+    UKObjectsEqual([root1 storeItem], [graph itemForUUID: [root1 UUID]]);
     
     // Test binary roundtrip
 
@@ -321,6 +323,12 @@
     COItemGraph *bingraph = COItemGraphFromBinaryData(bindata);
     
     UKTrue(COItemGraphEqualToItemGraph(ctx1, bingraph));
+    UKObjectsEqual([root1 UUID], [bingraph rootItemUUID]);
+    UKObjectsEqual([root1 storeItem], [bingraph itemForUUID: [root1 UUID]]);
+    
+    // TODO: We should have tests for COItemGraphEqualToItemGraph since we
+    // rely on it in checking the correctness of COItemGraphToJSONData
+    // and COItemGraphToBinaryData
 }
 
 - (void) testRelationshipInverseAfterInsertOrUpdateItems

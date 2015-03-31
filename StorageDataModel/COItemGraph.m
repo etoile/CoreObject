@@ -256,6 +256,11 @@ NSData *COItemGraphToBinaryData(id<COItemGraph> aGraph)
     // 16-byte UUID of root item
     // [ item data block, same format as used for COSQLiteStore ]
 
+    if (aGraph == nil)
+    {
+        [NSException raise: NSInvalidArgumentException format: @"Expected aGraph != nil"];
+    }
+    
     NSMutableData *result = [NSMutableData data];
     [result appendData: [BinaryHeaderString dataUsingEncoding: NSUTF8StringEncoding]];
     
