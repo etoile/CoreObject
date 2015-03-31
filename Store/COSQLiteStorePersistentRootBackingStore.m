@@ -386,7 +386,7 @@
 }
 
 
-static NSData *contentsBLOBWithItemTree(COItemGraph *itemGraph)
+NSData *contentsBLOBWithItemTree(id<COItemGraph> itemGraph)
 {
     NSMutableData *result = [NSMutableData dataWithCapacity: 64536];
     

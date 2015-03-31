@@ -96,3 +96,5 @@
 - (void) clearBackingStore;
 
 @end
+
+NSData *contentsBLOBWithItemTree(id<COItemGraph> itemGraph);

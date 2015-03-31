@@ -314,6 +314,13 @@
     COItemGraph *graph = COItemGraphFromJSONData(data);
     
     UKTrue(COItemGraphEqualToItemGraph(ctx1, graph));
+    
+    // Test binary roundtrip
+
+    NSData *bindata = COItemGraphToBinaryData(ctx1);
+    COItemGraph *bingraph = COItemGraphFromBinaryData(bindata);
+    
+    UKTrue(COItemGraphEqualToItemGraph(ctx1, bingraph));
 }
 
 - (void) testRelationshipInverseAfterInsertOrUpdateItems
