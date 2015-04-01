@@ -486,7 +486,6 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	// We could also change -[COObjectGraphContext itemForUUID:] to search
 	// itemGraph during the loading rather than the loaded objects (but that's
 	// roughly the same than we do currently).
-	// FIXME: Update loadableUUIDs when items are deleted in the migration.
 	NSArray *migratedItems = [COSchemaMigration migrateItems: itemGraph.items
 	                          withModelDescriptionRepository: self.modelDescriptionRepository];
 	_loadingItemGraph = [[COItemGraph alloc] initWithItems: migratedItems
