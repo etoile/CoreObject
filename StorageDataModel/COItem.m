@@ -471,7 +471,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 - (void)setEntityName: (NSString *)entityName
 {
-	[self setValue: entityName
+	[self setValue: [entityName copy]
 	  forAttribute: kCOObjectEntityNameProperty
 	          type: kCOTypeString];
 }
