@@ -55,8 +55,8 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 			&& item.packageVersion == migration.sourceVersion)
 		{
 			NSDictionary *versionsByPackageName = [migration.dependentSourceVersionsByPackageName
-											  dictionaryByAddingEntriesFromDictionary:
-											  @{ migration.packageName : @(migration.sourceVersion) }];
+												   dictionaryByAddingEntriesFromDictionary:
+												   @{ migration.packageName : @(migration.sourceVersion) }];
 			return versionsByPackageName;
 		}
 	}
