@@ -85,7 +85,8 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	/* Early exit, common case: the version in the item matches the package verion
 	   in the model description repository. In that case we have no migration to do */
 	if (entity.owner != nil
-		&& entity.owner.version == item.packageVersion)
+		&& entity.owner.version == item.packageVersion
+		&& [entity.owner.name isEqualToString: item.packageName])
 	{
 		return [NSSet set];
 	}
@@ -196,12 +197,6 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 	[pristineItem setValue: [item valueForAttribute: kCOObjectEntityNameProperty]
 	          forAttribute: kCOObjectEntityNameProperty
 	                  type: [item typeForAttribute: kCOObjectEntityNameProperty]];
-	[pristineItem setValue: [item valueForAttribute: kCOObjectPackageNameProperty]
-	          forAttribute: kCOObjectPackageNameProperty
-	                  type: [item typeForAttribute: kCOObjectPackageNameProperty]];
-	[pristineItem setValue: [item valueForAttribute: kCOObjectPackageVersionProperty]
-	          forAttribute: kCOObjectPackageVersionProperty
-	                  type: [item typeForAttribute: kCOObjectPackageVersionProperty]];
 
 	return pristineItem;
 }
@@ -217,6 +212,26 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 	ETEntityDescription *entity = [_modelDescriptionRepository descriptionForName: item.entityName];
 	ETAssert(entity != nil);
 	return [entity persistentPropertyDescriptionNamesForPackageDescription: package];
+}
+
+static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *sourceItem, ETPackageDescription *package, COMutableItem *destinationItem)
+{
+	BOOL isOwningPackage = [sourceItem.packageName isEqualToString: package.name];
+	
+	if (!isOwningPackage)
+		return;
+	
+	if (sourceItem.packageVersion != package.version)
+	{
+		[NSException raise: NSInternalInconsistencyException
+		            format: @"A migrated item doesn't match its owning package current version "
+		                     "%lu. You probably forgot to update COItem.packageVersion in some "
+		                     "migration applied to this item: %@", (unsigned long)package.version, sourceItem];
+	}
+	assert([sourceItem.packageName isEqualToString: package.name]);
+
+	destinationItem.packageVersion = sourceItem.packageVersion;
+	destinationItem.packageName = sourceItem.packageName;
 }
 
 /**
@@ -247,8 +262,7 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 			}
 			
 			copyAttributesFromItemTo(attributes, item, combinedItem);
-			//[combinedItem setVersion: package.version
-			//               forDomain: packageName];
+			copySchemaAttributesFromItemWhenOwnedByPackageToItem(item, package, combinedItem);
 		}
 	}
 

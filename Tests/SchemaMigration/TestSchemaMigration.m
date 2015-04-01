@@ -243,6 +243,15 @@
 	UKRaisesException([migratedContext insertOrUpdateItems: A(childItem)]);
 }
 
+- (void)testExceptionOnMigrationReturningItemsWithIncorrectVersion
+{
+	/* The missing migration block means the item versions won't be incremented */
+	[self registerMigrationWithTestPackageVersion: 1 block: NULL];
+
+	[ctx commit];
+	UKRaisesException([self prepareNewMigrationContextForDestinationVersion: 1]);
+}
+
 - (id)registerLabelUpdateMigrationWithVersion: (int64_t)version
 {
 	COMigrationBlock block = ^(COSchemaMigration *migration, NSArray *storeItems) {
@@ -308,10 +317,7 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			if ([newItem.packageName isEqual: migration.packageName])
-			{
-				newItem.packageVersion = migration.destinationVersion;
-			}
+			newItem.packageVersion = migration.destinationVersion;
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -370,10 +376,7 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			if ([newItem.packageName isEqual: migration.packageName])
-			{
-				newItem.packageVersion = migration.destinationVersion;
-			}
+			newItem.packageVersion = migration.destinationVersion;
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -440,10 +443,7 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			if ([newItem.packageName isEqual: migration.packageName])
-			{
-				newItem.packageVersion = migration.destinationVersion;
-			}
+			newItem.packageVersion = migration.destinationVersion;
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -505,10 +505,7 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			if ([newItem.packageName isEqual: migration.packageName])
-			{
-				newItem.packageVersion = migration.destinationVersion;
-			}
+			newItem.packageVersion = migration.destinationVersion;
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -584,10 +581,7 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			if ([newItem.packageName isEqual: migration.packageName])
-			{
-				newItem.packageVersion = migration.destinationVersion;
-			}
+			newItem.packageVersion = migration.destinationVersion;
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -657,10 +651,7 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 
-			if ([newItem.packageName isEqual: migration.packageName])
-			{
-				newItem.packageVersion = migration.destinationVersion;
-			}
+			newItem.packageVersion = migration.destinationVersion;
 
 			[migratedItems addObject: newItem];
 
@@ -679,10 +670,7 @@
 			       forAttribute: kCOObjectPackageVersionProperty
 						   type: [oldItem typeForAttribute: kCOObjectPackageVersionProperty]];
 
-			if ([mediaItem.packageName isEqual: migration.packageName])
-			{
-				mediaItem.packageVersion = migration.destinationVersion;
-			}
+			mediaItem.packageVersion = migration.destinationVersion;
 			
 			[newItem setValue: mediaItem.UUID
 			     forAttribute: @"media"
@@ -761,10 +749,7 @@
 
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			if ([newItem.packageName isEqual: migration.packageName])
-			{
-				newItem.packageVersion = migration.destinationVersion;
-			}
+			newItem.packageVersion = migration.destinationVersion;
 
 			[migratedItems addObject: newItem];
 		}
@@ -819,10 +804,7 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			if ([newItem.packageName isEqual: migration.packageName])
-			{
-				newItem.packageVersion = migration.destinationVersion;
-			}
+			newItem.packageVersion = migration.destinationVersion;
 
 			if ([newItem.entityName isEqualToString: @"OutlineItem"])
 			{
@@ -905,10 +887,7 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			if ([newItem.packageName isEqual: migration.packageName])
-			{
-				newItem.packageVersion = migration.destinationVersion;
-			}
+			newItem.packageVersion = migration.destinationVersion;
 
 			[migratedItems addObject: newItem];
 		}
@@ -916,7 +895,7 @@
 	};
 
 	COSchemaMigration *migration = [self registerMigrationWithTestPackageVersion: version
-																		  block: NULL];
+																		  block: block];
 	COModelElementMove *outlineMove = [COModelElementMove new];
 
 	outlineMove.name = @"OutlineItem";
@@ -1007,10 +986,7 @@
 		{
 			COMutableItem *newItem = [oldItem mutableCopy];
 	
-			if ([newItem.packageName isEqual: migration.packageName])
-			{
-				newItem.packageVersion = migration.destinationVersion;
-			}
+			newItem.packageVersion = migration.destinationVersion;
 
 			[migratedItems addObject: newItem];
 		}
@@ -1071,7 +1047,6 @@
 	
 	return [self validateModelDescriptionRepository: repo];
 }
-
 
 /**
  * We don't support package deletion and renaming, but we can simulate renaming

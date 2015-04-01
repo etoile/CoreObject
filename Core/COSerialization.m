@@ -934,9 +934,21 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		// TODO: Rewrite this exception to provide a better explanation.
         [NSException raise: NSInvalidArgumentException
                     format: @"-setStoreItem: called with entity name %@ on COObject with entity name %@",
-                            [aStoreItem valueForAttribute: kCOObjectEntityNameProperty], [[self entityDescription] name]];
+                            entityName, [[self entityDescription] name]];
 
     }
+	if (![aStoreItem.packageName isEqualToString: entityDesc.owner.name])
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: @"-setStoreItem: called with package name %@ on COObject with package name %@",
+		                    aStoreItem.packageName, self.entityDescription.owner.name];
+	}
+	if (aStoreItem.packageVersion != entityDesc.owner.version)
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: @"-setStoreItem: called with package version %lld on COObject with package version %lu",
+		                    aStoreItem.packageVersion, (unsigned long)self.entityDescription.owner.version];
+	}
 }
 
 - (void)setStoreItem: (COItem *)aStoreItem

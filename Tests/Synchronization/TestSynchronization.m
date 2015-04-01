@@ -39,11 +39,16 @@ static ETUUID *branchBUUID;
 
 - (COItemGraph *) itemGraphWithLabel: (NSString *)aLabel
 {
+	ETEntityDescription *entity = [ctx.modelDescriptionRepository descriptionForName: @"OutlineItem"];
     COMutableItem *child = [[COMutableItem alloc] initWithUUID: rootItemUUID];
-	[child setValue: @"OutlineItem" forAttribute: kCOObjectEntityNameProperty type: kCOTypeString];
+
+	child.entityName = entity.name;
+	child.packageName = entity.owner.name;
+	child.packageVersion = entity.owner.version;
     [child setValue: aLabel
        forAttribute: @"label"
                type: kCOTypeString];
+
     return [COItemGraph itemGraphWithItemsRootFirst: @[child]];
 }
 
