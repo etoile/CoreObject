@@ -47,17 +47,17 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
  * comes from, namely the package/version pairs for the entity and all of its
  * superclasses.
  */
-- (NSDictionary *) versionsByDomainForItem: (COItem *)item
+- (NSDictionary *) versionsByPackageNameForItem: (COItem *)item
 {
 	for (COSchemaMigration *migration in [COSchemaMigration migrations])
 	{
 		if ([item.packageName isEqual: migration.packageName]
 			&& item.packageVersion == migration.sourceVersion)
 		{
-			NSDictionary *versionsByDomain = [migration.dependentSourceVersionsByDomain
+			NSDictionary *versionsByPackageName = [migration.dependentSourceVersionsByPackageName
 											  dictionaryByAddingEntriesFromDictionary:
 											  @{ migration.packageName : @(migration.sourceVersion) }];
-			return versionsByDomain;
+			return versionsByPackageName;
 		}
 	}
 	return @{};
@@ -93,34 +93,34 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	
 	/* At this point we are doing a migration for some packages for sure. */
 
-	NSDictionary *versionsByDomain = [self versionsByDomainForItem: item];
+	NSDictionary *versionsByPackageName = [self versionsByPackageNameForItem: item];
 	
-	if (versionsByDomain == nil
-		|| versionsByDomain[@"org.etoile-project.CoreObject"] == nil
-		|| ![versionsByDomain[item.packageName] isEqual: @(item.packageVersion)])
+	if (versionsByPackageName == nil
+		|| versionsByPackageName[@"org.etoile-project.CoreObject"] == nil
+		|| ![versionsByPackageName[item.packageName] isEqual: @(item.packageVersion)])
 	{
 		// TODO: Test that we get this exception when needed
 		[NSException raise: NSInternalInconsistencyException
 					format: @"Item with entityName '%@' package '%@' version %d needs a migration, "
-							"but -versionsByDomainForItem: returned an incomplete "
+							"but -versionsByPackageNameForItem: returned an incomplete "
 							"snapshot of the past version of the metamodel we need. "
 							"It returned: %@. \n"
 							"We require it to be a non-nil dictionary, have a "
 							"version set for the org.etoile-project.CoreObject "
 							"package, and include the same package/version as "
 							"the item being migrated. Probably, you forgot to "
-							"set COSchemaMigration.dependentSourceVersionsByDomain.",
-							item.entityName, item.packageName, (int)item.packageVersion, versionsByDomain];
+							"set COSchemaMigration.dependentSourceVersionsByPackageName.",
+							item.entityName, item.packageName, (int)item.packageVersion, versionsByPackageName];
 	}
 	
 	NSMutableSet *packagesToMigrate = [NSMutableSet new];
 	
-	for (NSString *package in [versionsByDomain allKeys])
+	for (NSString *package in [versionsByPackageName allKeys])
 	{
 		ETPackageDescription *packageDesc = [_modelDescriptionRepository descriptionForName: package];
 		BOOL isDeletedPackage = (packageDesc == nil);
-		int64_t version = versionsByDomain[package] != nil
-			? (int64_t)[versionsByDomain[package] longLongValue]
+		int64_t version = versionsByPackageName[package] != nil
+			? (int64_t)[versionsByPackageName[package] longLongValue]
 			: (int64_t)-1;
 
 		if (isDeletedPackage || version != (int64_t)packageDesc.version)
@@ -263,7 +263,7 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
                    toVersion: (int64_t)destinationVersion
 {
 	COItem *randomItem = [itemsToMigrate[packageName] firstObject];
-	int64_t proposedVersion = [[self versionsByDomainForItem: randomItem][packageName] longLongValue];
+	int64_t proposedVersion = [[self versionsByPackageNameForItem: randomItem][packageName] longLongValue];
 	
 	if (proposedVersion < 0)
 	{

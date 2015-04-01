@@ -302,7 +302,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
 	int64_t _destinationVersion;
 	COMigrationBlock _migrationBlock;
 	__weak COSchemaMigrationDriver *migrationDriver;
-	NSDictionary *_dependentSourceVersionsByDomain;
+	NSDictionary *_dependentSourceVersionsByPackageName;
 }
 
 
@@ -387,7 +387,7 @@ withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
  * This acts as a snapshot of the necessary parts of the metamodel at 
  * -sourceVersion.
  */
-@property (nonatomic, copy) NSDictionary *dependentSourceVersionsByDomain;
+@property (nonatomic, copy) NSDictionary *dependentSourceVersionsByPackageName;
 
 /** @task Move Operations Accross Domains */
 

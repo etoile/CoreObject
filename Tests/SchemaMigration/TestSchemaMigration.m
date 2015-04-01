@@ -60,17 +60,17 @@
 	return repo;
 }
 
-- (ETModelDescriptionRepository *)modelDescriptionRepositoryForDestinationVersions: (NSDictionary *)versionsByDomain
+- (ETModelDescriptionRepository *)modelDescriptionRepositoryForDestinationVersions: (NSDictionary *)versionsByPackageName
 {
 	ETModelDescriptionRepository *repo = [ETModelDescriptionRepository new];
 	CORegisterCoreObjectMetamodel(repo);
 
-	for (NSString *package in versionsByDomain)
+	for (NSString *package in versionsByPackageName)
 	{
 		ETPackageDescription *packageDesc = [repo descriptionForName: package];
 		ETAssert(packageDesc != nil);
 		
-		packageDesc.version = [versionsByDomain[package] longLongValue];
+		packageDesc.version = [versionsByPackageName[package] longLongValue];
 	}
 	return repo;
 }
@@ -81,10 +81,10 @@
 								modelDescriptionRepository: repo];
 }
 
-- (void)prepareNewMigrationContextForDestinationVersions: (NSDictionary *)versionsByDomain
+- (void)prepareNewMigrationContextForDestinationVersions: (NSDictionary *)versionsByPackageName
 {
 	[self prepareNewMigrationContextWithModelDescriptionRepository:
-	 	[self modelDescriptionRepositoryForDestinationVersions: versionsByDomain]];
+	 	[self modelDescriptionRepositoryForDestinationVersions: versionsByPackageName]];
 }
 
 - (void)prepareNewMigrationContextForDestinationVersion: (int64_t)version
@@ -152,7 +152,7 @@
 	migration.packageName = package;
 	migration.destinationVersion = version;
 	migration.migrationBlock = block;
-	migration.dependentSourceVersionsByDomain = deps;
+	migration.dependentSourceVersionsByPackageName = deps;
 	
 	[COSchemaMigration registerMigration: migration];
 	return migration;

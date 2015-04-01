@@ -14,7 +14,7 @@
 
 @synthesize packageName = _packageName, destinationVersion = _destinationVersion, migrationBlock = _migrationBlock;
 @synthesize entityMoves = _entityMoves, propertyMoves = _propertyMoves, migrationDriver = _migrationDriver;
-@synthesize dependentSourceVersionsByDomain = _dependentSourceVersionsByDomain;
+@synthesize dependentSourceVersionsByPackageName = _dependentSourceVersionsByPackageName;
 
 static NSMutableDictionary *migrations;
 static NSMutableDictionary *dependencies;
@@ -110,8 +110,8 @@ static NSMutableDictionary *dependencies;
 	for (COItem *item in storeItems)
 	{
 		ETAssert(self.migrationDriver != nil);
-		NSDictionary *versionsByDomain = [self.migrationDriver versionsByDomainForItem: item];
-		int64_t itemVersion = [versionsByDomain[self.packageName] longLongValue];
+		NSDictionary *versionsByPackageName = [self.migrationDriver versionsByPackageNameForItem: item];
+		int64_t itemVersion = [versionsByPackageName[self.packageName] longLongValue];
 
 		if (itemVersion != self.sourceVersion)
 		{

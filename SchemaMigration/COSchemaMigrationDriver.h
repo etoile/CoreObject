@@ -31,6 +31,6 @@
 
 /** @taskunit Framework private */
 
-- (NSDictionary *) versionsByDomainForItem: (COItem *)item;
+- (NSDictionary *) versionsByPackageNameForItem: (COItem *)item;
 
 @end
