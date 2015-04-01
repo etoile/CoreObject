@@ -184,8 +184,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  *     {
  *         newItem = [item mutableCopy];
  *         [newItem removeValueForAttribute: @"whatever"];
- *         [newItem setVersion: migration.destinationVersion
- *                   forDomain: kCOObjectVersionsProperty];
+ *         newItem.packageVersion = migration.destinationVersion;
  *         [newItems addObject: newItem];
  *     }
  *
@@ -277,8 +276,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  *     for (COItem *item in storeItems)
  *     {
  *         COItem *newItem = [item mutableCopy];
- *         [newItem setVersion: migration.destinationVersion
- *                   forDomain: migration.packageName];
+ *         newItem.packageVersion = migration.destinationVersion;
  *         [newItems addObject: newItem];
  *     }
  *
