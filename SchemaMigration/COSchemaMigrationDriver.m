@@ -71,8 +71,7 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	/* For a deleted entity, the package versions match between item and packages */
 	if (isDeletedEntity)
 	{
-		// FIXME: We hit this line when loading a CODictionary during the test suite,
-		// something must be wrong (but no tests fail).
+		// NOTE: CODictionary hits this case because it doesn't have an entity description
 		return S(item.packageName);
 	}
 	
