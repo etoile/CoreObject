@@ -170,9 +170,8 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 		ETPackageDescription *package = [_modelDescriptionRepository descriptionForName: packageName];
 		ETAssert(package != nil);
 
-		// NOTE: Or -migrateItems:boundToPackageNamed:inRepository:
-		[self migrateItemsInDomain: packageName
-						 toVersion: (int64_t)package.version];
+		[self migrateItemsBoundToPackageNamed: packageName
+									toVersion: (int64_t)package.version];
 	}
 
 	return [upToDateItems arrayByAddingObjectsFromArray: [self combineMigratedItems: itemsToMigrate]];
@@ -256,10 +255,10 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 	return [combinedItems allValues];
 }
 
-#pragma mark Migrating an Item Domain to a Future Version -
+#pragma mark Migrating Items in a Package to a Future Version -
 
-- (void)migrateItemsInDomain: (NSString *)packageName
-                   toVersion: (int64_t)destinationVersion
+- (void)migrateItemsBoundToPackageNamed: (NSString *)packageName
+							  toVersion: (int64_t)destinationVersion
 {
 	COItem *randomItem = [itemsToMigrate[packageName] firstObject];
 	int64_t proposedVersion = [[self versionsByPackageNameForItem: randomItem][packageName] longLongValue];
@@ -405,8 +404,8 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 	for (COSchemaMigration *migration in dependencies)
 	{
 		/* Run enumerated migration and all preceding migrations not yet run */
-		[self migrateItemsInDomain: migration.packageName
-		                 toVersion: migration.destinationVersion];
+		[self migrateItemsBoundToPackageNamed: migration.packageName
+									toVersion: migration.destinationVersion];
 	}
 }
 
