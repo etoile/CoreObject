@@ -96,10 +96,10 @@
  * Returns the package version for the given package of the object.
  * (using the object's model description repository)
  */
-- (int64_t) checkObject: (COObject *)anObject versionForPackageName: (NSString *)aDomain
+- (int64_t) checkObject: (COObject *)anObject versionForPackageName: (NSString *)aPackage
 {
 	COItem *item = anObject.storeItem;
-	if ([item.packageName isEqual: aDomain])
+	if ([item.packageName isEqual: aPackage])
 	{
 		/* Sanity check that the item package/version are in sync with the model
 		   description repository. */
@@ -111,7 +111,7 @@
 
 	for (ETPackageDescription *package in [anObject.entityDescription allPackageDescriptions])
 	{
-		if ([package.name isEqual: aDomain])
+		if ([package.name isEqual: aPackage])
 		{
 			return package.version;
 		}
@@ -167,7 +167,7 @@
 										block: NULL];
 }
 
-- (COSchemaMigration *)registerMigrationWithTestDomainVersion: (int64_t)version
+- (COSchemaMigration *)registerMigrationWithTestPackageVersion: (int64_t)version
 														block: (COMigrationBlock)block
 {
 	// The Test package depends on the CoreObject package, v0
@@ -266,7 +266,7 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithTestDomainVersion: version
+	return [self registerMigrationWithTestPackageVersion: version
 												  block: block];
 }
 
@@ -328,7 +328,7 @@
 	                                    block: block];
 }
 
-- (void)testBasicMigrationInTwoDomainsWithoutMetamodelChanges
+- (void)testBasicMigrationInTwoPackagesWithoutMetamodelChanges
 {
 	COSchemaMigration *testMigration = [self registerLabelUpdateMigrationWithVersion: 1];
 	COSchemaMigration *coreObjectMigration = [self registerNameUpdateMigrationWithVersion: 1];
@@ -386,7 +386,7 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithTestDomainVersion: version
+	return [self registerMigrationWithTestPackageVersion: version
 												  block: block];
 }
 
@@ -454,7 +454,7 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithTestDomainVersion: version
+	return [self registerMigrationWithTestPackageVersion: version
 												  block: block];
 }
 
@@ -522,7 +522,7 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithTestDomainVersion: version
+	return [self registerMigrationWithTestPackageVersion: version
 												  block: block];
 }
 
@@ -603,7 +603,7 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithTestDomainVersion: version
+	return [self registerMigrationWithTestPackageVersion: version
 												  block: block];
 }
 
@@ -622,7 +622,7 @@
 	return [self validateModelDescriptionRepository: repo];
 }
 
-- (void)testPropertyOverridingAccrossDomains
+- (void)testPropertyOverridingAccrossPackages
 {
 	COSchemaMigration *testMigration = [self registerNameOverridingMigrationWithVersion: 1];
 
@@ -693,7 +693,7 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithTestDomainVersion: version
+	return [self registerMigrationWithTestPackageVersion: version
 												  block: block];
 }
 
@@ -771,7 +771,7 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithTestDomainVersion: version
+	return [self registerMigrationWithTestPackageVersion: version
 												  block: block];
 }
 
@@ -833,7 +833,7 @@
 		return migratedItems;
 	};
 
-	return [self registerMigrationWithTestDomainVersion: version
+	return [self registerMigrationWithTestPackageVersion: version
 												  block: block];
 }
 
@@ -915,7 +915,7 @@
 		return migratedItems;
 	};
 
-	COSchemaMigration *migration = [self registerMigrationWithTestDomainVersion: version
+	COSchemaMigration *migration = [self registerMigrationWithTestPackageVersion: version
 																		  block: NULL];
 	COModelElementMove *outlineMove = [COModelElementMove new];
 
@@ -962,7 +962,7 @@
  * Note: For a property addition which can enter in conflict with a property
  * in a subentity, we would increment the CoreObject package version.
  */
-- (void)testEntityMoveAccrossDomains
+- (void)testEntityMoveAccrossPackages
 {
 	// Entity deletion in Test package
 	COSchemaMigration *migration = [self registerOutlineItemMoveMigrationWithVersion: 1];
@@ -1017,7 +1017,7 @@
 		return migratedItems;
 	};
 
-	COSchemaMigration *migration = [self registerMigrationWithTestDomainVersion: version
+	COSchemaMigration *migration = [self registerMigrationWithTestPackageVersion: version
 																		  block: block];
 	COModelElementMove *tagMove = [COModelElementMove new];
 	COModelElementMove *outlineMove = [COModelElementMove new];

@@ -381,7 +381,7 @@ withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
  */
 @property (nonatomic, copy) COMigrationBlock migrationBlock;
 /**
- * Domains depended on by the -sourceVersion of -packageName, along with
+ * Package names depended on by the -sourceVersion of -packageName, along with
  * their versions.
  *
  * This acts as a snapshot of the necessary parts of the metamodel at 
@@ -389,7 +389,7 @@ withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
  */
 @property (nonatomic, copy) NSDictionary *dependentSourceVersionsByPackageName;
 
-/** @task Move Operations Accross Domains */
+/** @task Move Operations Accross Packages */
 
 
 @property (nonatomic, copy) NSSet *entityMoves;
