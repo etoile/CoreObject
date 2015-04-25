@@ -519,6 +519,17 @@ static ETUUID *childUUID2;
     UKTrue([[NSFileManager defaultManager] fileExistsAtPath: [[store URLForAttachmentID: hash2] path]]);
 }
 
+- (void) testAttachmentFromData
+{
+    NSString *fakeAttachment = @"this is a large attachment";
+	COAttachmentID *hash = [store importAttachmentFromData: [fakeAttachment dataUsingEncoding: NSUTF8StringEncoding]];
+    
+    UKObjectsEqual(fakeAttachment, [NSString stringWithContentsOfURL: [store URLForAttachmentID: hash]
+                                                            encoding: NSUTF8StringEncoding
+	                                                           error: NULL]);
+    UKTrue([[NSFileManager defaultManager] fileExistsAtPath: [[store URLForAttachmentID: hash] path]]);
+}
+
 - (void) testAttachmentsGCDoesNotCollectReferenced
 {
     NSString *fakeAttachment = @"this is a large attachment";

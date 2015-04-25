@@ -11,5 +11,6 @@
 
 - (NSURL *) URLForAttachmentID: (COAttachmentID *)aHash;
 - (COAttachmentID *) importAttachmentFromURL: (NSURL *)aURL;
+- (COAttachmentID *) importAttachmentFromData: (NSData *)data;
 
 @end

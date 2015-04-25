@@ -17,6 +17,7 @@
 # 	define SHA1_Init CC_SHA1_Init
 # 	define SHA1_Update CC_SHA1_Update
 # 	define SHA1_Final CC_SHA1_Final
+#	define SHA1 CC_SHA1
 #endif
 
 @implementation COSQLiteStore (Attachments)
@@ -78,6 +79,17 @@ static NSData *hashItemAtURL(NSURL *aURL)
     return [NSData dataWithBytes: digest length: SHA_DIGEST_LENGTH];
 }
 
+static NSData *hashItemWithData(NSData *data)
+{
+	unsigned char digest[SHA_DIGEST_LENGTH];
+
+	if (SHA1(data.bytes, data.length, digest) == NULL)
+	{
+		return nil;
+	}
+	return [NSData dataWithBytes: digest length: SHA_DIGEST_LENGTH];
+}
+
 static NSString *hexString(NSData *aData)
 {
     const NSUInteger len = [aData length];
@@ -122,31 +134,52 @@ static NSData *dataFromHexString(NSString *hexString)
 
 - (COAttachmentID *) importAttachmentFromURL: (NSURL *)aURL
 {
-    NSFileManager *fm = [NSFileManager defaultManager];
-    
-    // Ignore if this fails
+	NILARG_EXCEPTION_TEST(aURL)
+	return [self importAttachmentFromData: nil orURL: aURL];
+}
+
+- (COAttachmentID *) importAttachmentFromData: (NSData *)data
+{
+	NILARG_EXCEPTION_TEST(data);
+	return [self importAttachmentFromData: data orURL: nil];
+}
+
+- (COAttachmentID *) importAttachmentFromData: (NSData *)data orURL: (NSURL *)sourceURL
+{
+	NSFileManager *fm = [NSFileManager defaultManager];
     
     [fm createDirectoryAtURL: [self attachmentsURL]
  withIntermediateDirectories: NO
                   attributes: nil
                        error: NULL];
+
+	NSData *hash = (sourceURL == nil ?  hashItemWithData(data) : hashItemAtURL(sourceURL));
+	COAttachmentID *attachmentID = [[COAttachmentID alloc] initWithData: hash];
+    NSURL *attachmentURL = [self URLForAttachmentID: attachmentID];
     
-    // Hash it
-    
-    NSData *hash = hashItemAtURL(aURL);
-    NSURL *attachmentURL = [self URLForAttachmentID: [[COAttachmentID alloc] initWithData: hash]];
-    
-    if (![fm fileExistsAtPath: [attachmentURL path]])
-    {
-        NSError *error = nil;
-        if (NO == [fm copyItemAtURL: aURL toURL: attachmentURL error: &error])
-        {
-            // This is a real error, e.g. disk full, store not writable, filesystem not available, etc.
-            return nil;
-        }
-    }
-    
-    return [[COAttachmentID alloc] initWithData: hash];
+    if ([fm fileExistsAtPath: [attachmentURL path]])
+		return attachmentID;
+
+	NSError *error = nil;
+		
+	if (sourceURL == nil)
+	{
+		if (![data writeToURL: attachmentURL options: NSDataWritingAtomic error: &error])
+		{
+			// This is a real error, e.g. disk full, store not writable, filesystem not available, etc.
+			return nil;
+		}
+	}
+	else
+	{
+		if (![fm copyItemAtURL: sourceURL toURL: attachmentURL error: &error])
+		{
+			// This is a real error, e.g. disk full, store not writable, filesystem not available, etc.
+			return nil;
+		}
+	}
+
+    return attachmentID;
 }
 
 - (NSArray *) attachments
