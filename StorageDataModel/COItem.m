@@ -392,6 +392,8 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 @implementation COMutableItem
 
+@dynamic entityName, packageName, packageVersion;
+
 + (COMutableItem *) itemWithTypesForAttributes: (NSDictionary *)typesForAttributes
 						   valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
