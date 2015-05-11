@@ -11,8 +11,10 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"OrderedGroupContent"];
-    [entity setParent: (id)@"Anonymous.COObject"];
+	ETEntityDescription *entity = [self newBasicEntityDescription];
+	
+	if (![entity.name isEqual: [OrderedGroupContent className]])
+		return entity;
 	
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                  type: (id)@"Anonymous.NSString"];

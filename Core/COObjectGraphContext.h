@@ -265,7 +265,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * describes all the objects managed by the context.
  */
 @property (nonatomic, readonly) ETModelDescriptionRepository *modelDescriptionRepository;
-
+@property (nonatomic, readonly) int64_t schemaVersion;
 
 /** @taskunit Related Persistency Management Objects */
 
@@ -305,6 +305,12 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * Returns all the inner object UUIDs.
  */
 - (NSArray *)itemUUIDs;
+/**
+ * Returns the immutable items that corresponds to the inner objects.
+ *
+ * The returned item count is the same than -itemUUIDs.
+ */
+- (NSArray *)items;
 /**
  * Updates the inner object graph to match the given item set.
  *

@@ -192,8 +192,11 @@
 	[ctx1 acceptAllChanges]; // TODO: Move to test -init
 	UKFalse([ctx1 hasChanges]);
 	
+	ETEntityDescription *entity = [ctx1.modelDescriptionRepository descriptionForName: @"OutlineItem"];
 	COMutableItem *mutableItem = [COMutableItem item];
-    [mutableItem setValue: @"OutlineItem" forAttribute: kCOObjectEntityNameProperty type: kCOTypeString];
+    mutableItem.entityName = entity.name;
+	mutableItem.packageName = entity.owner.name;
+	mutableItem.packageVersion = entity.owner.version;
     [ctx1 insertOrUpdateItems: A(mutableItem)];
 	
 	UKTrue([ctx1 hasChanges]);

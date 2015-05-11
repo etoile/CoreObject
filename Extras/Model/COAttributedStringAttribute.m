@@ -13,8 +13,10 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"COAttributedStringAttribute"];
-    [entity setParent: (id)@"COObject"];
+	ETEntityDescription *entity = [self newBasicEntityDescription];
+
+	if (![entity.name isEqual: [COAttributedStringAttribute className]])
+		return entity;
 	
 	ETPropertyDescription *styleKeyProperty = [ETPropertyDescription descriptionWithName: @"styleKey"
 																					type: (id)@"NSString"];

@@ -514,10 +514,15 @@ serialization. */
                         types: (NSMutableDictionary *)types
                        values: (NSMutableDictionary *)values
                    entityName: (NSString *)anEntityName
+		   packageDescription: (ETPackageDescription *)package
 {
     [values setObject: anEntityName forKey: kCOObjectEntityNameProperty];
-	[types setObject: [NSNumber numberWithInt: kCOTypeString] forKey: kCOObjectEntityNameProperty];
-	
+	[types setObject: @(kCOTypeString) forKey: kCOObjectEntityNameProperty];
+	[values setObject: @(package.version) forKey: kCOObjectPackageVersionProperty];
+	[types setObject: @(kCOTypeInt64) forKey: kCOObjectPackageVersionProperty];
+	[values setObject: package.name forKey: kCOObjectPackageNameProperty];
+	[types setObject: @(kCOTypeString) forKey: kCOObjectPackageNameProperty];
+
 	return [[COItem alloc] initWithUUID: aUUID
 	                 typesForAttributes: types
 	                valuesForAttributes: values];
@@ -549,7 +554,8 @@ serialization. */
 	return [self storeItemWithUUID: [self UUID]
 	                         types: types
 	                        values: values
-	                    entityName: [[self entityDescription] name]];
+	                    entityName: [[self entityDescription] name]
+				packageDescription: _entityDescription.owner];
 }
 
 - (COItem *)additionalStoreItemForUUID: (ETUUID *)anItemUUID
@@ -928,9 +934,28 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		// TODO: Rewrite this exception to provide a better explanation.
         [NSException raise: NSInvalidArgumentException
                     format: @"-setStoreItem: called with entity name %@ on COObject with entity name %@",
-                            [aStoreItem valueForAttribute: kCOObjectEntityNameProperty], [[self entityDescription] name]];
+                            entityName, [[self entityDescription] name]];
 
     }
+	
+	BOOL wasSerializedBeforeSchemaMigrationSupport =
+		aStoreItem.packageName == nil && [aStoreItem valueForAttribute: kCOObjectPackageVersionProperty] == nil;
+	
+	if (wasSerializedBeforeSchemaMigrationSupport)
+		return;
+
+	if (![aStoreItem.packageName isEqualToString: entityDesc.owner.name])
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: @"-setStoreItem: called with package name %@ on COObject with package name %@",
+		                    aStoreItem.packageName, self.entityDescription.owner.name];
+	}
+	if (aStoreItem.packageVersion != entityDesc.owner.version)
+	{
+		[NSException raise: NSInvalidArgumentException
+		            format: @"-setStoreItem: called with package version %lld on COObject with package version %lu",
+		                    aStoreItem.packageVersion, (unsigned long)self.entityDescription.owner.version];
+	}
 }
 
 - (void)setStoreItem: (COItem *)aStoreItem
@@ -941,7 +966,9 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	
 	for (NSString *property in [aStoreItem attributeNames])
 	{
-        if ([property isEqualToString: kCOObjectEntityNameProperty])
+        if ([property isEqualToString: kCOObjectEntityNameProperty]
+		 || [property isEqualToString: kCOObjectPackageVersionProperty]
+         || [property isEqualToString: kCOObjectPackageNameProperty])
         {
             // HACK
             continue;

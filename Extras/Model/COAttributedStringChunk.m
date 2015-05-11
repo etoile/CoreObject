@@ -12,8 +12,10 @@
 @implementation COAttributedStringChunk
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"COAttributedStringChunk"];
-    [entity setParent: (id)@"COObject"];
+	ETEntityDescription *entity = [self newBasicEntityDescription];
+	
+	if (![entity.name isEqual: [COAttributedStringChunk className]])
+		return entity;
 	
 	ETPropertyDescription *textProperty = [ETPropertyDescription descriptionWithName: @"text"
 																				type: (id)@"NSString"];

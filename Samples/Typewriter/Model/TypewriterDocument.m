@@ -11,8 +11,10 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"TypewriterDocument"];
-    [entity setParent: (id)@"COObject"];
+	ETEntityDescription *entity = [super newBasicEntityDescription];
+	
+	if (![entity.name isEqual: [TypewriterDocument className]])
+		return entity;
     
     ETPropertyDescription *attrString = [ETPropertyDescription descriptionWithName: @"attrString"
 																			  type: (id)@"COAttributedString"];

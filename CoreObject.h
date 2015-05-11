@@ -18,6 +18,11 @@
 #import <CoreObject/COSerialization.h>
 #import <CoreObject/COSQLiteStore.h>
 
+/* Schema Migration */
+
+#import <CoreObject/COSchemaMigration.h>
+#import <CoreObject/COModelElementMove.h>
+
 /* Model */
 
 #import <CoreObject/COBookmark.h>

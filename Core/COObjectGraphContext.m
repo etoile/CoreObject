@@ -13,6 +13,7 @@
 #import "COObject+RelationshipCache.h"
 #import "COMetamodel.h"
 #import "COSerialization.h"
+#import "COSchemaMigration.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
 #import "COBranch+Private.h"
@@ -136,6 +137,12 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 - (BOOL)isObjectGraphContext
 {
 	return YES;
+}
+
+- (int64_t)schemaVersion
+{
+	COObject *rootObject = self.rootObject;
+	return (rootObject == nil ? 0 : (int64_t)rootObject.entityDescription.owner.version);
 }
 
 #pragma mark -
@@ -373,6 +380,17 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	return [[_loadedObjects allKeys] arrayByAddingObjectsFromArray: additionalItemUUIDs];
 }
 
+- (NSArray *)items
+{
+	NSMutableArray *items = [NSMutableArray new];
+
+	for (ETUUID *itemUUID in self.itemUUIDs)
+	{
+		[items addObject: [self itemForUUID: itemUUID]];
+	}
+	return items;
+}
+
 /**
  * Returns the owner item to load or reload to get the additional item looked up
  * in the loading item graph, and deserialized into a property. 
@@ -468,8 +486,10 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	// We could also change -[COObjectGraphContext itemForUUID:] to search
 	// itemGraph during the loading rather than the loaded objects (but that's
 	// roughly the same than we do currently).
-	_loadingItemGraph = itemGraph;
-	
+	NSArray *migratedItems = [COSchemaMigration migrateItems: itemGraph.items
+	                          withModelDescriptionRepository: self.modelDescriptionRepository];
+	_loadingItemGraph = [[COItemGraph alloc] initWithItems: migratedItems
+	                                          rootItemUUID: itemGraph.rootItemUUID];
 	// TODO: Decide how we update the change tracking in regard to additional items.
 
 	// Update change tracking
@@ -486,7 +506,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 		}
 	}
 	
-	NSSet *mainItems = [self mainItemsFromItemGraph: itemGraph
+	NSSet *mainItems = [self mainItemsFromItemGraph: _loadingItemGraph
 									  loadableUUIDs: itemUUIDs];
 	NSSet *mainItemUUIDs = (id)[[mainItems mappedCollection] UUID];
 

@@ -37,14 +37,6 @@
 
 
 @implementation TestObjectUpdateEntity
-
-+ (ETEntityDescription*)newEntityDescription
-{
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"TestObjectUpdateEntity"];
-    [entity setParent: (id)@"Anonymous.COObject"];
-    return entity;
-}
-
 @end
 
 

@@ -11,8 +11,10 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"UnorderedAttributeModel"];
-    [entity setParent: (id)@"Anonymous.COObject"];
+	ETEntityDescription *entity = [self newBasicEntityDescription];
+	
+	if (![entity.name isEqual: [UnorderedAttributeModel className]])
+		return entity;
 	
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                  type: (id)@"Anonymous.NSString"];

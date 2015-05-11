@@ -17,8 +17,10 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"ValueTransformerModel"];
-    [entity setParent: (id)@"COObject"];
+	ETEntityDescription *entity = [self newBasicEntityDescription];
+	
+	if (![entity.name isEqual: [ValueTransformerModel className]])
+		return entity;
 
 #if TARGET_OS_IPHONE
 	NSString *colorType = @"UIColor";

@@ -13,6 +13,8 @@
 #import "COAttachmentID.h"
 
 NSString *kCOObjectEntityNameProperty = @"org.etoile-project.coreobject.entityname";
+NSString *kCOObjectPackageVersionProperty = @"org.etoile-project.coreobject.packageversion";
+NSString *kCOObjectPackageNameProperty = @"org.etoile-project.coreobject.packagename";
 NSString *kCOObjectIsSharedProperty = @"isShared";
 
 static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
@@ -133,6 +135,26 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 }
 
 /** @taskunit convenience */
+
+- (NSString *)entityName
+{
+	return [self valueForAttribute: kCOObjectEntityNameProperty];
+}
+
+- (int64_t) packageVersion
+{
+	NSNumber *version = [values objectForKey: kCOObjectPackageVersionProperty];
+	if (version != nil)
+	{
+		return [version longLongValue];
+	}
+	return -1;
+}
+
+- (NSString *) packageName
+{
+	return [values objectForKey: kCOObjectPackageNameProperty];
+}
 
 - (NSArray *) allObjectsForAttribute: (NSString *)attribute
 {
@@ -370,6 +392,8 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 @implementation COMutableItem
 
+@dynamic entityName, packageName, packageVersion;
+
 + (COMutableItem *) itemWithTypesForAttributes: (NSDictionary *)typesForAttributes
 						   valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
@@ -446,6 +470,27 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 }
 
 /** @taskunit convenience */
+
+- (void)setEntityName: (NSString *)entityName
+{
+	[self setValue: [entityName copy]
+	  forAttribute: kCOObjectEntityNameProperty
+	          type: kCOTypeString];
+}
+
+- (void)setPackageVersion:(int64_t)entityVersion
+{
+	[self setValue: @(entityVersion)
+	  forAttribute: kCOObjectPackageVersionProperty
+			  type: kCOTypeInt64];
+}
+
+- (void)setPackageName:(NSString *)packageName
+{
+	[self setValue: [packageName copy]
+	  forAttribute: kCOObjectPackageNameProperty
+			  type: kCOTypeString];
+}
 
 - (void) setValue: (id)aValue
 	 forAttribute: (NSString*)anAttribute

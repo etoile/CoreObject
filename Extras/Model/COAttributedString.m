@@ -20,8 +20,10 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"COAttributedString"];
-    [entity setParent: (id)@"COObject"];
+	ETEntityDescription *entity = [self newBasicEntityDescription];
+
+	if (![entity.name isEqual: [COAttributedString className]])
+		return entity;
 	
 	ETPropertyDescription *chunksProperty = [ETPropertyDescription descriptionWithName: @"chunks"
 																				  type: (id)@"COAttributedStringChunk"];
@@ -109,8 +111,13 @@
 	// Insert a root COAttributedString item
 	
 	COMutableItem *rootItem = [COMutableItem item];
-	[rootItem setValue: @"COAttributedString" forAttribute: kCOObjectEntityNameProperty type: kCOTypeString];
+
+	rootItem.entityName = @"COAttributedString";
+	rootItem.packageName = self.entityDescription.owner.name;
+	rootItem.packageVersion = self.entityDescription.owner.version;
+
 	[rootItem setValue: copiedUUIDs forAttribute: @"chunks" type: COTypeMakeArrayOf(kCOTypeCompositeReference)];
+
 	[result insertOrUpdateItems: @[rootItem]];
 	[result setRootItemUUID: [rootItem UUID]];
 	

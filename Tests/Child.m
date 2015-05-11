@@ -11,8 +11,10 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"Child"];
-    [entity setParent: (id)@"Anonymous.COObject"];
+	ETEntityDescription *entity = [self newBasicEntityDescription];
+
+	if (![entity.name isEqual: [Child className]])
+		return entity;
 	
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                  type: (id)@"Anonymous.NSString"];

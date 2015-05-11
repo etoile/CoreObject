@@ -12,6 +12,8 @@
 
 // TODO: Rename these variables to be prefixed by COItem and not COObject
 extern NSString *kCOObjectEntityNameProperty;
+extern NSString *kCOObjectPackageVersionProperty;
+extern NSString *kCOObjectPackageNameProperty;
 extern NSString *kCOObjectIsSharedProperty;
 
 /**
@@ -70,6 +72,13 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 
 /** @taskunit Convenience */
 
+
+/**
+ * Returns the entity name corresponding to -[COObject entityDescription].
+ */
+@property (nonatomic, readonly) NSString *entityName;
+@property (nonatomic, readonly) int64_t packageVersion;
+@property (nonatomic, readonly) NSString *packageName;
 
 // allows treating primitive or container, unordered or ordered as NSArray
 - (NSArray*) allObjectsForAttribute: (NSString*)attribute;
@@ -134,6 +143,10 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 
 /** @taskunit Convenience */
 
+
+@property (nonatomic, readwrite) NSString *entityName;
+@property (nonatomic, readwrite) int64_t packageVersion;
+@property (nonatomic, readwrite) NSString *packageName;
 
 - (void) setValue: (id)aValue
 	 forAttribute: (NSString*)anAttribute;
