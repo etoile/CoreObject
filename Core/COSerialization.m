@@ -937,6 +937,13 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
                             entityName, [[self entityDescription] name]];
 
     }
+	
+	BOOL wasSerializedBeforeSchemaMigrationSupport =
+		aStoreItem.packageName == nil && [aStoreItem valueForAttribute: kCOObjectPackageVersionProperty] == nil;
+	
+	if (wasSerializedBeforeSchemaMigrationSupport)
+		return;
+
 	if (![aStoreItem.packageName isEqualToString: entityDesc.owner.name])
 	{
 		[NSException raise: NSInvalidArgumentException
