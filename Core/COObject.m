@@ -22,6 +22,7 @@
 #import "COGroup.h"
 #import "COObjectGraphContext.h"
 #import "COObjectGraphContext+Private.h"
+#import "COPath.h"
 #import "COSerialization.h"
 #import "COEditingContext+Private.h"
 #import "CORevision.h"
@@ -1472,34 +1473,43 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
  */
 - (void) replaceReferencesToObjectIdenticalTo: (COObject *)anObject withObject: (COObject *)aReplacement
 {
+	id replacement = (aReplacement != nil ? aReplacement : [COPath pathWithPersistentRoot: anObject.persistentRoot.UUID branch: anObject.branch.UUID]);
+
 	for (NSString *key in [self persistentPropertyNames])
 	{
 		id value = [self valueForStorageKey: key];
 		if (value == anObject)
 		{
+			// TODO: Use 'replacement' to support undeletion but will require
+			// some changes in -valueFor(Variable)StorageKey:
 			[self setValue: aReplacement forVariableStorageKey: key];
 		}
 		else if ([value isKindOfClass: [COMutableArray class]])
 		{
 			COMutableArray *array = value;
-			
 			const NSUInteger count = [array count];
+
+			array.mutable = YES;
 			for (NSUInteger i=0; i<count; i++)
 			{
 				if (array[i] == anObject)
 				{
-					[array replaceObjectAtIndex: i withObject: aReplacement];
+					[array replaceReferenceAtIndex: i withReference: replacement];
 				}
 			}
+			array.mutable = NO;
 		}
-		else if ([value isKindOfClass: [NSMutableSet class]])
+		else if ([value isKindOfClass: [COMutableSet class]])
 		{
-			NSMutableSet *set = value;
+			COMutableSet *set = value;
+			
+			set.mutable = YES;
 			if ([set containsObject: anObject])
 			{
-				[set removeObject: anObject];
-				[set addObject: aReplacement];
+				[set removeReference: anObject];
+				[set addReference: replacement];
 			}
+			set.mutable = NO;
 		}
 		// FIXME: COMutableDictionary
 	}

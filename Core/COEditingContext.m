@@ -18,6 +18,7 @@
 #import "COBranch+Private.h"
 #import "COPath.h"
 #import "COObjectGraphContext.h"
+#import "COObjectGraphContext+Private.h"
 #import "COEditingContext+Undo.h"
 #import "COEditingContext+Private.h"
 #import "CORevisionCache.h"
@@ -298,6 +299,13 @@
         // NOTE: Deleted persistent roots are removed from the cache on commit.
         [_persistentRootsPendingDeletion addObject: aPersistentRoot];
     }
+
+	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
+	{
+		// TODO: Fix references in other branches too
+		[persistentRoot.objectGraphContext replaceObject: aPersistentRoot.rootObject
+		                                      withObject: nil];
+	}
 }
 
 - (void)undeletePersistentRoot: (COPersistentRoot *)aPersistentRoot

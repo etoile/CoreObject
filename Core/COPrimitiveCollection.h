@@ -30,9 +30,10 @@
 	@public
 	BOOL _mutable;
 	NSHashTable *_backing;
-	NSHashTable *_deadObjects;
+	NSHashTable *_deadReferences;
 }
-- (void)addDeadPath: (COPath *)aPath;
+- (void)addReference: (id)aReference;
+- (void)removeReference: (id)aReference;
 @end
 
 @interface COMutableArray : NSMutableArray <COPrimitiveCollection>
@@ -42,7 +43,8 @@
 	NSPointerArray *_backing;
 	NSMutableIndexSet *_deadIndexes;
 }
-- (void)addDeadPath: (COPath *)aPath;
+- (void)addReference: (id)aReference;
+- (void)replaceReferenceAtIndex: (NSUInteger)index withReference: (id)aReference;
 @end
 
 @interface COUnsafeRetainedMutableSet : COMutableSet
@@ -58,5 +60,5 @@
 	NSMutableDictionary *_backing;
 	NSMutableSet *_deadKeys;
 }
-- (void)setDeadPath: (COPath *)aPath forKey: (id <NSCopying>)aKey;
+- (void)setReference: (id)aReference forKey: (id <NSCopying>)aKey;
 @end

@@ -114,3 +114,48 @@
 }
 
 @end
+
+
+@interface TestCrossPersistentRootUnorderedRelationship : EditingContextTestCase <UKTest>
+{
+	UnorderedGroupNoOpposite *group1;
+	OutlineItem *item1;
+	OutlineItem *item2;
+}
+
+@end
+
+@implementation TestCrossPersistentRootUnorderedRelationship
+
+- (id)init
+{
+	SUPERINIT;
+	group1 = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupNoOpposite"].rootObject;
+	item1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
+	item2 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
+	return self;
+}
+
+- (void)testPersistentRootDeletion
+{
+	group1.contents = S(item1, item2);
+	
+	[ctx commit];
+	
+	item1.persistentRoot.deleted = YES;
+	
+	[ctx commit];
+
+	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
+	                                           inBlock:
+		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	{
+		UnorderedGroupNoOpposite *newGroup1 = testPersistentRoot.rootObject;
+		UnorderedGroupNoOpposite *newItem2 =
+			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
+
+		UKObjectsEqual(S(newItem2), newGroup1.contents);
+	}];
+}
+
+@end

@@ -703,14 +703,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 			                                              ofType: COTypePrimitivePart(type)
 			                                 propertyDescription: aPropertyDesc];
 			
-			if ([deserializedValue isKindOfClass: [COPath class]])
-			{
-				[resultCollection addDeadPath: deserializedValue];
-			}
-			else
-			{
-				[resultCollection addObject: deserializedValue];
-			}
+			[resultCollection addObject: deserializedValue];
 		}
 
 		// FIXME: Make read-only if needed
@@ -729,14 +722,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 			                                              ofType: COTypePrimitivePart(type)
 			                                 propertyDescription: aPropertyDesc];
 
-			if ([deserializedValue isKindOfClass: [COPath class]])
-			{
-				[resultCollection addDeadPath: deserializedValue];
-			}
-			else
-			{
-				[resultCollection addObject: deserializedValue];
-			}
+			[resultCollection addObject: deserializedValue];
 		}
 		
 		// FIXME: Make read-only if needed
@@ -838,13 +824,10 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		BOOL isDeadCrossPersistentRootRef =
 			(result == nil && [value isKindOfClass: [COPath class]]);
 
-		if (isDeadCrossPersistentRootRef || isDeletedCrossPersistentRootRef)
-		{
-			result = COTypeIsMultivalued(type) ? value : nil;
-		}
+		result = (isDeadCrossPersistentRootRef || isDeletedCrossPersistentRootRef ? value : result);
 		
 		// TODO: We should be able to remove it since the value transformer
-		// should touch it
+		// shouldn't touch it
 		return result;
 	}
     else if (type == kCOTypeInt64)

@@ -7,6 +7,7 @@
 
 #import "COPrimitiveCollection.h"
 #import "COObject.h"
+#import "COPath.h"
 
 #pragma clang diagnostic ignored "-Wobjc-designated-initializers"
 
@@ -55,10 +56,14 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 	SUPERINIT;
 	_backing = [self makeBacking];
 	_deadIndexes = [NSMutableIndexSet new];
+	
+	_mutable = YES;
 	for (NSUInteger i=0; i<count; i++)
 	{
-		[_backing addPointer: (__bridge void *)objects[i]];
+		[self addReference: objects[i]];
 	}
+	_mutable = NO;
+
 	return self;
 }
 
@@ -67,11 +72,28 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 	return [self init];
 }
 
-- (void)addDeadPath: (COPath *)aPath
+- (void)addReference: (id)aReference
 {
 	COThrowExceptionIfNotMutable(_mutable);
-	[_deadIndexes addIndex: _backing.count];
-	[_backing addPointer: (__bridge void *)aPath];
+	if ([aReference isKindOfClass: [COPath class]])
+	{
+		[_deadIndexes addIndex: _backing.count];
+	}
+	[_backing addPointer: (__bridge void *)aReference];
+}
+
+- (void)replaceReferenceAtIndex: (NSUInteger)index withReference: (id)aReference
+{
+	COThrowExceptionIfNotMutable(_mutable);
+	if ([aReference isKindOfClass: [COPath class]])
+	{
+		[_deadIndexes addIndex: index];
+	}
+	if ([(id)[_backing pointerAtIndex: index] isKindOfClass: [COPath class]])
+	{
+		[_deadIndexes removeIndex: index];
+	}
+	[_backing replacePointerAtIndex: index withPointer: (__bridge void *)aReference];
 }
 
 - (NSIndexSet *)aliveIndexes
@@ -174,11 +196,15 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 {
 	SUPERINIT;
 	_backing = [self makeBacking];
-	_deadObjects = [NSHashTable new];
+	_deadReferences = [NSHashTable new];
+
+	_mutable = YES;
 	for (NSUInteger i=0; i<count; i++)
 	{
-		[_backing addObject: objects[i]];
+		[self addReference: objects[i]];
 	}
+	_mutable = NO;
+
 	return self;
 }
 - (instancetype)initWithCapacity: (NSUInteger)numItems
@@ -186,28 +212,41 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 	return [self init];
 }
 
-- (void)addDeadPath: (COPath *)aPath
+- (void)addReference: (id)aReference
 {
 	COThrowExceptionIfNotMutable(_mutable);
-	[_deadObjects addObject: aPath];
-	[_backing addObject: aPath];
+	if ([aReference isKindOfClass: [COPath class]])
+	{
+		[_deadReferences addObject: aReference];
+	}
+	[_backing addObject: aReference];
+}
+
+- (void)removeReference: (id)aReference
+{
+	COThrowExceptionIfNotMutable(_mutable);
+	if ([aReference isKindOfClass: [COPath class]])
+	{
+		[_deadReferences removeObject: aReference];
+	}
+	[_backing removeObject: aReference];
 }
 
 - (NSHashTable *)aliveObjects
 {
 	NSHashTable *aliveObjects = [_backing mutableCopy];
-	[aliveObjects minusHashTable: _deadObjects];
+	[aliveObjects minusHashTable: _deadReferences];
 	return aliveObjects;
 }
 
 - (NSUInteger)count
 {
-	return [_backing count] - [_deadObjects count];
+	return [_backing count] - [_deadReferences count];
 }
 
 - (id)member: (id)anObject
 {
-	return [_deadObjects member: anObject] == nil ? [_backing member: anObject] : nil;
+	return [_deadReferences member: anObject] == nil ? [_backing member: anObject] : nil;
 }
 
 - (NSUInteger)countByEnumeratingWithState: (NSFastEnumerationState *)state 
@@ -263,8 +302,16 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 - (instancetype)initWithObjects: (const id[])objects forKeys: (const id <NSCopying>[])keys count: (NSUInteger)count
 {
 	SUPERINIT;
-	_backing = [[NSMutableDictionary alloc] initWithObjects: objects forKeys: keys count: count];
+	_backing = [[NSMutableDictionary alloc] initWithCapacity: count];
 	_deadKeys = [NSMutableSet new];
+	
+	_mutable = YES;
+	for (NSUInteger i=0; i<count; i++)
+	{
+		[self setReference: objects[i] forKey: keys[i]];
+	}
+	_mutable = NO;
+
 	return self;
 }
 
@@ -273,11 +320,18 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 	return [self init];
 }
 
-- (void)setDeadPath: (COPath *)aPath forKey: (id <NSCopying>)aKey
+- (void)setReference: (id)aReference forKey: (id<NSCopying>)aKey
 {
 	COThrowExceptionIfNotMutable(_mutable);
-	[_deadKeys addObject: aKey];
-	_backing[aKey] = aPath;
+	if ([aReference isKindOfClass: [COPath class]])
+	{
+		[_deadKeys addObject: aKey];
+	}
+	if ([_backing[aKey] isKindOfClass: [COPath class]])
+	{
+		[_deadKeys removeObject: aKey];
+	}
+	_backing[aKey] = aReference;
 }
 
 - (NSDictionary *)aliveEntries
