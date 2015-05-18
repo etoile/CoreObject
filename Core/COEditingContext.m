@@ -318,6 +318,13 @@
     {
         [_persistentRootsPendingUndeletion addObject: aPersistentRoot];
     }
+	
+	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
+	{
+		// TODO: Fix references in other branches too
+		[persistentRoot.objectGraphContext replaceObject: nil
+											  withObject: aPersistentRoot.rootObject];
+	}
 }
 
 - (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot

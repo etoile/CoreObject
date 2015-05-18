@@ -133,28 +133,50 @@
 	group1 = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupNoOpposite"].rootObject;
 	item1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
 	item2 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
+	group1.contents = S(item1, item2);
+	[ctx commit];
 	return self;
 }
 
 - (void)testPersistentRootDeletion
 {
-	group1.contents = S(item1, item2);
-	
-	[ctx commit];
-	
 	item1.persistentRoot.deleted = YES;
-	
 	[ctx commit];
 
 	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
 	                                           inBlock:
 		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
 	{
-		UnorderedGroupNoOpposite *newGroup1 = testPersistentRoot.rootObject;
-		UnorderedGroupNoOpposite *newItem2 =
+		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
+		UnorderedGroupNoOpposite *testItem2 =
 			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
 
-		UKObjectsEqual(S(newItem2), newGroup1.contents);
+		UKObjectsEqual(S(testItem2), testGroup1.contents);
+	}];
+}
+
+- (void)testPersistentRootUndeletion
+{
+	item1.persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	item1.persistentRoot.deleted = NO;
+	[ctx commit];
+
+	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
+	                                           inBlock:
+		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	{
+		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
+		UnorderedGroupNoOpposite *testItem1 =
+			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
+		UnorderedGroupNoOpposite *testItem2 =
+			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
+
+		// FIXME: The relationship cache needs some tweaking to keep track of
+		// dead relationships, since -referringObjects doesn't return testItem1
+		// in -[COObjectGraphContext replaceObject:withObject:].
+		//UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
 	}];
 }
 

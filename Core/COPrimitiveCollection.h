@@ -34,6 +34,7 @@
 }
 - (void)addReference: (id)aReference;
 - (void)removeReference: (id)aReference;
+- (BOOL)containsReference: (id)aReference;
 @end
 
 @interface COMutableArray : NSMutableArray <COPrimitiveCollection>

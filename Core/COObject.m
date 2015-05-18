@@ -1473,6 +1473,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
  */
 - (void) replaceReferencesToObjectIdenticalTo: (COObject *)anObject withObject: (COObject *)aReplacement
 {
+	id object = (anObject != nil ? anObject : [COPath pathWithPersistentRoot: aReplacement.persistentRoot.UUID branch: aReplacement.branch.UUID]);
 	id replacement = (aReplacement != nil ? aReplacement : [COPath pathWithPersistentRoot: anObject.persistentRoot.UUID branch: anObject.branch.UUID]);
 
 	for (NSString *key in [self persistentPropertyNames])
@@ -1480,8 +1481,8 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 		id value = [self valueForStorageKey: key];
 		if (value == anObject)
 		{
-			// TODO: Use 'replacement' to support undeletion but will require
-			// some changes in -valueFor(Variable)StorageKey:
+			// TODO: Use 'object' and 'replacement' to support undeletion but
+			// will require some changes in -valueFor(Variable)StorageKey:
 			[self setValue: aReplacement forVariableStorageKey: key];
 		}
 		else if ([value isKindOfClass: [COMutableArray class]])
@@ -1492,7 +1493,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 			array.mutable = YES;
 			for (NSUInteger i=0; i<count; i++)
 			{
-				if (array[i] == anObject)
+				if (array[i] == object)
 				{
 					[array replaceReferenceAtIndex: i withReference: replacement];
 				}
@@ -1504,9 +1505,9 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 			COMutableSet *set = value;
 			
 			set.mutable = YES;
-			if ([set containsObject: anObject])
+			if ([set containsReference: object])
 			{
-				[set removeReference: anObject];
+				[set removeReference: object];
 				[set addReference: replacement];
 			}
 			set.mutable = NO;

@@ -232,6 +232,11 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 	[_backing removeObject: aReference];
 }
 
+- (BOOL)containsReference: (id)aReference
+{
+	return [_backing member: aReference] != nil;
+}
+
 - (NSHashTable *)aliveObjects
 {
 	NSHashTable *aliveObjects = [_backing mutableCopy];
