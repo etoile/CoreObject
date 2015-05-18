@@ -8,7 +8,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@class COObject;
+@class COObject, COPath;
 
 @interface COWeakRef : NSObject
 {
@@ -30,7 +30,9 @@
 	@public
 	BOOL _mutable;
 	NSHashTable *_backing;
+	NSHashTable *_deadObjects;
 }
+- (void)addDeadPath: (COPath *)aPath;
 @end
 
 @interface COMutableArray : NSMutableArray <COPrimitiveCollection>
@@ -38,7 +40,9 @@
 @public
 	BOOL _mutable;
 	NSPointerArray *_backing;
+	NSMutableIndexSet *_deadIndexes;
 }
+- (void)addDeadPath: (COPath *)aPath;
 @end
 
 @interface COUnsafeRetainedMutableSet : COMutableSet
@@ -52,5 +56,7 @@
 	@public
 	BOOL _mutable;
 	NSMutableDictionary *_backing;
+	NSMutableSet *_deadKeys;
 }
+- (void)setDeadPath: (COPath *)aPath forKey: (id <NSCopying>)aKey;
 @end

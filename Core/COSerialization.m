@@ -15,6 +15,7 @@
 #import "COObjectGraphContext.h"
 #import "COObjectGraphContext+Private.h"
 #import "COPath.h"
+#import "COPrimitiveCollection.h"
 #import "COAttachmentID.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
@@ -240,6 +241,10 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	else if ([value isKindOfClass: [COObject class]])
 	{
 		return [self serializedReferenceForObject: value];
+	}
+	else if ([value isKindOfClass: [COPath class]])
+	{
+		return value;
 	}
 	else if ([value isKindOfClass: [COAttachmentID class]])
 	{
@@ -644,7 +649,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 
 - (COObject *)objectForSerializedReference: (id)value
 									ofType: (COType)type
-               propertyDescription: (ETPropertyDescription *)aPropertyDesc
+                       propertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
 	COObject *object = nil;
 
@@ -661,8 +666,6 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 		object = [[[self persistentRoot] parentContext] crossPersistentRootReferenceWithPath: (COPath *)value];
 	}
 
-	// Even when we add support for broken references, object will still
-	// be non null, so this assertion should always hold.
 	ETAssert(object != nil);
 	ETAssert([[object entityDescription] isKindOfEntity: [aPropertyDesc persistentType]]);
 	
@@ -700,7 +703,14 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 			                                              ofType: COTypePrimitivePart(type)
 			                                 propertyDescription: aPropertyDesc];
 			
-			[resultCollection addObject: deserializedValue];
+			if ([deserializedValue isKindOfClass: [COPath class]])
+			{
+				[resultCollection addDeadPath: deserializedValue];
+			}
+			else
+			{
+				[resultCollection addObject: deserializedValue];
+			}
 		}
 
 		// FIXME: Make read-only if needed
@@ -719,7 +729,14 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 			                                              ofType: COTypePrimitivePart(type)
 			                                 propertyDescription: aPropertyDesc];
 
-			[resultCollection addObject: deserializedValue];
+			if ([deserializedValue isKindOfClass: [COPath class]])
+			{
+				[resultCollection addDeadPath: deserializedValue];
+			}
+			else
+			{
+				[resultCollection addObject: deserializedValue];
+			}
 		}
 		
 		// FIXME: Make read-only if needed
@@ -812,9 +829,23 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	}
 	else if (type == kCOTypeReference || type == kCOTypeCompositeReference)
 	{
-		return [self objectForSerializedReference: value
+		result = [self objectForSerializedReference: value
 										   ofType: type
 							  propertyDescription: aPropertyDesc];
+		
+		BOOL isDeletedCrossPersistentRootRef =
+			[(COObject *)result persistentRoot].isDeleted || [(COObject *)result branch].isDeleted;
+		BOOL isDeadCrossPersistentRootRef =
+			(result == nil && [value isKindOfClass: [COPath class]]);
+
+		if (isDeadCrossPersistentRootRef || isDeletedCrossPersistentRootRef)
+		{
+			result = COTypeIsMultivalued(type) ? value : nil;
+		}
+		
+		// TODO: We should be able to remove it since the value transformer
+		// should touch it
+		return result;
 	}
     else if (type == kCOTypeInt64)
 	{

@@ -54,6 +54,7 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 {
 	SUPERINIT;
 	_backing = [self makeBacking];
+	_deadIndexes = [NSMutableIndexSet new];
 	for (NSUInteger i=0; i<count; i++)
 	{
 		[_backing addPointer: (__bridge void *)objects[i]];
@@ -66,14 +67,30 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 	return [self init];
 }
 
+- (void)addDeadPath: (COPath *)aPath
+{
+	COThrowExceptionIfNotMutable(_mutable);
+	[_deadIndexes addIndex: _backing.count];
+	[_backing addPointer: (__bridge void *)aPath];
+}
+
+- (NSIndexSet *)aliveIndexes
+{
+	NSMutableIndexSet *indexes =
+		[NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [_backing count])];
+	[indexes removeIndexes: _deadIndexes];
+	return indexes;
+}
+
 - (NSUInteger)count
 {
-	return [_backing count];
+	return [[self aliveIndexes] count];
 }
 
 - (id)objectAtIndex: (NSUInteger)index
 {
-	return [_backing pointerAtIndex: index];
+	NSUInteger deadIndexCount = [_deadIndexes countOfIndexesInRange: NSMakeRange(0, index)];
+	return [_backing pointerAtIndex: index + deadIndexCount];
 }
 
 - (void)addObject: (id)anObject
@@ -94,26 +111,33 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
     }
     else
     {
-        [_backing insertPointer: (__bridge void *)anObject atIndex: index];
+		NSUInteger deadIndexCount = [_deadIndexes countOfIndexesInRange: NSMakeRange(0, index)];
+        [_backing insertPointer: (__bridge void *)anObject
+		                atIndex: index + deadIndexCount];
     }
 }
 
 - (void)removeLastObject
 {
 	COThrowExceptionIfNotMutable(_mutable);
-	[self removeObjectAtIndex: [self count] - 1];
+	NSUInteger index = [self count] - 1;
+	NSUInteger deadIndexCount = [_deadIndexes countOfIndexesInRange: NSMakeRange(0, index)];
+	[self removeObjectAtIndex: index + deadIndexCount];
 }
 
 - (void)removeObjectAtIndex: (NSUInteger)index
 {
 	COThrowExceptionIfNotMutable(_mutable);
-	[_backing removePointerAtIndex: index];
+	NSUInteger deadIndexCount = [_deadIndexes countOfIndexesInRange: NSMakeRange(0, index)];
+	[_backing removePointerAtIndex: index + deadIndexCount];
 }
 
 - (void)replaceObjectAtIndex: (NSUInteger)index withObject: (id)anObject
 {
 	COThrowExceptionIfNotMutable(_mutable);
-	[_backing replacePointerAtIndex: index withPointer: (__bridge void *)anObject];
+	NSUInteger deadIndexCount = [_deadIndexes countOfIndexesInRange: NSMakeRange(0, index)];
+	[_backing replacePointerAtIndex: index + deadIndexCount
+	                    withPointer: (__bridge void *)anObject];
 }
 
 @end
@@ -150,6 +174,7 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 {
 	SUPERINIT;
 	_backing = [self makeBacking];
+	_deadObjects = [NSHashTable new];
 	for (NSUInteger i=0; i<count; i++)
 	{
 		[_backing addObject: objects[i]];
@@ -161,26 +186,41 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 	return [self init];
 }
 
+- (void)addDeadPath: (COPath *)aPath
+{
+	COThrowExceptionIfNotMutable(_mutable);
+	[_deadObjects addObject: aPath];
+	[_backing addObject: aPath];
+}
+
+- (NSHashTable *)aliveObjects
+{
+	NSHashTable *aliveObjects = [_backing mutableCopy];
+	[aliveObjects minusHashTable: _deadObjects];
+	return aliveObjects;
+}
+
 - (NSUInteger)count
 {
-	return [_backing count];
+	return [_backing count] - [_deadObjects count];
 }
 
 - (id)member: (id)anObject
 {
-	return [_backing member: anObject];
+	return [_deadObjects member: anObject] == nil ? [_backing member: anObject] : nil;
 }
 
 - (NSUInteger)countByEnumeratingWithState: (NSFastEnumerationState *)state 
                                   objects: (__unsafe_unretained id[])stackbuf 
                                     count: (NSUInteger)len
 {
-	return [_backing countByEnumeratingWithState: state objects: stackbuf count: len];
+	// TODO: Don't recreate aliveObjects on every invocation
+	return [[self aliveObjects] countByEnumeratingWithState: state objects: stackbuf count: len];
 }
 
 - (NSEnumerator *)objectEnumerator
 {
-	return [_backing objectEnumerator];
+	return [[self aliveObjects] objectEnumerator];
 }
 
 - (void)addObject: (id)anObject
@@ -224,6 +264,7 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 {
 	SUPERINIT;
 	_backing = [[NSMutableDictionary alloc] initWithObjects: objects forKeys: keys count: count];
+	_deadKeys = [NSMutableSet new];
 	return self;
 }
 
@@ -232,24 +273,38 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 	return [self init];
 }
 
+- (void)setDeadPath: (COPath *)aPath forKey: (id <NSCopying>)aKey
+{
+	COThrowExceptionIfNotMutable(_mutable);
+	[_deadKeys addObject: aKey];
+	_backing[aKey] = aPath;
+}
+
+- (NSDictionary *)aliveEntries
+{
+	NSMutableDictionary *aliveEntries = [_backing mutableCopy];
+	[_backing removeObjectsForKeys: [_deadKeys allObjects]];
+	return aliveEntries;
+}
+
 - (NSUInteger)count
 {
-	return [_backing count];
+	return [_backing count] - [_deadKeys count];
 }
 
 - (id)objectForKey: (id)key
 {
-	return [_backing objectForKey: key];
+	return ![_deadKeys containsObject: key] ? [_backing objectForKey: key] : nil;
 }
 
 - (NSEnumerator *)objectEnumerator
 {
-	return [_backing objectEnumerator];
+	return [[self aliveEntries] objectEnumerator];
 }
 
 - (NSEnumerator *)keyEnumerator
 {
-	return [_backing keyEnumerator];
+	return [[self aliveEntries] keyEnumerator];
 }
 
 - (void)removeObjectForKey: (id)aKey
