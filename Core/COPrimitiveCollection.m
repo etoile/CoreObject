@@ -109,10 +109,14 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 	return [[self aliveIndexes] count];
 }
 
+- (NSUInteger)deadIndexCountBeforeIndex: (NSUInteger)index
+{
+	return [_deadIndexes countOfIndexesInRange: NSMakeRange(0, index - 1)];
+}
+
 - (id)objectAtIndex: (NSUInteger)index
 {
-	NSUInteger deadIndexCount = [_deadIndexes countOfIndexesInRange: NSMakeRange(0, index)];
-	return [_backing pointerAtIndex: index + deadIndexCount];
+	return [_backing pointerAtIndex: index + [self deadIndexCountBeforeIndex: index]];
 }
 
 - (void)addObject: (id)anObject
@@ -133,9 +137,8 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
     }
     else
     {
-		NSUInteger deadIndexCount = [_deadIndexes countOfIndexesInRange: NSMakeRange(0, index)];
         [_backing insertPointer: (__bridge void *)anObject
-		                atIndex: index + deadIndexCount];
+		                atIndex: index + [self deadIndexCountBeforeIndex: index]];
     }
 }
 
@@ -143,22 +146,19 @@ static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 {
 	COThrowExceptionIfNotMutable(_mutable);
 	NSUInteger index = [self count] - 1;
-	NSUInteger deadIndexCount = [_deadIndexes countOfIndexesInRange: NSMakeRange(0, index)];
-	[self removeObjectAtIndex: index + deadIndexCount];
+	[self removeObjectAtIndex: index + [self deadIndexCountBeforeIndex: index]];
 }
 
 - (void)removeObjectAtIndex: (NSUInteger)index
 {
 	COThrowExceptionIfNotMutable(_mutable);
-	NSUInteger deadIndexCount = [_deadIndexes countOfIndexesInRange: NSMakeRange(0, index)];
-	[_backing removePointerAtIndex: index + deadIndexCount];
+	[_backing removePointerAtIndex: index + [self deadIndexCountBeforeIndex: index]];
 }
 
 - (void)replaceObjectAtIndex: (NSUInteger)index withObject: (id)anObject
 {
 	COThrowExceptionIfNotMutable(_mutable);
-	NSUInteger deadIndexCount = [_deadIndexes countOfIndexesInRange: NSMakeRange(0, index)];
-	[_backing replacePointerAtIndex: index + deadIndexCount
+	[_backing replacePointerAtIndex: index + [self deadIndexCountBeforeIndex: index]
 	                    withPointer: (__bridge void *)anObject];
 }
 
