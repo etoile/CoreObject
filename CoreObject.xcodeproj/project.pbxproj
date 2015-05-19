@@ -106,6 +106,8 @@
 		609CB4D21A5E9384003E8052 /* COTopologicalSort.m in Sources */ = {isa = PBXBuildFile; fileRef = 609CB4CE1A5E9384003E8052 /* COTopologicalSort.m */; };
 		60AA7EB11A641FCD00897498 /* COSchemaMigrationDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 60FA55DE1A447A8600A2D8A7 /* COSchemaMigrationDriver.h */; };
 		60AA7EBC1A641FDE00897498 /* COSchemaMigrationDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 60FA55DF1A447A8600A2D8A7 /* COSchemaMigrationDriver.m */; };
+		60AD2F521B0A5BB000A9F473 /* TestPrimitiveCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 60AD2F511B0A5BB000A9F473 /* TestPrimitiveCollection.m */; };
+		60AD2F531B0A5BB000A9F473 /* TestPrimitiveCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 60AD2F511B0A5BB000A9F473 /* TestPrimitiveCollection.m */; };
 		60B1568D19B860C8006D5EEF /* COUndoTrackStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE29317C07ED800E729F5 /* COUndoTrackStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60B1568E19B861BF006D5EEF /* COEditingContext+Debugging.h in Headers */ = {isa = PBXBuildFile; fileRef = 601FD94418893ED50002F957 /* COEditingContext+Debugging.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60B1568F19B861D3006D5EEF /* COObjectGraphContext+Debugging.h in Headers */ = {isa = PBXBuildFile; fileRef = 66A00A18187DDB6A005CFE16 /* COObjectGraphContext+Debugging.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1030,6 +1032,7 @@
 		609CB4BE1A5D8380003E8052 /* COModelElementMove.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COModelElementMove.m; path = SchemaMigration/COModelElementMove.m; sourceTree = SOURCE_ROOT; };
 		609CB4CD1A5E9384003E8052 /* COTopologicalSort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COTopologicalSort.h; path = Utilities/COTopologicalSort.h; sourceTree = "<group>"; };
 		609CB4CE1A5E9384003E8052 /* COTopologicalSort.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COTopologicalSort.m; path = Utilities/COTopologicalSort.m; sourceTree = "<group>"; };
+		60AD2F511B0A5BB000A9F473 /* TestPrimitiveCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestPrimitiveCollection.m; sourceTree = "<group>"; };
 		60B1D3F919791F8800ACAC9C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		60B1D3FB19791F9400ACAC9C /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/usr/lib/libsqlite3.dylib; sourceTree = DEVELOPER_DIR; };
 		60B84C061A6E6F5F00418128 /* COTrackViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COTrackViewController.h; path = Extras/HistoryView/UIKit/COTrackViewController.h; sourceTree = SOURCE_ROOT; };
@@ -2126,6 +2129,7 @@
 				66E40D351836D08D00E5B4A7 /* TestObjectGraphContext.m */,
 				66E40D361836D08D00E5B4A7 /* TestObjectUpdate.m */,
 				66E40D371836D08D00E5B4A7 /* TestPersistentRoot.m */,
+				60AD2F511B0A5BB000A9F473 /* TestPrimitiveCollection.m */,
 				66E40D381836D08D00E5B4A7 /* TestRevisionNumber.m */,
 				6660B3951839522B009007FD /* TestSerialization.m */,
 			);
@@ -3238,6 +3242,7 @@
 				60F91EE0197D324B009F47D7 /* TestHistoryTrack.m in Sources */,
 				60F91EE4197D324B009F47D7 /* TestUndoTrack.m in Sources */,
 				60F91F31197D32E2009F47D7 /* UnivaluedAttributeModel.m in Sources */,
+				60AD2F531B0A5BB000A9F473 /* TestPrimitiveCollection.m in Sources */,
 				60F91F25197D32E2009F47D7 /* OrderedGroupNoOpposite.m in Sources */,
 				60F91EFC197D3282009F47D7 /* TestCrossPersistentRootReferences.m in Sources */,
 				60F91F04197D3282009F47D7 /* TestRevisionNumber.m in Sources */,
@@ -3497,6 +3502,7 @@
 				66E40D761836D08E00E5B4A7 /* TestHistoryTrack.m in Sources */,
 				66E451D917CC565200205679 /* Tag.m in Sources */,
 				66EEB2B7186D3CBA003695E6 /* TestItemGraph.m in Sources */,
+				60AD2F521B0A5BB000A9F473 /* TestPrimitiveCollection.m in Sources */,
 				66E40D6D1836D08D00E5B4A7 /* TestSQLiteStoreErrorHandling.m in Sources */,
 				66E40D741836D08E00E5B4A7 /* TestSynchronizerMultiUser.m in Sources */,
 				6610115B184D8B9E001A3E24 /* UnorderedGroupNoOpposite.m in Sources */,

@@ -10,6 +10,7 @@
 #import <CoreObject/CoreObject.h>
 
 #import "COObjectGraphContext+GarbageCollection.h"
+#import "COPrimitiveCollection.h"
 #import "CODateSerialization.h"
 
 #import "COSynchronizerRevision.h"

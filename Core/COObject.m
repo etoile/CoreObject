@@ -1493,7 +1493,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 			array.mutable = YES;
 			for (NSUInteger i=0; i<count; i++)
 			{
-				if (array[i] == object)
+				if ([array referenceAtIndex: i] == object)
 				{
 					[array replaceReferenceAtIndex: i withReference: replacement];
 				}

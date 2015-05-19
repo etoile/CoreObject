@@ -44,6 +44,7 @@
 	NSPointerArray *_backing;
 	NSMutableIndexSet *_deadIndexes;
 }
+- (id)referenceAtIndex: (NSUInteger)index;
 - (void)addReference: (id)aReference;
 - (void)replaceReferenceAtIndex: (NSUInteger)index withReference: (id)aReference;
 @end
@@ -52,6 +53,11 @@
 @end
 
 @interface COUnsafeRetainedMutableArray : COMutableArray
+{
+	// TODO: Replace with custom acquire/relinquish functions to retain/release
+	// COPath references as necessary
+	NSMutableSet *_deadReferences;
+}
 @end
 
 @interface COMutableDictionary : NSMutableDictionary <COPrimitiveCollection>
