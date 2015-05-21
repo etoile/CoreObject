@@ -193,10 +193,7 @@
 		UnorderedGroupNoOpposite *testItem2 =
 			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
 
-		// FIXME: The relationship cache needs some tweaking to keep track of
-		// dead relationships, since -referringObjects doesn't return testItem1
-		// in -[COObjectGraphContext replaceObject:withObject:].
-		//UKObjectsEqual(A(testItem1, testItem2), testGroup1.contents);
+		UKObjectsEqual(A(testItem1, testItem2), testGroup1.contents);
 	}];
 }
 

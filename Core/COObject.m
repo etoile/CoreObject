@@ -1561,7 +1561,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 			array.mutable = YES;
 			for (NSUInteger i=0; i<count; i++)
 			{
-				if ([array referenceAtIndex: i] == object)
+				if ([[array referenceAtIndex: i] isEqual: object])
 				{
 					if (!updated)
 					{
