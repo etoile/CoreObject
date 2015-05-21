@@ -1,7 +1,7 @@
 /*
 	Copyright (C) 2015 Quentin Mathe
 
-	Date:  July 2015
+	Date:  May 2015
 	License:  MIT  (see COPYING)
  */
 
