@@ -173,7 +173,7 @@
 	UKRaisesException([array objectAtIndex: 2]);
 }
 
-#pragma mark - Alive Objects Operations
+#pragma mark - Alive Objects Primitive Operations
 
 - (void)testFirstObjectInsertion
 {
@@ -323,6 +323,77 @@
 	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
 	UKObjectsEqual(alive3, [array objectAtIndex: 1]);
 	UKRaisesException([array objectAtIndex: 2]);
+}
+
+#pragma mark - Alive Objects Additional Operations
+
+/**
+ * -addObject: must call -insertObject:atIndex: with a valid index when the
+ * collection is empty.
+ */
+- (void)testFirstObjectAddition
+{
+	[array addObject: alive3];
+
+	[array addReference: alive1];
+	[array addReference: dead1];
+	[array addReference: alive2];
+	[array addReference: dead2];
+	
+	// Tests identical to -testFirstObjectInsertion
+	UKObjectsEqual(INDEXSET(2, 4), array.deadIndexes);
+	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
+	UKObjectsEqual(A(alive3, alive1, dead1, alive2, dead2), array.allReferences);
+	UKIntsEqual(3, array.count);
+	UKObjectsEqual(alive3, [array objectAtIndex: 0]);
+	UKObjectsEqual(alive1, [array objectAtIndex: 1]);
+	UKObjectsEqual(alive2, [array objectAtIndex: 2]);
+	UKRaisesException([array objectAtIndex: 3]);
+}
+
+- (void)testLastObjectAddition
+{
+	[array addReference: alive1];
+	[array addReference: dead1];
+	[array addReference: alive2];
+	[array addReference: dead2];
+	
+	[array addObject: alive3];
+
+	// Tests identical to -testLastObjectInsertion
+	UKObjectsEqual(INDEXSET(1, 3), array.deadIndexes);
+	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
+	UKObjectsEqual(A(alive1, dead1, alive2, dead2, alive3), array.allReferences);
+	UKIntsEqual(3, array.count);
+	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
+	UKObjectsEqual(alive2, [array objectAtIndex: 1]);
+	UKObjectsEqual(alive3, [array objectAtIndex: 2]);
+	UKRaisesException([array objectAtIndex: 3]);
+}
+
+- (void)testRemoveLastObject
+{
+	[array addReference: alive1];
+	[array addReference: dead1];
+	[array addReference: alive2];
+	[array addReference: dead2];
+	[array addReference: alive3];
+	
+	[array removeLastObject];
+	
+	// Tests identical to -testLastObjectRemoval
+	UKObjectsEqual(INDEXSET(1, 3), array.deadIndexes);
+	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
+	UKObjectsEqual(A(alive1, dead1, alive2, dead2), array.allReferences);
+	UKIntsEqual(2, array.count);
+	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
+	UKObjectsEqual(alive2, [array objectAtIndex: 1]);
+	UKRaisesException([array objectAtIndex: 3]);
+}
+
+- (void)testRemoveLastObjectWhenEmpty
+{
+	UKDoesNotRaiseException([array removeLastObject]);
 }
 
 @end

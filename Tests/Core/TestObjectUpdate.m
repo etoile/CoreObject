@@ -13,6 +13,14 @@
 #import "COObject+Private.h"
 
 @interface TestObjectUpdateEntity : COObject
+{
+	NSString *_label;
+	COMutableArray *_contents;
+}
+
+@property (nonatomic, readwrite) NSString *label;
+@property (nonatomic, readwrite) NSArray *contents;
+
 @end
 
 @interface TestObjectUpdate : EditingContextTestCase
@@ -29,7 +37,13 @@
 @interface TestIVarUpdate : TestObjectUpdate <UKTest>
 @end
 
+@interface TestIVarCollectionUpdate : TestObjectUpdate <UKTest>
+@end
+
 @interface TestVariableStorageUpdate : TestObjectUpdate <UKTest>
+@end
+
+@interface TestVariableStorageCollectionUpdate : TestObjectUpdate <UKTest>
 @end
 
 @interface TestDirectVariableStorageUpdate : TestObjectUpdate <UKTest>
@@ -37,6 +51,55 @@
 
 
 @implementation TestObjectUpdateEntity
+
+// FIXME: Support @dynamic label, contents;
+@synthesize label = _label, contents = _contents;
+
++ (ETEntityDescription *) newEntityDescription
+{
+	ETEntityDescription *entity = [self newBasicEntityDescription];
+	
+	if ([[entity name] isEqual: [TestObjectUpdateEntity className]] == NO)
+		return entity;
+	
+	ETPropertyDescription *label =
+		[ETPropertyDescription descriptionWithName: @"label" typeName: @"NSString"];
+	label.persistent = YES;
+	ETPropertyDescription *contents =
+		[ETPropertyDescription descriptionWithName: @"contents" typeName: @"NSString"];
+	contents.persistent = YES;
+	contents.multivalued = YES;
+	contents.ordered = YES;
+
+	entity.propertyDescriptions = @[label, contents];
+
+	return entity;
+}
+
+- (id)initWithObjectGraphContext: (COObjectGraphContext *)aContext
+{
+	self = [super initWithObjectGraphContext: aContext];
+	if (self == nil)
+		return nil;
+
+	_contents = [COMutableArray new];
+	return self;
+}
+
+- (void)setLabel: (NSString *)label
+{
+	[self willChangeValueForProperty: @"label"];
+	_label = label;
+	[self didChangeValueForProperty: @"label"];
+}
+
+- (void)setContents: (NSArray *)contents
+{
+	[self willChangeValueForProperty: @"contents"];
+	_contents = [COMutableArray arrayWithArray: contents];
+	[self didChangeValueForProperty: @"contents"];
+}
+
 @end
 
 
@@ -45,6 +108,11 @@
 - (NSString *) property
 {
 	return nil;
+}
+
+- (id)oldValue
+{
+	return [NSNull null];
 }
 
 - (id) newValue
@@ -80,7 +148,12 @@
 	            options: NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
 	            context: NULL];
 	ETAssert([self property] != nil);
+	ETAssert([self oldValue] != nil);
 	ETAssert([self newValue] != nil);
+	if (![[self oldValue] isEqual: [NSNull null]])
+	{
+		[object setValue: [self oldValue] forStorageKey: [self property]];
+	}
 	return self;
 }
 
@@ -91,7 +164,7 @@
 
 - (void)validateKVOUpdate
 {
-	UKObjectsEqual([NSNull null], oldValue);
+	UKObjectsEqual([self oldValue], (oldValue != nil ? oldValue : [NSNull null]));
 	UKObjectsEqual([self newValue], newValue);
 	UKObjectsSame(object, poster);
 	UKIntsEqual(1, notificationCount);
@@ -114,7 +187,7 @@
 
 - (NSString *) property
 {
-	return @"name";
+	return @"label";
 }
 
 - (id) newValue
@@ -124,8 +197,49 @@
 
 - (void) testSetter
 {
-	[(COObject *)object setName: [self newValue]];
+	[(TestObjectUpdateEntity *)object setLabel: [self newValue]];
 
+	[self validateUpdate];
+}
+
+- (void) testPVC
+{
+	[object setValue: [self newValue] forProperty: [self property]];
+	
+	[self validateUpdate];
+}
+
+- (void) testKVC
+{
+	[object setValue: [self newValue] forKey: [self property]];
+	
+	[self validateUpdate];
+}
+
+@end
+
+
+@implementation TestIVarCollectionUpdate
+
+- (NSString *) property
+{
+	return @"contents";
+}
+
+- (id) oldValue
+{
+	return @[@"bop", @"poum"];
+}
+
+- (id) newValue
+{
+	return @[@"bip", @"bop"];
+}
+
+- (void) testSetter
+{
+	[(OrderedAttributeModel *)object setContents: [self newValue]];
+	
 	[self validateUpdate];
 }
 
@@ -174,6 +288,52 @@
 {
 	[object setValue: [self newValue] forProperty: [self property]];
 
+	[self validateUpdate];
+}
+
+- (void) testKVC
+{
+	[object setValue: [self newValue] forKey: [self property]];
+	
+	[self validateUpdate];
+}
+
+@end
+
+
+@implementation TestVariableStorageCollectionUpdate
+
+- (NSString *) property
+{
+	return @"contents";
+}
+
+- (id) oldValue
+{
+	return @[@"bop", @"poum"];
+}
+
+- (id) newValue
+{
+	return @[@"bip", @"bop"];
+}
+
+- (NSString *) entityName
+{
+	return @"OrderedAttributeModel";
+}
+
+- (void) testSetter
+{
+	[(OrderedAttributeModel *)object setContents: [self newValue]];
+	
+	[self validateUpdate];
+}
+
+- (void) testPVC
+{
+	[object setValue: [self newValue] forProperty: [self property]];
+	
 	[self validateUpdate];
 }
 

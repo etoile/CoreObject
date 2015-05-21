@@ -83,6 +83,29 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	return [self init];
 }
 
+- (id)copyWithZone: (NSZone *)zone
+{
+	COMutableArray *newArray = [[self class] allocWithZone: zone];
+	
+	newArray->_backing = [_backing copyWithZone: zone];
+	newArray->_deadIndexes = [_deadIndexes mutableCopyWithZone: zone];
+	newArray->_mutable = _mutable;
+
+	return newArray;
+}
+
+- (id)mutableCopyWithZone: (NSZone *)zone
+{
+	COMutableArray *newArray = [self copyWithZone: zone];
+	newArray->_mutable = YES;
+	return newArray;
+}
+
+- (id <NSFastEnumeration>)enumerableReferences
+{
+	return _backing;
+}
+
 - (id)referenceAtIndex: (NSUInteger)index
 {
 	return [_backing pointerAtIndex: index];
@@ -155,7 +178,8 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 - (void)addObject: (id)anObject
 {
-	[self insertObject: anObject atIndex: self.count - 1];
+	NSUInteger count = self.count;
+	[self insertObject: anObject atIndex: (count > 0 ? count : 0)];
 }
 
 - (void)insertObject: (id)anObject atIndex: (NSUInteger)index
@@ -181,7 +205,12 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 - (void)removeLastObject
 {
-	[self removeObjectAtIndex: self.count - 1];
+	NSUInteger count = self.count;
+
+	if (count == 0)
+		return;
+
+	[self removeObjectAtIndex: count - 1];
 }
 
 - (void)removeObjectAtIndex: (NSUInteger)index
@@ -212,6 +241,27 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	[_backing replacePointerAtIndex: [self backingIndex: index]
 	                    withPointer: (__bridge void *)anObject];
 }
+
+// TODO: Compute a diff between the receiver objects and the ones in argument,
+// then apply insertion, move and removal operations to the receiver derived
+// from the diff. In this way, the dead references would shifted around more properly.
+- (void)setArray: (NSArray *)liveObjects
+{
+	COThrowExceptionIfNotMutable(_mutable);
+
+	NSArray *deadReferences = [_backing.allObjects objectsAtIndexes: _deadIndexes];
+
+	_backing = [self makeBacking];
+	_deadIndexes = [NSMutableIndexSet new];
+
+	NSArray *validLiveObjects = (liveObjects != nil ? liveObjects : [NSArray new]);
+
+	for (id reference in [validLiveObjects arrayByAddingObjectsFromArray: deadReferences])
+	{
+		[self addReference: reference];
+	}
+}
+
 
 @end
 
@@ -289,6 +339,29 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 - (instancetype)initWithCapacity: (NSUInteger)numItems
 {
 	return [self init];
+}
+
+- (id)copyWithZone: (NSZone *)zone
+{
+	COMutableSet *newSet = [[self class] allocWithZone: zone];
+	
+	newSet->_backing = [_backing copyWithZone: zone];
+	newSet->_deadReferences = [_deadReferences copyWithZone: zone];
+	newSet->_mutable = _mutable;
+	
+	return newSet;
+}
+
+- (id)mutableCopyWithZone: (NSZone *)zone
+{
+	COMutableSet *newSet = [self copyWithZone: zone];
+	newSet->_mutable = YES;
+	return newSet;
+}
+
+- (id <NSFastEnumeration>)enumerableReferences
+{
+	return _backing;
 }
 
 - (void)addReference: (id)aReference
@@ -402,6 +475,29 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 - (instancetype)initWithCapacity: (NSUInteger)aCount
 {
 	return [self init];
+}
+
+- (id)copyWithZone: (NSZone *)zone
+{
+	COMutableDictionary *newDictionary = [[self class] allocWithZone: zone];
+	
+	newDictionary->_backing = [_backing copyWithZone: zone];
+	newDictionary->_deadKeys = [_deadKeys copyWithZone: zone];
+	newDictionary->_mutable = _mutable;
+	
+	return newDictionary;
+}
+
+- (id)mutableCopyWithZone: (NSZone *)zone
+{
+	COMutableDictionary *newDictionary = [self copyWithZone: zone];
+	newDictionary->_mutable = YES;
+	return newDictionary;
+}
+
+- (id <NSFastEnumeration>)enumerableReferences
+{
+	return [_backing objectEnumerator];
 }
 
 - (void)setReference: (id)aReference forKey: (id<NSCopying>)aKey

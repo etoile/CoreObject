@@ -11,7 +11,10 @@
 #import "CORelationshipCache.h"
 #import "COObjectGraphContext.h"
 #import "COEditingContext.h"
+#import "COEditingContext+Private.h"
+#import "COCrossPersistentRootDeadRelationshipCache.h"
 #import "COPath.h"
+#import "COPrimitiveCollection.h"
 
 @implementation COObject (RelationshipCache)
 
@@ -49,10 +52,23 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
         {
             if ([aProperty isMultivalued])
             {
-                for (COObject *obj in aValue)
+				COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
+					self.editingContext.deadRelationshipCache;
+
+                for (id obj in [(id <COPrimitiveCollection>)aValue enumerableReferences])
                 {
-                    [[obj incomingRelationshipCache] removeReferencesForPropertyInSource: [aProperty name]
-                                                                    sourceObject: self];
+					BOOL isDeadReference = [obj isKindOfClass: [COPath class]];
+					
+					if (isDeadReference)
+					{
+						[deadRelationshipCache removeReferringObject: self
+						                                     forPath: obj];
+					}
+					else
+					{
+                    	[[obj incomingRelationshipCache] removeReferencesForPropertyInSource: [aProperty name]
+                                                                                sourceObject: self];
+					}
                 }
             }
             else
@@ -84,11 +100,24 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
 			
 			if ([aProperty isMultivalued])
 			{
-				for (COObject *obj in aValue)
+				COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
+					self.editingContext.deadRelationshipCache;
+
+				for (id obj in [(id <COPrimitiveCollection>)aValue enumerableReferences])
 				{
-					[[obj incomingRelationshipCache] addReferenceFromSourceObject: self
-														   sourceProperty: [aProperty name]
-														   targetProperty: [propertyInTarget name]];
+					BOOL isDeadReference = [obj isKindOfClass: [COPath class]];
+
+					if (isDeadReference)
+					{
+						[deadRelationshipCache addReferringObject: self
+						                                  forPath: obj];
+					}
+					else
+					{
+						[[obj incomingRelationshipCache] addReferenceFromSourceObject: self
+						                                               sourceProperty: [aProperty name]
+						                                               targetProperty: [propertyInTarget name]];
+					}
 				}
 			}
 			else

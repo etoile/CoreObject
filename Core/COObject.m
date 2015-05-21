@@ -15,6 +15,7 @@
 #import "COBranch+Private.h"
 #import "COObject+RelationshipCache.h"
 #import "COObject+Private.h"
+#import "COCrossPersistentRootDeadRelationshipCache.h"
 #import "COPrimitiveCollection.h"
 #import "CORelationshipCache.h"
 #import "COSQLiteStore.h"
@@ -341,6 +342,15 @@ See +[NSObject typePrefix]. */
 
 	/* For subclasses that override the designated initializer */
 	return [self initWithObjectGraphContext: aContext];
+}
+
+- (void)dealloc
+{
+	COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
+		self.editingContext.deadRelationshipCache;
+
+	ETAssert(!self.isPersistent || deadRelationshipCache != nil);
+	[deadRelationshipCache removeReferringObject: self];
 }
 
 // TODO: Maybe add convenience copying method, - (COObject *) copyWithCopier: (COCopier *)aCopier
@@ -817,33 +827,58 @@ See +[NSObject typePrefix]. */
 	return [aCollection conformsToProtocol: @protocol(COPrimitiveCollection)];
 }
 
-- (id)mutableCollectionWithCollection: (id)aCollection
-                  propertyDescription: (ETPropertyDescription *)propDesc
+/**
+ * The collection to be updated is either:
+ *
+ * - a COMutableArray/Set/Dictionary, when the property is persistent
+ * - a NSMutableArray/Set/Dictionary, when the property is transient.
+ *
+ * Note: the returned collection class must be identical to the first collection 
+ * argument.
+ */
+- (id)replaceContentOfCollection: (id)collection
+                  withCollection: (id)content
+             propertyDescription: (ETPropertyDescription *)propDesc
 {
-	Class collectionClass = Nil;
-	id collection = nil;
+	NSParameterAssert(collection != nil);
+	
+	/* At deserialization, we receive primitive collections containing dead
+	   references we don't want to lost.
+	   Collection content setter such as -[COMutableArray setArray:] ignores all
+	   dead references that could exist in the collection passed in argument.
 
-	if ([propDesc isPersistent])
+	   We also return a copy in case someone later update the property with a
+	   COPrimitiveCollection that wasn't instantiated by the receiver (we could 
+	   bypass this step during the deserialization as an optimization). */
+	if ([self isCoreObjectCollection: content])
+		return [content copy];
+
+	if ([self isCoreObjectCollection: collection])
 	{
-		collectionClass = [self coreObjectCollectionClassForPropertyDescription: propDesc];
-	}
-	else
-	{
-		collectionClass = [[self collectionClassForPropertyDescription: propDesc] mutableClass];
+		[collection setMutable: YES];
 	}
 
 	if ([propDesc isKeyed])
 	{
-		collection = [[collectionClass alloc] initWithDictionary: aCollection];
+		[(NSMutableDictionary *)collection setDictionary: content];
 	}
 	else if ([propDesc isOrdered])
 	{
-		collection = [[collectionClass alloc] initWithArray: aCollection];
+		// FIXME: Remove this copy hack to ensure KVO doesn't report a old value
+		// identical to the new one.
+		collection = [collection mutableCopy];
+		[(NSMutableArray *)collection setArray: content];
 	}
 	else
 	{
-		collection = [[collectionClass alloc] initWithSet: aCollection];
+		[(NSMutableSet *)collection setSet: content];
 	}
+	
+	if ([self isCoreObjectCollection: collection])
+	{
+		[collection setMutable: NO];
+	}
+	
 	return collection;
 }
 
@@ -872,8 +907,10 @@ See +[NSObject typePrefix]. */
 	}
 	else if ([propertyDesc isMultivalued] && [self isCoreObjectCollection: aValue] == NO)
 	{
-		storageValue = [self mutableCollectionWithCollection: aValue
-		                                 propertyDescription: propertyDesc];
+		storageValue = _variableStorage[key];
+		storageValue = [self replaceContentOfCollection: storageValue
+		                                 withCollection: aValue
+		                            propertyDescription: propertyDesc];
 	}
 	else
 	{
@@ -1473,17 +1510,48 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
  */
 - (void) replaceReferencesToObjectIdenticalTo: (COObject *)anObject withObject: (COObject *)aReplacement
 {
-	id object = (anObject != nil ? anObject : [COPath pathWithPersistentRoot: aReplacement.persistentRoot.UUID branch: aReplacement.branch.UUID]);
-	id replacement = (aReplacement != nil ? aReplacement : [COPath pathWithPersistentRoot: anObject.persistentRoot.UUID branch: anObject.branch.UUID]);
+	ETAssert((anObject == nil || aReplacement == nil) || (anObject != nil && aReplacement != nil));
+	id object = anObject;
+	id replacement = aReplacement;
+	BOOL isUndeletion = (anObject == nil);
+	BOOL isDeletion = (aReplacement == nil);
+	
+	if (isDeletion)
+	{
+		if (anObject.objectGraphContext.isTrackingSpecificBranch)
+		{
+			replacement = [COPath pathWithPersistentRoot: anObject.persistentRoot.UUID
+			                                      branch: anObject.branch.UUID];
+		}
+		else
+		{
+			replacement = [COPath pathWithPersistentRoot: anObject.persistentRoot.UUID];
+		}
+	}
+	else if (isUndeletion)
+	{
+		if (aReplacement.objectGraphContext.isTrackingSpecificBranch)
+		{
+			object = [COPath pathWithPersistentRoot: aReplacement.persistentRoot.UUID
+			                                 branch: aReplacement.branch.UUID];
+		}
+		else
+		{
+			object = [COPath pathWithPersistentRoot: aReplacement.persistentRoot.UUID];
+		}
+	}
 
 	for (NSString *key in [self persistentPropertyNames])
 	{
 		id value = [self valueForStorageKey: key];
-		if (value == anObject)
+		BOOL updated = NO;
+
+		if (value == object)
 		{
-			// TODO: Use 'object' and 'replacement' to support undeletion but
-			// will require some changes in -valueFor(Variable)StorageKey:
-			[self setValue: aReplacement forVariableStorageKey: key];
+			// TODO: Will require some changes in -valueFor(Variable)StorageKey:
+			// to return nil when a dead reference marker is inserted.
+			// FIXME: We should call -setValue:forStorageKey here.
+			[self setValue: replacement forVariableStorageKey: key];
 		}
 		else if ([value isKindOfClass: [COMutableArray class]])
 		{
@@ -1495,7 +1563,12 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 			{
 				if ([array referenceAtIndex: i] == object)
 				{
+					if (!updated)
+					{
+						[self willChangeValueForProperty: key];
+					}
 					[array replaceReferenceAtIndex: i withReference: replacement];
+					updated = YES;
 				}
 			}
 			array.mutable = NO;
@@ -1507,11 +1580,23 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 			set.mutable = YES;
 			if ([set containsReference: object])
 			{
+				if (!updated)
+				{
+					[self willChangeValueForProperty: key];
+				}
 				[set removeReference: object];
 				[set addReference: replacement];
+				updated = YES;
 			}
 			set.mutable = NO;
 		}
+		
+		if (updated)
+		{
+			// Will update the dead relationship cache
+			[self didChangeValueForProperty: key];
+		}
+
 		// FIXME: COMutableDictionary
 	}
 }

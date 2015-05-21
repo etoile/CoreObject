@@ -21,6 +21,7 @@
 #import "COObjectGraphContext+Private.h"
 #import "COEditingContext+Undo.h"
 #import "COEditingContext+Private.h"
+#import "COCrossPersistentRootDeadRelationshipCache.h"
 #import "CORevisionCache.h"
 #import "COStoreTransaction.h"
 #import "NSDistributedNotificationCenter.h"
@@ -30,6 +31,7 @@
 @synthesize store = _store, modelDescriptionRepository = _modelDescriptionRepository;
 @synthesize persistentRootsPendingDeletion = _persistentRootsPendingDeletion;
 @synthesize persistentRootsPendingUndeletion = _persistentRootsPendingUndeletion;
+@synthesize deadRelationshipCache = _deadRelationshipCache;
 @synthesize isRecordingUndo = _isRecordingUndo;
 
 #pragma mark Creating a New Context -
@@ -53,6 +55,7 @@
 	_loadedPersistentRoots = [NSMutableDictionary new];
 	_persistentRootsPendingDeletion = [NSMutableSet new];
     _persistentRootsPendingUndeletion = [NSMutableSet new];
+	_deadRelationshipCache = [COCrossPersistentRootDeadRelationshipCache new];
     _isRecordingUndo = YES;
 	_revisionCache = [[CORevisionCache alloc] initWithParentEditingContext: self];
 	_internalTransientObjectGraphContext = [[COObjectGraphContext alloc] initWithModelDescriptionRepository: aRepo];
@@ -302,6 +305,9 @@
 
 	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
 	{
+		if (persistentRoot == aPersistentRoot)
+			continue;
+
 		// TODO: Fix references in other branches too
 		[persistentRoot.objectGraphContext replaceObject: aPersistentRoot.rootObject
 		                                      withObject: nil];
@@ -319,12 +325,28 @@
         [_persistentRootsPendingUndeletion addObject: aPersistentRoot];
     }
 	
+	/* Fix dead references in referring persistent roots */
+	
 	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
 	{
+		if (persistentRoot == aPersistentRoot)
+			continue;
+				
 		// TODO: Fix references in other branches too
 		[persistentRoot.objectGraphContext replaceObject: nil
 											  withObject: aPersistentRoot.rootObject];
 	}
+	
+	/* Once all the dead references are fixed, remove them from the cache */
+	
+	NSSet * allBranches = [aPersistentRoot.branches setByAddingObjectsFromSet: aPersistentRoot.deletedBranches];
+	
+	for (COBranch *branch in allBranches)
+	{
+		[_deadRelationshipCache removePath: [COPath pathWithPersistentRoot: aPersistentRoot.UUID
+		                                                            branch: branch.UUID]];
+	}
+	[_deadRelationshipCache removePath: [COPath pathWithPersistentRoot: aPersistentRoot.UUID]];
 }
 
 - (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot

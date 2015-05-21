@@ -23,6 +23,7 @@
 
 @protocol COPrimitiveCollection <NSObject>
 @property (nonatomic, getter=isMutable) BOOL mutable;
+@property (nonatomic, readonly) id <NSFastEnumeration> enumerableReferences;
 @end
 
 @interface COMutableSet : NSMutableSet <COPrimitiveCollection>

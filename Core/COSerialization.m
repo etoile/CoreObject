@@ -180,10 +180,10 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
     }
     else if ([aPropertyDesc isOrdered])
     {
-        ETAssert([value isKindOfClass: [NSArray class]]);
+        ETAssert([value isKindOfClass: [COMutableArray class]]);
 		NSMutableArray *array = [NSMutableArray arrayWithCapacity: [value count]];
 
-		for (id element in value)
+		for (id element in [value enumerableReferences])
 		{
 			[array addObject: [self serializedValueForValue: element
                                univaluedPropertyDescription: aPropertyDesc]];
@@ -192,10 +192,10 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
     }
     else
     {
-        ETAssert([value isKindOfClass: [NSSet class]]);
+        ETAssert([value isKindOfClass: [COMutableSet class]]);
         NSMutableSet *set = [NSMutableSet setWithCapacity: [value count]];
 		
-		for (id element in value)
+		for (id element in [value enumerableReferences])
 		{
             [set addObject: [self serializedValueForValue: element
                              univaluedPropertyDescription: aPropertyDesc]];
@@ -695,18 +695,20 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		NSAssert([aPropertyDesc isKeyed] == NO && [aPropertyDesc isOrdered] && [aPropertyDesc isMultivalued],
 				 @"Serialization type doesn't match metamodel");
 		
-		id resultCollection = [NSMutableArray array];
+		COMutableArray *resultCollection =
+			[[self coreObjectCollectionClassForPropertyDescription: aPropertyDesc] new];
 		
+		resultCollection.mutable = YES;
 		for (id subvalue in value)
 		{
 			id deserializedValue = [self valueForSerializedValue: subvalue
 			                                              ofType: COTypePrimitivePart(type)
 			                                 propertyDescription: aPropertyDesc];
 			
-			[resultCollection addObject: deserializedValue];
+			[resultCollection addReference: deserializedValue];
 		}
+		resultCollection.mutable = NO;
 
-		// FIXME: Make read-only if needed
 		return resultCollection;
 	}
 	else if (COTypeMultivaluedPart(type) == kCOTypeSet)
@@ -714,18 +716,20 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		NSAssert([aPropertyDesc isKeyed] == NO && [aPropertyDesc isOrdered] == NO && [aPropertyDesc isMultivalued],
 				 @"Serialization type doesn't match metamodel");
 		
-		id resultCollection = [NSMutableSet set];
+		COMutableSet *resultCollection =
+			[[self coreObjectCollectionClassForPropertyDescription: aPropertyDesc] new];
 		
+		resultCollection.mutable = YES;
 		for (id subvalue in value)
 		{
 			id deserializedValue = [self valueForSerializedValue: subvalue
 			                                              ofType: COTypePrimitivePart(type)
 			                                 propertyDescription: aPropertyDesc];
 
-			[resultCollection addObject: deserializedValue];
+			[resultCollection addReference: deserializedValue];
 		}
-		
-		// FIXME: Make read-only if needed
+		resultCollection.mutable = NO;
+
 		return resultCollection;
 	}
 	else if (type == kCOTypeCompositeReference)
