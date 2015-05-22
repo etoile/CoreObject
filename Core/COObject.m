@@ -1566,9 +1566,9 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 					if (!updated)
 					{
 						[self willChangeValueForProperty: key];
+						updated = YES;
 					}
 					[array replaceReferenceAtIndex: i withReference: replacement];
-					updated = YES;
 				}
 			}
 			array.mutable = NO;
@@ -1583,10 +1583,10 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 				if (!updated)
 				{
 					[self willChangeValueForProperty: key];
+					updated = YES;
 				}
 				[set removeReference: object];
 				[set addReference: replacement];
-				updated = YES;
 			}
 			set.mutable = NO;
 		}

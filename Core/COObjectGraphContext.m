@@ -883,7 +883,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 		referringObjects = [[anObject incomingRelationshipCache] referringObjects];
 	}
 
-	_ignoresChangeTrackingNotifications = YES;
+	//_ignoresChangeTrackingNotifications = YES;
 	for (COObject *referrer in referringObjects)
 	{
 		/* The dead relationship cache tracks referring objects that exist 
@@ -896,7 +896,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 		[referrer replaceReferencesToObjectIdenticalTo: anObject
 											withObject: aReplacement];
 	}
-	_ignoresChangeTrackingNotifications = NO;
+	//_ignoresChangeTrackingNotifications = NO;
 }
 
 - (COItemGraph *)modifiedItemsSnapshot
