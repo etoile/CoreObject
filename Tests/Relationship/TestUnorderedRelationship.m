@@ -143,6 +143,28 @@
 	return self;
 }
 
+- (void)testRelationships
+{
+	UKObjectsEqual(S(item1, item2), group1.contents);
+	// Check that the relationship cache knows the inverse relationship,
+	// even though it is not used in the metamodel (non-public API)
+	UKObjectsEqual(S(group1), [item1 referringObjects]);
+	UKObjectsEqual(S(group1), [item2 referringObjects]);
+}
+
+- (void)testRelationshipsFromAndToCurrentBranches
+{
+	UnorderedGroupNoOpposite *currentGroup1 = group1.persistentRoot.currentBranch.rootObject;
+	OutlineItem *currentItem1 = item1.persistentRoot.currentBranch.rootObject;
+	OutlineItem *currentItem2 = item2.persistentRoot.currentBranch.rootObject;
+	
+	UKObjectsEqual(S(item1, item2), currentGroup1.contents);
+	// Check that the relationship cache knows the inverse relationship,
+	// even though it is not used in the metamodel (non-public API)
+	UKTrue([currentItem1 referringObjects].isEmpty);
+	UKTrue([currentItem2 referringObjects].isEmpty);
+}
+
 - (void)testPersistentRootDeletion
 {
 	item1.persistentRoot.deleted = YES;
