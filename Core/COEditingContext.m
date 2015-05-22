@@ -303,15 +303,8 @@
         [_persistentRootsPendingDeletion addObject: aPersistentRoot];
     }
 
-	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
-	{
-		if (persistentRoot == aPersistentRoot)
-			continue;
-
-		// TODO: Fix references in other branches too
-		[persistentRoot.objectGraphContext replaceObject: aPersistentRoot.rootObject
-		                                      withObject: nil];
-	}
+	[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
+	                                                isDeleted: YES];
 }
 
 - (void)undeletePersistentRoot: (COPersistentRoot *)aPersistentRoot
@@ -324,18 +317,9 @@
     {
         [_persistentRootsPendingUndeletion addObject: aPersistentRoot];
     }
-	
-	/* Fix dead references in referring persistent roots */
-	
-	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
-	{
-		if (persistentRoot == aPersistentRoot)
-			continue;
-				
-		// TODO: Fix references in other branches too
-		[persistentRoot.objectGraphContext replaceObject: nil
-											  withObject: aPersistentRoot.rootObject];
-	}
+
+	[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
+	                                                isDeleted: NO];
 	
 	/* Once all the dead references are fixed, remove them from the cache */
 	
@@ -347,6 +331,47 @@
 		                                                            branch: branch.UUID]];
 	}
 	[_deadRelationshipCache removePath: [COPath pathWithPersistentRoot: aPersistentRoot.UUID]];
+}
+
+/**
+ * When isDeleted is YES, turns live references to the given persistent root 
+ * into dead ones in referring persistent roots.
+ *
+ * When isDeleted is NO, turns dead references to the given persistent root
+ * into live ones in referring persistent roots.
+ */
+- (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot
+                                                  isDeleted: (BOOL)isDeletion
+{
+	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
+	{
+		if (persistentRoot == aPersistentRoot)
+			continue;
+
+		/* Fix references pointing to any branch including the tracking branch,
+		   that belong to the deleted persistent root (the relationship target) */
+		NSMutableSet *targetObjectGraphs =
+			[(id)[[aPersistentRoot.branches mappedCollection] objectGraphContext] mutableCopy];
+		[targetObjectGraphs removeObject: aPersistentRoot.currentBranch.objectGraphContext];
+		[targetObjectGraphs addObject: aPersistentRoot.objectGraphContext];
+
+		for (COObjectGraphContext *target in targetObjectGraphs)
+		{
+			/* Fix references in all branches including the tracking branch, 
+			   that belong to persistent roots referencing the deleted 
+			   persistent root (those are relationship sources) */
+			NSMutableSet *sourceObjectGraphs =
+				[(id)[[persistentRoot.branches mappedCollection] objectGraphContext] mutableCopy];
+			[sourceObjectGraphs removeObject: persistentRoot.currentBranch.objectGraphContext];
+			[sourceObjectGraphs addObject: persistentRoot.objectGraphContext];
+
+			for (COObjectGraphContext *source in sourceObjectGraphs)
+			{
+				[source replaceObject: (isDeletion ? target.rootObject : nil)
+						   withObject: (isDeletion ? nil : target.rootObject)];
+			}
+		}
+	}
 }
 
 - (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot

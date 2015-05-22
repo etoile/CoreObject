@@ -839,7 +839,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 		self.editingContext.deadRelationshipCache;
 	COPath *pathToUndeletedObject = nil;
 	
-	if ([self isTrackingSpecificBranch])
+	if ([undeletedObject.objectGraphContext isTrackingSpecificBranch])
 	{
 		pathToUndeletedObject = [COPath pathWithPersistentRoot: undeletedObject.persistentRoot.UUID
 		                                                branch: undeletedObject.branch.UUID];
@@ -853,9 +853,19 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 }
 
 /**
+ * This method is called on every object graph containing one or more referring 
+ * objects (the relationship sources) whose properties needs to be updated to 
+ * point to the proposed replacement (the new relationship target).
+ *
+ * When deleting a persistent root, other persistent root object graphs will
+ * receive this message with a nil object as second argument, so referring
+ * objects will contain live references (matching the the first argument) to
+ * be replaced by COPath markers.
+ *
  * When undeleting a persistent root, other persistent root object graphs will 
- * receive this message with a nil object as first argument, so referringObjects
- * will be limited to the other object graphs containing dead references.
+ * receive this message with a nil object as first argument, so referring 
+ * objects will contain hidden dead references (COPath markers) to be replaced 
+ * by the second argument.
  *
  * For this method, referring objects are inner objects of the receiver.
  */
@@ -876,6 +886,13 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	_ignoresChangeTrackingNotifications = YES;
 	for (COObject *referrer in referringObjects)
 	{
+		/* The dead relationship cache tracks referring objects that exist 
+		   in the tracking branch and current branch, but the current branch 
+		   object graph won't be fixed. If both object graphs were changed,
+		   an exception would be raised at commit time. */
+		if (referrer.objectGraphContext == referrer.persistentRoot.currentBranch.objectGraphContext)
+			continue;
+
 		[referrer replaceReferencesToObjectIdenticalTo: anObject
 											withObject: aReplacement];
 	}
