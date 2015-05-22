@@ -141,6 +141,7 @@
 	OrderedGroupNoOpposite *group1;
 	OutlineItem *item1;
 	OutlineItem *item2;
+	OutlineItem *otherItem1;
 }
 
 @end
@@ -152,8 +153,12 @@
 	SUPERINIT;
 	group1 = [ctx insertNewPersistentRootWithEntityName: @"OrderedGroupNoOpposite"].rootObject;
 	item1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
+	item1.label = @"current";
 	item2 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
 	group1.contents = A(item1, item2);
+	[ctx commit];
+	otherItem1 = [item1.persistentRoot.currentBranch makeBranchWithLabel: @"other"].rootObject;
+	otherItem1.label = @"other";
 	[ctx commit];
 	return self;
 }
@@ -194,6 +199,36 @@
 			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
 
 		UKObjectsEqual(A(testItem1, testItem2), testGroup1.contents);
+	}];
+}
+
+- (void)testPersistentRootUndeletionForReferenceToSpecificBranch
+{
+	group1.contents = A(otherItem1, item2);
+	[ctx commit];
+
+	item1.persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	item1.persistentRoot.deleted = NO;
+	[ctx commit];
+	
+	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
+											   inBlock:
+		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	{
+		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
+		UnorderedGroupNoOpposite *testItem1 =
+			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
+		UnorderedGroupNoOpposite *testOtherItem1 =
+			[testItem1.persistentRoot branchForUUID: otherItem1.branch.UUID].rootObject;
+		UnorderedGroupNoOpposite *testItem2 =
+			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
+
+		UKStringsEqual(@"other", testOtherItem1.label);
+		UKStringsEqual(@"current", testItem1.label);
+		UKObjectsEqual(A(testOtherItem1, testItem2), testGroup1.contents);
+		UKObjectsNotEqual(A(testItem1, testItem2), testGroup1.contents);
 	}];
 }
 
