@@ -202,6 +202,26 @@
 	}];
 }
 
+- (void)testPersistentRootDeletionForReferenceToSpecificBranch
+{
+	group1.contents = A(otherItem1, item2);
+	[ctx commit];
+
+	item1.persistentRoot.deleted = YES;
+	[ctx commit];
+
+	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
+											   inBlock:
+		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	{
+		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
+		UnorderedGroupNoOpposite *testItem2 =
+			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
+
+		UKObjectsEqual(A(testItem2), testGroup1.contents);
+	}];
+}
+
 - (void)testPersistentRootUndeletionForReferenceToSpecificBranch
 {
 	group1.contents = A(otherItem1, item2);
