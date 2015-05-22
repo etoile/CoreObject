@@ -175,7 +175,7 @@
 		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
 	{
 		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
-		UnorderedGroupNoOpposite *testItem2 =
+		OutlineItem *testItem2 =
 			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
 
 		UKObjectsEqual(S(testItem2), testGroup1.contents);
@@ -195,9 +195,9 @@
 		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
 	{
 		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
-		UnorderedGroupNoOpposite *testItem1 =
+		OutlineItem *testItem1 =
 			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
-		UnorderedGroupNoOpposite *testItem2 =
+		OutlineItem *testItem2 =
 			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
 
 		UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
@@ -217,7 +217,7 @@
 		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
 	{
 		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
-		UnorderedGroupNoOpposite *testItem2 =
+		OutlineItem *testItem2 =
 			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
 
 		UKObjectsEqual(S(testItem2), testGroup1.contents);
@@ -240,11 +240,11 @@
 		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
 	{
 		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
-		UnorderedGroupNoOpposite *testItem1 =
+		OutlineItem *testItem1 =
 			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
 		UnorderedGroupNoOpposite *testOtherItem1 =
 			[testItem1.persistentRoot branchForUUID: otherItem1.branch.UUID].rootObject;
-		UnorderedGroupNoOpposite *testItem2 =
+		OutlineItem *testItem2 =
 			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
 
 		UKStringsEqual(@"other", testOtherItem1.label);
@@ -271,7 +271,7 @@
 		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
 	{
 		 UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
-		 UnorderedGroupNoOpposite *testItem2 =
+		 OutlineItem *testItem2 =
 			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
 		 
 		 UKObjectsEqual(S(testItem2), testGroup1.contents);
@@ -294,11 +294,11 @@
 		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
 	{
 		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
-		UnorderedGroupNoOpposite *testItem1 =
+		OutlineItem *testItem1 =
 			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
 		UnorderedGroupNoOpposite *testOtherItem1 =
 			[testItem1.persistentRoot branchForUUID: otherItem1.branch.UUID].rootObject;
-		UnorderedGroupNoOpposite *testItem2 =
+		OutlineItem *testItem2 =
 			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
 
 		UKStringsEqual(@"other", testOtherItem1.label);
