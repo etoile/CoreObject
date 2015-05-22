@@ -252,4 +252,58 @@
 	}];
 }
 
+/**
+ * The current branch cannot be deleted, so we cannot write a test method
+ * -testBranchDeletion analog to -testPersistentRootDeletion
+ */
+- (void)testBranchDeletionForReferenceToSpecificBranch
+{
+	group1.contents = A(otherItem1, item2);
+	[ctx commit];
+	
+	otherItem1.branch.deleted = YES;
+	[ctx commit];
+
+	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
+											   inBlock:
+		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	{
+		 UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
+		 UnorderedGroupNoOpposite *testItem2 =
+			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
+		 
+		 UKObjectsEqual(A(testItem2), testGroup1.contents);
+	}];
+}
+
+- (void)testBranchUndeletionForReferenceToSpecificBranch
+{
+	group1.contents = A(otherItem1, item2);
+	[ctx commit];
+	
+	otherItem1.branch.deleted = YES;
+	[ctx commit];
+
+	otherItem1.branch.deleted = NO;
+	[ctx commit];
+
+	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
+											   inBlock:
+		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	{
+		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
+		UnorderedGroupNoOpposite *testItem1 =
+			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
+		UnorderedGroupNoOpposite *testOtherItem1 =
+			[testItem1.persistentRoot branchForUUID: otherItem1.branch.UUID].rootObject;
+		UnorderedGroupNoOpposite *testItem2 =
+			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
+
+		UKStringsEqual(@"other", testOtherItem1.label);
+		UKStringsEqual(@"current", testItem1.label);
+		UKObjectsEqual(A(testOtherItem1, testItem2), testGroup1.contents);
+		UKObjectsNotEqual(A(testItem1, testItem2), testGroup1.contents);
+	}];
+}
+
 @end
