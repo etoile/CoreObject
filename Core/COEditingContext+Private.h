@@ -65,6 +65,12 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
+- (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot
+                                                     branch: (COBranch *)aBranch
+                                                  isDeleted: (BOOL)isDeletion;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
 - (void)deletePersistentRoot: (COPersistentRoot *)aPersistentRoot;
 /**
  * This method is only exposed to be used internally by CoreObject.

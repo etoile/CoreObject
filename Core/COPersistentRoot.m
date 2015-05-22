@@ -359,6 +359,9 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	{
 		[_branchesPendingDeletion addObject: aBranch];
 	}
+	[self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: aBranch.persistentRoot
+	                                                                  branch: aBranch
+	                                                               isDeleted: YES];
 }
 
 - (void)undeleteBranch: (COBranch *)aBranch
@@ -371,6 +374,9 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     {
         [_branchesPendingUndeletion addObject: aBranch];
     }
+	[self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: aBranch.persistentRoot
+	                                                                  branch: aBranch
+	                                                               isDeleted: NO];
 }
 
 #pragma mark Pending Changes -

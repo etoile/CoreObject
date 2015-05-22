@@ -304,6 +304,7 @@
     }
 
 	[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
+	                                                   branch: nil
 	                                                isDeleted: YES];
 }
 
@@ -319,6 +320,7 @@
     }
 
 	[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
+	                                                   branch: nil
 	                                                isDeleted: NO];
 	
 	/* Once all the dead references are fixed, remove them from the cache */
@@ -341,27 +343,47 @@
  * into live ones in referring persistent roots.
  */
 - (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot
+                                                     branch: (COBranch *)aBranch
                                                   isDeleted: (BOOL)isDeletion
 {
+	NSParameterAssert(aPersistentRoot != nil);
+	// NOTE: -delete/undeleteBranch: enforce !aBranch.isCurrentBranch already.
+	NSParameterAssert(aBranch == nil
+		|| (!aBranch.isCurrentBranch && aBranch.persistentRoot == aPersistentRoot));
+
 	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
 	{
 		if (persistentRoot == aPersistentRoot)
 			continue;
 
-		/* Fix references pointing to any branch including the tracking branch,
-		   that belong to the deleted persistent root (the relationship target) */
-		NSMutableSet *targetObjectGraphs =
-			[(id)[[aPersistentRoot.branches mappedCollection] objectGraphContext] mutableCopy];
-		[targetObjectGraphs removeObject: aPersistentRoot.currentBranch.objectGraphContext];
-		[targetObjectGraphs addObject: aPersistentRoot.objectGraphContext];
+		/* Fix references pointing to any branch that belong to the deleted 
+		   persistent root (the relationship target) */
+		NSSet *targetObjectGraphs = nil;
+		
+		if (aBranch != nil)
+		{
+			targetObjectGraphs = [NSSet setWithObject: aBranch.objectGraphContext];
+		}
+		else
+		{
+			targetObjectGraphs =
+				[(id)[[aPersistentRoot.branches mappedCollection] objectGraphContext] mutableCopy];
+
+			/* Fixed branches include the tracking branch but not the current 
+			   branch (committing changes in both at the same time is not allowed) */
+			[(NSMutableSet *)targetObjectGraphs removeObject: aPersistentRoot.currentBranch.objectGraphContext];
+			[(NSMutableSet *)targetObjectGraphs addObject: aPersistentRoot.objectGraphContext];
+		}
 
 		for (COObjectGraphContext *target in targetObjectGraphs)
 		{
-			/* Fix references in all branches including the tracking branch, 
-			   that belong to persistent roots referencing the deleted 
-			   persistent root (those are relationship sources) */
+			/* Fix references in all branches that belong to persistent roots 
+			   referencing the deleted persistent root (those are relationship sources) */
 			NSMutableSet *sourceObjectGraphs =
 				[(id)[[persistentRoot.branches mappedCollection] objectGraphContext] mutableCopy];
+
+			/* Fixed branches include the tracking branch but not the current
+			   branch (committing changes in both at the same time is not allowed) */
 			[sourceObjectGraphs removeObject: persistentRoot.currentBranch.objectGraphContext];
 			[sourceObjectGraphs addObject: persistentRoot.objectGraphContext];
 
