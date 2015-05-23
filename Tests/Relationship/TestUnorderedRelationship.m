@@ -331,8 +331,7 @@
 		OutlineItem *testCurrentOtherItem1 =
 			[testCtx persistentRootForUUID: otherItem1.persistentRoot.UUID].currentBranch.rootObject;
 
-		// FIXME: This test fails randomly every 5 run or so
-		//KObjectsEqual(S(testItem2), testCurrentGroup1.contents);
+		UKObjectsEqual(S(testItem2), testCurrentGroup1.contents);
 		UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
 	}];
 }
@@ -353,6 +352,7 @@
 		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
 	{
 		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
+		UnorderedGroupNoOpposite *testCurrentGroup1 = testPersistentRoot.currentBranch.rootObject;
 		OutlineItem *testItem1 =
 			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
 		UnorderedGroupNoOpposite *testOtherItem1 =
@@ -366,14 +366,12 @@
 		UKObjectsNotEqual(S(testItem1, testItem2), testGroup1.contents);
 		// Check that the relationship cache knows the inverse relationship,
 		// even though it is not used in the metamodel (non-public API)
-		// FIXME: This test fails randomly every 5 run or so
-		//UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testOtherItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testOtherItem1 referringObjects]);
 		
 		OutlineItem *testCurrentOtherItem1 =
-		[testCtx persistentRootForUUID: otherItem1.persistentRoot.UUID].currentBranch.rootObject;
-		
-		// FIXME: This test fails randomly every 5 run or so
-		//UKObjectsEqual(S(testOtherItem1, testItem2), testCurrentGroup1.contents);
+			[testCtx persistentRootForUUID: otherItem1.persistentRoot.UUID].currentBranch.rootObject;
+
+		UKObjectsEqual(S(testOtherItem1, testItem2), testCurrentGroup1.contents);
 		UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
 	}];
 }

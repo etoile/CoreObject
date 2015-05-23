@@ -443,8 +443,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 	/* Clear other pending changes */
 
-	[_branchesPendingDeletion removeAllObjects];
-	[_branchesPendingUndeletion removeAllObjects];
+	[self clearBranchesPendingDeletionAndUndeletion];
 
 	if (_metadataChanged)
     {
@@ -731,6 +730,10 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	}
 	
 	ETAssert([[self branchesPendingInsertion] isEmpty]);
+}
+
+- (void)clearBranchesPendingDeletionAndUndeletion
+{
 	[_branchesPendingDeletion removeAllObjects];
 	[_branchesPendingUndeletion removeAllObjects];
 }

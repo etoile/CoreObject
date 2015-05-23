@@ -661,8 +661,8 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 															  forPersistentRoot: uuid];
 		}
 		
-		/* Update _persistentRootsPendingDeletion and _persistentRootsPendingUndeletion and unload
-		   persistent roots. */
+		/* Update persistent roots and branches pending deletion and undeletion, 
+		   and unload persistent roots */
 		
 		for (COPersistentRoot *persistentRoot in persistentRoots)
 		{
@@ -676,9 +676,9 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 			{
 				[_persistentRootsPendingUndeletion removeObject: persistentRoot];
 			}
+			[persistentRoot clearBranchesPendingDeletionAndUndeletion];
 		}
-												
-					
+
 		ETAssert([_store commitStoreTransaction: transaction]);
 		COCommandGroup *command = [self recordEndUndoGroupWithUndoTrack: track];
 		
