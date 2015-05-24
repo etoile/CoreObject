@@ -84,3 +84,73 @@
 }
 
 @end
+
+
+@interface TestCrossPersistentRootUnorderedRelationshipWithOpposite : EditingContextTestCase <UKTest>
+{
+	UnorderedGroupWithOpposite *group1;
+	UnorderedGroupContent *item1;
+	UnorderedGroupContent *item2;
+	UnorderedGroupContent *otherItem1;
+}
+
+@end
+
+@implementation TestCrossPersistentRootUnorderedRelationshipWithOpposite
+
+- (id)init
+{
+	SUPERINIT;
+	group1 = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupWithOpposite"].rootObject;
+	item1 = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupContent"].rootObject;
+	item1.label = @"current";
+	item2 = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupContent"].rootObject;
+	group1.contents = S(item1, item2);
+	[ctx commit];
+	otherItem1 = [item1.persistentRoot.currentBranch makeBranchWithLabel: @"other"].rootObject;
+	otherItem1.label = @"other";
+	[ctx commit];
+	return self;
+}
+
+- (void)testSourcePersistentRootDeletion
+{
+	group1.persistentRoot.deleted = YES;
+	[ctx commit];
+
+	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
+	                                           inBlock:
+		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	{
+		UnorderedGroupWithOpposite *testGroup1 = testPersistentRoot.rootObject;
+		UnorderedGroupWithOpposite *testCurrentGroup1 = testPersistentRoot.currentBranch.rootObject;
+		UnorderedGroupContent *testItem1 =
+			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
+		UnorderedGroupContent *testItem2 =
+			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
+
+		UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
+		// Check that the relationship cache knows the inverse relationship,
+		// even though it is not used in the metamodel (non-public API)
+		// TODO: Move this test in no opposite tests
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testItem1 referringObjects]);
+		UKTrue(testItem1.parentGroups.isEmpty);
+
+		UnorderedGroupContent *testCurrentItem1 =
+			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].currentBranch.rootObject;
+
+		// Bidirectional cross persistent root relationships are limited to the
+		// tracking branch, this means item1 in the non-tracking current branch
+		// doesn't appear in testCurrentGroup1.contents and doesn't refer to it
+		// with an inverse relationship.
+		// Bidirectional cross persistent root relationships are supported
+		// accross current branches, but materialized accross tracking branches
+		// in memory (they are not visible accross the current branches in memory).
+		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
+		// TODO: Move this test in no opposite tests
+		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+		UKTrue(testCurrentItem1.parentGroups.isEmpty);
+	}];
+}
+
+@end

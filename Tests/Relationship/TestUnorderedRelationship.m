@@ -222,7 +222,14 @@
 			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].currentBranch.rootObject;
 		OutlineItem *testCurrentItem2 =
 			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].currentBranch.rootObject;
-		
+
+		// Bidirectional cross persistent root relationships are limited to the
+		// tracking branch, this means item1 in the non-tracking current branch
+		// doesn't appear in testCurrentGroup1.contents and doesn't refer to it
+		// with an inverse relationship.
+		// Bidirectional cross persistent root relationships are supported
+		// accross current branches, but materialized accross tracking branches
+		// in memory (they are not visible accross the current branches in memory).
 		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
 		UKTrue([testCurrentItem1 referringObjects].isEmpty);
 	}];

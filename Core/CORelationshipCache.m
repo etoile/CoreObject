@@ -13,6 +13,7 @@
 #import "COObject+Private.h"
 #import "COObjectGraphContext+Private.h"
 #import "COPersistentRoot.h"
+#import "COBranch.h"
 
 @interface COCachedRelationship : NSObject
 {
@@ -32,7 +33,7 @@
 @property (readwrite, nonatomic, copy) NSString *targetProperty;
 
 - (BOOL) isSourceObjectTrackingSpecificBranchForTargetObject: (COObject *)aTargetObject;
-
+- (BOOL)isSourceObjectBranchDeleted;
 
 @end
 
@@ -61,6 +62,11 @@
 		return NO;
 	}
 	return [_sourceObject.objectGraphContext isTrackingSpecificBranch];
+}
+
+- (BOOL)isSourceObjectBranchDeleted
+{
+	return _sourceObject.persistentRoot.deleted || _sourceObject.branch.deleted;
 }
 
 @end
@@ -96,6 +102,9 @@
 		   this corresponds to John (A) and Lucy (A) hiding the dotted incoming references from
 		   Group (B). */
 		if ([entry isSourceObjectTrackingSpecificBranchForTargetObject: _owner])
+			continue;
+
+		if ([entry isSourceObjectBranchDeleted])
 			continue;
 		
         if ([aProperty isEqualToString: entry->_targetProperty])
