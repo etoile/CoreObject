@@ -230,7 +230,8 @@
 		// Bidirectional cross persistent root relationships are limited to the
 		// tracking branch, this means item1 in the non-tracking current branch
 		// doesn't appear in testCurrentGroup1.contents and doesn't refer to it
-		// with an inverse relationship.
+		// with an inverse relationship (-referringObjectsForPropertyInTarget:
+		// simulates it though).
 		// Bidirectional cross persistent root relationships are supported
 		// accross current branches, but materialized accross tracking branches
 		// in memory (they are not visible accross the current branches in memory).
@@ -324,6 +325,39 @@
 
 		UKObjectsEqual(S(testOtherItem1, testItem2), testCurrentGroup1.contents);
 		UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
+	}];
+}
+
+- (void)testSourcePersistentRootDeletion
+{
+	group1.persistentRoot.deleted = YES;
+	[ctx commit];
+
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testItem1 referringObjects]);
+
+		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
+		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+	}];
+}
+
+- (void)testSourcePersistentRootUndeletion
+{
+	group1.persistentRoot.deleted = YES;
+	[ctx commit];
+
+	group1.persistentRoot.deleted = NO;
+	[ctx commit];
+
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testItem1 referringObjects]);
+		 
+		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
+		UKTrue([testCurrentItem1 referringObjects].isEmpty);
 	}];
 }
 

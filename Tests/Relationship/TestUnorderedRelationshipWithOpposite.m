@@ -145,23 +145,30 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
-		// Check that the relationship cache knows the inverse relationship,
-		// even though it is not used in the metamodel (non-public API)
-		// TODO: Move this test in no opposite tests
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testItem1 referringObjects]);
 		UKTrue(testItem1.parentGroups.isEmpty);
 
-		// Bidirectional cross persistent root relationships are limited to the
-		// tracking branch, this means item1 in the non-tracking current branch
-		// doesn't appear in testCurrentGroup1.contents and doesn't refer to it
-		// with an inverse relationship.
-		// Bidirectional cross persistent root relationships are supported
-		// accross current branches, but materialized accross tracking branches
-		// in memory (they are not visible accross the current branches in memory).
 		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
-		// TODO: Move this test in no opposite tests
-		UKTrue([testCurrentItem1 referringObjects].isEmpty);
 		UKTrue(testCurrentItem1.parentGroups.isEmpty);
+	}];
+}
+
+- (void)testSourcePersistentRootUndeletion
+{
+	group1.persistentRoot.deleted = YES;
+	[ctx commit];
+
+	group1.persistentRoot.deleted = NO;
+	[ctx commit];
+
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
+		// testCurrentGroup1 present in -referrringObjects is hidden by -referringObjectsForPropertyInTarget:
+		UKObjectsEqual(S(testGroup1), testItem1.parentGroups);
+		 
+		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
+		// testGroup1 missing from -referringObjects is added by -referringObjectsForPropertyInTarget:
+		UKObjectsEqual(S(testGroup1), testCurrentItem1.parentGroups);
 	}];
 }
 
