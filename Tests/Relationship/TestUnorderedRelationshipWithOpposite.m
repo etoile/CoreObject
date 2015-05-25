@@ -92,6 +92,7 @@
 	UnorderedGroupContent *item1;
 	UnorderedGroupContent *item2;
 	UnorderedGroupContent *otherItem1;
+	UnorderedGroupWithOpposite *otherGroup1;
 }
 
 @end
@@ -101,19 +102,25 @@
 - (id)init
 {
 	SUPERINIT;
+
 	group1 = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupWithOpposite"].rootObject;
 	item1 = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupContent"].rootObject;
 	item1.label = @"current";
 	item2 = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupContent"].rootObject;
+	group1.label = @"current";
 	group1.contents = S(item1, item2);
 	[ctx commit];
+
 	otherItem1 = [item1.persistentRoot.currentBranch makeBranchWithLabel: @"other"].rootObject;
 	otherItem1.label = @"other";
+	otherGroup1 = [group1.persistentRoot.currentBranch makeBranchWithLabel: @"other"].rootObject;
+	otherGroup1.label = @"other";
 	[ctx commit];
+
 	return self;
 }
 
-#define CHECK_BLOCK_ARGS COEditingContext *testCtx, UnorderedGroupWithOpposite *testGroup1, UnorderedGroupContent *testItem1, UnorderedGroupContent *testItem2, UnorderedGroupWithOpposite *testCurrentGroup1, UnorderedGroupContent *testCurrentItem1, UnorderedGroupContent *testCurrentItem2, BOOL isNewContext
+#define CHECK_BLOCK_ARGS COEditingContext *testCtx, UnorderedGroupWithOpposite *testGroup1, UnorderedGroupContent *testItem1, UnorderedGroupContent *testItem2, UnorderedGroupWithOpposite *testOtherGroup1, UnorderedGroupWithOpposite *testCurrentGroup1, UnorderedGroupContent *testCurrentItem1, UnorderedGroupContent *testCurrentItem2, UnorderedGroupWithOpposite *testCurrentOtherGroup1, BOOL isNewContext
 
 - (void)checkPersistentRootsWithExistingAndNewContextInBlock: (void (^)(CHECK_BLOCK_ARGS))block
 {
@@ -126,14 +133,18 @@
 			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
 		UnorderedGroupContent *testItem2 =
 			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
+		UnorderedGroupWithOpposite *testOtherGroup1 =
+			[testGroup1.persistentRoot branchForUUID: otherGroup1.branch.UUID].rootObject;
 		
 		UnorderedGroupWithOpposite *testCurrentGroup1 = testPersistentRoot.currentBranch.rootObject;
 		UnorderedGroupContent *testCurrentItem1 =
 			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].currentBranch.rootObject;
 		UnorderedGroupContent *testCurrentItem2 =
 			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].currentBranch.rootObject;
-		
-		block(testCtx, testGroup1, testItem1, testItem2, testCurrentGroup1, testCurrentItem1, testCurrentItem2, isNewContext);
+		UnorderedGroupWithOpposite *testCurrentOtherGroup1 =
+			[testCtx persistentRootForUUID: otherGroup1.persistentRoot.UUID].currentBranch.rootObject;
+	
+		block(testCtx, testGroup1, testItem1, testItem2, testOtherGroup1, testCurrentGroup1, testCurrentItem1, testCurrentItem2, testCurrentOtherGroup1, isNewContext);
 	}];
 }
 
@@ -168,6 +179,53 @@
 		 
 		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
 		// testGroup1 missing from -referringObjects is added by -referringObjectsForPropertyInTarget:
+		UKObjectsEqual(S(testGroup1), testCurrentItem1.parentGroups);
+	}];
+}
+
+- (void)testSourcePersistentRootDeletionForReferenceToSpecificBranch
+{
+	otherGroup1.contents = S(item1, item2);
+	[ctx commit];
+
+	otherGroup1.persistentRoot.deleted = YES;
+	[ctx commit];
+
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKObjectsEqual(S(testItem1, testItem2), testOtherGroup1.contents);
+		UKObjectsEqual(S(), testItem1.parentGroups);
+		
+		UKObjectsEqual(S(testItem1, testItem2), testCurrentOtherGroup1.contents);
+		UKTrue(testCurrentItem1.parentGroups.isEmpty);
+	}];
+}
+
+- (void)testSourcePersistentRootUndeletionForReferenceToSpecificBranch
+{
+	otherGroup1.contents = S(item1, item2);
+	[ctx commit];
+
+	otherGroup1.persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	otherGroup1.persistentRoot.deleted = NO;
+	[ctx commit];
+	
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKStringsEqual(@"other", testOtherGroup1.label);
+		UKStringsEqual(@"current", testGroup1.label);
+		UKObjectsEqual(S(testItem1, testItem2), testOtherGroup1.contents);
+		// Bidirectional inverse multivalued relationship always point to a
+		// single source object owned by the tracking branch, even when the
+		// relationship source object exist in multiple branches.
+		// For a parent-to-child relationship, reporting every branch source
+		// object as a distinct parent doesn't make sense, since conceptually
+		// they are all the same parent from the child viewpoint.
+		UKObjectsEqual(S(testGroup1), testItem1.parentGroups);
+		
+		UKObjectsEqual(S(testItem1, testItem2), testCurrentOtherGroup1.contents);
 		UKObjectsEqual(S(testGroup1), testCurrentItem1.parentGroups);
 	}];
 }
