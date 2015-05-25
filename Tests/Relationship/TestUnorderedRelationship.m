@@ -116,6 +116,10 @@
 @end
 
 
+/**
+ * For some general code comments that apply to all tests, see 
+ * -testPersistentRootUndeletion.
+ */
 @interface TestCrossPersistentRootUnorderedRelationship : EditingContextTestCase <UKTest>
 {
 	UnorderedGroupNoOpposite *group1;
@@ -141,6 +145,34 @@
 	otherItem1.label = @"other";
 	[ctx commit];
 	return self;
+}
+
+#define CHECK_BLOCK_ARGS COEditingContext *testCtx, UnorderedGroupNoOpposite *testGroup1, OutlineItem *testItem1, OutlineItem *testItem2, OutlineItem *testOtherItem1, UnorderedGroupNoOpposite *testCurrentGroup1, OutlineItem *testCurrentItem1, OutlineItem *testCurrentItem2, OutlineItem *testCurrentOtherItem1, BOOL isNewContext
+
+- (void)checkPersistentRootsWithExistingAndNewContextInBlock: (void (^)(CHECK_BLOCK_ARGS))block
+{
+	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
+											   inBlock:
+	 ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	{
+		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
+		OutlineItem *testItem1 =
+			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
+		OutlineItem *testItem2 =
+			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
+		OutlineItem *testOtherItem1 =
+			[testItem1.persistentRoot branchForUUID: otherItem1.branch.UUID].rootObject;
+		
+		UnorderedGroupNoOpposite *testCurrentGroup1 = testPersistentRoot.currentBranch.rootObject;
+		OutlineItem *testCurrentItem1 =
+			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].currentBranch.rootObject;
+		OutlineItem *testCurrentItem2 =
+			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].currentBranch.rootObject;
+		OutlineItem *testCurrentOtherItem1 =
+			[testCtx persistentRootForUUID: otherItem1.persistentRoot.UUID].currentBranch.rootObject;
+
+		block(testCtx, testGroup1, testItem1, testItem2, testOtherItem1, testCurrentGroup1, testCurrentItem1, testCurrentItem2, testCurrentOtherItem1, isNewContext);
+	}];
 }
 
 - (void)testRelationships
@@ -170,24 +202,10 @@
 	item1.persistentRoot.deleted = YES;
 	[ctx commit];
 
-	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
-	                                           inBlock:
-		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
-		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
-		OutlineItem *testItem1 =
-			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
-		OutlineItem *testItem2 =
-			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
-
 		UKObjectsEqual(S(testItem2), testGroup1.contents);
-		// Check that the relationship cache knows the inverse relationship,
-		// even though it is not used in the metamodel (non-public API)
 		UKTrue([testItem1 referringObjects].isEmpty);
-
-		UnorderedGroupNoOpposite *testCurrentGroup1 = testPersistentRoot.currentBranch.rootObject;
-		OutlineItem *testCurrentItem1 =
-			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].currentBranch.rootObject;
 
 		UKObjectsEqual(S(testItem2), testCurrentGroup1.contents);
 		UKTrue([testCurrentItem1 referringObjects].isEmpty);
@@ -202,26 +220,12 @@
 	item1.persistentRoot.deleted = NO;
 	[ctx commit];
 
-	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
-	                                           inBlock:
-		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
-		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
-		UnorderedGroupNoOpposite *testCurrentGroup1 = testPersistentRoot.currentBranch.rootObject;
-		OutlineItem *testItem1 =
-			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
-		OutlineItem *testItem2 =
-			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
-
 		UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
 		// Check that the relationship cache knows the inverse relationship,
 		// even though it is not used in the metamodel (non-public API)
 		UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testItem1 referringObjects]);
-
-		OutlineItem *testCurrentItem1 =
-			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].currentBranch.rootObject;
-		OutlineItem *testCurrentItem2 =
-			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].currentBranch.rootObject;
 
 		// Bidirectional cross persistent root relationships are limited to the
 		// tracking branch, this means item1 in the non-tracking current branch
@@ -243,24 +247,10 @@
 	item1.persistentRoot.deleted = YES;
 	[ctx commit];
 
-	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
-											   inBlock:
-		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
-		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
-		OutlineItem *testItem1 =
-			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
-		OutlineItem *testItem2 =
-			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
-
 		UKObjectsEqual(S(testItem2), testGroup1.contents);
-		// Check that the relationship cache knows the inverse relationship,
-		// even though it is not used in the metamodel (non-public API)
 		UKTrue([testItem1 referringObjects].isEmpty);
-		
-		UnorderedGroupNoOpposite *testCurrentGroup1 = testPersistentRoot.currentBranch.rootObject;
-		OutlineItem *testCurrentItem1 =
-			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].currentBranch.rootObject;
 		
 		UKObjectsEqual(S(testItem2), testCurrentGroup1.contents);
 		UKTrue([testCurrentItem1 referringObjects].isEmpty);
@@ -278,29 +268,13 @@
 	item1.persistentRoot.deleted = NO;
 	[ctx commit];
 	
-	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
-											   inBlock:
-		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
-		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
-		UnorderedGroupNoOpposite *testCurrentGroup1 = testPersistentRoot.currentBranch.rootObject;
-		OutlineItem *testItem1 =
-			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
-		UnorderedGroupNoOpposite *testOtherItem1 =
-			[testItem1.persistentRoot branchForUUID: otherItem1.branch.UUID].rootObject;
-		OutlineItem *testItem2 =
-			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
-
 		UKStringsEqual(@"other", testOtherItem1.label);
 		UKStringsEqual(@"current", testItem1.label);
 		UKObjectsEqual(S(testOtherItem1, testItem2), testGroup1.contents);
 		UKObjectsNotEqual(S(testItem1, testItem2), testGroup1.contents);
-		// Check that the relationship cache knows the inverse relationship,
-		// even though it is not used in the metamodel (non-public API)
 		UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testOtherItem1 referringObjects]);
-		
-		OutlineItem *testCurrentOtherItem1 =
-			[testCtx persistentRootForUUID: otherItem1.persistentRoot.UUID].currentBranch.rootObject;
 		
 		UKObjectsEqual(S(testOtherItem1, testItem2), testCurrentGroup1.contents);
 		UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
@@ -319,24 +293,10 @@
 	otherItem1.branch.deleted = YES;
 	[ctx commit];
 
-	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
-											   inBlock:
-		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
-		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
-		OutlineItem *testOtherItem1 =
-			[testCtx persistentRootForUUID: otherItem1.persistentRoot.UUID].rootObject;
-		OutlineItem *testItem2 =
-			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
-		 
 		UKObjectsEqual(S(testItem2), testGroup1.contents);
-		// Check that the relationship cache knows the inverse relationship,
-		// even though it is not used in the metamodel (non-public API)
 		UKTrue([testOtherItem1 referringObjects].isEmpty);
-
-		UnorderedGroupNoOpposite *testCurrentGroup1 = testPersistentRoot.currentBranch.rootObject;
-		OutlineItem *testCurrentOtherItem1 =
-			[testCtx persistentRootForUUID: otherItem1.persistentRoot.UUID].currentBranch.rootObject;
 
 		UKObjectsEqual(S(testItem2), testCurrentGroup1.contents);
 		UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
@@ -354,29 +314,13 @@
 	otherItem1.branch.deleted = NO;
 	[ctx commit];
 
-	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
-											   inBlock:
-		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
-		UnorderedGroupNoOpposite *testGroup1 = testPersistentRoot.rootObject;
-		UnorderedGroupNoOpposite *testCurrentGroup1 = testPersistentRoot.currentBranch.rootObject;
-		OutlineItem *testItem1 =
-			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
-		UnorderedGroupNoOpposite *testOtherItem1 =
-			[testItem1.persistentRoot branchForUUID: otherItem1.branch.UUID].rootObject;
-		OutlineItem *testItem2 =
-			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
-
 		UKStringsEqual(@"other", testOtherItem1.label);
 		UKStringsEqual(@"current", testItem1.label);
 		UKObjectsEqual(S(testOtherItem1, testItem2), testGroup1.contents);
 		UKObjectsNotEqual(S(testItem1, testItem2), testGroup1.contents);
-		// Check that the relationship cache knows the inverse relationship,
-		// even though it is not used in the metamodel (non-public API)
 		UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testOtherItem1 referringObjects]);
-		
-		OutlineItem *testCurrentOtherItem1 =
-			[testCtx persistentRootForUUID: otherItem1.persistentRoot.UUID].currentBranch.rootObject;
 
 		UKObjectsEqual(S(testOtherItem1, testItem2), testCurrentGroup1.contents);
 		UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
