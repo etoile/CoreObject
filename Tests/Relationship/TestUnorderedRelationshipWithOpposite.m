@@ -86,6 +86,11 @@
 @end
 
 
+/**
+ * For some general code comments that apply to all tests, see
+ * -testSourcePersistentRootUndeletion and 
+ * -testSourcePersistentRootUndeletionForReferenceToSpecificBranch.
+ */
 @interface TestCrossPersistentRootUnorderedRelationshipWithOpposite : EditingContextTestCase <UKTest>
 {
 	UnorderedGroupWithOpposite *group1;
@@ -120,7 +125,7 @@
 	return self;
 }
 
-#define CHECK_BLOCK_ARGS COEditingContext *testCtx, UnorderedGroupWithOpposite *testGroup1, UnorderedGroupContent *testItem1, UnorderedGroupContent *testItem2, UnorderedGroupWithOpposite *testOtherGroup1, UnorderedGroupWithOpposite *testCurrentGroup1, UnorderedGroupContent *testCurrentItem1, UnorderedGroupContent *testCurrentItem2, UnorderedGroupWithOpposite *testCurrentOtherGroup1, BOOL isNewContext
+#define CHECK_BLOCK_ARGS COEditingContext *testCtx, UnorderedGroupWithOpposite *testGroup1, UnorderedGroupContent *testItem1, UnorderedGroupContent *testItem2, UnorderedGroupContent *testOtherItem1, UnorderedGroupWithOpposite *testOtherGroup1, UnorderedGroupWithOpposite *testCurrentGroup1, UnorderedGroupContent *testCurrentItem1, UnorderedGroupContent *testCurrentItem2, UnorderedGroupContent *testCurrentOtherItem1, UnorderedGroupWithOpposite *testCurrentOtherGroup1, BOOL isNewContext
 
 - (void)checkPersistentRootsWithExistingAndNewContextInBlock: (void (^)(CHECK_BLOCK_ARGS))block
 {
@@ -133,6 +138,8 @@
 			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
 		UnorderedGroupContent *testItem2 =
 			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
+		UnorderedGroupContent *testOtherItem1 =
+			[testItem1.persistentRoot branchForUUID: otherItem1.branch.UUID].rootObject;
 		UnorderedGroupWithOpposite *testOtherGroup1 =
 			[testGroup1.persistentRoot branchForUUID: otherGroup1.branch.UUID].rootObject;
 		
@@ -141,10 +148,12 @@
 			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].currentBranch.rootObject;
 		UnorderedGroupContent *testCurrentItem2 =
 			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].currentBranch.rootObject;
+		UnorderedGroupContent *testCurrentOtherItem1 =
+			[testCtx persistentRootForUUID: otherItem1.persistentRoot.UUID].currentBranch.rootObject;
 		UnorderedGroupWithOpposite *testCurrentOtherGroup1 =
 			[testCtx persistentRootForUUID: otherGroup1.persistentRoot.UUID].currentBranch.rootObject;
 	
-		block(testCtx, testGroup1, testItem1, testItem2, testOtherGroup1, testCurrentGroup1, testCurrentItem1, testCurrentItem2, testCurrentOtherGroup1, isNewContext);
+		block(testCtx, testGroup1, testItem1, testItem2, testOtherItem1, testOtherGroup1, testCurrentGroup1, testCurrentItem1, testCurrentItem2, testCurrentOtherItem1, testCurrentOtherGroup1, isNewContext);
 	}];
 }
 
@@ -194,7 +203,7 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		UKObjectsEqual(S(testItem1, testItem2), testOtherGroup1.contents);
-		UKObjectsEqual(S(), testItem1.parentGroups);
+		UKTrue(testItem1.parentGroups.isEmpty);
 		
 		UKObjectsEqual(S(testItem1, testItem2), testCurrentOtherGroup1.contents);
 		UKTrue(testCurrentItem1.parentGroups.isEmpty);
@@ -226,6 +235,49 @@
 		UKObjectsEqual(S(testGroup1), testItem1.parentGroups);
 		
 		UKObjectsEqual(S(testItem1, testItem2), testCurrentOtherGroup1.contents);
+		UKObjectsEqual(S(testGroup1), testCurrentItem1.parentGroups);
+	}];
+}
+
+- (void)testSourceBranchDeletionForReferenceToSpecificBranch
+{
+	otherGroup1.contents = S(item1, item2);
+	[ctx commit];
+	
+	otherGroup1.branch.deleted = YES;
+	[ctx commit];
+	
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKObjectsEqual(S(testItem1, testItem2), testOtherGroup1.contents);
+		// The tracking branch is not deleted, so testItem1 parent is untouched,
+		// see comment in -testSourcePersistentRootUndeletionForReferenceToSpecificBranch
+		UKObjectsEqual(S(testGroup1), testItem1.parentGroups);
+
+		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
+		UKObjectsEqual(S(testGroup1), testCurrentItem1.parentGroups);
+	}];
+}
+
+- (void)testSourceBranchUndeletionForReferenceToSpecificBranch
+{
+	otherGroup1.contents = S(item1, item2);
+	[ctx commit];
+	
+	otherGroup1.branch.deleted = YES;
+	[ctx commit];
+	
+	otherGroup1.branch.deleted = NO;
+	[ctx commit];
+	
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKStringsEqual(@"other", testOtherItem1.label);
+		UKStringsEqual(@"current", testItem1.label);
+		UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
+		UKObjectsEqual(S(testGroup1), testItem1.parentGroups);
+
+		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
 		UKObjectsEqual(S(testGroup1), testCurrentItem1.parentGroups);
 	}];
 }

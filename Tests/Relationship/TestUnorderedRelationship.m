@@ -411,4 +411,45 @@
 	}];
 }
 
+- (void)testSourceBranchDeletionForReferenceToSpecificBranch
+{
+	otherGroup1.contents = S(item1, item2);
+	[ctx commit];
+	
+	otherGroup1.branch.deleted = YES;
+	[ctx commit];
+	
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	 {
+		 UKObjectsEqual(S(testItem1, testItem2), testOtherGroup1.contents);
+		 UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentOtherGroup1), [testItem1 referringObjects]);
+		 
+		 UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
+		 UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
+	 }];
+}
+
+- (void)testSourceBranchUndeletionForReferenceToSpecificBranch
+{
+	otherGroup1.contents = S(item1, item2);
+	[ctx commit];
+	
+	otherGroup1.branch.deleted = YES;
+	[ctx commit];
+	
+	otherGroup1.branch.deleted = NO;
+	[ctx commit];
+	
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	 {
+		 UKStringsEqual(@"other", testOtherItem1.label);
+		 UKStringsEqual(@"current", testItem1.label);
+		 UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
+		 UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentOtherGroup1), [testItem1 referringObjects]);
+		 
+		 UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
+		 UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
+	 }];
+}
+
 @end
