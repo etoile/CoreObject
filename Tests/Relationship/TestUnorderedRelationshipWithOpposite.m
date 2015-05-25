@@ -113,31 +113,43 @@
 	return self;
 }
 
+#define CHECK_BLOCK_ARGS COEditingContext *testCtx, UnorderedGroupWithOpposite *testGroup1, UnorderedGroupContent *testItem1, UnorderedGroupContent *testItem2, UnorderedGroupWithOpposite *testCurrentGroup1, UnorderedGroupContent *testCurrentItem1, UnorderedGroupContent *testCurrentItem2, BOOL isNewContext
+
+- (void)checkPersistentRootsWithExistingAndNewContextInBlock: (void (^)(CHECK_BLOCK_ARGS))block
+{
+	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
+											   inBlock:
+	 ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	{
+		UnorderedGroupWithOpposite *testGroup1 = testPersistentRoot.rootObject;
+		UnorderedGroupContent *testItem1 =
+			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
+		UnorderedGroupContent *testItem2 =
+			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
+		
+		UnorderedGroupWithOpposite *testCurrentGroup1 = testPersistentRoot.currentBranch.rootObject;
+		UnorderedGroupContent *testCurrentItem1 =
+			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].currentBranch.rootObject;
+		UnorderedGroupContent *testCurrentItem2 =
+			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].currentBranch.rootObject;
+		
+		block(testCtx, testGroup1, testItem1, testItem2, testCurrentGroup1, testCurrentItem1, testCurrentItem2, isNewContext);
+	}];
+}
+
 - (void)testSourcePersistentRootDeletion
 {
 	group1.persistentRoot.deleted = YES;
 	[ctx commit];
 
-	[self checkPersistentRootWithExistingAndNewContext: group1.persistentRoot
-	                                           inBlock:
-		^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
-		UnorderedGroupWithOpposite *testGroup1 = testPersistentRoot.rootObject;
-		UnorderedGroupWithOpposite *testCurrentGroup1 = testPersistentRoot.currentBranch.rootObject;
-		UnorderedGroupContent *testItem1 =
-			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].rootObject;
-		UnorderedGroupContent *testItem2 =
-			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
-
 		UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
 		// Check that the relationship cache knows the inverse relationship,
 		// even though it is not used in the metamodel (non-public API)
 		// TODO: Move this test in no opposite tests
 		UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testItem1 referringObjects]);
 		UKTrue(testItem1.parentGroups.isEmpty);
-
-		UnorderedGroupContent *testCurrentItem1 =
-			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].currentBranch.rootObject;
 
 		// Bidirectional cross persistent root relationships are limited to the
 		// tracking branch, this means item1 in the non-tracking current branch
