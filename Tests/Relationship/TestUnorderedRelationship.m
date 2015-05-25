@@ -117,8 +117,9 @@
 
 
 /**
- * For some general code comments that apply to all tests, see 
- * -testTargetPersistentRootUndeletion.
+ * For some general code comments that apply to all tests, see
+ * -testTargetPersistentRootUndeletion, -testSourcePersistentRootUndeletion and
+ * -testSourcePersistentRootUndeletionForReferenceToSpecificBranch.
  *
  * For Relationship Source Deletion Tests, we test the referring objects that 
  * exist implicitly in the relationship cache, but are not exposed since the 
@@ -428,13 +429,13 @@
 	[ctx commit];
 	
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
-	 {
+	{
 		 UKObjectsEqual(S(testItem1, testItem2), testOtherGroup1.contents);
 		 UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentOtherGroup1), [testItem1 referringObjects]);
 		 
 		 UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
 		 UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
-	 }];
+	}];
 }
 
 - (void)testSourceBranchUndeletionForReferenceToSpecificBranch
@@ -449,15 +450,15 @@
 	[ctx commit];
 	
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
-	 {
-		 UKStringsEqual(@"other", testOtherItem1.label);
-		 UKStringsEqual(@"current", testItem1.label);
-		 UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
-		 UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentOtherGroup1), [testItem1 referringObjects]);
-		 
-		 UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
-		 UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
-	 }];
+	{
+		UKStringsEqual(@"other", testOtherItem1.label);
+		UKStringsEqual(@"current", testItem1.label);
+		UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentOtherGroup1), [testItem1 referringObjects]);
+
+		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
+		UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
+	}];
 }
 
 @end
