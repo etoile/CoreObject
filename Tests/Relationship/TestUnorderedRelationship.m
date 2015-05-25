@@ -119,6 +119,10 @@
 /**
  * For some general code comments that apply to all tests, see 
  * -testTargetPersistentRootUndeletion.
+ *
+ * For Relationship Source Deletion Tests, we test the referring objects that 
+ * exist implicitly in the relationship cache, but are not exposed since the 
+ * relationship is unidirectional.
  */
 @interface TestCrossPersistentRootUnorderedRelationship : EditingContextTestCase <UKTest>
 {
@@ -207,6 +211,8 @@
 	UKTrue([currentItem1 referringObjects].isEmpty);
 	UKTrue([currentItem2 referringObjects].isEmpty);
 }
+
+#pragma mark - Relationship Target Deletion Tests
 
 - (void)testTargetPersistentRootDeletion
 {
@@ -336,6 +342,8 @@
 		UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
 	}];
 }
+
+#pragma mark - Relationship Source Deletion Tests
 
 - (void)testSourcePersistentRootDeletion
 {

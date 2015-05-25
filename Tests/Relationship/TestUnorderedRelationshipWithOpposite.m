@@ -88,7 +88,7 @@
 
 /**
  * For some general code comments that apply to all tests, see
- * -testSourcePersistentRootUndeletion and 
+ * -testTargetPersistentRootUndeletion, -testSourcePersistentRootUndeletion and
  * -testSourcePersistentRootUndeletionForReferenceToSpecificBranch.
  */
 @interface TestCrossPersistentRootUnorderedRelationshipWithOpposite : EditingContextTestCase <UKTest>
@@ -156,6 +156,139 @@
 		block(testCtx, testGroup1, testItem1, testItem2, testOtherItem1, testOtherGroup1, testCurrentGroup1, testCurrentItem1, testCurrentItem2, testCurrentOtherItem1, testCurrentOtherGroup1, isNewContext);
 	}];
 }
+
+#pragma mark - Relationship Target Deletion Tests
+
+- (void)testTargetPersistentRootDeletion
+{
+	item1.persistentRoot.deleted = YES;
+	[ctx commit];
+
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKObjectsEqual(S(testItem2), testGroup1.contents);
+		UKTrue(testItem1.parentGroups.isEmpty);
+
+		UKObjectsEqual(S(testItem2), testCurrentGroup1.contents);
+		UKTrue(testCurrentItem1.parentGroups.isEmpty);
+	}];
+}
+
+- (void)testTargetPersistentRootUndeletion
+{
+	item1.persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	item1.persistentRoot.deleted = NO;
+	[ctx commit];
+
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
+		UKObjectsEqual(S(testGroup1), testItem1.parentGroups);
+
+		// Bidirectional cross persistent root relationships are limited to the
+		// tracking branch, this means item1 in the non-tracking current branch
+		// doesn't appear in testCurrentGroup1.contents and doesn't refer to it
+		// with an inverse relationship (-referringObjectsForPropertyInTarget:
+		// simulates it though).
+		// Bidirectional cross persistent root relationships are supported
+		// accross current branches, but materialized accross tracking branches
+		// in memory (they are not visible accross the current branches in memory).
+		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
+		UKObjectsEqual(S(testGroup1), testCurrentItem1.parentGroups);
+	}];
+}
+
+- (void)testTargetPersistentRootDeletionForReferenceToSpecificBranch
+{
+	group1.contents = S(otherItem1, item2);
+	[ctx commit];
+
+	item1.persistentRoot.deleted = YES;
+	[ctx commit];
+
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKObjectsEqual(S(testItem2), testGroup1.contents);
+		UKTrue(testItem1.parentGroups.isEmpty);
+		
+		UKObjectsEqual(S(testItem2), testCurrentGroup1.contents);
+		UKTrue(testCurrentItem1.parentGroups.isEmpty);
+	}];
+}
+
+- (void)testTargetPersistentRootUndeletionForReferenceToSpecificBranch
+{
+	group1.contents = S(otherItem1, item2);
+	[ctx commit];
+
+	item1.persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	item1.persistentRoot.deleted = NO;
+	[ctx commit];
+	
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKStringsEqual(@"other", testOtherItem1.label);
+		UKStringsEqual(@"current", testItem1.label);
+		UKObjectsEqual(S(testOtherItem1, testItem2), testGroup1.contents);
+		UKObjectsEqual(S(testGroup1), testOtherItem1.parentGroups);
+		
+		UKObjectsEqual(S(testOtherItem1, testItem2), testCurrentGroup1.contents);
+		UKObjectsEqual(S(testGroup1), testOtherItem1.parentGroups);
+	}];
+}
+
+/**
+ * The current branch cannot be deleted, so we cannot write a test method
+ * -testTargetBranchDeletion analog to -testTargetPersistentRootDeletion
+ */
+- (void)testTargetBranchDeletionForReferenceToSpecificBranch
+{
+	group1.contents = S(otherItem1, item2);
+	[ctx commit];
+	
+	otherItem1.branch.deleted = YES;
+	[ctx commit];
+
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKObjectsEqual(S(testItem2), testGroup1.contents);
+		UKTrue(testOtherItem1.parentGroups.isEmpty);
+
+		UKObjectsEqual(S(testItem2), testCurrentGroup1.contents);
+		UKTrue(testCurrentOtherItem1.parentGroups.isEmpty);
+
+	}];
+}
+
+- (void)testTargetBranchUndeletionForReferenceToSpecificBranch
+{
+	group1.contents = S(otherItem1, item2);
+	[ctx commit];
+	
+	otherItem1.branch.deleted = YES;
+	[ctx commit];
+
+	otherItem1.branch.deleted = NO;
+	[ctx commit];
+
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKStringsEqual(@"other", testOtherItem1.label);
+		UKStringsEqual(@"current", testItem1.label);
+		UKObjectsEqual(S(testOtherItem1, testItem2), testGroup1.contents);
+		UKObjectsEqual(S(testGroup1), testOtherItem1.parentGroups);
+
+		UKObjectsEqual(S(testOtherItem1, testItem2), testCurrentGroup1.contents);
+		UKObjectsEqual(S(testGroup1), testOtherItem1.parentGroups);
+	}];
+}
+
+
+#pragma mark - Relationship Source Deletion Tests
 
 - (void)testSourcePersistentRootDeletion
 {
