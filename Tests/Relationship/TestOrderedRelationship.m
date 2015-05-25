@@ -136,12 +136,22 @@
 @end
 
 
+/**
+ * For some general code comments that apply to all tests, see
+ * -testTargetPersistentRootUndeletion, -testSourcePersistentRootUndeletion and
+ * -testSourcePersistentRootUndeletionForReferenceToSpecificBranch.
+ *
+ * For Relationship Source Deletion Tests, we test the referring objects that 
+ * exist implicitly in the relationship cache, but are not exposed since the 
+ * relationship is unidirectional.
+ */
 @interface TestCrossPersistentRootOrderedRelationship : EditingContextTestCase <UKTest>
 {
 	OrderedGroupNoOpposite *group1;
 	OutlineItem *item1;
 	OutlineItem *item2;
 	OutlineItem *otherItem1;
+	OrderedGroupNoOpposite *otherGroup1;
 }
 
 @end
@@ -151,19 +161,25 @@
 - (id)init
 {
 	SUPERINIT;
+
 	group1 = [ctx insertNewPersistentRootWithEntityName: @"OrderedGroupNoOpposite"].rootObject;
 	item1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
 	item1.label = @"current";
 	item2 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
 	group1.contents = A(item1, item2);
+	group1.label = @"current";
 	[ctx commit];
+
 	otherItem1 = [item1.persistentRoot.currentBranch makeBranchWithLabel: @"other"].rootObject;
 	otherItem1.label = @"other";
+	otherGroup1 = [group1.persistentRoot.currentBranch makeBranchWithLabel: @"other"].rootObject;
+	otherGroup1.label = @"other";
 	[ctx commit];
+
 	return self;
 }
 
-#define CHECK_BLOCK_ARGS COEditingContext *testCtx, OrderedGroupNoOpposite *testGroup1, OutlineItem *testItem1, OutlineItem *testItem2, OutlineItem *testOtherItem1, OrderedGroupNoOpposite *testCurrentGroup1, OutlineItem *testCurrentItem1, OutlineItem *testCurrentItem2, OutlineItem *testCurrentOtherItem1, BOOL isNewContext
+#define CHECK_BLOCK_ARGS COEditingContext *testCtx, OrderedGroupNoOpposite *testGroup1, OutlineItem *testItem1, OutlineItem *testItem2, OutlineItem *testOtherItem1, OrderedGroupNoOpposite *testOtherGroup1, OrderedGroupNoOpposite *testCurrentGroup1, OutlineItem *testCurrentItem1, OutlineItem *testCurrentItem2, OutlineItem *testCurrentOtherItem1, OrderedGroupNoOpposite *testCurrentOtherGroup1, BOOL isNewContext
 
 - (void)checkPersistentRootsWithExistingAndNewContextInBlock: (void (^)(CHECK_BLOCK_ARGS))block
 {
@@ -178,7 +194,9 @@
 			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].rootObject;
 		OutlineItem *testOtherItem1 =
 			[testItem1.persistentRoot branchForUUID: otherItem1.branch.UUID].rootObject;
-		
+		OrderedGroupNoOpposite *testOtherGroup1 =
+			[testGroup1.persistentRoot branchForUUID: otherGroup1.branch.UUID].rootObject;
+
 		OrderedGroupNoOpposite *testCurrentGroup1 = testPersistentRoot.currentBranch.rootObject;
 		OutlineItem *testCurrentItem1 =
 			[testCtx persistentRootForUUID: item1.persistentRoot.UUID].currentBranch.rootObject;
@@ -186,8 +204,10 @@
 			[testCtx persistentRootForUUID: item2.persistentRoot.UUID].currentBranch.rootObject;
 		OutlineItem *testCurrentOtherItem1 =
 			[testCtx persistentRootForUUID: otherItem1.persistentRoot.UUID].currentBranch.rootObject;
+		OrderedGroupNoOpposite *testCurrentOtherGroup1 =
+			[testCtx persistentRootForUUID: otherGroup1.persistentRoot.UUID].currentBranch.rootObject;
 
-		block(testCtx, testGroup1, testItem1, testItem2, testOtherItem1, testCurrentGroup1, testCurrentItem1, testCurrentItem2, testCurrentOtherItem1, isNewContext);
+		block(testCtx, testGroup1, testItem1, testItem2, testOtherItem1, testOtherGroup1, testCurrentGroup1, testCurrentItem1, testCurrentItem2, testCurrentOtherItem1, testCurrentOtherGroup1, isNewContext);
 	}];
 }
 
@@ -196,8 +216,8 @@
 	UKObjectsEqual(A(item1, item2), group1.contents);
 	// Check that the relationship cache knows the inverse relationship,
 	// even though it is not used in the metamodel (non-public API)
-	UKObjectsEqual(S(group1), [item1 referringObjects]);
-	UKObjectsEqual(S(group1), [item2 referringObjects]);
+	UKObjectsEqual(S(group1, otherGroup1), [item1 referringObjects]);
+	UKObjectsEqual(S(group1, otherGroup1), [item2 referringObjects]);
 }
 
 - (void)testRelationshipsFromAndToCurrentBranches
@@ -241,7 +261,7 @@
 		UKObjectsEqual(A(testItem1, testItem2), testGroup1.contents);
 		// Check that the relationship cache knows the inverse relationship,
 		// even though it is not used in the metamodel (non-public API)
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testOtherGroup1, testCurrentGroup1), [testItem1 referringObjects]);
 
 		// Bidirectional cross persistent root relationships are limited to the
 		// tracking branch, this means item1 in the non-tracking current branch
@@ -290,7 +310,6 @@
 		UKStringsEqual(@"other", testOtherItem1.label);
 		UKStringsEqual(@"current", testItem1.label);
 		UKObjectsEqual(A(testOtherItem1, testItem2), testGroup1.contents);
-		UKObjectsNotEqual(A(testItem1, testItem2), testGroup1.contents);
 		UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testOtherItem1 referringObjects]);
 
 		UKObjectsEqual(A(testOtherItem1, testItem2), testCurrentGroup1.contents);
@@ -336,10 +355,124 @@
 		UKStringsEqual(@"other", testOtherItem1.label);
 		UKStringsEqual(@"current", testItem1.label);
 		UKObjectsEqual(A(testOtherItem1, testItem2), testGroup1.contents);
-		UKObjectsNotEqual(A(testItem1, testItem2), testGroup1.contents);
 		UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testOtherItem1 referringObjects]);
 
 		UKObjectsEqual(A(testOtherItem1, testItem2), testCurrentGroup1.contents);
+		UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
+	}];
+}
+
+- (void)testSourcePersistentRootDeletion
+{
+	group1.persistentRoot.deleted = YES;
+	[ctx commit];
+
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKObjectsEqual(A(testItem1, testItem2), testGroup1.contents);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
+
+		UKObjectsEqual(A(testItem1, testItem2), testCurrentGroup1.contents);
+		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+	}];
+}
+
+- (void)testSourcePersistentRootUndeletion
+{
+	group1.persistentRoot.deleted = YES;
+	[ctx commit];
+
+	group1.persistentRoot.deleted = NO;
+	[ctx commit];
+
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKObjectsEqual(A(testItem1, testItem2), testGroup1.contents);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
+		 
+		UKObjectsEqual(A(testItem1, testItem2), testCurrentGroup1.contents);
+		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+	}];
+}
+
+- (void)testSourcePersistentRootDeletionForReferenceToSpecificBranch
+{
+	otherGroup1.contents = A(item1, item2);
+	[ctx commit];
+
+	otherGroup1.persistentRoot.deleted = YES;
+	[ctx commit];
+
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKObjectsEqual(A(testItem1, testItem2), testOtherGroup1.contents);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentOtherGroup1), [testItem1 referringObjects]);
+		
+		UKObjectsEqual(A(testItem1, testItem2), testCurrentOtherGroup1.contents);
+		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+	}];
+}
+
+- (void)testSourcePersistentRootUndeletionForReferenceToSpecificBranch
+{
+	otherGroup1.contents = A(item1, item2);
+	[ctx commit];
+
+	otherGroup1.persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	otherGroup1.persistentRoot.deleted = NO;
+	[ctx commit];
+	
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKStringsEqual(@"other", testOtherGroup1.label);
+		UKStringsEqual(@"current", testGroup1.label);
+		UKObjectsEqual(A(testItem1, testItem2), testOtherGroup1.contents);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentOtherGroup1), [testItem1 referringObjects]);
+		
+		UKObjectsEqual(A(testItem1, testItem2), testCurrentOtherGroup1.contents);
+		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+	}];
+}
+
+- (void)testSourceBranchDeletionForReferenceToSpecificBranch
+{
+	otherGroup1.contents = A(item1, item2);
+	[ctx commit];
+	
+	otherGroup1.branch.deleted = YES;
+	[ctx commit];
+	
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		 UKObjectsEqual(A(testItem1, testItem2), testOtherGroup1.contents);
+		 UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentOtherGroup1), [testItem1 referringObjects]);
+		 
+		 UKObjectsEqual(A(testItem1, testItem2), testCurrentGroup1.contents);
+		 UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
+	}];
+}
+
+- (void)testSourceBranchUndeletionForReferenceToSpecificBranch
+{
+	otherGroup1.contents = A(item1, item2);
+	[ctx commit];
+	
+	otherGroup1.branch.deleted = YES;
+	[ctx commit];
+	
+	otherGroup1.branch.deleted = NO;
+	[ctx commit];
+	
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKStringsEqual(@"other", testOtherItem1.label);
+		UKStringsEqual(@"current", testItem1.label);
+		UKObjectsEqual(A(testItem1, testItem2), testGroup1.contents);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentOtherGroup1), [testItem1 referringObjects]);
+
+		UKObjectsEqual(A(testItem1, testItem2), testCurrentGroup1.contents);
 		UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
 	}];
 }
