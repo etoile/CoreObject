@@ -118,7 +118,7 @@
 
 /**
  * For some general code comments that apply to all tests, see 
- * -testPersistentRootUndeletion.
+ * -testTargetPersistentRootUndeletion.
  */
 @interface TestCrossPersistentRootUnorderedRelationship : EditingContextTestCase <UKTest>
 {
@@ -197,7 +197,7 @@
 	UKTrue([currentItem2 referringObjects].isEmpty);
 }
 
-- (void)testPersistentRootDeletion
+- (void)testTargetPersistentRootDeletion
 {
 	item1.persistentRoot.deleted = YES;
 	[ctx commit];
@@ -212,7 +212,7 @@
 	}];
 }
 
-- (void)testPersistentRootUndeletion
+- (void)testTargetPersistentRootUndeletion
 {
 	item1.persistentRoot.deleted = YES;
 	[ctx commit];
@@ -239,7 +239,7 @@
 	}];
 }
 
-- (void)testPersistentRootDeletionForReferenceToSpecificBranch
+- (void)testTargetPersistentRootDeletionForReferenceToSpecificBranch
 {
 	group1.contents = S(otherItem1, item2);
 	[ctx commit];
@@ -257,7 +257,7 @@
 	}];
 }
 
-- (void)testPersistentRootUndeletionForReferenceToSpecificBranch
+- (void)testTargetPersistentRootUndeletionForReferenceToSpecificBranch
 {
 	group1.contents = S(otherItem1, item2);
 	[ctx commit];
@@ -283,9 +283,9 @@
 
 /**
  * The current branch cannot be deleted, so we cannot write a test method
- * -testBranchDeletion analog to -testPersistentRootDeletion
+ * -testTargetBranchDeletion analog to -testTargetPersistentRootDeletion
  */
-- (void)testBranchDeletionForReferenceToSpecificBranch
+- (void)testTargetBranchDeletionForReferenceToSpecificBranch
 {
 	group1.contents = S(otherItem1, item2);
 	[ctx commit];
@@ -303,7 +303,7 @@
 	}];
 }
 
-- (void)testBranchUndeletionForReferenceToSpecificBranch
+- (void)testTargetBranchUndeletionForReferenceToSpecificBranch
 {
 	group1.contents = S(otherItem1, item2);
 	[ctx commit];
