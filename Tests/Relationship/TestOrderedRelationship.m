@@ -213,11 +213,13 @@
 
 - (void)testRelationships
 {
+	OrderedGroupNoOpposite *currentGroup1 = group1.persistentRoot.currentBranch.rootObject;
+
 	UKObjectsEqual(A(item1, item2), group1.contents);
 	// Check that the relationship cache knows the inverse relationship,
 	// even though it is not used in the metamodel (non-public API)
-	UKObjectsEqual(S(group1, otherGroup1), [item1 referringObjects]);
-	UKObjectsEqual(S(group1, otherGroup1), [item2 referringObjects]);
+	UKObjectsEqual(S(group1, currentGroup1, otherGroup1), [item1 referringObjects]);
+	UKObjectsEqual(S(group1, currentGroup1, otherGroup1), [item2 referringObjects]);
 }
 
 - (void)testRelationshipsFromAndToCurrentBranches
