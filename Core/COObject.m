@@ -1556,7 +1556,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 		else if ([value isKindOfClass: [COMutableArray class]])
 		{
 			COMutableArray *array = value;
-			const NSUInteger count = [array count];
+			const NSUInteger count = array.backing.count;
 
 			array.mutable = YES;
 			for (NSUInteger i=0; i<count; i++)

@@ -46,7 +46,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 @implementation COMutableArray
 
-@synthesize mutable = _mutable;
+@synthesize mutable = _mutable, backing = _backing;
 
 - (NSPointerArray *) makeBacking
 {

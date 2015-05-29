@@ -45,6 +45,9 @@
 	NSPointerArray *_backing;
 	NSMutableIndexSet *_deadIndexes;
 }
+
+@property (nonatomic, readonly) NSPointerArray *backing;
+
 - (id)referenceAtIndex: (NSUInteger)index;
 - (void)addReference: (id)aReference;
 - (void)replaceReferenceAtIndex: (NSUInteger)index withReference: (id)aReference;

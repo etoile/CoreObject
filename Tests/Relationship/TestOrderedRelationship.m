@@ -276,6 +276,32 @@
 	}];
 }
 
+/**
+ * This is a regression test to cover cases where we are not iterating over
+ * references correctly in -[COObject replaceReferencesToObjectIdenticalTo:withObject:]
+ * (e.g. array.count rather array.backing.count).
+ */
+- (void)testTargetPersistentRootUndeletionWithEmptyGroup
+{
+	group1.contents = A(item1);
+	[ctx commit];
+
+	item1.persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	item1.persistentRoot.deleted = NO;
+	[ctx commit];
+
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKObjectsEqual(A(testItem1), testGroup1.contents);
+		UKObjectsEqual(S(testGroup1, testOtherGroup1, testCurrentGroup1), [testItem1 referringObjects]);
+
+		UKObjectsEqual(A(testItem1), testCurrentGroup1.contents);
+		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+	}];
+}
+
 - (void)testTargetPersistentRootDeletionForReferenceToSpecificBranch
 {
 	group1.contents = A(otherItem1, item2);
