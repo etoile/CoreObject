@@ -377,6 +377,9 @@
 	{
 		if (persistentRoot == aPersistentRoot)
 			continue;
+		
+		// TODO: Use -objectGraphWithoutUnfaulting to prevent loading every
+		// object graph contexts we check
 
 		/* Fix references pointing to any branch that belong to the deleted 
 		   persistent root (the relationship target) */
