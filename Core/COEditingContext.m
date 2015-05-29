@@ -164,6 +164,13 @@
 
 #pragma mark Managing Persistent Roots -
 
+/**
+ * We don't need to update cross persistent references when loading a persistent 
+ * root, see -[COPersistentRoot setCurrentBranchObjectGraphToRevisionUUID:persistentRootUUID:].
+ *
+ * There is one exception to this rule, it's when we reload due to an external 
+ * change as covered in -storePersistentRootsDidChange:isDistributed:.
+ */
 - (COPersistentRoot *)persistentRootForUUID: (ETUUID *)persistentRootUUID
 {
 	COPersistentRoot *persistentRoot = [_loadedPersistentRoots objectForKey: persistentRootUUID];
@@ -178,9 +185,6 @@
 		return nil;
 
 	persistentRoot = [self makePersistentRootWithInfo: info objectGraphContext: nil];
-	[self updateCrossPersistentRootReferencesToPersistentRoot: persistentRoot
-	                                                   branch: nil
-	                                                isDeleted: persistentRoot.isDeleted];
 
 	return persistentRoot;
 }
@@ -357,6 +361,8 @@
  * <item>implicit deletion/undeletion when reloading persistent roots or branches 
  * (e.g. isTargetDeletion comment).</item>
  * </list>
+ *
+ * See also -[COPersistentRoot setCurrentBranchObjectGraphToRevisionUUID:persistentRootUUID:].
  */
 - (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot
                                                      branch: (COBranch *)aBranch

@@ -136,6 +136,11 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     return [_persistentRoot editingContext];
 }
 
+/**
+ * For the interaction with cross persistent root references, see
+ * -[COPersistentRoot setCurrentBranchObjectGraphToRevisionUUID:persistentRootUUID:]
+ * whose discussion applies this method unfaulting logic in the same way.
+ */
 - (COObjectGraphContext *) objectGraphContext
 {
 	if (_objectGraph == nil)
