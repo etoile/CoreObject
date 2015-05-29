@@ -178,6 +178,9 @@
 		return nil;
 
 	persistentRoot = [self makePersistentRootWithInfo: info objectGraphContext: nil];
+	[self updateCrossPersistentRootReferencesToPersistentRoot: persistentRoot
+	                                                   branch: nil
+	                                                isDeleted: persistentRoot.isDeleted];
 
 	return persistentRoot;
 }
@@ -341,6 +344,19 @@
  *
  * When isDeleted is NO, turns dead references to the given persistent root
  * into live ones in referring persistent roots.
+ *
+ * When isDeleted is YES and branch is nil, this means the persistent root 
+ * itself is deleted. In this case, we consider the branches to be all 
+ * transively deleted for this method logic, although there aren't marked as 
+ * deleted.
+ *
+ * The implementation must take in account deletion/undeletion can be:
+ *
+ * <list>
+ * <item>explicit with COPersistentRoot and COBranch API</item>
+ * <item>implicit deletion/undeletion when reloading persistent roots or branches 
+ * (e.g. isTargetDeletion comment).</item>
+ * </list>
  */
 - (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot
                                                      branch: (COBranch *)aBranch
@@ -377,6 +393,11 @@
 
 		for (COObjectGraphContext *target in targetObjectGraphs)
 		{
+			/* When we are not deleting a persistent root or branch explicitly,
+			   but reloading persistent roots, we must take in account that  
+			   branches can become deleted when their persistent root doesn't 
+			   (isDeletion is NO) */
+			BOOL isTargetDeletion = isDeletion || target.branch.deleted;
 			/* Fix references in all branches that belong to persistent roots 
 			   referencing the deleted persistent root (those are relationship sources) */
 			NSMutableSet *sourceObjectGraphs =
@@ -389,8 +410,8 @@
 
 			for (COObjectGraphContext *source in sourceObjectGraphs)
 			{
-				[source replaceObject: (isDeletion ? target.rootObject : nil)
-						   withObject: (isDeletion ? nil : target.rootObject)];
+				[source replaceObject: (isTargetDeletion ? target.rootObject : nil)
+						   withObject: (isTargetDeletion ? nil : target.rootObject)];
 			}
 		}
 	}
@@ -765,11 +786,29 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 			}
 			
 			int64_t notifTransaction = [notifTransactionObj longLongValue];
-			
+
+			/* When we have committed the changes explicitly, we send
+			   COPersistentRootDidChangeNotification later with 
+			   -didCommitWithCommand:persistentRoots: and not now. */
 			if (notifTransaction > loaded.lastTransactionID)
 			{
 				hadChanges = YES;
+				/* Will reload every branch info and ensure each one reports 
+				   a correct deletion status (critical to update the cross
+				   persistent root references). Between 
+				   -clearBranchesPendingDeletionAndUndeletion and this point, 
+				   COBranch.isDeleted is always NO. */
 				[loaded storePersistentRootDidChange: notif isDistributed: isDistributed];
+				/* When -[COUndoTrack setCurrentNode:] is used or we receive 
+				   another application commit notification, we must update other
+				   persistent root references pointing to the loaded one.
+				   However when we have committed the changes explicitly, the
+				   cross persistent root references have already been updated at
+				   commit time, so we have nothing to do (i.e. 
+				   notifTransaction > loaded.lastTransactionID is NO). */
+				[self updateCrossPersistentRootReferencesToPersistentRoot: loaded
+			                                                       branch: nil
+			                                                    isDeleted: loaded.isDeleted];
 			}
 		}
 		else
@@ -778,6 +817,15 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 			if (newlyInserted != nil)
 			{
 				hadChanges = YES;
+				/* When -[COUndoTrack setCurrentNode:] is used or we receive
+				   another application commit notification, the store is updated
+				   directly and the newly inserted persistent root can be one
+				   just undeleted by the undo track (or in another app). This
+				   means we must check other persistent roots in case they have
+				   dead references pointing it. */
+				[self updateCrossPersistentRootReferencesToPersistentRoot: newlyInserted
+			                                                       branch: nil
+			                                                    isDeleted: newlyInserted.isDeleted];
 			}
 		}
 	}

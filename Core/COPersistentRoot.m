@@ -322,6 +322,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	_currentBranchObjectGraph.branch = aBranch;
 	
 	[self reloadCurrentBranchObjectGraph];
+	// TODO: Update cross persistent root references
 }
 
 - (NSSet *)branches
