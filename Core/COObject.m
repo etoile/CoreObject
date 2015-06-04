@@ -594,7 +594,9 @@ See +[NSObject typePrefix]. */
 	}
 	else
 	{
-		ETAssert([self isEditingContextValidForObject: (COObject *)value]);
+		BOOL isDeadRef = [value isKindOfClass: [COPath class]];
+
+		ETAssert(isDeadRef || [self isEditingContextValidForObject: (COObject *)value]);
 	}
 }
 
@@ -616,8 +618,10 @@ See +[NSObject typePrefix]. */
 	}
 	else
 	{
-		ETAssert([self isObjectGraphContextValidForObject: (COObject *)value
-		                              propertyDescription: propertyDesc]);
+		BOOL isDeadRef = [value isKindOfClass: [COPath class]];
+
+		ETAssert(isDeadRef || [self isObjectGraphContextValidForObject: (COObject *)value
+		                                           propertyDescription: propertyDesc]);
 	}
 }
 
@@ -818,6 +822,31 @@ See +[NSObject typePrefix]. */
 	{
 		return ((COWeakRef *)value)->_object;
 	}
+	if ([value isKindOfClass: [COPath class]])
+	{
+		return nil;
+	}
+	
+	return value;
+}
+
+- (id)serializableValueForVariableStorageKey: (NSString *)key
+{
+	// NOTE: This is just a debugging aid, and the check is only placed
+	// here because -valueForVariableStorageKey: is a commonly called method.
+	[self checkIsNotRemovedFromContext];
+
+	id value = _variableStorage[key];
+	
+	// Convert value stored in variable storage to a form we can return to the user
+	if (value == [NSNull null])
+	{
+		return nil;
+	}
+	if ([value isKindOfClass: [COWeakRef class]])
+	{
+		return ((COWeakRef *)value)->_object;
+	}
 	
 	return value;
 }
@@ -951,12 +980,24 @@ See +[NSObject typePrefix]. */
 	return value;
 }
 
+- (id)serializableValueForStorageKey: (NSString *)key
+{
+	id value = nil;
+
+	if (ETGetInstanceVariableValueForKey(self, &value, key) == NO)
+	{
+		value = [self serializableValueForVariableStorageKey: key];
+	}
+	return value;
+}
+
 - (void)setValue: (id)value forStorageKey: (NSString *)key
 {
 	if (ETSetInstanceVariableValueForKey(self, value, key) == NO)
 	{
 		[self setValue: value forVariableStorageKey: key];
 	}
+
 }
 
 #pragma mark - Notifications to be called by Accessors
@@ -978,7 +1019,7 @@ See +[NSObject typePrefix]. */
 {
 	ETPropertyDescription *propertyDesc =
 		[_entityDescription propertyDescriptionForName: key];
-	id oldValue = [self valueForStorageKey: key];
+	id oldValue = [self serializableValueForStorageKey: key];
 
 	[self pushOldCoreObjectRelationshipValue: oldValue
 	                  forPropertyDescription: propertyDesc];
@@ -1033,6 +1074,14 @@ See +[NSObject typePrefix]. */
 	}
 }
 
+- (BOOL)isValidDeadReference: (id)value
+      forPropertyDescription: (ETPropertyDescription *)propertyDesc
+{
+	return [value isKindOfClass: [COPath class]]
+		&& !propertyDesc.multivalued
+		&& [self isCoreObjectRelationship: propertyDesc];
+}
+
 - (void)  validateSingleValue: (id)singleValue
 conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 {
@@ -1046,9 +1095,11 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	ETEntityDescription *newValueEntityDesc = [self entityDescriptionForObject: singleValue];
 	ETAssert(newValueEntityDesc != nil);
 	
-	if ([[propertyDesc type] isValidValue: singleValue type: newValueEntityDesc])
+	if ([[propertyDesc type] isValidValue: singleValue type: newValueEntityDesc]
+	 || [self isValidDeadReference: singleValue forPropertyDescription: propertyDesc])
+	{
 		return;
-	
+	}
 	[NSException raise: NSInvalidArgumentException
 	            format: @"single value '%@' (entity %@) does not conform to type %@ (property %@)",
 	                    singleValue, newValueEntityDesc, [propertyDesc type], propertyDesc];
@@ -1247,7 +1298,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 - (void)commonDidChangeValueForProperty: (NSString *)key
 {
 	ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
-	id newValue = [self valueForStorageKey: key];
+	id newValue = [self serializableValueForStorageKey: key];
 	id oldValue = [self popOldCoreObjectRelationshipValueForPropertyDescription: propertyDesc];
 
 	if (propertyDesc == nil)
@@ -1543,17 +1594,10 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 
 	for (NSString *key in [self persistentPropertyNames])
 	{
-		id value = [self valueForStorageKey: key];
+		id value = [self serializableValueForStorageKey: key];
 		BOOL updated = NO;
 
-		if (value == object)
-		{
-			// TODO: Will require some changes in -valueFor(Variable)StorageKey:
-			// to return nil when a dead reference marker is inserted.
-			// FIXME: We should call -setValue:forStorageKey here.
-			[self setValue: replacement forVariableStorageKey: key];
-		}
-		else if ([value isKindOfClass: [COMutableArray class]])
+		if ([value isKindOfClass: [COMutableArray class]])
 		{
 			COMutableArray *array = value;
 			const NSUInteger count = array.backing.count;
@@ -1590,7 +1634,16 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 			}
 			set.mutable = NO;
 		}
-		
+		else if ([value isEqual: object])
+		{
+			// TODO: Will require some changes in -valueFor(Variable)StorageKey:
+			// to return nil when a dead reference marker is inserted.
+			// FIXME: We should call -setValue:forStorageKey here.
+			[self willChangeValueForProperty: key];
+			[self setValue: replacement forVariableStorageKey: key];
+			updated = YES;
+		}
+
 		if (updated)
 		{
 			// Will update the dead relationship cache

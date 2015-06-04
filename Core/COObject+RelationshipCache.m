@@ -50,11 +50,11 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
     {
         if (isPersistentCoreObjectReferencePropertyDescription(aProperty))
         {
+			COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
+				self.editingContext.deadRelationshipCache;
+
             if ([aProperty isMultivalued])
             {
-				COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
-					self.editingContext.deadRelationshipCache;
-
                 for (id obj in [(id <COPrimitiveCollection>)aValue enumerableReferences])
                 {
 					BOOL isDeadReference = [obj isKindOfClass: [COPath class]];
@@ -73,8 +73,19 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
             }
             else
             {
-                [[(COObject *)aValue incomingRelationshipCache] removeReferencesForPropertyInSource: [aProperty name]
-                                                                               sourceObject: self];
+				BOOL isDeadReference = [aValue isKindOfClass: [COPath class]];
+
+				if (isDeadReference)
+				{
+					[deadRelationshipCache removeReferringObject: self
+					                                     forPath: aValue];
+				}
+				else
+				{
+					[[(COObject *)aValue incomingRelationshipCache]
+						removeReferencesForPropertyInSource: [aProperty name]
+                    	                       sourceObject: self];
+				}
             }
         }
     }
@@ -88,6 +99,8 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
     {
         if (isPersistentCoreObjectReferencePropertyDescription(aProperty))
         {
+			COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
+				self.editingContext.deadRelationshipCache;
             ETPropertyDescription *propertyInTarget = [aProperty opposite]; // May be nil
 
 			// Metamodel sanity check
@@ -100,9 +113,6 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
 			
 			if ([aProperty isMultivalued])
 			{
-				COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
-					self.editingContext.deadRelationshipCache;
-
 				for (id obj in [(id <COPrimitiveCollection>)aValue enumerableReferences])
 				{
 					BOOL isDeadReference = [obj isKindOfClass: [COPath class]];
@@ -122,9 +132,20 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
 			}
 			else
 			{
-				[[(COObject *)aValue incomingRelationshipCache] addReferenceFromSourceObject: self
-																	  sourceProperty: [aProperty name]
-																	  targetProperty: [propertyInTarget name]];
+				BOOL isDeadReference = [aValue isKindOfClass: [COPath class]];
+
+				if (isDeadReference)
+				{
+					[deadRelationshipCache addReferringObject: self
+					                                  forPath: aValue];
+				}
+				else
+				{
+					[[(COObject *)aValue incomingRelationshipCache]
+						addReferenceFromSourceObject: self
+						              sourceProperty: [aProperty name]
+						              targetProperty: [propertyInTarget name]];
+				}
 			}
 		}
     }

@@ -68,6 +68,10 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
+- (id)serializableValueForStorageKey: (NSString *)key;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
 - (void)setValue: (id)value forStorageKey: (NSString *)key;
 /**
  * This method is only exposed to be used internally by CoreObject.

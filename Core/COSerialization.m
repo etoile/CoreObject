@@ -512,7 +512,7 @@ serialization. */
 	/* If no custom getter can be found, we access the stored value directly 
 	   (ivar and variable storage) */
 
-	return [self valueForStorageKey: [aPropertyDesc name]];
+	return [self serializableValueForStorageKey: [aPropertyDesc name]];
 }
 
 - (COItem *)storeItemWithUUID: (ETUUID *)aUUID
