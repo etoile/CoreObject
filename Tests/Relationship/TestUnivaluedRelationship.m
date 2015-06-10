@@ -115,8 +115,7 @@
 
 /**
  * For some general code comments that apply to all tests, see
- * -testTargetPersistentRootUndeletion, -testSourcePersistentRootUndeletion and
- * -testSourcePersistentRootUndeletionForReferenceToSpecificBranch.
+ * -testTargetPersistentRootUndeletionh.
  *
  * For Relationship Source Deletion Tests, we test the referring objects that 
  * exist implicitly in the relationship cache, but are not exposed since the 

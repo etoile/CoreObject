@@ -316,7 +316,7 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
-		// testCurrentGroup1 present in -referrringObjects is hidden by -referringObjectsForPropertyInTarget:
+		// testCurrentGroup1 and testOtherGroup1 present in -referringObjects are hidden by -referringObjectsForPropertyInTarget:
 		UKObjectsEqual(S(testGroup1), testItem1.parentGroups);
 		 
 		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
