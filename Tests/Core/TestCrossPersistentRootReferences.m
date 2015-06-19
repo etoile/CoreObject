@@ -394,7 +394,7 @@
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [photo1 commit];
-    
+
     COBranch *branchA = [photo1 currentBranch];
     COBranch *branchB = [branchA makeBranchWithLabel: @"branchB"];
     [branchB.rootObject setLabel: @"photo1, branch B"];
@@ -406,22 +406,45 @@
     /* This creates a reference to branch B of photo1. */
 	[[library1 rootObject] addObject: branchB.rootObject];
     [ctx commit];
+    
+    // Valid reference should be visible in existing and new context
+    [self checkPersistentRootWithExistingAndNewContext: library1
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsEqual(S(@"photo1, branch B"), [[[[testProot rootObject] contents] mappedCollection] label]);
+     }];
 
 	branchB.deleted = YES;
+    
+    // Uncommitted deletion, reference should be hidden in current context but visible in a new one
+    [self checkPersistentRootWithExistingAndNewContext: library1
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         if (isNewContext)
+             UKObjectsEqual(S(@"photo1, branch B"), [[[[testProot rootObject] contents] mappedCollection] label]);
+         else
+             UKObjectsEqual(S(), [[[[testProot rootObject] contents] mappedCollection] label]);
+     }];
+    
     [ctx commit];
 	
+    // Committed deletion, reference should be hidden
+    [self checkPersistentRootWithExistingAndNewContext: library1
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsEqual(S(), [[[[testProot rootObject] contents] mappedCollection] label]);
+     }];
+    
 	[store finalizeDeletionsForPersistentRoot: [photo1 UUID]
 									 error: NULL];
-	
-	// TODO: The persistent root should notice that the branch was permanently
-	// deleted, and move the COObjectGraphContext to a CODeletedBranch
-	// (but the COObject pointer to the root object remains valid.)
-	//
-	// 4 cases:
-	// - loaded in memory -> root broken reference in memory, deleted
-	// - not in memory -> root broken reference in memory, deleted
-	// - root broken reference in memory, deleted -> restored from backup (?)
-	// - not in memory -> loaded in memory (regular case)
+
+    // Finalized deletion, reference should be hidden
+    // FIXME: Currently failing with an assertion failure
+    [self checkPersistentRootWithExistingAndNewContext: library1
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsEqual(S(), [[[[testProot rootObject] contents] mappedCollection] label]);
+     }];
 }
 
 #if 0
