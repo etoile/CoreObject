@@ -447,36 +447,34 @@
      }];
 }
 
-#if 0
 - (void) testMultipleRelationshipsPerObject
 {
     // tag1 <<persistent root>>
 	//  |
 	//  \--photo1 // content property, cross-persistent-root link
 	//  |
-	//  \--tag2 // childTags property, cross-persistent-root link
+	//  \--photo2 // content property, cross-persistent-root link
 	//
 	// photo1 <<persistent root>>
     //
-	// tag2 <<persistent root>>
+	// photo2 <<persistent root>>
 	//
-    // Test the effect of deleting photo1 (tag2 should continue to work)
+    // Test the effect of deleting photo1 (photo2 should continue to work)
     
     COPersistentRoot *tag1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-    COPersistentRoot *tag2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
 	COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	
-	[[[tag1 rootObject] mutableSetValueForKey: @"contents"] addObject: [photo1 rootObject]];
-	// FIXME: Illegal, makes a compoiste cross-reference
-	[[[tag1 rootObject] mutableSetValueForKey: @"childTags"] addObject: [tag2 rootObject]];
+    COPersistentRoot *photo2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+
+	NSMutableSet *tag1ContentsProxy = [[tag1 rootObject] mutableSetValueForKey: @"contents"];
+	[tag1ContentsProxy addObject: [photo1 rootObject]];
+	[tag1ContentsProxy addObject: [photo2 rootObject]];
 	
 	[ctx commit];
 	
 	[self checkPersistentRootWithExistingAndNewContext: tag1
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(S([[photo1 rootObject] UUID]), [[[[testProot rootObject] contents] mappedCollection] UUID]);
-		 UKObjectsEqual(S([[tag2 rootObject] UUID]), [[[[testProot rootObject] childTags] mappedCollection] UUID]);
+		 UKObjectsEqual(S([[photo1 rootObject] UUID], [[photo2 rootObject] UUID]), [[[[testProot rootObject] contents] mappedCollection] UUID]);
 	 }];
 	
 	photo1.deleted = YES;
@@ -485,42 +483,9 @@
 	[self checkPersistentRootWithExistingAndNewContext: tag1
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(S([[photo1 rootObject] UUID]), [[[[testProot rootObject] contents] mappedCollection] UUID]);
-		 UKObjectsEqual(S([[tag2 rootObject] UUID]), [[[[testProot rootObject] childTags] mappedCollection] UUID]);
+		 UKObjectsEqual(S([[photo2 rootObject] UUID]), [[[[testProot rootObject] contents] mappedCollection] UUID]);
 	 }];
 }
-
-- (void) testMultipleRelationshipsPerObject2
-{
-    COPersistentRoot *tag1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-    COPersistentRoot *tag2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-	COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-
-	// Same as last test but order of these two statements is swapped
-	// FIXME: Illegal, makes a composite cross reference
-	[[[tag1 rootObject] mutableSetValueForKey: @"childTags"] addObject: [tag2 rootObject]];
-	[[[tag1 rootObject] mutableSetValueForKey: @"contents"] addObject: [photo1 rootObject]];
-	
-	[ctx commit];
-	
-	[self checkPersistentRootWithExistingAndNewContext: tag1
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKObjectsEqual(S([[photo1 rootObject] UUID]), [[[[testProot rootObject] contents] mappedCollection] UUID]);
-		 UKObjectsEqual(S([[tag2 rootObject] UUID]), [[[[testProot rootObject] childTags] mappedCollection] UUID]);
-	 }];
-	
-	photo1.deleted = YES;
-	[ctx commit];
-	
-	[self checkPersistentRootWithExistingAndNewContext: tag1
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKObjectsEqual(S([[photo1 rootObject] UUID]), [[[[testProot rootObject] contents] mappedCollection] UUID]);
-		 UKObjectsEqual(S([[tag2 rootObject] UUID]), [[[[testProot rootObject] childTags] mappedCollection] UUID]);
-	 }];
-}
-#endif
 
 - (void) testPersistentRootDeletion
 {
@@ -549,7 +514,7 @@
     
     photo1.deleted = YES;
     
-    // FIXME: UKObjectsEqual([NSSet set], [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual([NSSet set], [[library1 rootObject] valueForKeyPath: @"contents.label"]);
     
     [ctx commit];
 }
@@ -582,7 +547,7 @@
     
     library1.deleted = YES;
     
-    // FIXME: UKObjectsEqual([NSSet set], [[photo1 rootObject] valueForKeyPath: @"parentCollections.label"]);
+	UKObjectsEqual([NSSet set], [[photo1 rootObject] valueForKeyPath: @"parentCollections.label"]);
     
     [ctx commit];
 }
@@ -671,22 +636,27 @@
     
     library1.deleted = YES;
     [ctx commit];
-    
+	
+	
 	// FIXME: Currently fails for the isNewContext==NO case
 #if 0
-	[self testPersistentRootWithExistingAndNewContext: photo1
-											  inBlock: ^(COEditingContext *ctx2, COPersistentRoot *photo1ctx2, COBranch *testBranch, BOOL isNewContext)
+	[self checkPersistentRootWithExistingAndNewContext: photo1
+											   inBlock: ^(COEditingContext *ctx2, COPersistentRoot *photo1ctx2, COBranch *testBranch, BOOL isNewContext)
 	 {
         UKFalse([[photo1ctx2 objectGraphContext] hasChanges]);
         UKObjectsEqual([NSSet set], [[photo1ctx2 rootObject] valueForKeyPath: @"parentCollections.label"]);
         
         // Undelete library1, which should restore the cross-root inverse relationship
-        
-        COPersistentRoot *library1ctx2 = [[ctx2 deletedPersistentRoots] anyObject];
-        [library1ctx2 setDeleted: NO];
+		
+		// Check the -deletedPersistentRoots property
+		NSSet *deletedProots = [ctx2 deletedPersistentRoots];
+		UKIntsEqual(1, [deletedProots count]);
+        COPersistentRoot *library1ctx2 = [deletedProots anyObject];
+		UKObjectsEqual([library1 UUID], [library1ctx2 UUID]);
+        //[library1ctx2 setDeleted: NO];
 
-        UKFalse([[photo1ctx2 objectGraphContext] hasChanges]);
-        //FIXME: UKObjectsEqual(S(@"photo1"), [[photo1ctx2 rootObject] valueForKeyPath: @"parentCollections.label"]);
+        //UKFalse([[photo1ctx2 objectGraphContext] hasChanges]);
+        //UKObjectsEqual(S(@"library1"), [[photo1ctx2 rootObject] valueForKeyPath: @"parentCollections.label"]);
 	 }];
 #endif
 }
