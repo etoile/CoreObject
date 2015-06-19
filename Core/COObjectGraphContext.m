@@ -638,7 +638,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (void)markObjectAsUpdated: (COObject *)obj forProperty: (NSString *)aProperty
 {
-	if (_ignoresChangeTrackingNotifications)
+	if (ignoresChangeTrackingNotifications)
 		return;
 
 	ETUUID *uuid = obj.UUID;
@@ -852,6 +852,8 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	return [deadRelationshipCache referringObjectsForPath: pathToUndeletedObject].setRepresentation;
 }
 
+static BOOL ignoresChangeTrackingNotifications = NO;
+
 /**
  * This method is called on every object graph containing one or more referring 
  * objects (the relationship sources) whose properties needs to be updated to 
@@ -883,20 +885,13 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 		referringObjects = [[anObject incomingRelationshipCache] referringObjects];
 	}
 
-	//_ignoresChangeTrackingNotifications = YES;
+	ignoresChangeTrackingNotifications = YES;
 	for (COObject *referrer in referringObjects)
 	{
-		/* The dead relationship cache tracks referring objects that exist 
-		   in the tracking branch and current branch, but the current branch 
-		   object graph won't be fixed. If both object graphs were changed,
-		   an exception would be raised at commit time. */
-		if (referrer.objectGraphContext == referrer.persistentRoot.currentBranch.objectGraphContext)
-			continue;
-
 		[referrer replaceReferencesToObjectIdenticalTo: anObject
 											withObject: aReplacement];
 	}
-	//_ignoresChangeTrackingNotifications = NO;
+	ignoresChangeTrackingNotifications = NO;
 }
 
 - (COItemGraph *)modifiedItemsSnapshot

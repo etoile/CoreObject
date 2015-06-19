@@ -362,6 +362,11 @@
  * (e.g. isTargetDeletion comment).</item>
  * </list>
  *
+ * IMPORTANT: This method must never result in new changes to be committed, 
+ * since it replaces object references in memory, but doesn't change any item
+ * graphs (the references inside each COItem remain identical). Requiring no 
+ * commits means the references can be fixed in both tracking and current branches.
+ *
  * See also -[COPersistentRoot setCurrentBranchObjectGraphToRevisionUUID:persistentRootUUID:].
  */
 - (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot
@@ -378,8 +383,8 @@
 		if (persistentRoot == aPersistentRoot)
 			continue;
 		
-		// TODO: Use -objectGraphWithoutUnfaulting to prevent loading every
-		// object graph contexts we check
+		// TODO: Use -objectGraphWithoutUnfaulting or -allObjectGraphContexts to
+		// prevent loading every object graph contexts we check
 
 		/* Fix references pointing to any branch that belong to the deleted 
 		   persistent root (the relationship target) */
@@ -394,9 +399,6 @@
 			targetObjectGraphs =
 				[(id)[[aPersistentRoot.branches mappedCollection] objectGraphContext] mutableCopy];
 
-			/* Fixed branches include the tracking branch but not the current 
-			   branch (committing changes in both at the same time is not allowed) */
-			[(NSMutableSet *)targetObjectGraphs removeObject: aPersistentRoot.currentBranch.objectGraphContext];
 			[(NSMutableSet *)targetObjectGraphs addObject: aPersistentRoot.objectGraphContext];
 		}
 
@@ -412,9 +414,7 @@
 			NSMutableSet *sourceObjectGraphs =
 				[(id)[[persistentRoot.branches mappedCollection] objectGraphContext] mutableCopy];
 
-			/* Fixed branches include the tracking branch but not the current
-			   branch (committing changes in both at the same time is not allowed) */
-			[sourceObjectGraphs removeObject: persistentRoot.currentBranch.objectGraphContext];
+
 			[sourceObjectGraphs addObject: persistentRoot.objectGraphContext];
 
 			for (COObjectGraphContext *source in sourceObjectGraphs)
