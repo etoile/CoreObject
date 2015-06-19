@@ -439,7 +439,6 @@
 									 error: NULL];
 
     // Finalized deletion, reference should be hidden
-    // FIXME: Currently failing with an assertion failure
     [self checkPersistentRootWithExistingAndNewContext: library1
                                                inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
      {
@@ -585,8 +584,6 @@
     
     // Add photo2 inner item. Note that the photo1 cross-persistent-root reference is
     // still present in library1.contents, it's just hidden.
-    // FIXME: That is the part that's difficult to implement and not currently implemented.
-	// See comment in -[COObject updateOutgoingSerializedRelationshipCacheForProperty]
 	
     COObject *photo2 = [[library1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     [photo2 setValue: @"photo2" forProperty: @"label"];
@@ -607,9 +604,8 @@
         COPersistentRoot *photo1ctx2 = [[ctx2 deletedPersistentRoots] anyObject];
         [photo1ctx2 setDeleted: NO];
         
-		// FIXME: Currently broken, see comment in -[COObject updateCrossPersistentRootReferences]
-        //UKFalse([[library1ctx2 objectGraphContext] hasChanges]);
-       // UKObjectsEqual(S(@"photo1", @"photo2"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
+        UKFalse([[library1ctx2 objectGraphContext] hasChanges]);
+        UKObjectsEqual(S(@"photo1", @"photo2"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
 	 }];
 }
 
@@ -639,6 +635,7 @@
 	
 	
 	// FIXME: Currently fails for the isNewContext==NO case
+	// Caused by https://github.com/etoile/CoreObject/issues/20
 #if 0
 	[self checkPersistentRootWithExistingAndNewContext: photo1
 											   inBlock: ^(COEditingContext *ctx2, COPersistentRoot *photo1ctx2, COBranch *testBranch, BOOL isNewContext)
