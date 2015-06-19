@@ -659,15 +659,19 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 						  || COTypePrimitivePart(type) == kCOTypeCompositeReference);
 		/* Look up a inner object reference in the receiver persistent root */
 		object = [[self objectGraphContext] objectReferenceWithUUID: value];
+		ETAssert(object != nil);
 	}
 	else /* COPath */
 	{
 		NSParameterAssert(COTypePrimitivePart(type) == kCOTypeReference);
 		object = [[[self persistentRoot] parentContext] crossPersistentRootReferenceWithPath: (COPath *)value];
+		/* object may be nil for dead reference */
 	}
 
-	ETAssert(object != nil);
-	ETAssert([[object entityDescription] isKindOfEntity: [aPropertyDesc persistentType]]);
+	if (object != nil)
+	{
+		ETAssert([[object entityDescription] isKindOfEntity: [aPropertyDesc persistentType]]);
+	}
 	
 	return object;
 }

@@ -447,16 +447,10 @@
 	ETUUID *branchUUID = [aPath branch];
 
 	COPersistentRoot *persistentRoot = [self persistentRootForUUID: persistentRootUUID];
-	// FIXME: We will need to handle the case where a reference points to a
-	// persistent root that has been permanently deleted from the store,
-	// perhaps by allocating a placeholder "broken link" persistent root.
-    ETAssert(persistentRoot != nil);
-	
-	if (branchUUID != nil)
+
+if (branchUUID != nil)
 	{
 		COBranch *branch = [persistentRoot branchForUUID: branchUUID];
-		// FIXME: Again, this is a simplification, should handle broken refs.
-		ETAssert(branch != nil);
 		
 		return [branch rootObject];
 	}
