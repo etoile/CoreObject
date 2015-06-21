@@ -33,12 +33,26 @@
 	}
 }
 
+/* Only show the most recent nodes. Was getting stack overflows in the 
+   graph layout code. Need to rewrite it to be non-recursive some time... */
+#define MAX_NODES 200
+
 - (void) buildtrackNodesChronological
 {
 	ETAssert(self.delegate != nil);
-
-	trackNodesChronological =
-		[NSArray arrayWithArray: [self.delegate allOrderedNodesToDisplayForTrack: track]];
+	
+	NSArray *all = [self.delegate allOrderedNodesToDisplayForTrack: track];
+	
+	if ([all count] > MAX_NODES)
+	{
+		trackNodesChronological = [all subarrayWithRange: NSMakeRange(0, MAX_NODES)];
+	}
+	else
+	{
+		trackNodesChronological = [NSArray arrayWithArray: all];
+	}
+	
+	uuids = [NSSet setWithArray: (NSArray *)[[trackNodesChronological mappedCollection] UUID]];
 }
 
 - (void) buildRowIndexForUUID
@@ -60,16 +74,27 @@
 - (NSArray *)parentUUIDsForRevisionUUID: (ETUUID *)aUUID
 {
 	id<COTrackNode> aCommit = revisionInfoForUUID[aUUID];
-	ETAssert(aCommit != nil);
+	if (aCommit == nil)
+	{
+		return @[];
+	}
 	
 	NSMutableArray *result = [NSMutableArray new];
 	if ([aCommit parentNode] != nil)
 	{
-		[result addObject: [[aCommit parentNode] UUID]];
+		/* Only include the parent if it's in the set of nodes we're rendering */
+		if ([uuids containsObject:[[aCommit parentNode] UUID]])
+		{
+			[result addObject: [[aCommit parentNode] UUID]];
+		}
 	}
 	if ([aCommit mergeParentNode] != nil)
 	{
-		[result addObject: [[aCommit mergeParentNode] UUID]];
+		/* Only include the parent if it's in the set of nodes we're rendering */
+		if ([uuids containsObject:[[aCommit mergeParentNode] UUID]])
+		{
+			[result addObject: [[aCommit mergeParentNode] UUID]];
+		}
 	}
 	return result;
 }

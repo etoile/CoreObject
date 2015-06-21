@@ -15,6 +15,7 @@
 
 @interface EWGraphRenderer : NSObject
 {
+	NSSet *uuids;
 	NSArray *trackNodesChronological;
 	NSMutableDictionary *rowIndexForUUID;
 	NSMutableDictionary *revisionInfoForUUID;
