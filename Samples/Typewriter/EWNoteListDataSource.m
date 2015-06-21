@@ -43,6 +43,11 @@
     {
         return persistentRoot.modificationDate;
     }
+    else if ([[tableColumn identifier] isEqual: @"tags"])
+    {
+         return [persistentRoot.rootObject tagDescription];
+    }
+
     return nil;
 }
 
