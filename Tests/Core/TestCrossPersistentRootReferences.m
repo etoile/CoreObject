@@ -394,7 +394,7 @@
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [photo1 commit];
-    
+
     COBranch *branchA = [photo1 currentBranch];
     COBranch *branchB = [branchA makeBranchWithLabel: @"branchB"];
     [branchB.rootObject setLabel: @"photo1, branch B"];
@@ -406,54 +406,74 @@
     /* This creates a reference to branch B of photo1. */
 	[[library1 rootObject] addObject: branchB.rootObject];
     [ctx commit];
+    
+    // Valid reference should be visible in existing and new context
+    [self checkPersistentRootWithExistingAndNewContext: library1
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsEqual(S(@"photo1, branch B"), [[[[testProot rootObject] contents] mappedCollection] label]);
+     }];
 
 	branchB.deleted = YES;
+    
+    // Uncommitted deletion, reference should be hidden in current context but visible in a new one
+    [self checkPersistentRootWithExistingAndNewContext: library1
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         if (isNewContext)
+             UKObjectsEqual(S(@"photo1, branch B"), [[[[testProot rootObject] contents] mappedCollection] label]);
+         else
+             UKObjectsEqual(S(), [[[[testProot rootObject] contents] mappedCollection] label]);
+     }];
+    
     [ctx commit];
 	
+    // Committed deletion, reference should be hidden
+    [self checkPersistentRootWithExistingAndNewContext: library1
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsEqual(S(), [[[[testProot rootObject] contents] mappedCollection] label]);
+     }];
+    
 	[store finalizeDeletionsForPersistentRoot: [photo1 UUID]
 									 error: NULL];
-	
-	// TODO: The persistent root should notice that the branch was permanently
-	// deleted, and move the COObjectGraphContext to a CODeletedBranch
-	// (but the COObject pointer to the root object remains valid.)
-	//
-	// 4 cases:
-	// - loaded in memory -> root broken reference in memory, deleted
-	// - not in memory -> root broken reference in memory, deleted
-	// - root broken reference in memory, deleted -> restored from backup (?)
-	// - not in memory -> loaded in memory (regular case)
+
+    // Finalized deletion, reference should be hidden
+    [self checkPersistentRootWithExistingAndNewContext: library1
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsEqual(S(), [[[[testProot rootObject] contents] mappedCollection] label]);
+     }];
 }
 
-#if 0
 - (void) testMultipleRelationshipsPerObject
 {
     // tag1 <<persistent root>>
 	//  |
 	//  \--photo1 // content property, cross-persistent-root link
 	//  |
-	//  \--tag2 // childTags property, cross-persistent-root link
+	//  \--photo2 // content property, cross-persistent-root link
 	//
 	// photo1 <<persistent root>>
     //
-	// tag2 <<persistent root>>
+	// photo2 <<persistent root>>
 	//
-    // Test the effect of deleting photo1 (tag2 should continue to work)
+    // Test the effect of deleting photo1 (photo2 should continue to work)
     
     COPersistentRoot *tag1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-    COPersistentRoot *tag2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
 	COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	
-	[[[tag1 rootObject] mutableSetValueForKey: @"contents"] addObject: [photo1 rootObject]];
-	// FIXME: Illegal, makes a compoiste cross-reference
-	[[[tag1 rootObject] mutableSetValueForKey: @"childTags"] addObject: [tag2 rootObject]];
+    COPersistentRoot *photo2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+
+	NSMutableSet *tag1ContentsProxy = [[tag1 rootObject] mutableSetValueForKey: @"contents"];
+	[tag1ContentsProxy addObject: [photo1 rootObject]];
+	[tag1ContentsProxy addObject: [photo2 rootObject]];
 	
 	[ctx commit];
 	
 	[self checkPersistentRootWithExistingAndNewContext: tag1
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(S([[photo1 rootObject] UUID]), [[[[testProot rootObject] contents] mappedCollection] UUID]);
-		 UKObjectsEqual(S([[tag2 rootObject] UUID]), [[[[testProot rootObject] childTags] mappedCollection] UUID]);
+		 UKObjectsEqual(S([[photo1 rootObject] UUID], [[photo2 rootObject] UUID]), [[[[testProot rootObject] contents] mappedCollection] UUID]);
 	 }];
 	
 	photo1.deleted = YES;
@@ -462,42 +482,9 @@
 	[self checkPersistentRootWithExistingAndNewContext: tag1
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(S([[photo1 rootObject] UUID]), [[[[testProot rootObject] contents] mappedCollection] UUID]);
-		 UKObjectsEqual(S([[tag2 rootObject] UUID]), [[[[testProot rootObject] childTags] mappedCollection] UUID]);
+		 UKObjectsEqual(S([[photo2 rootObject] UUID]), [[[[testProot rootObject] contents] mappedCollection] UUID]);
 	 }];
 }
-
-- (void) testMultipleRelationshipsPerObject2
-{
-    COPersistentRoot *tag1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-    COPersistentRoot *tag2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-	COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-
-	// Same as last test but order of these two statements is swapped
-	// FIXME: Illegal, makes a composite cross reference
-	[[[tag1 rootObject] mutableSetValueForKey: @"childTags"] addObject: [tag2 rootObject]];
-	[[[tag1 rootObject] mutableSetValueForKey: @"contents"] addObject: [photo1 rootObject]];
-	
-	[ctx commit];
-	
-	[self checkPersistentRootWithExistingAndNewContext: tag1
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKObjectsEqual(S([[photo1 rootObject] UUID]), [[[[testProot rootObject] contents] mappedCollection] UUID]);
-		 UKObjectsEqual(S([[tag2 rootObject] UUID]), [[[[testProot rootObject] childTags] mappedCollection] UUID]);
-	 }];
-	
-	photo1.deleted = YES;
-	[ctx commit];
-	
-	[self checkPersistentRootWithExistingAndNewContext: tag1
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKObjectsEqual(S([[photo1 rootObject] UUID]), [[[[testProot rootObject] contents] mappedCollection] UUID]);
-		 UKObjectsEqual(S([[tag2 rootObject] UUID]), [[[[testProot rootObject] childTags] mappedCollection] UUID]);
-	 }];
-}
-#endif
 
 - (void) testPersistentRootDeletion
 {
@@ -526,7 +513,7 @@
     
     photo1.deleted = YES;
     
-    // FIXME: UKObjectsEqual([NSSet set], [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual([NSSet set], [[library1 rootObject] valueForKeyPath: @"contents.label"]);
     
     [ctx commit];
 }
@@ -559,7 +546,7 @@
     
     library1.deleted = YES;
     
-    // FIXME: UKObjectsEqual([NSSet set], [[photo1 rootObject] valueForKeyPath: @"parentCollections.label"]);
+	UKObjectsEqual([NSSet set], [[photo1 rootObject] valueForKeyPath: @"parentCollections.label"]);
     
     [ctx commit];
 }
@@ -593,18 +580,16 @@
     photo1.deleted = YES;
     [ctx commit];
     
-    UKObjectsEqual(S(@"photo1"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(S(), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
     
     // Add photo2 inner item. Note that the photo1 cross-persistent-root reference is
     // still present in library1.contents, it's just hidden.
-    // FIXME: That is the part that's difficult to implement and not currently implemented.
-	// See comment in -[COObject updateOutgoingSerializedRelationshipCacheForProperty]
 	
     COObject *photo2 = [[library1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     [photo2 setValue: @"photo2" forProperty: @"label"];
     [[library1 rootObject] addObject: photo2];
     
-    UKObjectsEqual(S(@"photo1", @"photo2"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(S(@"photo2"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
     
     [ctx commit];
     
@@ -612,15 +597,14 @@
 											  inBlock: ^(COEditingContext *ctx2, COPersistentRoot *library1ctx2, COBranch *testBranch, BOOL isNewContext)
 	 {
         UKFalse([[library1ctx2 objectGraphContext] hasChanges]);
-        UKObjectsEqual(S(@"photo1", @"photo2"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
+        UKObjectsEqual(S(@"photo2"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
         
         // Undelete photo1, which should restore the cross-root relationship
         
         COPersistentRoot *photo1ctx2 = [[ctx2 deletedPersistentRoots] anyObject];
         [photo1ctx2 setDeleted: NO];
         
-		// FIXME: Currently broken, see comment in -[COObject updateCrossPersistentRootReferences]
-        //UKFalse([[library1ctx2 objectGraphContext] hasChanges]);
+        UKFalse([[library1ctx2 objectGraphContext] hasChanges]);
         UKObjectsEqual(S(@"photo1", @"photo2"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
 	 }];
 }
@@ -648,22 +632,28 @@
     
     library1.deleted = YES;
     [ctx commit];
-    
+	
+	
 	// FIXME: Currently fails for the isNewContext==NO case
+	// Caused by https://github.com/etoile/CoreObject/issues/20
 #if 0
-	[self testPersistentRootWithExistingAndNewContext: photo1
-											  inBlock: ^(COEditingContext *ctx2, COPersistentRoot *photo1ctx2, COBranch *testBranch, BOOL isNewContext)
+	[self checkPersistentRootWithExistingAndNewContext: photo1
+											   inBlock: ^(COEditingContext *ctx2, COPersistentRoot *photo1ctx2, COBranch *testBranch, BOOL isNewContext)
 	 {
         UKFalse([[photo1ctx2 objectGraphContext] hasChanges]);
         UKObjectsEqual([NSSet set], [[photo1ctx2 rootObject] valueForKeyPath: @"parentCollections.label"]);
         
         // Undelete library1, which should restore the cross-root inverse relationship
-        
-        COPersistentRoot *library1ctx2 = [[ctx2 deletedPersistentRoots] anyObject];
-        [library1ctx2 setDeleted: NO];
+		
+		// Check the -deletedPersistentRoots property
+		NSSet *deletedProots = [ctx2 deletedPersistentRoots];
+		UKIntsEqual(1, [deletedProots count]);
+        COPersistentRoot *library1ctx2 = [deletedProots anyObject];
+		UKObjectsEqual([library1 UUID], [library1ctx2 UUID]);
+        //[library1ctx2 setDeleted: NO];
 
-        UKFalse([[photo1ctx2 objectGraphContext] hasChanges]);
-        //FIXME: UKObjectsEqual(S(@"photo1"), [[photo1ctx2 rootObject] valueForKeyPath: @"parentCollections.label"]);
+        //UKFalse([[photo1ctx2 objectGraphContext] hasChanges]);
+        //UKObjectsEqual(S(@"library1"), [[photo1ctx2 rootObject] valueForKeyPath: @"parentCollections.label"]);
 	 }];
 #endif
 }

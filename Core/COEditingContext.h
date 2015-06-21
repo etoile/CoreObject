@@ -10,7 +10,7 @@
 #import <CoreObject/COPersistentObjectContext.h>
 
 @class COSQLiteStore, COEditingContext, COPersistentRoot, COBranch, COObjectGraphContext, COObject;
-@class COUndoTrack, COCommandGroup, CORevisionCache;
+@class COUndoTrack, COCommandGroup, COCrossPersistentRootDeadRelationshipCache, CORevisionCache;
 @class COError;
 
 /**
@@ -129,6 +129,7 @@
 	NSMutableSet *_persistentRootsPendingDeletion;
     /** Set of persistent roots pending undeletion */
 	NSMutableSet *_persistentRootsPendingUndeletion;
+	COCrossPersistentRootDeadRelationshipCache *_deadRelationshipCache;
     /** Undo */
     BOOL _isRecordingUndo;
     COCommandGroup *_currentEditGroup;

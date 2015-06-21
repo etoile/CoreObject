@@ -53,7 +53,28 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
  * metadatas and returns the resulting revision.
  */
 - (void) saveCommitWithMetadata: (NSDictionary *)metadata transaction: (COStoreTransaction *)txn;
-
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * We must clear the branch status as late as possible to ensure the
+ * deserialization code can decide whether references to another persistent root 
+ * are alive or dead at any time during the commit.
+ *
+ * If we clear the branch status too early when preparing a persistent root
+ * commit is done with -saveCommitWithMetadata:transaction:, then this branch 
+ * will appear with an opposite status when the deserialization code checks it
+ * with -[COBranch isDeleted] (the deserialization being requested by another
+ * persistent root processed afterwards in the same commit).
+ *
+ * This situation will arise when cross persistent root references updated 
+ * usually on the initial status change, are updated in the current branch at
+ * commit time. The commit code applies the tracking branch item graph
+ * containing the fixed references to the non-tracking current branch. For 
+ * updating cross persistent root references at commit time, each branch will
+ * access other persistent roots and branches, and this requires to maintain a 
+ * coherent view until the store transaction is constructed.
+ */
+- (void)clearBranchesPendingDeletionAndUndeletion;
 - (COPersistentRootInfo *) persistentRootInfo;
 
 - (void)didMakeNewCommit;

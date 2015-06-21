@@ -106,9 +106,15 @@
 		609CB4D21A5E9384003E8052 /* COTopologicalSort.m in Sources */ = {isa = PBXBuildFile; fileRef = 609CB4CE1A5E9384003E8052 /* COTopologicalSort.m */; };
 		60AA7EB11A641FCD00897498 /* COSchemaMigrationDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 60FA55DE1A447A8600A2D8A7 /* COSchemaMigrationDriver.h */; };
 		60AA7EBC1A641FDE00897498 /* COSchemaMigrationDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 60FA55DF1A447A8600A2D8A7 /* COSchemaMigrationDriver.m */; };
+		60AD2F521B0A5BB000A9F473 /* TestPrimitiveCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 60AD2F511B0A5BB000A9F473 /* TestPrimitiveCollection.m */; };
+		60AD2F531B0A5BB000A9F473 /* TestPrimitiveCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 60AD2F511B0A5BB000A9F473 /* TestPrimitiveCollection.m */; };
 		60B1568D19B860C8006D5EEF /* COUndoTrackStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE29317C07ED800E729F5 /* COUndoTrackStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60B1568E19B861BF006D5EEF /* COEditingContext+Debugging.h in Headers */ = {isa = PBXBuildFile; fileRef = 601FD94418893ED50002F957 /* COEditingContext+Debugging.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60B1568F19B861D3006D5EEF /* COObjectGraphContext+Debugging.h in Headers */ = {isa = PBXBuildFile; fileRef = 66A00A18187DDB6A005CFE16 /* COObjectGraphContext+Debugging.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60B58E681B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 60B58E661B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.h */; };
+		60B58E691B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 60B58E661B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.h */; };
+		60B58E6A1B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 60B58E671B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.m */; };
+		60B58E6B1B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 60B58E671B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.m */; };
 		60B84C081A6E6F5F00418128 /* COTrackViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 60B84C061A6E6F5F00418128 /* COTrackViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60B84C091A6E6F5F00418128 /* COTrackViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60B84C071A6E6F5F00418128 /* COTrackViewController.m */; };
 		60C81D0B195DA82200AEEC68 /* COClassToString.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C81D0A195DA82200AEEC68 /* COClassToString.m */; };
@@ -1030,8 +1036,11 @@
 		609CB4BE1A5D8380003E8052 /* COModelElementMove.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COModelElementMove.m; path = SchemaMigration/COModelElementMove.m; sourceTree = SOURCE_ROOT; };
 		609CB4CD1A5E9384003E8052 /* COTopologicalSort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COTopologicalSort.h; path = Utilities/COTopologicalSort.h; sourceTree = "<group>"; };
 		609CB4CE1A5E9384003E8052 /* COTopologicalSort.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COTopologicalSort.m; path = Utilities/COTopologicalSort.m; sourceTree = "<group>"; };
+		60AD2F511B0A5BB000A9F473 /* TestPrimitiveCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestPrimitiveCollection.m; sourceTree = "<group>"; };
 		60B1D3F919791F8800ACAC9C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		60B1D3FB19791F9400ACAC9C /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/usr/lib/libsqlite3.dylib; sourceTree = DEVELOPER_DIR; };
+		60B58E661B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCrossPersistentRootDeadRelationshipCache.h; path = Core/COCrossPersistentRootDeadRelationshipCache.h; sourceTree = "<group>"; };
+		60B58E671B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCrossPersistentRootDeadRelationshipCache.m; path = Core/COCrossPersistentRootDeadRelationshipCache.m; sourceTree = "<group>"; };
 		60B84C061A6E6F5F00418128 /* COTrackViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COTrackViewController.h; path = Extras/HistoryView/UIKit/COTrackViewController.h; sourceTree = SOURCE_ROOT; };
 		60B84C071A6E6F5F00418128 /* COTrackViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COTrackViewController.m; path = Extras/HistoryView/UIKit/COTrackViewController.m; sourceTree = SOURCE_ROOT; };
 		60C81D0A195DA82200AEEC68 /* COClassToString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COClassToString.m; sourceTree = "<group>"; };
@@ -1793,6 +1802,8 @@
 		66457FEE17E968F1003C51A8 /* Private */ = {
 			isa = PBXGroup;
 			children = (
+				60B58E661B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.h */,
+				60B58E671B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.m */,
 				60EBC199184CA38200F751F5 /* COPrimitiveCollection.h */,
 				60EBC19A184CA38200F751F5 /* COPrimitiveCollection.m */,
 				6609485D1787A1160049468B /* CORelationshipCache.h */,
@@ -2126,6 +2137,7 @@
 				66E40D351836D08D00E5B4A7 /* TestObjectGraphContext.m */,
 				66E40D361836D08D00E5B4A7 /* TestObjectUpdate.m */,
 				66E40D371836D08D00E5B4A7 /* TestPersistentRoot.m */,
+				60AD2F511B0A5BB000A9F473 /* TestPrimitiveCollection.m */,
 				66E40D381836D08D00E5B4A7 /* TestRevisionNumber.m */,
 				6660B3951839522B009007FD /* TestSerialization.m */,
 			);
@@ -2485,6 +2497,7 @@
 				60E08D0619792FFA00D1B7AD /* COLibrary.h in Headers */,
 				60E08D5019792FFA00D1B7AD /* COObjectGraphContext+Private.h in Headers */,
 				60E08D0A19792FFA00D1B7AD /* COError.h in Headers */,
+				60B58E691B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.h in Headers */,
 				60E08D0919792FFA00D1B7AD /* COBranch.h in Headers */,
 				60E08D5319792FFA00D1B7AD /* COCommandSetPersistentRootMetadata.h in Headers */,
 				60E08D1519792FFA00D1B7AD /* CORelationshipCache.h in Headers */,
@@ -2544,6 +2557,7 @@
 				66BDC4B017B6ED27003B0EDA /* COPersistentRootInfo.h in Headers */,
 				66D96CB9178B717200D1553C /* COBinaryWriter.h in Headers */,
 				66D96CC0178B717200D1553C /* CORevisionInfo.h in Headers */,
+				60B58E681B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.h in Headers */,
 				66D96CC2178B717200D1553C /* COSearchResult.h in Headers */,
 				66D96CC4178B717200D1553C /* COSQLiteStore.h in Headers */,
 				66D96CC6178B717200D1553C /* COSQLiteStore+Attachments.h in Headers */,
@@ -3147,6 +3161,7 @@
 				60E08CB019792F4600D1B7AD /* COSearchResult.m in Sources */,
 				60882F1B197D50C000484033 /* COObjectToArchivedData.m in Sources */,
 				60E08CB119792F4600D1B7AD /* COSQLiteStore.m in Sources */,
+				60B58E6B1B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.m in Sources */,
 				60E08CAE19792F4600D1B7AD /* COItem+Binary.m in Sources */,
 				60E08CEF19792F4600D1B7AD /* COStoreSetCurrentRevision.m in Sources */,
 				60E08CED19792F4600D1B7AD /* COStoreSetCurrentBranch.m in Sources */,
@@ -3238,6 +3253,7 @@
 				60F91EE0197D324B009F47D7 /* TestHistoryTrack.m in Sources */,
 				60F91EE4197D324B009F47D7 /* TestUndoTrack.m in Sources */,
 				60F91F31197D32E2009F47D7 /* UnivaluedAttributeModel.m in Sources */,
+				60AD2F531B0A5BB000A9F473 /* TestPrimitiveCollection.m in Sources */,
 				60F91F25197D32E2009F47D7 /* OrderedGroupNoOpposite.m in Sources */,
 				60F91EFC197D3282009F47D7 /* TestCrossPersistentRootReferences.m in Sources */,
 				60F91F04197D3282009F47D7 /* TestRevisionNumber.m in Sources */,
@@ -3409,6 +3425,7 @@
 				66457FB817E8BFE5003C51A8 /* COStoreCreatePersistentRoot.m in Sources */,
 				66457FBA17E8BFE5003C51A8 /* COStoreDeleteBranch.m in Sources */,
 				66457FBC17E8BFE5003C51A8 /* COStoreDeletePersistentRoot.m in Sources */,
+				60B58E6A1B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.m in Sources */,
 				663E9BA0182B85790083AC46 /* COSynchronizerPersistentRootInfoToClientMessage.m in Sources */,
 				66457FBE17E8BFE5003C51A8 /* COStoreSetBranchMetadata.m in Sources */,
 				66457FC017E8BFE5003C51A8 /* COStoreSetCurrentBranch.m in Sources */,
@@ -3497,6 +3514,7 @@
 				66E40D761836D08E00E5B4A7 /* TestHistoryTrack.m in Sources */,
 				66E451D917CC565200205679 /* Tag.m in Sources */,
 				66EEB2B7186D3CBA003695E6 /* TestItemGraph.m in Sources */,
+				60AD2F521B0A5BB000A9F473 /* TestPrimitiveCollection.m in Sources */,
 				66E40D6D1836D08D00E5B4A7 /* TestSQLiteStoreErrorHandling.m in Sources */,
 				66E40D741836D08E00E5B4A7 /* TestSynchronizerMultiUser.m in Sources */,
 				6610115B184D8B9E001A3E24 /* UnorderedGroupNoOpposite.m in Sources */,

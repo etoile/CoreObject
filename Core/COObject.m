@@ -15,6 +15,7 @@
 #import "COBranch+Private.h"
 #import "COObject+RelationshipCache.h"
 #import "COObject+Private.h"
+#import "COCrossPersistentRootDeadRelationshipCache.h"
 #import "COPrimitiveCollection.h"
 #import "CORelationshipCache.h"
 #import "COSQLiteStore.h"
@@ -22,6 +23,7 @@
 #import "COGroup.h"
 #import "COObjectGraphContext.h"
 #import "COObjectGraphContext+Private.h"
+#import "COPath.h"
 #import "COSerialization.h"
 #import "COEditingContext+Private.h"
 #import "CORevision.h"
@@ -342,6 +344,15 @@ See +[NSObject typePrefix]. */
 	return [self initWithObjectGraphContext: aContext];
 }
 
+- (void)dealloc
+{
+	COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
+		self.editingContext.deadRelationshipCache;
+
+	ETAssert(!self.isPersistent || deadRelationshipCache != nil);
+	[deadRelationshipCache removeReferringObject: self];
+}
+
 // TODO: Maybe add convenience copying method, - (COObject *) copyWithCopier: (COCopier *)aCopier
 // where the copier stores the state relating to copying, e.g. which context to copy into.
 
@@ -583,7 +594,9 @@ See +[NSObject typePrefix]. */
 	}
 	else
 	{
-		ETAssert([self isEditingContextValidForObject: (COObject *)value]);
+		BOOL isDeadRef = [value isKindOfClass: [COPath class]];
+
+		ETAssert(isDeadRef || [self isEditingContextValidForObject: (COObject *)value]);
 	}
 }
 
@@ -605,8 +618,10 @@ See +[NSObject typePrefix]. */
 	}
 	else
 	{
-		ETAssert([self isObjectGraphContextValidForObject: (COObject *)value
-		                              propertyDescription: propertyDesc]);
+		BOOL isDeadRef = [value isKindOfClass: [COPath class]];
+
+		ETAssert(isDeadRef || [self isObjectGraphContextValidForObject: (COObject *)value
+		                                           propertyDescription: propertyDesc]);
 	}
 }
 
@@ -807,6 +822,31 @@ See +[NSObject typePrefix]. */
 	{
 		return ((COWeakRef *)value)->_object;
 	}
+	if ([value isKindOfClass: [COPath class]])
+	{
+		return nil;
+	}
+	
+	return value;
+}
+
+- (id)serializableValueForVariableStorageKey: (NSString *)key
+{
+	// NOTE: This is just a debugging aid, and the check is only placed
+	// here because -valueForVariableStorageKey: is a commonly called method.
+	[self checkIsNotRemovedFromContext];
+
+	id value = _variableStorage[key];
+	
+	// Convert value stored in variable storage to a form we can return to the user
+	if (value == [NSNull null])
+	{
+		return nil;
+	}
+	if ([value isKindOfClass: [COWeakRef class]])
+	{
+		return ((COWeakRef *)value)->_object;
+	}
 	
 	return value;
 }
@@ -816,33 +856,58 @@ See +[NSObject typePrefix]. */
 	return [aCollection conformsToProtocol: @protocol(COPrimitiveCollection)];
 }
 
-- (id)mutableCollectionWithCollection: (id)aCollection
-                  propertyDescription: (ETPropertyDescription *)propDesc
+/**
+ * The collection to be updated is either:
+ *
+ * - a COMutableArray/Set/Dictionary, when the property is persistent
+ * - a NSMutableArray/Set/Dictionary, when the property is transient.
+ *
+ * Note: the returned collection class must be identical to the first collection 
+ * argument.
+ */
+- (id)replaceContentOfCollection: (id)collection
+                  withCollection: (id)content
+             propertyDescription: (ETPropertyDescription *)propDesc
 {
-	Class collectionClass = Nil;
-	id collection = nil;
+	NSParameterAssert(collection != nil);
+	
+	/* At deserialization, we receive primitive collections containing dead
+	   references we don't want to lost.
+	   Collection content setter such as -[COMutableArray setArray:] ignores all
+	   dead references that could exist in the collection passed in argument.
 
-	if ([propDesc isPersistent])
+	   We also return a copy in case someone later update the property with a
+	   COPrimitiveCollection that wasn't instantiated by the receiver (we could 
+	   bypass this step during the deserialization as an optimization). */
+	if ([self isCoreObjectCollection: content])
+		return [content copy];
+
+	if ([self isCoreObjectCollection: collection])
 	{
-		collectionClass = [self coreObjectCollectionClassForPropertyDescription: propDesc];
-	}
-	else
-	{
-		collectionClass = [[self collectionClassForPropertyDescription: propDesc] mutableClass];
+		[collection setMutable: YES];
 	}
 
 	if ([propDesc isKeyed])
 	{
-		collection = [[collectionClass alloc] initWithDictionary: aCollection];
+		[(NSMutableDictionary *)collection setDictionary: content];
 	}
 	else if ([propDesc isOrdered])
 	{
-		collection = [[collectionClass alloc] initWithArray: aCollection];
+		// FIXME: Remove this copy hack to ensure KVO doesn't report a old value
+		// identical to the new one.
+		collection = [collection mutableCopy];
+		[(NSMutableArray *)collection setArray: content];
 	}
 	else
 	{
-		collection = [[collectionClass alloc] initWithSet: aCollection];
+		[(NSMutableSet *)collection setSet: content];
 	}
+	
+	if ([self isCoreObjectCollection: collection])
+	{
+		[collection setMutable: NO];
+	}
+	
 	return collection;
 }
 
@@ -871,8 +936,10 @@ See +[NSObject typePrefix]. */
 	}
 	else if ([propertyDesc isMultivalued] && [self isCoreObjectCollection: aValue] == NO)
 	{
-		storageValue = [self mutableCollectionWithCollection: aValue
-		                                 propertyDescription: propertyDesc];
+		storageValue = _variableStorage[key];
+		storageValue = [self replaceContentOfCollection: storageValue
+		                                 withCollection: aValue
+		                            propertyDescription: propertyDesc];
 	}
 	else
 	{
@@ -913,12 +980,24 @@ See +[NSObject typePrefix]. */
 	return value;
 }
 
+- (id)serializableValueForStorageKey: (NSString *)key
+{
+	id value = nil;
+
+	if (ETGetInstanceVariableValueForKey(self, &value, key) == NO)
+	{
+		value = [self serializableValueForVariableStorageKey: key];
+	}
+	return value;
+}
+
 - (void)setValue: (id)value forStorageKey: (NSString *)key
 {
 	if (ETSetInstanceVariableValueForKey(self, value, key) == NO)
 	{
 		[self setValue: value forVariableStorageKey: key];
 	}
+
 }
 
 #pragma mark - Notifications to be called by Accessors
@@ -940,7 +1019,7 @@ See +[NSObject typePrefix]. */
 {
 	ETPropertyDescription *propertyDesc =
 		[_entityDescription propertyDescriptionForName: key];
-	id oldValue = [self valueForStorageKey: key];
+	id oldValue = [self serializableValueForStorageKey: key];
 
 	[self pushOldCoreObjectRelationshipValue: oldValue
 	                  forPropertyDescription: propertyDesc];
@@ -995,6 +1074,14 @@ See +[NSObject typePrefix]. */
 	}
 }
 
+- (BOOL)isValidDeadReference: (id)value
+      forPropertyDescription: (ETPropertyDescription *)propertyDesc
+{
+	return [value isKindOfClass: [COPath class]]
+		&& !propertyDesc.multivalued
+		&& [self isCoreObjectRelationship: propertyDesc];
+}
+
 - (void)  validateSingleValue: (id)singleValue
 conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 {
@@ -1008,9 +1095,11 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	ETEntityDescription *newValueEntityDesc = [self entityDescriptionForObject: singleValue];
 	ETAssert(newValueEntityDesc != nil);
 	
-	if ([[propertyDesc type] isValidValue: singleValue type: newValueEntityDesc])
+	if ([[propertyDesc type] isValidValue: singleValue type: newValueEntityDesc]
+	 || [self isValidDeadReference: singleValue forPropertyDescription: propertyDesc])
+	{
 		return;
-	
+	}
 	[NSException raise: NSInvalidArgumentException
 	            format: @"single value '%@' (entity %@) does not conform to type %@ (property %@)",
 	                    singleValue, newValueEntityDesc, [propertyDesc type], propertyDesc];
@@ -1209,7 +1298,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 - (void)commonDidChangeValueForProperty: (NSString *)key
 {
 	ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
-	id newValue = [self valueForStorageKey: key];
+	id newValue = [self serializableValueForStorageKey: key];
 	id oldValue = [self popOldCoreObjectRelationshipValueForPropertyDescription: propertyDesc];
 
 	if (propertyDesc == nil)
@@ -1472,35 +1561,95 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
  */
 - (void) replaceReferencesToObjectIdenticalTo: (COObject *)anObject withObject: (COObject *)aReplacement
 {
+	ETAssert((anObject == nil || aReplacement == nil) || (anObject != nil && aReplacement != nil));
+	id object = anObject;
+	id replacement = aReplacement;
+	BOOL isUndeletion = (anObject == nil);
+	BOOL isDeletion = (aReplacement == nil);
+	
+	if (isDeletion)
+	{
+		if (anObject.objectGraphContext.isTrackingSpecificBranch)
+		{
+			replacement = [COPath pathWithPersistentRoot: anObject.persistentRoot.UUID
+			                                      branch: anObject.branch.UUID];
+		}
+		else
+		{
+			replacement = [COPath pathWithPersistentRoot: anObject.persistentRoot.UUID];
+		}
+	}
+	else if (isUndeletion)
+	{
+		if (aReplacement.objectGraphContext.isTrackingSpecificBranch)
+		{
+			object = [COPath pathWithPersistentRoot: aReplacement.persistentRoot.UUID
+			                                 branch: aReplacement.branch.UUID];
+		}
+		else
+		{
+			object = [COPath pathWithPersistentRoot: aReplacement.persistentRoot.UUID];
+		}
+	}
+
 	for (NSString *key in [self persistentPropertyNames])
 	{
-		id value = [self valueForStorageKey: key];
-		if (value == anObject)
-		{
-			[self setValue: aReplacement forVariableStorageKey: key];
-		}
-		else if ([value isKindOfClass: [COMutableArray class]])
+		id value = [self serializableValueForStorageKey: key];
+		BOOL updated = NO;
+
+		if ([value isKindOfClass: [COMutableArray class]])
 		{
 			COMutableArray *array = value;
-			
-			const NSUInteger count = [array count];
+			const NSUInteger count = array.backing.count;
+
+			array.mutable = YES;
 			for (NSUInteger i=0; i<count; i++)
 			{
-				if (array[i] == anObject)
+				if ([[array referenceAtIndex: i] isEqual: object])
 				{
-					[array replaceObjectAtIndex: i withObject: aReplacement];
+					if (!updated)
+					{
+						[self willChangeValueForProperty: key];
+						updated = YES;
+					}
+					[array replaceReferenceAtIndex: i withReference: replacement];
 				}
 			}
+			array.mutable = NO;
 		}
-		else if ([value isKindOfClass: [NSMutableSet class]])
+		else if ([value isKindOfClass: [COMutableSet class]])
 		{
-			NSMutableSet *set = value;
-			if ([set containsObject: anObject])
+			COMutableSet *set = value;
+			
+			set.mutable = YES;
+			if ([set containsReference: object])
 			{
-				[set removeObject: anObject];
-				[set addObject: aReplacement];
+				if (!updated)
+				{
+					[self willChangeValueForProperty: key];
+					updated = YES;
+				}
+				[set removeReference: object];
+				[set addReference: replacement];
 			}
+			set.mutable = NO;
 		}
+		else if ([value isEqual: object])
+		{
+			// TODO: Will require some changes in -valueFor(Variable)StorageKey:
+			// to return nil when a dead reference marker is inserted.
+			// FIXME: We should call -setValue:forStorageKey here.
+			[self willChangeValueForProperty: key];
+			[self setValue: replacement forVariableStorageKey: key];
+			updated = YES;
+		}
+
+		if (updated)
+		{
+			// Will update the dead relationship cache
+			[self didChangeValueForProperty: key];
+		}
+
 		// FIXME: COMutableDictionary
 	}
 }

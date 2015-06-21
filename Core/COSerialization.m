@@ -15,6 +15,7 @@
 #import "COObjectGraphContext.h"
 #import "COObjectGraphContext+Private.h"
 #import "COPath.h"
+#import "COPrimitiveCollection.h"
 #import "COAttachmentID.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
@@ -179,10 +180,10 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
     }
     else if ([aPropertyDesc isOrdered])
     {
-        ETAssert([value isKindOfClass: [NSArray class]]);
+        ETAssert([value isKindOfClass: [COMutableArray class]]);
 		NSMutableArray *array = [NSMutableArray arrayWithCapacity: [value count]];
 
-		for (id element in value)
+		for (id element in [value enumerableReferences])
 		{
 			[array addObject: [self serializedValueForValue: element
                                univaluedPropertyDescription: aPropertyDesc]];
@@ -191,10 +192,10 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
     }
     else
     {
-        ETAssert([value isKindOfClass: [NSSet class]]);
+        ETAssert([value isKindOfClass: [COMutableSet class]]);
         NSMutableSet *set = [NSMutableSet setWithCapacity: [value count]];
 		
-		for (id element in value)
+		for (id element in [value enumerableReferences])
 		{
             [set addObject: [self serializedValueForValue: element
                              univaluedPropertyDescription: aPropertyDesc]];
@@ -240,6 +241,10 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	else if ([value isKindOfClass: [COObject class]])
 	{
 		return [self serializedReferenceForObject: value];
+	}
+	else if ([value isKindOfClass: [COPath class]])
+	{
+		return value;
 	}
 	else if ([value isKindOfClass: [COAttachmentID class]])
 	{
@@ -507,7 +512,7 @@ serialization. */
 	/* If no custom getter can be found, we access the stored value directly 
 	   (ivar and variable storage) */
 
-	return [self valueForStorageKey: [aPropertyDesc name]];
+	return [self serializableValueForStorageKey: [aPropertyDesc name]];
 }
 
 - (COItem *)storeItemWithUUID: (ETUUID *)aUUID
@@ -644,7 +649,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 
 - (COObject *)objectForSerializedReference: (id)value
 									ofType: (COType)type
-               propertyDescription: (ETPropertyDescription *)aPropertyDesc
+                       propertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
 	COObject *object = nil;
 
@@ -654,17 +659,19 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 						  || COTypePrimitivePart(type) == kCOTypeCompositeReference);
 		/* Look up a inner object reference in the receiver persistent root */
 		object = [[self objectGraphContext] objectReferenceWithUUID: value];
+		ETAssert(object != nil);
 	}
 	else /* COPath */
 	{
 		NSParameterAssert(COTypePrimitivePart(type) == kCOTypeReference);
 		object = [[[self persistentRoot] parentContext] crossPersistentRootReferenceWithPath: (COPath *)value];
+		/* object may be nil for dead reference */
 	}
 
-	// Even when we add support for broken references, object will still
-	// be non null, so this assertion should always hold.
-	ETAssert(object != nil);
-	ETAssert([[object entityDescription] isKindOfEntity: [aPropertyDesc persistentType]]);
+	if (object != nil)
+	{
+		ETAssert([[object entityDescription] isKindOfEntity: [aPropertyDesc persistentType]]);
+	}
 	
 	return object;
 }
@@ -692,18 +699,20 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		NSAssert([aPropertyDesc isKeyed] == NO && [aPropertyDesc isOrdered] && [aPropertyDesc isMultivalued],
 				 @"Serialization type doesn't match metamodel");
 		
-		id resultCollection = [NSMutableArray array];
+		COMutableArray *resultCollection =
+			[[self coreObjectCollectionClassForPropertyDescription: aPropertyDesc] new];
 		
+		resultCollection.mutable = YES;
 		for (id subvalue in value)
 		{
 			id deserializedValue = [self valueForSerializedValue: subvalue
 			                                              ofType: COTypePrimitivePart(type)
 			                                 propertyDescription: aPropertyDesc];
 			
-			[resultCollection addObject: deserializedValue];
+			[resultCollection addReference: deserializedValue];
 		}
+		resultCollection.mutable = NO;
 
-		// FIXME: Make read-only if needed
 		return resultCollection;
 	}
 	else if (COTypeMultivaluedPart(type) == kCOTypeSet)
@@ -711,18 +720,20 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		NSAssert([aPropertyDesc isKeyed] == NO && [aPropertyDesc isOrdered] == NO && [aPropertyDesc isMultivalued],
 				 @"Serialization type doesn't match metamodel");
 		
-		id resultCollection = [NSMutableSet set];
+		COMutableSet *resultCollection =
+			[[self coreObjectCollectionClassForPropertyDescription: aPropertyDesc] new];
 		
+		resultCollection.mutable = YES;
 		for (id subvalue in value)
 		{
 			id deserializedValue = [self valueForSerializedValue: subvalue
 			                                              ofType: COTypePrimitivePart(type)
 			                                 propertyDescription: aPropertyDesc];
 
-			[resultCollection addObject: deserializedValue];
+			[resultCollection addReference: deserializedValue];
 		}
-		
-		// FIXME: Make read-only if needed
+		resultCollection.mutable = NO;
+
 		return resultCollection;
 	}
 	else if (type == kCOTypeCompositeReference)
@@ -812,9 +823,20 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	}
 	else if (type == kCOTypeReference || type == kCOTypeCompositeReference)
 	{
-		return [self objectForSerializedReference: value
+		result = [self objectForSerializedReference: value
 										   ofType: type
 							  propertyDescription: aPropertyDesc];
+
+		BOOL isCrossPersistentRootRef = [value isKindOfClass: [COPath class]];
+		BOOL isDeletedCrossPersistentRootRef = isCrossPersistentRootRef
+			&& ([(COObject *)result persistentRoot].isDeleted || [(COObject *)result branch].isDeleted);
+		BOOL isDeadCrossPersistentRootRef = (result == nil && isCrossPersistentRootRef);
+
+		result = (isDeadCrossPersistentRootRef || isDeletedCrossPersistentRootRef ? value : result);
+		
+		// TODO: We should be able to remove it since the value transformer
+		// shouldn't touch it
+		return result;
 	}
     else if (type == kCOTypeInt64)
 	{

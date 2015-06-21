@@ -12,7 +12,10 @@
 @class CORelationshipCache, COObjectGraphContext;
 
 @interface COObject ()
-
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
+- (Class)coreObjectCollectionClassForPropertyDescription: (ETPropertyDescription *)propDesc;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -62,6 +65,10 @@
  * This method is only exposed to be used internally by CoreObject.
  */
 - (id)valueForStorageKey: (NSString *)key;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
+- (id)serializableValueForStorageKey: (NSString *)key;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

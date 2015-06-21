@@ -6,6 +6,8 @@
  */
 
 #import "COObjectGraphContext.h"
+#import "COCrossPersistentRootDeadRelationshipCache.h"
+#import "COEditingContext+Private.h"
 #import "COItemGraph.h"
 #import "COObjectGraphContext+GarbageCollection.h"
 #import "CORelationshipCache.h"
@@ -19,6 +21,7 @@
 #import "COBranch+Private.h"
 #import "COItem.h"
 #import "CODictionary.h"
+#import "COPath.h"
 
 NSString * const COObjectGraphContextObjectsDidChangeNotification = @"COObjectGraphContextObjectsDidChangeNotification";
 
@@ -635,6 +638,9 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (void)markObjectAsUpdated: (COObject *)obj forProperty: (NSString *)aProperty
 {
+	if (ignoresChangeTrackingNotifications)
+		return;
+
 	ETUUID *uuid = obj.UUID;
 	if (nil == [_updatedPropertiesByUUID objectForKey: uuid])
 	{
@@ -815,13 +821,77 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	[self discardObjectsWithUUIDs: deadUUIDs];
 }
 
+/**
+ * The undeleted object is an outer root object that may be referenced by
+ * outgoing relationships of the receiver inner objects.
+ *
+ * The referring objects are the inner objects that hold a reference to it.
+ */
+- (NSSet *)referringObjectsWithDeadReferencesToObject: (COObject *)undeletedObject
+{
+	ETAssert(undeletedObject.objectGraphContext != self);
+	ETAssert(undeletedObject.isRoot);
+
+	if (self.persistentRoot == nil)
+		return [NSSet set];
+
+	COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
+		self.editingContext.deadRelationshipCache;
+	COPath *pathToUndeletedObject = nil;
+	
+	if ([undeletedObject.objectGraphContext isTrackingSpecificBranch])
+	{
+		pathToUndeletedObject = [COPath pathWithPersistentRoot: undeletedObject.persistentRoot.UUID
+		                                                branch: undeletedObject.branch.UUID];
+	}
+	else
+	{
+		pathToUndeletedObject = [COPath pathWithPersistentRoot: undeletedObject.persistentRoot.UUID];
+	}
+
+	return [deadRelationshipCache referringObjectsForPath: pathToUndeletedObject].setRepresentation;
+}
+
+static BOOL ignoresChangeTrackingNotifications = NO;
+
+/**
+ * This method is called on every object graph containing one or more referring 
+ * objects (the relationship sources) whose properties needs to be updated to 
+ * point to the proposed replacement (the new relationship target).
+ *
+ * When deleting a persistent root, other persistent root object graphs will
+ * receive this message with a nil object as second argument, so referring
+ * objects will contain live references (matching the the first argument) to
+ * be replaced by COPath markers.
+ *
+ * When undeleting a persistent root, other persistent root object graphs will 
+ * receive this message with a nil object as first argument, so referring 
+ * objects will contain hidden dead references (COPath markers) to be replaced 
+ * by the second argument.
+ *
+ * For this method, referring objects are inner objects of the receiver.
+ */
 - (void)replaceObject: (COObject *)anObject withObject: (COObject *)aReplacement
 {
-	for (COObject *referrer in [[anObject incomingRelationshipCache] referringObjects])
+	NSSet *referringObjects = nil;
+	BOOL isUndeletion = (anObject == nil);
+	
+	if (isUndeletion)
+	{
+		referringObjects = [self referringObjectsWithDeadReferencesToObject: aReplacement];
+	}
+	else
+	{
+		referringObjects = [[anObject incomingRelationshipCache] referringObjects];
+	}
+
+	ignoresChangeTrackingNotifications = YES;
+	for (COObject *referrer in referringObjects)
 	{
 		[referrer replaceReferencesToObjectIdenticalTo: anObject
 											withObject: aReplacement];
 	}
+	ignoresChangeTrackingNotifications = NO;
 }
 
 - (COItemGraph *)modifiedItemsSnapshot

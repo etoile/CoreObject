@@ -18,8 +18,10 @@
 #import "COBranch+Private.h"
 #import "COPath.h"
 #import "COObjectGraphContext.h"
+#import "COObjectGraphContext+Private.h"
 #import "COEditingContext+Undo.h"
 #import "COEditingContext+Private.h"
+#import "COCrossPersistentRootDeadRelationshipCache.h"
 #import "CORevisionCache.h"
 #import "COStoreTransaction.h"
 #import "NSDistributedNotificationCenter.h"
@@ -29,6 +31,7 @@
 @synthesize store = _store, modelDescriptionRepository = _modelDescriptionRepository;
 @synthesize persistentRootsPendingDeletion = _persistentRootsPendingDeletion;
 @synthesize persistentRootsPendingUndeletion = _persistentRootsPendingUndeletion;
+@synthesize deadRelationshipCache = _deadRelationshipCache;
 @synthesize isRecordingUndo = _isRecordingUndo;
 
 #pragma mark Creating a New Context -
@@ -52,6 +55,7 @@
 	_loadedPersistentRoots = [NSMutableDictionary new];
 	_persistentRootsPendingDeletion = [NSMutableSet new];
     _persistentRootsPendingUndeletion = [NSMutableSet new];
+	_deadRelationshipCache = [COCrossPersistentRootDeadRelationshipCache new];
     _isRecordingUndo = YES;
 	_revisionCache = [[CORevisionCache alloc] initWithParentEditingContext: self];
 	_internalTransientObjectGraphContext = [[COObjectGraphContext alloc] initWithModelDescriptionRepository: aRepo];
@@ -160,6 +164,13 @@
 
 #pragma mark Managing Persistent Roots -
 
+/**
+ * We don't need to update cross persistent references when loading a persistent 
+ * root, see -[COPersistentRoot setCurrentBranchObjectGraphToRevisionUUID:persistentRootUUID:].
+ *
+ * There is one exception to this rule, it's when we reload due to an external 
+ * change as covered in -storePersistentRootsDidChange:isDistributed:.
+ */
 - (COPersistentRoot *)persistentRootForUUID: (ETUUID *)persistentRootUUID
 {
 	COPersistentRoot *persistentRoot = [_loadedPersistentRoots objectForKey: persistentRootUUID];
@@ -298,6 +309,10 @@
         // NOTE: Deleted persistent roots are removed from the cache on commit.
         [_persistentRootsPendingDeletion addObject: aPersistentRoot];
     }
+
+	[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
+	                                                   branch: nil
+	                                                isDeleted: YES];
 }
 
 - (void)undeletePersistentRoot: (COPersistentRoot *)aPersistentRoot
@@ -310,6 +325,105 @@
     {
         [_persistentRootsPendingUndeletion addObject: aPersistentRoot];
     }
+
+	[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
+	                                                   branch: nil
+	                                                isDeleted: NO];
+	
+	/* Once all the dead references are fixed, remove them from the cache */
+	
+	NSSet * allBranches = [aPersistentRoot.branches setByAddingObjectsFromSet: aPersistentRoot.deletedBranches];
+	
+	for (COBranch *branch in allBranches)
+	{
+		[_deadRelationshipCache removePath: [COPath pathWithPersistentRoot: aPersistentRoot.UUID
+		                                                            branch: branch.UUID]];
+	}
+	[_deadRelationshipCache removePath: [COPath pathWithPersistentRoot: aPersistentRoot.UUID]];
+}
+
+/**
+ * When isDeleted is YES, turns live references to the given persistent root 
+ * into dead ones in referring persistent roots.
+ *
+ * When isDeleted is NO, turns dead references to the given persistent root
+ * into live ones in referring persistent roots.
+ *
+ * When isDeleted is YES and branch is nil, this means the persistent root 
+ * itself is deleted. In this case, we consider the branches to be all 
+ * transively deleted for this method logic, although there aren't marked as 
+ * deleted.
+ *
+ * The implementation must take in account deletion/undeletion can be:
+ *
+ * <list>
+ * <item>explicit with COPersistentRoot and COBranch API</item>
+ * <item>implicit deletion/undeletion when reloading persistent roots or branches 
+ * (e.g. isTargetDeletion comment).</item>
+ * </list>
+ *
+ * IMPORTANT: This method must never result in new changes to be committed, 
+ * since it replaces object references in memory, but doesn't change any item
+ * graphs (the references inside each COItem remain identical). Requiring no 
+ * commits means the references can be fixed in both tracking and current branches.
+ *
+ * See also -[COPersistentRoot setCurrentBranchObjectGraphToRevisionUUID:persistentRootUUID:].
+ */
+- (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot
+                                                     branch: (COBranch *)aBranch
+                                                  isDeleted: (BOOL)isDeletion
+{
+	NSParameterAssert(aPersistentRoot != nil);
+	// NOTE: -delete/undeleteBranch: enforce !aBranch.isCurrentBranch already.
+	NSParameterAssert(aBranch == nil
+		|| (!aBranch.isCurrentBranch && aBranch.persistentRoot == aPersistentRoot));
+
+	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
+	{
+		if (persistentRoot == aPersistentRoot)
+			continue;
+		
+		// TODO: Use -objectGraphWithoutUnfaulting or -allObjectGraphContexts to
+		// prevent loading every object graph contexts we check
+
+		/* Fix references pointing to any branch that belong to the deleted 
+		   persistent root (the relationship target) */
+		NSSet *targetObjectGraphs = nil;
+		
+		if (aBranch != nil)
+		{
+			targetObjectGraphs = [NSSet setWithObject: aBranch.objectGraphContext];
+		}
+		else
+		{
+			targetObjectGraphs =
+				[(id)[[aPersistentRoot.branches mappedCollection] objectGraphContext] mutableCopy];
+
+			[(NSMutableSet *)targetObjectGraphs addObject: aPersistentRoot.objectGraphContext];
+		}
+
+		for (COObjectGraphContext *target in targetObjectGraphs)
+		{
+			/* When we are not deleting a persistent root or branch explicitly,
+			   but reloading persistent roots, we must take in account that  
+			   branches can become deleted when their persistent root doesn't 
+			   (isDeletion is NO) */
+			BOOL isTargetDeletion = isDeletion || target.branch.deleted;
+			/* Fix references in all branches that belong to persistent roots 
+			   referencing the deleted persistent root (those are relationship sources) */
+			NSMutableSet *sourceObjectGraphs =
+				[(id)[[persistentRoot.branches mappedCollection] objectGraphContext] mutableCopy];
+
+
+			[sourceObjectGraphs addObject: persistentRoot.objectGraphContext];
+
+			for (COObjectGraphContext *source in sourceObjectGraphs)
+			{
+				[source replaceObject: (isTargetDeletion ? target.rootObject : nil)
+						   withObject: (isTargetDeletion ? nil : target.rootObject)];
+			}
+		}
+	}
 }
 
 - (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot
@@ -333,16 +447,10 @@
 	ETUUID *branchUUID = [aPath branch];
 
 	COPersistentRoot *persistentRoot = [self persistentRootForUUID: persistentRootUUID];
-	// FIXME: We will need to handle the case where a reference points to a
-	// persistent root that has been permanently deleted from the store,
-	// perhaps by allocating a placeholder "broken link" persistent root.
-    ETAssert(persistentRoot != nil);
-	
-	if (branchUUID != nil)
+
+if (branchUUID != nil)
 	{
 		COBranch *branch = [persistentRoot branchForUUID: branchUUID];
-		// FIXME: Again, this is a simplification, should handle broken refs.
-		ETAssert(branch != nil);
 		
 		return [branch rootObject];
 	}
@@ -577,8 +685,8 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 															  forPersistentRoot: uuid];
 		}
 		
-		/* Update _persistentRootsPendingDeletion and _persistentRootsPendingUndeletion and unload
-		   persistent roots. */
+		/* Update persistent roots and branches pending deletion and undeletion, 
+		   and unload persistent roots */
 		
 		for (COPersistentRoot *persistentRoot in persistentRoots)
 		{
@@ -592,9 +700,9 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 			{
 				[_persistentRootsPendingUndeletion removeObject: persistentRoot];
 			}
+			[persistentRoot clearBranchesPendingDeletionAndUndeletion];
 		}
-												
-					
+
 		ETAssert([_store commitStoreTransaction: transaction]);
 		COCommandGroup *command = [self recordEndUndoGroupWithUndoTrack: track];
 		
@@ -681,11 +789,29 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 			}
 			
 			int64_t notifTransaction = [notifTransactionObj longLongValue];
-			
+
+			/* When we have committed the changes explicitly, we send
+			   COPersistentRootDidChangeNotification later with 
+			   -didCommitWithCommand:persistentRoots: and not now. */
 			if (notifTransaction > loaded.lastTransactionID)
 			{
 				hadChanges = YES;
+				/* Will reload every branch info and ensure each one reports 
+				   a correct deletion status (critical to update the cross
+				   persistent root references). Between 
+				   -clearBranchesPendingDeletionAndUndeletion and this point, 
+				   COBranch.isDeleted is always NO. */
 				[loaded storePersistentRootDidChange: notif isDistributed: isDistributed];
+				/* When -[COUndoTrack setCurrentNode:] is used or we receive 
+				   another application commit notification, we must update other
+				   persistent root references pointing to the loaded one.
+				   However when we have committed the changes explicitly, the
+				   cross persistent root references have already been updated at
+				   commit time, so we have nothing to do (i.e. 
+				   notifTransaction > loaded.lastTransactionID is NO). */
+				[self updateCrossPersistentRootReferencesToPersistentRoot: loaded
+			                                                       branch: nil
+			                                                    isDeleted: loaded.isDeleted];
 			}
 		}
 		else
@@ -694,6 +820,15 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 			if (newlyInserted != nil)
 			{
 				hadChanges = YES;
+				/* When -[COUndoTrack setCurrentNode:] is used or we receive
+				   another application commit notification, the store is updated
+				   directly and the newly inserted persistent root can be one
+				   just undeleted by the undo track (or in another app). This
+				   means we must check other persistent roots in case they have
+				   dead references pointing it. */
+				[self updateCrossPersistentRootReferencesToPersistentRoot: newlyInserted
+			                                                       branch: nil
+			                                                    isDeleted: newlyInserted.isDeleted];
 			}
 		}
 	}

@@ -8,7 +8,7 @@
 #import <CoreObject/COEditingContext.h>
 #import <CoreObject/CORevision.h>
 
-@class COPath, COUndoTrack;
+@class  COCrossPersistentRootDeadRelationshipCache, COPath, COUndoTrack;
 
 @interface COEditingContext ()
 
@@ -55,9 +55,19 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 			 withUndoTrack: (COUndoTrack *)track
 					 error: (COError **)anError;
 /**
+ * This property is only exposed to be used internally by CoreObject.
+ */
+@property (nonatomic, readonly) COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache;
+/**
  * This method is only exposed to be used internally by CoreObject.
  */
 - (id)crossPersistentRootReferenceWithPath: (COPath *)aPath;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
+- (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot
+                                                     branch: (COBranch *)aBranch
+                                                  isDeleted: (BOOL)isDeletion;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

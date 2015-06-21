@@ -188,6 +188,22 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	return [self descriptionWithOptions: options];
 }
 
+/**
+ * We don't need to update incoming cross persistent root references in this 
+ * method, since the root object UUID is stable in the history and the object 
+ * graph will constantly reuse the same root object instance once allocated, 
+ * even while navigating the history.
+ *
+ * When we unfault an object graph, we never have to fix other persistent root
+ * branches, since their outgoing references are always resolved at 
+ * deserialization time (unfaulting all object graphs required to resolve them). 
+ * This means a lazily unfaulted object graph is never referenced by an already 
+ * loaded object graph.
+ *
+ * On -setItemGraph:, the deserialization code will also automatically check
+ * which persistent roots or branches are deleted, and decide which outgoing
+ * references are dead or live accordingly.
+ */
 - (void) setCurrentBranchObjectGraphToRevisionUUID: (ETUUID *)aRevision
 								persistentRootUUID: (ETUUID*)aPersistentRoot
 {
@@ -322,6 +338,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	_currentBranchObjectGraph.branch = aBranch;
 	
 	[self reloadCurrentBranchObjectGraph];
+	// TODO: Update cross persistent root references
 }
 
 - (NSSet *)branches
@@ -359,6 +376,9 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	{
 		[_branchesPendingDeletion addObject: aBranch];
 	}
+	[self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: aBranch.persistentRoot
+	                                                                  branch: aBranch
+	                                                               isDeleted: YES];
 }
 
 - (void)undeleteBranch: (COBranch *)aBranch
@@ -371,6 +391,9 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     {
         [_branchesPendingUndeletion addObject: aBranch];
     }
+	[self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: aBranch.persistentRoot
+	                                                                  branch: aBranch
+	                                                               isDeleted: NO];
 }
 
 #pragma mark Pending Changes -
@@ -437,8 +460,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 	/* Clear other pending changes */
 
-	[_branchesPendingDeletion removeAllObjects];
-	[_branchesPendingUndeletion removeAllObjects];
+	[self clearBranchesPendingDeletionAndUndeletion];
 
 	if (_metadataChanged)
     {
@@ -725,6 +747,10 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	}
 	
 	ETAssert([[self branchesPendingInsertion] isEmpty]);
+}
+
+- (void)clearBranchesPendingDeletionAndUndeletion
+{
 	[_branchesPendingDeletion removeAllObjects];
 	[_branchesPendingUndeletion removeAllObjects];
 }
