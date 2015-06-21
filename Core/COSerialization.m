@@ -826,11 +826,11 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		result = [self objectForSerializedReference: value
 										   ofType: type
 							  propertyDescription: aPropertyDesc];
-		
-		BOOL isDeletedCrossPersistentRootRef =
-			[(COObject *)result persistentRoot].isDeleted || [(COObject *)result branch].isDeleted;
-		BOOL isDeadCrossPersistentRootRef =
-			(result == nil && [value isKindOfClass: [COPath class]]);
+
+		BOOL isCrossPersistentRootRef = [value isKindOfClass: [COPath class]];
+		BOOL isDeletedCrossPersistentRootRef = isCrossPersistentRootRef
+			&& ([(COObject *)result persistentRoot].isDeleted || [(COObject *)result branch].isDeleted);
+		BOOL isDeadCrossPersistentRootRef = (result == nil && isCrossPersistentRootRef);
 
 		result = (isDeadCrossPersistentRootRef || isDeletedCrossPersistentRootRef ? value : result);
 		
