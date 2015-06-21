@@ -286,6 +286,13 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	return self;
 }
 
+- (id)copyWithZone: (NSZone *)zone
+{
+	COUnsafeRetainedMutableArray *newArray = [super copyWithZone: zone];
+	newArray->_deadReferences = [_deadReferences mutableCopyWithZone: zone];
+	return newArray;
+}
+
 - (void)addReference: (id)aReference
 {
 	[super addReference: aReference];
