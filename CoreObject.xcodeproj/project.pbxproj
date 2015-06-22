@@ -27,6 +27,10 @@
 		601FD94518893ED50002F957 /* COEditingContext+Debugging.h in Headers */ = {isa = PBXBuildFile; fileRef = 601FD94418893ED50002F957 /* COEditingContext+Debugging.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		602837AF1A334A2100D7B0D1 /* TestSchemaMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 602837AE1A334A2100D7B0D1 /* TestSchemaMigration.m */; };
 		602837B01A334A2100D7B0D1 /* TestSchemaMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 602837AE1A334A2100D7B0D1 /* TestSchemaMigration.m */; };
+		6036436C1B3800B400DC685B /* COHistoryCompaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 6036436A1B3800B400DC685B /* COHistoryCompaction.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6036436D1B3800B400DC685B /* COHistoryCompaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 6036436A1B3800B400DC685B /* COHistoryCompaction.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6036436E1B3800B400DC685B /* COHistoryCompaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 6036436B1B3800B400DC685B /* COHistoryCompaction.m */; };
+		6036436F1B3800B400DC685B /* COHistoryCompaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 6036436B1B3800B400DC685B /* COHistoryCompaction.m */; };
 		6043D4D31757B4F9002103CC /* COCommitDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 6043D4C717575D79002103CC /* COCommitDescriptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6043D4D41757B4FB002103CC /* COCommitDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6043D4C817575D7A002103CC /* COCommitDescriptor.m */; };
 		6048468818B6C245006E4EDC /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048465518B6C03E006E4EDC /* UnitKit.framework */; };
@@ -979,6 +983,8 @@
 		601FD94418893ED50002F957 /* COEditingContext+Debugging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COEditingContext+Debugging.h"; path = "Core/COEditingContext+Debugging.h"; sourceTree = "<group>"; };
 		601FD946188944360002F957 /* HACKING.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = HACKING.md; sourceTree = "<group>"; };
 		602837AE1A334A2100D7B0D1 /* TestSchemaMigration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSchemaMigration.m; path = Tests/SchemaMigration/TestSchemaMigration.m; sourceTree = SOURCE_ROOT; };
+		6036436A1B3800B400DC685B /* COHistoryCompaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COHistoryCompaction.h; path = Store/COHistoryCompaction.h; sourceTree = "<group>"; };
+		6036436B1B3800B400DC685B /* COHistoryCompaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COHistoryCompaction.m; path = Store/COHistoryCompaction.m; sourceTree = "<group>"; };
 		6043D4C717575D79002103CC /* COCommitDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCommitDescriptor.h; path = Utilities/COCommitDescriptor.h; sourceTree = "<group>"; };
 		6043D4C817575D7A002103CC /* COCommitDescriptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCommitDescriptor.m; path = Utilities/COCommitDescriptor.m; sourceTree = "<group>"; };
 		606E3DBF1787A07E00ED42DA /* COSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSerialization.h; path = Core/COSerialization.h; sourceTree = "<group>"; };
@@ -2366,6 +2372,8 @@
 				66D96CB4178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.m */,
 				66D96CB5178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h */,
 				66D96CB6178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m */,
+				6036436A1B3800B400DC685B /* COHistoryCompaction.h */,
+				6036436B1B3800B400DC685B /* COHistoryCompaction.m */,
 				791B4E6A1299C90200CCF472 /* fmdb */,
 			);
 			name = "Store (Low-level API)";
@@ -2452,6 +2460,7 @@
 				60E08D5419792FFA00D1B7AD /* COStoreDeleteBranch.h in Headers */,
 				60E08D3319792FFA00D1B7AD /* COSetAttribute.h in Headers */,
 				60E08D1F19792FFA00D1B7AD /* COItem+JSON.h in Headers */,
+				6036436D1B3800B400DC685B /* COHistoryCompaction.h in Headers */,
 				60E08D5619792FFA00D1B7AD /* COStoreSetBranchMetadata.h in Headers */,
 				60E08D4719792FFA00D1B7AD /* COAttributedString.h in Headers */,
 				60E08D5519792FFA00D1B7AD /* COStoreDeletePersistentRoot.h in Headers */,
@@ -2526,6 +2535,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6036436C1B3800B400DC685B /* COHistoryCompaction.h in Headers */,
 				60882F22197E62FC00484033 /* NSDistributedNotificationCenter.h in Headers */,
 				609C00801704C2BA00D01AAB /* CORevision.h in Headers */,
 				609C00941704C3DA00D01AAB /* COEditingContext.h in Headers */,
@@ -3141,6 +3151,7 @@
 				60E08CBC19792F4600D1B7AD /* COType.m in Sources */,
 				60E08C9119792F4600D1B7AD /* FMResultSet.m in Sources */,
 				60E08CA419792F4600D1B7AD /* COItem.m in Sources */,
+				6036436F1B3800B400DC685B /* COHistoryCompaction.m in Sources */,
 				60E08CCE19792F4600D1B7AD /* COCommandUndeletePersistentRoot.m in Sources */,
 				60E08C9F19792F4600D1B7AD /* COTag.m in Sources */,
 				60E08CA619792F4600D1B7AD /* COItemGraph.m in Sources */,
@@ -3410,6 +3421,7 @@
 				669724E217D461940090B31A /* COSetDeletion.m in Sources */,
 				669724E617D463B00090B31A /* COSequenceEdit.m in Sources */,
 				669724EA17D464170090B31A /* COSequenceDeletion.m in Sources */,
+				6036436E1B3800B400DC685B /* COHistoryCompaction.m in Sources */,
 				663E9BAB182D8A890083AC46 /* COSynchronizerUtils.m in Sources */,
 				66D3FCCF1860E197009BDF50 /* COAttributedStringAttribute.m in Sources */,
 				669724EE17D464400090B31A /* COSequenceInsertion.m in Sources */,
