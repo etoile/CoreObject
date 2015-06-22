@@ -82,6 +82,7 @@
 - (NSIndexSet *) revidsUsedRange;
 
 - (int64_t) revidForUUID: (ETUUID *)aUUID;
+- (NSIndexSet *)revidsForUUIDs: (NSArray *)UUIDs;
 
 - (ETUUID *) revisionUUIDForRevid: (int64_t)aRevid;
 

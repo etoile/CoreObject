@@ -9,6 +9,7 @@
 #import <EtoileFoundation/Macros.h>
 #import <EtoileFoundation/ETUUID.h>
 #import <EtoileFoundation/ETCollection.h>
+#import <EtoileFoundation/ETCollection+HOM.h>
 #import <EtoileFoundation/NSArray+Etoile.h>
 #import "COItemGraph.h"
 #import "COItem.h"
@@ -253,6 +254,25 @@
         return -1;
     }
     return [revid longLongValue];
+}
+
+- (NSIndexSet *)revidsForUUIDs: (NSArray *)UUIDs
+{
+	NSSet *UUIDDataValues = (id)[[[NSSet setWithArray: UUIDs] mappedCollection] dataValue];
+	NSMutableIndexSet *revids = [NSMutableIndexSet new];
+	FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
+		@"SELECT revid, uuid FROM %@", [self tableName]]];
+
+	while ([rs next])
+	{
+		if ([UUIDDataValues containsObject: [rs dataForColumnIndex: 1]])
+		{
+			[revids addIndex: [rs int64ForColumnIndex: 0]];
+		}
+	}
+	[rs close];
+
+	return revids;
 }
 
 - (ETUUID *) rootUUID
