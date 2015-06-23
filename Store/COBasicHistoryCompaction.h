@@ -19,21 +19,21 @@
 @interface COBasicHistoryCompaction : NSObject <COHistoryCompaction>
 {
 	@private
-	NSMutableSet *_deadPersistentRootUUIDs;
-	NSMutableSet *_livePersistentRootUUIDs;
+	NSMutableSet *_finalizablePersistentRootUUIDs;
+	NSMutableSet *_compactablePersistentRootUUIDs;
 }
 
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
- * See -[COHistoryCompaction deadPersistentRootUUIDs].
+ * See -[COHistoryCompaction finalizablePersistentRootUUIDs].
  */
-@property (nonatomic, readwrite) NSSet *deadPersistentRootUUIDs;
+@property (nonatomic, readwrite) NSSet *finalizablePersistentRootUUIDs;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
- * See -[COHistoryCompaction livePersistentRootUUIDs].
+ * See -[COHistoryCompaction compactablePersistentRootUUIDs].
  */
-@property (nonatomic, readwrite) NSSet *livePersistentRootUUIDs;
+@property (nonatomic, readwrite) NSSet *compactablePersistentRootUUIDs;
 
 @end

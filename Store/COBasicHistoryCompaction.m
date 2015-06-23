@@ -9,8 +9,8 @@
 
 @implementation COBasicHistoryCompaction
 
-@synthesize deadPersistentRootUUIDs = _deadPersistentRootUUIDs,
-	livePersistentRootUUIDs = _livePersistentRootUUIDs;
+@synthesize finalizablePersistentRootUUIDs = _finalizablePersistentRootUUIDs,
+	compactablePersistentRootUUIDs = _compactablePersistentRootUUIDs;
 
 - (NSSet *)deadRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs
 {

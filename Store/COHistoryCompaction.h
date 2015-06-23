@@ -25,8 +25,8 @@
  *
  * To implement a custom strategy, see COUndoTrackCompaction as an example.
  *
- * Both -deadPersistentRootUUIDs and -livePersistentRootUUIDs can be overlapping 
- * sets (as explained in -deadPersistentRootUUIDs).
+ * Both -finalizablePersistentRootUUIDs and -compactablePersistentRootUUIDs can 
+ * be overlapping sets (as explained in -finalizablePersistentRootUUIDs).
  */
 @protocol COHistoryCompaction <NSObject>
 /**
@@ -34,9 +34,9 @@
  *
  * Persistent roots not previously marked as deleted are ignored.
  *
- * To attempt finalizing all persistent roots, returns -livePersistentRootUUIDs.
+ * To attempt finalizing all persistent roots, return -compactablePersistentRootUUIDs.
  */
-@property (nonatomic, readonly) NSSet *deadPersistentRootUUIDs;
+@property (nonatomic, readonly) NSSet *finalizablePersistentRootUUIDs;
 /**
  * The persistent roots to be kept when compacting the history, but whose 
  * branches and revisions can be deleted.
@@ -44,10 +44,10 @@
  * Peristent roots not included in this set won't have their revision examined, 
  * when the history is compacted.
  *
- * If some of these persistent roots are returned among -deadPersistentRootUUIDs 
+ * If some of these persistent roots are returned among -finalizablePersistentRootUUIDs 
  * and end up being finalized, they will be ignored.
  */
-@property (nonatomic, readonly) NSSet *livePersistentRootUUIDs;
+@property (nonatomic, readonly) NSSet *compactablePersistentRootUUIDs;
 
 - (NSSet *)deadRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs;
 - (NSSet *)liveRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs;

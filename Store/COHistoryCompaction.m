@@ -29,7 +29,7 @@
         
         // Delete rows from branches and persistentroots tables
 		
-		for (ETUUID *persistentRoot in aCompactionStrategy.deadPersistentRootUUIDs)
+		for (ETUUID *persistentRoot in aCompactionStrategy.finalizablePersistentRootUUIDs)
 		{
 			NSData *persistentRootData = [persistentRoot dataValue];
 			
@@ -60,7 +60,7 @@
 		NSMutableSet *backingStoresForRevisionGC = [NSMutableSet new];
 		NSMutableDictionary *persistentRootsByBackingStore = [NSMutableDictionary new];
 
-		for (ETUUID *persistentRoot in aCompactionStrategy.livePersistentRootUUIDs)
+		for (ETUUID *persistentRoot in aCompactionStrategy.compactablePersistentRootUUIDs)
 		{
 			NSData *persistentRootData = [persistentRoot dataValue];
 			NSData *backingStoreData = [db_ dataForQuery: @"SELECT backingstore FROM persistentroot_backingstores WHERE uuid = ?", persistentRootData];

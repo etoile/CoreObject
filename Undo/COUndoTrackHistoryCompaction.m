@@ -17,8 +17,8 @@
 
 @implementation COUndoTrackHistoryCompaction
 
-@synthesize undoTrack = _undoTrack, deadPersistentRootUUIDs = _deadPersistentRootUUIDs,
-	livePersistentRootUUIDs = _livePersistentRootUUIDs,
+@synthesize undoTrack = _undoTrack, finalizablePersistentRootUUIDs = _finalizablePersistentRootUUIDs,
+	compactablePersistentRootUUIDs = _compactablePersistentRootUUIDs,
 	deadRevisionUUIDs = _deadRevisionUUIDs, liveRevisionUUIDs = _liveRevisionUUIDs;
 
 - (instancetype)initWithUndoTrack: (COUndoTrack *)aTrack upToCommand: (COCommand *)aCommand
@@ -26,8 +26,8 @@
 	SUPERINIT;
 	_undoTrack = aTrack;
 	_oldestCommandToKeep = aCommand;
-	_deadPersistentRootUUIDs = [NSMutableSet setWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
-	_livePersistentRootUUIDs = [NSMutableSet setWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
+	_finalizablePersistentRootUUIDs = [NSMutableSet setWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
+	_compactablePersistentRootUUIDs = [NSMutableSet setWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
 	_deadRevisionUUIDs = [NSMutableDictionary dictionaryWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
 	_liveRevisionUUIDs = [NSMutableDictionary dictionaryWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
 	return self;
@@ -67,7 +67,7 @@
  */
 - (void)allocateRevisionSets
 {
-	for (ETUUID *persistentRootUUID in _livePersistentRootUUIDs)
+	for (ETUUID *persistentRootUUID in _compactablePersistentRootUUIDs)
 	{
 		_deadRevisionUUIDs[persistentRootUUID] = [NSMutableSet set];
 		_liveRevisionUUIDs[persistentRootUUID] = [NSMutableSet set];
@@ -103,16 +103,16 @@
 {
 	if ([command isKindOfClass: [COCommandDeletePersistentRoot class]])
 	{
-		[_deadPersistentRootUUIDs addObject: command.persistentRootUUID];
-		[_livePersistentRootUUIDs removeObject: command.persistentRootUUID];
+		[_finalizablePersistentRootUUIDs addObject: command.persistentRootUUID];
+		[_compactablePersistentRootUUIDs removeObject: command.persistentRootUUID];
 	}
 	else if ([command isKindOfClass: [COCommandUndeletePersistentRoot class]])
 	{
 		/* This can represent COCommandCreatePersistentRoot too.
 		   Don't delete alive persistent roots, even when we committed no 
 		   changes following the oldest command to keep. */
-		[_deadPersistentRootUUIDs removeObject: command.persistentRootUUID];
-		[_livePersistentRootUUIDs addObject: command.persistentRootUUID];
+		[_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
+		[_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
 	}
 }
 
@@ -122,18 +122,18 @@
 	{
 		/* If we commit changes to a deleted persistent root after the oldest 
 		   command to keep, we want to keep this persistent root alive */
-		[_deadPersistentRootUUIDs removeObject: command.persistentRootUUID];
-		[_livePersistentRootUUIDs addObject: command.persistentRootUUID];
+		[_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
+		[_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
 	}
 	else if ([command isKindOfClass: [COCommandDeletePersistentRoot class]])
 	{
-		[_deadPersistentRootUUIDs removeObject: command.persistentRootUUID];
-		[_livePersistentRootUUIDs addObject: command.persistentRootUUID];
+		[_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
+		[_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
 	}
 	else if ([command isKindOfClass: [COCommandUndeletePersistentRoot class]])
 	{
-		[_deadPersistentRootUUIDs removeObject: command.persistentRootUUID];
-		[_livePersistentRootUUIDs addObject: command.persistentRootUUID];
+		[_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
+		[_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
 	}
 	else
 	{
@@ -163,7 +163,7 @@
 
 	if ([command isKindOfClass: [COCommandSetCurrentVersionForBranch class]])
 	{
-		ETAssert(![_deadPersistentRootUUIDs containsObject: [command persistentRootUUID]]);
+		ETAssert(![_finalizablePersistentRootUUIDs containsObject: [command persistentRootUUID]]);
 
 		// TODO: We'll need something more precise when we check branch aliveness
 

@@ -874,8 +874,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     NILARG_EXCEPTION_TEST(persistentRootUUIDs);
     COBasicHistoryCompaction *compaction = [COBasicHistoryCompaction new];
 	
-	compaction.deadPersistentRootUUIDs = persistentRootUUIDs;
-	compaction.livePersistentRootUUIDs = persistentRootUUIDs;
+	compaction.finalizablePersistentRootUUIDs = persistentRootUUIDs;
+	compaction.compactablePersistentRootUUIDs = persistentRootUUIDs;
 	
 	return [self compactHistory: compaction];
 }

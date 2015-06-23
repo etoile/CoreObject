@@ -16,8 +16,8 @@
 	@private
 	COUndoTrack *_undoTrack;
 	COCommand *_oldestCommandToKeep;
-	NSMutableSet *_deadPersistentRootUUIDs;
-	NSMutableSet *_livePersistentRootUUIDs;
+	NSMutableSet *_finalizablePersistentRootUUIDs;
+	NSMutableSet *_compactablePersistentRootUUIDs;
 	NSMutableDictionary *_deadRevisionUUIDs;
 	NSMutableDictionary *_liveRevisionUUIDs;
 }
