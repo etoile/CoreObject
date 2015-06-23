@@ -31,6 +31,14 @@
 		6036436D1B3800B400DC685B /* COHistoryCompaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 6036436A1B3800B400DC685B /* COHistoryCompaction.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6036436E1B3800B400DC685B /* COHistoryCompaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 6036436B1B3800B400DC685B /* COHistoryCompaction.m */; };
 		6036436F1B3800B400DC685B /* COHistoryCompaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 6036436B1B3800B400DC685B /* COHistoryCompaction.m */; };
+		603643841B394E8800DC685B /* COUndoTrackHistoryCompaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 603643821B394E8800DC685B /* COUndoTrackHistoryCompaction.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		603643851B394E8800DC685B /* COUndoTrackHistoryCompaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 603643821B394E8800DC685B /* COUndoTrackHistoryCompaction.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		603643861B394E8800DC685B /* COUndoTrackHistoryCompaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 603643831B394E8800DC685B /* COUndoTrackHistoryCompaction.m */; };
+		603643871B394E8800DC685B /* COUndoTrackHistoryCompaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 603643831B394E8800DC685B /* COUndoTrackHistoryCompaction.m */; };
+		603643941B395A7100DC685B /* COBasicHistoryCompaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 603643921B395A7100DC685B /* COBasicHistoryCompaction.h */; };
+		603643951B395A7100DC685B /* COBasicHistoryCompaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 603643921B395A7100DC685B /* COBasicHistoryCompaction.h */; };
+		603643961B395A7100DC685B /* COBasicHistoryCompaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 603643931B395A7100DC685B /* COBasicHistoryCompaction.m */; };
+		603643971B395A7100DC685B /* COBasicHistoryCompaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 603643931B395A7100DC685B /* COBasicHistoryCompaction.m */; };
 		6043D4D31757B4F9002103CC /* COCommitDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 6043D4C717575D79002103CC /* COCommitDescriptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6043D4D41757B4FB002103CC /* COCommitDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6043D4C817575D7A002103CC /* COCommitDescriptor.m */; };
 		6048468818B6C245006E4EDC /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048465518B6C03E006E4EDC /* UnitKit.framework */; };
@@ -985,6 +993,10 @@
 		602837AE1A334A2100D7B0D1 /* TestSchemaMigration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSchemaMigration.m; path = Tests/SchemaMigration/TestSchemaMigration.m; sourceTree = SOURCE_ROOT; };
 		6036436A1B3800B400DC685B /* COHistoryCompaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COHistoryCompaction.h; path = Store/COHistoryCompaction.h; sourceTree = "<group>"; };
 		6036436B1B3800B400DC685B /* COHistoryCompaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COHistoryCompaction.m; path = Store/COHistoryCompaction.m; sourceTree = "<group>"; };
+		603643821B394E8800DC685B /* COUndoTrackHistoryCompaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COUndoTrackHistoryCompaction.h; sourceTree = "<group>"; };
+		603643831B394E8800DC685B /* COUndoTrackHistoryCompaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COUndoTrackHistoryCompaction.m; sourceTree = "<group>"; };
+		603643921B395A7100DC685B /* COBasicHistoryCompaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBasicHistoryCompaction.h; path = Store/COBasicHistoryCompaction.h; sourceTree = "<group>"; };
+		603643931B395A7100DC685B /* COBasicHistoryCompaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBasicHistoryCompaction.m; path = Store/COBasicHistoryCompaction.m; sourceTree = "<group>"; };
 		6043D4C717575D79002103CC /* COCommitDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCommitDescriptor.h; path = Utilities/COCommitDescriptor.h; sourceTree = "<group>"; };
 		6043D4C817575D7A002103CC /* COCommitDescriptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCommitDescriptor.m; path = Utilities/COCommitDescriptor.m; sourceTree = "<group>"; };
 		606E3DBF1787A07E00ED42DA /* COSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSerialization.h; path = Core/COSerialization.h; sourceTree = "<group>"; };
@@ -1771,6 +1783,8 @@
 				6646976217CDB94300A1B767 /* COUndoTrack.m */,
 				662AC93B1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.h */,
 				662AC93C1802297100B088F2 /* COEndOfUndoTrackPlaceholderNode.m */,
+				603643821B394E8800DC685B /* COUndoTrackHistoryCompaction.h */,
+				603643831B394E8800DC685B /* COUndoTrackHistoryCompaction.m */,
 			);
 			path = Undo;
 			sourceTree = "<group>";
@@ -2368,12 +2382,14 @@
 				66D96CB0178B717100D1553C /* COSQLiteStore.m */,
 				66D96CB1178B717100D1553C /* COSQLiteStore+Attachments.h */,
 				66D96CB2178B717100D1553C /* COSQLiteStore+Attachments.m */,
+				6036436A1B3800B400DC685B /* COHistoryCompaction.h */,
+				6036436B1B3800B400DC685B /* COHistoryCompaction.m */,
+				603643921B395A7100DC685B /* COBasicHistoryCompaction.h */,
+				603643931B395A7100DC685B /* COBasicHistoryCompaction.m */,
 				66D96CB3178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.h */,
 				66D96CB4178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.m */,
 				66D96CB5178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h */,
 				66D96CB6178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m */,
-				6036436A1B3800B400DC685B /* COHistoryCompaction.h */,
-				6036436B1B3800B400DC685B /* COHistoryCompaction.m */,
 				791B4E6A1299C90200CCF472 /* fmdb */,
 			);
 			name = "Store (Low-level API)";
@@ -2425,6 +2441,7 @@
 				60E08D0119792FFA00D1B7AD /* COQuery.h in Headers */,
 				60E08D0819792FFA00D1B7AD /* COTag.h in Headers */,
 				60AA7EB11A641FCD00897498 /* COSchemaMigrationDriver.h in Headers */,
+				603643851B394E8800DC685B /* COUndoTrackHistoryCompaction.h in Headers */,
 				60882F1A197D50BD00484033 /* COObjectToArchivedData.h in Headers */,
 				60E08D6419792FFA00D1B7AD /* COTrack.h in Headers */,
 				60E08D1219792FFA00D1B7AD /* COSynchronizationServer.h in Headers */,
@@ -2516,6 +2533,7 @@
 				60E08D5919792FFA00D1B7AD /* COStoreTransaction.h in Headers */,
 				60E08D4F19792FFA00D1B7AD /* COSQLiteStore+Private.h in Headers */,
 				60E08D1819792FFA00D1B7AD /* COBinaryWriter.h in Headers */,
+				603643951B395A7100DC685B /* COBasicHistoryCompaction.h in Headers */,
 				60E08D6619792FFA00D1B7AD /* COSynchronizerServer.h in Headers */,
 				60E08D4E19792FFA00D1B7AD /* COPersistentRoot+Private.h in Headers */,
 				60E08D6A19792FFA00D1B7AD /* COObjectGraphContext.h in Headers */,
@@ -2539,6 +2557,7 @@
 				60882F22197E62FC00484033 /* NSDistributedNotificationCenter.h in Headers */,
 				609C00801704C2BA00D01AAB /* CORevision.h in Headers */,
 				609C00941704C3DA00D01AAB /* COEditingContext.h in Headers */,
+				603643841B394E8800DC685B /* COUndoTrackHistoryCompaction.h in Headers */,
 				609C00981704C3DA00D01AAB /* COObject.h in Headers */,
 				609C009A1704C3DA00D01AAB /* COPersistentRoot.h in Headers */,
 				609C009C1704C3DA00D01AAB /* COQuery.h in Headers */,
@@ -2651,6 +2670,7 @@
 				66E62253185BEA51002A22C1 /* COTrack.h in Headers */,
 				6660B3A01839659D009007FD /* COAttachmentID.h in Headers */,
 				66405DD1182A255800A6EF7A /* COSynchronizerServer.h in Headers */,
+				603643941B395A7100DC685B /* COBasicHistoryCompaction.h in Headers */,
 				66FD349A18314BC200898381 /* COSynchronizerJSONUtils.h in Headers */,
 				66FD348E1830BB3800898381 /* COSynchronizerJSONClient.h in Headers */,
 				660D4CE517D689FC003C9ACC /* COMergeInfo.h in Headers */,
@@ -3090,6 +3110,7 @@
 				60E08CF319792F4600D1B7AD /* COStoreWriteRevision.m in Sources */,
 				60E08CD119792F4600D1B7AD /* COCommandUndeleteBranch.m in Sources */,
 				60E08C9319792F4600D1B7AD /* COEditingContext.m in Sources */,
+				603643871B394E8800DC685B /* COUndoTrackHistoryCompaction.m in Sources */,
 				60E08CAD19792F4600D1B7AD /* COBinaryReader.m in Sources */,
 				608B3F4219FF045400304809 /* COMetamodel.m in Sources */,
 				60E08C9819792F4600D1B7AD /* COBookmark.m in Sources */,
@@ -3196,6 +3217,7 @@
 				60E08C8819792F4600D1B7AD /* COSynchronizerResponseToClientForSentRevisionsMessage.m in Sources */,
 				60E08CDA19792F4600D1B7AD /* COSequenceEdit.m in Sources */,
 				60E08C9019792F4600D1B7AD /* FMDatabaseAdditions.m in Sources */,
+				603643971B395A7100DC685B /* COBasicHistoryCompaction.m in Sources */,
 				60E08C9D19792F4600D1B7AD /* COLibrary.m in Sources */,
 				60882F19197D50B700484033 /* COColorToHTMLString.m in Sources */,
 				60E08CC019792F4600D1B7AD /* COObject+Accessors.m in Sources */,
@@ -3351,6 +3373,7 @@
 				66405DD2182A255800A6EF7A /* COSynchronizerServer.m in Sources */,
 				609C009D1704C3DA00D01AAB /* COQuery.m in Sources */,
 				609C00AD1704C3EF00D01AAB /* COBookmark.m in Sources */,
+				603643861B394E8800DC685B /* COUndoTrackHistoryCompaction.m in Sources */,
 				609C00AF1704C3EF00D01AAB /* COCollection.m in Sources */,
 				609C00B11704C3EF00D01AAB /* COContainer.m in Sources */,
 				66FD349B18314BC200898381 /* COSynchronizerJSONUtils.m in Sources */,
@@ -3419,6 +3442,7 @@
 				669724DA17D4614F0090B31A /* CODeleteAttribute.m in Sources */,
 				669724DE17D461750090B31A /* COSetInsertion.m in Sources */,
 				669724E217D461940090B31A /* COSetDeletion.m in Sources */,
+				603643961B395A7100DC685B /* COBasicHistoryCompaction.m in Sources */,
 				669724E617D463B00090B31A /* COSequenceEdit.m in Sources */,
 				669724EA17D464170090B31A /* COSequenceDeletion.m in Sources */,
 				6036436E1B3800B400DC685B /* COHistoryCompaction.m in Sources */,

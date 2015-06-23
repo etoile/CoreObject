@@ -9,35 +9,32 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COSQLiteStore.h>
 
-@class COUndoTrack, COCommand;
-
-@interface COHistoryCompaction : NSObject
-{
-	@private
-	COUndoTrack *_undoTrack;
-	COCommand *_oldestCommandToKeep;
-	NSMutableSet *_deadPersistentRootUUIDs;
-	NSMutableSet *_livePersistentRootUUIDs;
-	NSMutableDictionary *_deadRevisionUUIDs;
-	NSMutableDictionary *_liveRevisionUUIDs;
-}
-
-- (instancetype)initWithUndoTrack: (COUndoTrack *)aTrack upToCommand: (COCommand *)aCommand;
-
-@property (nonatomic, readonly) COUndoTrack *undoTrack;
-
 /**
- * Scans the history to divide persistent roots, branches and revisions into 
- * them into live and dead ones.
+ * @group Store
+ * @abstract A compaction strategy to free space in a CoreObject store.
+ *
+ * -[COSQLiteStore compactHistory:] uses this protocol to determine which
+ * persistent roots, branches and revisions can be deleted and finalized.
+ *
+ * By default, CoreObject comes bundled with a two compaction strategies:
+ *
+ * <list>
+ * <item>the one behind -[COSQLiteStore finalizeDeletionsForPersistentRoot:error:]</item>
+ * <item>COUndoTrackHistoryCompaction</item>
+ * </list>
+ *
+ * To implement a custom strategy, see COUndoTrackCompaction as an example.
+ *
+ * Both -deadPersistentRootUUIDs and -livePersistentRootUUIDs can be overlapping 
+ * sets (as explained in -deadPersistentRootUUIDs).
  */
-- (void)compute;
-
+@protocol COHistoryCompaction <NSObject>
 /**
- * @taskunit Computed Results
- */
-
-/**
- * The persistent roots to be deleted when compacting the history.
+ * The persistent roots to be finalized when compacting the history.
+ *
+ * Persistent roots not previously marked as deleted are ignored.
+ *
+ * To attempt finalizing all persistent roots, returns -livePersistentRootUUIDs.
  */
 @property (nonatomic, readonly) NSSet *deadPersistentRootUUIDs;
 /**
@@ -46,34 +43,27 @@
  *
  * Peristent roots not included in this set won't have their revision examined, 
  * when the history is compacted.
+ *
+ * If some of these persistent roots are returned among -deadPersistentRootUUIDs 
+ * and end up being finalized, they will be ignored.
  */
 @property (nonatomic, readonly) NSSet *livePersistentRootUUIDs;
-/**
- * The deletable revision sets when compacting the history, organized by 
- * persistent root UUID.
- *
- * These revisions won't be deleted, when they are inside a live revision range. 
- * See -liveRevisionUUIDs.
- */
-@property (nonatomic, readonly) NSDictionary *deadRevisionUUIDs;
-/**
- * The revisions sets to be kept when compacting the history, organized by 
- * persistent root UUID.
- *
- * These revisions can include dead revisions in their range, see 
- * -deadRevisionUUIDs.
- */
-@property (nonatomic, readonly) NSDictionary *liveRevisionUUIDs;
 
 - (NSSet *)deadRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs;
 - (NSSet *)liveRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs;
-
 @end
 
 
+/**
+ * @group Store
+ * @abstract Additions to control the store size.
+ *
+ * For freeing space in a CoreObject store, call -compactHistory: with a custom
+ * COHistoryCompaction object providing hints about what to delete and finalize.
+ */
 @interface COSQLiteStore (COHistoryCompaction)
 /**
  * Compacts the history with the given strategy.
  */
-- (BOOL)compactHistory: (COHistoryCompaction *)aCompactionStrategy;
+- (BOOL)compactHistory: (id <COHistoryCompaction>)aCompactionStrategy;
 @end

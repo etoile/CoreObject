@@ -14,6 +14,7 @@
 #import "COItem.h"
 #import "COSQLiteStore+Attachments.h"
 #import "COSearchResult.h"
+#import "COBasicHistoryCompaction.h"
 #import "COBranchInfo.h"
 #import "COJSONSerialization.h"
 #import "COPersistentRootInfo.h"
@@ -867,118 +868,16 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     return YES;
 }
 
-- (BOOL) finalizeDeletionsForPersistentRoots: (NSArray *)persistentRootUUIDs
+- (BOOL) finalizeDeletionsForPersistentRoots: (NSSet *)persistentRootUUIDs
 									   error: (NSError **)error
 {
     NILARG_EXCEPTION_TEST(persistentRootUUIDs);
-    
-    assert(dispatch_get_current_queue() != queue_);
-    
-    dispatch_sync(queue_, ^(){
-        
-        [db_ beginTransaction];
-        
-        // Delete rows from branches and persistentroots tables
-		
-		for (ETUUID *persistentRoot in persistentRootUUIDs)
-		{
-			NSData *persistentRootData = [persistentRoot dataValue];
-			
-			[db_ executeUpdate: @"DELETE FROM branches WHERE deleted = 1 AND proot = ?", persistentRootData];
-			
-			if ([db_ boolForQuery: @"SELECT deleted FROM persistentroots WHERE uuid = ?", persistentRootData])
-			{
-				[db_ executeUpdate: @"DELETE FROM branches WHERE proot = ?", persistentRootData];
-				[db_ executeUpdate: @"DELETE FROM persistentroots WHERE uuid = ?", persistentRootData];
-			}
-		}
-
-		// Delete unused backing stores
-		
-		NSArray *unusedBackingstoreUUIDDatas =
-			[db_ arrayForQuery: @"SELECT backingstore "
-			 "FROM persistentroot_backingstores "
-			 "LEFT OUTER JOIN (SELECT uuid, 1 AS present FROM persistentroots) USING(uuid) "
-			 "GROUP BY backingstore "
-			 "HAVING 0 = COALESCE(SUM(present), 0)"];
-		for (NSData *backingstoreUUIDData in unusedBackingstoreUUIDDatas)
-		{
-			[self deleteBackingStoreWithUUID: [ETUUID UUIDWithData: backingstoreUUIDData]];
-		}
-		
-		// Gather backing stores that need revision GC
-		
-		NSMutableSet *backingStoresForRevisionGC = [NSMutableSet new];
-		for (ETUUID *persistentRoot in persistentRootUUIDs)
-		{
-			NSData *persistentRootData = [persistentRoot dataValue];
-			
-			NSData *backingStoreData = [db_ dataForQuery: @"SELECT backingstore FROM persistentroot_backingstores WHERE uuid = ?", persistentRootData];
-						
-			// Don't attempt revision GC on backing stores we just deleted
-			if (![unusedBackingstoreUUIDDatas containsObject: backingStoreData])
-			{
-				[backingStoresForRevisionGC addObject:
-				 [ETUUID UUIDWithData: backingStoreData]];
-			}
-		}
-		
-		// Do the revision GC
-		
-		for (ETUUID *backingUUID in backingStoresForRevisionGC)
-		{
-			NSData *backingUUIDData = [backingUUID dataValue];
-		
-			COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID error: NULL];
-			
-			// Delete just the unreachable revisions
-			
-			NSMutableIndexSet *keptRevisions = [NSMutableIndexSet indexSet];
-			
-			FMResultSet *rs = [db_ executeQuery: @"SELECT "
-							   "branches.current_revid "
-							   "FROM persistentroots "
-							   "INNER JOIN branches ON persistentroots.uuid = branches.proot "
-							   "INNER JOIN persistentroot_backingstores ON persistentroots.uuid = persistentroot_backingstores.uuid "
-							   "WHERE persistentroot_backingstores.backingstore = ?", backingUUIDData];
-			while ([rs next])
-			{
-				ETUUID *head = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-				
-				NSIndexSet *revs = [backing revidsFromRevid: 0
-													toRevid: [backing revidForUUID: head]];
-				[keptRevisions addIndexes: revs];
-			}
-			[rs close];
-			
-			// Now for each index set in deletedRevisionsForBackingStore, subtract the index set
-			// in keptRevisionsForBackingStore
-			
-			NSMutableIndexSet *deletedRevisions = [NSMutableIndexSet indexSet];
-			[deletedRevisions addIndexes: [backing revidsUsedRange]];
-			[deletedRevisions removeIndexes: keptRevisions];
-			
-			//    for (NSUInteger i = [deletedRevisions firstIndex]; i != NSNotFound; i = [deletedRevisions indexGreaterThanIndex: i])
-			//    {
-			//
-			//        [db_ executeUpdate: @"DELETE FROM attachment_refs WHERE root_id = ? AND revid = ?",
-			//         [backingUUID dataValue],
-			//         [NSNumber numberWithLongLong: i]];
-			//
-			//        // FIXME: FTS, proot_refs
-			//    }
-			
-			// Delete the actual revisions
-			assert([backing deleteRevids: deletedRevisions]);
-		}
-		
-		assert([db_ commit]);
-		
-        [self finalizeGarbageAttachments];
-    });
-    
-    return YES;
-
+    COBasicHistoryCompaction *compaction = [COBasicHistoryCompaction new];
+	
+	compaction.deadPersistentRootUUIDs = persistentRootUUIDs;
+	compaction.livePersistentRootUUIDs = persistentRootUUIDs;
+	
+	return [self compactHistory: compaction];
 }
 
 
@@ -986,7 +885,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 - (BOOL) finalizeDeletionsForPersistentRoot: (ETUUID *)aRoot
                                       error: (NSError **)error
 {
-	return [self finalizeDeletionsForPersistentRoots: @[aRoot] error: error];
+	return [self finalizeDeletionsForPersistentRoots: [NSSet setWithObject: aRoot]
+	                                           error: error];
 }
 
 /**
