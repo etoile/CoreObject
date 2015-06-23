@@ -39,6 +39,8 @@
 		603643951B395A7100DC685B /* COBasicHistoryCompaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 603643921B395A7100DC685B /* COBasicHistoryCompaction.h */; };
 		603643961B395A7100DC685B /* COBasicHistoryCompaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 603643931B395A7100DC685B /* COBasicHistoryCompaction.m */; };
 		603643971B395A7100DC685B /* COBasicHistoryCompaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 603643931B395A7100DC685B /* COBasicHistoryCompaction.m */; };
+		6036439C1B3965E900DC685B /* TestUndoTrackHistoryCompaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 6036439B1B3965E900DC685B /* TestUndoTrackHistoryCompaction.m */; };
+		6036439D1B3965E900DC685B /* TestUndoTrackHistoryCompaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 6036439B1B3965E900DC685B /* TestUndoTrackHistoryCompaction.m */; };
 		6043D4D31757B4F9002103CC /* COCommitDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 6043D4C717575D79002103CC /* COCommitDescriptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6043D4D41757B4FB002103CC /* COCommitDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6043D4C817575D7A002103CC /* COCommitDescriptor.m */; };
 		6048468818B6C245006E4EDC /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048465518B6C03E006E4EDC /* UnitKit.framework */; };
@@ -997,6 +999,7 @@
 		603643831B394E8800DC685B /* COUndoTrackHistoryCompaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COUndoTrackHistoryCompaction.m; sourceTree = "<group>"; };
 		603643921B395A7100DC685B /* COBasicHistoryCompaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBasicHistoryCompaction.h; path = Store/COBasicHistoryCompaction.h; sourceTree = "<group>"; };
 		603643931B395A7100DC685B /* COBasicHistoryCompaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBasicHistoryCompaction.m; path = Store/COBasicHistoryCompaction.m; sourceTree = "<group>"; };
+		6036439B1B3965E900DC685B /* TestUndoTrackHistoryCompaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUndoTrackHistoryCompaction.m; sourceTree = "<group>"; };
 		6043D4C717575D79002103CC /* COCommitDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCommitDescriptor.h; path = Utilities/COCommitDescriptor.h; sourceTree = "<group>"; };
 		6043D4C817575D7A002103CC /* COCommitDescriptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCommitDescriptor.m; path = Utilities/COCommitDescriptor.m; sourceTree = "<group>"; };
 		606E3DBF1787A07E00ED42DA /* COSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSerialization.h; path = Core/COSerialization.h; sourceTree = "<group>"; };
@@ -2245,6 +2248,7 @@
 				66E725CD18AF50610032F28F /* TestUndoTrack.m */,
 				66E40D541836D08D00E5B4A7 /* TestUndoStackTrackProtocol.m */,
 				66E40D551836D08D00E5B4A7 /* TestUndoUseCases.m */,
+				6036439B1B3965E900DC685B /* TestUndoTrackHistoryCompaction.m */,
 			);
 			name = Undo;
 			path = Tests/Undo;
@@ -3317,6 +3321,7 @@
 				60F91F05197D3282009F47D7 /* TestSerialization.m in Sources */,
 				60F91F32197D32E2009F47D7 /* UnorderedAttributeModel.m in Sources */,
 				60F91EE8197D3263009F47D7 /* TestSynchronizer.m in Sources */,
+				6036439D1B3965E900DC685B /* TestUndoTrackHistoryCompaction.m in Sources */,
 				60F91F2C197D32E2009F47D7 /* UnorderedGroupWithOpposite.m in Sources */,
 				60F91F03197D3282009F47D7 /* TestPersistentRoot.m in Sources */,
 				60F91F21197D32E2009F47D7 /* Parent.m in Sources */,
@@ -3491,6 +3496,7 @@
 				66101130184D2D8A001A3E24 /* TestOrderedAttribute.m in Sources */,
 				66E40D661836D08D00E5B4A7 /* TestItemGraphDiff.m in Sources */,
 				66E62256185BECF0002A22C1 /* TestValueTransformerAttribute.m in Sources */,
+				6036439C1B3965E900DC685B /* TestUndoTrackHistoryCompaction.m in Sources */,
 				6699DDB2184888050003E803 /* TestUnorderedRelationship.m in Sources */,
 				66E40D5E1836D08D00E5B4A7 /* TestEditingContext.m in Sources */,
 				66E725CE18AF50610032F28F /* TestUndoTrack.m in Sources */,

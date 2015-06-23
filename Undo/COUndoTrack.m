@@ -415,7 +415,9 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 {
 	[self loadIfNeeded];
 	
-	return [_commandsByUUID allValues];
+	NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey: @"sequenceNumber"
+	                                                             ascending: YES];
+	return [[_commandsByUUID allValues] sortedArrayUsingDescriptors: @[descriptor]];
 }
 
 - (NSArray *) childrenOfNode: (id<COTrackNode>)aNode

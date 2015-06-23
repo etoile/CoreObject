@@ -41,7 +41,7 @@
  * The persistent roots to be kept when compacting the history, but whose 
  * branches and revisions can be deleted.
  *
- * Peristent roots not included in this set won't have their revision examined, 
+ * Peristent roots not included in this set won't have their revisions examined, 
  * when the history is compacted.
  *
  * If some of these persistent roots are returned among -finalizablePersistentRootUUIDs 

@@ -7,6 +7,7 @@
 
 #import "COUndoTrackHistoryCompaction.h"
 #import "COCommand.h"
+#import "COCommandGroup.h"
 #import "COCommandDeletePersistentRoot.h"
 #import "COCommandSetCurrentVersionForBranch.h"
 #import "COCommandUndeletePersistentRoot.h"
@@ -46,17 +47,20 @@
 {
 	BOOL isScanningLiveCommands = NO;
 
-	for (COCommand *command in _undoTrack.allCommands)
+	for (COCommandGroup *commandGroup in _undoTrack.allCommands)
 	{
-		isScanningLiveCommands = isScanningLiveCommands || [command isEqual: _oldestCommandToKeep];
+		isScanningLiveCommands = isScanningLiveCommands || [commandGroup isEqual: _oldestCommandToKeep];
 
-		if (isScanningLiveCommands)
+		for (COCommand *command in commandGroup.contents)
 		{
-			[self scanPersistentRootInLiveCommand: command];
-		}
-		else
-		{
-			[self scanPersistentRootInDeadCommand: command];
+			if (isScanningLiveCommands)
+			{
+				[self scanPersistentRootInLiveCommand: command];
+			}
+			else
+			{
+				[self scanPersistentRootInDeadCommand: command];
+			}
 		}
 	}
 }
@@ -75,8 +79,11 @@
 }
 
 /** 
- * Scanning to decide which revisions are alive, based on whether their
+ * Forward scanning to decide which revisions are alive, based on whether their
  * branch or persistent root are alive as computed by -scanPersistentRoots.
+ *
+ * The forward scanning is important to let -scanRevisionInLiveCommand: takes
+ * over -scanRevisionInDeadCommand: to decide whether a revision is dead or alive.
  */
 - (void)scanRevisions
 {
@@ -84,18 +91,24 @@
 	
 	[self allocateRevisionSets];
 
-	for (COCommand *command in [_undoTrack.allCommands reverseObjectEnumerator])
+	// NOTE: If we switch to a backward scanning, then we must change and move
+	// to the end isScanningLiveCommands condition and assignment.
+	for (COCommandGroup *commandGroup in _undoTrack.allCommands)
 	{
-		isScanningLiveCommands = isScanningLiveCommands || [command isEqual: _oldestCommandToKeep];
+		isScanningLiveCommands = isScanningLiveCommands || [commandGroup isEqual: _oldestCommandToKeep];
 
-		if (isScanningLiveCommands)
+		for (COCommand *command in commandGroup.contents)
 		{
-			[self scanRevisionInLiveCommand: command];
+			if (isScanningLiveCommands)
+			{
+				[self scanRevisionInLiveCommand: command];
+			}
+			else
+			{
+				[self scanRevisionInDeadCommand: command];
+			}
 		}
-		else
-		{
-			[self scanRevisionInDeadCommand: command];
-		}
+
 	}
 }
 
@@ -151,10 +164,10 @@
 	}
 	else if ([command isKindOfClass: [COCommandUndeletePersistentRoot class]])
 	{
-		[_deadRevisionUUIDs[persistentRootUUID] removeObject: [command initialRevisionID]];
+		[_deadRevisionUUIDs[persistentRootUUID] addObject: [command initialRevisionID]];
 	}
 	
-	ETAssert(_liveRevisionUUIDs.isEmpty);
+	ETAssert([_liveRevisionUUIDs[persistentRootUUID] isEmpty]);
 }
 
 - (void)scanRevisionInLiveCommand: (id)command
@@ -191,7 +204,7 @@
 	NSMutableSet *revisionUUIDs = [NSMutableSet new];
 	
 	for (NSSet *revisionSet in [_deadRevisionUUIDs objectsForKeys: persistentRootUUIDs
-	                                               notFoundMarker: nil])
+	                                               notFoundMarker: [NSNull null]])
 	{
 		[revisionUUIDs unionSet: revisionSet];
 	}
@@ -203,7 +216,7 @@
 	NSMutableSet *revisionUUIDs = [NSMutableSet new];
 	
 	for (NSSet *revisionSet in [_liveRevisionUUIDs objectsForKeys: persistentRootUUIDs
-	                                               notFoundMarker: nil])
+	                                               notFoundMarker: [NSNull null]])
 	{
 		[revisionUUIDs unionSet: revisionSet];
 	}
