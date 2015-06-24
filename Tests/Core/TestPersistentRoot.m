@@ -31,6 +31,19 @@
 - (id) init
 {
     SUPERINIT;
+	
+	// FIXME: If we change the unloading behavior, then we must write the tests
+	// a bit differently.
+	// For example, in -testExceptionOnDeletedPersistentRootCreateBranch the
+	// commits in the check block always succeeds, since the referenced
+	// persistent root has been unloaded in the editing context. Which means we
+	// probably need to catch the persistent root invalidity earlier in
+	// -makeBranchWithLabel:.
+	// To cope with this, the check block could cover more cases:
+	// - valid/loaded deleted persistent root reference
+	// - invalid/unloaded deleted persistent root reference
+	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorNever;
+
     persistentRoot =  [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 	rootObj = [persistentRoot rootObject];
     originalBranch =  [persistentRoot currentBranch];

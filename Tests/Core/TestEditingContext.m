@@ -19,6 +19,7 @@
 - (id) init
 {
     SUPERINIT;
+	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorNever;
     return self;
 }
 

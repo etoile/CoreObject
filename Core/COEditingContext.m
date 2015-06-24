@@ -29,6 +29,7 @@
 @implementation COEditingContext
 
 @synthesize store = _store, modelDescriptionRepository = _modelDescriptionRepository;
+@synthesize unloadingBehavior = _unloadingBehavior;
 @synthesize persistentRootsPendingDeletion = _persistentRootsPendingDeletion;
 @synthesize persistentRootsPendingUndeletion = _persistentRootsPendingUndeletion;
 @synthesize deadRelationshipCache = _deadRelationshipCache;
@@ -53,6 +54,7 @@
 	_store =  store;
 	_modelDescriptionRepository = aRepo;
 	_loadedPersistentRoots = [NSMutableDictionary new];
+	_unloadingBehavior = COEditingContextUnloadingBehaviorOnDeletion;
 	_persistentRootsPendingDeletion = [NSMutableSet new];
     _persistentRootsPendingUndeletion = [NSMutableSet new];
 	_deadRelationshipCache = [COCrossPersistentRootDeadRelationshipCache new];
@@ -428,10 +430,22 @@
 
 - (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot
 {
+	if (_unloadingBehavior == COEditingContextUnloadingBehaviorNever
+		&& ![aPersistentRoot isPersistentRootUncommitted])
+	{
+		return;
+	}
+
     // FIXME: Implement. For now, since we don't support faulting persistent
     // roots, only release a persistent root if it's deleted.
-    
+	COPersistentRoot *unloadedPersistentRoot = aPersistentRoot;
+
     [_loadedPersistentRoots removeObjectForKey: [aPersistentRoot UUID]];
+
+	[[NSNotificationCenter defaultCenter]
+		postNotificationName: COEditingContextDidUnloadPersistentRootsNotification
+		              object: self
+		            userInfo: @{ kCOUnloadedPersistentRootsKey : S(unloadedPersistentRoot) }];
 }
 
 #pragma mark Referencing Other Persistent Roots -
@@ -933,3 +947,6 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 NSString * const COEditingContextDidChangeNotification =
 	@"COEditingContextDidChangeNotification";
 NSString * const kCOCommandKey = @"kCOCommandKey";
+
+NSString * const COEditingContextDidUnloadPersistentRootsNotification = @"COEditingContextWillUnloadPersistentRootsNotification";
+NSString * const kCOUnloadedPersistentRootsKey = @"kCOUnloadedPersistentRootsKey";

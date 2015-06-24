@@ -107,6 +107,8 @@
 - (id)init
 {
 	SUPERINIT;
+	
+	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorNever;
 
 	group1 = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupWithOpposite"].rootObject;
 	item1 = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupContent"].rootObject;
