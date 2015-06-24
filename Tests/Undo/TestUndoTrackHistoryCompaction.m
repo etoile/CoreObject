@@ -49,6 +49,7 @@
 @interface TestUndoTrackHistoryCompaction : EditingContextTestCase <UKTest>
 {
 	COPersistentRoot *persistentRoot;
+	COPersistentRoot *otherPersistentRoot;
 	COUndoTrack *track;
 }
 
@@ -67,27 +68,52 @@
 	return self;
 }
 
-- (NSArray *)createPersistentRootWithTrivialHistory
+- (NSDictionary *)createPersistentRootsWithTrivialHistory: (BOOL)createMultiplePersistentRoots
 {
+	COObject *object = nil;
+	COObject *otherObject = nil;
+
 	persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
+	object = persistentRoot.rootObject;
 	[ctx commitWithUndoTrack: track];
-	
-	COObject *object = persistentRoot.rootObject;
 
 	object.name = @"Anywhere";
 	[ctx commitWithUndoTrack: track];
 	
+	if (createMultiplePersistentRoots)
+	{
+		otherPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
+		otherObject = otherPersistentRoot.rootObject;
+		[ctx commitWithUndoTrack: track];
+	}
+	
 	object.name = @"Somewhere";
 	[ctx commitWithUndoTrack: track];
+	
+	if (createMultiplePersistentRoots)
+	{
+		otherObject.name = @"Badger";
+		[ctx commitWithUndoTrack: track];
+		
+		otherPersistentRoot.deleted = YES;
+		[ctx commitWithUndoTrack: track];
+	}
 	
 	object.name = @"Nowhere";
 	[ctx commitWithUndoTrack: track];
 	
-	return persistentRoot.currentBranch.nodes;
+	NSMutableDictionary *revs =  [NSMutableDictionary new];
+	
+	revs[persistentRoot.UUID] = persistentRoot.currentBranch.nodes;
+	if (otherPersistentRoot != nil)
+	{
+	     revs[otherPersistentRoot.UUID] = otherPersistentRoot.currentBranch.nodes;
+	}
+	return revs;
 }
 
-- (NSArray *)compactUpToCommand: (COCommand *)command
-            expectingCompaction: (COUndoTrackHistoryCompaction *)expectedCompaction
+- (NSDictionary *)compactUpToCommand: (COCommand *)command
+                 expectingCompaction: (COUndoTrackHistoryCompaction *)expectedCompaction
 {
 	COUndoTrackHistoryCompaction *compaction =
 		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
@@ -111,13 +137,28 @@
 	
 	// TODO: Remove, the branches should receive a notification.
 	[persistentRoot.currentBranch reloadRevisions];
+	if (otherPersistentRoot.isDeleted)
+	{
+		UKRaisesException([otherPersistentRoot.currentBranch reloadRevisions]);
+	}
+	else
+	{
+		UKDoesNotRaiseException([otherPersistentRoot.currentBranch reloadRevisions]);
+	}
 
-	return persistentRoot.currentBranch.nodes;
+	NSMutableDictionary *revs =  [NSMutableDictionary new];
+	
+	revs[persistentRoot.UUID] = persistentRoot.currentBranch.nodes;
+	if (otherPersistentRoot != nil)
+	{
+	     revs[otherPersistentRoot.UUID] = otherPersistentRoot.currentBranch.nodes;
+	}
+	return revs;
 }
 
 - (void)testCompactPersistentRootWithTrivialHistory
 {
-	NSArray *oldRevs = [self createPersistentRootWithTrivialHistory];
+	NSArray *oldRevs = [self createPersistentRootsWithTrivialHistory: NO][persistentRoot.UUID];
 
 	NSArray *liveRevs = [oldRevs subarrayFromIndex: 2];
 	NSArray *deadRevs = [oldRevs arrayByRemovingObjectsInArray: liveRevs];
@@ -134,10 +175,36 @@
 
 	   This explains the index mistmatch between oldRevs subarrayFromIndex: 2]
 	   and the next line. */
-	NSArray *newRevs = [self compactUpToCommand: track.allCommands[3]
-	                        expectingCompaction: compaction];
+	NSDictionary *newRevs = [self compactUpToCommand: track.allCommands[3]
+	                             expectingCompaction: compaction];
 
-	UKObjectsEqual(liveRevs, newRevs);
+	UKObjectsEqual(liveRevs, newRevs[persistentRoot.UUID]);
+}
+
+- (void)testPersistentRootFinalization
+{
+	NSDictionary *oldRevs = [self createPersistentRootsWithTrivialHistory: YES];
+
+	/* We have 4 revisions in the main persistent root, we discard the last 
+	   command (keeping 6 commands out of 7), this means we keep the last 
+	   revision and the one just before, so we keep 2 revisions. */
+	NSArray *mainLiveRevs = [oldRevs[persistentRoot.UUID] subarrayFromIndex: 2];
+	NSArray *mainDeadRevs = [oldRevs[persistentRoot.UUID] arrayByRemovingObjectsInArray: mainLiveRevs];
+	COUndoTrackHistoryCompaction *compaction = [COUndoTrackHistoryCompaction new];
+
+	compaction.finalizablePersistentRootUUIDs = S(otherPersistentRoot.UUID);
+	compaction.compactablePersistentRootUUIDs = S(persistentRoot.UUID);
+	compaction.liveRevisionUUIDs = @{ persistentRoot.UUID : SA((id)[[mainLiveRevs mappedCollection] UUID]),
+	                             otherPersistentRoot.UUID : [NSSet new] };
+	compaction.deadRevisionUUIDs = @{ persistentRoot.UUID : SA((id)[[mainDeadRevs mappedCollection] UUID]),
+	                             otherPersistentRoot.UUID : oldRevs[otherPersistentRoot.UUID] };
+
+	/* See comment in -testCompactPersistentRootWithTrivialHistory */
+	NSDictionary *newRevs = [self compactUpToCommand: track.allCommands[6]
+	                             expectingCompaction: compaction];
+
+	UKObjectsEqual(mainLiveRevs, newRevs[persistentRoot.UUID]);
+	UKNil([ctx persistentRootForUUID: otherPersistentRoot.UUID]);
 }
 
 @end

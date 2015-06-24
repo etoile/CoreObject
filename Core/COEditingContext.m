@@ -429,12 +429,9 @@
 - (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot
 {
     // FIXME: Implement. For now, since we don't support faulting persistent
-    // roots, only release a persistent root if it's uncommitted.
+    // roots, only release a persistent root if it's deleted.
     
-    if ([aPersistentRoot isPersistentRootUncommitted])
-    {
-        [_loadedPersistentRoots removeObjectForKey: [aPersistentRoot UUID]];
-    }
+    [_loadedPersistentRoots removeObjectForKey: [aPersistentRoot UUID]];
 }
 
 #pragma mark Referencing Other Persistent Roots -
@@ -763,10 +760,24 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
     [self storePersistentRootsDidChange: notif isDistributed: NO];
 }
 
+/**
+ * Reloads changed persistent roots, except the ones that got deleted (either 
+ * with an explicit commit in the current context or from some other editing 
+ * context).
+ *
+ * Deleted persistent roots are unloaded right before executing the commit 
+ * transaction.
+ *
+ * The transaction IDs protect us against lost distributed commit notifications,
+ * that can result in state mismatches between the store and the editing context.
+ */
 - (void)storePersistentRootsDidChange: (NSNotification *)notif isDistributed: (BOOL)isDistributed
 {
 	NSDictionary *transactionIDs = notif.userInfo[kCOStorePersistentRootTransactionIDs];
     NSArray *persistentRootUUIDs = [[transactionIDs allKeys] mappedCollectionWithBlock: ^ (id uuidString) {
+		return [ETUUID UUIDWithString: uuidString];
+	}];
+	NSArray *deletedPersistentRootUUIDs = [notif.userInfo[kCOStoreDeletedPersistentRoots] mappedCollectionWithBlock: ^ (id uuidString) {
 		return [ETUUID UUIDWithString: uuidString];
 	}];
 	
@@ -812,10 +823,13 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 				[self updateCrossPersistentRootReferencesToPersistentRoot: loaded
 			                                                       branch: nil
 			                                                    isDeleted: loaded.isDeleted];
+				// TODO: Unload the persistent root when deleted (this represents
+				// an external deletion)
 			}
 		}
-		else
+		else if (![deletedPersistentRootUUIDs containsObject: persistentRootUUID])
 		{
+			/* For a finalized persistent root, newlyInserted is nil */
 			COPersistentRoot *newlyInserted = [self persistentRootForUUID: persistentRootUUID];
 			if (newlyInserted != nil)
 			{

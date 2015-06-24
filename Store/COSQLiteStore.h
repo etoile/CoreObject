@@ -56,7 +56,13 @@ extern NSString * const COStorePersistentRootsDidChangeNotification;
 /* userInfo dictionary keys for COStorePersistentRootsDidChangeNotification */
 
 extern NSString * const kCOStorePersistentRootTransactionIDs;
+/**
+ * The persistent root UUIDs inserted with the last commit.
+ */
 extern NSString * const kCOStoreInsertedPersistentRoots;
+/**
+ * The persistent root UUIDs deleted with the last commit.
+ */
 extern NSString * const kCOStoreDeletedPersistentRoots;
 extern NSString * const kCOStoreUUID;
 extern NSString * const kCOStoreURL;

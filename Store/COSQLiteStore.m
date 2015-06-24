@@ -265,13 +265,30 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         
 		// gather deleted persistent root UUIDs
 		
+		/* Since we don't allow committing to a deleted persistent root, this 
+		   means these deleted UUIDs won't include persistent roots deleted in 
+		   a previous commit. */
+		for (ETUUID *modifiedUUID in [aTransaction persistentRootUUIDs])
+        {
+			const BOOL isPresent = [db_ boolForQuery: @"SELECT COUNT(*) > 0 FROM persistentroots WHERE uuid = ? AND deleted = 1", [modifiedUUID dataValue]];
+			
+			if (isPresent)
+				[deletedUUIDs addObject: modifiedUUID];
+        }
+
+		// TODO: Turn on if we decide to write history compaction changes with
+		// this method.
+#if 0
+		// gather finalized persistent root UUIDs
+
 		for (ETUUID *modifiedUUID in [aTransaction persistentRootUUIDs])
         {
 			const BOOL isPresent = [db_ boolForQuery: @"SELECT COUNT(*) > 0 FROM persistentroots WHERE uuid = ?", [modifiedUUID dataValue]];
 			
 			if (!isPresent)
-				[deletedUUIDs addObject: modifiedUUID];
+				[finalizedUUIDs addObject: modifiedUUID];
         }
+#endif
 		
         if (!ok)
         {
@@ -352,6 +369,14 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
                                 options: (COBranchRevisionReadingOptions)options
 {
 	ETUUID *prootUUID = [self persistentRootUUIDForBranchUUID: aBranchUUID];
+	if (prootUUID == nil)
+	{
+		[NSException raise: NSInternalInconsistencyException
+		            format: @"For branch %@, the persistent root doesn't exist "
+		                     "in the store. This usually means the persistent "
+		                     "root has been finalized and this branch doesn't "
+		                     "exist anymore.", aBranchUUID];
+	}
 	ETUUID *headRevUUID = [self headRevisionUUIDForBranchUUID: aBranchUUID];
 
     __block NSArray *result = nil;

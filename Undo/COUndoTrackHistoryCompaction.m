@@ -109,6 +109,11 @@
 
 		for (COCommand *command in commandGroup.contents)
 		{
+			/* For persistent roots to be finalized, all their revisions are 
+			   going to be discarded */
+			if ([_finalizablePersistentRootUUIDs containsObject: command.persistentRootUUID])
+				continue;
+
 			if (isScanningLiveCommands)
 			{
 				[self scanRevisionInLiveCommand: command];
