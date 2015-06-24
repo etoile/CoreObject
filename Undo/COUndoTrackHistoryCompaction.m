@@ -112,6 +112,12 @@
 	}
 }
 
+/**
+ * The forward scanning is important in this method.
+ *
+ * The last status check (deleted vs undeleted) decides whether the persistent 
+ * root will be finalized or compacted.
+ */
 - (void)scanPersistentRootInDeadCommand: (COCommand *)command
 {
 	if ([command isKindOfClass: [COCommandDeletePersistentRoot class]])
@@ -129,6 +135,15 @@
 	}
 }
 
+/**
+ * A persistent root could have been marked as finalizable if 
+ * COCommandDeletePersistentRoot was present in dead commands.
+ *
+ * If COCommandDeletePersistentRoot and COCommandUndeletePersistentRoot are 
+ * present in live commands, the persistent root won't marked as finalizable 
+ * anymore, so we can continue to replay deletion or undeletion with the undo 
+ * track.
+ */
 - (void)scanPersistentRootInLiveCommand: (COCommand *)command
 {
 	if ([command isKindOfClass: [COCommandSetCurrentVersionForBranch class]])
@@ -154,6 +169,16 @@
 	}
 }
 
+/**
+ * Marks revisions created by this command as dead.
+ *
+ * For COCommandUndeletePersistentRoot and COCommandDeletePersistentRoot, 
+ * we don't mark their initial revision as dead, since this revision was not 
+ * created by these commands.
+ *
+ * For COCommandSetCurrentVersionForBranch, we don't mark the old revision, 
+ * old head revision and head revision as dead.
+ */
 - (void)scanRevisionInDeadCommand: (id)command
 {
 	ETUUID *persistentRootUUID = [command persistentRootUUID];
@@ -162,11 +187,10 @@
 	{
 		[_deadRevisionUUIDs[persistentRootUUID] addObject: [command revisionUUID]];
 	}
-	else if ([command isKindOfClass: [COCommandUndeletePersistentRoot class]])
+	else if ([command isKindOfClass: [COCommandCreatePersistentRoot class]])
 	{
 		[_deadRevisionUUIDs[persistentRootUUID] addObject: [command initialRevisionID]];
 	}
-	
 	ETAssert([_liveRevisionUUIDs[persistentRootUUID] isEmpty]);
 }
 
