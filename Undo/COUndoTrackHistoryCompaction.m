@@ -8,8 +8,10 @@
 #import "COUndoTrackHistoryCompaction.h"
 #import "COCommand.h"
 #import "COCommandGroup.h"
+#import "COCommandDeleteBranch.h"
 #import "COCommandDeletePersistentRoot.h"
 #import "COCommandSetCurrentVersionForBranch.h"
+#import "COCommandUndeleteBranch.h"
 #import "COCommandUndeletePersistentRoot.h"
 #import "COUndoTrack.h"
 
@@ -121,7 +123,10 @@
  * The forward scanning is important in this method.
  *
  * The last status check (deleted vs undeleted) decides whether the persistent 
- * root will be finalized or compacted.
+ * root will be finalized or compacted. The same applies to the branches.
+ *
+ * Take note that branch deletion/undeletion can appear in the history, even 
+ * with the owning persistent being deleted previously.
  */
 - (void)scanPersistentRootInDeadCommand: (COCommand *)command
 {
@@ -134,9 +139,22 @@
 	{
 		/* This can represent COCommandCreatePersistentRoot too.
 		   Don't delete alive persistent roots, even when we committed no 
-		   changes following the oldest command to keep. */
+		   changes in this persistent root with the live commands. */
 		[_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
 		[_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
+	}
+	else if ([command isKindOfClass: [COCommandDeleteBranch class]])
+	{
+		[_finalizableBranchUUIDs addObject: command.branchUUID];
+		[_compactableBranchUUIDs removeObject: command.branchUUID];
+	}
+	else if ([command isKindOfClass: [COCommandUndeleteBranch class]])
+	{
+		/* This can represent "COCommandCreateBranch" too.
+		   Don't delete alive branches, even when we committed no changes on 
+		   this branch in the live commands. */
+		[_finalizableBranchUUIDs removeObject: command.branchUUID];
+		[_compactableBranchUUIDs addObject: command.branchUUID];
 	}
 }
 
@@ -147,7 +165,11 @@
  * If COCommandDeletePersistentRoot and COCommandUndeletePersistentRoot are 
  * present in live commands, the persistent root won't marked as finalizable 
  * anymore, so we can continue to replay deletion or undeletion with the undo 
- * track.
+ * track. The same applies for COCommandDeleteBranch and COCommandUndeleteBranch.
+ *
+ * If branch-related commands appear in the live commands, we must prevent their 
+ * persistent roots to be finalized in case there is no other commands targeting 
+ * these persistent roots in the live commands.
  */
 - (void)scanPersistentRootInLiveCommand: (COCommand *)command
 {
@@ -167,6 +189,20 @@
 	{
 		[_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
 		[_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
+	}
+	else if ([command isKindOfClass: [COCommandDeleteBranch class]])
+	{
+		[_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
+		[_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
+		[_finalizableBranchUUIDs removeObject: command.branchUUID];
+		[_compactableBranchUUIDs addObject: command.branchUUID];
+	}
+	else if ([command isKindOfClass: [COCommandUndeleteBranch class]])
+	{
+		[_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
+		[_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
+		[_finalizableBranchUUIDs removeObject: command.branchUUID];
+		[_compactableBranchUUIDs addObject: command.branchUUID];
 	}
 	else
 	{
