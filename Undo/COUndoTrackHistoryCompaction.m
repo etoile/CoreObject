@@ -215,6 +215,9 @@
  *
  * For COCommandSetCurrentVersionForBranch, we don't mark the old revision, 
  * old head revision and head revision as dead.
+ *
+ * Branch-related commands beside COCommandSetCurrentVersionForBranch don't 
+ * involve revisions.
  */
 - (void)scanRevisionInDeadCommand: (id)command
 {
@@ -231,6 +234,13 @@
 	ETAssert([_liveRevisionUUIDs[persistentRootUUID] isEmpty]);
 }
 
+/**
+ * We don't need to collect COCommandDeletePersistentRoot.initialRevisionID,
+ * since to replay the deletion, there is no need to know the initial state.
+ *
+ * Branch-related commands beside COCommandSetCurrentVersionForBranch don't 
+ * involve revisions.
+ */
 - (void)scanRevisionInLiveCommand: (id)command
 {
 	ETUUID *persistentRootUUID = [command persistentRootUUID];
