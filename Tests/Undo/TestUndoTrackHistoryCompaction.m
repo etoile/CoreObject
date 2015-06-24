@@ -60,6 +60,7 @@
 - (id)init
 {
 	SUPERINIT;
+	store.maxNumberOfDeltaCommits = 0;
 	_track = [COUndoTrack trackForName: [self className]
 	                withEditingContext: ctx];
 	[_track clear];
@@ -136,7 +137,7 @@
 	NSArray *newRevs = [self compactUpToCommand: _track.allCommands[3]
 	                        expectingCompaction: compaction];
 
-	// FIXME: UKObjectsEqual(liveRevs, newRevs);
+	UKObjectsEqual(liveRevs, newRevs);
 }
 
 @end

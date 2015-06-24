@@ -6,6 +6,7 @@
  */
 
 #import "COSQLiteStore.h"
+#import "COSQLiteStore+Private.h"
 #import "COSQLiteStorePersistentRootBackingStore.h"
 #import "CORevisionInfo.h"
 #import <EtoileFoundation/Macros.h>
@@ -50,6 +51,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 
 @implementation COSQLiteStore
 
+@synthesize maxNumberOfDeltaCommits = _maxNumberOfDeltaCommits;
+
 - (id)initWithURL: (NSURL*)aURL
 {
 	SUPERINIT;
@@ -59,6 +62,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 	url_ = aURL;
 	backingStores_ = [[NSMutableDictionary alloc] init];
     backingStoreUUIDForPersistentRootUUID_ = [[NSMutableDictionary alloc] init];
+	_maxNumberOfDeltaCommits = 50;
+
     __block BOOL ok = YES;
     
     dispatch_sync(queue_, ^() {

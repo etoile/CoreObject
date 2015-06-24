@@ -19,6 +19,7 @@
 #import "COItem+Binary.h"
 #import "CORevisionInfo.h"
 #import "COSQLiteStore.h"
+#import "COSQLiteStore+Private.h"
 #import "CODateSerialization.h"
 #import "COJSONSerialization.h"
 #ifdef GNUSTEP
@@ -527,8 +528,8 @@ static NSData *Sha1Data(NSData *data)
     NSData *contentsBlob;
     int64_t bytesInDeltaRun;
     
-    // Limit delta runs to 9 commits:
-    const BOOL delta = (parent_deltabase != -1 && rowid - parent_deltabase < 50);
+    // Limit delta runs to 50 commits
+    const BOOL delta = (parent_deltabase != -1 && rowid - parent_deltabase < _store.maxNumberOfDeltaCommits);
     
     // Limit delta runs to 4k
     //const BOOL delta = (parent_deltabase != -1 && lastBytesInDeltaRun < 4096);

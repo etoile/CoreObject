@@ -19,6 +19,8 @@
 
 - (ETUUID *) backingUUIDForPersistentRootUUID: (ETUUID *)aUUID;
 
+@property (nonatomic, assign) NSUInteger maxNumberOfDeltaCommits;
+
 - (BOOL) writeRevisionWithModifiedItems: (COItemGraph *)anItemTree
                            revisionUUID: (ETUUID *)aRevisionUUID
                                metadata: (NSDictionary *)metadata

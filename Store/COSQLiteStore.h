@@ -323,6 +323,7 @@ extern NSString * const COPersistentRootAttributeUsedSize;
     NSMutableDictionary *backingStoreUUIDForPersistentRootUUID_;
     
     dispatch_queue_t queue_;
+	NSUInteger _maxNumberOfDeltaCommits;
 }
 
 /**
