@@ -62,7 +62,9 @@
 {
 	SUPERINIT;
 	store.maxNumberOfDeltaCommits = 0;
-	track = [COUndoTrack trackForName: [self className]
+	// NOTE: The name must not start with 'TestUndoTrack', otherwise this
+	// conflicts with pattern track tests in TestUndoTrack.m.
+	track = [COUndoTrack trackForName: @"TestHistoryCompaction"
 	               withEditingContext: ctx];
 	[track clear];
 	return self;
