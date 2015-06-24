@@ -10,7 +10,10 @@
 #import "COCommandGroup.h"
 #import "COCommandDeleteBranch.h"
 #import "COCommandDeletePersistentRoot.h"
+#import "COCommandSetBranchMetadata.h"
+#import "COCommandSetCurrentBranch.h"
 #import "COCommandSetCurrentVersionForBranch.h"
+#import "COCommandSetPersistentRootMetadata.h"
 #import "COCommandUndeleteBranch.h"
 #import "COCommandUndeletePersistentRoot.h"
 #import "COUndoTrack.h"
@@ -180,24 +183,17 @@
 		[_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
 		[_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
 	}
-	else if ([command isKindOfClass: [COCommandDeletePersistentRoot class]])
+	else if ([command isKindOfClass: [COCommandDeletePersistentRoot class]]
+	      || [command isKindOfClass: [COCommandUndeletePersistentRoot class]]
+		  || [command isKindOfClass: [COCommandSetPersistentRootMetadata class]])
 	{
 		[_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
 		[_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
 	}
-	else if ([command isKindOfClass: [COCommandUndeletePersistentRoot class]])
-	{
-		[_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
-		[_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
-	}
-	else if ([command isKindOfClass: [COCommandDeleteBranch class]])
-	{
-		[_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
-		[_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
-		[_finalizableBranchUUIDs removeObject: command.branchUUID];
-		[_compactableBranchUUIDs addObject: command.branchUUID];
-	}
-	else if ([command isKindOfClass: [COCommandUndeleteBranch class]])
+	else if ([command isKindOfClass: [COCommandDeleteBranch class]]
+	      || [command isKindOfClass: [COCommandUndeleteBranch class]]
+		  || [command isKindOfClass: [COCommandSetBranchMetadata class]]
+		  || [command isKindOfClass: [COCommandSetCurrentBranch class]])
 	{
 		[_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
 		[_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
