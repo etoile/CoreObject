@@ -18,6 +18,8 @@
 	COCommand *_oldestCommandToKeep;
 	NSMutableSet *_finalizablePersistentRootUUIDs;
 	NSMutableSet *_compactablePersistentRootUUIDs;
+	NSMutableSet *_finalizableBranchUUIDs;
+	NSMutableSet *_compactableBranchUUIDs;
 	NSMutableDictionary *_deadRevisionUUIDs;
 	NSMutableDictionary *_liveRevisionUUIDs;
 }

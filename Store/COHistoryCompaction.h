@@ -29,6 +29,11 @@
  * be overlapping sets (as explained in -finalizablePersistentRootUUIDs).
  */
 @protocol COHistoryCompaction <NSObject>
+
+
+/** @taskunit Persistent Root Status */
+
+
 /**
  * The persistent roots to be finalized when compacting the history.
  *
@@ -49,8 +54,37 @@
  */
 @property (nonatomic, readonly) NSSet *compactablePersistentRootUUIDs;
 
+
+/** @taskunit Branch Status */
+
+
+/**
+ * The branches to be finalized when compacting the history.
+ *
+ * Branches not previously marked as deleted are ignored.
+ *
+ * To attempt finalizing all branches, return -compactableBranchUUIDs.
+ */
+@property (nonatomic, readonly) NSSet *finalizableBranchUUIDs;
+/**
+ * The branches to be kept when compacting the history, but whose revisions can 
+ * be deleted.
+ *
+ * Branches not included in this set won't have their revisions examined,
+ * when the history is compacted.
+ *
+ * If some of these branches are returned among -finalizableBranchUUIDs and end
+ * up being finalized, they will be ignored.
+ */
+@property (nonatomic, readonly) NSSet *compactableBranchUUIDs;
+
+
+/** @taskunit Revision Status */
+
+
 - (NSSet *)deadRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs;
 - (NSSet *)liveRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs;
+
 @end
 
 

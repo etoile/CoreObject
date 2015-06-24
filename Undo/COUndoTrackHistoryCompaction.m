@@ -15,11 +15,14 @@
 
 
 #define PERSISTENT_ROOT_CAPACITY_HINT 25000
+#define BRANCH_CAPACITY_HINT PERSISTENT_ROOT_CAPACITY_HINT
 
 @implementation COUndoTrackHistoryCompaction
 
 @synthesize undoTrack = _undoTrack, finalizablePersistentRootUUIDs = _finalizablePersistentRootUUIDs,
 	compactablePersistentRootUUIDs = _compactablePersistentRootUUIDs,
+	finalizableBranchUUIDs = _finalizableBranchUUIDs,
+	compactableBranchUUIDs = _compactableBranchUUIDs,
 	deadRevisionUUIDs = _deadRevisionUUIDs, liveRevisionUUIDs = _liveRevisionUUIDs;
 
 - (instancetype)initWithUndoTrack: (COUndoTrack *)aTrack upToCommand: (COCommand *)aCommand
@@ -29,6 +32,8 @@
 	_oldestCommandToKeep = aCommand;
 	_finalizablePersistentRootUUIDs = [NSMutableSet setWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
 	_compactablePersistentRootUUIDs = [NSMutableSet setWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
+	_finalizableBranchUUIDs = [NSMutableSet setWithCapacity: BRANCH_CAPACITY_HINT];
+	_compactableBranchUUIDs = [NSMutableSet setWithCapacity: BRANCH_CAPACITY_HINT];
 	_deadRevisionUUIDs = [NSMutableDictionary dictionaryWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
 	_liveRevisionUUIDs = [NSMutableDictionary dictionaryWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
 	return self;

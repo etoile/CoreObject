@@ -19,8 +19,10 @@
 @interface COBasicHistoryCompaction : NSObject <COHistoryCompaction>
 {
 	@private
-	NSMutableSet *_finalizablePersistentRootUUIDs;
-	NSMutableSet *_compactablePersistentRootUUIDs;
+	NSSet *_finalizablePersistentRootUUIDs;
+	NSSet *_compactablePersistentRootUUIDs;
+	NSSet *_finalizableBranchUUIDs;
+	NSSet *_compactableUUIDs;
 }
 
 /**
@@ -35,5 +37,17 @@
  * See -[COHistoryCompaction compactablePersistentRootUUIDs].
  */
 @property (nonatomic, readwrite) NSSet *compactablePersistentRootUUIDs;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * See -[COHistoryCompaction finalizableBranchUUIDs].
+ */
+@property (nonatomic, readwrite) NSSet *finalizableBranchUUIDs;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ *
+ * See -[COHistoryCompaction compactableBranchUUIDs].
+ */
+@property (nonatomic, readwrite) NSSet *compactableBranchUUIDs;
 
 @end
