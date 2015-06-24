@@ -48,8 +48,8 @@
 
 @interface TestUndoTrackHistoryCompaction : EditingContextTestCase <UKTest>
 {
-	COPersistentRoot *_persistentRoot;
-	COUndoTrack *_track;
+	COPersistentRoot *persistentRoot;
+	COUndoTrack *track;
 }
 
 @end
@@ -61,36 +61,36 @@
 {
 	SUPERINIT;
 	store.maxNumberOfDeltaCommits = 0;
-	_track = [COUndoTrack trackForName: [self className]
-	                withEditingContext: ctx];
-	[_track clear];
+	track = [COUndoTrack trackForName: [self className]
+	               withEditingContext: ctx];
+	[track clear];
 	return self;
 }
 
 - (NSArray *)createPersistentRootWithTrivialHistory
 {
-	_persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
-	[ctx commitWithUndoTrack: _track];
+	persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
+	[ctx commitWithUndoTrack: track];
 	
-	COObject *object = _persistentRoot.rootObject;
+	COObject *object = persistentRoot.rootObject;
 
 	object.name = @"Anywhere";
-	[ctx commitWithUndoTrack: _track];
+	[ctx commitWithUndoTrack: track];
 	
 	object.name = @"Somewhere";
-	[ctx commitWithUndoTrack: _track];
+	[ctx commitWithUndoTrack: track];
 	
 	object.name = @"Nowhere";
-	[ctx commitWithUndoTrack: _track];
+	[ctx commitWithUndoTrack: track];
 	
-	return _persistentRoot.currentBranch.nodes;
+	return persistentRoot.currentBranch.nodes;
 }
 
 - (NSArray *)compactUpToCommand: (COCommand *)command
             expectingCompaction: (COUndoTrackHistoryCompaction *)expectedCompaction
 {
 	COUndoTrackHistoryCompaction *compaction =
-		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: _track
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
 		                                            upToCommand: command];
 	
 	[compaction compute];
@@ -102,17 +102,17 @@
 	UKObjectsEqual(expectedCompaction.compactablePersistentRootUUIDs, compaction.compactablePersistentRootUUIDs);
 	UKIntsEqual(persistentRootUUIDs.count, expectedCompaction.liveRevisionUUIDs.count);
 	UKIntsEqual(persistentRootUUIDs.count, expectedCompaction.deadRevisionUUIDs.count);
-	UKObjectsEqual([expectedCompaction liveRevisionUUIDsForPersistentRootUUIDs: @[_persistentRoot.UUID]],
-	                       [compaction liveRevisionUUIDsForPersistentRootUUIDs: @[_persistentRoot.UUID]]);
-	UKObjectsEqual([expectedCompaction deadRevisionUUIDsForPersistentRootUUIDs: @[_persistentRoot.UUID]],
-	                       [compaction deadRevisionUUIDsForPersistentRootUUIDs: @[_persistentRoot.UUID]]);
+	UKObjectsEqual([expectedCompaction liveRevisionUUIDsForPersistentRootUUIDs: @[persistentRoot.UUID]],
+	                       [compaction liveRevisionUUIDsForPersistentRootUUIDs: @[persistentRoot.UUID]]);
+	UKObjectsEqual([expectedCompaction deadRevisionUUIDsForPersistentRootUUIDs: @[persistentRoot.UUID]],
+	                       [compaction deadRevisionUUIDsForPersistentRootUUIDs: @[persistentRoot.UUID]]);
 
 	UKTrue([store compactHistory: compaction]);
 	
 	// TODO: Remove, the branches should receive a notification.
-	[_persistentRoot.currentBranch reloadRevisions];
+	[persistentRoot.currentBranch reloadRevisions];
 
-	return _persistentRoot.currentBranch.nodes;
+	return persistentRoot.currentBranch.nodes;
 }
 
 - (void)testCompactPersistentRootWithTrivialHistory
@@ -124,17 +124,17 @@
 	COUndoTrackHistoryCompaction *compaction = [COUndoTrackHistoryCompaction new];
 
 	compaction.finalizablePersistentRootUUIDs = [NSSet set];
-	compaction.compactablePersistentRootUUIDs = S(_persistentRoot.UUID);
-	compaction.liveRevisionUUIDs = @{ _persistentRoot.UUID : SA((id)[[liveRevs mappedCollection] UUID]) };
-	compaction.deadRevisionUUIDs = @{ _persistentRoot.UUID : SA((id)[[deadRevs mappedCollection] UUID]) };
+	compaction.compactablePersistentRootUUIDs = S(persistentRoot.UUID);
+	compaction.liveRevisionUUIDs = @{ persistentRoot.UUID : SA((id)[[liveRevs mappedCollection] UUID]) };
+	compaction.deadRevisionUUIDs = @{ persistentRoot.UUID : SA((id)[[deadRevs mappedCollection] UUID]) };
 
 	/* COCommandSetCurrentVersionForBranch.oldRevisionID is kept alive by 
 	   COUndoTrackHistoryCompaction logic, this means the oldest kept revision 
-	   will be the revision prior to _track.allCommands[3].newRevisionID.
+	   will be the revision prior to track.allCommands[3].newRevisionID.
 
 	   This explains the index mistmatch between oldRevs subarrayFromIndex: 2]
 	   and the next line. */
-	NSArray *newRevs = [self compactUpToCommand: _track.allCommands[3]
+	NSArray *newRevs = [self compactUpToCommand: track.allCommands[3]
 	                        expectingCompaction: compaction];
 
 	UKObjectsEqual(liveRevs, newRevs);
