@@ -39,6 +39,11 @@
  *
  * Persistent roots not previously marked as deleted are ignored.
  *
+ * When a persistent root is finalized, it is permanently erased from the store,
+ * along with its branches and revisions. If the associated backing store is not 
+ * deleted at the same time, all the revisions corresponding to this persistent 
+ * root are still erased.
+ *
  * To attempt finalizing all persistent roots, return -compactablePersistentRootUUIDs.
  */
 @property (nonatomic, readonly) NSSet *finalizablePersistentRootUUIDs;
@@ -49,8 +54,8 @@
  * Peristent roots not included in this set won't have their revisions examined, 
  * when the history is compacted.
  *
- * If some of these persistent roots are returned among -finalizablePersistentRootUUIDs 
- * and end up being finalized, they will be ignored.
+ * If some of these persistent roots are returned among -finalizablePersistentRootUUIDs,
+ * they will be finalized if marked as deleted, or compacted otherwise.
  */
 @property (nonatomic, readonly) NSSet *compactablePersistentRootUUIDs;
 

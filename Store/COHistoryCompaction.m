@@ -26,6 +26,11 @@
     dispatch_sync(queue_, ^()
 	{
         [db_ beginTransaction];
+		
+		NSMutableSet *collectablePersistentRootUUIDs = [NSMutableSet new];
+
+		[collectablePersistentRootUUIDs unionSet: aCompactionStrategy.compactablePersistentRootUUIDs];
+		[collectablePersistentRootUUIDs unionSet: aCompactionStrategy.finalizablePersistentRootUUIDs];
         
         // Delete rows from branches and persistentroots tables
 		
@@ -40,6 +45,21 @@
 				[db_ executeUpdate: @"DELETE FROM branches WHERE proot = ?", persistentRootData];
 				[db_ executeUpdate: @"DELETE FROM persistentroots WHERE uuid = ?", persistentRootData];
 			}
+		}
+
+		for (ETUUID *branchUUID in aCompactionStrategy.finalizableBranchUUIDs)
+		{
+			FMResultSet *rs = [db_ executeQuery:
+				@"SELECT proot FROM branches WHERE uuid = ?", branchUUID.dataValue];
+
+			if ([rs next])
+			{
+				[collectablePersistentRootUUIDs addObject: [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]]];
+				ETAssert([rs next] == NO);
+			}
+			[rs close];
+
+			[db_ executeUpdate: @"DELETE FROM branches WHERE deleted = 1 AND uuid = ?", branchUUID.dataValue];
 		}
 
 		// Delete unused backing stores
@@ -60,7 +80,7 @@
 		NSMutableSet *backingStoresForRevisionGC = [NSMutableSet new];
 		NSMutableDictionary *persistentRootsByBackingStore = [NSMutableDictionary new];
 
-		for (ETUUID *persistentRoot in aCompactionStrategy.compactablePersistentRootUUIDs)
+		for (ETUUID *persistentRoot in collectablePersistentRootUUIDs)
 		{
 			NSData *persistentRootData = [persistentRoot dataValue];
 			NSData *backingStoreData = [db_ dataForQuery: @"SELECT backingstore FROM persistentroot_backingstores WHERE uuid = ?", persistentRootData];
@@ -85,53 +105,56 @@
 		for (ETUUID *backingUUID in backingStoresForRevisionGC)
 		{
 			NSData *backingUUIDData = [backingUUID dataValue];
-		
-			COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID error: NULL];
+			COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID
+			                                                                       error: NULL];
+			NSIndexSet *revisions = [backing revidsUsedRange];
+			NSMutableIndexSet *reachableRevisions = [NSMutableIndexSet new];
+			NSMutableIndexSet *contiguousLiveRevisions = [NSMutableIndexSet new];
 			
-			// Delete just the unreachable revisions
+			// Find reachable revisions
+
+			FMResultSet *rs = [db_ executeQuery: @"SELECT "
+							   "branches.current_revid "
+							   "FROM persistentroots "
+							   "INNER JOIN branches ON persistentroots.uuid = branches.proot "
+							   "INNER JOIN persistentroot_backingstores ON persistentroots.uuid = persistentroot_backingstores.uuid "
+							   "WHERE persistentroot_backingstores.backingstore = ?", backingUUIDData];
+
+			while ([rs next])
+			{
+				ETUUID *head = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+				NSIndexSet *revs = [backing revidsFromRevid: 0
+													toRevid: [backing revidForUUID: head]];
+
+				[reachableRevisions addIndexes: revs];
+			}
+			[rs close];
+
+			// Join live revisions into a single contiguous range
 			
 			NSArray *persistentRootUUIDs = persistentRootsByBackingStore[backingUUID];
-			NSSet *liveRevisionUUIDs = [aCompactionStrategy liveRevisionUUIDsForPersistentRootUUIDs: persistentRootUUIDs];
-			NSIndexSet *keptRevisions = nil;
-			NSIndexSet *revisions = [backing revidsUsedRange];
-			
-			if (liveRevisionUUIDs.isEmpty)
-			{
-				FMResultSet *rs = [db_ executeQuery: @"SELECT "
-								   "branches.current_revid "
-								   "FROM persistentroots "
-								   "INNER JOIN branches ON persistentroots.uuid = branches.proot "
-								   "INNER JOIN persistentroot_backingstores ON persistentroots.uuid = persistentroot_backingstores.uuid "
-								   "WHERE persistentroot_backingstores.backingstore = ?", backingUUIDData];
-				
-				keptRevisions = [NSMutableIndexSet new];
-
-				while ([rs next])
-				{
-					ETUUID *head = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-					
-					NSIndexSet *revs = [backing revidsFromRevid: 0
-														toRevid: [backing revidForUUID: head]];
-					[(NSMutableIndexSet *)keptRevisions addIndexes: revs];
-				}
-				[rs close];
-			}
-			else
+			NSSet *liveRevisionUUIDs =
+				[aCompactionStrategy liveRevisionUUIDsForPersistentRootUUIDs: persistentRootUUIDs];
+			BOOL canDeleteReachableRevisions = !liveRevisionUUIDs.isEmpty;
+	
+			if (canDeleteReachableRevisions)
 			{
 				NSIndexSet *liveRevisions = [backing revidsForUUIDs: liveRevisionUUIDs.allObjects];
-				
-				/* Join the live revisions into a single range to determine the kept revisions */
 				ETAssert(liveRevisions.lastIndex <= revisions.lastIndex);
 				NSUInteger length = revisions.lastIndex - liveRevisions.firstIndex + 1;
 				NSRange liveRange = NSMakeRange(liveRevisions.firstIndex, length);
 				
-				keptRevisions = [NSIndexSet indexSetWithIndexesInRange: liveRange];
+				[contiguousLiveRevisions addIndexesInRange: liveRange];
 			}
+
+			// Compute deleted revisions (unreachable or outside live range)
 			
-			// Now for each index set in deletedRevisionsForBackingStore, subtract the index set
-			// in keptRevisionsForBackingStore
+			ETAssert([reachableRevisions containsIndexes: contiguousLiveRevisions]);
 			
 			NSMutableIndexSet *deletedRevisions = [NSMutableIndexSet indexSet];
+			NSIndexSet *keptRevisions =
+				(canDeleteReachableRevisions ? contiguousLiveRevisions : reachableRevisions);
+	
 			[deletedRevisions addIndexes: revisions];
 			[deletedRevisions removeIndexes: keptRevisions];
 			
@@ -146,6 +169,7 @@
 			//    }
 			
 			// Delete the actual revisions
+
 			assert([backing deleteRevids: deletedRevisions]);
 		}
 		
