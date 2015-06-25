@@ -132,6 +132,10 @@
 
 			// Join live revisions into a single contiguous range
 			
+			// FIXME: Include non-deleted branches initial revisions in the
+			// contiguous range, otherwise branches untouched in the history
+			// recently could have their revisions discarded.
+			
 			NSArray *persistentRootUUIDs = persistentRootsByBackingStore[backingUUID];
 			NSSet *liveRevisionUUIDs =
 				[aCompactionStrategy liveRevisionUUIDsForPersistentRootUUIDs: persistentRootUUIDs];
