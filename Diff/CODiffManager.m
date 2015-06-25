@@ -134,6 +134,16 @@
 	return result;
 }
 
+- (COItemGraphDiff *)subdiffForAlgorithmName: (NSString *)aDiffAlgorithmName
+{
+	return self.subDiffsByAlgorithmName[aDiffAlgorithmName];
+}
+
+- (void)addSubdiff: (id <CODiffAlgorithm>)aSubdiff
+{
+	self.subDiffsByAlgorithmName[NSStringFromClass([aSubdiff class])] = aSubdiff;
+}
+
 - (BOOL) applyTo: (id<COItemGraph>)dest
 {
 	NSMutableDictionary *itemsByUUID = [NSMutableDictionary new];
