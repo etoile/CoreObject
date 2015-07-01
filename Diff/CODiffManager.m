@@ -109,6 +109,13 @@
 	return result;
 }
 
+- (instancetype)init
+{
+	SUPERINIT;
+	subDiffsByAlgorithmName = [NSMutableDictionary new];
+	return self;
+}
+
 - (CODiffManager *) diffByMergingWithDiff: (CODiffManager *)otherDiff
 {
 	CODiffManager *result = [[CODiffManager alloc] init];
