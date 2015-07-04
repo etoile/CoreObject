@@ -24,7 +24,9 @@
 #import "COCrossPersistentRootDeadRelationshipCache.h"
 #import "CORevisionCache.h"
 #import "COStoreTransaction.h"
+#if TARGET_OS_IPHONE
 #import "NSDistributedNotificationCenter.h"
+#endif
 
 @implementation COEditingContext
 

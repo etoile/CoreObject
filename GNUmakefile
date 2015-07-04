@@ -31,7 +31,7 @@ ifeq ($(ramdisk), yes)
   CoreObject_CPPFLAGS += -DIN_MEMORY_STORE
 endif
 
-OTHER_HEADER_DIRS = . Core Debugging Diff Extras/Diff Extras/Model Extras/ValueTransformers Model Store Undo Synchronization Synchronization/Messages Utilities StorageDataModel
+OTHER_HEADER_DIRS = . Core Debugging Diff Extras/Diff Extras/Model Extras/ValueTransformers Model Store Undo Synchronization Synchronization/Messages Utilities StorageDataModel SchemaMigration
 
 CoreObject_HEADER_FILES_DIR = Headers
 CoreObject_HEADER_FILES = $(notdir $(wildcard Headers/*.h))

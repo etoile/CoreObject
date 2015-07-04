@@ -14,7 +14,9 @@
 #import "CODateSerialization.h"
 #import "COEndOfUndoTrackPlaceholderNode.h"
 #import "COJSONSerialization.h"
+#if TARGET_OS_IPHONE
 #import "NSDistributedNotificationCenter.h"
+#endif
 
 NSString * const COUndoTrackStoreTrackDidChangeNotification = @"COUndoTrackStoreTrackDidChangeNotification";
 NSString * const COUndoTrackStoreTrackName = @"COUndoTrackStoreTrackName";
