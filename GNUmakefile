@@ -12,9 +12,10 @@ LIBRARIES_DEPEND_UPON = $(shell pkg-config --libs sqlite3) -lEtoileFoundation $(
 # For test builds, pass one more libdispatch include directory located in GNUstep Local domain
 CoreObject_INCLUDE_DIRS = -IStore/fmdb/src -I$(GNUSTEP_LOCAL_ROOT)/Library/Headers/dispatch
 CoreObject_CPPFLAGS += -DGNUSTEP_MISSING_API_COMPATIBILITY -DOS_OBJECT_USE_OBJC=0
-CoreObject_LDFLAGS += -lstdc++ -lobjcxx -lsqlite3 -ldispatch
+CoreObject_LDFLAGS += -lsqlite3 -ldispatch
 # TODO: Check that -fobjc-arc is all we need to pass, then remove -fobjc-nonfragile-abi -fblocks
-CoreObject_OBJCFLAGS += -fobjc-nonfragile-abi -fblocks -fobjc-arc -Wall -Wno-arc-performSelector-leaks
+CoreObject_OBJCFLAGS += -fblocks -fobjc-arc -Wall -Wno-arc-performSelector-leaks
+LD=${CXX}
 
 ifeq ($(test), yes)
   BUNDLE_NAME = $(FRAMEWORK_NAME)
@@ -33,8 +34,7 @@ endif
 
 OTHER_HEADER_DIRS = . Core Debugging Diff Extras/Diff Extras/Model Extras/ValueTransformers Model Store Undo Synchronization Synchronization/Messages Utilities StorageDataModel SchemaMigration
 
-CoreObject_HEADER_FILES_DIR = Headers
-CoreObject_HEADER_FILES = $(notdir $(wildcard Headers/*.h))
+CoreObject_HEADER_FILES = $(foreach dir, ${OTHER_HEADER_DIRS}, $(addprefix ${dir}/, $(notdir $(wildcard ${dir}/*.h))))
 
 CoreObject_OBJC_FILES += $(wildcard Core/*.m)
 CoreObject_OBJC_FILES += $(wildcard Diff/*.m)
