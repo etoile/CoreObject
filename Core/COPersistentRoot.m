@@ -119,7 +119,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
         
         for (COBranchInfo *branchInfo in [[_savedState branchForUUID] allValues])
         {
-            [self updateBranchWithBranchInfo: branchInfo];
+            [self updateBranchWithBranchInfo: branchInfo
+			                       compacted: NO];
         }
         
         _currentBranchUUID =  [_savedState currentBranchUUID];
@@ -776,7 +777,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	
 	for (COBranch *branch in [self branches])
 	{
-		[branch updateRevisions];
+		[branch updateRevisions: NO];
 	}
 }
 
@@ -818,7 +819,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     return newBranch;
 }
 
-- (void)updateBranchWithBranchInfo: (COBranchInfo *)branchInfo
+- (void)updateBranchWithBranchInfo: (COBranchInfo *)branchInfo compacted: (BOOL)wasCompacted
 {
     COBranch *branch = [_branchForUUID objectForKey: [branchInfo UUID]];
     
@@ -833,7 +834,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     }
     else
     {
-        [branch updateWithBranchInfo: branchInfo];
+        [branch updateWithBranchInfo: branchInfo
+		                   compacted: wasCompacted];
     }
 }
 
@@ -852,10 +854,14 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     for (ETUUID *uuid in [info branchUUIDs])
     {
         COBranchInfo *branchInfo = [info branchInfoForUUID: uuid];
-        [self updateBranchWithBranchInfo: branchInfo];
+		BOOL wasCompacted =
+			[notif.userInfo[kCOStoreCompactedPersistentRoots] containsObject: self.UUID.stringValue];
+	
+        [self updateBranchWithBranchInfo: branchInfo
+		                       compacted: wasCompacted];
     }
     
-	// FIXME: Factor out like -[COBranch updateBranchWithBranchInfo:]
+	// FIXME: Factor out like -[COBranch updateBranchWithBranchInfo:compacted:]
 	// TODO: Test that _everything_ is reloaded
 	
     _currentBranchUUID =  [_savedState currentBranchUUID];

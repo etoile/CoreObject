@@ -136,16 +136,10 @@
 	                       [compaction deadRevisionUUIDsForPersistentRootUUIDs: @[persistentRoot.UUID]]);
 
 	UKTrue([store compactHistory: compaction]);
-	
-	// TODO: Remove, the branches should receive a notification.
-	[persistentRoot.currentBranch reloadRevisions];
+
 	if (otherPersistentRoot.isDeleted)
 	{
 		UKRaisesException([otherPersistentRoot.currentBranch reloadRevisions]);
-	}
-	else
-	{
-		UKDoesNotRaiseException([otherPersistentRoot.currentBranch reloadRevisions]);
 	}
 
 	NSMutableDictionary *revs =  [NSMutableDictionary new];
