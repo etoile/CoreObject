@@ -64,6 +64,28 @@ extern NSString * const kCOStoreInsertedPersistentRoots;
  * The persistent root UUIDs deleted with the last commit.
  */
 extern NSString * const kCOStoreDeletedPersistentRoots;
+/**
+ * The persistent root UUIDs compacted with -compactHistory: or
+ * -finalizeDeletionsForPersistentRoot:error:.
+ *
+ * These persistent roots don't appear in kCOStorePersistentRootTransactionIDs.
+ * Transaction IDs are not needed, since persistent root histories are
+ * compacted by looking at the store state).
+ *
+ * Can include persistent roots which have not been compacted (but were just 
+ * candidates for compaction).
+ */
+extern NSString * const kCOStoreCompactedPersistentRoots;
+/**
+ * The persistent root UUIDs finalized with -compactHistory: or
+ * -finalizeDeletionsForPersistentRoot:error:.
+ *
+ * These persistent roots don't appear in kCOStorePersistentRootTransactionIDs 
+ * Transaction IDs are not needed, since we look at the deletion status in store 
+ * to decide whether we can finalize the persistent roots. Moreover the 
+ * transaction ID that exist per persistent root erased with the finalization.
+ */
+extern NSString * const kCOStoreFinalizedPersistentRoots;
 extern NSString * const kCOStoreUUID;
 extern NSString * const kCOStoreURL;
 

@@ -794,7 +794,15 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 	NSArray *deletedPersistentRootUUIDs = [notif.userInfo[kCOStoreDeletedPersistentRoots] mappedCollectionWithBlock: ^ (id uuidString) {
 		return [ETUUID UUIDWithString: uuidString];
 	}];
+	NSArray *compactedPersistentRootUUIDs = [notif.userInfo[kCOStoreCompactedPersistentRoots] mappedCollectionWithBlock: ^ (id uuidString) {
+		return [ETUUID UUIDWithString: uuidString];
+	}];
+	NSArray *finalizedPersistentRootUUIDs = [notif.userInfo[kCOStoreFinalizedPersistentRoots] mappedCollectionWithBlock: ^ (id uuidString) {
+		return [ETUUID UUIDWithString: uuidString];
+	}];
 	
+	ETAssert(transactionIDs.isEmpty || (finalizedPersistentRootUUIDs.isEmpty && compactedPersistentRootUUIDs.isEmpty));
+
     //NSLog(@"%@: Got change notif for persistent root: %@", self, persistentRootUUID);
     
 	BOOL hadChanges = NO;
@@ -859,6 +867,22 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 			                                                    isDeleted: newlyInserted.isDeleted];
 			}
 		}
+	}
+	
+	for (ETUUID *persistentRootUUID in compactedPersistentRootUUIDs)
+	{
+		COPersistentRoot *loaded = [_loadedPersistentRoots objectForKey: persistentRootUUID];
+		
+		[loaded storePersistentRootDidChange: notif isDistributed: isDistributed];
+		hadChanges = YES;
+	}
+	
+	for (ETUUID *persistentRootUUID in finalizedPersistentRootUUIDs)
+	{
+		COPersistentRoot *loaded = [_loadedPersistentRoots objectForKey: persistentRootUUID];
+		
+		// TODO: [self unloadPersistentRoot: loaded]
+		hadChanges = YES;
 	}
 	
 	if (hadChanges)

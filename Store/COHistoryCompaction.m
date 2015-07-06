@@ -14,6 +14,11 @@
 - (void)deleteBackingStoreWithUUID: (ETUUID *)aUUID;
 - (COSQLiteStorePersistentRootBackingStore *) backingStoreForUUID: (ETUUID *)aUUID error: (NSError **)error;
 - (BOOL)finalizeGarbageAttachments;
+- (void)postCommitNotificationsWithTransactionIDForPersistentRootUUID: (NSDictionary *)txnIDForPersistentRoot
+                                              insertedPersistentRoots: (NSArray *)insertedUUIDs
+                                               deletedPersistentRoots: (NSArray *)deletedUUIDs
+                                             compactedPersistentRoots: (NSArray *)compactedUUIDs
+                                             finalizedPersistentRoots: (NSArray *)finalizedUUIDs;
 @end
 
 @implementation COSQLiteStore (COHistoryCompaction)
@@ -22,6 +27,9 @@
 {
     NILARG_EXCEPTION_TEST(aCompactionStrategy);
     ETAssert(dispatch_get_current_queue() != queue_);
+	
+	__block NSMutableSet *compactedPersistentRootUUIDs = [NSMutableSet new];
+	__block NSMutableSet *finalizedPersistentRootUUIDs = [NSMutableSet new];
     
     dispatch_sync(queue_, ^()
 	{
@@ -31,6 +39,12 @@
 
 		[collectablePersistentRootUUIDs unionSet: aCompactionStrategy.compactablePersistentRootUUIDs];
 		[collectablePersistentRootUUIDs unionSet: aCompactionStrategy.finalizablePersistentRootUUIDs];
+
+		// NOTE: We pretend all compactable persistent roots end up being
+		// compacted (this will cause an useless reloading in COPersistentRoot),
+		// but this is less complex/costly than computing precisely which
+		// persistent roots are compacted when deleting revisions in a backing store.
+		[compactedPersistentRootUUIDs unionSet: aCompactionStrategy.compactablePersistentRootUUIDs];
         
         // Delete rows from branches and persistentroots tables
 		
@@ -44,6 +58,8 @@
 			{
 				[db_ executeUpdate: @"DELETE FROM branches WHERE proot = ?", persistentRootData];
 				[db_ executeUpdate: @"DELETE FROM persistentroots WHERE uuid = ?", persistentRootData];
+				
+				[finalizedPersistentRootUUIDs addObject: persistentRoot];
 			}
 		}
 
@@ -54,7 +70,11 @@
 
 			if ([rs next])
 			{
-				[collectablePersistentRootUUIDs addObject: [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]]];
+				ETUUID *UUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+
+				[collectablePersistentRootUUIDs addObject: UUID];
+				[compactedPersistentRootUUIDs addObject: UUID];
+	
 				ETAssert([rs next] == NO);
 			}
 			[rs close];
@@ -181,6 +201,12 @@
 		
         [self finalizeGarbageAttachments];
     });
+	
+	[self postCommitNotificationsWithTransactionIDForPersistentRootUUID: @{}
+	                                            insertedPersistentRoots: @[]
+												 deletedPersistentRoots: @[]
+											   compactedPersistentRoots: compactedPersistentRootUUIDs.allObjects
+											   finalizedPersistentRoots: finalizedPersistentRootUUIDs.allObjects];
     
     return YES;
 }

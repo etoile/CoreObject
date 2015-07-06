@@ -35,6 +35,8 @@ NSString * const kCOStorePersistentRootTransactionIDs = @"COPersistentRootTransa
 NSString * const kCOStoreInsertedPersistentRoots = @"COStoreInsertedPersistentRoots";
 NSString * const kCOStoreUpdatedPersistentRoots = @"COStoreUpdatedPersistentRoots";
 NSString * const kCOStoreDeletedPersistentRoots = @"COStoreDeletedPersistentRoots";
+NSString * const kCOStoreCompactedPersistentRoots = @"COStoreCompactedPersistentRoots";
+NSString * const kCOStoreFinalizedPersistentRoots = @"COStoreFinalizedPersistentRoots";
 NSString * const kCOStoreUUID = @"COStoreUUID";
 NSString * const kCOStoreURL = @"COStoreURL";
 
@@ -305,7 +307,9 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 	{
 		[self postCommitNotificationsWithTransactionIDForPersistentRootUUID: txnIDForPersistentRoot
 													insertedPersistentRoots: insertedUUIDs
-													 deletedPersistentRoots: deletedUUIDs];
+													 deletedPersistentRoots: deletedUUIDs
+		                                           compactedPersistentRoots: @[]
+		                                           finalizedPersistentRoots: @[]];
 	}
 	else
 	{
@@ -974,11 +978,15 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 - (void) postCommitNotificationsWithTransactionIDForPersistentRootUUID: (NSDictionary *)txnIDForPersistentRoot
 											   insertedPersistentRoots: (NSArray *)insertedUUIDs
 												deletedPersistentRoots: (NSArray *)deletedUUIDs
+                                              compactedPersistentRoots: (NSArray *)compactedUUIDs
+                                              finalizedPersistentRoots: (NSArray *)finalizedUUIDs
 {
 	NSMutableDictionary *stringTxnIDForPersistentRoot = [[NSMutableDictionary alloc] init];
 	NSMutableArray *deletedUUIDStrings = [NSMutableArray new];
 	NSMutableArray *insertedUUIDStrings = [NSMutableArray new];
-	
+	NSMutableArray *compactedUUIDStrings = [NSMutableArray new];
+	NSMutableArray *finalizedUUIDStrings = [NSMutableArray new];
+
 	for (ETUUID *persistentRootUUID in txnIDForPersistentRoot)
     {
 		stringTxnIDForPersistentRoot[[persistentRootUUID stringValue]] = txnIDForPersistentRoot[persistentRootUUID];
@@ -991,10 +999,20 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 	{
 		[deletedUUIDStrings addObject: persistentRootUUID.stringValue];
 	}
-	
+	for (ETUUID *persistentRootUUID in compactedUUIDs)
+	{
+		[compactedUUIDStrings addObject: persistentRootUUID.stringValue];
+	}
+	for (ETUUID *persistentRootUUID in finalizedUUIDs)
+	{
+		[finalizedUUIDStrings addObject: persistentRootUUID.stringValue];
+	}
+
 	NSDictionary *userInfo = @{kCOStorePersistentRootTransactionIDs : stringTxnIDForPersistentRoot,
 							   kCOStoreDeletedPersistentRoots : deletedUUIDStrings,
 							   kCOStoreInsertedPersistentRoots : insertedUUIDStrings,
+							   kCOStoreCompactedPersistentRoots : compactedUUIDStrings,
+							   kCOStoreFinalizedPersistentRoots : finalizedUUIDStrings,
 							   kCOStoreUUID : [[self UUID] stringValue],
 							   kCOStoreURL : [[self URL] absoluteString]};
 
