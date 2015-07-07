@@ -20,30 +20,35 @@ NSString * const COUndoTrackStoreTrackDidChangeNotification = @"COUndoTrackStore
 NSString * const COUndoTrackStoreTrackName = @"COUndoTrackStoreTrackName";
 NSString * const COUndoTrackStoreTrackHeadCommandUUID = @"COUndoTrackStoreTrackHeadCommandUUID";
 NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTrackCurrentCommandUUID";
+NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompacted";
 
 @implementation COUndoTrackSerializedCommand
 @synthesize JSONData, metadata, UUID, parentUUID, trackName, timestamp, sequenceNumber;
 @end
 
 @implementation COUndoTrackState
-@synthesize trackName, headCommandUUID, currentCommandUUID;
+@synthesize trackName, headCommandUUID, currentCommandUUID, compacted;
 - (id)copyWithZone:(NSZone *)zone
 {
 	COUndoTrackState *aCopy = [COUndoTrackState new];
 	aCopy.trackName = self.trackName;
 	aCopy.headCommandUUID = self.headCommandUUID;
 	aCopy.currentCommandUUID = self.currentCommandUUID;
+	aCopy.compacted = self.compacted;
 	return aCopy;
 }
 - (BOOL) isEqual:(id)object
 {
 	if (![object isKindOfClass: [COUndoTrackState class]])
 		return NO;
+	
 	COUndoTrackState *otherState = object;
+
 	return [self.trackName isEqual: otherState.trackName]
 		&& [self.headCommandUUID isEqual: otherState.headCommandUUID]
 		&& ((self.currentCommandUUID == nil && otherState.currentCommandUUID == nil)
-			|| [self.currentCommandUUID isEqual: otherState.currentCommandUUID]);
+			|| [self.currentCommandUUID isEqual: otherState.currentCommandUUID])
+		&& self.compacted == otherState.compacted;
 }
 @end
 
@@ -146,9 +151,31 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 			[NSException raise: NSGenericException format: @"Your SQLite version doesn't support foreign keys"];
 		}
 		
+		/* Store Metadata table (including schema version) */
+    
+		if (![_db tableExists: @"storeMetadata"])
+		{
+			NSAssert(![_db tableExists: @"commands"], @"Unsupported unversioned schema");
+
+			[_db executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER)"];
+			[_db executeUpdate: @"INSERT INTO storeMetadata VALUES(1)"];
+		}
+		else
+		{
+			int version = [_db intForQuery: @"SELECT version FROM storeMetadata"];
+			if (1 != version)
+			{
+				NSLog(@"Error, undo track store version %d, only version 1 is supported", version);
+				[_db rollback];
+				return NO;
+			}
+		}
+		
+		/* Commands and Tracks tables */
+		
 		[_db executeUpdate: @"CREATE TABLE IF NOT EXISTS commands (id INTEGER PRIMARY KEY AUTOINCREMENT, "
 							 "uuid BLOB NOT NULL UNIQUE, parentid INTEGER, trackname STRING NOT NULL, data BLOB NOT NULL, "
-							 "metadata BLOB, timestamp INTEGER NOT NULL)"];
+							 "metadata BLOB, timestamp INTEGER NOT NULL, deleted BOOLEAN DEFAULT 0)"];
 		
 		// NULL currentid means "the start of the track"
 		[_db executeUpdate: @"CREATE TABLE IF NOT EXISTS tracks (trackname STRING PRIMARY KEY, "
@@ -234,7 +261,7 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 
 - (NSArray *) allCommandUUIDsOnTrackWithName: (NSString*)aName
 {
-	return [[_db arrayForQuery: @"SELECT uuid FROM commands WHERE trackname = ?", aName] mappedCollectionWithBlock: ^(id object) {
+	return [[_db arrayForQuery: @"SELECT uuid FROM commands WHERE trackname = ? and deleted = 0", aName] mappedCollectionWithBlock: ^(id object) {
 		return [ETUUID UUIDWithData: object];
 	}];
 }
@@ -306,6 +333,36 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 	return [_db boolForQuery: @"SELECT 1 WHERE ? GLOB ?", aString, aPattern];
 }
 
+- (void)markCommandsAsDeletedForUUIDs: (NSArray *)UUIDs
+{
+	[_db beginTransaction];
+
+	for (ETUUID *UUID in UUIDs)
+	{
+		[_db executeUpdate: @"UPDATE commands SET deleted = 1 WHERE uuid = ?", [UUID dataValue]];
+	}
+
+	NSArray *compactedTrackNames =
+		[_db arrayForQuery: @"SELECT DISTINCT trackname FROM commands WHERE deleted = 1 "];
+
+	for (NSString *trackName in compactedTrackNames)
+	{
+		if (_modifiedTrackStateForTrackName[trackName] == nil)
+		{
+			_modifiedTrackStateForTrackName[trackName] = [[self stateForTrackName: trackName] copy];
+		}
+		((COUndoTrackState *)_modifiedTrackStateForTrackName[trackName]).compacted = YES;
+	}
+
+	[_db commit];
+	[self postCommitNotifications];
+}
+
+- (void)finalizeDeletions
+{
+	[_db executeUpdate: @"DELETE FROM commands WHERE deleted = 1"];
+}
+
 - (void) postCommitNotificationsWithUserInfo: (NSDictionary *)userInfo
 {
 	ETAssert([NSThread isMainThread]);
@@ -336,6 +393,7 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 		{
 			userInfo[COUndoTrackStoreTrackCurrentCommandUUID] = [state.currentCommandUUID stringValue];
 		}
+		userInfo[COUndoTrackStoreTrackCompacted] = @(state.compacted);
 
 		[self postCommitNotificationsWithUserInfo: userInfo];
 		

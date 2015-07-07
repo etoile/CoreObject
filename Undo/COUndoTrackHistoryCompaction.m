@@ -17,6 +17,7 @@
 #import "COCommandUndeleteBranch.h"
 #import "COCommandUndeletePersistentRoot.h"
 #import "COUndoTrack.h"
+#import "COUndoTrackStore.h"
 
 
 #define PERSISTENT_ROOT_CAPACITY_HINT 25000
@@ -297,6 +298,18 @@
 		[revisionUUIDs unionSet: revisionSet];
 	}
 	return revisionUUIDs;
+}
+
+- (void)beginCompaction
+{
+	NSArray *commandUUIDs = (id)[[[_undoTrack allCommands] mappedCollection] UUID];
+
+	[_undoTrack.store markCommandsAsDeletedForUUIDs: commandUUIDs];
+}
+
+- (void)endCompaction: (BOOL)success
+{
+	[_undoTrack.store finalizeDeletions];
 }
 
 @end

@@ -34,4 +34,14 @@
 	return [NSSet new];
 }
 
+- (void)beginCompaction
+{
+
+}
+
+- (void)endCompaction: (BOOL)success
+{
+
+}
+
 @end

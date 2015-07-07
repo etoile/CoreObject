@@ -23,6 +23,10 @@ NSString * const COUndoTrackStoreTrackHeadCommandUUID;
  * NSNull or UUID string
  */
 NSString * const COUndoTrackStoreTrackCurrentCommandUUID;
+/**
+ * NSNumber boolean
+ */
+NSString * const COUndoTrackStoreTrackCompacted;
 
 @interface COUndoTrackSerializedCommand : NSObject
 @property (nonatomic, readwrite, strong) id JSONData;
@@ -38,6 +42,16 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID;
 @property (nonatomic, readwrite, copy) NSString *trackName;
 @property (nonatomic, readwrite, copy) ETUUID *headCommandUUID;
 @property (nonatomic, readwrite, copy) ETUUID *currentCommandUUID;
+/** 
+ * Reports whether a history compaction is underway for this track.
+ *
+ * For a cleaner API, we could replace 'compacted' by 'tailCommandUUID' to 
+ * report compaction, but this is much more complex to implement.
+ *
+ * For state objects returned by -[COUndoTrackStore stateForTrackName:], this 
+ * property is currently always NO.
+ */
+@property (nonatomic, readwrite, assign) BOOL compacted;
 @end
 
 @interface COUndoTrackStore : NSObject
@@ -58,6 +72,13 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID;
 - (COUndoTrackState *) stateForTrackName: (NSString*)aName;
 - (void) setTrackState: (COUndoTrackState *)aState;
 - (void) removeTrackWithName: (NSString*)aName;
+/**
+ * Returns UUIDs for all the commands on a given track.
+ *
+ * This doesn't include commands marked as deleted.
+ *
+ * See -markCommandsAsDeletedForUUIDs:.
+ */
 - (NSArray *) allCommandUUIDsOnTrackWithName: (NSString*)aName;
 
 /**
@@ -66,6 +87,27 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID;
 - (void) addCommand: (COUndoTrackSerializedCommand *)aCommand;
 - (COUndoTrackSerializedCommand *) commandForUUID: (ETUUID *)aUUID;
 - (void) removeCommandForUUID: (ETUUID *)aUUID;
+
+
+/** @taskunit History Compaction Integration */
+
+
+/**
+ * Marks the given commands as deleted.
+ *
+ * This should be called before compacting the history with COSQLiteStore.
+ *
+ * Posts a COUndoTrackStoreTrackDidChangeNotification with 
+ * COUndoTrackStoreTrackCompacted set to YES.
+ */
+- (void)markCommandsAsDeletedForUUIDs: (NSArray *)UUIDs;
+/**
+ * Erases commands marked as deleted permanently.
+ *
+ * This should be called after compacting the history with COSQLiteStore.
+ */
+- (void)finalizeDeletions;
+
 
 - (BOOL) string: (NSString *)aString matchesGlobPattern: (NSString *)aPattern;
 

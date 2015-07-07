@@ -30,6 +30,8 @@
 	
 	__block NSMutableSet *compactedPersistentRootUUIDs = [NSMutableSet new];
 	__block NSMutableSet *finalizedPersistentRootUUIDs = [NSMutableSet new];
+	
+	[aCompactionStrategy beginCompaction];
     
     dispatch_sync(queue_, ^()
 	{
@@ -201,6 +203,8 @@
 		
         [self finalizeGarbageAttachments];
     });
+	
+	[aCompactionStrategy endCompaction: YES];
 	
 	[self postCommitNotificationsWithTransactionIDForPersistentRootUUID: @{}
 	                                            insertedPersistentRoots: @[]

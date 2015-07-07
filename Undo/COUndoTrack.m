@@ -774,6 +774,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	{
 		notifState.currentCommandUUID = [ETUUID UUIDWithString: userInfo[COUndoTrackStoreTrackCurrentCommandUUID]];
 	}
+	notifState.compacted = [userInfo[COUndoTrackStoreTrackCompacted] boolValue];
 
 	if ([_store string: notifState.trackName matchesGlobPattern: _name])
 	{

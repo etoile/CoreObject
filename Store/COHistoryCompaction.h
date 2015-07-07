@@ -90,6 +90,34 @@
 - (NSSet *)deadRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs;
 - (NSSet *)liveRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs;
 
+
+/** @taskunit Reacting to Compaction Progresses */
+
+/**
+ * Tells the receiver the store is going to be compacted according to the 
+ * receiver rules.
+ *
+ * You don't call this method, COSQLiteStore will call it.
+ *
+ * Use this method to hide high-level objects involved in the compaction 
+ * (e.g. COCommand and COUndoTrack), when they don't observe store notifications
+ * directly.
+ */
+- (void)beginCompaction;
+/**
+ * Tells the receiver the store was compacted according to the receiver rules.
+ *
+ * You don't call this method, COSQLiteStore will call it.
+ *
+ * Use this method to discard or show high-level objects involved in the
+ * compaction (e.g. COCommand and COUndoTrack), when they don't observe store
+ * notifications directly.
+ *
+ * If the compaction is a success, you should discard these high-level objects,
+ * otherwise you should show them again to the user.
+ */
+- (void)endCompaction: (BOOL)success;
+
 @end
 
 
