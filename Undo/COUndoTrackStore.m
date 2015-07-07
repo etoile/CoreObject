@@ -363,6 +363,13 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 	[_db executeUpdate: @"DELETE FROM commands WHERE deleted = 1"];
 }
 
+- (BOOL)vacuum
+{
+	// TODO: Run with dispatch_sync() in a queue, so we can sure no other
+	// threads access the database when we invoke -vacuum in a background thread.
+    return [_db executeUpdate: @"VACUUM"];
+}
+
 - (void) postCommitNotificationsWithUserInfo: (NSDictionary *)userInfo
 {
 	ETAssert([NSThread isMainThread]);

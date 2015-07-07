@@ -462,6 +462,23 @@ extern NSString * const COPersistentRootAttributeUsedSize;
  */
 - (BOOL) finalizeDeletionsForPersistentRoot: (ETUUID *)aRoot
                                       error: (NSError **)error;
+/**
+ * Compacts the database by rebuilding it.
+ *
+ * This shrinks the database file size unlike -compactHistory:.
+ *
+ * This operation is slow and will block the database until the method returns.
+ * You should usually call it in a background thread and present an 
+ * indeterminate progress bar at the UI level.
+ *
+ * For some background about running a vacuum operation, see:
+ *
+ * <list>
+ * <item>https://blogs.gnome.org/jnelson/2015/01/06/sqlite-vacuum-and-auto_vacuum/</item>
+ * <item>https://wiki.mozilla.org/Firefox/Projects/Places_Vacuum</item>
+ * </list>
+ */
+- (BOOL)vacuum;
 
 
 /** @taskunit Transactions */

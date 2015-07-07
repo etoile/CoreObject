@@ -131,6 +131,17 @@
 @interface COSQLiteStore (COHistoryCompaction)
 /**
  * Compacts the history with the given strategy.
+ *
+ * You should usually compact history when reaching certain conditions (e.g. 
+ * a database file size, a number of persistent roots or revisions etc.). 
+ *
+ * This won't shrink the database file size, but free some internal space that
+ * can be reused.
+ * 
+ * If you need to shrink the database file size, compact the history and call 
+ * -vacuum at some point in the future. -vacum is much slower than 
+ * -compactHistory: usually, so you should vacuum less often than you compact
+ * the history.
  */
 - (BOOL)compactHistory: (id <COHistoryCompaction>)aCompactionStrategy;
 @end

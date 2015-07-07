@@ -112,7 +112,16 @@ NSString * const COUndoTrackStoreTrackCompacted;
  * This should be called after compacting the history with COSQLiteStore.
  */
 - (void)finalizeDeletions;
-
+/**
+ * Compacts the database by rebuilding it.
+ *
+ * This shrinks the database file size unlike -finalizeDeletions.
+ *
+ * This operation is slow and will block the database until the method returns.
+ * 
+ * See also -[COSQLiteStore vacuum].
+ */
+- (BOOL)vacuum;
 
 - (BOOL) string: (NSString *)aString matchesGlobPattern: (NSString *)aPattern;
 

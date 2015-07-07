@@ -952,6 +952,18 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     return results;
 }
 
+- (BOOL)vacuum
+{
+    assert(dispatch_get_current_queue() != queue_);
+	__block BOOL success = NO;
+
+    dispatch_sync(queue_, ^() {
+       	success = [db_ executeUpdate: @"VACUUM"];
+	});
+
+	return success;
+}
+
 /**
  * We could put this code in a block passed to dispatch_async(dispatch_get_main_queue(), theBlock) 
  * and  call dispatch_async() in our  caller, but dispatch_get_main_queue() is only supported for 
