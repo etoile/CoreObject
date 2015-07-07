@@ -237,6 +237,8 @@ extern NSString * const kCOUndoTrackName;
  *
  * Returns a cached command group, or attempts to load it from the store if
  * not present in memory.
+ *
+ * If the command has been deleted, returns nil.
  */
 - (COCommandGroup *) commandForUUID: (ETUUID*)aUUID;
 

@@ -85,6 +85,11 @@ NSString * const COUndoTrackStoreTrackCompacted;
  * sequenceNumber is set in the provided command object
  */
 - (void) addCommand: (COUndoTrackSerializedCommand *)aCommand;
+/**
+ * Returns the serialized representation for the command bound to the given UUID.
+ *
+ * If the UUID corresponds to a deleted command, returns nil.
+ */
 - (COUndoTrackSerializedCommand *) commandForUUID: (ETUUID *)aUUID;
 - (void) removeCommandForUUID: (ETUUID *)aUUID;
 

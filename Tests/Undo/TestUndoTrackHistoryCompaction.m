@@ -152,6 +152,8 @@
 	return revs;
 }
 
+#define NODES(x) [@[[COEndOfUndoTrackPlaceholderNode sharedInstance]] arrayByAddingObjectsFromArray: x]
+
 - (void)testCompactPersistentRootWithTrivialHistory
 {
 	NSArray *oldRevs = [self createPersistentRootsWithTrivialHistory: NO][persistentRoot.UUID];
@@ -165,6 +167,7 @@
 	compaction.liveRevisionUUIDs = @{ persistentRoot.UUID : SA((id)[[liveRevs mappedCollection] UUID]) };
 	compaction.deadRevisionUUIDs = @{ persistentRoot.UUID : SA((id)[[deadRevs mappedCollection] UUID]) };
 
+	NSArray *liveCommands = [track.allCommands subarrayFromIndex: 3];
 	/* COCommandSetCurrentVersionForBranch.oldRevisionID is kept alive by 
 	   COUndoTrackHistoryCompaction logic, this means the oldest kept revision 
 	   will be the revision prior to track.allCommands[3].newRevisionID.
@@ -175,6 +178,8 @@
 	                             expectingCompaction: compaction];
 
 	UKObjectsEqual(liveRevs, newRevs[persistentRoot.UUID]);
+	UKObjectsEqual(NODES(liveCommands), track.nodes);
+	UKObjectsEqual(liveCommands, track.allCommands);
 }
 
 - (void)testPersistentRootFinalization
@@ -195,12 +200,15 @@
 	compaction.deadRevisionUUIDs = @{ persistentRoot.UUID : SA((id)[[mainDeadRevs mappedCollection] UUID]),
 	                             otherPersistentRoot.UUID : oldRevs[otherPersistentRoot.UUID] };
 
+	NSArray *liveCommands = [track.allCommands subarrayFromIndex: 6];
 	/* See comment in -testCompactPersistentRootWithTrivialHistory */
 	NSDictionary *newRevs = [self compactUpToCommand: track.allCommands[6]
 	                             expectingCompaction: compaction];
 
 	UKObjectsEqual(mainLiveRevs, newRevs[persistentRoot.UUID]);
 	UKNil([ctx persistentRootForUUID: otherPersistentRoot.UUID]);
+	UKObjectsEqual(NODES(liveCommands), track.nodes);
+	UKObjectsEqual(liveCommands, track.allCommands);
 }
 
 @end

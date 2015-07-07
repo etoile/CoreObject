@@ -636,12 +636,18 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		{
 			NSMutableArray *targetArray = redoNodes;
 			ETUUID *commandUUID = trackState.headCommandUUID;
+
 			while (commandUUID != nil && ![commandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
 			{
 				if ([commandUUID isEqual: trackState.currentCommandUUID])
 					targetArray = undoNodes;
 				
 				COCommandGroup *command = [self commandForUUID: commandUUID];
+				BOOL isDeletedCommand = (command == nil);
+	
+				if (isDeletedCommand)
+					break;
+
 				ETAssert([command.UUID isEqual: commandUUID]);
 				
 				[targetArray addObject: command];
@@ -710,6 +716,11 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	if (command == nil)
 	{
 		COUndoTrackSerializedCommand *serializedCommand = [_store commandForUUID: aUUID];
+		BOOL isDeletedCommand = (serializedCommand == nil);
+
+		if (isDeletedCommand)
+			return nil;
+
 		ETAssert([serializedCommand.UUID isEqual: aUUID]);
 		command = [self loadSerializedCommand: serializedCommand];
 		ETAssert([command.UUID isEqual: aUUID]);
@@ -782,6 +793,12 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		if (![inMemoryState isEqual: notifState])
 		{
 			//NSLog(@"Doing track reload");
+			BOOL needsClearCommandCache = notifState.compacted;
+
+			if (needsClearCommandCache)
+			{
+				[_commandsByUUID removeAllObjects];
+			}
 			[self reload];
 		}
 		else

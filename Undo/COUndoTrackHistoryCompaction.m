@@ -302,9 +302,16 @@
 
 - (void)beginCompaction
 {
-	NSArray *commandUUIDs = (id)[[[_undoTrack allCommands] mappedCollection] UUID];
+	NSArray *allCommands = [_undoTrack allCommands];
+	NSUInteger upToCommandIndex = [allCommands indexOfObject: _oldestCommandToKeep];
+	ETAssert(upToCommandIndex != NSNotFound);
+	NSArray *deletedCommands = [allCommands subarrayWithRange: NSMakeRange(0, upToCommandIndex)];
+	NSArray *deletedUUIDs = (id)[[deletedCommands mappedCollection] UUID];
 
-	[_undoTrack.store markCommandsAsDeletedForUUIDs: commandUUIDs];
+	ETAssert(![deletedUUIDs containsObject: _oldestCommandToKeep.UUID]);
+	ETAssert(![deletedUUIDs containsObject: _undoTrack.currentNode.UUID]);
+
+	[_undoTrack.store markCommandsAsDeletedForUUIDs: deletedUUIDs];
 }
 
 - (void)endCompaction: (BOOL)success

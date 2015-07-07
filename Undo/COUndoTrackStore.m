@@ -301,7 +301,7 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
     FMResultSet *rs = [_db executeQuery: @"SELECT c.id, parent.uuid AS parentuuid, c.trackname, c.data, c.metadata, c.timestamp "
 										  "FROM commands AS c "
 										  "LEFT OUTER JOIN commands AS parent ON c.parentid = parent.id "
-										  "WHERE c.uuid = ?", [aUUID dataValue]];
+										  "WHERE c.uuid = ? and c.deleted = 0", [aUUID dataValue]];
 	COUndoTrackSerializedCommand *result = nil;
     if ([rs next])
     {
