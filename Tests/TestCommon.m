@@ -86,20 +86,31 @@ doesNotPostNotification: (NSString *)notif
 #ifdef DELETE_STORE_AFTER_EACH_TEST_METHOD
 	// FIXME: For Mac OS X 10.7, this is unsupported, SQLite disk errors
 	// (DB Error: 10 "disk I/O error") appear in TestStoreSQLite.m.
-	[[self class] deleteStore];
+	[[self class] deleteStores];
 #endif
 }
 
-+ (void) deleteStore
++ (void) deleteStores
 {
 	BOOL isDir = NO;
 
 	if ([[NSFileManager defaultManager] fileExistsAtPath: [[self storeURL] path]
-	                                         isDirectory: &isDir] && isDir)
+	                                         isDirectory: &isDir])
 	{
+		ETAssert(isDir);
 		NSError *error = nil;
 
 		[[NSFileManager defaultManager] removeItemAtURL: [self storeURL] error: &error];
+		ETAssert(error == nil);
+	}
+	
+	if ([[NSFileManager defaultManager] fileExistsAtPath: [[self undoTrackStoreURL] path]
+	                                         isDirectory: &isDir])
+	{
+		ETAssert(isDir);
+		NSError *error = nil;
+
+		[[NSFileManager defaultManager] removeItemAtURL: [self undoTrackStoreURL] error: &error];
 		ETAssert(error == nil);
 	}
 }
@@ -203,7 +214,7 @@ doesNotPostNotification: (NSString *)notif
 
 + (void) willRunTestSuite
 {
-	[SQLiteStoreTestCase deleteStore];
+	[SQLiteStoreTestCase deleteStores];
 
 	// NOTE: We are about to initialize every loaded class. Make sure
 	// NSApplication is created first or various other gui classes on GNUstep
@@ -213,7 +224,7 @@ doesNotPostNotification: (NSString *)notif
 
 + (void) didRunTestSuite
 {
-	[SQLiteStoreTestCase deleteStore];
+	[SQLiteStoreTestCase deleteStores];
 	
 	// Run a runloop so we handle any outstanding notifications, so
 	// we can check for leaks afterwards.
@@ -256,7 +267,9 @@ doesNotPostNotification: (NSString *)notif
 - (id) init
 {
 	SUPERINIT;
-	ctx = [[COEditingContext alloc] initWithStore: store];
+	ctx = [[COEditingContext alloc] initWithStore: store
+	                   modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]
+	                               undoTrackStore: [[COUndoTrackStore alloc] initWithURL: [[self class] undoTrackStoreURL]]];
     return self;
 }
 

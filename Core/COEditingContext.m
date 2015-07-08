@@ -51,6 +51,7 @@
 {
 	NILARG_EXCEPTION_TEST(store);
 	NILARG_EXCEPTION_TEST(aRepo);
+	NILARG_EXCEPTION_TEST(anUndoTrackStore);
 	INVALIDARG_EXCEPTION_TEST(aRepo, [aRepo entityDescriptionForClass: [COObject class]] != nil);
 
 	SUPERINIT;

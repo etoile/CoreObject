@@ -140,11 +140,12 @@ doesNotPostNotification: (NSString *)notif;
  */
 + (NSURL *)undoTrackStoreURL;
 /**
- * Deletes all saved datas related to the store.
+ * Deletes all saved datas related to the stores (this includes any undo track
+ * store created with +undoTrackStoreURL).
  *
  * Saved datas are usually .sqlitedb files.
  */
-+ (void)deleteStore;
++ (void)deleteStores;
 
 - (void) checkPersistentRoot: (ETUUID *)aPersistentRoot
 					 current: (ETUUID *)expectedCurrent

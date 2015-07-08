@@ -178,8 +178,10 @@
  * To register types bound to classes manually, see
  * -[ETModelDescriptionRepository registerEntityDescriptionsForClasses:resolveNow:].
  *
- * For a nil model repository, or a repository that doesn't a COObject entity 
+ * For a nil model repository, or a repository that doesn't a COObject entity
  * description, raises a NSInvalidArgumentException.
+ *
+ * For a nil undo track store, raises a NSInvalidArgumentException.
  */
 - (instancetype)initWithStore: (COSQLiteStore *)store
    modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo

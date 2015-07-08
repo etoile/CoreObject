@@ -234,8 +234,19 @@
 - (void) testWithNoStore
 {
 	UKRaisesException([[COEditingContext alloc] initWithStore: nil]);
-	UKRaisesException([[COEditingContext alloc] initWithStore: nil modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]]);
+	UKRaisesException([[COEditingContext alloc] initWithStore: nil
+	                               modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]]);
+	UKRaisesException([[COEditingContext alloc] initWithStore: nil
+	                               modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]
+	                                           undoTrackStore: [COUndoTrackStore defaultStore]]);
 	UKRaisesException([[COEditingContext alloc] init]);
+}
+
+- (void)testWithNoUndoTrackStore
+{
+	UKRaisesException([[COEditingContext alloc] initWithStore: store
+	                               modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]
+	                                           undoTrackStore: nil]);
 }
 
 - (void) testRevisionEqualityFromMultipleEditingContexts
