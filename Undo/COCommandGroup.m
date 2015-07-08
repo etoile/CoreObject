@@ -13,6 +13,7 @@
 #import "CORevision.h"
 #import "CODateSerialization.h"
 #import "COUndoTrackStore.h"
+#import "COUndoTrackStore+Private.h"
 #import "COUndoTrack.h"
 #import "COEndOfUndoTrackPlaceholderNode.h"
 #import <EtoileFoundation/Macros.h>

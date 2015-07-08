@@ -249,6 +249,8 @@
 	[self registerMigrationWithTestPackageVersion: 1 block: NULL];
 
 	[ctx commit];
+	// Will retain the current context store and never release it due to the exception
+	// (the store is retained when passed in argument to COEditingContext initializer)
 	UKRaisesException([self prepareNewMigrationContextForDestinationVersion: 1]);
 }
 

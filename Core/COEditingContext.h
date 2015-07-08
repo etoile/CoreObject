@@ -10,7 +10,8 @@
 #import <CoreObject/COPersistentObjectContext.h>
 
 @class COSQLiteStore, COEditingContext, COPersistentRoot, COBranch, COObjectGraphContext, COObject;
-@class COUndoTrack, COCommandGroup, COCrossPersistentRootDeadRelationshipCache, CORevisionCache;
+@class COUndoTrackStore, COUndoTrack, COCommandGroup;
+@class COCrossPersistentRootDeadRelationshipCache, CORevisionCache;
 @class COError;
 
 /**
@@ -131,6 +132,7 @@
 	NSMutableSet *_persistentRootsPendingUndeletion;
 	COCrossPersistentRootDeadRelationshipCache *_deadRelationshipCache;
     /** Undo */
+	COUndoTrackStore *_undoTrackStore;
     BOOL _isRecordingUndo;
     COCommandGroup *_currentEditGroup;
 	CORevisionCache *_revisionCache;
@@ -153,15 +155,16 @@
 /**
  * Initializes a context which persists its content in the given store.
  *
- * The model repository is set to -[ETModelDescription mainRepository].
+ * The model repository is set to +[ETModelDescription mainRepository].
  *
  * See also -initWithStore:modelDescriptionRepository:.
  */
-- (id)initWithStore: (COSQLiteStore *)store;
+- (instancetype)initWithStore: (COSQLiteStore *)store;
 /**
  * <init />
- * Initializes a context which persists its content in the given store, and 
- * manages it using the metamodel provided by the model description repository.
+ * Initializes a context which persists its content in the given store,
+ * manages it using the metamodel provided by the model description repository, 
+ * and whose undo tracks are backed by the last store argument.
  *
  * When COObject entity description doesn't appear in the repository, this 
  * initializer invokes +newEntityDescription on COObject and its subclasses, 
@@ -175,18 +178,31 @@
  * To register types bound to classes manually, see
  * -[ETModelDescriptionRepository registerEntityDescriptionsForClasses:resolveNow:].
  *
- * For a nil model repository, or a repository that doesn't a COObject entity 
+ * For a nil model repository, or a repository that doesn't a COObject entity
  * description, raises a NSInvalidArgumentException.
+ *
+ * For a nil undo track store, raises a NSInvalidArgumentException.
  */
-- (id)initWithStore: (COSQLiteStore *)store
-    modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo;
+- (instancetype)initWithStore: (COSQLiteStore *)store
+   modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
+               undoTrackStore: (COUndoTrackStore *)aUndoTrackStore;
+/**
+ * Initializes a context which persists its content in the given store, and
+ * manages it using the metamodel provided by the model description repository.
+ *
+ * The undo track store is set to +[COUndoTrackStore defaultStore].
+ *
+ * See also -initWithStore:modelDescriptionRepository:undoTrackStore:.
+ */
+- (instancetype)initWithStore: (COSQLiteStore *)store
+   modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo;
 /**
  * Initializes the context with no store. 
  * As a result, the context content is not persisted.
  *
  * See also -initWithStore:.
  */
-- (id)init;
+- (instancetype)init;
 
 
 /** @taskunit Accessing All Persistent Roots */
@@ -217,6 +233,10 @@
  * describes all the persistent objects editable in the context.
  */
 @property (nonatomic, readonly, strong) ETModelDescriptionRepository *modelDescriptionRepository;
+/**
+ * Returns the store backing the undo tracks initialized with the receiver.
+ */
+@property (nonatomic, readonly, strong) COUndoTrackStore *undoTrackStore;
 
 
 /** @taskunit Managing Persistent Roots */

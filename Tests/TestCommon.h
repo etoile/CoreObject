@@ -73,6 +73,7 @@
 #import "COObjectGraphContext+Graphviz.h"
 #import "COEditingContext+Private.h"
 #import "COMetamodel.h"
+#import "COUndoTrackStore+Private.h"
 
 #import "diff.h"
 
@@ -133,13 +134,18 @@ doesNotPostNotification: (NSString *)notif;
  * This is a subdirectory of +temporaryDirectoryForTestStorage.
  */
 + (NSURL *)storeURL;
-
 /**
- * Deletes all saved datas related to the store.
+ * Returns the URL used for the undo track store.
+ * This is a subdirectory of +temporaryDirectoryForTestStorage.
+ */
++ (NSURL *)undoTrackStoreURL;
+/**
+ * Deletes all saved datas related to the stores (this includes any undo track
+ * store created with +undoTrackStoreURL).
  *
  * Saved datas are usually .sqlitedb files.
  */
-+ (void)deleteStore;
++ (void)deleteStores;
 
 - (void) checkPersistentRoot: (ETUUID *)aPersistentRoot
 					 current: (ETUUID *)expectedCurrent
