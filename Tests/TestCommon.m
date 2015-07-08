@@ -240,12 +240,13 @@ doesNotPostNotification: (NSString *)notif
 	// Count up the number of open sqlite database connections at this
 	// point.
 	//
-	// As of 2014-01-24, there are 3 open connections:
+	// As of 2015-08-27, there are 3 open connections:
 	//
-	//  - In TestSynchronizer, -testBasicServerRevert and -testBasicClientRevert each leak a store.
-	//    (I don't understand why, but they're not so serious because
-	//     they only happen when throwing an exception in response to incorrect API usage.)
-	//
+	//  - In -[TestEditingContext testWithNoUndoTrackStore] and
+	//    -[TestSchemaMigration testExceptionOnMigrationReturningItemsWithIncorrectVersion]
+	//    the store is retained when passed as an argument, but never released
+	//    if an exception is thrown in the called method (this could be
+	//    considered a ARC bug or limitation).
 	//  - +[COUndoTrackStore defaultStore] intentionally opens and never closes a database connection
 	//    to the ~/Library/CoreObject/Undo/undo.sqlite database
 
@@ -253,7 +254,7 @@ doesNotPostNotification: (NSString *)notif
 	{
 		[FMDatabase logOpenDatabases];
 
-		const int expectedOpenDatabases = 4;
+		const int expectedOpenDatabases = 3;
 		if ([FMDatabase countOfOpenDatabases] > expectedOpenDatabases)
 		{
 			NSLog(@"ERROR: Expected only %d SQLite database connections to still be open.", expectedOpenDatabases);
