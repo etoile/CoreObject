@@ -24,6 +24,7 @@
 #import "COCrossPersistentRootDeadRelationshipCache.h"
 #import "CORevisionCache.h"
 #import "COStoreTransaction.h"
+#import "COUndoTrackStore.h"
 #if TARGET_OS_IPHONE
 #import "NSDistributedNotificationCenter.h"
 #endif
@@ -34,7 +35,7 @@
 @synthesize persistentRootsPendingDeletion = _persistentRootsPendingDeletion;
 @synthesize persistentRootsPendingUndeletion = _persistentRootsPendingUndeletion;
 @synthesize deadRelationshipCache = _deadRelationshipCache;
-@synthesize isRecordingUndo = _isRecordingUndo;
+@synthesize undoTrackStore = _undoTrackStore, isRecordingUndo = _isRecordingUndo;
 
 #pragma mark Creating a New Context -
 
@@ -44,7 +45,9 @@
 	return [[self alloc] initWithStore: [[COSQLiteStore alloc] initWithURL: aURL]];
 }
 
-- (id)initWithStore: (COSQLiteStore *)store modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
+- (instancetype)initWithStore: (COSQLiteStore *)store
+   modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
+               undoTrackStore: (COUndoTrackStore *)anUndoTrackStore
 {
 	NILARG_EXCEPTION_TEST(store);
 	NILARG_EXCEPTION_TEST(aRepo);
@@ -58,6 +61,7 @@
 	_persistentRootsPendingDeletion = [NSMutableSet new];
     _persistentRootsPendingUndeletion = [NSMutableSet new];
 	_deadRelationshipCache = [COCrossPersistentRootDeadRelationshipCache new];
+	_undoTrackStore = anUndoTrackStore;
     _isRecordingUndo = YES;
 	_revisionCache = [[CORevisionCache alloc] initWithParentEditingContext: self];
 	_internalTransientObjectGraphContext = [[COObjectGraphContext alloc] initWithModelDescriptionRepository: aRepo];
@@ -82,13 +86,21 @@
 	return self;
 }
 
-- (id)initWithStore: (COSQLiteStore *)store
+- (instancetype)initWithStore: (COSQLiteStore *)store
+   modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
+{
+	return [self initWithStore: store
+	modelDescriptionRepository: aRepo
+	            undoTrackStore: [COUndoTrackStore defaultStore]];
+}
+
+- (instancetype)initWithStore: (COSQLiteStore *)store
 {
 	return [self initWithStore: store
 	           modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]];
 }
 
-- (id)init
+- (instancetype)init
 {
 	return [self initWithStore: nil];
 }

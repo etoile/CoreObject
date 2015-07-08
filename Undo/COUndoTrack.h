@@ -91,7 +91,6 @@ extern NSString * const kCOUndoTrackName;
 @interface COUndoTrack : NSObject <COTrack>
 {
 	@private
-    COUndoTrackStore *_store;
     NSString *_name;
 	NSMutableArray *_nodesOnCurrentUndoBranch;
 	NSMutableDictionary *_commandsByUUID;

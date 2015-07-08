@@ -123,6 +123,11 @@ doesNotPostNotification: (NSString *)notif
 	return [[self temporaryURLForTestStorage] URLByAppendingPathComponent: @"TestStore.sqlite"];
 }
 
++ (NSURL *)undoTrackStoreURL
+{
+	return [[self temporaryURLForTestStorage] URLByAppendingPathComponent: @"TestUndoTrackStore.sqlite"];
+}
+
 - (void) checkPersistentRoot: (ETUUID *)aPersistentRoot
 					 current: (ETUUID *)expectedCurrent
 						head: (ETUUID *)expectedHead

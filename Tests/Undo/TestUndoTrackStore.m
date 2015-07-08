@@ -21,7 +21,7 @@
 {
     SUPERINIT;
     
-    _store = [[COUndoTrackStore alloc] init];
+    _store = [[COUndoTrackStore alloc] initWithURL: [SQLiteStoreTestCase undoTrackStoreURL]];
 	[_store beginTransaction];
 	[_store removeTrackWithName: @"test1"];
 	[_store removeTrackWithName: @"test2"];
