@@ -125,8 +125,8 @@
 		60CB08201A05075F00C25B80 /* ObjectWithTransientState.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CB08141A05075700C25B80 /* ObjectWithTransientState.m */; };
 		60DBD0A91A822AEE009F3935 /* COJSONSeralization.m in Sources */ = {isa = PBXBuildFile; fileRef = 60DBD0A71A822AEE009F3935 /* COJSONSeralization.m */; };
 		60DBD0AA1A822AEE009F3935 /* COJSONSeralization.m in Sources */ = {isa = PBXBuildFile; fileRef = 60DBD0A71A822AEE009F3935 /* COJSONSeralization.m */; };
-		60DBD0AB1A822AEE009F3935 /* COJSONSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 60DBD0A81A822AEE009F3935 /* COJSONSerialization.h */; };
-		60DBD0AC1A822AEE009F3935 /* COJSONSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 60DBD0A81A822AEE009F3935 /* COJSONSerialization.h */; };
+		60DBD0AB1A822AEE009F3935 /* COJSONSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 60DBD0A81A822AEE009F3935 /* COJSONSerialization.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60DBD0AC1A822AEE009F3935 /* COJSONSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 60DBD0A81A822AEE009F3935 /* COJSONSerialization.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60E08C8119792EEF00D1B7AD /* libEtoileFoundation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048464818B6C03E006E4EDC /* libEtoileFoundation.a */; };
 		60E08C8219792EEF00D1B7AD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B1D3F919791F8800ACAC9C /* Foundation.framework */; };
 		60E08C8719792F4600D1B7AD /* COCommandDeletePersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 663CE2B217C09DE700E729F5 /* COCommandDeletePersistentRoot.m */; };
