@@ -125,6 +125,10 @@
 		60C913C6165BBF5200E0C5F4 /* CoreObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 60C913C5165BBF5000E0C5F4 /* CoreObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60CB08151A05075700C25B80 /* ObjectWithTransientState.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CB08141A05075700C25B80 /* ObjectWithTransientState.m */; };
 		60CB08201A05075F00C25B80 /* ObjectWithTransientState.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CB08141A05075700C25B80 /* ObjectWithTransientState.m */; };
+		60DA51581B4FBD9E00E51D86 /* COURLToString.h in Headers */ = {isa = PBXBuildFile; fileRef = 60DA51561B4FBD9E00E51D86 /* COURLToString.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60DA51591B4FBD9E00E51D86 /* COURLToString.h in Headers */ = {isa = PBXBuildFile; fileRef = 60DA51561B4FBD9E00E51D86 /* COURLToString.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60DA515A1B4FBD9E00E51D86 /* COURLToString.m in Sources */ = {isa = PBXBuildFile; fileRef = 60DA51571B4FBD9E00E51D86 /* COURLToString.m */; };
+		60DA515B1B4FBD9E00E51D86 /* COURLToString.m in Sources */ = {isa = PBXBuildFile; fileRef = 60DA51571B4FBD9E00E51D86 /* COURLToString.m */; };
 		60DBD0A91A822AEE009F3935 /* COJSONSeralization.m in Sources */ = {isa = PBXBuildFile; fileRef = 60DBD0A71A822AEE009F3935 /* COJSONSeralization.m */; };
 		60DBD0AA1A822AEE009F3935 /* COJSONSeralization.m in Sources */ = {isa = PBXBuildFile; fileRef = 60DBD0A71A822AEE009F3935 /* COJSONSeralization.m */; };
 		60DBD0AB1A822AEE009F3935 /* COJSONSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 60DBD0A81A822AEE009F3935 /* COJSONSerialization.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1053,6 +1057,8 @@
 		60C913C5165BBF5000E0C5F4 /* CoreObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreObject.h; sourceTree = "<group>"; };
 		60CB08131A05075700C25B80 /* ObjectWithTransientState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ObjectWithTransientState.h; path = Tests/TestModelObjects/ObjectWithTransientState.h; sourceTree = "<group>"; };
 		60CB08141A05075700C25B80 /* ObjectWithTransientState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ObjectWithTransientState.m; path = Tests/TestModelObjects/ObjectWithTransientState.m; sourceTree = "<group>"; };
+		60DA51561B4FBD9E00E51D86 /* COURLToString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COURLToString.h; sourceTree = "<group>"; };
+		60DA51571B4FBD9E00E51D86 /* COURLToString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COURLToString.m; sourceTree = "<group>"; };
 		60DBD0A71A822AEE009F3935 /* COJSONSeralization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COJSONSeralization.m; path = Utilities/COJSONSeralization.m; sourceTree = "<group>"; };
 		60DBD0A81A822AEE009F3935 /* COJSONSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COJSONSerialization.h; path = Utilities/COJSONSerialization.h; sourceTree = "<group>"; };
 		60E08C6219792BEA00D1B7AD /* libCoreObject.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCoreObject.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1726,6 +1732,8 @@
 				608D25F5192B475200BB7461 /* COObjectToArchivedData.m */,
 				6633F10C185515F1009CE6F7 /* CORectToString.h */,
 				6633F10D185515F1009CE6F7 /* CORectToString.m */,
+				60DA51561B4FBD9E00E51D86 /* COURLToString.h */,
+				60DA51571B4FBD9E00E51D86 /* COURLToString.m */,
 			);
 			path = ValueTransformers;
 			sourceTree = "<group>";
@@ -2465,6 +2473,7 @@
 				60E08D4119792FFA00D1B7AD /* COSynchronizerPushedRevisionsFromClientMessage.h in Headers */,
 				60E08D2819792FFA00D1B7AD /* COObject+RelationshipCache.h in Headers */,
 				60E08D5A19792FFA00D1B7AD /* COStoreUndeleteBranch.h in Headers */,
+				60DA51591B4FBD9E00E51D86 /* COURLToString.h in Headers */,
 				60E08D1B19792FFA00D1B7AD /* COSQLiteStore.h in Headers */,
 				60E08D4019792FFA00D1B7AD /* COSynchronizerPersistentRootInfoToClientMessage.h in Headers */,
 				609CB4C01A5D8380003E8052 /* COModelElementMove.h in Headers */,
@@ -2637,6 +2646,7 @@
 				66457FC517E8BFE5003C51A8 /* COStoreUndeleteBranch.h in Headers */,
 				66457FC717E8BFE5003C51A8 /* COStoreUndeletePersistentRoot.h in Headers */,
 				66457FC917E8BFE5003C51A8 /* COStoreWriteRevision.h in Headers */,
+				60DA51581B4FBD9E00E51D86 /* COURLToString.h in Headers */,
 				66457FCF17E8C9D0003C51A8 /* COStoreAction.h in Headers */,
 				6633F11C185516B5009CE6F7 /* COBezierPath.h in Headers */,
 				6633F10E185515F1009CE6F7 /* COColorToHTMLString.h in Headers */,
@@ -3127,6 +3137,7 @@
 				60E08CB619792F4600D1B7AD /* COCopier.m in Sources */,
 				60E08C9B19792F4600D1B7AD /* COSynchronizerJSONUtils.m in Sources */,
 				60E08CF019792F4600D1B7AD /* COStoreTransaction.m in Sources */,
+				60DA515B1B4FBD9E00E51D86 /* COURLToString.m in Sources */,
 				60E08C8E19792F4600D1B7AD /* COSynchronizerJSONClient.m in Sources */,
 				60E08CF619792F4600D1B7AD /* COObjectGraphContext+GarbageCollection.m in Sources */,
 				60E08CB519792F4600D1B7AD /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m in Sources */,
@@ -3332,6 +3343,7 @@
 				66E6225C185BEECE002A22C1 /* COSQLiteStore+Graphviz.m in Sources */,
 				6633F10F185515F1009CE6F7 /* COColorToHTMLString.m in Sources */,
 				66A00A39187E7D12005CFE16 /* COBranch+Graphviz.m in Sources */,
+				60DA515A1B4FBD9E00E51D86 /* COURLToString.m in Sources */,
 				791B4E721299C90900CCF472 /* FMDatabase.m in Sources */,
 				660179C9182AFA4B006E7D7B /* COSynchronizerRevision.m in Sources */,
 				60FA55E11A447A8600A2D8A7 /* COSchemaMigrationDriver.m in Sources */,
