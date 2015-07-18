@@ -139,6 +139,8 @@
 
 	if (otherPersistentRoot.isDeleted)
 	{
+		// Will retain the store but not release it due to the exception (looks
+		// like the store is retained as a receiver in -[COBranch revisionsWithOptions:]).
 		UKRaisesException([otherPersistentRoot.currentBranch reloadRevisions]);
 	}
 

@@ -242,8 +242,9 @@ doesNotPostNotification: (NSString *)notif
 	//
 	// As of 2015-08-27, there are 3 open connections:
 	//
-	//  - In -[TestEditingContext testWithNoUndoTrackStore] and
-	//    -[TestSchemaMigration testExceptionOnMigrationReturningItemsWithIncorrectVersion]
+	//  - In -[TestEditingContext testWithNoUndoTrackStore],
+	//    -[TestSchemaMigration testExceptionOnMigrationReturningItemsWithIncorrectVersion] and
+	//    -[TestUndoTrackHistoryCompaction compactUpToCommand:expectingCompaction:],
 	//    the store is retained when passed as an argument, but never released
 	//    if an exception is thrown in the called method (this could be
 	//    considered a ARC bug or limitation).
@@ -254,7 +255,7 @@ doesNotPostNotification: (NSString *)notif
 	{
 		[FMDatabase logOpenDatabases];
 
-		const int expectedOpenDatabases = 3;
+		const int expectedOpenDatabases = 4;
 		if ([FMDatabase countOfOpenDatabases] > expectedOpenDatabases)
 		{
 			NSLog(@"ERROR: Expected only %d SQLite database connections to still be open.", expectedOpenDatabases);
