@@ -18,7 +18,7 @@
 #import "COCommandUndeletePersistentRoot.h"
 #import "COUndoTrack.h"
 #import "COUndoTrackStore.h"
-
+#import "COUndoTrackStore+Private.h"
 
 #define PERSISTENT_ROOT_CAPACITY_HINT 25000
 #define BRANCH_CAPACITY_HINT PERSISTENT_ROOT_CAPACITY_HINT
