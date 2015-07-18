@@ -11,118 +11,72 @@
 @class FMDatabase;
 @class ETUUID;
 
-NSString * const COUndoTrackStoreTrackDidChangeNotification;
-
-// User info keys for COUndoTrackStoreTrackDidChangeNotification
-NSString * const COUndoTrackStoreTrackName;
 /**
- * UUID string
- */
-NSString * const COUndoTrackStoreTrackHeadCommandUUID;
-/**
- * NSNull or UUID string
- */
-NSString * const COUndoTrackStoreTrackCurrentCommandUUID;
-/**
- * NSNumber boolean
- */
-NSString * const COUndoTrackStoreTrackCompacted;
-
-@interface COUndoTrackSerializedCommand : NSObject
-@property (nonatomic, readwrite, strong) id JSONData;
-@property (nonatomic, readwrite, strong) NSDictionary *metadata;
-@property (nonatomic, readwrite, copy) ETUUID *UUID;
-@property (nonatomic, readwrite, copy) ETUUID *parentUUID;
-@property (nonatomic, readwrite, copy) NSString *trackName;
-@property (nonatomic, readwrite, copy) NSDate *timestamp;
-@property (nonatomic, readwrite, assign) int64_t sequenceNumber;
-@end
-
-@interface COUndoTrackState : NSObject <NSCopying>
-@property (nonatomic, readwrite, copy) NSString *trackName;
-@property (nonatomic, readwrite, copy) ETUUID *headCommandUUID;
-@property (nonatomic, readwrite, copy) ETUUID *currentCommandUUID;
-/** 
- * Reports whether a history compaction is underway for this track.
+ * @group Undo
+ * @abstract A specialized store to persist undo tracks.
  *
- * For a cleaner API, we could replace 'compacted' by 'tailCommandUUID' to 
- * report compaction, but this is much more complex to implement.
+ * @section Conceptual Model
  *
- * For state objects returned by -[COUndoTrackStore stateForTrackName:], this 
- * property is currently always NO.
+ * If you intend to share a CoreObject store with multiple applications, the 
+ * default undo track store should be used, otherwise it's usually better to
+ * use an undo track store that remains private to your application.
+ *
+ * With a private undo track store, the history can be backed up and compacted 
+ * without worrying about other applications.
+ *
+ * With the default undo track store, you cannot replace the database on disk 
+ * at run-time and reload the instance returned by +[COUndoTrackStore defaultStore], 
+ * since other applications can be using it.
+ *
+ * @section Current Limitations
+ *
+ * For now, COUndoTrackStore doesn't post distributed notifications, so undo 
+ * tracks have no way to observe multiple instances of the same store 
+ * (COUndoTrackStore objects initialized with the same URL). This means 
+ * COUndoTrack will only track changes posted by the undo track store instance
+ * of their editing context.
+ *
+ * For the default undo track store, all CoreObject applications must link
+ * CoreObject versions whose COUndoTrackStore schema versions are identical.
  */
-@property (nonatomic, readwrite, assign) BOOL compacted;
-@end
-
 @interface COUndoTrackStore : NSObject
 {
+	@private
+	NSURL *_URL;
     FMDatabase *_db;
 	NSMutableDictionary *_modifiedTrackStateForTrackName;
 }
 
-+ (COUndoTrackStore *) defaultStore;
 
-/** @taskunit Framework Private */
-
-- (BOOL) beginTransaction;
-- (BOOL) commitTransaction;
-
-- (NSArray *) trackNames;
-- (NSArray *) trackNamesMatchingGlobPattern: (NSString *)aPattern;
-- (COUndoTrackState *) stateForTrackName: (NSString*)aName;
-- (void) setTrackState: (COUndoTrackState *)aState;
-- (void) removeTrackWithName: (NSString*)aName;
-/**
- * Returns UUIDs for all the commands on a given track.
- *
- * This doesn't include commands marked as deleted.
- *
- * See -markCommandsAsDeletedForUUIDs:.
- */
-- (NSArray *) allCommandUUIDsOnTrackWithName: (NSString*)aName;
+/** @taskunit Initialization */
 
 /**
- * sequenceNumber is set in the provided command object
- */
-- (void) addCommand: (COUndoTrackSerializedCommand *)aCommand;
-/**
- * Returns the serialized representation for the command bound to the given UUID.
+ * Returns the default store that can shared by CoreObject applications.
  *
- * If the UUID corresponds to a deleted command, returns nil.
+ * This store is backed by a single database on disk per user account.
  */
-- (COUndoTrackSerializedCommand *) commandForUUID: (ETUUID *)aUUID;
-- (void) removeCommandForUUID: (ETUUID *)aUUID;
++ (instancetype)defaultStore;
+/**
+ * <init />
+ * Returns a new store backed by the database located at the given URL.
+ *
+ * If there is no database at the given URL, a new one is created, otherwise 
+ * the existing one is reused.
+ *
+ * For a nil argument or a URL which doesn't referenced the local filesystem,
+ * raises a NSInvalidArgumentException.
+ */
+- (instancetype)initWithURL: (NSURL *)aURL;
 
 
-/** @taskunit History Compaction Integration */
+/** @taskunit Basic Properties */
 
 
 /**
- * Marks the given commands as deleted.
+ * The database URL.
  *
- * This should be called before compacting the history with COSQLiteStore.
- *
- * Posts a COUndoTrackStoreTrackDidChangeNotification with 
- * COUndoTrackStoreTrackCompacted set to YES.
+ * See also -initWithURL:.
  */
-- (void)markCommandsAsDeletedForUUIDs: (NSArray *)UUIDs;
-/**
- * Erases commands marked as deleted permanently.
- *
- * This should be called after compacting the history with COSQLiteStore.
- */
-- (void)finalizeDeletions;
-/**
- * Compacts the database by rebuilding it.
- *
- * This shrinks the database file size unlike -finalizeDeletions.
- *
- * This operation is slow and will block the database until the method returns.
- * 
- * See also -[COSQLiteStore vacuum].
- */
-- (BOOL)vacuum;
-
-- (BOOL) string: (NSString *)aString matchesGlobPattern: (NSString *)aPattern;
+@property (nonatomic, readonly) NSURL *URL;
 
 @end

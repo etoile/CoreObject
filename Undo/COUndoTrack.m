@@ -8,6 +8,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 
 #import "COUndoTrackStore.h"
+#import "COUndoTrackStore+Private.h"
 #import "COUndoTrack.h"
 #import "COEditingContext+Undo.h"
 #import "COEditingContext+Private.h"
@@ -27,13 +28,12 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 
 
 @interface COUndoTrack ()
-@property (strong, readwrite, nonatomic) COUndoTrackStore *store;
 @property (strong, readwrite, nonatomic) NSString *name;
 @end
 
 @implementation COUndoTrack
 
-@synthesize name = _name, editingContext = _editingContext, store = _store;
+@synthesize name = _name, editingContext = _editingContext;
 @synthesize customRevisionMetadata;
 
 #pragma mark -
@@ -50,26 +50,21 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 + (COUndoTrack *)trackForName: (NSString *)aName
            withEditingContext: (COEditingContext *)aContext
 {
-	return [[self alloc] initWithStore: [COUndoTrackStore defaultStore]
-	                              name: aName
-	                    editingContext: aContext];
+	return [[self alloc] initWithName: aName editingContext: aContext];
 }
 
 + (COUndoTrack *)trackForPattern: (NSString *)aPattern
               withEditingContext: (COEditingContext *)aContext
 {
-	return [[COPatternUndoTrack alloc] initWithStore: [COUndoTrackStore defaultStore]
-	                                            name: aPattern
-	                                  editingContext: aContext];
+	return [[COPatternUndoTrack alloc] initWithName: aPattern
+	                                 editingContext: aContext];
 }
 
-- (id) initWithStore: (COUndoTrackStore *)aStore
-                name: (NSString *)aName
-	  editingContext: (COEditingContext *)aContext
+- (id) initWithName: (NSString *)aName
+     editingContext: (COEditingContext *)aContext
 {
     SUPERINIT;
     _name = aName;
-    _store = aStore;
 	_editingContext = aContext;
 	_trackStateForName = [NSMutableDictionary new];
 	_commandsByUUID = [NSMutableDictionary new];
@@ -77,7 +72,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	[[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(storeTrackDidChange:)
                                                  name: COUndoTrackStoreTrackDidChangeNotification
-                                               object: _store];
+                                               object: self.store];
 	
     return self;
 }
@@ -85,6 +80,11 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 - (void) dealloc
 {
 	[[NSNotificationCenter defaultCenter] removeObserver: self];
+}
+
+- (COUndoTrackStore *)store
+{
+	return _editingContext.undoTrackStore;
 }
 
 #pragma mark - Track Protocol - Convenience Methods
@@ -172,7 +172,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	if (targetIndex == currentIndex)
 		return YES;
 	
-	[_store beginTransaction];
+	[self.store beginTransaction];
 	
 	NSMutableArray *undo1 = [NSMutableArray new];
 	NSMutableArray *redo1 = [NSMutableArray new];
@@ -194,7 +194,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	
 	[self undo: undo1 redo: redo1 undo: @[] redo: @[]];
 	
-	BOOL ok = [_store commitTransaction];
+	BOOL ok = [self.store commitTransaction];
 	if (ok)
 	{
 		[self didUpdate];
@@ -233,7 +233,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	ETAssert(commonAncestorIndex != NSNotFound);
 	ETAssert(currentIndex != NSNotFound);
 
-	[_store beginTransaction];
+	[self.store beginTransaction];
 	
 	NSMutableArray *undo1 = [NSMutableArray new];
 	NSMutableArray *redo1 = [NSMutableArray new];
@@ -259,7 +259,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	
 	[self undo: undo1 redo: redo1 undo: @[] redo: redo2];
 	
-	BOOL ok = [_store commitTransaction];
+	BOOL ok = [self.store commitTransaction];
 	if (ok)
 	{
 		// FIXME: Not sure if we should need to call this explicitly, calling
@@ -331,12 +331,12 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	// Set ownership pointers (not parent UUID!)
 	[self setParentPointersForCommandGroup: aCommand];
 
-	[_store beginTransaction];
+	[self.store beginTransaction];
 	
 	[self loadIfNeeded];
 	
 	// Check our state
-	COUndoTrackState *storeState = [_store stateForTrackName: _name];
+	COUndoTrackState *storeState = [self.store stateForTrackName: _name];
 	if (!([state.headCommandUUID isEqual: storeState.headCommandUUID]
 		  && [state.currentCommandUUID isEqual: storeState.currentCommandUUID]))
 	{
@@ -376,7 +376,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	}
 	
 	COUndoTrackSerializedCommand *serialized = [aCommand serializedCommand];
-	[_store addCommand: serialized];
+	[self.store addCommand: serialized];
 	aCommand.sequenceNumber = serialized.sequenceNumber;
 	
 	// Write out the new store state
@@ -386,25 +386,25 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	newStoreState.currentCommandUUID = aCommand.UUID;
 	newStoreState.headCommandUUID = aCommand.UUID;
 	
-	[_store setTrackState: newStoreState];
+	[self.store setTrackState: newStoreState];
 	_trackStateForName[_name] = newStoreState;
 	
 	// Delete the obsolete last command created by coalescing
 	if (coalescedCommandUUIDToDelete != nil)
 	{
-		[_store removeCommandForUUID: coalescedCommandUUIDToDelete];
+		[self.store removeCommandForUUID: coalescedCommandUUIDToDelete];
 		[_commandsByUUID removeObjectForKey: coalescedCommandUUIDToDelete];
 	}
 
-	ETAssert([_store commitTransaction]);
+	ETAssert([self.store commitTransaction]);
 	[self reloadNodesOnCurrentBranch];
 }
 
 -(void)clear
 {
-	[_store beginTransaction];
-	[_store removeTrackWithName: _name];
-	ETAssert([_store commitTransaction]);
+	[self.store beginTransaction];
+	[self.store removeTrackWithName: _name];
+	ETAssert([self.store commitTransaction]);
 	
 	_nodesOnCurrentUndoBranch = nil;
 	[_commandsByUUID removeAllObjects];
@@ -575,7 +575,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	newStoreState.currentCommandUUID = newCurrentNodeUUID;
 	newStoreState.headCommandUUID = newHeadNodeUUID;
 	
-	[_store setTrackState: newStoreState];
+	[self.store setTrackState: newStoreState];
 	_trackStateForName[trackName] = newStoreState;
 }
 
@@ -655,7 +655,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 			}
 			
 			// Also make sure all commands have been loaded, including divergent ones
-			for (ETUUID *uuid in [_store allCommandUUIDsOnTrackWithName: _name])
+			for (ETUUID *uuid in [self.store allCommandUUIDsOnTrackWithName: _name])
 			{
 				[self commandForUUID: uuid];
 			}
@@ -685,10 +685,10 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	_nodesOnCurrentUndoBranch = [NSMutableArray new];
 	
 	// May be empty if we are uncommitted
-	NSArray *matchingNames = [_store trackNamesMatchingGlobPattern: _name];
+	NSArray *matchingNames = [self.store trackNamesMatchingGlobPattern: _name];
 	for (NSString *matchingName in matchingNames)
 	{
-		COUndoTrackState *trackState = [_store stateForTrackName: matchingName];
+		COUndoTrackState *trackState = [self.store stateForTrackName: matchingName];
 		_trackStateForName[matchingName] = trackState;
 	}
 	
@@ -715,7 +715,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	COCommandGroup *command = _commandsByUUID[aUUID];
 	if (command == nil)
 	{
-		COUndoTrackSerializedCommand *serializedCommand = [_store commandForUUID: aUUID];
+		COUndoTrackSerializedCommand *serializedCommand = [self.store commandForUUID: aUUID];
 		BOOL isDeletedCommand = (serializedCommand == nil);
 
 		if (isDeletedCommand)
@@ -787,7 +787,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	}
 	notifState.compacted = [userInfo[COUndoTrackStoreTrackCompacted] boolValue];
 
-	if ([_store string: notifState.trackName matchesGlobPattern: _name])
+	if ([self.store string: notifState.trackName matchesGlobPattern: _name])
 	{
 		COUndoTrackState *inMemoryState = _trackStateForName[notifState.trackName];
 		if (![inMemoryState isEqual: notifState])

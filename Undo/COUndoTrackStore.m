@@ -6,6 +6,7 @@
  */
 
 #import "COUndoTrackStore.h"
+#import "COUndoTrackStore+Private.h"
 #import "COUndoTrack.h"
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "FMDatabase.h"
@@ -14,7 +15,9 @@
 #import "CODateSerialization.h"
 #import "COEndOfUndoTrackPlaceholderNode.h"
 #import "COJSONSerialization.h"
+#if TARGET_OS_IPHONE
 #import "NSDistributedNotificationCenter.h"
+#endif
 
 NSString * const COUndoTrackStoreTrackDidChangeNotification = @"COUndoTrackStoreTrackDidChangeNotification";
 NSString * const COUndoTrackStoreTrackName = @"COUndoTrackStoreTrackName";
@@ -103,35 +106,55 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
 @implementation COUndoTrackStore
 
-+ (COUndoTrackStore *) defaultStore
+@synthesize URL = _URL;
+
++ (NSURL *)defaultStoreURL
+{
+    NSArray *libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+
+    return [NSURL fileURLWithPath: [[libraryDirs[0] stringByAppendingPathComponent: @"CoreObject"]
+		stringByAppendingPathComponent: @"Undo"]];
+}
+
++ (instancetype)defaultStore
 {
     static COUndoTrackStore *store;
     if (store == nil)
     {
-        store = [[COUndoTrackStore alloc] init];
+        store = [[COUndoTrackStore alloc] initWithURL: [self defaultStoreURL]];
     }
     return store;
 }
 
-- (id) init
+- (instancetype)initWithURL: (NSURL *)aURL
 {
+	NILARG_EXCEPTION_TEST(aURL);
+	INVALIDARG_EXCEPTION_TEST(aURL, aURL.isFileURL);
     SUPERINIT;
-    
+	
+	BOOL isDir = NO;
+
+	if (![[NSFileManager defaultManager] fileExistsAtPath: aURL.path
+	                                          isDirectory: &isDir])
+	{
+		NSError *error = nil;
+
+		[[NSFileManager defaultManager] createDirectoryAtURL: aURL
+    	                         withIntermediateDirectories: YES
+    	                                          attributes: nil
+		                                               error: &error];
+		ETAssert(error == nil);
+	}
+	else
+	{
+		ETAssert(isDir);
+	}
+
+	_URL = aURL;
 	_modifiedTrackStateForTrackName = [NSMutableDictionary new];
 	
-    NSArray *libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-
-    NSString *dir = [[[libraryDirs objectAtIndex: 0]
-                      stringByAppendingPathComponent: @"CoreObject"]
-                        stringByAppendingPathComponent: @"Undo"];
-
-    [[NSFileManager defaultManager] createDirectoryAtPath: dir
-                              withIntermediateDirectories: YES
-                                               attributes: nil
-                                                    error: NULL];
-	
     @autoreleasepool {
-		_db = [[FMDatabase alloc] initWithPath: [dir stringByAppendingPathComponent: @"undo.sqlite"]];
+		_db = [[FMDatabase alloc] initWithPath: [aURL.path stringByAppendingPathComponent: @"undo.sqlite"]];
 		[_db setShouldCacheStatements: YES];
 		[_db setLogsErrors: YES];
 		assert([_db open]);
@@ -184,6 +207,11 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 							 "FOREIGN KEY(currentid) REFERENCES commands(id))"];
 	}
     return self;
+}
+
+- (instancetype)init
+{
+	return [self initWithURL: nil];
 }
 
 - (void) dealloc

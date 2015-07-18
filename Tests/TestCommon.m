@@ -86,20 +86,31 @@ doesNotPostNotification: (NSString *)notif
 #ifdef DELETE_STORE_AFTER_EACH_TEST_METHOD
 	// FIXME: For Mac OS X 10.7, this is unsupported, SQLite disk errors
 	// (DB Error: 10 "disk I/O error") appear in TestStoreSQLite.m.
-	[[self class] deleteStore];
+	[[self class] deleteStores];
 #endif
 }
 
-+ (void) deleteStore
++ (void) deleteStores
 {
 	BOOL isDir = NO;
 
 	if ([[NSFileManager defaultManager] fileExistsAtPath: [[self storeURL] path]
-	                                         isDirectory: &isDir] && isDir)
+	                                         isDirectory: &isDir])
 	{
+		ETAssert(isDir);
 		NSError *error = nil;
 
 		[[NSFileManager defaultManager] removeItemAtURL: [self storeURL] error: &error];
+		ETAssert(error == nil);
+	}
+	
+	if ([[NSFileManager defaultManager] fileExistsAtPath: [[self undoTrackStoreURL] path]
+	                                         isDirectory: &isDir])
+	{
+		ETAssert(isDir);
+		NSError *error = nil;
+
+		[[NSFileManager defaultManager] removeItemAtURL: [self undoTrackStoreURL] error: &error];
 		ETAssert(error == nil);
 	}
 }
@@ -121,6 +132,11 @@ doesNotPostNotification: (NSString *)notif
 + (NSURL *) storeURL
 {
 	return [[self temporaryURLForTestStorage] URLByAppendingPathComponent: @"TestStore.sqlite"];
+}
+
++ (NSURL *)undoTrackStoreURL
+{
+	return [[self temporaryURLForTestStorage] URLByAppendingPathComponent: @"TestUndoTrackStore.sqlite"];
 }
 
 - (void) checkPersistentRoot: (ETUUID *)aPersistentRoot
@@ -198,7 +214,7 @@ doesNotPostNotification: (NSString *)notif
 
 + (void) willRunTestSuite
 {
-	[SQLiteStoreTestCase deleteStore];
+	[SQLiteStoreTestCase deleteStores];
 
 	// NOTE: We are about to initialize every loaded class. Make sure
 	// NSApplication is created first or various other gui classes on GNUstep
@@ -208,7 +224,7 @@ doesNotPostNotification: (NSString *)notif
 
 + (void) didRunTestSuite
 {
-	[SQLiteStoreTestCase deleteStore];
+	[SQLiteStoreTestCase deleteStores];
 	
 	// Run a runloop so we handle any outstanding notifications, so
 	// we can check for leaks afterwards.
@@ -224,12 +240,13 @@ doesNotPostNotification: (NSString *)notif
 	// Count up the number of open sqlite database connections at this
 	// point.
 	//
-	// As of 2014-01-24, there are 3 open connections:
+	// As of 2015-08-27, there are 3 open connections:
 	//
-	//  - In TestSynchronizer, -testBasicServerRevert and -testBasicClientRevert each leak a store.
-	//    (I don't understand why, but they're not so serious because
-	//     they only happen when throwing an exception in response to incorrect API usage.)
-	//
+	//  - In -[TestEditingContext testWithNoUndoTrackStore] and
+	//    -[TestSchemaMigration testExceptionOnMigrationReturningItemsWithIncorrectVersion]
+	//    the store is retained when passed as an argument, but never released
+	//    if an exception is thrown in the called method (this could be
+	//    considered a ARC bug or limitation).
 	//  - +[COUndoTrackStore defaultStore] intentionally opens and never closes a database connection
 	//    to the ~/Library/CoreObject/Undo/undo.sqlite database
 
@@ -237,7 +254,7 @@ doesNotPostNotification: (NSString *)notif
 	{
 		[FMDatabase logOpenDatabases];
 
-		const int expectedOpenDatabases = 4;
+		const int expectedOpenDatabases = 3;
 		if ([FMDatabase countOfOpenDatabases] > expectedOpenDatabases)
 		{
 			NSLog(@"ERROR: Expected only %d SQLite database connections to still be open.", expectedOpenDatabases);
@@ -251,7 +268,9 @@ doesNotPostNotification: (NSString *)notif
 - (id) init
 {
 	SUPERINIT;
-	ctx = [[COEditingContext alloc] initWithStore: store];
+	ctx = [[COEditingContext alloc] initWithStore: store
+	                   modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]
+	                               undoTrackStore: [[COUndoTrackStore alloc] initWithURL: [[self class] undoTrackStoreURL]]];
     return self;
 }
 

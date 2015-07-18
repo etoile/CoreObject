@@ -52,6 +52,10 @@
 	// Check that the relationship cache knows the inverse relationship, even though it is
 	// not used in the metamodel (non-public API)
 	UKObjectsEqual(S(group1), [item1 referringObjects]);
+
+	[ctx1 discardAllChanges];
+	
+	UKTrue([[item1 referringObjects] isEmpty]);
 }
 
 - (void) testRetainCycleMemoryLeakWithUserSuppliedSet

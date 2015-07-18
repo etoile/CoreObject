@@ -109,6 +109,13 @@
 	return result;
 }
 
+- (instancetype)init
+{
+	SUPERINIT;
+	subDiffsByAlgorithmName = [NSMutableDictionary new];
+	return self;
+}
+
 - (CODiffManager *) diffByMergingWithDiff: (CODiffManager *)otherDiff
 {
 	CODiffManager *result = [[CODiffManager alloc] init];
@@ -132,6 +139,16 @@
 	
 	result->subDiffsByAlgorithmName = resultDict;
 	return result;
+}
+
+- (COItemGraphDiff *)subdiffForAlgorithmName: (NSString *)aDiffAlgorithmName
+{
+	return self.subDiffsByAlgorithmName[aDiffAlgorithmName];
+}
+
+- (void)addSubdiff: (id <CODiffAlgorithm>)aSubdiff
+{
+	self.subDiffsByAlgorithmName[NSStringFromClass([aSubdiff class])] = aSubdiff;
 }
 
 - (BOOL) applyTo: (id<COItemGraph>)dest

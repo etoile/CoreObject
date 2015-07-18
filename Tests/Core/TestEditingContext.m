@@ -235,8 +235,20 @@
 - (void) testWithNoStore
 {
 	UKRaisesException([[COEditingContext alloc] initWithStore: nil]);
-	UKRaisesException([[COEditingContext alloc] initWithStore: nil modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]]);
+	UKRaisesException([[COEditingContext alloc] initWithStore: nil
+	                               modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]]);
+	UKRaisesException([[COEditingContext alloc] initWithStore: nil
+	                               modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]
+	                                           undoTrackStore: [COUndoTrackStore defaultStore]]);
 	UKRaisesException([[COEditingContext alloc] init]);
+}
+
+- (void)testWithNoUndoTrackStore
+{
+	// Will retain the store as argument but not release it due to the exception
+	UKRaisesException([[COEditingContext alloc] initWithStore: store
+	                               modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]
+	                                           undoTrackStore: nil]);
 }
 
 - (void) testRevisionEqualityFromMultipleEditingContexts
@@ -294,14 +306,16 @@
 	__block BOOL receivedNotification = NO;
 	__block BOOL insideCommit = NO;
 	
-	[[NSNotificationCenter defaultCenter] addObserverForName: COEditingContextDidChangeNotification
-													  object: ctx
-													   queue: nil
-												  usingBlock: ^(NSNotification *notif) {
-													  receivedNotification = YES;
-													  UKTrue(insideCommit);
-													  UKRaisesException([ctx commit]);
-												  }];
+	id observer = [[NSNotificationCenter defaultCenter]
+		addObserverForName: COEditingContextDidChangeNotification
+		            object: ctx
+	                 queue: nil
+	            usingBlock: ^(NSNotification *notif)
+	{
+		receivedNotification = YES;
+		UKTrue(insideCommit);
+		UKRaisesException([ctx commit]);
+	}];
 		
 	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 
@@ -310,6 +324,8 @@
 	insideCommit = NO;
 	
 	UKTrue(receivedNotification);
+	
+	[[NSNotificationCenter defaultCenter] removeObserver: observer];
 }
 
 @end

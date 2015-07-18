@@ -1457,7 +1457,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 
 - (void)willDiscard
 {
-    
+    [self removeCachedOutgoingRelationships];
 }
 
 #pragma mark - Equality

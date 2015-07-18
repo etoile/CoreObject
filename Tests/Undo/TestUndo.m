@@ -42,6 +42,12 @@
     return self;
 }
 
+- (COEditingContext *)newContext
+{
+	return [[COEditingContext alloc] initWithStore: [[COSQLiteStore alloc] initWithURL: ctx.store.URL]
+	                    modelDescriptionRepository: ctx.modelDescriptionRepository
+	                                undoTrackStore: ctx.undoTrackStore];
+}
 
 - (void)testUndoSetCurrentVersionForBranchBasic
 {
@@ -113,7 +119,7 @@
     
     // Load in another context
     {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
 
 		COUndoTrack *rootEditTrack = [_rootEditTrack trackWithEditingContext: ctx2];
@@ -196,7 +202,7 @@
         
     // Load in another context
     {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
 
@@ -221,7 +227,7 @@
 	
     // Load in another context
     {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
 		
@@ -246,7 +252,7 @@
     
     // Load in another context
     {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
 
@@ -274,7 +280,7 @@
     
     // Load in another context
     {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
 
@@ -299,7 +305,7 @@
     
     // Load in another context
     {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
@@ -323,7 +329,7 @@
     
     // Load in another context
     {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
 		
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
@@ -352,7 +358,7 @@
     
     // Load in another context
     {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
         COBranch *ctx2originalBranch = [ctx2persistentRoot branchForUUID: [originalBranch UUID]];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
@@ -381,7 +387,7 @@
     
     // Load in another context
     {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
 		
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
@@ -402,7 +408,7 @@
     
     // Load in another context
     {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
 		
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
@@ -425,7 +431,7 @@
     
     // Load in another context
     {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
+        COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];

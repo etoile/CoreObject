@@ -810,13 +810,6 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
     NSMutableSet *deadUUIDs = [NSMutableSet setWithArray: [_loadedObjects allKeys]];
 	NSSet *liveUUIDs = [self allReachableObjectUUIDs];
     [deadUUIDs minusSet: liveUUIDs];
-    
-	// FIXME: Should the other places that call -discardObjectsWithUUIDs: also do this?
-    for (ETUUID *deadUUID in deadUUIDs)
-    {
-		COObject *anObject = [_loadedObjects objectForKey: deadUUID];
-		[anObject removeCachedOutgoingRelationships];
-    }
 	
 	[self discardObjectsWithUUIDs: deadUUIDs];
 }

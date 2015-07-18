@@ -21,7 +21,9 @@
 #import "COPersistentRootInfo.h"
 #import "COStoreTransaction.h"
 #import "COStoreAction.h"
+#if TARGET_OS_IPHONE
 #import "NSDistributedNotificationCenter.h"
+#endif
 
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"

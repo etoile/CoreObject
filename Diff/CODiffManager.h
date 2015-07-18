@@ -57,6 +57,26 @@
 
 - (CODiffManager *) diffByMergingWithDiff: (CODiffManager *)otherDiff;
 
+
+/** @taskunit Accessing Subdiffs */
+
+
+/**
+ * Returns the diff portion corresponding to this algorithm.
+ *
+ * The returned diff applied to all the items whose entity description requested 
+ * this algorithm with -[ETEntityDescription diffAlgorithm].
+ *
+ * The returned subdiff always conforms to CODiffAlgorithm.
+ */
+- (id)subdiffForAlgorithmName: (NSString *)aDiffAlgorithmName;
+/**
+ * Adds a subdiff using its class name to map it to an algorithm name.
+ *
+ * If a subdiff already exists for this algorithm, it is replaced.
+ */
+- (void)addSubdiff: (id <CODiffAlgorithm>)aSubdiff;
+
 /**
  * Applies the diff to the destination item graph, and returns whether the
  * item graph was changed.
