@@ -31,7 +31,7 @@
 	compactableBranchUUIDs = _compactableBranchUUIDs,
 	deadRevisionUUIDs = _deadRevisionUUIDs, liveRevisionUUIDs = _liveRevisionUUIDs;
 
-- (instancetype)initWithUndoTrack: (COUndoTrack *)aTrack upToCommand: (COCommand *)aCommand
+- (instancetype)initWithUndoTrack: (COUndoTrack *)aTrack upToCommand: (COCommandGroup *)aCommand
 {
 	SUPERINIT;
 	_undoTrack = aTrack;

@@ -9,7 +9,7 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COHistoryCompaction.h>
 
-@class COUndoTrack, COCommand;
+@class COUndoTrack, COCommandGroup;
 
 /** 
  * @group Undo
@@ -40,7 +40,7 @@
 {
 	@private
 	COUndoTrack *_undoTrack;
-	COCommand *_oldestCommandToKeep;
+	COCommandGroup *_oldestCommandToKeep;
 	NSMutableSet *_finalizablePersistentRootUUIDs;
 	NSMutableSet *_compactablePersistentRootUUIDs;
 	NSMutableSet *_finalizableBranchUUIDs;
@@ -49,7 +49,7 @@
 	NSMutableDictionary *_liveRevisionUUIDs;
 }
 
-- (instancetype)initWithUndoTrack: (COUndoTrack *)aTrack upToCommand: (COCommand *)aCommand;
+- (instancetype)initWithUndoTrack: (COUndoTrack *)aTrack upToCommand: (COCommandGroup *)aCommand;
 
 @property (nonatomic, readonly) COUndoTrack *undoTrack;
 
