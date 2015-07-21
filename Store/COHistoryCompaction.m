@@ -145,9 +145,9 @@
 			while ([rs next])
 			{
 				ETUUID *head = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-				NSIndexSet *revs = [backing revidsFromRevid: 0
+				// TODO: Could be better to pass the tail revid
+				NSIndexSet *revs = [backing revidsFromRevid: revisions.firstIndex
 													toRevid: [backing revidForUUID: head]];
-
 				[reachableRevisions addIndexes: revs];
 			}
 			[rs close];

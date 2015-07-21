@@ -104,6 +104,9 @@
 	object.name = @"Nowhere";
 	[ctx commitWithUndoTrack: track];
 	
+	object.name = @"Wherever";
+	[ctx commitWithUndoTrack: track];
+	
 	NSMutableDictionary *revs =  [NSMutableDictionary new];
 	
 	revs[persistentRoot.UUID] = persistentRoot.currentBranch.nodes;
@@ -174,10 +177,68 @@
 	   COUndoTrackHistoryCompaction logic, this means the oldest kept revision 
 	   will be the revision prior to track.allCommands[3].newRevisionID.
 
-	   This explains the index mistmatch between oldRevs subarrayFromIndex: 2]
+	   This explains the index mistmatch between [oldRevs subarrayFromIndex: 2]
 	   and the next line. */
 	NSDictionary *newRevs = [self compactUpToCommand: track.allCommands[3]
 	                             expectingCompaction: compaction];
+
+	UKObjectsEqual(liveRevs, newRevs[persistentRoot.UUID]);
+	UKObjectsEqual(NODES(liveCommands), track.nodes);
+	UKObjectsEqual(liveCommands, track.allCommands);
+}
+
+/**
+ * This is a regression test to ensure we detect compactable persistent roots
+ * correctly, even when the initial undeletion/creation command has been
+ * finalized with a previous compaction.
+ */
+- (void)testCompactPersistentRootWithTrivialHistoryTwice
+{
+	NSArray *oldRevs = [self createPersistentRootsWithTrivialHistory: NO][persistentRoot.UUID];
+
+	/* First compaction */
+
+	NSArray *liveRevs = [oldRevs subarrayFromIndex: 1];
+	NSArray *deadRevs = [oldRevs arrayByRemovingObjectsInArray: liveRevs];
+	COUndoTrackHistoryCompaction *compaction = [COUndoTrackHistoryCompaction new];
+
+	compaction.finalizablePersistentRootUUIDs = [NSSet set];
+	compaction.compactablePersistentRootUUIDs = S(persistentRoot.UUID);
+	compaction.liveRevisionUUIDs = @{ persistentRoot.UUID : SA((id)[[liveRevs mappedCollection] UUID]) };
+	compaction.deadRevisionUUIDs = @{ persistentRoot.UUID : SA((id)[[deadRevs mappedCollection] UUID]) };
+
+	NSArray *liveCommands = [track.allCommands subarrayFromIndex: 2];
+	/* See comment in -testCompactPersistentRootWithTrivialHistory */
+	NSDictionary *newRevs = [self compactUpToCommand: track.allCommands[2]
+	                             expectingCompaction: compaction];
+	
+	/* Second compaction */
+	
+	oldRevs = liveRevs;
+
+	liveRevs = [oldRevs subarrayFromIndex: 2];
+	deadRevs = [oldRevs arrayByRemovingObjectsInArray: liveRevs];
+	compaction = [COUndoTrackHistoryCompaction new];
+
+	compaction.finalizablePersistentRootUUIDs = [NSSet set];
+	compaction.compactablePersistentRootUUIDs = S(persistentRoot.UUID);
+	compaction.liveRevisionUUIDs = @{ persistentRoot.UUID : SA((id)[[liveRevs mappedCollection] UUID]) };
+	compaction.deadRevisionUUIDs = @{ persistentRoot.UUID : SA((id)[[deadRevs mappedCollection] UUID]) };
+
+	/* COCommandSetCurrentVersionForBranch.oldRevisionID is kept alive by 
+	   COUndoTrackHistoryCompaction logic, this means the oldest kept revision 
+	   will be the revision prior to track.allCommands[2].newRevisionID.
+
+	   However oldRevs starts with the old revision ID for track.allCommands[0]
+	   and the old revision ID for track.allCommands[1] (which happens to be the
+	   revision ID bound to track.allCommands[0]). Both will be discarded.
+	   
+	   After a first compaction, we always have an old revision to discard 
+	   together with the first command, so there is no index mismatch between 
+	   [oldRevs subarrayFromIndex: 2] and the next line. */
+	liveCommands = [track.allCommands subarrayFromIndex: 2];
+	newRevs = [self compactUpToCommand: track.allCommands[2]
+	               expectingCompaction: compaction];
 
 	UKObjectsEqual(liveRevs, newRevs[persistentRoot.UUID]);
 	UKObjectsEqual(NODES(liveCommands), track.nodes);

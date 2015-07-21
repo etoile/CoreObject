@@ -643,16 +643,11 @@ static NSData *Sha1Data(NSData *data)
             assert([rs hasAnotherRow]);
         }
     }
-	
     [rs close];
 
-    if (![result containsIndex: baseRevid]
-        || ![result containsIndex: revid])
-    {
-        NSLog(@"Warning, -revidsFromRevid:toRevid: given invalid arguments");
-        return nil;
-    }
-    
+	NSAssert([result containsIndex: baseRevid] && [result containsIndex: revid],
+		@"-revidsFromRevid:toRevid: given invalid arguments");
+
     return result;
 }
 
@@ -725,12 +720,20 @@ static NSData *Sha1Data(NSData *data)
 
 - (NSIndexSet *) revidsUsedRange
 {
+	// NOTE: For performance, we use two distinct queries, see
+	// http://stackoverflow.com/questions/11515165/sqlite3-select-min-max-together-is-much-slower-than-select-them-separately
+    NSNumber *min = [db_ numberForQuery: [NSString stringWithFormat: @"SELECT MIN(rowid) FROM %@", [self tableName]]];
     NSNumber *max = [db_ numberForQuery: [NSString stringWithFormat: @"SELECT MAX(rowid) FROM %@", [self tableName]]];
-    if (max != nil)
-    {
-        return [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [max longLongValue] + 1)];
-    }
-    return nil;
+
+	if (min == nil && max == nil)
+	{
+		return [NSIndexSet new];
+	}
+	NSAssert(min != nil && max != nil, @"The backing store database is returning incoherent results");
+
+	NSUInteger length = max.longLongValue - min.longLongValue + 1;
+
+	return [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(min.longLongValue, length)];
 }
 
 - (CORevisionInfo *)revisionInfoWithResultSet: (FMResultSet *)rs revisionIDs: (NSMutableDictionary *)revIDs

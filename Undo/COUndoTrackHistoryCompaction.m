@@ -134,6 +134,10 @@
  * The last status check (deleted vs undeleted) decides whether the persistent 
  * root will be finalized or compacted. The same applies to the branches.
  *
+ * When the history has already been compacted, we are not always able to decide 
+ * the last status based on the last deletion/undeletion command, since the 
+ * last undeletion could have been compacted, so we must check all command kinds.
+ *
  * Take note that branch deletion/undeletion can appear in the history, even 
  * with the owning persistent being deleted previously.
  */
@@ -144,7 +148,7 @@
 		[_finalizablePersistentRootUUIDs addObject: command.persistentRootUUID];
 		[_compactablePersistentRootUUIDs removeObject: command.persistentRootUUID];
 	}
-	else if ([command isKindOfClass: [COCommandUndeletePersistentRoot class]])
+	else
 	{
 		/* This can represent COCommandCreatePersistentRoot too.
 		   Don't delete alive persistent roots, even when we committed no 
@@ -152,18 +156,29 @@
 		[_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
 		[_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
 	}
-	else if ([command isKindOfClass: [COCommandDeleteBranch class]])
+
+	if ([command isKindOfClass: [COCommandDeleteBranch class]])
 	{
 		[_finalizableBranchUUIDs addObject: command.branchUUID];
 		[_compactableBranchUUIDs removeObject: command.branchUUID];
 	}
-	else if ([command isKindOfClass: [COCommandUndeleteBranch class]])
+	else if ([command isKindOfClass: [COCommandUndeleteBranch class]]
+	      || [command isKindOfClass: [COCommandSetCurrentVersionForBranch class]]
+	      || [command isKindOfClass: [COCommandSetBranchMetadata class]]
+	      || [command isKindOfClass: [COCommandSetCurrentBranch class]])
 	{
 		/* This can represent "COCommandCreateBranch" too.
 		   Don't delete alive branches, even when we committed no changes on 
 		   this branch in the live commands. */
 		[_finalizableBranchUUIDs removeObject: command.branchUUID];
 		[_compactableBranchUUIDs addObject: command.branchUUID];
+	}
+	else if ([command isKindOfClass: [COCommandSetCurrentVersionForBranch class]])
+	{
+		[_finalizableBranchUUIDs removeObject: command.branchUUID];
+		[_compactableBranchUUIDs addObject: command.branchUUID];
+		[_finalizableBranchUUIDs removeObject: ((COCommandSetCurrentBranch *)command).oldBranchUUID];
+		[_compactableBranchUUIDs addObject: ((COCommandSetCurrentBranch *)command).oldBranchUUID];
 	}
 }
 
@@ -206,6 +221,15 @@
 		[_finalizableBranchUUIDs removeObject: command.branchUUID];
 		[_compactableBranchUUIDs addObject: command.branchUUID];
 	}
+	else if ([command isKindOfClass: [COCommandSetCurrentBranch class]])
+	{
+		[_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
+		[_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
+		[_finalizableBranchUUIDs removeObject: command.branchUUID];
+		[_compactableBranchUUIDs addObject: command.branchUUID];
+		[_finalizableBranchUUIDs removeObject: ((COCommandSetCurrentBranch *)command).oldBranchUUID];
+		[_compactableBranchUUIDs addObject: ((COCommandSetCurrentBranch *)command).oldBranchUUID];
+	}
 	else
 	{
 		ETAssertUnreachable();
@@ -232,6 +256,9 @@
 	if ([command isKindOfClass: [COCommandSetCurrentVersionForBranch class]])
 	{
 		[_deadRevisionUUIDs[persistentRootUUID] addObject: [command revisionUUID]];
+		[_deadRevisionUUIDs[persistentRootUUID] addObject: [command oldRevisionUUID]];
+		[_deadRevisionUUIDs[persistentRootUUID] addObject: [command headRevisionUUID]];
+		[_deadRevisionUUIDs[persistentRootUUID] addObject: [command oldHeadRevisionUUID]];
 	}
 	else if ([command isKindOfClass: [COCommandCreatePersistentRoot class]])
 	{
