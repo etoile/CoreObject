@@ -46,7 +46,7 @@
 @end
 
 
-@interface TestUndoTrackHistoryCompaction : EditingContextTestCase <UKTest>
+@interface UndoTrackHistoryCompactionTestCase : EditingContextTestCase
 {
 	COPersistentRoot *persistentRoot;
 	COPersistentRoot *otherPersistentRoot;
@@ -56,19 +56,74 @@
 @end
 
 
-@implementation TestUndoTrackHistoryCompaction
+@implementation UndoTrackHistoryCompactionTestCase
 
 - (id)init
 {
 	SUPERINIT;
 	store.maxNumberOfDeltaCommits = 0;
+	[self prepareTracks];
+	return self;
+}
+
+- (void)prepareTracks
+{
 	// NOTE: The name must not start with 'TestUndoTrack', otherwise this
 	// conflicts with pattern track tests in TestUndoTrack.m.
 	track = [COUndoTrack trackForName: @"TestHistoryCompaction"
 	               withEditingContext: ctx];
 	[track clear];
-	return self;
 }
+
+- (NSDictionary *)compactUpToCommand: (COCommandGroup *)command
+                 expectingCompaction: (COUndoTrackHistoryCompaction *)expectedCompaction
+{
+	COUndoTrackHistoryCompaction *compaction =
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+		                                            upToCommand: command];
+	
+	[compaction compute];
+	
+	NSSet *persistentRootUUIDs = [compaction.finalizablePersistentRootUUIDs
+		setByAddingObjectsFromSet: compaction.compactablePersistentRootUUIDs];
+	
+	UKObjectsEqual(expectedCompaction.finalizablePersistentRootUUIDs, compaction.finalizablePersistentRootUUIDs);
+	UKObjectsEqual(expectedCompaction.compactablePersistentRootUUIDs, compaction.compactablePersistentRootUUIDs);
+	UKIntsEqual(persistentRootUUIDs.count, expectedCompaction.liveRevisionUUIDs.count);
+	UKIntsEqual(persistentRootUUIDs.count, expectedCompaction.deadRevisionUUIDs.count);
+	UKObjectsEqual([expectedCompaction liveRevisionUUIDsForPersistentRootUUIDs: @[persistentRoot.UUID]],
+	                       [compaction liveRevisionUUIDsForPersistentRootUUIDs: @[persistentRoot.UUID]]);
+	UKObjectsEqual([expectedCompaction deadRevisionUUIDsForPersistentRootUUIDs: @[persistentRoot.UUID]],
+	                       [compaction deadRevisionUUIDsForPersistentRootUUIDs: @[persistentRoot.UUID]]);
+
+	UKTrue([store compactHistory: compaction]);
+
+	if (otherPersistentRoot.isDeleted)
+	{
+		// Will retain the store but not release it due to the exception (looks
+		// like the store is retained as a receiver in -[COBranch revisionsWithOptions:]).
+		UKRaisesException([otherPersistentRoot.currentBranch reloadRevisions]);
+	}
+
+	NSMutableDictionary *revs =  [NSMutableDictionary new];
+	
+	revs[persistentRoot.UUID] = persistentRoot.currentBranch.nodes;
+	if (otherPersistentRoot != nil)
+	{
+	     revs[otherPersistentRoot.UUID] = otherPersistentRoot.currentBranch.nodes;
+	}
+	return revs;
+}
+
+#define NODES(x) [@[[COEndOfUndoTrackPlaceholderNode sharedInstance]] arrayByAddingObjectsFromArray: x]
+
+@end
+
+
+@interface TestUndoTrackHistoryCompaction : UndoTrackHistoryCompactionTestCase <UKTest>
+@end
+
+@implementation TestUndoTrackHistoryCompaction
 
 - (NSDictionary *)createPersistentRootsWithTrivialHistory: (BOOL)createMultiplePersistentRoots
 {
@@ -116,48 +171,6 @@
 	}
 	return revs;
 }
-
-- (NSDictionary *)compactUpToCommand: (COCommand *)command
-                 expectingCompaction: (COUndoTrackHistoryCompaction *)expectedCompaction
-{
-	COUndoTrackHistoryCompaction *compaction =
-		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
-		                                            upToCommand: command];
-	
-	[compaction compute];
-	
-	NSSet *persistentRootUUIDs = [compaction.finalizablePersistentRootUUIDs
-		setByAddingObjectsFromSet: compaction.compactablePersistentRootUUIDs];
-	
-	UKObjectsEqual(expectedCompaction.finalizablePersistentRootUUIDs, compaction.finalizablePersistentRootUUIDs);
-	UKObjectsEqual(expectedCompaction.compactablePersistentRootUUIDs, compaction.compactablePersistentRootUUIDs);
-	UKIntsEqual(persistentRootUUIDs.count, expectedCompaction.liveRevisionUUIDs.count);
-	UKIntsEqual(persistentRootUUIDs.count, expectedCompaction.deadRevisionUUIDs.count);
-	UKObjectsEqual([expectedCompaction liveRevisionUUIDsForPersistentRootUUIDs: @[persistentRoot.UUID]],
-	                       [compaction liveRevisionUUIDsForPersistentRootUUIDs: @[persistentRoot.UUID]]);
-	UKObjectsEqual([expectedCompaction deadRevisionUUIDsForPersistentRootUUIDs: @[persistentRoot.UUID]],
-	                       [compaction deadRevisionUUIDsForPersistentRootUUIDs: @[persistentRoot.UUID]]);
-
-	UKTrue([store compactHistory: compaction]);
-
-	if (otherPersistentRoot.isDeleted)
-	{
-		// Will retain the store but not release it due to the exception (looks
-		// like the store is retained as a receiver in -[COBranch revisionsWithOptions:]).
-		UKRaisesException([otherPersistentRoot.currentBranch reloadRevisions]);
-	}
-
-	NSMutableDictionary *revs =  [NSMutableDictionary new];
-	
-	revs[persistentRoot.UUID] = persistentRoot.currentBranch.nodes;
-	if (otherPersistentRoot != nil)
-	{
-	     revs[otherPersistentRoot.UUID] = otherPersistentRoot.currentBranch.nodes;
-	}
-	return revs;
-}
-
-#define NODES(x) [@[[COEndOfUndoTrackPlaceholderNode sharedInstance]] arrayByAddingObjectsFromArray: x]
 
 - (void)testCompactPersistentRootWithTrivialHistory
 {
@@ -272,6 +285,91 @@
 	UKNil([ctx persistentRootForUUID: otherPersistentRoot.UUID]);
 	UKObjectsEqual(NODES(liveCommands), track.nodes);
 	UKObjectsEqual(liveCommands, track.allCommands);
+}
+
+@end
+
+
+@interface TestPatternUndoTrackHistoryCompaction : UndoTrackHistoryCompactionTestCase <UKTest>
+{
+	COUndoTrack *concreteTrack1;
+	COUndoTrack *concreteTrack2;
+}
+
+@end
+
+@implementation TestPatternUndoTrackHistoryCompaction
+
+- (void)prepareTracks
+{
+	// NOTE: The name must not start with 'TestUndoTrack', otherwise this
+	// conflicts with pattern track tests in TestUndoTrack.m.
+	track = [COUndoTrack trackForPattern: @"TestHistoryCompaction/Pattern/*"
+	                  withEditingContext: ctx];
+	[track clear];
+	concreteTrack1 = [COUndoTrack trackForName: @"TestHistoryCompaction/Pattern/1"
+	                        withEditingContext: ctx];
+	[concreteTrack1 clear];
+	concreteTrack2 = [COUndoTrack trackForName: @"TestHistoryCompaction/Pattern/2"
+	                        withEditingContext: ctx];
+	[concreteTrack2 clear];
+}
+
+- (NSArray *)createPersistentRootWithMinimalHistory
+{
+	COObject *object = nil;
+
+	persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
+	object = persistentRoot.rootObject;
+	[ctx commitWithUndoTrack: concreteTrack2];
+	
+	object.name = @"Bop";
+	[ctx commitWithUndoTrack: concreteTrack2];
+
+	object.name = @"Bip";
+	[ctx commitWithUndoTrack: concreteTrack2];
+	
+	object.name = @"Bap";
+	[ctx commitWithUndoTrack: concreteTrack1];
+
+	return persistentRoot.currentBranch.nodes;
+}
+
+/**
+ * For -[COUndoTrackHistoryCompaction substractAdditionalCommandsToKeep].
+ */
+- (void)testCompactionKeepsCurrentCommandsOfMatchingTracks
+{
+	NSArray *oldRevs = [self createPersistentRootWithMinimalHistory];
+
+	NSArray *liveRevs = [oldRevs subarrayFromIndex: 1];
+	NSArray *deadRevs = [oldRevs arrayByRemovingObjectsInArray: liveRevs];
+	COUndoTrackHistoryCompaction *compaction = [COUndoTrackHistoryCompaction new];
+
+	compaction.finalizablePersistentRootUUIDs = [NSSet set];
+	compaction.compactablePersistentRootUUIDs = S(persistentRoot.UUID);
+	compaction.liveRevisionUUIDs = @{ persistentRoot.UUID : SA((id)[[liveRevs mappedCollection] UUID]) };
+	compaction.deadRevisionUUIDs = @{ persistentRoot.UUID : SA((id)[[deadRevs mappedCollection] UUID]) };
+
+	NSArray *liveCommands = [track.allCommands subarrayFromIndex: 2];
+	/* Keeping 'Bap' command means we also keep keep 'Bip' which is the latest 
+	   command on the other concrete track. If the compaction keeps 'Bip', then 
+	   this its old revision corresponding to 'Bop' is also kept.
+	   In the end, we only delete the first revision, so this is why we have 
+	   this special index mismatch 1 vs 2 vs 3.
+	   See also -testCompactPersistentRootWithTrivialHistory. */
+	NSDictionary *newRevs = [self compactUpToCommand: track.allCommands[3]
+	                             expectingCompaction: compaction];
+
+	UKObjectsEqual(liveRevs, newRevs[persistentRoot.UUID]);
+	UKObjectsEqual(NODES(liveCommands), track.nodes);
+	UKObjectsEqual(liveCommands, track.allCommands);
+	
+	UKObjectsEqual(NODES(@[liveCommands.lastObject]), concreteTrack1.nodes);
+	UKObjectsEqual(@[liveCommands.lastObject], concreteTrack1.allCommands);
+
+	UKObjectsEqual(NODES(@[liveCommands.firstObject]), concreteTrack2.nodes);
+	UKObjectsEqual(@[liveCommands.firstObject], concreteTrack2.allCommands);
 }
 
 @end

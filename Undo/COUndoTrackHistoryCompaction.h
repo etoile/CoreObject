@@ -41,6 +41,7 @@
 	@private
 	COUndoTrack *_undoTrack;
 	COCommandGroup *_oldestCommandToKeep;
+	NSMutableSet *_additionalCommandsToKeep;
 	NSMutableSet *_finalizablePersistentRootUUIDs;
 	NSMutableSet *_compactablePersistentRootUUIDs;
 	NSMutableSet *_finalizableBranchUUIDs;
