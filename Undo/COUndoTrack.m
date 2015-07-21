@@ -604,7 +604,19 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	{
 		if (state.currentCommandUUID != nil)
 		{
-			[potentialCurrentCommands addObject: [self commandForUUID: state.currentCommandUUID]];
+			COCommandGroup *command = [self commandForUUID: state.currentCommandUUID];
+			/* If after a compaction, we undo until we reach the placeholder node,
+			   the current command UUID corresponds to a non-existent command.
+			   This state was recreated by inversing the child command. 
+			   For now, we don't reset the oldest command parent UUID to nil 
+			   on compaction. We could do this too, although keeping the parent 
+			   UUID easily tells us whether the track has been compacted or not. */
+			BOOL wasDeleted = (command == nil);
+
+			if (wasDeleted)
+				continue;
+
+			[potentialCurrentCommands addObject: command];
 		}
 	}
 

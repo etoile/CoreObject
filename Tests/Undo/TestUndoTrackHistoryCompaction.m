@@ -117,6 +117,22 @@
 
 #define NODES(x) [@[[COEndOfUndoTrackPlaceholderNode sharedInstance]] arrayByAddingObjectsFromArray: x]
 
+- (void)checkUndoRedo
+{
+	__unused NSUInteger counter = [track nodes].count;
+
+	while ([track canUndo])
+	{
+		UKDoesNotRaiseException([track undo]);
+		counter--;
+	}
+	while ([track canRedo])
+	{
+		counter++;
+		UKDoesNotRaiseException([track redo]);
+	}
+}
+
 @end
 
 
@@ -198,6 +214,8 @@
 	UKObjectsEqual(liveRevs, newRevs[persistentRoot.UUID]);
 	UKObjectsEqual(NODES(liveCommands), track.nodes);
 	UKObjectsEqual(liveCommands, track.allCommands);
+	
+	[self checkUndoRedo];
 }
 
 /**
@@ -256,6 +274,8 @@
 	UKObjectsEqual(liveRevs, newRevs[persistentRoot.UUID]);
 	UKObjectsEqual(NODES(liveCommands), track.nodes);
 	UKObjectsEqual(liveCommands, track.allCommands);
+	
+	[self checkUndoRedo];
 }
 
 - (void)testPersistentRootFinalization
@@ -285,6 +305,8 @@
 	UKNil([ctx persistentRootForUUID: otherPersistentRoot.UUID]);
 	UKObjectsEqual(NODES(liveCommands), track.nodes);
 	UKObjectsEqual(liveCommands, track.allCommands);
+	
+	[self checkUndoRedo];
 }
 
 @end
@@ -370,6 +392,8 @@
 
 	UKObjectsEqual(NODES(@[liveCommands.firstObject]), concreteTrack2.nodes);
 	UKObjectsEqual(@[liveCommands.firstObject], concreteTrack2.allCommands);
+	
+	[self checkUndoRedo];
 }
 
 @end

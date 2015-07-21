@@ -390,6 +390,30 @@
 - (void)endCompaction: (BOOL)success
 {
 	[_undoTrack.store finalizeDeletions];
+	[self validateCompaction];
+}
+
+- (void)validateCompaction
+{
+	NSMutableArray *trackStates = [NSMutableArray new];
+	
+	if ([_undoTrack isKindOfClass: NSClassFromString(@"COPatternUndoTrack")])
+	{
+		for (NSString *name in [_undoTrack.store trackNamesMatchingGlobPattern: _undoTrack.name])
+		{
+			[trackStates addObject: [_undoTrack.store stateForTrackName: name]];
+		}
+	}
+	else
+	{
+		[trackStates addObject: [_undoTrack.store stateForTrackName: _undoTrack.name]];
+	}
+	
+	for (COUndoTrackState *state in trackStates)
+	{
+		ETAssert([_undoTrack.store commandForUUID: state.currentCommandUUID] != nil);
+		ETAssert([_undoTrack.store commandForUUID: state.headCommandUUID] != nil);
+	}
 }
 
 @end
