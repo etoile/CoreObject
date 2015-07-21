@@ -396,4 +396,25 @@
 	[self checkUndoRedo];
 }
 
+/**
+ * For -[COUndoTrackHistoryCompaction substractAdditionalCommandsToKeep].
+ */
+- (void)testComputeWithPlaceholderNodeAsCurrentNodeInChildTrack
+{
+	COObject *object = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
+	[ctx commitWithUndoTrack: concreteTrack1];
+	
+	object.name = @"Ding";
+	[ctx commitWithUndoTrack: concreteTrack2];
+	
+	[track undo];
+
+	COUndoTrackHistoryCompaction *compaction =
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+		                                            upToCommand: (COCommandGroup *)track.currentNode];
+	
+	UKObjectKindOf(concreteTrack2.currentNode, COEndOfUndoTrackPlaceholderNode);
+	UKDoesNotRaiseException([compaction compute]);
+}
+
 @end

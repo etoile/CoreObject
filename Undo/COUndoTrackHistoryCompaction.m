@@ -16,6 +16,7 @@
 #import "COCommandSetPersistentRootMetadata.h"
 #import "COCommandUndeleteBranch.h"
 #import "COCommandUndeletePersistentRoot.h"
+#import "COEndOfUndoTrackPlaceholderNode.h"
 #import "COUndoTrack.h"
 #import "COUndoTrackStore.h"
 #import "COUndoTrackStore+Private.h"
@@ -71,10 +72,17 @@
 
 	for (COUndoTrack *track in childTracks)
 	{
+		COCommandGroup *current = (COCommandGroup *)[track currentNode];
 		COCommandGroup *head = (COCommandGroup *)[[track nodes] lastObject];
 
-		[_additionalCommandsToKeep addObject: [track currentNode]];
-		[_additionalCommandsToKeep addObject: head];
+		if (![current isKindOfClass: [COEndOfUndoTrackPlaceholderNode class]])
+		{
+			[_additionalCommandsToKeep addObject: current];
+		}
+		if (![head isKindOfClass: [COEndOfUndoTrackPlaceholderNode class]])
+		{
+			[_additionalCommandsToKeep addObject: head];
+		}
 	}
 	
 	for (COCommandGroup *commandGroup in _additionalCommandsToKeep)
