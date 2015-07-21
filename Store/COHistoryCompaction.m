@@ -136,7 +136,7 @@
 			// Find reachable revisions
 
 			FMResultSet *rs = [db_ executeQuery: @"SELECT "
-							   "branches.current_revid "
+							   "branches.head_revid "
 							   "FROM persistentroots "
 							   "INNER JOIN branches ON persistentroots.uuid = branches.proot "
 							   "INNER JOIN persistentroot_backingstores ON persistentroots.uuid = persistentroot_backingstores.uuid "

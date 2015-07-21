@@ -309,6 +309,24 @@
 	[self checkUndoRedo];
 }
 
+- (void)testReachableRevisionsEncloseLiveContiguousRevisionsWithMismatchedCurrentAndHeadNodes
+{
+	COObject *object = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
+	[ctx commitWithUndoTrack: track];
+	
+	object.name = @"Ding";
+	[ctx commitWithUndoTrack: track];
+	
+	[track undo];
+
+	COUndoTrackHistoryCompaction *compaction =
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+		                                            upToCommand: (COCommandGroup *)track.currentNode];
+	[compaction compute];
+
+	UKDoesNotRaiseException([store compactHistory: compaction]);
+}
+
 @end
 
 
