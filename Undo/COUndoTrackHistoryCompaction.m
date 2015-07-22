@@ -34,6 +34,7 @@
 
 - (instancetype)initWithUndoTrack: (COUndoTrack *)aTrack upToCommand: (COCommandGroup *)aCommand
 {
+	INVALIDARG_EXCEPTION_TEST(aCommand, [aCommand isKindOfClass: [COCommandGroup class]]);
 	SUPERINIT;
 	_undoTrack = aTrack;
 	_oldestCommandToKeep = aCommand;

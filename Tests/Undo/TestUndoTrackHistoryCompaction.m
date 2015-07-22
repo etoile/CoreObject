@@ -327,6 +327,12 @@
 	UKDoesNotRaiseException([store compactHistory: compaction]);
 }
 
+- (void)testExceptionOnPlaceholderNodeAsOldestKeptCommand
+{
+	UKRaisesException([[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+	                                                              upToCommand: (COCommandGroup *)track.currentNode]);
+}
+
 @end
 
 
@@ -438,6 +444,78 @@
 	UKObjectKindOf(concreteTrack2.currentNode, COEndOfUndoTrackPlaceholderNode);
 	UKDoesNotRaiseException([compaction compute]);
 	UKDoesNotRaiseException([store compactHistory: compaction]);
+}
+
+- (void)testCompactionsInterleavedWithCommitsAndUndoRedo
+{
+	COObject *object = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
+	[ctx commitWithUndoTrack: concreteTrack1];
+	
+	COUndoTrackHistoryCompaction *compaction =
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+		                                            upToCommand: (COCommandGroup *)track.currentNode];
+
+	UKDoesNotRaiseException([compaction compute]);
+	UKDoesNotRaiseException([store compactHistory: compaction]);
+	
+	object.name = @"Ding";
+	[ctx commitWithUndoTrack: concreteTrack1];
+
+	compaction =
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+		                                            upToCommand: (COCommandGroup *)track.currentNode];
+
+	UKDoesNotRaiseException([compaction compute]);
+	UKDoesNotRaiseException([store compactHistory: compaction]);
+	
+	object.persistentRoot.deleted = YES;
+	[ctx commitWithUndoTrack: concreteTrack2];
+	
+	compaction =
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+		                                            upToCommand: (COCommandGroup *)track.currentNode];
+
+	UKDoesNotRaiseException([compaction compute]);
+	UKDoesNotRaiseException([store compactHistory: compaction]);
+	
+	/* Undo Deletion */
+	
+	[track undo];
+	
+	compaction =
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+		                                            upToCommand: (COCommandGroup *)track.currentNode];
+
+	UKDoesNotRaiseException([compaction compute]);
+	UKDoesNotRaiseException([store compactHistory: compaction]);
+	
+	/* Redo Deletion */
+
+	[track redo];
+
+	compaction =
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+		                                            upToCommand: (COCommandGroup *)track.currentNode];
+
+	UKDoesNotRaiseException([compaction compute]);
+	UKDoesNotRaiseException([store compactHistory: compaction]);
+	
+	/* Undo Deletion */
+	
+	[track undo];
+	
+	compaction =
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+		                                            upToCommand: (COCommandGroup *)track.currentNode];
+
+	UKDoesNotRaiseException([compaction compute]);
+	UKDoesNotRaiseException([store compactHistory: compaction]);
+	
+	/* Undo Renaming (reaching the oldest kept state) */
+	
+	[track undo];
+	
+	UKFalse([track canUndo]);
 }
 
 @end
