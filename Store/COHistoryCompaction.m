@@ -175,7 +175,18 @@
 
 			// Compute deleted revisions (unreachable or outside live range)
 			
-			ETAssert([reachableRevisions containsIndexes: contiguousLiveRevisions]);
+			/* Contiguous live revisions can contain unreachable revisions 
+			   referenced by an undo track. For example, committing after an 
+			   undo turns the undone revisions into divergent ones (and 
+			   unreachable since not owned by a branch). If the head changes, 
+			   revisions beyond it becomes unreachable (but once again an undo
+			   undo track could reference them).
+			   In other words, reachable revisions and contiguous live revisions
+			   can overlap (there is no subset relationship between them). */
+	
+			// TODO: Decide whether the first contiguous live revision could ever
+			// precede the first reachable revision (probably not).
+			//ETAssert(reachableRevisions.firstIndex <= contiguousLiveRevisions.firstIndex);
 			
 			NSMutableIndexSet *deletedRevisions = [NSMutableIndexSet indexSet];
 			NSIndexSet *keptRevisions =

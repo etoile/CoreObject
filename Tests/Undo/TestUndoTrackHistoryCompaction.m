@@ -309,6 +309,13 @@
 	[self checkUndoRedo];
 }
 
+/**
+ * In this precise case, live contiguous revisions are a subset of reachable 
+ * revisions in -[COSQLiteStore compactHistory:], but they can overlap in other 
+ * situations. 
+ *
+ * See -testDivergentRevisionsWithUndoFollowedByCommit.
+ */
 - (void)testReachableRevisionsEncloseLiveContiguousRevisionsWithMismatchedCurrentAndHeadNodes
 {
 	COObject *object = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
@@ -331,6 +338,27 @@
 {
 	UKRaisesException([[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
 	                                                              upToCommand: (COCommandGroup *)track.currentNode]);
+}
+
+- (void)testDivergentRevisionsWithUndoFollowedByCommit
+{
+	COObject *object = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
+	[ctx commitWithUndoTrack: track];
+	
+	object.name = @"Ding";
+	[ctx commitWithUndoTrack: track];
+	
+	[track undo];
+	
+	object.name = @"Dong";
+	[ctx commitWithUndoTrack: track];
+
+	COUndoTrackHistoryCompaction *compaction =
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+		                                            upToCommand: (COCommandGroup *)track.currentNode];
+	[compaction compute];
+
+	UKDoesNotRaiseException([store compactHistory: compaction]);
 }
 
 @end
