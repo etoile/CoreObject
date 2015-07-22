@@ -419,8 +419,10 @@
 	
 	for (COUndoTrackState *state in trackStates)
 	{
-		ETAssert([_undoTrack.store commandForUUID: state.currentCommandUUID] != nil);
-		ETAssert([_undoTrack.store commandForUUID: state.headCommandUUID] != nil);
+		ETAssert(state.currentCommandUUID == nil
+			|| [_undoTrack.store commandForUUID: state.currentCommandUUID] != nil);
+		ETAssert(state.headCommandUUID == nil
+			|| [_undoTrack.store commandForUUID: state.headCommandUUID] != nil);
 	}
 }
 

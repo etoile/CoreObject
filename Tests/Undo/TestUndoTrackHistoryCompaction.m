@@ -415,9 +415,13 @@
 }
 
 /**
- * For -[COUndoTrackHistoryCompaction substractAdditionalCommandsToKeep].
+ * For -[COUndoTrackHistoryCompaction substractAdditionalCommandsToKeep] and 
+ * –[[COUndoTrackHistoryCompaction validateCompaction]. 
+ *
+ * In these methods, when the current node is the place holder node, we must be 
+ * sure we can cope with -[COSerializedCommand currentCommandUUID] returning nil.
  */
-- (void)testComputeWithPlaceholderNodeAsCurrentNodeInChildTrack
+- (void)testCompactionWithPlaceholderNodeAsCurrentNodeInChildTrack
 {
 	COObject *object = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
 	[ctx commitWithUndoTrack: concreteTrack1];
@@ -433,6 +437,7 @@
 	
 	UKObjectKindOf(concreteTrack2.currentNode, COEndOfUndoTrackPlaceholderNode);
 	UKDoesNotRaiseException([compaction compute]);
+	UKDoesNotRaiseException([store compactHistory: compaction]);
 }
 
 @end
