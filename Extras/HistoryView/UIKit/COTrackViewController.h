@@ -17,6 +17,7 @@
 	id <COTrack> _track;
 	UIColor *_pastColor;
 	UIColor *_futureColor;
+	NSIndexPath *_checkedIndexPath;
 }
 
 
@@ -76,6 +77,28 @@
  * Can be overriden to return a custom cell.
  */
 - (UITableViewCell *)makeCellForNode: (id <COTrackNode>)node;
+/**
+ * Adds a visual indicator to the row representing the current node.
+ *
+ * Will be called after -uncheckRowAtIndexPath:.
+ *
+ * You shouldn't call this method, but override it to add a custom visual
+ * indicator set on the row.
+ *
+ * The default indicator is a checkmark.
+ */
+- (void)checkRow: (UITableViewCell *)cell;
+/**
+ * Removes the visual indicator from the row representing the current node.
+ *
+ * Will be called before -checkRowAtIndexPath:.
+ *
+ * You shouldn't call this method, but override it to remove a custom visual
+ * indicator set on the row.
+ *
+ * The default indicator is a checkmark.
+ */
+- (void)uncheckRow: (UITableViewCell *)cell;
 
 
 /** @taskunit Undo and Redo */
