@@ -43,9 +43,9 @@
 /**
  * The color used to indicate the past history.
  *
- * By default, this is background color for all nodes before the current node.
+ * By default, this is the text color for all nodes before the current node.
  *
- * The current node background color is based on this color too.
+ * The current node text color is based on this color too.
  *
  * See -suggestedColorForNode:.
  */
@@ -53,7 +53,7 @@
 /**
  * The color used to indicate the future history.
  *
- * By default, this is background color for all nodes after the current node.
+ * By default, this is the text color for all nodes after the current node.
  *
  * See -suggestedColorForNode:.
  */
@@ -72,7 +72,7 @@
  * -[UITableView dequeueReusableCellWithIdentifier:].
  *
  * By default, the cell label is set to -[COTrackNode localizedShortDescription]
- * and the background color to -suggestedColorForNode:.
+ * and the text color to -suggestedColorForNode:.
  *
  * Can be overriden to return a custom cell.
  */

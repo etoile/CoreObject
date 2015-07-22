@@ -111,8 +111,8 @@
 	}
 	
 	cell.textLabel.text = node.localizedShortDescription;
-	cell.backgroundColor = [self suggestedColorForNode: node];
-	
+	cell.textLabel.textColor = [self suggestedColorForNode: node];
+
 	return cell;
 }
 
