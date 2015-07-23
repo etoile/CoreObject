@@ -9,6 +9,18 @@
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
 
+void dispatch_sync_now(dispatch_queue_t queue, dispatch_block_t block) {
+	const char *currentQueueLabel = dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL);
+
+	if (strcmp(dispatch_queue_get_label(queue), currentQueueLabel) == 0)
+	{
+		block();
+	}
+	else {
+		dispatch_sync(queue, block);
+	}
+}
+
 NSDictionary *pageStatisticsForDatabase(FMDatabase *db)
 {
 	NSNumber *freelistCount = [db numberForQuery: @"PRAGMA freelist_count"];

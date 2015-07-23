@@ -7,6 +7,7 @@
 
 #import "COHistoryCompaction.h"
 #import "COSQLiteStorePersistentRootBackingStore.h"
+#import "COSQLiteUtilities.h"
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
 
@@ -217,12 +218,14 @@
 	
 	[aCompactionStrategy endCompaction: YES];
 	
-	[self postCommitNotificationsWithTransactionIDForPersistentRootUUID: @{}
-	                                            insertedPersistentRoots: @[]
-												 deletedPersistentRoots: @[]
-											   compactedPersistentRoots: compactedPersistentRootUUIDs.allObjects
-											   finalizedPersistentRoots: finalizedPersistentRootUUIDs.allObjects];
-    
+	dispatch_sync_now(dispatch_get_main_queue(), ^() {
+		[self postCommitNotificationsWithTransactionIDForPersistentRootUUID: @{}
+		                                            insertedPersistentRoots: @[]
+		                                             deletedPersistentRoots: @[]
+		                                           compactedPersistentRoots: compactedPersistentRootUUIDs.allObjects
+		                                           finalizedPersistentRoots: finalizedPersistentRootUUIDs.allObjects];
+	});
+
     return YES;
 }
 
