@@ -15,6 +15,7 @@
 #import "CODateSerialization.h"
 #import "COEndOfUndoTrackPlaceholderNode.h"
 #import "COJSONSerialization.h"
+#import "COSQLiteUtilities.h"
 #if TARGET_OS_IPHONE
 #import "NSDistributedNotificationCenter.h"
 #endif
@@ -132,6 +133,8 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 	INVALIDARG_EXCEPTION_TEST(aURL, aURL.isFileURL);
     SUPERINIT;
 	
+	_queue = dispatch_queue_create([[NSString stringWithFormat: @"COUndoTrackStore-%p", self] UTF8String], NULL);
+	
 	BOOL isDir = NO;
 
 	if (![[NSFileManager defaultManager] fileExistsAtPath: aURL.path
@@ -217,6 +220,14 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 - (void) dealloc
 {
     [_db close];
+	
+#if !(TARGET_OS_IPHONE)
+	// N.B.: We are using deployment target 10.7, so ARC does not manage libdispatch objects.
+	// If we switch to deployment target 10.8, ARC will manage libdispatch objects automatically.
+	// For GNUstep, ARC doesn't manage libdispatch objects since libobjc2 doesn't support it 
+	// currently (we compile CoreObject with -DOS_OBJECT_USE_OBJC=0).
+	dispatch_release(_queue);
+#endif
 }
 
 - (BOOL) beginTransaction
@@ -391,11 +402,34 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 	[_db executeUpdate: @"DELETE FROM commands WHERE deleted = 1"];
 }
 
+// TODO: Update all methods to access the db with dispatch_sync().
+
+/**
+ * We run vacuum with dispatch_sync() in a queue, so we can sure no other
+ * threads access the database when we invoke -vacuum in a background thread.
+ */
 - (BOOL)vacuum
 {
-	// TODO: Run with dispatch_sync() in a queue, so we can sure no other
-	// threads access the database when we invoke -vacuum in a background thread.
-    return [_db executeUpdate: @"VACUUM"];
+    assert(dispatch_get_current_queue() != _queue);
+	__block BOOL success = NO;
+
+    dispatch_sync(_queue, ^() {
+    	success = [_db executeUpdate: @"VACUUM"];
+	});
+	
+	return success;
+}
+
+- (NSDictionary *)pageStatistics
+{
+    assert(dispatch_get_current_queue() != _queue);
+	__block NSDictionary *statistics = nil;
+
+    dispatch_sync(_queue, ^() {
+		statistics = pageStatisticsForDatabase(_db);
+	});
+	
+	return statistics;
 }
 
 - (void) postCommitNotificationsWithUserInfo: (NSDictionary *)userInfo

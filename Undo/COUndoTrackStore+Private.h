@@ -116,6 +116,10 @@ NSString * const COUndoTrackStoreTrackCompacted;
  * See also -[COSQLiteStore vacuum].
  */
 - (BOOL)vacuum;
+/**
+ * See -[COSQLiteStore pageStatistics].
+ */
+@property (nonatomic, readonly) NSDictionary *pageStatistics;
 
 - (BOOL) string: (NSString *)aString matchesGlobPattern: (NSString *)aPattern;
 

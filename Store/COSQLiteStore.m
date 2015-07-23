@@ -14,6 +14,7 @@
 
 #import "COItem.h"
 #import "COSQLiteStore+Attachments.h"
+#import "COSQLiteUtilities.h"
 #import "COSearchResult.h"
 #import "COBasicHistoryCompaction.h"
 #import "COBranchInfo.h"
@@ -964,6 +965,18 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 	});
 
 	return success;
+}
+
+- (NSDictionary *)pageStatistics
+{
+    assert(dispatch_get_current_queue() != queue_);
+	__block NSDictionary *statistics = nil;
+
+    dispatch_sync(queue_, ^() {
+		statistics = pageStatisticsForDatabase(db_);
+	});
+	
+	return statistics;
 }
 
 /**

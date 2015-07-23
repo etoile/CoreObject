@@ -25,6 +25,10 @@
 		601C1D50180C115D00CED07E /* COObjectGraphContext+GarbageCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */; };
 		601FD943188935E40002F957 /* COObjectGraphContext+Debugging.h in Headers */ = {isa = PBXBuildFile; fileRef = 66A00A18187DDB6A005CFE16 /* COObjectGraphContext+Debugging.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		601FD94518893ED50002F957 /* COEditingContext+Debugging.h in Headers */ = {isa = PBXBuildFile; fileRef = 601FD94418893ED50002F957 /* COEditingContext+Debugging.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6025EA3A1B60E960007DD28B /* COSQLiteUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 6025EA381B60E960007DD28B /* COSQLiteUtilities.h */; };
+		6025EA3B1B60E960007DD28B /* COSQLiteUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 6025EA381B60E960007DD28B /* COSQLiteUtilities.h */; };
+		6025EA3C1B60E960007DD28B /* COSQLiteUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 6025EA391B60E960007DD28B /* COSQLiteUtilities.m */; };
+		6025EA3D1B60E960007DD28B /* COSQLiteUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 6025EA391B60E960007DD28B /* COSQLiteUtilities.m */; };
 		602837AF1A334A2100D7B0D1 /* TestSchemaMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 602837AE1A334A2100D7B0D1 /* TestSchemaMigration.m */; };
 		602837B01A334A2100D7B0D1 /* TestSchemaMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 602837AE1A334A2100D7B0D1 /* TestSchemaMigration.m */; };
 		6036436C1B3800B400DC685B /* COHistoryCompaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 6036436A1B3800B400DC685B /* COHistoryCompaction.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -998,6 +1002,8 @@
 		601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObjectGraphContext+GarbageCollection.m"; path = "Core/COObjectGraphContext+GarbageCollection.m"; sourceTree = "<group>"; };
 		601FD94418893ED50002F957 /* COEditingContext+Debugging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COEditingContext+Debugging.h"; path = "Core/COEditingContext+Debugging.h"; sourceTree = "<group>"; };
 		601FD946188944360002F957 /* HACKING.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = HACKING.md; sourceTree = "<group>"; };
+		6025EA381B60E960007DD28B /* COSQLiteUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSQLiteUtilities.h; path = Store/COSQLiteUtilities.h; sourceTree = "<group>"; };
+		6025EA391B60E960007DD28B /* COSQLiteUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSQLiteUtilities.m; path = Store/COSQLiteUtilities.m; sourceTree = "<group>"; };
 		602837AE1A334A2100D7B0D1 /* TestSchemaMigration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSchemaMigration.m; path = Tests/SchemaMigration/TestSchemaMigration.m; sourceTree = SOURCE_ROOT; };
 		6036436A1B3800B400DC685B /* COHistoryCompaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COHistoryCompaction.h; path = Store/COHistoryCompaction.h; sourceTree = "<group>"; };
 		6036436B1B3800B400DC685B /* COHistoryCompaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COHistoryCompaction.m; path = Store/COHistoryCompaction.m; sourceTree = "<group>"; };
@@ -2406,6 +2412,8 @@
 				66D96CB4178B717200D1553C /* COSQLiteStorePersistentRootBackingStore.m */,
 				66D96CB5178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.h */,
 				66D96CB6178B717200D1553C /* COSQLiteStorePersistentRootBackingStoreBinaryFormats.m */,
+				6025EA381B60E960007DD28B /* COSQLiteUtilities.h */,
+				6025EA391B60E960007DD28B /* COSQLiteUtilities.m */,
 				791B4E6A1299C90200CCF472 /* fmdb */,
 			);
 			name = "Store (Low-level API)";
@@ -2480,6 +2488,7 @@
 				60DBD0AC1A822AEE009F3935 /* COJSONSerialization.h in Headers */,
 				60E08D3C19792FFA00D1B7AD /* COSynchronizerUtils.h in Headers */,
 				60E08CFD19792FFA00D1B7AD /* CORevision.h in Headers */,
+				6025EA3B1B60E960007DD28B /* COSQLiteUtilities.h in Headers */,
 				60882F1D197D50CE00484033 /* CORectToString.h in Headers */,
 				60E08D6019792FFA00D1B7AD /* CORevisionCache.h in Headers */,
 				60E08D4819792FFA00D1B7AD /* COAttributedStringWrapper.h in Headers */,
@@ -2602,6 +2611,7 @@
 				6609485F1787A1160049468B /* CORelationshipCache.h in Headers */,
 				66BDC4AF17B6ED27003B0EDA /* COBranchInfo.h in Headers */,
 				66BDC4B017B6ED27003B0EDA /* COPersistentRootInfo.h in Headers */,
+				6025EA3A1B60E960007DD28B /* COSQLiteUtilities.h in Headers */,
 				66D96CB9178B717200D1553C /* COBinaryWriter.h in Headers */,
 				66D96CC0178B717200D1553C /* CORevisionInfo.h in Headers */,
 				60B58E681B0BF1CD00A87D5F /* COCrossPersistentRootDeadRelationshipCache.h in Headers */,
@@ -3221,6 +3231,7 @@
 				60E08CC719792F4600D1B7AD /* COCommandDeleteBranch.m in Sources */,
 				60E08CB719792F4600D1B7AD /* COArrayDiff.m in Sources */,
 				60E08CC619792F4600D1B7AD /* COCommand.m in Sources */,
+				6025EA3D1B60E960007DD28B /* COSQLiteUtilities.m in Sources */,
 				60E08CD419792F4600D1B7AD /* COAttributedStringWrapper.m in Sources */,
 				60E08CD219792F4600D1B7AD /* COUndoTrack.m in Sources */,
 				60E08CB819792F4600D1B7AD /* COItemGraphDiff.m in Sources */,
@@ -3422,6 +3433,7 @@
 				66D96CBB178B717200D1553C /* COItem+Binary.m in Sources */,
 				66D96CC1178B717200D1553C /* CORevisionInfo.m in Sources */,
 				66D96CC3178B717200D1553C /* COSearchResult.m in Sources */,
+				6025EA3C1B60E960007DD28B /* COSQLiteUtilities.m in Sources */,
 				66D96CC5178B717200D1553C /* COSQLiteStore.m in Sources */,
 				66405DC4182A0D4D00A6EF7A /* COSynchronizerClient.m in Sources */,
 				66D96CC7178B717200D1553C /* COSQLiteStore+Attachments.m in Sources */,

@@ -479,6 +479,22 @@ extern NSString * const COPersistentRootAttributeUsedSize;
  * </list>
  */
 - (BOOL)vacuum;
+/**
+ * Returns statistics about the database pages.
+ *
+ * The returned dictionary includes three keys (corresponding to specific SQLite
+ * PRAGMA arguments):
+ *
+ * <deflist>
+ * <term>freelist_count</term><desc>number of unused pages</desc>
+ * <term>page_count</term><desc>number of all pages (used and unused)</desc>
+ * <term>page_size</term><desc>page size (with page_size * page_count being 
+ * equal to the database file size)</desc>
+ * </deflist>
+ *
+ * These infos can be used to decide when to compact and vacuum the store.
+ */
+@property (nonatomic, readonly) NSDictionary *pageStatistics;
 
 
 /** @taskunit Transactions */
