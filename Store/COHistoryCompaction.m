@@ -200,15 +200,16 @@
 			[deletedRevisions addIndexes: revisions];
 			[deletedRevisions removeIndexes: keptRevisions];
 			
-			//    for (NSUInteger i = [deletedRevisions firstIndex]; i != NSNotFound; i = [deletedRevisions indexGreaterThanIndex: i])
-			//    {
-			//
-			//        [db_ executeUpdate: @"DELETE FROM attachment_refs WHERE root_id = ? AND revid = ?",
-			//         [backingUUID dataValue],
-			//         [NSNumber numberWithLongLong: i]];
-			//
-			//        // FIXME: FTS, proot_refs
-			//    }
+			[deletedRevisions enumerateIndexesUsingBlock: ^(NSUInteger i, BOOL *stop)
+			{
+				// TODO: We should probably change attachment_refs to store
+				// revid as INTEGER rather than BLOB (same for proot_refs)
+				[db_ executeUpdate: @"DELETE FROM attachment_refs WHERE root_id = ? AND revid = ?",
+					backingUUID.dataValue,
+					[backing revisionUUIDForRevid: i].dataValue];
+			
+				// FIXME: FTS, proot_refs
+			}];
 			
 			// Delete the actual revisions
 

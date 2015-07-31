@@ -393,6 +393,66 @@
 	UKObjectsEqual([NSSet new], [compaction liveRevisionUUIDsForPersistentRootUUIDs: @[[ETUUID new]]]);
 }
 
+- (OutlineItem *)createPersistentRootWithAttachmentInHistory: (NSString *)fakeAttachment
+{
+	OutlineItem *item = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
+	[ctx commitWithUndoTrack: track];
+
+	COAttachmentID *hash = [store importAttachmentFromData:
+		[fakeAttachment dataUsingEncoding: NSUTF8StringEncoding]];
+
+	item.attachmentID = hash;
+	[ctx commitWithUndoTrack: track];
+
+	return item;
+}
+
+- (void)testKeepAttachmentReferencedByLiveRevisions
+{
+	NSString *fakeAttachment = @"this is a large attachment";
+	OutlineItem *item = [self createPersistentRootWithAttachmentInHistory : fakeAttachment];
+	NSURL *URL = [store URLForAttachmentID: item.attachmentID];
+
+	COUndoTrackHistoryCompaction *compaction =
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+		                                            upToCommand: (COCommandGroup *)track.currentNode];
+	[compaction compute];
+	[store compactHistory: compaction];
+
+   	UKObjectsEqual(fakeAttachment, [NSString stringWithContentsOfURL: URL
+                                                            encoding: NSUTF8StringEncoding
+	                                                           error: NULL]);
+    UKTrue([[NSFileManager defaultManager] fileExistsAtPath: URL.path]);
+}
+
+- (void)testFinalizeAttachmentReferencedByDeadRevisions
+{
+	NSString *fakeAttachment = @"this is a large attachment";
+	OutlineItem *item = [self createPersistentRootWithAttachmentInHistory : fakeAttachment];
+	NSURL *URL = [store URLForAttachmentID: item.attachmentID];
+
+	item.attachmentID = nil;
+	[ctx commitWithUndoTrack: track];
+	
+	// At this point, the revision that created the attachment is still
+	// referenced by track.currentNode.oldRevisionUUID.
+	// We make one more commit to ensure the attachment won't be referenced,
+	// if we compact up to the current node.
+	item.name = @"Oak";
+	[ctx commitWithUndoTrack: track];
+	
+	COUndoTrackHistoryCompaction *compaction =
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+		                                            upToCommand: (COCommandGroup *)track.currentNode];
+	[compaction compute];
+	[store compactHistory: compaction];
+	
+   	UKNil([NSString stringWithContentsOfURL: URL
+                                   encoding: NSUTF8StringEncoding
+	                                  error: NULL]);
+    UKFalse([[NSFileManager defaultManager] fileExistsAtPath: URL.path]);
+}
+
 @end
 
 
