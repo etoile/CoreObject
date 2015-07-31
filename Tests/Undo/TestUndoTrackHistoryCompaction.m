@@ -336,6 +336,8 @@
 
 - (void)testExceptionOnPlaceholderNodeAsOldestKeptCommand
 {
+	// Will retain the undo track but not release it due to the exception (looks
+	// like the undo track store remains retained).
 	UKRaisesException([[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
 	                                                              upToCommand: (COCommandGroup *)track.currentNode]);
 }

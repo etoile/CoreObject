@@ -240,24 +240,31 @@ doesNotPostNotification: (NSString *)notif
 	// Count up the number of open sqlite database connections at this
 	// point.
 	//
-	// As of 2015-08-27, there are 3 open connections:
+	// As of 2015-07-31, there are 6 open connections:
 	//
-	//  - In -[TestEditingContext testWithNoUndoTrackStore],
-	//    -[TestSchemaMigration testExceptionOnMigrationReturningItemsWithIncorrectVersion] and
-	//    -[TestUndoTrackHistoryCompaction compactUpToCommand:expectingCompaction:],
-	//    the store is retained when passed as an argument, but never released
-	//    if an exception is thrown in the called method (this could be
-	//    considered a ARC bug or limitation).
-	//  - +[COUndoTrackStore defaultStore] intentionally opens and never closes a database connection
-	//    to the ~/Library/CoreObject/Undo/undo.sqlite database
+	// 	   -[TestEditingContext testWithNoUndoTrackStore],
+	//     -[TestSchemaMigration testExceptionOnMigrationReturningItemsWithIncorrectVersion],
+	//     -[TestUndoTrackHistoryCompaction compactUpToCommand:expectingCompaction:] and
+	//     -[TestUndoTrackHistoryCompaction testExceptionOnPlaceholderNodeAsOldestKeptCommand]
+	//     -[TestPatternUndoTrackHistoryCompaction testExceptionOnPlaceholderNodeAsOldestKeptCommand]
+	//
+	// The store (COSQLiteStore or COUndoTrackStore) is retained directly when
+	// passed as an argument, or indirectly when the argument retains it, but
+	// never released if an exception is thrown in the called method (this could
+	// be considered a ARC bug or limitation).
+    //
+	//     +[COUndoTrackStore defaultStore]
+	//
+	// Intentionally opens and never closes a database connection to the
+	// ~/Library/CoreObject/Undo/undo.sqlite database
 
 	@autoreleasepool
 	{
-		[FMDatabase logOpenDatabases];
-
-		const int expectedOpenDatabases = 4;
+		const int expectedOpenDatabases = 6;
 		if ([FMDatabase countOfOpenDatabases] > expectedOpenDatabases)
 		{
+			[FMDatabase logOpenDatabases];
+
 			NSLog(@"ERROR: Expected only %d SQLite database connections to still be open.", expectedOpenDatabases);
 			UKFail();
 		}
