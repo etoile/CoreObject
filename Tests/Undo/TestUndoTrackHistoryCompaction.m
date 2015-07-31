@@ -361,6 +361,36 @@
 	UKDoesNotRaiseException([store compactHistory: compaction]);
 }
 
+- (void)testDeadRevisionsForUnknownOrFinalizablePersistentRoot
+{
+	[ctx insertNewPersistentRootWithEntityName: @"COObject"];
+	[ctx commitWithUndoTrack: track];
+
+	COUndoTrackHistoryCompaction *compaction =
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+		                                            upToCommand: (COCommandGroup *)track.currentNode];
+
+	UKObjectsEqual([NSSet new], [compaction deadRevisionUUIDsForPersistentRootUUIDs: @[[ETUUID new]]]);
+}
+
+/** 
+ * When we compact a backing store where some revisions have no corresponding
+ * commands in the compacted undo track, -[COSQLiteStore compactHistory:] can 
+ * end up finalizing these revisions belonging to persistent roots unknown by 
+ * the undo track.
+ */
+- (void)testLiveRevisionsForUnknownOrFinalizablePersistentRoot
+{
+	[ctx insertNewPersistentRootWithEntityName: @"COObject"];
+	[ctx commitWithUndoTrack: track];
+
+	COUndoTrackHistoryCompaction *compaction =
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+		                                            upToCommand: (COCommandGroup *)track.currentNode];
+
+	UKObjectsEqual([NSSet new], [compaction liveRevisionUUIDsForPersistentRootUUIDs: @[[ETUUID new]]]);
+}
+
 @end
 
 

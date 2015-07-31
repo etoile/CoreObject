@@ -173,6 +173,8 @@
 				NSUInteger length = revisions.lastIndex - liveRevisions.firstIndex + 1;
 				NSRange liveRange = NSMakeRange(liveRevisions.firstIndex, length);
 				
+				// TODO: Keep at least one revision for a non-deleted persistent
+				// root not referenced by any command in the undo track.
 				[contiguousLiveRevisions addIndexesInRange: liveRange];
 			}
 

@@ -362,6 +362,9 @@
 	for (NSSet *revisionSet in [_deadRevisionUUIDs objectsForKeys: persistentRootUUIDs
 	                                               notFoundMarker: [NSNull null]])
 	{
+		if ([revisionSet isEqual: [NSNull null]])
+			continue;
+
 		[revisionUUIDs unionSet: revisionSet];
 	}
 	return revisionUUIDs;
@@ -374,6 +377,9 @@
 	for (NSSet *revisionSet in [_liveRevisionUUIDs objectsForKeys: persistentRootUUIDs
 	                                               notFoundMarker: [NSNull null]])
 	{
+		if ([revisionSet isEqual: [NSNull null]])
+			continue;
+
 		[revisionUUIDs unionSet: revisionSet];
 	}
 	return revisionUUIDs;
