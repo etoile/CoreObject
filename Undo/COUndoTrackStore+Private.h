@@ -54,16 +54,95 @@ NSString * const COUndoTrackStoreTrackCompacted;
 @end
 
 
+/**
+ * COUndoTrackStore API is mostly thread-safe, except -beginTransaction,
+ * -commitTransaction and -setTrackState: which must be run in the main thread.
+ */
 @interface COUndoTrackStore ()
 
+
+/** @taskunit Batch Operations */
+
+
+/**
+ * Begins a COUndoTrackStore transaction to run multiple COUndoTrackStore
+ * API operations.
+ *
+ * Returns whether initiating the transaction has succeeded.
+ *
+ * This method must be run in the main thread.
+ */
 - (BOOL) beginTransaction;
+/**
+ * Ends a COUndoTrackStore transaction previously initiated with 
+ * -beginTransaction.
+ *
+ * Returns whether committing the transaction has succeeded.
+ *
+ * This method must be run in the main thread.
+ */
 - (BOOL) commitTransaction;
 
+
+/** @taskunit Managing Undo Tracks */
+
+
+/**
+ * Returns the current track names.
+ *
+ * Once a track persistent state is saved with -setStateForTrackName:, the
+ * track appears in the returned array until -removeTrackWithName: is called.
+ */
 - (NSArray *) trackNames;
+/**
+ * Returns the current track names that match a pattern built with '*'.
+ *
+ * To know how the matching works, see GLOB definition in SQLite documentation.
+ *
+ * See COPatternUndoTrack which uses this method to discover its child tracks.
+ */
 - (NSArray *) trackNamesMatchingGlobPattern: (NSString *)aPattern;
+/**
+ * Returns the persistent state describing a track.
+ *
+ * When no persistent state exists in the dabase, returns nil. This means the 
+ * track has never saved or has been deleted.
+ */
 - (COUndoTrackState *) stateForTrackName: (NSString*)aName;
+/**
+ * Updates the persistent state describing a track.
+ *
+ * If the database contains no persistent state corresponding to this track, 
+ * this acts a track insertion (-trackNames will include it once the method 
+ * returns).
+ *
+ * This method must be run in the main thread.
+ */
 - (void) setTrackState: (COUndoTrackState *)aState;
+/**
+ * Deletes a track including all its commands.
+ */
 - (void) removeTrackWithName: (NSString*)aName;
+
+
+
+/** @taskunit Managing Commands */
+
+
+/**
+ * Saves a command and sets -[COUndoTrackSerializedCommand sequenceNumber].
+ */
+- (void) addCommand: (COUndoTrackSerializedCommand *)aCommand;
+/** 
+ * Deletes the command bound the given UUID.
+ */
+- (void) removeCommandForUUID: (ETUUID *)aUUID;
+/**
+ * Returns the serialized representation for the command bound to the given UUID.
+ *
+ * If the UUID corresponds to a deleted command, returns nil.
+ */
+- (COUndoTrackSerializedCommand *) commandForUUID: (ETUUID *)aUUID;
 /**
  * Returns UUIDs for all the commands on a given track.
  *
@@ -73,19 +152,6 @@ NSString * const COUndoTrackStoreTrackCompacted;
  */
 - (NSArray *) allCommandUUIDsOnTrackWithName: (NSString*)aName;
 
-
-
-/**
- * sequenceNumber is set in the provided command object
- */
-- (void) addCommand: (COUndoTrackSerializedCommand *)aCommand;
-/**
- * Returns the serialized representation for the command bound to the given UUID.
- *
- * If the UUID corresponds to a deleted command, returns nil.
- */
-- (COUndoTrackSerializedCommand *) commandForUUID: (ETUUID *)aUUID;
-- (void) removeCommandForUUID: (ETUUID *)aUUID;
 
 
 /** @taskunit History Compaction Integration */
@@ -136,6 +202,15 @@ NSString * const COUndoTrackStoreTrackCompacted;
  */
 @property (nonatomic, readonly) NSDictionary *pageStatistics;
 
+
+/** @task Glob Pattern Matching */
+
+
+/**
+ * Returns whether the given string would be matched by this SQLite glob pattern.
+ *
+ * See also -trackNamesMatchingGlobPattern:.
+ */
 - (BOOL) string: (NSString *)aString matchesGlobPattern: (NSString *)aPattern;
 
 @end

@@ -34,7 +34,9 @@
  * The most common use case is when you want to free space in a CoreObject store.
  *
  * Before passing the compaction strategy to -[COSQLiteStore compactHistory:], 
- * you must always call -compute. You can do this in a background thread.
+ * you must always call -compute.
+ *
+ * For now, COUndoTrackHistoryCompaction is not thread-safe.
  */
 @interface COUndoTrackHistoryCompaction : NSObject <COHistoryCompaction>
 {

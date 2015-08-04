@@ -96,8 +96,16 @@
 	}
 }
 
+/**
+ * Since COUndoTrackStore is almost entirely thread-safe, we could relatively
+ * easily rewrite -compute code path to support being run in background.
+ *
+ * To do so, we could rely on COUndoTrackStore where we access COUndoTrack, or 
+ * gather COCommand objects required by the computation before doing it.
+ */
 - (void)compute
 {
+	ETAssert([NSThread isMainThread]);
 	[self scanPersistentRoots];
 	[self scanRevisions];
 	[self substractAdditionalCommandsToKeep];
@@ -399,9 +407,14 @@
 	ETAssert(![deletedUUIDs containsObject: _oldestCommandToKeep.UUID]);
 	ETAssert(![deletedUUIDs containsObject: _undoTrack.currentNode.UUID]);
 
+	// TODO: Decide whether we should run it in background
 	[_undoTrack.store markCommandsAsDeletedForUUIDs: deletedUUIDs];
 }
 
+/**
+ * This could be run entirely in background, but we wouldn't incur any
+ * performance improvement.
+ */
 - (void)endCompaction: (BOOL)success
 {
 	[_undoTrack.store finalizeDeletions];
