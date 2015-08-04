@@ -98,12 +98,22 @@ NSString * const COUndoTrackStoreTrackCompacted;
  *
  * Posts a COUndoTrackStoreTrackDidChangeNotification with 
  * COUndoTrackStoreTrackCompacted set to YES.
+ *
+ * Can be run a the main queue or a background queue.
+ *
+ * To run it in the main queue, while a transaction initiated with 
+ * -beginTransaction is underway will result in a deadlock.
  */
 - (void)markCommandsAsDeletedForUUIDs: (NSArray *)UUIDs;
 /**
  * Erases commands marked as deleted permanently.
  *
  * This should be called after compacting the history with COSQLiteStore.
+ *
+ * Can be run a the main queue or a background queue.
+ *
+ * To run it in the main queue, while a transaction initiated with
+ * -beginTransaction is underway will result in a deadlock.
  */
 - (void)finalizeDeletions;
 /**
@@ -112,6 +122,11 @@ NSString * const COUndoTrackStoreTrackCompacted;
  * This shrinks the database file size unlike -finalizeDeletions.
  *
  * This operation is slow and will block the database until the method returns.
+ *
+ * Can be run a the main queue or a background queue.
+ *
+ * To run it in the main queue, while a transaction initiated with
+ * -beginTransaction is underway will result in a deadlock.
  * 
  * See also -[COSQLiteStore vacuum].
  */
