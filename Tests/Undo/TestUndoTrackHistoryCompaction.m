@@ -212,7 +212,7 @@
 	                             expectingCompaction: compaction];
 
 	UKObjectsEqual(liveRevs, newRevs[persistentRoot.UUID]);
-	UKObjectsEqual(NODES(liveCommands), track.nodes);
+	UKObjectsEqual(liveCommands, track.nodes);
 	UKObjectsEqual(liveCommands, track.allCommands);
 	
 	[self checkUndoRedo];
@@ -272,7 +272,7 @@
 	               expectingCompaction: compaction];
 
 	UKObjectsEqual(liveRevs, newRevs[persistentRoot.UUID]);
-	UKObjectsEqual(NODES(liveCommands), track.nodes);
+	UKObjectsEqual(liveCommands, track.nodes);
 	UKObjectsEqual(liveCommands, track.allCommands);
 	
 	[self checkUndoRedo];
@@ -303,7 +303,7 @@
 
 	UKObjectsEqual(mainLiveRevs, newRevs[persistentRoot.UUID]);
 	UKNil([ctx persistentRootForUUID: otherPersistentRoot.UUID]);
-	UKObjectsEqual(NODES(liveCommands), track.nodes);
+	UKObjectsEqual(liveCommands, track.nodes);
 	UKObjectsEqual(liveCommands, track.allCommands);
 	
 	[self checkUndoRedo];
@@ -528,13 +528,13 @@
 	                             expectingCompaction: compaction];
 
 	UKObjectsEqual(liveRevs, newRevs[persistentRoot.UUID]);
-	UKObjectsEqual(NODES(liveCommands), track.nodes);
+	UKObjectsEqual(liveCommands, track.nodes);
 	UKObjectsEqual(liveCommands, track.allCommands);
 	
 	UKObjectsEqual(NODES(@[liveCommands.lastObject]), concreteTrack1.nodes);
 	UKObjectsEqual(@[liveCommands.lastObject], concreteTrack1.allCommands);
 
-	UKObjectsEqual(NODES(@[liveCommands.firstObject]), concreteTrack2.nodes);
+	UKObjectsEqual(@[liveCommands.firstObject], concreteTrack2.nodes);
 	UKObjectsEqual(@[liveCommands.firstObject], concreteTrack2.allCommands);
 	
 	[self checkUndoRedo];
@@ -631,10 +631,15 @@
 	UKDoesNotRaiseException([compaction compute]);
 	UKDoesNotRaiseException([store compactHistory: compaction]);
 	
-	/* Undo Renaming (reaching the oldest kept state) */
+	/* Forbidden Undo Renaming
 	
-	[track undo];
-	
+	  We should be able to undo the renaming since COUndoTrackHistoryCompaction 
+	  keeps every revision referenced by a command. However the oldest kept 
+	  state unlike the initial state is not represented with a placeholder node, 
+	  so undoing it is not supported.
+
+      The renaming applied is the oldest reachable state.
+	  The renaming not applied is the oldest kept state. */
 	UKFalse([track canUndo]);
 }
 

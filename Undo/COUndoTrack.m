@@ -91,7 +91,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 
 - (BOOL)canUndo
 {
-	return [self currentNode] != [COEndOfUndoTrackPlaceholderNode sharedInstance];
+	return [[self currentNode] parentNode] != nil;
 }
 
 - (BOOL)canRedo
@@ -467,9 +467,12 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	{
 		[ancestorUUIDsOfA addObject: temp.UUID];
 	}
-	
-	ETAssert([ancestorUUIDsOfA containsObject: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
-	
+
+	if ([[self nodes].firstObject isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance]])
+	{
+		ETAssert([ancestorUUIDsOfA containsObject: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+	}
+
 	for (id<COTrackNode> temp = commitB; temp != nil; temp = [temp parentNode])
 	{
 		if ([ancestorUUIDsOfA containsObject: temp.UUID])
@@ -643,6 +646,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	{
 		NSMutableArray *undoNodes = [NSMutableArray new];
 		NSMutableArray *redoNodes = [NSMutableArray new];
+		BOOL isCompacted = NO;
 		
 		for (COUndoTrackState *trackState in [_trackStateForName allValues])
 		{
@@ -658,7 +662,10 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 				BOOL isDeletedCommand = (command == nil);
 	
 				if (isDeletedCommand)
+				{
+					isCompacted = YES;
 					break;
+				}
 
 				ETAssert([command.UUID isEqual: commandUUID]);
 				
@@ -681,7 +688,10 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		[redoNodes sortUsingDescriptors:
 		 @[[NSSortDescriptor sortDescriptorWithKey: @"sequenceNumber" ascending: YES]]];
 		
-		[_nodesOnCurrentUndoBranch addObject: [COEndOfUndoTrackPlaceholderNode sharedInstance]];
+		if (!isCompacted)
+		{
+			[_nodesOnCurrentUndoBranch addObject: [COEndOfUndoTrackPlaceholderNode sharedInstance]];
+		}
 		[_nodesOnCurrentUndoBranch addObjectsFromArray: undoNodes];
 		[_nodesOnCurrentUndoBranch addObjectsFromArray: redoNodes];
 	}
