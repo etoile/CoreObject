@@ -341,6 +341,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	
     _currentRevisionUUID = [newCurrentRevision UUID];
     [self reloadAtRevision: newCurrentRevision];
+	[self didUpdate];
 }
 
 - (void) setCurrentRevision:(CORevision *)newCurrentRevision
@@ -1048,7 +1049,6 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 {
 	INVALIDARG_EXCEPTION_TEST(node, [node isKindOfClass: [CORevision class]]);
 	[self setCurrentRevision: (CORevision *)node];
-	[self didUpdate];
 	
 	// TODO: Should return NO if self.supportsRevert is NO and this is a revert
 	return YES;

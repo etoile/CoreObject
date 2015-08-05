@@ -106,12 +106,25 @@
 
 /**
  * See -[COTrack undo].
+ *
+ * Can be overriden to record a branch undo on an undo track.
  */
 - (IBAction)undo;
 /**
  * See -[COTrack redo].
+ *
+ * Can be overriden to record a branch redo on an undo track.
  */
 - (IBAction)redo;
+/**
+ * Tells the user changed the selection by tapping a row, and changes the 
+ * current node to the given node.
+ *
+ * See -[COTrack setCurrentNode:].
+ *
+ * Can be overriden to record a branch current revision change on an undo track.
+ */
+- (void)didSelectNode: (id <COTrackNode>)aNode;
 
 
 /** @taskunit Reacting to Track Changes */

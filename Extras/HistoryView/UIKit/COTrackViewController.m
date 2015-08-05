@@ -148,6 +148,11 @@
 	[self.track redo];
 }
 
+- (void)didSelectNode: (id <COTrackNode>)aNode
+{
+	[self.track setCurrentNode: aNode];
+}
+
 #pragma mark - Table View Data Source
 
 - (NSInteger)tableView: (UITableView *)tableView numberOfRowsInSection: (NSInteger)section
@@ -184,7 +189,7 @@
 	                              animated: NO];
 	
 	/* Will trigger -trackDidUpdate: */
-	self.track.currentNode = [self nodeForRowAtIndexPath: indexPath];
+	[self didSelectNode: [self nodeForRowAtIndexPath: indexPath]];
 }
 
 @end
