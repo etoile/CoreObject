@@ -197,7 +197,29 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	BOOL ok = [self.store commitTransaction];
 	if (ok)
 	{
-		[self didUpdate];
+		if ([self isKindOfClass: [COPatternUndoTrack class]])
+		{
+			/* When the current command changes, the commands can be reordered
+			   in a pattern track, due to the split between redo and undo nodes.
+
+			   Track X -> A
+			   Track Y -> B C
+			   Pattern track X + Y -> A B C
+			 
+			   If we undo C, then we commit a change D on track X, the pattern 
+			   track nodes are A B D C.
+			   If we redo on the pattern track, without reloading the pattern
+			   track nodes would remain A B D C and the current node stuck on D 
+			   since -currentCommandGroup returns the most recent current 
+			   command between X and Y (D sequence number is higher than C). 
+			   
+			   Reloading will reorder the pattern track to A B C D. */
+			[self reloadNodesOnCurrentBranch];
+		}
+		else
+		{
+			[self didUpdate];
+		}
 	}
 	return ok;
 }
@@ -262,8 +284,8 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	BOOL ok = [self.store commitTransaction];
 	if (ok)
 	{
-		// FIXME: Not sure if we should need to call this explicitly, calling
-		// -didUpdate could be enough.
+		/* When we set the current command to a divergent one, we switch to
+		   another command branch (the head command changes) */
 		[self reloadNodesOnCurrentBranch];
 	}
 	return ok;
