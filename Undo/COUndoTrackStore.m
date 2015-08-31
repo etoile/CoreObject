@@ -180,7 +180,11 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
 - (void) dealloc
 {
-    [_db close];
+	assert(dispatch_get_current_queue() != _queue);
+    
+    dispatch_sync(_queue, ^() {
+    	[_db close];
+	});
 	
 #if !(TARGET_OS_IPHONE)
 	// N.B.: We are using deployment target 10.7, so ARC does not manage libdispatch objects.
@@ -194,6 +198,8 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
 - (BOOL) setupSchema
 {
+	assert(dispatch_get_current_queue() == _queue);
+
     /* SQLite compatibility */
     
 	[_db executeUpdate: @"PRAGMA foreign_keys = ON"];
@@ -255,7 +261,12 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 	// wait until it is finished
 	dispatch_semaphore_wait(_transactionLock, DISPATCH_TIME_FOREVER);
 
-    BOOL ok = [_db beginTransaction];
+    __block BOOL ok = NO;
+
+	dispatch_sync(_queue, ^() {
+		ok = [_db beginTransaction];
+	});
+
 	if (!ok)
 	{
 		dispatch_semaphore_signal(_transactionLock);
@@ -266,8 +277,12 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 - (BOOL) commitTransaction
 {
 	ETAssert([NSThread isMainThread]);
+	__block BOOL ok = NO;
 
-    BOOL ok = [_db commit];
+    dispatch_sync(_queue, ^() {
+		ok = [_db commit];
+	});
+
 	if (ok)
 	{
 		[self postCommitNotifications];

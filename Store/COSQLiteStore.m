@@ -128,6 +128,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 
 - (BOOL) setupSchema
 {
+	assert(dispatch_get_current_queue() == queue_);
+
     [db_ beginDeferredTransaction];
     
     /* Store Metadata tables (including schema version) */
