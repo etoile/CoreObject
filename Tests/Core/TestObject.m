@@ -382,3 +382,68 @@
 }
 
 @end
+
+#pragma mark - Test Insertion Hint
+
+@interface OutlineItem_InsertObjectAtIndexHint_Mock : OutlineItem
+@property (nonatomic, readwrite, strong) NSMutableArray *insertObjectArgumentsForCalls;
+@end
+
+@implementation OutlineItem_InsertObjectAtIndexHint_Mock
+
+@synthesize insertObjectArgumentsForCalls;
+
+-(void)insertObject:(id)object atIndex:(NSUInteger)index hint:(id)hint
+{
+	[super insertObject:object atIndex:index hint:hint];
+	
+	if (nil == insertObjectArgumentsForCalls)
+		insertObjectArgumentsForCalls = [NSMutableArray array];
+
+	[insertObjectArgumentsForCalls addObject: @{ @"object" : object,
+												 @"index" : @(index),
+												 @"hint" : hint ? hint : [NSNull null]}];
+}
+
+@end
+
+@interface TestObjectInsertionHint : EditingContextTestCase <UKTest>
+{
+	COObjectGraphContext *objectGraphContext;
+	OutlineItem_InsertObjectAtIndexHint_Mock *parent;
+	OutlineItem *other;
+}
+
+@end
+
+@implementation TestObjectInsertionHint
+
+- (id)init
+{
+	SUPERINIT;
+	objectGraphContext = [COObjectGraphContext objectGraphContext];
+
+	parent = [[OutlineItem_InsertObjectAtIndexHint_Mock alloc]
+				initWithObjectGraphContext: objectGraphContext];
+	
+	// N.B.: Not added to parent yet.
+	other = [[OutlineItem alloc] initWithObjectGraphContext: objectGraphContext];
+
+	return self;
+}
+
+- (void) testAddObject
+{
+	UKNil(parent.insertObjectArgumentsForCalls);
+	[parent addObject: other];
+	UKIntsEqual(1, [parent.insertObjectArgumentsForCalls count]);
+	
+	// Check the arguments that were passed to -insertObject:atIndex:hint:
+	NSDictionary *args = parent.insertObjectArgumentsForCalls[0];
+	UKObjectsSame(other, args[@"object"]);
+	UKObjectsEqual(@(ETUndeterminedIndex), args[@"index"]);
+	UKObjectsEqual([NSNull null], args[@"hint"]);
+}
+
+@end
+
