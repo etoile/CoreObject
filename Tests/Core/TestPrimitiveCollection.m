@@ -459,6 +459,24 @@
 	UKTrue(objectDealloced);
 }
 
+- (void) testDisallowsDuplicates
+{
+	[array addObject: @"a"];
+	[array addObject: @"b"];
+	[array addObject: [NSString stringWithFormat: @"a"]];
+	UKObjectsEqual(A(@"a", @"b"), array);
+}
+
+- (void) testAllowsReinsertion
+{
+	[array addObject: @"a"];
+	UKObjectsEqual(A(@"a"), array);
+	[array removeObject: @"a"];
+	UKObjectsEqual(A(), array);
+	[array addObject: @"a"];
+	UKObjectsEqual(A(@"a"), array);
+}
+
 @end
 
 #pragma mark - TestUnsafeRetainedMutableSet
@@ -496,6 +514,24 @@
 	}
 	
 	UKTrue(objectDealloced);
+}
+
+- (void) testDisallowsDuplicates
+{
+	[set addObject: @"a"];
+	[set addObject: @"b"];
+	[set addObject: [NSString stringWithFormat: @"a"]];
+	UKObjectsEqual(S(@"a", @"b"), set);
+}
+
+- (void) testAllowsReinsertion
+{
+	[set addObject: @"a"];
+	UKObjectsEqual(S(@"a"), set);
+	[set removeObject: @"a"];
+	UKObjectsEqual(S(), set);
+	[set addObject: @"a"];
+	UKObjectsEqual(S(@"a"), set);
 }
 
 @end

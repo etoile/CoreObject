@@ -61,6 +61,7 @@
 	// TODO: Replace with custom acquire/relinquish functions to retain/release
 	// COPath references as necessary
 	NSMutableSet *_deadReferences;
+	NSHashTable *_backingHashTable;
 }
 @end
 

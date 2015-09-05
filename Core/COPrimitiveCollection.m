@@ -262,6 +262,8 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	}
 }
 
+// NOTE: For any additional mutation methods added, ensure they are overridden
+// in COUnsafeRetainedMutableArray to enforce no duplicates
 
 @end
 
@@ -276,6 +278,15 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 #endif
 }
 
+- (NSHashTable *) makeBackingHashTable
+{
+#if TARGET_OS_IPHONE
+	return [NSHashTable weakObjectsHashTable];
+#else
+	return [NSHashTable hashTableWithWeakObjects];
+#endif
+}
+
 - (instancetype)initWithObjects: (const id [])objects count: (NSUInteger)count
 {
 	self = [super initWithObjects: objects count: count];
@@ -283,6 +294,8 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 		return nil;
 	
 	_deadReferences = [NSMutableSet new];
+	_backingHashTable = [self makeBackingHashTable];
+	
 	return self;
 }
 
@@ -290,11 +303,33 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 {
 	COUnsafeRetainedMutableArray *newArray = [super copyWithZone: zone];
 	newArray->_deadReferences = [_deadReferences mutableCopyWithZone: zone];
+	newArray->_backingHashTable = [_backingHashTable copyWithZone: zone];
 	return newArray;
+}
+
+- (BOOL)checkPresentAndAddToHashTable: (id)anObject
+{
+	if ([_backingHashTable containsObject: anObject])
+	{
+		return YES;
+	}
+	else
+	{
+		[_backingHashTable addObject: anObject];
+		return NO;
+	}
 }
 
 - (void)addReference: (id)aReference
 {
+	COThrowExceptionIfNotMutable(_mutable);
+
+	// discard duplicates
+	if ([self checkPresentAndAddToHashTable: aReference])
+	{
+		return;
+	}
+	
 	[super addReference: aReference];
 	if ([aReference isKindOfClass: [COPath class]])
 	{
@@ -304,11 +339,71 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 - (void)replaceReferenceAtIndex: (NSUInteger)index withReference: (id)aReference
 {
+	COThrowExceptionIfNotMutable(_mutable);
+
+	// discard duplicates
+	if ([self checkPresentAndAddToHashTable: aReference])
+	{
+		return;
+	}
+
+	// remove old value from hash table
+	[_backingHashTable removeObject: [_backing pointerAtIndex: index]];
+
 	[super replaceReferenceAtIndex: index withReference: aReference];
 	if ([aReference isKindOfClass: [COPath class]])
 	{
 		[_deadReferences addObject: aReference];
 	}
+}
+
+- (void)insertObject: (id)anObject atIndex: (NSUInteger)index
+{
+	COThrowExceptionIfNotMutable(_mutable);
+
+	// discard duplicates
+	if ([self checkPresentAndAddToHashTable: anObject])
+	{
+		return;
+	}
+	
+	[super insertObject: anObject atIndex: index];
+}
+
+- (void)removeObjectAtIndex: (NSUInteger)index
+{
+	COThrowExceptionIfNotMutable(_mutable);
+	
+	// remove old value from hash table
+	[_backingHashTable removeObject: [self objectAtIndex: index]];
+	
+	[super removeObjectAtIndex: index];
+}
+
+- (void)replaceObjectAtIndex: (NSUInteger)index withObject: (id)anObject
+{
+	COThrowExceptionIfNotMutable(_mutable);
+	
+	// discard duplicates
+	if ([self checkPresentAndAddToHashTable: anObject])
+	{
+		return;
+	}
+	
+	// remove old value from hash table
+	[_backingHashTable removeObject: [self objectAtIndex: index]];
+	
+	[super replaceObjectAtIndex: index withObject: anObject];
+}
+
+- (void)setArray: (NSArray *)liveObjects
+{
+	COThrowExceptionIfNotMutable(_mutable);
+
+	// remove old values from hash table
+	[_backingHashTable removeAllObjects];
+	
+	[super setArray: liveObjects];
 }
 
 @end
