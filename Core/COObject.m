@@ -1312,12 +1312,16 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	{
 		[(id <COPrimitiveCollection>)newValue setMutable: NO];
 	}
-	if ([self removeDuplicatesInValue: newValue propertyDescription: propertyDesc])
+	else
 	{
-		// the -removeDuplicatesInValue:propertyDescription: method removed some
-		// duplicates and saved the resulting de-duplicated collection in the storage
-		// again. Reload the new value.
-		newValue = [self valueForStorageKey: key];
+		// COPrimitiveCollection handles duplicate removal itself
+		if ([self removeDuplicatesInValue: newValue propertyDescription: propertyDesc])
+		{
+			// the -removeDuplicatesInValue:propertyDescription: method removed some
+			// duplicates and saved the resulting de-duplicated collection in the storage
+			// again. Reload the new value.
+			newValue = [self valueForStorageKey: key];
+		}
 	}
 	
 	[self validateNewValue: newValue propertyDescription: propertyDesc];
