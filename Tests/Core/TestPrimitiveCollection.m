@@ -397,3 +397,105 @@
 }
 
 @end
+
+#pragma mark - TestUnsafeRetainedMutableArray
+
+@interface DoOnDealloc : NSObject
+{
+	void (^doOnDeallocBlock)();
+}
+@end
+
+@implementation DoOnDealloc
+
+-(instancetype)initWithBlock:(void (^)())aDoOnDeallocBlock;
+{
+	SUPERINIT;
+	doOnDeallocBlock = aDoOnDeallocBlock;
+	return self;
+}
+
+- (void)dealloc
+{
+	doOnDeallocBlock();
+}
+
+@end
+
+
+
+@interface TestUnsafeRetainedMutableArray : NSObject <UKTest>
+{
+	COUnsafeRetainedMutableArray *array;
+}
+
+@end
+
+@implementation TestUnsafeRetainedMutableArray
+
+- (id)init
+{
+	SUPERINIT;
+	array = [COUnsafeRetainedMutableArray new];
+	array.mutable = YES;
+	return self;
+}
+
+- (void) testDoesNotRetain
+{
+	__block BOOL objectDealloced = NO;
+	
+	@autoreleasepool {
+		DoOnDealloc *foo = [[DoOnDealloc alloc] initWithBlock: ^() {
+			// This executes when this object is being deallocated
+			objectDealloced = YES;
+		}];
+		
+		[array addObject: foo];
+		UKObjectsSame(foo, array[0]);
+		UKFalse(objectDealloced);
+	}
+	
+	UKTrue(objectDealloced);
+}
+
+@end
+
+#pragma mark - TestUnsafeRetainedMutableSet
+
+@interface TestUnsafeRetainedMutableSet : NSObject <UKTest>
+{
+	COUnsafeRetainedMutableSet *set;
+}
+
+@end
+
+@implementation TestUnsafeRetainedMutableSet
+
+- (id)init
+{
+	SUPERINIT;
+	set = [COUnsafeRetainedMutableSet new];
+	set.mutable = YES;
+	return self;
+}
+
+- (void) testDoesNotRetain
+{
+	__block BOOL objectDealloced = NO;
+	
+	@autoreleasepool {
+		DoOnDealloc *foo = [[DoOnDealloc alloc] initWithBlock: ^() {
+			// This executes when this object is being deallocated
+			objectDealloced = YES;
+		}];
+		
+		[set addObject: foo];
+		UKIntsEqual(1, [set count]);
+		UKFalse(objectDealloced);
+	}
+	
+	UKTrue(objectDealloced);
+}
+
+@end
