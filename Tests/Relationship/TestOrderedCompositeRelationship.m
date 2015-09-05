@@ -123,6 +123,18 @@
 			|| [@[child1, child2] isEqual: parent.contents]));
 }
 
+- (void) testDuplicatesAutomaticallyRemovedOnAddObject
+{
+	parent.contents = @[child1, child2];
+	[parent addObject: child1];
+	UKObjectsEqual(A(child1, child2), parent.contents);
+	[parent addObject: child2];
+	UKObjectsEqual(A(child1, child2), parent.contents);
+	
+	// Verify at the store item level too
+	UKObjectsEqual(A(child1.UUID, child2.UUID), [[parent storeItem] valueForAttribute: @"contents"]);
+}
+
 - (void) testIllegalDirectModificationOfCollection
 {
 	// Test that an exception is raised when modifying when we last set the array using a setter
