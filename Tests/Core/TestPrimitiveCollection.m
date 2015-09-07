@@ -19,12 +19,14 @@
 
 - (NSIndexSet *)deadIndexes
 {
-	return _deadIndexes;
+	return [_backing.allObjects indexesOfObjectsPassingTest: ^(id obj, NSUInteger idx, BOOL *stop) {
+		return [obj isKindOfClass: [COPath class]];
+	}];
 }
 
 - (NSArray *)deadReferences
 {
-	return [_backing.allObjects objectsAtIndexes: _deadIndexes];
+	return [_backing.allObjects objectsAtIndexes: [self deadIndexes]];
 }
 
 - (NSArray *)allReferences
@@ -171,6 +173,108 @@
 	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
 	UKObjectsEqual(alive3, [array objectAtIndex: 1]);
 	UKRaisesException([array objectAtIndex: 2]);
+}
+
+- (void)testDeadReferenceToAliveReplacementAtStart
+{
+	[array addReference: dead1];
+	[array addReference: alive2];
+	[array addReference: dead2];
+	
+	[array replaceReferenceAtIndex: 0 withReference: alive1];
+
+	UKObjectsEqual(INDEXSET(2), array.deadIndexes);
+	UKObjectsEqual(A(dead2), array.deadReferences);
+	UKObjectsEqual(A(alive1, alive2, dead2), array.allReferences);
+	UKIntsEqual(2, array.count);
+	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
+	UKObjectsEqual(alive2, [array objectAtIndex: 1]);
+	UKRaisesException([array objectAtIndex: 2]);
+}
+
+- (void)testDeadReferenceToAliveReplacementInMiddle
+{
+	[array addReference: alive1];
+	[array addReference: dead1];
+	[array addReference: alive3];
+	[array addReference: dead2];
+	
+	[array replaceReferenceAtIndex: 1 withReference: alive2];
+	
+	UKObjectsEqual(INDEXSET(3), array.deadIndexes);
+	UKObjectsEqual(A(dead2), array.deadReferences);
+	UKObjectsEqual(A(alive1, alive2, alive3, dead2), array.allReferences);
+	UKIntsEqual(3, array.count);
+	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
+	UKObjectsEqual(alive2, [array objectAtIndex: 1]);
+	UKObjectsEqual(alive3, [array objectAtIndex: 2]);
+	UKRaisesException([array objectAtIndex: 3]);
+}
+
+- (void)testDeadReferenceToAliveReplacementAtEnd
+{
+	[array addReference: dead1];
+	[array addReference: alive2];
+	[array addReference: dead2];
+	
+	[array replaceReferenceAtIndex: 2 withReference: alive3];
+	
+	UKObjectsEqual(INDEXSET(0), array.deadIndexes);
+	UKObjectsEqual(A(dead1), array.deadReferences);
+	UKObjectsEqual(A(dead1, alive2, alive3), array.allReferences);
+	UKIntsEqual(2, array.count);
+	UKObjectsEqual(alive2, [array objectAtIndex: 0]);
+	UKObjectsEqual(alive3, [array objectAtIndex: 1]);
+	UKRaisesException([array objectAtIndex: 2]);
+}
+
+- (void)testAliveReferenceToDeadReplacementAtStart
+{
+	[array addReference: alive1];
+	[array addReference: dead2];
+	[array addReference: alive2];
+	
+	[array replaceReferenceAtIndex: 0 withReference: dead1];
+	
+	UKObjectsEqual(INDEXSET(0, 1), array.deadIndexes);
+	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
+	UKObjectsEqual(A(dead1, dead2, alive2), array.allReferences);
+	UKIntsEqual(1, array.count);
+	UKObjectsEqual(alive2, [array objectAtIndex: 0]);
+	UKRaisesException([array objectAtIndex: 1]);
+}
+
+- (void)testAliveReferenceToDeadReplacementInMiddle
+{
+	[array addReference: alive1];
+	[array addReference: dead1];
+	[array addReference: alive2];
+	[array addReference: dead3];
+	
+	[array replaceReferenceAtIndex: 2 withReference: dead2];
+	
+	UKObjectsEqual(INDEXSET(1, 2, 3), array.deadIndexes);
+	UKObjectsEqual(A(dead1, dead2, dead3), array.deadReferences);
+	UKObjectsEqual(A(alive1, dead1, dead2, dead3), array.allReferences);
+	UKIntsEqual(1, array.count);
+	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
+	UKRaisesException([array objectAtIndex: 1]);
+}
+
+- (void)testAliveReferenceToDeadReplacementAtEnd
+{
+	[array addReference: alive1];
+	[array addReference: dead1];
+	[array addReference: alive2];
+	
+	[array replaceReferenceAtIndex: 2 withReference: dead2];
+	
+	UKObjectsEqual(INDEXSET(1, 2), array.deadIndexes);
+	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
+	UKObjectsEqual(A(alive1, dead1, dead2), array.allReferences);
+	UKIntsEqual(1, array.count);
+	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
+	UKRaisesException([array objectAtIndex: 1]);
 }
 
 #pragma mark - Alive Objects Primitive Operations
