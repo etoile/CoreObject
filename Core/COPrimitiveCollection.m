@@ -108,7 +108,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 - (NSUInteger)referencesCount
 {
-	return [_backing count];
+	return _backing.count;
 }
 
 - (id)referenceAtIndex: (NSUInteger)index
@@ -121,14 +121,14 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	COThrowExceptionIfNotMutable(_mutable);
 	if (![aReference isKindOfClass: [COPath class]])
 	{
-		[_externalIndexToBackingIndex addPointer: (void *)[_backing count]];
+		[_externalIndexToBackingIndex addPointer: (void *)_backing.count];
 	}
 	[_backing addPointer: (__bridge void *)aReference];
 }
 
 - (NSUInteger)firstExternalIndexGreaterThanOrEqualToBackingIndex: (NSUInteger)index
 {
-	const NSUInteger externalCount = [_externalIndexToBackingIndex count];
+	const NSUInteger externalCount = _externalIndexToBackingIndex.count;
 	for (NSUInteger externalI = 0; externalI < externalCount; externalI++)
 	{
 		const NSUInteger backingI  = (NSUInteger)[_externalIndexToBackingIndex pointerAtIndex: externalI];
@@ -142,7 +142,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 - (void)shiftBackingIndicesGreaterThanOrEqualTo: (NSUInteger)index by: (NSInteger)delta
 {
-	const NSUInteger externalCount = [_externalIndexToBackingIndex count];
+	const NSUInteger externalCount = _externalIndexToBackingIndex.count;
 	for (NSUInteger i = 0; i < externalCount; i++)
 	{
 		const NSUInteger backingI  = (NSUInteger)[_externalIndexToBackingIndex pointerAtIndex: i];
@@ -188,7 +188,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 - (NSUInteger)count
 {
-	return [_externalIndexToBackingIndex count];
+	return _externalIndexToBackingIndex.count;
 }
 
 - (NSUInteger)backingIndex: (NSUInteger)index
@@ -217,10 +217,10 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	
     // NSPointerArray on 10.7 doesn't allow inserting at the end using index == count, so
     // call addPointer in that case as a workaround.
-    if (index == [_externalIndexToBackingIndex count])
+    if (index == _externalIndexToBackingIndex.count)
     {
 		// insert at end
-		[_externalIndexToBackingIndex addPointer: (void *)[_backing count]];
+		[_externalIndexToBackingIndex addPointer: (void *)_backing.count];
 		[_backing addPointer: (__bridge void *)anObject];
     }
     else
@@ -528,7 +528,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 - (NSUInteger)count
 {
-	return [_backing count] - [_deadReferences count];
+	return _backing.count - _deadReferences.count;
 }
 
 - (id)member: (id)anObject
@@ -653,7 +653,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 - (NSUInteger)count
 {
-	return [_backing count] - [_deadKeys count];
+	return _backing.count - _deadKeys.count;
 }
 
 - (id)objectForKey: (id)key
