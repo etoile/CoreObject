@@ -145,10 +145,10 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	const NSUInteger externalCount = [_externalIndexToBackingIndex count];
 	for (NSUInteger i = 0; i < externalCount; i++)
 	{
-		const NSInteger backingI  = (NSInteger)[_externalIndexToBackingIndex pointerAtIndex: i];
+		const NSUInteger backingI  = (NSUInteger)[_externalIndexToBackingIndex pointerAtIndex: i];
 		if (backingI >= index)
 		{
-			const NSInteger shifted = backingI + delta;
+			const NSUInteger shifted = backingI + delta;
 			[_externalIndexToBackingIndex replacePointerAtIndex: i
 													withPointer: (void *)shifted];
 		}
