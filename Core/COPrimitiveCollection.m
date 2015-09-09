@@ -275,7 +275,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 {
 	COThrowExceptionIfNotMutable(_mutable);
 
-	NSArray *deadReferences = [_backing.allObjects filteredCollectionWithBlock: ^(id obj){
+	NSArray *deadReferences = [_backing.allObjects filteredCollectionWithBlock: ^(id obj) {
 		return [obj isKindOfClass: [COPath class]];
 	}];
 							   

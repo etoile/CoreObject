@@ -1500,7 +1500,10 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 		}
 		replacedOrRemoved = objs;
 	}
-	else ETAssert(NO);
+	else
+	{
+		ETAssert(NO);
+	}
 
 	// Do the various validations / updates for the removed and added objects.
 	
