@@ -291,7 +291,7 @@ See +[NSObject typePrefix]. */
 	_isPrepared = YES;
 	_variableStorage = [self newVariableStorage];
 	_incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
-	_oldValues = [NSMutableArray new];
+	_propertyChangeStack = [NSMutableArray new];
 	_additionalStoreItemUUIDs = [self newAdditionalStoreItemUUIDs: (inserted == NO)];
 
 	[_objectGraphContext registerObject: self isNew: inserted];
@@ -367,7 +367,7 @@ See +[NSObject typePrefix]. */
 	newObject->_objectGraphContext = _objectGraphContext;
 	newObject->_variableStorage = [self newVariableStorage];
 	newObject->_incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
-	newObject->_oldValues = [NSMutableArray new];
+	newObject->_propertyChangeStack = [NSMutableArray new];
 
 	return newObject;
 }
@@ -1032,35 +1032,93 @@ See +[NSObject typePrefix]. */
 
 #pragma mark - Notifications to be called by Accessors
 
-- (void)pushOldCoreObjectRelationshipValue: (id)oldValue
-                    forPropertyDescription: (ETPropertyDescription *)propertyDesc
+- (void)pushProperty: (NSString *)key
 {
-	if ([self isCoreObjectRelationship: propertyDesc] == NO)
-		return;
-
-	id oldValueSnapshot =
-		([propertyDesc isMultivalued] ? [oldValue mutableCopy] : oldValue);
-
-	[_oldValues addObject: [ETKeyValuePair pairWithKey: [propertyDesc name]
-	                                             value: oldValueSnapshot]];
+	[_propertyChangeStack addObject: key];
 }
 
+/**
+ * Slow path
+ */
 - (void)commonWillChangeValueForProperty: (NSString *)key
 {
 	ETPropertyDescription *propertyDesc =
 		[_entityDescription propertyDescriptionForName: key];
 	id oldValue = [self serializableValueForStorageKey: key];
 
-	[self pushOldCoreObjectRelationshipValue: oldValue
-	                  forPropertyDescription: propertyDesc];
+	[self pushProperty: key];
 	if ([self isCoreObjectCollection: oldValue])
 	{
 		[(id <COPrimitiveCollection>)oldValue setMutable: YES];
+	}
+
+	// Used to be done in -commonDidChangeValueForProperty: when we kept a snapshot
+	// of the old collection during an update.
+
+	// Clears cached relationships for all children in the relationship.
+	// They will be recreated for the new children in -commonDidChangeValueForProperty:
+	[self removeCachedOutgoingRelationshipsForValue: oldValue
+						  ofPropertyWithDescription: propertyDesc];
+}
+
+/**
+ * Fast path version of -commonWillChangeValueForProperty:
+ */
+- (void)commonWillChangeValueForProperty: (NSString *)key
+							   atIndexes: (NSIndexSet *)indexes
+							withObjects: (NSArray *)objects
+							mutationKind: (ETCollectionMutationKind)mutationKind
+{
+	ETPropertyDescription *propertyDesc =
+		[_entityDescription propertyDescriptionForName: key];
+	id oldValue = [self serializableValueForStorageKey: key];
+	
+	[self pushProperty: key];
+	if ([self isCoreObjectCollection: oldValue])
+	{
+		[(id <COPrimitiveCollection>)oldValue setMutable: YES];
+	}
+	
+	NSArray *replacedOrRemoved;
+	if (mutationKind == ETCollectionMutationKindInsertion)
+	{
+		replacedOrRemoved = @[];
+	}
+	else if (mutationKind == ETCollectionMutationKindRemoval)
+	{
+		replacedOrRemoved = objects;
+	}
+	else if (mutationKind == ETCollectionMutationKindReplacement)
+	{
+		// FIXME: How do we know which objects were replaced if it's an unordered collection?
+		// FIXME: Is the 'objects' param the new replacement objects or the old objects?
+		ETAssert([oldValue isOrdered]);
+
+		NSMutableArray *objs = [NSMutableArray new];
+		if (![indexes isEmpty])
+		{
+			[indexes enumerateIndexesUsingBlock: ^(NSUInteger idx, BOOL *stop){
+				[objs addObject: [oldValue objectAtIndex: idx]];
+			}];
+		}
+		replacedOrRemoved = objs;
+	}
+	else
+	{
+		ETAssert(NO);
+	}
+
+	// Do the various validations / updates for the removed objects.
+	for (id oldCollectionMember in replacedOrRemoved)
+	{
+		[self removeCachedOutgoingRelationshipsForCollectionValue: oldCollectionMember
+										ofPropertyWithDescription: propertyDesc];
 	}
 }
 
 - (void)willChangeValueForProperty: (NSString *)key
 {
+	// Use the slow path
 	[self commonWillChangeValueForProperty: key];
 	[super willChangeValueForKey: key];
 }
@@ -1070,7 +1128,8 @@ See +[NSObject typePrefix]. */
                        withObjects: (NSArray *)objects
                       mutationKind: (ETCollectionMutationKind)mutationKind
 {
-	[self commonWillChangeValueForProperty: property];
+	// Use the fast path
+	[self commonWillChangeValueForProperty: property atIndexes: indexes withObjects: objects mutationKind: mutationKind];
 	[self willChangeValueForKey: property atIndexes: indexes withObjects: objects mutationKind: mutationKind];
 }
 
@@ -1374,32 +1433,28 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	}
 }
 
-- (id)popOldCoreObjectRelationshipValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc
+- (void)popProperty: (NSString *)key
 {
-	if ([self isCoreObjectRelationship: aPropertyDesc] == NO)
-		return nil;
+	NSString *top = [_propertyChangeStack lastObject];
 
-	ETKeyValuePair *pair = [_oldValues lastObject];
-
-	if ([[pair key] isEqual: [aPropertyDesc name]] == NO)
+	if ([top isEqual: key] == NO)
 	{
 		[NSException raise: NSInternalInconsistencyException
 		            format: @"-willChangeValueForProperty: and -didChangeValueForProperty: "
 		                     "must be paired in setters. Either "
 		                     "-willChangeValueForProperty: was not called for %@ "
 		                     "or -didChangeValueForProperty: was not called for %@.",
-		                    [aPropertyDesc name], [pair key]];
+		                    key, top];
 	}
 
-	[_oldValues removeLastObject];
-	return [pair value];
+	[_propertyChangeStack removeLastObject];
 }
 
 - (void)commonDidChangeValueForProperty: (NSString *)key
 {
 	ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
 	id newValue = [self serializableValueForStorageKey: key];
-	id oldValue = [self popOldCoreObjectRelationshipValueForPropertyDescription: propertyDesc];
+	[self popProperty: key];
 
 	if (propertyDesc == nil)
 	{
@@ -1427,9 +1482,9 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	[self validateNewValue: newValue propertyDescription: propertyDesc];
 
 	[self updateCompositeRelationshipForPropertyDescription: propertyDesc];
-    [self updateCachedOutgoingRelationshipsForOldValue: oldValue
-	                                          newValue: newValue
-                             ofPropertyWithDescription: propertyDesc];
+	
+	[self addCachedOutgoingRelationshipsForValue: newValue
+					   ofPropertyWithDescription: propertyDesc];
 
 	[self markAsUpdatedIfNeededForProperty: key];	
 
@@ -1446,7 +1501,6 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 {
 	ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
 	id newValue = [self serializableValueForStorageKey: key];
-	id oldValue = [self popOldCoreObjectRelationshipValueForPropertyDescription: propertyDesc];
 	
 	if (propertyDesc == nil)
 	{
@@ -1468,56 +1522,38 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	
 	// Fast path:
 	
+	[self popProperty: key];
 	[(id <COPrimitiveCollection>)newValue setMutable: NO];
 	
 	// We must figure out which objects were added, and which were replaced or removed
 	
-	NSArray *replacedOrRemoved;
 	NSArray *addedObjects;
 	
 	if (mutationKind == ETCollectionMutationKindInsertion)
 	{
 		addedObjects = objects;
-		replacedOrRemoved = @[];
 	}
 	else if (mutationKind == ETCollectionMutationKindRemoval)
 	{
 		addedObjects = @[];
-		replacedOrRemoved = objects;
 	}
 	else if (mutationKind == ETCollectionMutationKindReplacement)
 	{
-		// FIXME: How do we know which objects were replaced if it's an unordered collection?
-		
-		ETAssert([newValue isOrdered]);
-		
-		NSMutableArray *objs = [NSMutableArray new];
-		if (![indexes isEmpty])
-		{
-			[indexes enumerateIndexesUsingBlock: ^(NSUInteger idx, BOOL *stop){
-				[objs addObject: [oldValue objectAtIndex: idx]];
-			}];
-		}
-		replacedOrRemoved = objs;
+		addedObjects = objects;
 	}
 	else
 	{
 		ETAssert(NO);
 	}
 
-	// Do the various validations / updates for the removed and added objects.
-	
-	for (id oldValue in replacedOrRemoved)
-	{
-		[self removeCachedOutgoingRelationshipsForCollectionValue: oldValue
-										ofPropertyWithDescription: propertyDesc];
-	}
+	// Do the various validations / updates for the added objects.
 	
 	for (id newValue in addedObjects)
 	{
 		[self validateNewCollectionValue: newValue
 					 propertyDescription: propertyDesc];
 		
+		// Remove inserted objects from their old parents, if needed
 		[self updateCompositeRelationshipForNewCollectionValue: newValue
 										   propertyDescription: propertyDesc];
 		

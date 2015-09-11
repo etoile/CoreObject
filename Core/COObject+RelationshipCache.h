@@ -21,4 +21,10 @@
 - (void) addCachedOutgoingRelationshipsForCollectionValue: (id)obj
 								ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
 
+- (void) removeCachedOutgoingRelationshipsForValue: (id)aValue
+						 ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
+
+- (void) addCachedOutgoingRelationshipsForValue: (id)aValue
+					  ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
+
 @end

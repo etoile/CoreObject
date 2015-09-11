@@ -412,10 +412,10 @@
 	 */
     CORelationshipCache *_incomingRelationshipCache;
 	/**
-	 * Stack of old collection values during nested change notifications i.e. 
+	 * Stack of nested property names for change notifications i.e.
 	 * -willChangeValueForProperty: is called multiple times for the same object.
 	 */
-	NSMutableArray *_oldValues;
+	NSMutableArray *_propertyChangeStack;
 	/**
 	 * Dictionary UUIDs by property names. Used by 
 	 * -[COObject storeItemFromDictionaryForPropertyDescription:] to recreate 
