@@ -352,6 +352,32 @@
 	UKRaisesException([contentsDesc setOrdered: NO]);
 }
 
+- (void) testDidChangeValueForWrongProperty
+{
+	COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
+	OutlineItem *object = [[OutlineItem alloc] initWithObjectGraphContext: objectGraphContext];
+	
+	[object willChangeValueForProperty: @"label"];
+	UKRaisesException([object didChangeValueForProperty: @"contents"]);
+}
+
+- (void) testUnpairedDidChangeValueForProperty
+{
+	COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
+	OutlineItem *object = [[OutlineItem alloc] initWithObjectGraphContext: objectGraphContext];
+	
+	UKRaisesException([object didChangeValueForProperty: @"contents"]);
+}
+
+- (void) testEmptyDidChangeValueForProperty
+{
+	COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
+	OutlineItem *object = [[OutlineItem alloc] initWithObjectGraphContext: objectGraphContext];
+	
+	[object willChangeValueForProperty: @"label"];
+	UKDoesNotRaiseException([object didChangeValueForProperty: @"label"]);
+}
+
 @end
 
 
