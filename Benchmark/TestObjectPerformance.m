@@ -289,19 +289,27 @@ static const int LARGE_RELATIONSHIP_SIZE = 1000;
 - (void) testCreateLargeOrderedRelationsip
 {
 	// compare speed of COObject's -addObject: with NSMutableArray's
+	NSMutableArray *items = [NSMutableArray new];
 	__block int i = 0;
 	[self timeBlock: ^(void) {
 		OutlineItem *child = [[OutlineItem alloc] initWithObjectGraphContext: objectGraphContext];
 		child.label = [NSString stringWithFormat: @"%d", i++];
+		[items addObject: child];
+	} iterations: LARGE_RELATIONSHIP_SIZE message: @"Create OutlineItem and add to an NSMutableArray with -addObject:"];
+	
+	// compare speed of COObject's -addObject: with NSMutableArray's
+	i = 0;
+	[self timeBlock: ^(void) {
+		OutlineItem *child = items[i++];
 		[coreobjectParent addObject: child];
-	} iterations: LARGE_RELATIONSHIP_SIZE message: @"Create OutlineItem and add to an OutlineItem with -addObject:"];
+	} iterations: LARGE_RELATIONSHIP_SIZE message: @"Add OutlineItem to an OutlineItem with -addObject:"];
 
 	NSMutableArray *nsmutablearray = [NSMutableArray new];
+	i = 0;
 	[self timeBlock: ^(void) {
-		OutlineItem *child = [[OutlineItem alloc] initWithObjectGraphContext: objectGraphContext];
-		child.label = [NSString stringWithFormat: @"%d", i++];
+		OutlineItem *child = items[i++];
 		[nsmutablearray addObject: child];
-	} iterations: LARGE_RELATIONSHIP_SIZE message: @"Create OutlineItem and add to an NSMutableArray with -addObject:"];
+	} iterations: LARGE_RELATIONSHIP_SIZE message: @"Add OutlineItem to an NSMutableArray with -addObject:"];
 	
 	// test -count
 	
@@ -321,14 +329,14 @@ static const int LARGE_RELATIONSHIP_SIZE = 1000;
 	[self timeBlock: ^(void) {
 		for (OutlineItem *child in parentContentsArray)
 		{
-			count += [child.label intValue];
+			count += (intptr_t)(child);
 		}
 	} message: [NSString stringWithFormat: @"for/in loop on CoreObject array with %d elements", LARGE_RELATIONSHIP_SIZE]];
 	
 	[self timeBlock: ^(void) {
 		for (OutlineItem *child in parentContentsArrayCopy)
 		{
-			count += [child.label intValue];
+			count += (intptr_t)(child);
 		}
 	} message: [NSString stringWithFormat: @"for/in loop on NSArray with %d elements", LARGE_RELATIONSHIP_SIZE]];
 }
