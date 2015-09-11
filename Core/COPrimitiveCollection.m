@@ -376,7 +376,12 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	}
 
 	// remove old value from hash table
-	[_backingHashTable removeObject: [_backing pointerAtIndex: index]];
+	id oldValue = [_backing pointerAtIndex: index];
+	[_backingHashTable removeObject: oldValue];
+	if ([oldValue isKindOfClass: [COPath class]])
+	{
+		[_deadReferences removeObject: oldValue];
+	}
 
 	[super replaceReferenceAtIndex: index withReference: aReference];
 	if ([aReference isKindOfClass: [COPath class]])
@@ -497,21 +502,21 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 - (void)addReference: (id)aReference
 {
 	COThrowExceptionIfNotMutable(_mutable);
+	[_backing addObject: aReference];
 	if ([aReference isKindOfClass: [COPath class]])
 	{
 		[_deadReferences addObject: aReference];
 	}
-	[_backing addObject: aReference];
 }
 
 - (void)removeReference: (id)aReference
 {
 	COThrowExceptionIfNotMutable(_mutable);
+	[_backing removeObject: aReference];
 	if ([aReference isKindOfClass: [COPath class]])
 	{
 		[_deadReferences removeObject: aReference];
 	}
-	[_backing removeObject: aReference];
 }
 
 - (BOOL)containsReference: (id)aReference
@@ -552,12 +557,16 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 - (void)addObject: (id)anObject
 {
 	COThrowExceptionIfNotMutable(_mutable);
+	ETAssert(![anObject isKindOfClass: [COPath class]]);
+		
 	[_backing addObject: anObject];
 }
 
 - (void)removeObject: (id)anObject
 {
 	COThrowExceptionIfNotMutable(_mutable);
+	ETAssert(![anObject isKindOfClass: [COPath class]]);
+	
 	[_backing removeObject: anObject];
 }
 

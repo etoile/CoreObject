@@ -15,23 +15,52 @@
 @property (nonatomic, readonly) NSArray *allReferences;
 @end
 
+@interface COMutableSet (TestPrimitiveCollection)
+@property (nonatomic, readonly) NSSet *deadReferences;
+@property (nonatomic, readonly) NSSet *allReferences;
+@end
+
 @implementation COMutableArray (TestPrimitiveCollection)
 
 - (NSIndexSet *)deadIndexes
 {
-	return [_backing.allObjects indexesOfObjectsPassingTest: ^(id obj, NSUInteger idx, BOOL *stop) {
+	return [self.allReferences indexesOfObjectsPassingTest: ^(id obj, NSUInteger idx, BOOL *stop) {
 		return [obj isKindOfClass: [COPath class]];
 	}];
 }
 
 - (NSArray *)deadReferences
 {
-	return [_backing.allObjects objectsAtIndexes: [self deadIndexes]];
+	return [self.allReferences objectsAtIndexes: [self deadIndexes]];
 }
 
 - (NSArray *)allReferences
 {
-	return _backing.allObjects;
+	NSMutableArray *results = [NSMutableArray new];
+	for (id ref in self.enumerableReferences) {
+		[results addObject: ref];
+	}
+	return results;
+}
+
+@end
+
+@implementation COMutableSet (TestPrimitiveCollection)
+
+- (NSSet *)deadReferences
+{
+	return [self.allReferences objectsPassingTest:^(id obj, BOOL *stop) {
+		return [obj isKindOfClass: [COPath class]];
+	}];
+}
+
+- (NSSet *)allReferences
+{
+	NSMutableSet *results = [NSMutableSet new];
+	for (id ref in self.enumerableReferences) {
+		[results addObject: ref];
+	}
+	return results;
 }
 
 @end
@@ -279,6 +308,12 @@
 
 #pragma mark - Alive Objects Primitive Operations
 
+- (void)testAddObjectRejectsReference
+{
+	COPath *p = [COPath pathWithPersistentRoot: [ETUUID UUID]];
+	UKRaisesException([array addObject: p]);
+}
+
 - (void)testFirstObjectInsertion
 {
 	[array addReference: alive1];
@@ -502,31 +537,201 @@
 
 @end
 
-#pragma mark - TestUnsafeRetainedMutableArray
+#pragma mark - TestMutableSet
 
-@interface DoOnDealloc : NSObject
+@interface TestMutableSet : NSObject <UKTest>
 {
-	void (^doOnDeallocBlock)();
+	COMutableSet *set;
+	id alive1;
+	id alive2;
+	id dead1;
+	id dead2;
 }
+
 @end
 
-@implementation DoOnDealloc
+@implementation TestMutableSet
 
--(instancetype)initWithBlock:(void (^)())aDoOnDeallocBlock;
+- (id)init
 {
 	SUPERINIT;
-	doOnDeallocBlock = aDoOnDeallocBlock;
+	set = [COMutableSet new];
+	set.mutable = YES;
+	alive1 = @"alive1";
+	alive2 = @"alive2";
+	dead1 = [COPath pathWithPersistentRoot: [ETUUID UUID]];
+	dead2 = [COPath pathWithPersistentRoot: [ETUUID UUID]];
 	return self;
 }
 
-- (void)dealloc
+- (void)testEmptyCollection
 {
-	doOnDeallocBlock();
+	UKIntsEqual(0, set.count);
+	UKIntsEqual(0, set.allReferences.count);
+	UKFalse([set containsObject: @"something"]);
+}
+
+#pragma mark - Backing Operations
+
+- (void)testAliveReferenceAddition
+{
+	[set addReference: alive1];
+	
+	UKTrue(set.deadReferences.isEmpty);
+	UKIntsEqual(1, set.count);
+	UKObjectsEqual(alive1, [set anyObject]);
+	UKObjectsEqual(S(alive1), set.allReferences);
+}
+
+- (void)testDeadReferenceAddition
+{
+	[set addReference: dead1];
+	
+	UKObjectsEqual(S(dead1), set.allReferences);
+	UKObjectsEqual(S(dead1), set.deadReferences);
+	UKObjectsEqual(S(), set);
+	UKIntsEqual(0, set.count);
+	UKFalse([set containsObject: dead1]);
+	UKNil([set member: dead1]);
+}
+
+- (void)testDeadBeforeAliveReferenceAddition
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	UKObjectsEqual(S(dead1, alive1), set.allReferences);
+	UKObjectsEqual(S(dead1), set.deadReferences);
+	UKObjectsEqual(S(alive1), set);
+	UKIntsEqual(1, set.count);
+	UKFalse([set containsObject: dead1]);
+	UKTrue([set containsObject: alive1]);
+}
+
+- (void)testDeadReferenceReplacement
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	// replace dead1 with dead2
+	[set removeReference: dead1];
+	[set addReference: dead2];
+	
+	UKObjectsEqual(S(dead2, alive1), set.allReferences);
+	UKObjectsEqual(S(dead2), set.deadReferences);
+	UKObjectsEqual(S(alive1), set);
+	UKIntsEqual(1, set.count);
+}
+
+- (void)testAliveReferenceReplacement
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	// replace alive1 with alive2
+	[set removeReference: alive1];
+	[set addReference: alive2];
+	
+	UKObjectsEqual(S(alive2, dead1), set.allReferences);
+	UKObjectsEqual(S(dead1), set.deadReferences);
+	UKObjectsEqual(S(alive2), set);
+	UKIntsEqual(1, set.count);
+}
+
+- (void)testDeadReferenceToAliveReplacement
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	// replace dead1 with alive2
+	[set removeReference: dead1];
+	[set addReference: alive2];
+	
+	UKObjectsEqual(S(alive1, alive2), set.allReferences);
+	UKObjectsEqual(S(), set.deadReferences);
+	UKObjectsEqual(S(alive1, alive2), set);
+	UKIntsEqual(2, set.count);
+}
+
+- (void)testAliveReferenceToDeadReplacement
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	// replace alive1 with dead2
+	[set removeReference: alive1];
+	[set addReference: dead2];
+	
+	UKObjectsEqual(S(dead1, dead2), set.allReferences);
+	UKObjectsEqual(S(dead1, dead2), set.deadReferences);
+	UKObjectsEqual(S(), set);
+	UKIntsEqual(0, set.count);
+}
+
+#pragma mark - Alive Objects Primitive Operations
+
+- (void)testAddObjectRejectsReference
+{
+	COPath *p = [COPath pathWithPersistentRoot: [ETUUID UUID]];
+	UKRaisesException([set addObject: p]);
+}
+
+- (void)testObjectInsertion
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	[set addObject: alive2];
+	
+	UKObjectsEqual(S(dead1, alive1, alive2), set.allReferences);
+	UKObjectsEqual(S(dead1), set.deadReferences);
+	UKObjectsEqual(S(alive1, alive2), set);
+	UKIntsEqual(2, set.count);
+}
+
+- (void)testObjectRemoval
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	[set removeObject: alive1];
+	
+	UKObjectsEqual(S(dead1), set.allReferences);
+	UKObjectsEqual(S(dead1), set.deadReferences);
+	UKObjectsEqual(S(), set);
+	UKIntsEqual(0, set.count);
+}
+
+- (void) testRemoveAllObjects
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	[set removeAllObjects];
+	
+	UKObjectsEqual(S(dead1), set.allReferences);
+	UKObjectsEqual(S(dead1), set.deadReferences);
+	UKObjectsEqual(S(), set);
+	UKIntsEqual(0, set.count);
+}
+
+- (void) testSetSet
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	[set setSet: [NSSet set]];
+	
+	UKObjectsEqual(S(dead1), set.allReferences);
+	UKObjectsEqual(S(dead1), set.deadReferences);
+	UKObjectsEqual(S(), set);
+	UKIntsEqual(0, set.count);
 }
 
 @end
 
 
+#pragma mark - TestUnsafeRetainedMutableArray
 
 @interface TestUnsafeRetainedMutableArray : NSObject <UKTest>
 {
@@ -547,20 +752,39 @@
 
 - (void) testDoesNotRetain
 {
-	__block BOOL objectDealloced = NO;
+	__weak id weakReference = nil;
 	
 	@autoreleasepool {
-		DoOnDealloc *foo = [[DoOnDealloc alloc] initWithBlock: ^() {
-			// This executes when this object is being deallocated
-			objectDealloced = YES;
-		}];
-		
-		[array addObject: foo];
-		UKObjectsSame(foo, array[0]);
-		UKFalse(objectDealloced);
+		NSObject *content = [NSObject new];
+		weakReference = content;
+		[array addObject: content];
+		UKObjectsSame(weakReference, array[0]);
+		UKNotNil(weakReference);
+	}
+	UKNil(weakReference);
+}
+
+- (void) testDoesRetainCOPath
+{
+	__weak COPath *weakReference = nil;
+	
+	@autoreleasepool {
+		COPath *p = [COPath pathWithPersistentRoot: [ETUUID UUID]];
+		weakReference = p;
+		[array addReference: p];
+		UKNotNil(weakReference);
+	}
+
+	// Going out of scope should not deallocate it
+	@autoreleasepool {
+		UKNotNil(weakReference);
 	}
 	
-	UKTrue(objectDealloced);
+	// Removing it from the collection should deallocate it
+	@autoreleasepool {
+		[array replaceReferenceAtIndex: 0 withReference: @"replacement object"];
+	}
+	UKNil(weakReference);
 }
 
 - (void) testDisallowsDuplicates
@@ -604,20 +828,40 @@
 
 - (void) testDoesNotRetain
 {
-	__block BOOL objectDealloced = NO;
+	__weak id weakReference = nil;
 	
 	@autoreleasepool {
-		DoOnDealloc *foo = [[DoOnDealloc alloc] initWithBlock: ^() {
-			// This executes when this object is being deallocated
-			objectDealloced = YES;
-		}];
-		
-		[set addObject: foo];
+		NSObject *content = [NSObject new];
+		weakReference = content;
+		[set addObject: content];
 		UKIntsEqual(1, [set count]);
-		UKFalse(objectDealloced);
+		UKNotNil(weakReference);
 	}
 	
-	UKTrue(objectDealloced);
+	UKNil(weakReference);
+}
+
+- (void) testDoesRetainCOPath
+{
+	__weak COPath *weakReference = nil;
+	
+	@autoreleasepool {
+		COPath *p = [COPath pathWithPersistentRoot: [ETUUID UUID]];
+		weakReference = p;
+		[set addReference: p];
+		UKNotNil(weakReference);
+	}
+	
+	// Going out of scope should not deallocate it
+	@autoreleasepool {
+		UKObjectKindOf(weakReference, COPath);
+	}
+	
+	// Removing it from the collection should deallocate it
+	@autoreleasepool {
+		[set removeReference: weakReference];
+	}
+	UKNil(weakReference);
 }
 
 - (void) testDisallowsDuplicates
