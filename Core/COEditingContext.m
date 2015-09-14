@@ -915,8 +915,8 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 	
 	for (ETUUID *persistentRootUUID in finalizedPersistentRootUUIDs)
 	{
-		COPersistentRoot *loaded = [_loadedPersistentRoots objectForKey: persistentRootUUID];
-		
+		__unused COPersistentRoot *loaded = [_loadedPersistentRoots objectForKey: persistentRootUUID];
+
 		// TODO: [self unloadPersistentRoot: loaded]
 		hadChanges = YES;
 	}

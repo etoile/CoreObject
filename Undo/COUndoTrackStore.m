@@ -20,6 +20,10 @@
 #import "NSDistributedNotificationCenter.h"
 #endif
 
+/* For dispatch_get_current_queue() deprecated on iOS (to prevent to people to 
+   use it beside debugging) */
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 NSString * const COUndoTrackStoreTrackDidChangeNotification = @"COUndoTrackStoreTrackDidChangeNotification";
 NSString * const COUndoTrackStoreTrackName = @"COUndoTrackStoreTrackName";
 NSString * const COUndoTrackStoreTrackHeadCommandUUID = @"COUndoTrackStoreTrackHeadCommandUUID";

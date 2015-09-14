@@ -11,6 +11,10 @@
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
 
+/* For dispatch_get_current_queue() deprecated on iOS (to prevent to people to 
+   use it beside debugging) */
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 @interface COSQLiteStore ()
 - (void)deleteBackingStoreWithUUID: (ETUUID *)aUUID;
 - (COSQLiteStorePersistentRootBackingStore *) backingStoreForUUID: (ETUUID *)aUUID error: (NSError **)error;
