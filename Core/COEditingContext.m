@@ -346,10 +346,18 @@
 	[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
 	                                                   branch: nil
 	                                                isDeleted: NO];
-	
-	/* Once all the dead references are fixed, remove them from the cache */
-	
-	NSSet * allBranches = [aPersistentRoot.branches setByAddingObjectsFromSet: aPersistentRoot.deletedBranches];
+	[self updateDeadRelationshipCacheForUndeletedPersistentRoot: aPersistentRoot];
+}
+
+/**
+ * Once all the dead references are fixed, remove them from the cache.
+ *
+ * -updateCrossPersistentRootReferencesToPersistentRoot:branch:isDeleted: must 
+ * be called just before.
+ */
+- (void)updateDeadRelationshipCacheForUndeletedPersistentRoot: (COPersistentRoot *)aPersistentRoot
+{
+	NSSet *allBranches = [aPersistentRoot.branches setByAddingObjectsFromSet: aPersistentRoot.deletedBranches];
 	
 	for (COBranch *branch in allBranches)
 	{
@@ -837,6 +845,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 			}
 			
 			int64_t notifTransaction = [notifTransactionObj longLongValue];
+			BOOL wasDeleted = loaded.isDeleted;
 
 			/* When we have committed the changes explicitly, we send
 			   COPersistentRootDidChangeNotification later with 
@@ -862,13 +871,21 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 			                                                    isDeleted: loaded.isDeleted];
 				// TODO: Unload the persistent root when deleted (this represents
 				// an external deletion)
+				
+				BOOL isUndeletion = wasDeleted && !loaded.isDeleted;
+				
+				if (isUndeletion)
+				{
+					[self updateDeadRelationshipCacheForUndeletedPersistentRoot: loaded];
+				}
 			}
 		}
 		else if (![deletedPersistentRootUUIDs containsObject: persistentRootUUID])
 		{
-			/* For a finalized persistent root, newlyInserted is nil */
-			COPersistentRoot *newlyInserted = [self persistentRootForUUID: persistentRootUUID];
-			if (newlyInserted != nil)
+			/* For a finalized persistent root, insertedOrUndeleted is nil */
+			COPersistentRoot *insertedOrUndeleted = [self persistentRootForUUID: persistentRootUUID];
+
+			if (insertedOrUndeleted != nil)
 			{
 				hadChanges = YES;
 				/* When -[COUndoTrack setCurrentNode:] is used or we receive
@@ -877,9 +894,13 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 				   just undeleted by the undo track (or in another app). This
 				   means we must check other persistent roots in case they have
 				   dead references pointing it. */
-				[self updateCrossPersistentRootReferencesToPersistentRoot: newlyInserted
+				[self updateCrossPersistentRootReferencesToPersistentRoot: insertedOrUndeleted
 			                                                       branch: nil
-			                                                    isDeleted: newlyInserted.isDeleted];
+			                                                    isDeleted: insertedOrUndeleted.isDeleted];
+				/* For the sake of simplicity, we update the dead relationship
+				   cache in the same way on insertion and undeletion (insertion 
+				   is simply a no-op). */
+				[self updateDeadRelationshipCacheForUndeletedPersistentRoot: insertedOrUndeleted];
 			}
 		}
 	}
