@@ -106,11 +106,6 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	return _backing;
 }
 
-- (NSUInteger)referencesCount
-{
-	return _backing.count;
-}
-
 - (id)referenceAtIndex: (NSUInteger)index
 {
 	return [_backing pointerAtIndex: index];
