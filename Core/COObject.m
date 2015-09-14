@@ -346,11 +346,7 @@ See +[NSObject typePrefix]. */
 
 - (void)dealloc
 {
-	COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
-		self.editingContext.deadRelationshipCache;
 
-	ETAssert(!self.isPersistent || deadRelationshipCache != nil);
-	[deadRelationshipCache removeReferringObject: self];
 }
 
 // TODO: Maybe add convenience copying method, - (COObject *) copyWithCopier: (COCopier *)aCopier
@@ -1458,6 +1454,19 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 - (void)willDiscard
 {
     [self removeCachedOutgoingRelationships];
+	
+	/* For dead outgoing univalued relationship, the property value is nil and 
+	   not a COPath, so -removeCachedOutgoingRelationships does nothing, and 
+	   we have to remove the receiver manually.
+	   If we don't do that the next time the cross persistent root references 
+	   are updated, -[COObjectGraphContext replaceObject:withObject:] might 
+	   retrieve this zombie object as a referring object from the dead 
+	   relationship cache and attempt to update it. */
+	COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
+		self.editingContext.deadRelationshipCache;
+
+	ETAssert(!self.isPersistent || deadRelationshipCache != nil);
+	[deadRelationshipCache removeReferringObject: self];
 }
 
 #pragma mark - Equality
