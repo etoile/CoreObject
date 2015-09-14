@@ -38,12 +38,22 @@
 - (BOOL)containsReference: (id)aReference;
 @end
 
+/**
+ * References are either COPath or any other object.
+ *
+ * COPath are treated as "tombstones" and hidden from the NSArray
+ * access methods (-count, -objectAtIndex:, etc.)
+ */
 @interface COMutableArray : NSMutableArray <COPrimitiveCollection>
 {
 @public
 	BOOL _mutable;
 	NSPointerArray *_backing;
-	NSMutableIndexSet *_deadIndexes;
+	/**
+	 * Array of integers, the ith entry gives the backing index for
+	 * "external" index i.
+	 */
+	NSPointerArray *_externalIndexToBackingIndex;
 }
 
 @property (nonatomic, readonly) NSPointerArray *backing;
@@ -61,6 +71,7 @@
 	// TODO: Replace with custom acquire/relinquish functions to retain/release
 	// COPath references as necessary
 	NSMutableSet *_deadReferences;
+	NSHashTable *_backingHashTable;
 }
 @end
 

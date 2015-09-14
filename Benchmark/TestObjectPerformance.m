@@ -217,3 +217,129 @@ TIME_METHOD(timeToModifyCoreObjectOrderedRelationship, MODIFICATION_ITERATIONS, 
 }
 
 @end
+
+@implementation TestCase (Timing)
+
+#pragma mark - Timing Methods
+
+// TODO: Timing infrastructure earlier in the file, using macros, looks awful.
+// Convert to use this.
+- (NSTimeInterval) timeBlock: (void (^)())aBlock iterations: (NSUInteger)iterations
+{
+	NSDate *start = [NSDate date];
+	for (NSUInteger i=0; i<iterations; i++)
+	{
+		aBlock();
+	}
+	NSTimeInterval time = [[NSDate date] timeIntervalSinceDate: start] / iterations;
+	return time;
+}
+
+static const int DEFAULT_ITERATIONS = 1000;
+
+static NSString *FormatTimeInterval(NSTimeInterval s)
+{
+	double us = s * US_PER_SECOND;
+	double ms = s * 1000.0;
+	if (ms > 1000)
+		return [NSString stringWithFormat: @"%f s", s];
+	else if (us > 1000)
+		return [NSString stringWithFormat: @"%f ms", ms];
+	else
+		return [NSString stringWithFormat: @"%f us", us];
+}
+
+- (void) timeBlock: (void (^)())aBlock iterations: (NSUInteger)iterations message: (NSString *)message
+{
+	NSTimeInterval time = [self timeBlock: aBlock iterations: iterations];
+	NSLog(@"%@ per iteration for '%@'", FormatTimeInterval(time), message);
+}
+
+
+- (void) timeBlock: (void (^)())aBlock message: (NSString *)message
+{
+	[self timeBlock: aBlock iterations:DEFAULT_ITERATIONS message: message];
+}
+
+@end
+
+#pragma mark - Test large relationships
+
+@interface TestLargeOrderedRelationsip : TestCase <UKTest>
+{
+	COObjectGraphContext *objectGraphContext;
+	OutlineItem *coreobjectParent;
+}
+@end
+
+@implementation TestLargeOrderedRelationsip
+
+- (id)init
+{
+	SUPERINIT;
+	objectGraphContext = [COObjectGraphContext new];
+	coreobjectParent = [[OutlineItem alloc] initWithObjectGraphContext: objectGraphContext];
+	return self;
+}
+
+static const int LARGE_RELATIONSHIP_SIZE = 1000;
+
+// 2015-09-04: Typewriter performance is getting unusably slow on small documents
+
+- (void) testCreateLargeOrderedRelationsip
+{
+	// compare speed of COObject's -addObject: with NSMutableArray's
+	NSMutableArray *items = [NSMutableArray new];
+	__block int i = 0;
+	[self timeBlock: ^(void) {
+		OutlineItem *child = [[OutlineItem alloc] initWithObjectGraphContext: objectGraphContext];
+		child.label = [NSString stringWithFormat: @"%d", i++];
+		[items addObject: child];
+	} iterations: LARGE_RELATIONSHIP_SIZE message: @"Create OutlineItem and add to an NSMutableArray with -addObject:"];
+	
+	// compare speed of COObject's -addObject: with NSMutableArray's
+	i = 0;
+	[self timeBlock: ^(void) {
+		OutlineItem *child = items[i++];
+		[coreobjectParent addObject: child];
+	} iterations: LARGE_RELATIONSHIP_SIZE message: @"Add OutlineItem to an OutlineItem with -addObject:"];
+
+	NSMutableArray *nsmutablearray = [NSMutableArray new];
+	i = 0;
+	[self timeBlock: ^(void) {
+		OutlineItem *child = items[i++];
+		[nsmutablearray addObject: child];
+	} iterations: LARGE_RELATIONSHIP_SIZE message: @"Add OutlineItem to an NSMutableArray with -addObject:"];
+	
+	// test -count
+	
+	NSArray *parentContentsArray = coreobjectParent.contents;
+	__block NSUInteger count = 0;
+	[self timeBlock: ^(void) {
+		count += [parentContentsArray count];
+	} message: [NSString stringWithFormat: @"-count on CoreObject array with %d elements", LARGE_RELATIONSHIP_SIZE]];
+	
+	NSArray *parentContentsArrayCopy = [NSArray arrayWithArray: coreobjectParent.contents];
+	[self timeBlock: ^(void) {
+		count += [parentContentsArrayCopy count];
+	} message: [NSString stringWithFormat: @"-count on NSArray with %d elements", LARGE_RELATIONSHIP_SIZE]];
+	
+	// test for/in loop
+	
+	[self timeBlock: ^(void) {
+		for (OutlineItem *child in parentContentsArray)
+		{
+			count += (intptr_t)(child);
+		}
+	} message: [NSString stringWithFormat: @"for/in loop on CoreObject array with %d elements", LARGE_RELATIONSHIP_SIZE]];
+	
+	[self timeBlock: ^(void) {
+		for (OutlineItem *child in parentContentsArrayCopy)
+		{
+			count += (intptr_t)(child);
+		}
+	} message: [NSString stringWithFormat: @"for/in loop on NSArray with %d elements", LARGE_RELATIONSHIP_SIZE]];
+}
+
+
+@end

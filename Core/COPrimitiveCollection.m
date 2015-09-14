@@ -66,7 +66,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 {
 	SUPERINIT;
 	_backing = [self makeBacking];
-	_deadIndexes = [NSMutableIndexSet new];
+	_externalIndexToBackingIndex = [NSPointerArray pointerArrayWithOptions:NSPointerFunctionsOpaqueMemory | NSPointerFunctionsIntegerPersonality];
 	
 	_mutable = YES;
 	for (NSUInteger i=0; i<count; i++)
@@ -88,7 +88,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	COMutableArray *newArray = [[self class] allocWithZone: zone];
 	
 	newArray->_backing = [_backing copyWithZone: zone];
-	newArray->_deadIndexes = [_deadIndexes mutableCopyWithZone: zone];
+	newArray->_externalIndexToBackingIndex = [_externalIndexToBackingIndex copyWithZone: zone];
 	newArray->_mutable = _mutable;
 
 	return newArray;
@@ -114,60 +114,81 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 - (void)addReference: (id)aReference
 {
 	COThrowExceptionIfNotMutable(_mutable);
-	if ([aReference isKindOfClass: [COPath class]])
+	if (![aReference isKindOfClass: [COPath class]])
 	{
-		[_deadIndexes addIndex: _backing.count];
+		[_externalIndexToBackingIndex addPointer: (void *)_backing.count];
 	}
 	[_backing addPointer: (__bridge void *)aReference];
+}
+
+- (NSUInteger)firstExternalIndexGreaterThanOrEqualToBackingIndex: (NSUInteger)index
+{
+	const NSUInteger externalCount = _externalIndexToBackingIndex.count;
+	for (NSUInteger externalI = 0; externalI < externalCount; externalI++)
+	{
+		const NSUInteger backingI  = (NSUInteger)[_externalIndexToBackingIndex pointerAtIndex: externalI];
+		if (backingI >= index)
+		{
+			return externalI;
+		}
+	}
+	return NSNotFound;
+}
+
+- (void)shiftBackingIndicesGreaterThanOrEqualTo: (NSUInteger)index by: (NSInteger)delta
+{
+	const NSUInteger externalCount = _externalIndexToBackingIndex.count;
+	for (NSUInteger i = 0; i < externalCount; i++)
+	{
+		const NSUInteger backingI  = (NSUInteger)[_externalIndexToBackingIndex pointerAtIndex: i];
+		if (backingI >= index)
+		{
+			const NSUInteger shifted = backingI + delta;
+			[_externalIndexToBackingIndex replacePointerAtIndex: i
+													withPointer: (void *)shifted];
+		}
+	}
 }
 
 - (void)replaceReferenceAtIndex: (NSUInteger)index withReference: (id)aReference
 {
 	COThrowExceptionIfNotMutable(_mutable);
-	if ([(id)[_backing pointerAtIndex: index] isKindOfClass: [COPath class]])
+	
+	const BOOL wasTombstone = [(id)[_backing pointerAtIndex: index] isKindOfClass: [COPath class]];
+	const BOOL willBeTombstone = [aReference isKindOfClass: [COPath class]];
+	
+	if (!wasTombstone && willBeTombstone)
 	{
-		[_deadIndexes removeIndex: index];
+		NSUInteger externalI = [self firstExternalIndexGreaterThanOrEqualToBackingIndex: index];
+		
+		[_externalIndexToBackingIndex removePointerAtIndex: externalI];
 	}
-	if ([aReference isKindOfClass: [COPath class]])
+	else if (wasTombstone && !willBeTombstone)
 	{
-		[_deadIndexes addIndex: index];
+		NSUInteger externalI = [self firstExternalIndexGreaterThanOrEqualToBackingIndex: index];
+		if (externalI == NSNotFound)
+		{
+			// inserting at the end
+			[_externalIndexToBackingIndex addPointer: (void *)index];
+		}
+		else
+		{
+			[_externalIndexToBackingIndex insertPointer: (void *)index
+												atIndex: externalI];
+		}
 	}
-	[_backing replacePointerAtIndex: index withPointer: (__bridge void *)aReference];
-}
 
-- (NSIndexSet *)aliveIndexes
-{
-	NSMutableIndexSet *indexes =
-		[NSMutableIndexSet indexSetWithIndexesInRange: NSMakeRange(0, [_backing count])];
-	[indexes removeIndexes: _deadIndexes];
-	return indexes;
+	[_backing replacePointerAtIndex: index withPointer: (__bridge void *)aReference];
 }
 
 - (NSUInteger)count
 {
-	return [[self aliveIndexes] count];
+	return _externalIndexToBackingIndex.count;
 }
 
 - (NSUInteger)backingIndex: (NSUInteger)index
 {
-	__block NSUInteger backingIndex = NSNotFound;
-	__block NSUInteger position = 0;
-	[[self aliveIndexes] enumerateIndexesUsingBlock: ^(NSUInteger idx, BOOL *stop)
-	{
-		if (position == index)
-		{
-			backingIndex = idx;
-			*stop = YES;
-		}
-		position++;
-	}];
-	
-	if (backingIndex == NSNotFound && position <= index)
-	{
-		backingIndex = _backing.count;
-	}
- 
-	return backingIndex;
+	return (NSUInteger)[_externalIndexToBackingIndex pointerAtIndex: index];
 }
 
 - (id)objectAtIndex: (NSUInteger)index
@@ -187,19 +208,27 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	COThrowExceptionIfNotMutable(_mutable);
 	COThrowExceptionIfOutOfBounds(self, index, YES);
 	
-	NSUInteger backingIndex = [self backingIndex: index];
-
+	ETAssert(![anObject isKindOfClass: [COPath class]]);
+	
     // NSPointerArray on 10.7 doesn't allow inserting at the end using index == count, so
     // call addPointer in that case as a workaround.
-    if (backingIndex == [_backing count])
+    if (index == _externalIndexToBackingIndex.count)
     {
-        [_backing addPointer: (__bridge void *)anObject];
+		// insert at end
+		[_externalIndexToBackingIndex addPointer: (void *)_backing.count];
+		[_backing addPointer: (__bridge void *)anObject];
     }
     else
 	{
+		// insert in the beginning or middle
+		NSUInteger backingIndex = [self backingIndex: index];
+
+		[self shiftBackingIndicesGreaterThanOrEqualTo: backingIndex by: 1];
+		
+		[_externalIndexToBackingIndex insertPointer: (void *)backingIndex
+											atIndex: index];
         [_backing insertPointer: (__bridge void *)anObject
 						atIndex: backingIndex];
-		[_deadIndexes shiftIndexesStartingAtIndex: backingIndex by: 1];
     }
 }
 
@@ -219,25 +248,17 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	COThrowExceptionIfOutOfBounds(self, index, NO);
 
 	NSUInteger backingIndex = [self backingIndex: index];
-	/* According to Apple doc, "A left shift deletes the indexes in a range the 
-	   length of delta preceding startIndex from the set", so we must alter  
-	   this behavior to avoid losing indexes.
-	   See also http://ootips.org/yonat/workaround-for-bug-in-nsindexset-shiftindexesstartingatindex/ */
-	BOOL isPreviousIndexDead = [_deadIndexes containsIndex: backingIndex - 1];
-
 	[_backing removePointerAtIndex: backingIndex];
-	[_deadIndexes shiftIndexesStartingAtIndex: backingIndex by: -1];
-	if (isPreviousIndexDead)
-	{
-		[_deadIndexes addIndex: backingIndex - 1];
-	}
+	[_externalIndexToBackingIndex removePointerAtIndex: index];
 	
+	[self shiftBackingIndicesGreaterThanOrEqualTo: backingIndex by: -1];
 }
 
 - (void)replaceObjectAtIndex: (NSUInteger)index withObject: (id)anObject
 {
 	COThrowExceptionIfNotMutable(_mutable);
 	COThrowExceptionIfOutOfBounds(self, index, NO);
+	ETAssert(![anObject isKindOfClass: [COPath class]]);
 	[_backing replacePointerAtIndex: [self backingIndex: index]
 	                    withPointer: (__bridge void *)anObject];
 }
@@ -249,10 +270,12 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 {
 	COThrowExceptionIfNotMutable(_mutable);
 
-	NSArray *deadReferences = [_backing.allObjects objectsAtIndexes: _deadIndexes];
-
-	_backing = [self makeBacking];
-	_deadIndexes = [NSMutableIndexSet new];
+	NSArray *deadReferences = [_backing.allObjects filteredCollectionWithBlock: ^(id obj) {
+		return [obj isKindOfClass: [COPath class]];
+	}];
+							   
+	[_backing setCount: 0];
+	[_externalIndexToBackingIndex setCount: 0];
 
 	NSArray *validLiveObjects = (liveObjects != nil ? liveObjects : [NSArray new]);
 
@@ -262,6 +285,8 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	}
 }
 
+// NOTE: For any additional mutation methods added, ensure they are overridden
+// in COUnsafeRetainedMutableArray to enforce no duplicates
 
 @end
 
@@ -276,6 +301,15 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 #endif
 }
 
+- (NSHashTable *) makeBackingHashTable
+{
+#if TARGET_OS_IPHONE
+	return [NSHashTable weakObjectsHashTable];
+#else
+	return [NSHashTable hashTableWithWeakObjects];
+#endif
+}
+
 - (instancetype)initWithObjects: (const id [])objects count: (NSUInteger)count
 {
 	self = [super initWithObjects: objects count: count];
@@ -283,6 +317,8 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 		return nil;
 	
 	_deadReferences = [NSMutableSet new];
+	_backingHashTable = [self makeBackingHashTable];
+	
 	return self;
 }
 
@@ -290,11 +326,33 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 {
 	COUnsafeRetainedMutableArray *newArray = [super copyWithZone: zone];
 	newArray->_deadReferences = [_deadReferences mutableCopyWithZone: zone];
+	newArray->_backingHashTable = [_backingHashTable copyWithZone: zone];
 	return newArray;
+}
+
+- (BOOL)checkPresentAndAddToHashTable: (id)anObject
+{
+	if ([_backingHashTable containsObject: anObject])
+	{
+		return YES;
+	}
+	else
+	{
+		[_backingHashTable addObject: anObject];
+		return NO;
+	}
 }
 
 - (void)addReference: (id)aReference
 {
+	COThrowExceptionIfNotMutable(_mutable);
+
+	// discard duplicates
+	if ([self checkPresentAndAddToHashTable: aReference])
+	{
+		return;
+	}
+	
 	[super addReference: aReference];
 	if ([aReference isKindOfClass: [COPath class]])
 	{
@@ -304,11 +362,76 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 - (void)replaceReferenceAtIndex: (NSUInteger)index withReference: (id)aReference
 {
+	COThrowExceptionIfNotMutable(_mutable);
+
+	// discard duplicates
+	if ([self checkPresentAndAddToHashTable: aReference])
+	{
+		return;
+	}
+
+	// remove old value from hash table
+	id oldValue = [_backing pointerAtIndex: index];
+	[_backingHashTable removeObject: oldValue];
+	if ([oldValue isKindOfClass: [COPath class]])
+	{
+		[_deadReferences removeObject: oldValue];
+	}
+
 	[super replaceReferenceAtIndex: index withReference: aReference];
 	if ([aReference isKindOfClass: [COPath class]])
 	{
 		[_deadReferences addObject: aReference];
 	}
+}
+
+- (void)insertObject: (id)anObject atIndex: (NSUInteger)index
+{
+	COThrowExceptionIfNotMutable(_mutable);
+
+	// discard duplicates
+	if ([self checkPresentAndAddToHashTable: anObject])
+	{
+		return;
+	}
+	
+	[super insertObject: anObject atIndex: index];
+}
+
+- (void)removeObjectAtIndex: (NSUInteger)index
+{
+	COThrowExceptionIfNotMutable(_mutable);
+	
+	// remove old value from hash table
+	[_backingHashTable removeObject: [self objectAtIndex: index]];
+	
+	[super removeObjectAtIndex: index];
+}
+
+- (void)replaceObjectAtIndex: (NSUInteger)index withObject: (id)anObject
+{
+	COThrowExceptionIfNotMutable(_mutable);
+	
+	// discard duplicates
+	if ([self checkPresentAndAddToHashTable: anObject])
+	{
+		return;
+	}
+	
+	// remove old value from hash table
+	[_backingHashTable removeObject: [self objectAtIndex: index]];
+	
+	[super replaceObjectAtIndex: index withObject: anObject];
+}
+
+- (void)setArray: (NSArray *)liveObjects
+{
+	COThrowExceptionIfNotMutable(_mutable);
+
+	// remove old values from hash table
+	[_backingHashTable removeAllObjects];
+	
+	[super setArray: liveObjects];
 }
 
 @end
@@ -374,21 +497,21 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 - (void)addReference: (id)aReference
 {
 	COThrowExceptionIfNotMutable(_mutable);
+	[_backing addObject: aReference];
 	if ([aReference isKindOfClass: [COPath class]])
 	{
 		[_deadReferences addObject: aReference];
 	}
-	[_backing addObject: aReference];
 }
 
 - (void)removeReference: (id)aReference
 {
 	COThrowExceptionIfNotMutable(_mutable);
+	[_backing removeObject: aReference];
 	if ([aReference isKindOfClass: [COPath class]])
 	{
 		[_deadReferences removeObject: aReference];
 	}
-	[_backing removeObject: aReference];
 }
 
 - (BOOL)containsReference: (id)aReference
@@ -405,7 +528,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 - (NSUInteger)count
 {
-	return [_backing count] - [_deadReferences count];
+	return _backing.count - _deadReferences.count;
 }
 
 - (id)member: (id)anObject
@@ -429,12 +552,16 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 - (void)addObject: (id)anObject
 {
 	COThrowExceptionIfNotMutable(_mutable);
+	ETAssert(![anObject isKindOfClass: [COPath class]]);
+		
 	[_backing addObject: anObject];
 }
 
 - (void)removeObject: (id)anObject
 {
 	COThrowExceptionIfNotMutable(_mutable);
+	ETAssert(![anObject isKindOfClass: [COPath class]]);
+	
 	[_backing removeObject: anObject];
 }
 
@@ -530,7 +657,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 - (NSUInteger)count
 {
-	return [_backing count] - [_deadKeys count];
+	return _backing.count - _deadKeys.count;
 }
 
 - (id)objectForKey: (id)key

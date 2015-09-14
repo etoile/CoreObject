@@ -15,21 +15,52 @@
 @property (nonatomic, readonly) NSArray *allReferences;
 @end
 
+@interface COMutableSet (TestPrimitiveCollection)
+@property (nonatomic, readonly) NSSet *deadReferences;
+@property (nonatomic, readonly) NSSet *allReferences;
+@end
+
 @implementation COMutableArray (TestPrimitiveCollection)
 
 - (NSIndexSet *)deadIndexes
 {
-	return _deadIndexes;
+	return [self.allReferences indexesOfObjectsPassingTest: ^(id obj, NSUInteger idx, BOOL *stop) {
+		return [obj isKindOfClass: [COPath class]];
+	}];
 }
 
 - (NSArray *)deadReferences
 {
-	return [_backing.allObjects objectsAtIndexes: _deadIndexes];
+	return [self.allReferences objectsAtIndexes: [self deadIndexes]];
 }
 
 - (NSArray *)allReferences
 {
-	return _backing.allObjects;
+	NSMutableArray *results = [NSMutableArray new];
+	for (id ref in self.enumerableReferences) {
+		[results addObject: ref];
+	}
+	return results;
+}
+
+@end
+
+@implementation COMutableSet (TestPrimitiveCollection)
+
+- (NSSet *)deadReferences
+{
+	return [self.allReferences objectsPassingTest:^(id obj, BOOL *stop) {
+		return [obj isKindOfClass: [COPath class]];
+	}];
+}
+
+- (NSSet *)allReferences
+{
+	NSMutableSet *results = [NSMutableSet new];
+	for (id ref in self.enumerableReferences) {
+		[results addObject: ref];
+	}
+	return results;
 }
 
 @end
@@ -173,7 +204,115 @@
 	UKRaisesException([array objectAtIndex: 2]);
 }
 
+- (void)testDeadReferenceToAliveReplacementAtStart
+{
+	[array addReference: dead1];
+	[array addReference: alive2];
+	[array addReference: dead2];
+	
+	[array replaceReferenceAtIndex: 0 withReference: alive1];
+
+	UKObjectsEqual(INDEXSET(2), array.deadIndexes);
+	UKObjectsEqual(A(dead2), array.deadReferences);
+	UKObjectsEqual(A(alive1, alive2, dead2), array.allReferences);
+	UKIntsEqual(2, array.count);
+	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
+	UKObjectsEqual(alive2, [array objectAtIndex: 1]);
+	UKRaisesException([array objectAtIndex: 2]);
+}
+
+- (void)testDeadReferenceToAliveReplacementInMiddle
+{
+	[array addReference: alive1];
+	[array addReference: dead1];
+	[array addReference: alive3];
+	[array addReference: dead2];
+	
+	[array replaceReferenceAtIndex: 1 withReference: alive2];
+	
+	UKObjectsEqual(INDEXSET(3), array.deadIndexes);
+	UKObjectsEqual(A(dead2), array.deadReferences);
+	UKObjectsEqual(A(alive1, alive2, alive3, dead2), array.allReferences);
+	UKIntsEqual(3, array.count);
+	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
+	UKObjectsEqual(alive2, [array objectAtIndex: 1]);
+	UKObjectsEqual(alive3, [array objectAtIndex: 2]);
+	UKRaisesException([array objectAtIndex: 3]);
+}
+
+- (void)testDeadReferenceToAliveReplacementAtEnd
+{
+	[array addReference: dead1];
+	[array addReference: alive2];
+	[array addReference: dead2];
+	
+	[array replaceReferenceAtIndex: 2 withReference: alive3];
+	
+	UKObjectsEqual(INDEXSET(0), array.deadIndexes);
+	UKObjectsEqual(A(dead1), array.deadReferences);
+	UKObjectsEqual(A(dead1, alive2, alive3), array.allReferences);
+	UKIntsEqual(2, array.count);
+	UKObjectsEqual(alive2, [array objectAtIndex: 0]);
+	UKObjectsEqual(alive3, [array objectAtIndex: 1]);
+	UKRaisesException([array objectAtIndex: 2]);
+}
+
+- (void)testAliveReferenceToDeadReplacementAtStart
+{
+	[array addReference: alive1];
+	[array addReference: dead2];
+	[array addReference: alive2];
+	
+	[array replaceReferenceAtIndex: 0 withReference: dead1];
+	
+	UKObjectsEqual(INDEXSET(0, 1), array.deadIndexes);
+	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
+	UKObjectsEqual(A(dead1, dead2, alive2), array.allReferences);
+	UKIntsEqual(1, array.count);
+	UKObjectsEqual(alive2, [array objectAtIndex: 0]);
+	UKRaisesException([array objectAtIndex: 1]);
+}
+
+- (void)testAliveReferenceToDeadReplacementInMiddle
+{
+	[array addReference: alive1];
+	[array addReference: dead1];
+	[array addReference: alive2];
+	[array addReference: dead3];
+	
+	[array replaceReferenceAtIndex: 2 withReference: dead2];
+	
+	UKObjectsEqual(INDEXSET(1, 2, 3), array.deadIndexes);
+	UKObjectsEqual(A(dead1, dead2, dead3), array.deadReferences);
+	UKObjectsEqual(A(alive1, dead1, dead2, dead3), array.allReferences);
+	UKIntsEqual(1, array.count);
+	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
+	UKRaisesException([array objectAtIndex: 1]);
+}
+
+- (void)testAliveReferenceToDeadReplacementAtEnd
+{
+	[array addReference: alive1];
+	[array addReference: dead1];
+	[array addReference: alive2];
+	
+	[array replaceReferenceAtIndex: 2 withReference: dead2];
+	
+	UKObjectsEqual(INDEXSET(1, 2), array.deadIndexes);
+	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
+	UKObjectsEqual(A(alive1, dead1, dead2), array.allReferences);
+	UKIntsEqual(1, array.count);
+	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
+	UKRaisesException([array objectAtIndex: 1]);
+}
+
 #pragma mark - Alive Objects Primitive Operations
+
+- (void)testAddObjectRejectsReference
+{
+	COPath *p = [COPath pathWithPersistentRoot: [ETUUID UUID]];
+	UKRaisesException([array addObject: p]);
+}
 
 - (void)testFirstObjectInsertion
 {
@@ -394,6 +533,353 @@
 - (void)testRemoveLastObjectWhenEmpty
 {
 	UKDoesNotRaiseException([array removeLastObject]);
+}
+
+@end
+
+#pragma mark - TestMutableSet
+
+@interface TestMutableSet : NSObject <UKTest>
+{
+	COMutableSet *set;
+	id alive1;
+	id alive2;
+	id dead1;
+	id dead2;
+}
+
+@end
+
+@implementation TestMutableSet
+
+- (id)init
+{
+	SUPERINIT;
+	set = [COMutableSet new];
+	set.mutable = YES;
+	alive1 = @"alive1";
+	alive2 = @"alive2";
+	dead1 = [COPath pathWithPersistentRoot: [ETUUID UUID]];
+	dead2 = [COPath pathWithPersistentRoot: [ETUUID UUID]];
+	return self;
+}
+
+- (void)testEmptyCollection
+{
+	UKIntsEqual(0, set.count);
+	UKIntsEqual(0, set.allReferences.count);
+	UKFalse([set containsObject: @"something"]);
+}
+
+#pragma mark - Backing Operations
+
+- (void)testAliveReferenceAddition
+{
+	[set addReference: alive1];
+	
+	UKTrue(set.deadReferences.isEmpty);
+	UKIntsEqual(1, set.count);
+	UKObjectsEqual(alive1, [set anyObject]);
+	UKObjectsEqual(S(alive1), set.allReferences);
+}
+
+- (void)testDeadReferenceAddition
+{
+	[set addReference: dead1];
+	
+	UKObjectsEqual(S(dead1), set.allReferences);
+	UKObjectsEqual(S(dead1), set.deadReferences);
+	UKObjectsEqual(S(), set);
+	UKIntsEqual(0, set.count);
+	UKFalse([set containsObject: dead1]);
+	UKNil([set member: dead1]);
+}
+
+- (void)testDeadBeforeAliveReferenceAddition
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	UKObjectsEqual(S(dead1, alive1), set.allReferences);
+	UKObjectsEqual(S(dead1), set.deadReferences);
+	UKObjectsEqual(S(alive1), set);
+	UKIntsEqual(1, set.count);
+	UKFalse([set containsObject: dead1]);
+	UKTrue([set containsObject: alive1]);
+}
+
+- (void)testDeadReferenceReplacement
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	// replace dead1 with dead2
+	[set removeReference: dead1];
+	[set addReference: dead2];
+	
+	UKObjectsEqual(S(dead2, alive1), set.allReferences);
+	UKObjectsEqual(S(dead2), set.deadReferences);
+	UKObjectsEqual(S(alive1), set);
+	UKIntsEqual(1, set.count);
+}
+
+- (void)testAliveReferenceReplacement
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	// replace alive1 with alive2
+	[set removeReference: alive1];
+	[set addReference: alive2];
+	
+	UKObjectsEqual(S(alive2, dead1), set.allReferences);
+	UKObjectsEqual(S(dead1), set.deadReferences);
+	UKObjectsEqual(S(alive2), set);
+	UKIntsEqual(1, set.count);
+}
+
+- (void)testDeadReferenceToAliveReplacement
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	// replace dead1 with alive2
+	[set removeReference: dead1];
+	[set addReference: alive2];
+	
+	UKObjectsEqual(S(alive1, alive2), set.allReferences);
+	UKObjectsEqual(S(), set.deadReferences);
+	UKObjectsEqual(S(alive1, alive2), set);
+	UKIntsEqual(2, set.count);
+}
+
+- (void)testAliveReferenceToDeadReplacement
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	// replace alive1 with dead2
+	[set removeReference: alive1];
+	[set addReference: dead2];
+	
+	UKObjectsEqual(S(dead1, dead2), set.allReferences);
+	UKObjectsEqual(S(dead1, dead2), set.deadReferences);
+	UKObjectsEqual(S(), set);
+	UKIntsEqual(0, set.count);
+}
+
+#pragma mark - Alive Objects Primitive Operations
+
+- (void)testAddObjectRejectsReference
+{
+	COPath *p = [COPath pathWithPersistentRoot: [ETUUID UUID]];
+	UKRaisesException([set addObject: p]);
+}
+
+- (void)testObjectInsertion
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	[set addObject: alive2];
+	
+	UKObjectsEqual(S(dead1, alive1, alive2), set.allReferences);
+	UKObjectsEqual(S(dead1), set.deadReferences);
+	UKObjectsEqual(S(alive1, alive2), set);
+	UKIntsEqual(2, set.count);
+}
+
+- (void)testObjectRemoval
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	[set removeObject: alive1];
+	
+	UKObjectsEqual(S(dead1), set.allReferences);
+	UKObjectsEqual(S(dead1), set.deadReferences);
+	UKObjectsEqual(S(), set);
+	UKIntsEqual(0, set.count);
+}
+
+- (void) testRemoveAllObjects
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	[set removeAllObjects];
+	
+	UKObjectsEqual(S(dead1), set.allReferences);
+	UKObjectsEqual(S(dead1), set.deadReferences);
+	UKObjectsEqual(S(), set);
+	UKIntsEqual(0, set.count);
+}
+
+- (void) testSetSet
+{
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	[set setSet: [NSSet set]];
+	
+	UKObjectsEqual(S(dead1), set.allReferences);
+	UKObjectsEqual(S(dead1), set.deadReferences);
+	UKObjectsEqual(S(), set);
+	UKIntsEqual(0, set.count);
+}
+
+@end
+
+
+#pragma mark - TestUnsafeRetainedMutableArray
+
+@interface TestUnsafeRetainedMutableArray : NSObject <UKTest>
+{
+	COUnsafeRetainedMutableArray *array;
+}
+
+@end
+
+@implementation TestUnsafeRetainedMutableArray
+
+- (id)init
+{
+	SUPERINIT;
+	array = [COUnsafeRetainedMutableArray new];
+	array.mutable = YES;
+	return self;
+}
+
+- (void) testDoesNotRetain
+{
+	__weak id weakReference = nil;
+	
+	@autoreleasepool {
+		NSObject *content = [NSObject new];
+		weakReference = content;
+		[array addObject: content];
+		UKObjectsSame(weakReference, array[0]);
+		UKNotNil(weakReference);
+	}
+	UKNil(weakReference);
+}
+
+- (void) testDoesRetainCOPath
+{
+	__weak COPath *weakReference = nil;
+	
+	@autoreleasepool {
+		COPath *p = [COPath pathWithPersistentRoot: [ETUUID UUID]];
+		weakReference = p;
+		[array addReference: p];
+		UKNotNil(weakReference);
+	}
+
+	// Going out of scope should not deallocate it
+	@autoreleasepool {
+		UKNotNil(weakReference);
+	}
+	
+	// Removing it from the collection should deallocate it
+	@autoreleasepool {
+		[array replaceReferenceAtIndex: 0 withReference: @"replacement object"];
+	}
+	UKNil(weakReference);
+}
+
+- (void) testDisallowsDuplicates
+{
+	[array addObject: @"a"];
+	[array addObject: @"b"];
+	[array addObject: [NSString stringWithFormat: @"a"]];
+	UKObjectsEqual(A(@"a", @"b"), array);
+}
+
+- (void) testAllowsReinsertion
+{
+	[array addObject: @"a"];
+	UKObjectsEqual(A(@"a"), array);
+	[array removeObject: @"a"];
+	UKObjectsEqual(A(), array);
+	[array addObject: @"a"];
+	UKObjectsEqual(A(@"a"), array);
+}
+
+@end
+
+#pragma mark - TestUnsafeRetainedMutableSet
+
+@interface TestUnsafeRetainedMutableSet : NSObject <UKTest>
+{
+	COUnsafeRetainedMutableSet *set;
+}
+
+@end
+
+@implementation TestUnsafeRetainedMutableSet
+
+- (id)init
+{
+	SUPERINIT;
+	set = [COUnsafeRetainedMutableSet new];
+	set.mutable = YES;
+	return self;
+}
+
+- (void) testDoesNotRetain
+{
+	__weak id weakReference = nil;
+	
+	@autoreleasepool {
+		NSObject *content = [NSObject new];
+		weakReference = content;
+		[set addObject: content];
+		UKIntsEqual(1, [set count]);
+		UKNotNil(weakReference);
+	}
+	
+	UKNil(weakReference);
+}
+
+- (void) testDoesRetainCOPath
+{
+	__weak COPath *weakReference = nil;
+	
+	@autoreleasepool {
+		COPath *p = [COPath pathWithPersistentRoot: [ETUUID UUID]];
+		weakReference = p;
+		[set addReference: p];
+		UKNotNil(weakReference);
+	}
+	
+	// Going out of scope should not deallocate it
+	@autoreleasepool {
+		UKObjectKindOf(weakReference, COPath);
+	}
+	
+	// Removing it from the collection should deallocate it
+	@autoreleasepool {
+		[set removeReference: weakReference];
+	}
+	UKNil(weakReference);
+}
+
+- (void) testDisallowsDuplicates
+{
+	[set addObject: @"a"];
+	[set addObject: @"b"];
+	[set addObject: [NSString stringWithFormat: @"a"]];
+	UKObjectsEqual(S(@"a", @"b"), set);
+}
+
+- (void) testAllowsReinsertion
+{
+	[set addObject: @"a"];
+	UKObjectsEqual(S(@"a"), set);
+	[set removeObject: @"a"];
+	UKObjectsEqual(S(), set);
+	[set addObject: @"a"];
+	UKObjectsEqual(S(@"a"), set);
 }
 
 @end

@@ -43,6 +43,30 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
     return ([prop isPersistent] && isCoreObjectEntityType([prop type]) && ![prop isKeyed]);
 }
 
+- (void) removeCachedOutgoingRelationshipsForCollectionValue: (id)obj
+								   ofPropertyWithDescription: (ETPropertyDescription *)aProperty
+{
+	if (isPersistentCoreObjectReferencePropertyDescription(aProperty))
+	{
+		COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
+		self.editingContext.deadRelationshipCache;
+		
+	
+		BOOL isDeadReference = [obj isKindOfClass: [COPath class]];
+		
+		if (isDeadReference)
+		{
+			[deadRelationshipCache removeReferringObject: self
+												 forPath: obj];
+		}
+		else
+		{
+			[[obj incomingRelationshipCache] removeReferencesForPropertyInSource: [aProperty name]
+																	sourceObject: self];
+		}
+	}
+}
+
 - (void) removeCachedOutgoingRelationshipsForValue: (id)aValue
                          ofPropertyWithDescription: (ETPropertyDescription *)aProperty
 {
@@ -50,45 +74,58 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
     {
         if (isPersistentCoreObjectReferencePropertyDescription(aProperty))
         {
-			COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
-				self.editingContext.deadRelationshipCache;
-
             if ([aProperty isMultivalued])
             {
                 for (id obj in [(id <COPrimitiveCollection>)aValue enumerableReferences])
                 {
-					BOOL isDeadReference = [obj isKindOfClass: [COPath class]];
-					
-					if (isDeadReference)
-					{
-						[deadRelationshipCache removeReferringObject: self
-						                                     forPath: obj];
-					}
-					else
-					{
-                    	[[obj incomingRelationshipCache] removeReferencesForPropertyInSource: [aProperty name]
-                                                                                sourceObject: self];
-					}
+					[self removeCachedOutgoingRelationshipsForCollectionValue: obj
+													ofPropertyWithDescription: aProperty];
                 }
             }
             else
             {
-				BOOL isDeadReference = [aValue isKindOfClass: [COPath class]];
-
-				if (isDeadReference)
-				{
-					[deadRelationshipCache removeReferringObject: self
-					                                     forPath: aValue];
-				}
-				else
-				{
-					[[(COObject *)aValue incomingRelationshipCache]
-						removeReferencesForPropertyInSource: [aProperty name]
-                    	                       sourceObject: self];
-				}
+				[self removeCachedOutgoingRelationshipsForCollectionValue: aValue
+												ofPropertyWithDescription: aProperty];
             }
         }
     }
+}
+
+- (void) addCachedOutgoingRelationshipsForCollectionValue: (id)obj
+								ofPropertyWithDescription: (ETPropertyDescription *)aProperty
+
+{
+	ETAssert(obj != nil);
+
+	if (isPersistentCoreObjectReferencePropertyDescription(aProperty))
+	{
+		COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
+		self.editingContext.deadRelationshipCache;
+		ETPropertyDescription *propertyInTarget = [aProperty opposite]; // May be nil
+		
+		// Metamodel sanity check
+		ETAssert(![aProperty isDerived]);
+		if (propertyInTarget != nil)
+		{
+			NSAssert2([propertyInTarget isDerived], @"Your metamodel is invalid - the property %@ (opposite of %@) should be marked as derived.", [propertyInTarget fullName], [aProperty fullName]);
+			ETAssert(![propertyInTarget isPersistent]);
+		}
+		
+		BOOL isDeadReference = [obj isKindOfClass: [COPath class]];
+		
+		if (isDeadReference)
+		{
+			[deadRelationshipCache addReferringObject: self
+											  forPath: obj];
+		}
+		else
+		{
+			[[obj incomingRelationshipCache] addReferenceFromSourceObject: self
+														   sourceProperty: [aProperty name]
+														   targetProperty: [propertyInTarget name]];
+		}
+	}
+
 }
 
 - (void) addCachedOutgoingRelationshipsForValue: (id)aValue
@@ -99,8 +136,6 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
     {
         if (isPersistentCoreObjectReferencePropertyDescription(aProperty))
         {
-			COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
-				self.editingContext.deadRelationshipCache;
             ETPropertyDescription *propertyInTarget = [aProperty opposite]; // May be nil
 
 			// Metamodel sanity check
@@ -115,37 +150,14 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
 			{
 				for (id obj in [(id <COPrimitiveCollection>)aValue enumerableReferences])
 				{
-					BOOL isDeadReference = [obj isKindOfClass: [COPath class]];
-
-					if (isDeadReference)
-					{
-						[deadRelationshipCache addReferringObject: self
-						                                  forPath: obj];
-					}
-					else
-					{
-						[[obj incomingRelationshipCache] addReferenceFromSourceObject: self
-						                                               sourceProperty: [aProperty name]
-						                                               targetProperty: [propertyInTarget name]];
-					}
+					[self addCachedOutgoingRelationshipsForCollectionValue: obj
+												 ofPropertyWithDescription: aProperty];
 				}
 			}
 			else
 			{
-				BOOL isDeadReference = [aValue isKindOfClass: [COPath class]];
-
-				if (isDeadReference)
-				{
-					[deadRelationshipCache addReferringObject: self
-					                                  forPath: aValue];
-				}
-				else
-				{
-					[[(COObject *)aValue incomingRelationshipCache]
-						addReferenceFromSourceObject: self
-						              sourceProperty: [aProperty name]
-						              targetProperty: [propertyInTarget name]];
-				}
+				[self addCachedOutgoingRelationshipsForCollectionValue: aValue
+											 ofPropertyWithDescription: aProperty];
 			}
 		}
     }
