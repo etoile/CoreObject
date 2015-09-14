@@ -140,6 +140,8 @@
 - (id)init
 {
 	SUPERINIT;
+	
+	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorNever;
 
 	group1 = [ctx insertNewPersistentRootWithEntityName: @"UnivaluedGroupNoOpposite"].rootObject;
 	item1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;

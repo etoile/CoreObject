@@ -32,6 +32,7 @@
 @implementation COEditingContext
 
 @synthesize store = _store, modelDescriptionRepository = _modelDescriptionRepository;
+@synthesize unloadingBehavior = _unloadingBehavior;
 @synthesize persistentRootsPendingDeletion = _persistentRootsPendingDeletion;
 @synthesize persistentRootsPendingUndeletion = _persistentRootsPendingUndeletion;
 @synthesize deadRelationshipCache = _deadRelationshipCache;
@@ -59,6 +60,7 @@
 	_store =  store;
 	_modelDescriptionRepository = aRepo;
 	_loadedPersistentRoots = [NSMutableDictionary new];
+	_unloadingBehavior = COEditingContextUnloadingBehaviorOnDeletion;
 	_persistentRootsPendingDeletion = [NSMutableSet new];
     _persistentRootsPendingUndeletion = [NSMutableSet new];
 	_deadRelationshipCache = [COCrossPersistentRootDeadRelationshipCache new];
@@ -443,13 +445,22 @@
 
 - (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot
 {
+	if (_unloadingBehavior == COEditingContextUnloadingBehaviorNever
+		&& ![aPersistentRoot isPersistentRootUncommitted])
+	{
+		return;
+	}
+
     // FIXME: Implement. For now, since we don't support faulting persistent
-    // roots, only release a persistent root if it's uncommitted.
-    
-    if ([aPersistentRoot isPersistentRootUncommitted])
-    {
-        [_loadedPersistentRoots removeObjectForKey: [aPersistentRoot UUID]];
-    }
+    // roots, only release a persistent root if it's deleted.
+	COPersistentRoot *unloadedPersistentRoot = aPersistentRoot;
+
+    [_loadedPersistentRoots removeObjectForKey: [aPersistentRoot UUID]];
+
+	[[NSNotificationCenter defaultCenter]
+		postNotificationName: COEditingContextDidUnloadPersistentRootsNotification
+		              object: self
+		            userInfo: @{ kCOUnloadedPersistentRootsKey : S(unloadedPersistentRoot) }];
 }
 
 #pragma mark Referencing Other Persistent Roots -
@@ -778,13 +789,35 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
     [self storePersistentRootsDidChange: notif isDistributed: NO];
 }
 
+/**
+ * Reloads changed persistent roots, except the ones that got deleted (either 
+ * with an explicit commit in the current context or from some other editing 
+ * context).
+ *
+ * Deleted persistent roots are unloaded right before executing the commit 
+ * transaction.
+ *
+ * The transaction IDs protect us against lost distributed commit notifications,
+ * that can result in state mismatches between the store and the editing context.
+ */
 - (void)storePersistentRootsDidChange: (NSNotification *)notif isDistributed: (BOOL)isDistributed
 {
 	NSDictionary *transactionIDs = notif.userInfo[kCOStorePersistentRootTransactionIDs];
     NSArray *persistentRootUUIDs = [[transactionIDs allKeys] mappedCollectionWithBlock: ^ (id uuidString) {
 		return [ETUUID UUIDWithString: uuidString];
 	}];
+	NSArray *deletedPersistentRootUUIDs = [notif.userInfo[kCOStoreDeletedPersistentRoots] mappedCollectionWithBlock: ^ (id uuidString) {
+		return [ETUUID UUIDWithString: uuidString];
+	}];
+	NSArray *compactedPersistentRootUUIDs = [notif.userInfo[kCOStoreCompactedPersistentRoots] mappedCollectionWithBlock: ^ (id uuidString) {
+		return [ETUUID UUIDWithString: uuidString];
+	}];
+	NSArray *finalizedPersistentRootUUIDs = [notif.userInfo[kCOStoreFinalizedPersistentRoots] mappedCollectionWithBlock: ^ (id uuidString) {
+		return [ETUUID UUIDWithString: uuidString];
+	}];
 	
+	ETAssert(transactionIDs.isEmpty || (finalizedPersistentRootUUIDs.isEmpty && compactedPersistentRootUUIDs.isEmpty));
+
     //NSLog(@"%@: Got change notif for persistent root: %@", self, persistentRootUUID);
     
 	BOOL hadChanges = NO;
@@ -827,10 +860,13 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 				[self updateCrossPersistentRootReferencesToPersistentRoot: loaded
 			                                                       branch: nil
 			                                                    isDeleted: loaded.isDeleted];
+				// TODO: Unload the persistent root when deleted (this represents
+				// an external deletion)
 			}
 		}
-		else
+		else if (![deletedPersistentRootUUIDs containsObject: persistentRootUUID])
 		{
+			/* For a finalized persistent root, newlyInserted is nil */
 			COPersistentRoot *newlyInserted = [self persistentRootForUUID: persistentRootUUID];
 			if (newlyInserted != nil)
 			{
@@ -846,6 +882,22 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 			                                                    isDeleted: newlyInserted.isDeleted];
 			}
 		}
+	}
+	
+	for (ETUUID *persistentRootUUID in compactedPersistentRootUUIDs)
+	{
+		COPersistentRoot *loaded = [_loadedPersistentRoots objectForKey: persistentRootUUID];
+		
+		[loaded storePersistentRootDidChange: notif isDistributed: isDistributed];
+		hadChanges = YES;
+	}
+	
+	for (ETUUID *persistentRootUUID in finalizedPersistentRootUUIDs)
+	{
+		COPersistentRoot *loaded = [_loadedPersistentRoots objectForKey: persistentRootUUID];
+		
+		// TODO: [self unloadPersistentRoot: loaded]
+		hadChanges = YES;
 	}
 	
 	if (hadChanges)
@@ -934,3 +986,6 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 NSString * const COEditingContextDidChangeNotification =
 	@"COEditingContextDidChangeNotification";
 NSString * const kCOCommandKey = @"kCOCommandKey";
+
+NSString * const COEditingContextDidUnloadPersistentRootsNotification = @"COEditingContextWillUnloadPersistentRootsNotification";
+NSString * const kCOUnloadedPersistentRootsKey = @"kCOUnloadedPersistentRootsKey";

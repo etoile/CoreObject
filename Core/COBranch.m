@@ -92,7 +92,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     {
         // Loading an existing branch
         
-        [self updateWithBranchInfo: [self branchInfo]];
+        [self updateWithBranchInfo: [self branchInfo] compacted: NO];
     }
     else
     {
@@ -341,6 +341,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	
     _currentRevisionUUID = [newCurrentRevision UUID];
     [self reloadAtRevision: newCurrentRevision];
+	[self didUpdate];
 }
 
 - (void) setCurrentRevision:(CORevision *)newCurrentRevision
@@ -844,18 +845,20 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 		postNotificationName: ETCollectionDidUpdateNotification object: self];
 }
 
-- (void)updateRevisions
+- (void)updateRevisions: (BOOL)reload
 {
 	CORevision *currentRev = [[self editingContext] revisionForRevisionUUID: _currentRevisionUUID
 	                                                     persistentRootUUID: [[self persistentRoot] UUID]];
+	BOOL isUpToDate = [currentRev isEqual: [_revisions lastObject]] || _revisions == nil;
 
-	if ([currentRev isEqual: [_revisions lastObject]] || _revisions == nil)
+	if (!reload && isUpToDate)
 		return;
 
 	BOOL isNewCommit = [[currentRev parentRevision] isEqual: [_revisions lastObject]];
 
 	if (isNewCommit)
 	{
+		ETAssert(!reload);
 		[_revisions addObject: currentRev];
 	}
 	else
@@ -867,6 +870,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 }
 
 - (void)updateWithBranchInfo: (COBranchInfo *)branchInfo
+                   compacted: (BOOL)wasCompacted
 {
     NSParameterAssert(branchInfo != nil);
     
@@ -885,7 +889,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 		[_objectGraph removeUnreachableObjects];
 	}
 	
-	[self updateRevisions];
+	[self updateRevisions: wasCompacted];
 }
 
 - (id)rootObject
@@ -1045,7 +1049,6 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 {
 	INVALIDARG_EXCEPTION_TEST(node, [node isKindOfClass: [CORevision class]]);
 	[self setCurrentRevision: (CORevision *)node];
-	[self didUpdate];
 	
 	// TODO: Should return NO if self.supportsRevert is NO and this is a revert
 	return YES;

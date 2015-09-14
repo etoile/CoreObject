@@ -91,7 +91,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 
 - (BOOL)canUndo
 {
-	return [self currentNode] != [COEndOfUndoTrackPlaceholderNode sharedInstance];
+	return [[self currentNode] parentNode] != nil;
 }
 
 - (BOOL)canRedo
@@ -197,7 +197,29 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	BOOL ok = [self.store commitTransaction];
 	if (ok)
 	{
-		[self didUpdate];
+		if ([self isKindOfClass: [COPatternUndoTrack class]])
+		{
+			/* When the current command changes, the commands can be reordered
+			   in a pattern track, due to the split between redo and undo nodes.
+
+			   Track X -> A
+			   Track Y -> B C
+			   Pattern track X + Y -> A B C
+			 
+			   If we undo C, then we commit a change D on track X, the pattern 
+			   track nodes are A B D C.
+			   If we redo on the pattern track, without reloading the pattern
+			   track nodes would remain A B D C and the current node stuck on D 
+			   since -currentCommandGroup returns the most recent current 
+			   command between X and Y (D sequence number is higher than C). 
+			   
+			   Reloading will reorder the pattern track to A B C D. */
+			[self reloadNodesOnCurrentBranch];
+		}
+		else
+		{
+			[self didUpdate];
+		}
 	}
 	return ok;
 }
@@ -262,8 +284,8 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	BOOL ok = [self.store commitTransaction];
 	if (ok)
 	{
-		// FIXME: Not sure if we should need to call this explicitly, calling
-		// -didUpdate could be enough.
+		/* When we set the current command to a divergent one, we switch to
+		   another command branch (the head command changes) */
 		[self reloadNodesOnCurrentBranch];
 	}
 	return ok;
@@ -415,7 +437,9 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 {
 	[self loadIfNeeded];
 	
-	return [_commandsByUUID allValues];
+	NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey: @"sequenceNumber"
+	                                                             ascending: YES];
+	return [[_commandsByUUID allValues] sortedArrayUsingDescriptors: @[descriptor]];
 }
 
 - (NSArray *) childrenOfNode: (id<COTrackNode>)aNode
@@ -465,9 +489,12 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	{
 		[ancestorUUIDsOfA addObject: temp.UUID];
 	}
-	
-	ETAssert([ancestorUUIDsOfA containsObject: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
-	
+
+	if ([[self nodes].firstObject isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance]])
+	{
+		ETAssert([ancestorUUIDsOfA containsObject: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+	}
+
 	for (id<COTrackNode> temp = commitB; temp != nil; temp = [temp parentNode])
 	{
 		if ([ancestorUUIDsOfA containsObject: temp.UUID])
@@ -602,7 +629,19 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	{
 		if (state.currentCommandUUID != nil)
 		{
-			[potentialCurrentCommands addObject: [self commandForUUID: state.currentCommandUUID]];
+			COCommandGroup *command = [self commandForUUID: state.currentCommandUUID];
+			/* If after a compaction, we undo until we reach the placeholder node,
+			   the current command UUID corresponds to a non-existent command.
+			   This state was recreated by inversing the child command. 
+			   For now, we don't reset the oldest command parent UUID to nil 
+			   on compaction. We could do this too, although keeping the parent 
+			   UUID easily tells us whether the track has been compacted or not. */
+			BOOL wasDeleted = (command == nil);
+
+			if (wasDeleted)
+				continue;
+
+			[potentialCurrentCommands addObject: command];
 		}
 	}
 
@@ -629,17 +668,27 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	{
 		NSMutableArray *undoNodes = [NSMutableArray new];
 		NSMutableArray *redoNodes = [NSMutableArray new];
+		BOOL isCompacted = NO;
 		
 		for (COUndoTrackState *trackState in [_trackStateForName allValues])
 		{
 			NSMutableArray *targetArray = redoNodes;
 			ETUUID *commandUUID = trackState.headCommandUUID;
+
 			while (commandUUID != nil && ![commandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
 			{
 				if ([commandUUID isEqual: trackState.currentCommandUUID])
 					targetArray = undoNodes;
 				
 				COCommandGroup *command = [self commandForUUID: commandUUID];
+				BOOL isDeletedCommand = (command == nil);
+	
+				if (isDeletedCommand)
+				{
+					isCompacted = YES;
+					break;
+				}
+
 				ETAssert([command.UUID isEqual: commandUUID]);
 				
 				[targetArray addObject: command];
@@ -661,7 +710,10 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		[redoNodes sortUsingDescriptors:
 		 @[[NSSortDescriptor sortDescriptorWithKey: @"sequenceNumber" ascending: YES]]];
 		
-		[_nodesOnCurrentUndoBranch addObject: [COEndOfUndoTrackPlaceholderNode sharedInstance]];
+		if (!isCompacted)
+		{
+			[_nodesOnCurrentUndoBranch addObject: [COEndOfUndoTrackPlaceholderNode sharedInstance]];
+		}
 		[_nodesOnCurrentUndoBranch addObjectsFromArray: undoNodes];
 		[_nodesOnCurrentUndoBranch addObjectsFromArray: redoNodes];
 	}
@@ -708,6 +760,11 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	if (command == nil)
 	{
 		COUndoTrackSerializedCommand *serializedCommand = [self.store commandForUUID: aUUID];
+		BOOL isDeletedCommand = (serializedCommand == nil);
+
+		if (isDeletedCommand)
+			return nil;
+
 		ETAssert([serializedCommand.UUID isEqual: aUUID]);
 		command = [self loadSerializedCommand: serializedCommand];
 		ETAssert([command.UUID isEqual: aUUID]);
@@ -772,6 +829,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	{
 		notifState.currentCommandUUID = [ETUUID UUIDWithString: userInfo[COUndoTrackStoreTrackCurrentCommandUUID]];
 	}
+	notifState.compacted = [userInfo[COUndoTrackStoreTrackCompacted] boolValue];
 
 	if ([self.store string: notifState.trackName matchesGlobPattern: _name])
 	{
@@ -779,6 +837,12 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		if (![inMemoryState isEqual: notifState])
 		{
 			//NSLog(@"Doing track reload");
+			BOOL needsClearCommandCache = notifState.compacted;
+
+			if (needsClearCommandCache)
+			{
+				[_commandsByUUID removeAllObjects];
+			}
 			[self reload];
 		}
 		else

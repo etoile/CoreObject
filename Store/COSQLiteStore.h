@@ -56,8 +56,36 @@ extern NSString * const COStorePersistentRootsDidChangeNotification;
 /* userInfo dictionary keys for COStorePersistentRootsDidChangeNotification */
 
 extern NSString * const kCOStorePersistentRootTransactionIDs;
+/**
+ * The persistent root UUIDs inserted with the last commit.
+ */
 extern NSString * const kCOStoreInsertedPersistentRoots;
+/**
+ * The persistent root UUIDs deleted with the last commit.
+ */
 extern NSString * const kCOStoreDeletedPersistentRoots;
+/**
+ * The persistent root UUIDs compacted with -compactHistory: or
+ * -finalizeDeletionsForPersistentRoot:error:.
+ *
+ * These persistent roots don't appear in kCOStorePersistentRootTransactionIDs.
+ * Transaction IDs are not needed, since persistent root histories are
+ * compacted by looking at the store state).
+ *
+ * Can include persistent roots which have not been compacted (but were just 
+ * candidates for compaction).
+ */
+extern NSString * const kCOStoreCompactedPersistentRoots;
+/**
+ * The persistent root UUIDs finalized with -compactHistory: or
+ * -finalizeDeletionsForPersistentRoot:error:.
+ *
+ * These persistent roots don't appear in kCOStorePersistentRootTransactionIDs 
+ * Transaction IDs are not needed, since we look at the deletion status in store 
+ * to decide whether we can finalize the persistent roots. Moreover the 
+ * transaction ID that exist per persistent root erased with the finalization.
+ */
+extern NSString * const kCOStoreFinalizedPersistentRoots;
 extern NSString * const kCOStoreUUID;
 extern NSString * const kCOStoreURL;
 
@@ -323,6 +351,7 @@ extern NSString * const COPersistentRootAttributeUsedSize;
     NSMutableDictionary *backingStoreUUIDForPersistentRootUUID_;
     
     dispatch_queue_t queue_;
+	NSUInteger _maxNumberOfDeltaCommits;
 }
 
 /**
@@ -433,6 +462,39 @@ extern NSString * const COPersistentRootAttributeUsedSize;
  */
 - (BOOL) finalizeDeletionsForPersistentRoot: (ETUUID *)aRoot
                                       error: (NSError **)error;
+/**
+ * Compacts the database by rebuilding it.
+ *
+ * This shrinks the database file size unlike -compactHistory:.
+ *
+ * This operation is slow and will block the database until the method returns.
+ * You should usually call it in a background thread and present an 
+ * indeterminate progress bar at the UI level.
+ *
+ * For some background about running a vacuum operation, see:
+ *
+ * <list>
+ * <item>https://blogs.gnome.org/jnelson/2015/01/06/sqlite-vacuum-and-auto_vacuum/</item>
+ * <item>https://wiki.mozilla.org/Firefox/Projects/Places_Vacuum</item>
+ * </list>
+ */
+- (BOOL)vacuum;
+/**
+ * Returns statistics about the database pages.
+ *
+ * The returned dictionary includes three keys (corresponding to specific SQLite
+ * PRAGMA arguments):
+ *
+ * <deflist>
+ * <term>freelist_count</term><desc>number of unused pages</desc>
+ * <term>page_count</term><desc>number of all pages (used and unused)</desc>
+ * <term>page_size</term><desc>page size (with page_size * page_count being 
+ * equal to the database file size)</desc>
+ * </deflist>
+ *
+ * These infos can be used to decide when to compact and vacuum the store.
+ */
+@property (nonatomic, readonly) NSDictionary *pageStatistics;
 
 
 /** @taskunit Transactions */

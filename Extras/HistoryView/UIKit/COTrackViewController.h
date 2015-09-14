@@ -17,6 +17,7 @@
 	id <COTrack> _track;
 	UIColor *_pastColor;
 	UIColor *_futureColor;
+	NSIndexPath *_checkedIndexPath;
 }
 
 
@@ -42,9 +43,9 @@
 /**
  * The color used to indicate the past history.
  *
- * By default, this is background color for all nodes before the current node.
+ * By default, this is the text color for all nodes before the current node.
  *
- * The current node background color is based on this color too.
+ * The current node text color is based on this color too.
  *
  * See -suggestedColorForNode:.
  */
@@ -52,7 +53,7 @@
 /**
  * The color used to indicate the future history.
  *
- * By default, this is background color for all nodes after the current node.
+ * By default, this is the text color for all nodes after the current node.
  *
  * See -suggestedColorForNode:.
  */
@@ -71,11 +72,33 @@
  * -[UITableView dequeueReusableCellWithIdentifier:].
  *
  * By default, the cell label is set to -[COTrackNode localizedShortDescription]
- * and the background color to -suggestedColorForNode:.
+ * and the text color to -suggestedColorForNode:.
  *
  * Can be overriden to return a custom cell.
  */
 - (UITableViewCell *)makeCellForNode: (id <COTrackNode>)node;
+/**
+ * Adds a visual indicator to the row representing the current node.
+ *
+ * Will be called after -uncheckRowAtIndexPath:.
+ *
+ * You shouldn't call this method, but override it to add a custom visual
+ * indicator set on the row.
+ *
+ * The default indicator is a checkmark.
+ */
+- (void)checkRow: (UITableViewCell *)cell;
+/**
+ * Removes the visual indicator from the row representing the current node.
+ *
+ * Will be called before -checkRowAtIndexPath:.
+ *
+ * You shouldn't call this method, but override it to remove a custom visual
+ * indicator set on the row.
+ *
+ * The default indicator is a checkmark.
+ */
+- (void)uncheckRow: (UITableViewCell *)cell;
 
 
 /** @taskunit Undo and Redo */
@@ -83,12 +106,25 @@
 
 /**
  * See -[COTrack undo].
+ *
+ * Can be overriden to record a branch undo on an undo track.
  */
 - (IBAction)undo;
 /**
  * See -[COTrack redo].
+ *
+ * Can be overriden to record a branch redo on an undo track.
  */
 - (IBAction)redo;
+/**
+ * Tells the user changed the selection by tapping a row, and changes the 
+ * current node to the given node.
+ *
+ * See -[COTrack setCurrentNode:].
+ *
+ * Can be overriden to record a branch current revision change on an undo track.
+ */
+- (void)didSelectNode: (id <COTrackNode>)aNode;
 
 
 /** @taskunit Reacting to Track Changes */

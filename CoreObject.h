@@ -63,6 +63,7 @@
 
 #import <CoreObject/CORevisionInfo.h>
 #import <CoreObject/COBranchInfo.h>
+#import <CoreObject/COHistoryCompaction.h>
 #import <CoreObject/COPersistentRootInfo.h>
 #import <CoreObject/COSearchResult.h>
 #import <CoreObject/COSQLiteStore.h>
@@ -72,6 +73,7 @@
 
 #import <CoreObject/COUndoTrackStore.h>
 #import <CoreObject/COUndoTrack.h>
+#import <CoreObject/COUndoTrackHistoryCompaction.h>
 #import <CoreObject/COEndOfUndoTrackPlaceholderNode.h>
 #import <CoreObject/COEditingContext+Undo.h>
 

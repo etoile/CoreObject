@@ -15,6 +15,7 @@
 #import "CODateSerialization.h"
 #import "COEndOfUndoTrackPlaceholderNode.h"
 #import "COJSONSerialization.h"
+#import "COSQLiteUtilities.h"
 #if TARGET_OS_IPHONE
 #import "NSDistributedNotificationCenter.h"
 #endif
@@ -23,30 +24,35 @@ NSString * const COUndoTrackStoreTrackDidChangeNotification = @"COUndoTrackStore
 NSString * const COUndoTrackStoreTrackName = @"COUndoTrackStoreTrackName";
 NSString * const COUndoTrackStoreTrackHeadCommandUUID = @"COUndoTrackStoreTrackHeadCommandUUID";
 NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTrackCurrentCommandUUID";
+NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompacted";
 
 @implementation COUndoTrackSerializedCommand
 @synthesize JSONData, metadata, UUID, parentUUID, trackName, timestamp, sequenceNumber;
 @end
 
 @implementation COUndoTrackState
-@synthesize trackName, headCommandUUID, currentCommandUUID;
+@synthesize trackName, headCommandUUID, currentCommandUUID, compacted;
 - (id)copyWithZone:(NSZone *)zone
 {
 	COUndoTrackState *aCopy = [COUndoTrackState new];
 	aCopy.trackName = self.trackName;
 	aCopy.headCommandUUID = self.headCommandUUID;
 	aCopy.currentCommandUUID = self.currentCommandUUID;
+	aCopy.compacted = self.compacted;
 	return aCopy;
 }
 - (BOOL) isEqual:(id)object
 {
 	if (![object isKindOfClass: [COUndoTrackState class]])
 		return NO;
+	
 	COUndoTrackState *otherState = object;
+
 	return [self.trackName isEqual: otherState.trackName]
 		&& [self.headCommandUUID isEqual: otherState.headCommandUUID]
 		&& ((self.currentCommandUUID == nil && otherState.currentCommandUUID == nil)
-			|| [self.currentCommandUUID isEqual: otherState.currentCommandUUID]);
+			|| [self.currentCommandUUID isEqual: otherState.currentCommandUUID])
+		&& self.compacted == otherState.compacted;
 }
 @end
 
@@ -126,31 +132,25 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 	NILARG_EXCEPTION_TEST(aURL);
 	INVALIDARG_EXCEPTION_TEST(aURL, aURL.isFileURL);
     SUPERINIT;
-	
-	BOOL isDir = NO;
-
-	if (![[NSFileManager defaultManager] fileExistsAtPath: aURL.path
-	                                          isDirectory: &isDir])
-	{
-		NSError *error = nil;
-
-		[[NSFileManager defaultManager] createDirectoryAtURL: aURL
-    	                         withIntermediateDirectories: YES
-    	                                          attributes: nil
-		                                               error: &error];
-		ETAssert(error == nil);
-	}
-	else
-	{
-		ETAssert(isDir);
-	}
 
 	_URL = aURL;
 	_modifiedTrackStateForTrackName = [NSMutableDictionary new];
-	
-    @autoreleasepool {
+	_queue = dispatch_queue_create([[NSString stringWithFormat: @"COUndoTrackStore-%p", self] UTF8String], NULL);
+	_transactionLock = dispatch_semaphore_create(1);
+
+   	__block BOOL ok = YES;
+    
+    dispatch_sync(_queue, ^() {
+		// Ignore if this fails (it will fail if the directory already exists).
+        // If it really fails, we will notice later when we try to open the db.
+        [[NSFileManager defaultManager] createDirectoryAtPath: _URL.path
+                                  withIntermediateDirectories: YES
+                                                   attributes: nil
+                                                        error: NULL];
+		
 		_db = [[FMDatabase alloc] initWithPath: [aURL.path stringByAppendingPathComponent: @"undo.sqlite"]];
 		[_db setShouldCacheStatements: YES];
+		[_db setCrashOnErrors: NO];
 		[_db setLogsErrors: YES];
 		assert([_db open]);
 		
@@ -163,22 +163,13 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 			}
 		}
 
-		[_db executeUpdate: @"PRAGMA foreign_keys = ON"];
-		if (1 != [_db intForQuery: @"PRAGMA foreign_keys"])
-		{
-			[NSException raise: NSGenericException format: @"Your SQLite version doesn't support foreign keys"];
-		}
-		
-		[_db executeUpdate: @"CREATE TABLE IF NOT EXISTS commands (id INTEGER PRIMARY KEY AUTOINCREMENT, "
-							 "uuid BLOB NOT NULL UNIQUE, parentid INTEGER, trackname STRING NOT NULL, data BLOB NOT NULL, "
-							 "metadata BLOB, timestamp INTEGER NOT NULL)"];
-		
-		// NULL currentid means "the start of the track"
-		[_db executeUpdate: @"CREATE TABLE IF NOT EXISTS tracks (trackname STRING PRIMARY KEY, "
-							 "headid INTEGER NOT NULL, currentid INTEGER, "
-							 "FOREIGN KEY(headid) REFERENCES commands(id), "
-							 "FOREIGN KEY(currentid) REFERENCES commands(id))"];
-	}
+        ok = [self setupSchema];
+	});
+
+    if (!ok)
+    {
+        return nil;
+    }
     return self;
 }
 
@@ -189,82 +180,225 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 
 - (void) dealloc
 {
-    [_db close];
+	assert(dispatch_get_current_queue() != _queue);
+    
+    dispatch_sync(_queue, ^() {
+    	[_db close];
+	});
+	
+#if !(TARGET_OS_IPHONE)
+	// N.B.: We are using deployment target 10.7, so ARC does not manage libdispatch objects.
+	// If we switch to deployment target 10.8, ARC will manage libdispatch objects automatically.
+	// For GNUstep, ARC doesn't manage libdispatch objects since libobjc2 doesn't support it 
+	// currently (we compile CoreObject with -DOS_OBJECT_USE_OBJC=0).
+	dispatch_release(_queue);
+	dispatch_release(_transactionLock);
+#endif
+}
+
+- (BOOL) setupSchema
+{
+	assert(dispatch_get_current_queue() == _queue);
+
+    /* SQLite compatibility */
+    
+	[_db executeUpdate: @"PRAGMA foreign_keys = ON"];
+	if (1 != [_db intForQuery: @"PRAGMA foreign_keys"])
+	{
+		[NSException raise: NSGenericException
+		            format: @"Your SQLite version doesn't support foreign keys"];
+	}
+	
+	[_db beginDeferredTransaction];
+
+	/* Store Metadata table (including schema version) */
+
+	if (![_db tableExists: @"storeMetadata"])
+	{
+		NSAssert(![_db tableExists: @"commands"], @"Unsupported unversioned schema");
+
+		[_db executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER)"];
+		[_db executeUpdate: @"INSERT INTO storeMetadata VALUES(1)"];
+	}
+	else
+	{
+		int version = [_db intForQuery: @"SELECT version FROM storeMetadata"];
+		if (1 != version)
+		{
+			NSLog(@"Error, undo track store version %d, only version 1 is supported", version);
+			[_db rollback];
+			return NO;
+		}
+	}
+	
+	/* Commands and Tracks tables */
+	
+	[_db executeUpdate: @"CREATE TABLE IF NOT EXISTS commands (id INTEGER PRIMARY KEY AUTOINCREMENT, "
+	                     "uuid BLOB NOT NULL UNIQUE, parentid INTEGER, trackname STRING NOT NULL, data BLOB NOT NULL, "
+	                     "metadata BLOB, timestamp INTEGER NOT NULL, deleted BOOLEAN DEFAULT 0)"];
+	
+	// NULL currentid means "the start of the track"
+	[_db executeUpdate: @"CREATE TABLE IF NOT EXISTS tracks (trackname STRING PRIMARY KEY, "
+	                     "headid INTEGER NOT NULL, currentid INTEGER, "
+	                     "FOREIGN KEY(headid) REFERENCES commands(id), "
+	                     "FOREIGN KEY(currentid) REFERENCES commands(id))"];
+
+    [_db commit];
+    
+    if ([_db hadError])
+    {
+        NSLog(@"Error %d: %@", [_db lastErrorCode], [_db lastErrorMessage]);
+        return NO;
+    }
+    return YES;
 }
 
 - (BOOL) beginTransaction
 {
-    return [_db executeUpdate: @"BEGIN EXCLUSIVE TRANSACTION"];
+	ETAssert([NSThread isMainThread]);
+
+	// If there is a background operation (e.g. mark as deleted, vacuum) underway,
+	// wait until it is finished
+	dispatch_semaphore_wait(_transactionLock, DISPATCH_TIME_FOREVER);
+
+    __block BOOL ok = NO;
+
+	dispatch_sync(_queue, ^() {
+		ok = [_db beginTransaction];
+	});
+
+	if (!ok)
+	{
+		dispatch_semaphore_signal(_transactionLock);
+	}
+	return ok;
 }
 
 - (BOOL) commitTransaction
 {
-    BOOL ok = [_db commit];
+	ETAssert([NSThread isMainThread]);
+	__block BOOL ok = NO;
+
+    dispatch_sync(_queue, ^() {
+		ok = [_db commit];
+	});
+
 	if (ok)
 	{
 		[self postCommitNotifications];
 	}
+	dispatch_semaphore_signal(_transactionLock);
 	return ok;
 }
 
 - (NSArray *) trackNames
 {
-	return [_db arrayForQuery: @"SELECT DISTINCT trackname FROM tracks"];
+    __block NSArray *result = nil;
+    assert(dispatch_get_current_queue() != _queue);
+    
+    dispatch_sync(_queue, ^() {
+        result = [_db arrayForQuery: @"SELECT DISTINCT trackname FROM tracks"];
+    });
+    return result;
 }
 
 - (NSArray *) trackNamesMatchingGlobPattern: (NSString *)aPattern
 {
-	return [_db arrayForQuery: @"SELECT DISTINCT trackname FROM tracks WHERE trackname GLOB ?", aPattern];
+    __block NSArray *result = nil;
+    assert(dispatch_get_current_queue() != _queue);
+    
+    dispatch_sync(_queue, ^() {
+        result = [_db arrayForQuery: @"SELECT DISTINCT trackname FROM tracks WHERE trackname GLOB ?", aPattern];
+    });
+    return result;
+}
+
+- (COUndoTrackState *)stateForTrackNameInCurrentQueue: (NSString *)aName
+{
+    assert(dispatch_get_current_queue() == _queue);
+
+	COUndoTrackState *result = nil;
+	FMResultSet *rs = [_db executeQuery:
+		@"SELECT track.trackname, head.uuid AS headuuid, current.uuid AS currentuuid "
+		 "FROM tracks AS track "
+		 "LEFT OUTER JOIN commands AS head ON track.headid = head.id "
+		 "LEFT OUTER JOIN commands AS current ON track.currentid = current.id "
+		 "WHERE track.trackname = ?", aName];
+
+	if ([rs next])
+	{
+		result = [COUndoTrackState new];
+		result.trackName = [rs stringForColumn: @"trackname"];
+		result.headCommandUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"headuuid"]];
+		if ([rs dataForColumn: @"currentuuid"] != nil)
+		{
+			result.currentCommandUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"currentuuid"]];
+		}
+		else
+		{
+			result.currentCommandUUID = nil;
+		}
+		
+		ETAssert(![result.currentCommandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+		ETAssert(![result.headCommandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+	}
+	[rs close];
+
+    return result;
 }
 
 - (COUndoTrackState *) stateForTrackName: (NSString*)aName
 {
-    FMResultSet *rs = [_db executeQuery: @"SELECT track.trackname, head.uuid AS headuuid, current.uuid AS currentuuid "
-										  "FROM tracks AS track "
-										  "LEFT OUTER JOIN commands AS head ON track.headid = head.id "
-										  "LEFT OUTER JOIN commands AS current ON track.currentid = current.id "
-										  "WHERE track.trackname = ?", aName];
-	COUndoTrackState *result = nil;
-    if ([rs next])
-    {
-		result = [COUndoTrackState new];
-		result.trackName = [rs stringForColumn: @"trackname"];
-		result.headCommandUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"headuuid"]];
-		result.currentCommandUUID = [rs dataForColumn: @"currentuuid"] != nil
-									? [ETUUID UUIDWithData: [rs dataForColumn: @"currentuuid"]]
-									: nil;
-		
-		ETAssert(![result.currentCommandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
-		ETAssert(![result.headCommandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
-    }
-    [rs close];
+	__block COUndoTrackState *result = nil;
+    assert(dispatch_get_current_queue() != _queue);
+    
+    dispatch_sync(_queue, ^() {
+    	result = [self stateForTrackNameInCurrentQueue: aName];
+	});
+
     return result;
 }
 
 - (void) setTrackState: (COUndoTrackState *)aState
 {
-	ETAssert([_db inTransaction]);
+    assert(dispatch_get_current_queue() != _queue);
+	ETAssert([NSThread isMainThread]);
 	ETAssert(![aState.headCommandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
 	ETAssert(![aState.currentCommandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
 	
-	[_db executeUpdate: @"INSERT OR REPLACE INTO tracks (trackname, headid, currentid) "
-						@"VALUES (?, (SELECT id FROM commands WHERE uuid = ?), (SELECT id FROM commands WHERE uuid = ?))",
-						aState.trackName, [aState.headCommandUUID dataValue], [aState.currentCommandUUID dataValue]];
+	dispatch_sync(_queue, ^() {
+		ETAssert([_db inTransaction]);
+
+		[_db executeUpdate: @"INSERT OR REPLACE INTO tracks (trackname, headid, currentid) "
+		                    @"VALUES (?, (SELECT id FROM commands WHERE uuid = ?),"
+		                               @"(SELECT id FROM commands WHERE uuid = ?))",
+			aState.trackName, [aState.headCommandUUID dataValue], [aState.currentCommandUUID dataValue]];
+	});
+
 	_modifiedTrackStateForTrackName[aState.trackName] = [aState copy];
 }
 
 - (void) removeTrackWithName: (NSString*)aName
 {
-	ETAssert([_db inTransaction]);
-	[_db executeUpdate: @"DELETE FROM tracks WHERE trackname = ?", aName];
-	[_db executeUpdate: @"DELETE FROM commands WHERE trackname = ?", aName];
+    assert(dispatch_get_current_queue() != _queue);
+
+	dispatch_sync(_queue, ^() {
+		ETAssert([_db inTransaction]);
+
+		[_db executeUpdate: @"DELETE FROM tracks WHERE trackname = ?", aName];
+		[_db executeUpdate: @"DELETE FROM commands WHERE trackname = ?", aName];
+	});
 }
 
 - (NSArray *) allCommandUUIDsOnTrackWithName: (NSString*)aName
 {
-	return [[_db arrayForQuery: @"SELECT uuid FROM commands WHERE trackname = ?", aName] mappedCollectionWithBlock: ^(id object) {
-		return [ETUUID UUIDWithData: object];
-	}];
+	__block NSArray *result = nil;
+    assert(dispatch_get_current_queue() != _queue);
+    
+    dispatch_sync(_queue, ^() {
+        result = [[_db arrayForQuery: @"SELECT uuid FROM commands WHERE trackname = ? and deleted = 0", aName] mappedCollectionWithBlock: ^(id object) { return [ETUUID UUIDWithData: object]; }];
+    });
+    return result;
 }
 
 - (NSData *) serialize: (id)json
@@ -283,55 +417,180 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 
 - (void) addCommand: (COUndoTrackSerializedCommand *)aCommand
 {
+	assert(dispatch_get_current_queue() != _queue);
 	ETAssert(![aCommand.parentUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
 	ETAssert(![aCommand.UUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
 	
-	[_db executeUpdate: @"INSERT INTO commands(uuid, parentid, trackname, data, metadata, timestamp) "
-						@"VALUES(?, (SELECT id FROM commands WHERE uuid = ?), ?, ?, ?, ?)",
-		[aCommand.UUID dataValue],
-		[aCommand.parentUUID dataValue],
-		aCommand.trackName,
-		[self serialize: aCommand.JSONData],
-		[self serialize: aCommand.metadata],
-		CODateToJavaTimestamp(aCommand.timestamp)];
-	aCommand.sequenceNumber = [_db lastInsertRowId];
+	__block int64_t rowid = -1;
+	
+	dispatch_sync(_queue, ^() {
+		[_db executeUpdate: @"INSERT INTO commands(uuid, parentid, trackname, data, metadata, timestamp) "
+		                    @"VALUES(?, (SELECT id FROM commands WHERE uuid = ?), ?, ?, ?, ?)",
+		                    [aCommand.UUID dataValue],
+		                    [aCommand.parentUUID dataValue],
+		                    aCommand.trackName,
+		                    [self serialize: aCommand.JSONData],
+		                    [self serialize: aCommand.metadata],
+		                    CODateToJavaTimestamp(aCommand.timestamp)];
+	
+	 	rowid = [_db lastInsertRowId];
+	});
+	 
+	aCommand.sequenceNumber = rowid;
 }
 
 - (COUndoTrackSerializedCommand *) commandForUUID: (ETUUID *)aUUID
 {
-    FMResultSet *rs = [_db executeQuery: @"SELECT c.id, parent.uuid AS parentuuid, c.trackname, c.data, c.metadata, c.timestamp "
-										  "FROM commands AS c "
-										  "LEFT OUTER JOIN commands AS parent ON c.parentid = parent.id "
-										  "WHERE c.uuid = ?", [aUUID dataValue]];
-	COUndoTrackSerializedCommand *result = nil;
-    if ([rs next])
-    {
-		result = [COUndoTrackSerializedCommand new];
-		result.JSONData = [self deserialize: [rs dataForColumn: @"data"]];
-		result.metadata = [self deserialize: [rs dataForColumn: @"metadata"]];
-		result.UUID = aUUID;
-		ETAssert(![result.UUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
-		if ([rs dataForColumn: @"parentuuid"] != nil)
+	assert(dispatch_get_current_queue() != _queue);
+	__block COUndoTrackSerializedCommand *result = nil;
+
+	dispatch_sync(_queue, ^() {
+		FMResultSet *rs = [_db executeQuery:
+			@"SELECT c.id, parent.uuid AS parentuuid, c.trackname, c.data, c.metadata, c.timestamp "
+			 "FROM commands AS c "
+			 "LEFT OUTER JOIN commands AS parent ON c.parentid = parent.id "
+			 "WHERE c.uuid = ? and c.deleted = 0", [aUUID dataValue]];
+
+
+		if ([rs next])
 		{
-			result.parentUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"parentuuid"]];
-			ETAssert(![result.parentUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+			result = [COUndoTrackSerializedCommand new];
+
+			result.JSONData = [self deserialize: [rs dataForColumn: @"data"]];
+			result.metadata = [self deserialize: [rs dataForColumn: @"metadata"]];
+			result.UUID = aUUID;
+			ETAssert(![result.UUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+
+			if ([rs dataForColumn: @"parentuuid"] != nil)
+			{
+				result.parentUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"parentuuid"]];
+				ETAssert(![result.parentUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+			}
+
+			result.trackName = [rs stringForColumn: @"trackname"];
+			result.timestamp = CODateFromJavaTimestamp([rs numberForColumn: @"timestamp"]);
+			result.sequenceNumber = [rs longForColumn: @"id"];
 		}
-		result.trackName = [rs stringForColumn: @"trackname"];
-		result.timestamp = CODateFromJavaTimestamp([rs numberForColumn: @"timestamp"]);
-		result.sequenceNumber = [rs longForColumn: @"id"];
-    }
-    [rs close];
+		[rs close];
+	});
+
     return result;
 }
 
 - (void) removeCommandForUUID: (ETUUID *)aUUID
 {
-	[_db executeUpdate: @"DELETE FROM commands WHERE uuid = ?", [aUUID dataValue]];
+	assert(dispatch_get_current_queue() != _queue);
+	
+	dispatch_sync(_queue, ^() {
+		[_db executeUpdate: @"DELETE FROM commands WHERE uuid = ?", [aUUID dataValue]];
+	});
 }
 
 - (BOOL) string: (NSString *)aString matchesGlobPattern: (NSString *)aPattern
 {
-	return [_db boolForQuery: @"SELECT 1 WHERE ? GLOB ?", aString, aPattern];
+	assert(dispatch_get_current_queue() != _queue);
+	__block BOOL result = NO;
+
+	dispatch_sync(_queue, ^() {
+		result = [_db boolForQuery: @"SELECT 1 WHERE ? GLOB ?", aString, aPattern];
+	});
+	
+	return result;
+}
+
+- (void)markCommandsAsDeletedForUUIDs: (NSArray *)UUIDs
+{
+	assert(dispatch_get_current_queue() != _queue);
+
+	// If there is a transaction underway, wait until it is finished
+	dispatch_semaphore_wait(_transactionLock, DISPATCH_TIME_FOREVER);
+	
+	__block NSArray *compactedTrackNames = nil;
+
+	// This can be run in background
+	dispatch_sync(_queue, ^() {
+		[_db beginTransaction];
+
+		for (ETUUID *UUID in UUIDs)
+		{
+			[_db executeUpdate: @"UPDATE commands SET deleted = 1 WHERE uuid = ?", [UUID dataValue]];
+		}
+
+		compactedTrackNames =
+			[_db arrayForQuery: @"SELECT DISTINCT trackname FROM commands WHERE deleted = 1 "];
+
+		[_db commit];
+	});
+
+	/* This must be run in the main thread:
+	   - no one must access _modifiedTrackStateForTrackName at the same time
+	   - we must post the commit notification immediately
+	   
+	   If we post it with some delay, someone could touch 
+	   _modifiedTrackStateForTrackName and overwrite COUndoTrackState.compacted. */
+	dispatch_sync_now(dispatch_get_main_queue(), ^() {
+		dispatch_sync(_queue, ^() {
+			[_db beginTransaction];
+
+			for (NSString *trackName in compactedTrackNames)
+			{
+				if (_modifiedTrackStateForTrackName[trackName] == nil)
+				{
+					_modifiedTrackStateForTrackName[trackName] = [self stateForTrackNameInCurrentQueue: trackName];
+				}
+				((COUndoTrackState *)_modifiedTrackStateForTrackName[trackName]).compacted = YES;
+			}
+
+			[_db commit];
+		});
+
+		[self postCommitNotifications];
+	});
+
+	dispatch_semaphore_signal(_transactionLock);
+}
+
+- (void)finalizeDeletions
+{
+	assert(dispatch_get_current_queue() != _queue);
+
+	// If there is a transaction underway, wait until it is finished
+	dispatch_semaphore_wait(_transactionLock, DISPATCH_TIME_FOREVER);
+	dispatch_sync(_queue, ^() {
+		[_db executeUpdate: @"DELETE FROM commands WHERE deleted = 1"];
+	});
+	dispatch_semaphore_signal(_transactionLock);
+}
+
+/**
+ * We run vacuum with dispatch_sync() in a queue, so we can sure no other
+ * threads access the database when we invoke -vacuum in a background thread.
+ */
+- (BOOL)vacuum
+{
+    assert(dispatch_get_current_queue() != _queue);
+	__block BOOL success = NO;
+
+	// If there is a transaction underway, wait until it is finished
+	dispatch_semaphore_wait(_transactionLock, DISPATCH_TIME_FOREVER);
+	dispatch_sync(_queue, ^() {
+		success = [_db executeUpdate: @"VACUUM"];
+	});
+	dispatch_semaphore_signal(_transactionLock);
+	
+	return success;
+}
+
+- (NSDictionary *)pageStatistics
+{
+    assert(dispatch_get_current_queue() != _queue);
+	__block NSDictionary *statistics = nil;
+
+    dispatch_sync(_queue, ^() {
+		statistics = pageStatisticsForDatabase(_db);
+	});
+	
+	return statistics;
 }
 
 - (void) postCommitNotificationsWithUserInfo: (NSDictionary *)userInfo
@@ -364,6 +623,7 @@ NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTra
 		{
 			userInfo[COUndoTrackStoreTrackCurrentCommandUUID] = [state.currentCommandUUID stringValue];
 		}
+		userInfo[COUndoTrackStoreTrackCompacted] = @(state.compacted);
 
 		[self postCommitNotificationsWithUserInfo: userInfo];
 		

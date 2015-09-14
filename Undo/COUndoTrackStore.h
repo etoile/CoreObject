@@ -6,6 +6,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#include <dispatch/dispatch.h>
 
 @class COUndoTrack;
 @class FMDatabase;
@@ -45,6 +46,8 @@
 	NSURL *_URL;
     FMDatabase *_db;
 	NSMutableDictionary *_modifiedTrackStateForTrackName;
+	dispatch_queue_t _queue;
+	dispatch_semaphore_t _transactionLock;
 }
 
 

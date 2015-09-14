@@ -79,9 +79,16 @@
  */
 - (BOOL) deleteRevids: (NSIndexSet *)revids;
 
+/**
+ * Returns a revision set containing all the revids used in the backing store.
+ *
+ * Initially this revision set starts at zero, but after compacting the history
+ * the first index corresponds to the first kept revision.
+ */
 - (NSIndexSet *) revidsUsedRange;
 
 - (int64_t) revidForUUID: (ETUUID *)aUUID;
+- (NSIndexSet *)revidsForUUIDs: (NSArray *)UUIDs;
 
 - (ETUUID *) revisionUUIDForRevid: (int64_t)aRevid;
 

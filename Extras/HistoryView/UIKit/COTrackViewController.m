@@ -111,9 +111,22 @@
 	}
 	
 	cell.textLabel.text = node.localizedShortDescription;
-	cell.backgroundColor = [self suggestedColorForNode: node];
-	
+	cell.textLabel.textColor = [self suggestedColorForNode: node];
+
 	return cell;
+}
+
+- (void)checkRow: (UITableViewCell *)cell
+{
+	cell.accessoryType = UITableViewCellAccessoryCheckmark;
+}
+
+- (void)uncheckRow: (UITableViewCell *)cell
+{
+	if (cell.accessoryType != UITableViewCellAccessoryCheckmark)
+		return;
+
+	cell.accessoryType = UITableViewCellAccessoryNone;
 }
 
 #pragma mark - Reacting to Track Changes
@@ -135,6 +148,11 @@
 	[self.track redo];
 }
 
+- (void)didSelectNode: (id <COTrackNode>)aNode
+{
+	[self.track setCurrentNode: aNode];
+}
+
 #pragma mark - Table View Data Source
 
 - (NSInteger)tableView: (UITableView *)tableView numberOfRowsInSection: (NSInteger)section
@@ -146,15 +164,32 @@
          cellForRowAtIndexPath: (NSIndexPath *)indexPath
 {
 	ETAssert(self.tableView == tableView);
-	return [self makeCellForNode: [self nodeForRowAtIndexPath: indexPath]];
+	id <COTrackNode> node = [self nodeForRowAtIndexPath: indexPath];
+	UITableViewCell *cell = [self makeCellForNode: node];
+	
+	if ([[self.track currentNode] isEqual: node])
+	{
+		[self checkRow: cell];
+	}
+	else
+	{
+		[self uncheckRow: cell];
+	}
+	
+	return cell;
 }
 
 - (void)tableView: (UITableView *)tableView didSelectRowAtIndexPath: (NSIndexPath *)indexPath
 {
-	NSLog(@"Select row at %@", indexPath);
+	[self uncheckRow: [tableView cellForRowAtIndexPath: _checkedIndexPath]];
+	[self checkRow: [tableView cellForRowAtIndexPath: indexPath]];
+	_checkedIndexPath = indexPath;
+
+	[self.tableView deselectRowAtIndexPath: indexPath
+	                              animated: NO];
 	
 	/* Will trigger -trackDidUpdate: */
-	self.track.currentNode = [self nodeForRowAtIndexPath: indexPath];
+	[self didSelectNode: [self nodeForRowAtIndexPath: indexPath]];
 }
 
 @end

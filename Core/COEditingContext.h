@@ -15,6 +15,27 @@
 @class COError;
 
 /**
+ * The behavior to decide when the editing context should unload persistent 
+ * roots.
+ *
+ * TODO: If we keep it around, this should probably become a mask.
+ */
+typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
+	/**
+	 * Persistent roots cannot be unloaded, except uncommitted persistent roots
+	 * on deletion.
+	 */
+	COEditingContextUnloadingBehaviorNever,
+	/**
+	 * Persistent roots can be unloaded on deletion.
+	 *
+     * For external deletions committed in other editing contexts, persistent
+	 * roots will unloaded in the current one.
+	 */
+	COEditingContextUnloadingBehaviorOnDeletion
+};
+
+/**
  * @group Core
  * @abstract An editing context exposes an in-memory snapshot of a CoreObject 
  * store, allows the user to queue changes in memory and commit them atomically. 
@@ -126,6 +147,7 @@
 	ETModelDescriptionRepository *_modelDescriptionRepository;
 	/** Loaded (or inserted) persistent roots by UUID */
 	NSMutableDictionary *_loadedPersistentRoots;
+	COEditingContextUnloadingBehavior _unloadingBehavior;
     /** Set of persistent roots pending deletion */
 	NSMutableSet *_persistentRootsPendingDeletion;
     /** Set of persistent roots pending undeletion */
@@ -273,6 +295,12 @@
  * root using that root object.
  */
 - (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName;
+/**
+ * The conditions to unload persistent roots.
+ *
+ * By default, returns COEditingContextUnloadingOnDeletion.
+ */
+@property (nonatomic, assign) COEditingContextUnloadingBehavior unloadingBehavior;
 
 
 /** @taskunit Pending Changes */
@@ -455,3 +483,21 @@ extern NSString * const COEditingContextDidChangeNotification;
  * See userInfo explanation in COEditingContextDidChangeNotification.
  */
 extern NSString * const kCOCommandKey;
+
+
+/**
+ * Posted by when one ore more persistent roots have been unloaded (usually due 
+ * to deletion).
+ *
+ * Use this notification to release any references to these persistent roots. 
+ *
+ * To get a new reference immediately, you can force a reloading with 
+ * -persistentRootForUUID:.
+ *
+ * The sender is the COEditingContext that does the unloading.
+ */
+extern NSString * const COEditingContextDidUnloadPersistentRootsNotification;
+/**
+ * The unloaded COPersistentRoot set.
+ */
+extern NSString * const kCOUnloadedPersistentRootsKey;

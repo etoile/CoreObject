@@ -6,6 +6,7 @@
  */
 
 #import "COSQLiteStore.h"
+#import "COSQLiteStore+Private.h"
 #import "COSQLiteStorePersistentRootBackingStore.h"
 #import "CORevisionInfo.h"
 #import <EtoileFoundation/Macros.h>
@@ -13,7 +14,9 @@
 
 #import "COItem.h"
 #import "COSQLiteStore+Attachments.h"
+#import "COSQLiteUtilities.h"
 #import "COSearchResult.h"
+#import "COBasicHistoryCompaction.h"
 #import "COBranchInfo.h"
 #import "COJSONSerialization.h"
 #import "COPersistentRootInfo.h"
@@ -35,6 +38,8 @@ NSString * const kCOStorePersistentRootTransactionIDs = @"COPersistentRootTransa
 NSString * const kCOStoreInsertedPersistentRoots = @"COStoreInsertedPersistentRoots";
 NSString * const kCOStoreUpdatedPersistentRoots = @"COStoreUpdatedPersistentRoots";
 NSString * const kCOStoreDeletedPersistentRoots = @"COStoreDeletedPersistentRoots";
+NSString * const kCOStoreCompactedPersistentRoots = @"COStoreCompactedPersistentRoots";
+NSString * const kCOStoreFinalizedPersistentRoots = @"COStoreFinalizedPersistentRoots";
 NSString * const kCOStoreUUID = @"COStoreUUID";
 NSString * const kCOStoreURL = @"COStoreURL";
 
@@ -51,6 +56,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 
 @implementation COSQLiteStore
 
+@synthesize maxNumberOfDeltaCommits = _maxNumberOfDeltaCommits;
+
 - (id)initWithURL: (NSURL*)aURL
 {
 	SUPERINIT;
@@ -60,6 +67,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 	url_ = aURL;
 	backingStores_ = [[NSMutableDictionary alloc] init];
     backingStoreUUIDForPersistentRootUUID_ = [[NSMutableDictionary alloc] init];
+	_maxNumberOfDeltaCommits = 50;
+
     __block BOOL ok = YES;
     
     dispatch_sync(queue_, ^() {
@@ -119,6 +128,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 
 - (BOOL) setupSchema
 {
+	assert(dispatch_get_current_queue() == queue_);
+
     [db_ beginDeferredTransaction];
     
     /* Store Metadata tables (including schema version) */
@@ -261,13 +272,30 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         
 		// gather deleted persistent root UUIDs
 		
+		/* Since we don't allow committing to a deleted persistent root, this 
+		   means these deleted UUIDs won't include persistent roots deleted in 
+		   a previous commit. */
+		for (ETUUID *modifiedUUID in [aTransaction persistentRootUUIDs])
+        {
+			const BOOL isPresent = [db_ boolForQuery: @"SELECT COUNT(*) > 0 FROM persistentroots WHERE uuid = ? AND deleted = 1", [modifiedUUID dataValue]];
+			
+			if (isPresent)
+				[deletedUUIDs addObject: modifiedUUID];
+        }
+
+		// TODO: Turn on if we decide to write history compaction changes with
+		// this method.
+#if 0
+		// gather finalized persistent root UUIDs
+
 		for (ETUUID *modifiedUUID in [aTransaction persistentRootUUIDs])
         {
 			const BOOL isPresent = [db_ boolForQuery: @"SELECT COUNT(*) > 0 FROM persistentroots WHERE uuid = ?", [modifiedUUID dataValue]];
 			
 			if (!isPresent)
-				[deletedUUIDs addObject: modifiedUUID];
+				[finalizedUUIDs addObject: modifiedUUID];
         }
+#endif
 		
         if (!ok)
         {
@@ -284,7 +312,9 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 	{
 		[self postCommitNotificationsWithTransactionIDForPersistentRootUUID: txnIDForPersistentRoot
 													insertedPersistentRoots: insertedUUIDs
-													 deletedPersistentRoots: deletedUUIDs];
+													 deletedPersistentRoots: deletedUUIDs
+		                                           compactedPersistentRoots: @[]
+		                                           finalizedPersistentRoots: @[]];
 	}
 	else
 	{
@@ -348,6 +378,14 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
                                 options: (COBranchRevisionReadingOptions)options
 {
 	ETUUID *prootUUID = [self persistentRootUUIDForBranchUUID: aBranchUUID];
+	if (prootUUID == nil)
+	{
+		[NSException raise: NSInternalInconsistencyException
+		            format: @"For branch %@, the persistent root doesn't exist "
+		                     "in the store. This usually means the persistent "
+		                     "root has been finalized and this branch doesn't "
+		                     "exist anymore.", aBranchUUID];
+	}
 	ETUUID *headRevUUID = [self headRevisionUUIDForBranchUUID: aBranchUUID];
 
     __block NSArray *result = nil;
@@ -869,118 +907,16 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     return YES;
 }
 
-- (BOOL) finalizeDeletionsForPersistentRoots: (NSArray *)persistentRootUUIDs
+- (BOOL) finalizeDeletionsForPersistentRoots: (NSSet *)persistentRootUUIDs
 									   error: (NSError **)error
 {
     NILARG_EXCEPTION_TEST(persistentRootUUIDs);
-    
-    assert(dispatch_get_current_queue() != queue_);
-    
-    dispatch_sync(queue_, ^(){
-        
-        [db_ beginTransaction];
-        
-        // Delete rows from branches and persistentroots tables
-		
-		for (ETUUID *persistentRoot in persistentRootUUIDs)
-		{
-			NSData *persistentRootData = [persistentRoot dataValue];
-			
-			[db_ executeUpdate: @"DELETE FROM branches WHERE deleted = 1 AND proot = ?", persistentRootData];
-			
-			if ([db_ boolForQuery: @"SELECT deleted FROM persistentroots WHERE uuid = ?", persistentRootData])
-			{
-				[db_ executeUpdate: @"DELETE FROM branches WHERE proot = ?", persistentRootData];
-				[db_ executeUpdate: @"DELETE FROM persistentroots WHERE uuid = ?", persistentRootData];
-			}
-		}
-
-		// Delete unused backing stores
-		
-		NSArray *unusedBackingstoreUUIDDatas =
-			[db_ arrayForQuery: @"SELECT backingstore "
-			 "FROM persistentroot_backingstores "
-			 "LEFT OUTER JOIN (SELECT uuid, 1 AS present FROM persistentroots) USING(uuid) "
-			 "GROUP BY backingstore "
-			 "HAVING 0 = COALESCE(SUM(present), 0)"];
-		for (NSData *backingstoreUUIDData in unusedBackingstoreUUIDDatas)
-		{
-			[self deleteBackingStoreWithUUID: [ETUUID UUIDWithData: backingstoreUUIDData]];
-		}
-		
-		// Gather backing stores that need revision GC
-		
-		NSMutableSet *backingStoresForRevisionGC = [NSMutableSet new];
-		for (ETUUID *persistentRoot in persistentRootUUIDs)
-		{
-			NSData *persistentRootData = [persistentRoot dataValue];
-			
-			NSData *backingStoreData = [db_ dataForQuery: @"SELECT backingstore FROM persistentroot_backingstores WHERE uuid = ?", persistentRootData];
-						
-			// Don't attempt revision GC on backing stores we just deleted
-			if (![unusedBackingstoreUUIDDatas containsObject: backingStoreData])
-			{
-				[backingStoresForRevisionGC addObject:
-				 [ETUUID UUIDWithData: backingStoreData]];
-			}
-		}
-		
-		// Do the revision GC
-		
-		for (ETUUID *backingUUID in backingStoresForRevisionGC)
-		{
-			NSData *backingUUIDData = [backingUUID dataValue];
-		
-			COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID error: NULL];
-			
-			// Delete just the unreachable revisions
-			
-			NSMutableIndexSet *keptRevisions = [NSMutableIndexSet indexSet];
-			
-			FMResultSet *rs = [db_ executeQuery: @"SELECT "
-							   "branches.current_revid "
-							   "FROM persistentroots "
-							   "INNER JOIN branches ON persistentroots.uuid = branches.proot "
-							   "INNER JOIN persistentroot_backingstores ON persistentroots.uuid = persistentroot_backingstores.uuid "
-							   "WHERE persistentroot_backingstores.backingstore = ?", backingUUIDData];
-			while ([rs next])
-			{
-				ETUUID *head = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-				
-				NSIndexSet *revs = [backing revidsFromRevid: 0
-													toRevid: [backing revidForUUID: head]];
-				[keptRevisions addIndexes: revs];
-			}
-			[rs close];
-			
-			// Now for each index set in deletedRevisionsForBackingStore, subtract the index set
-			// in keptRevisionsForBackingStore
-			
-			NSMutableIndexSet *deletedRevisions = [NSMutableIndexSet indexSet];
-			[deletedRevisions addIndexes: [backing revidsUsedRange]];
-			[deletedRevisions removeIndexes: keptRevisions];
-			
-			//    for (NSUInteger i = [deletedRevisions firstIndex]; i != NSNotFound; i = [deletedRevisions indexGreaterThanIndex: i])
-			//    {
-			//
-			//        [db_ executeUpdate: @"DELETE FROM attachment_refs WHERE root_id = ? AND revid = ?",
-			//         [backingUUID dataValue],
-			//         [NSNumber numberWithLongLong: i]];
-			//
-			//        // FIXME: FTS, proot_refs
-			//    }
-			
-			// Delete the actual revisions
-			assert([backing deleteRevids: deletedRevisions]);
-		}
-		
-		assert([db_ commit]);
-		
-        [self finalizeGarbageAttachments];
-    });
-    
-    return YES;
-
+    COBasicHistoryCompaction *compaction = [COBasicHistoryCompaction new];
+	
+	compaction.finalizablePersistentRootUUIDs = persistentRootUUIDs;
+	compaction.compactablePersistentRootUUIDs = persistentRootUUIDs;
+	
+	return [self compactHistory: compaction];
 }
 
 
@@ -988,7 +924,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 - (BOOL) finalizeDeletionsForPersistentRoot: (ETUUID *)aRoot
                                       error: (NSError **)error
 {
-	return [self finalizeDeletionsForPersistentRoots: @[aRoot] error: error];
+	return [self finalizeDeletionsForPersistentRoots: [NSSet setWithObject: aRoot]
+	                                           error: error];
 }
 
 /**
@@ -1020,6 +957,30 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     return results;
 }
 
+- (BOOL)vacuum
+{
+    assert(dispatch_get_current_queue() != queue_);
+	__block BOOL success = NO;
+
+    dispatch_sync(queue_, ^() {
+       	success = [db_ executeUpdate: @"VACUUM"];
+	});
+
+	return success;
+}
+
+- (NSDictionary *)pageStatistics
+{
+    assert(dispatch_get_current_queue() != queue_);
+	__block NSDictionary *statistics = nil;
+
+    dispatch_sync(queue_, ^() {
+		statistics = pageStatisticsForDatabase(db_);
+	});
+	
+	return statistics;
+}
+
 /**
  * We could put this code in a block passed to dispatch_async(dispatch_get_main_queue(), theBlock) 
  * and  call dispatch_async() in our  caller, but dispatch_get_main_queue() is only supported for 
@@ -1046,11 +1007,15 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 - (void) postCommitNotificationsWithTransactionIDForPersistentRootUUID: (NSDictionary *)txnIDForPersistentRoot
 											   insertedPersistentRoots: (NSArray *)insertedUUIDs
 												deletedPersistentRoots: (NSArray *)deletedUUIDs
+                                              compactedPersistentRoots: (NSArray *)compactedUUIDs
+                                              finalizedPersistentRoots: (NSArray *)finalizedUUIDs
 {
 	NSMutableDictionary *stringTxnIDForPersistentRoot = [[NSMutableDictionary alloc] init];
 	NSMutableArray *deletedUUIDStrings = [NSMutableArray new];
 	NSMutableArray *insertedUUIDStrings = [NSMutableArray new];
-	
+	NSMutableArray *compactedUUIDStrings = [NSMutableArray new];
+	NSMutableArray *finalizedUUIDStrings = [NSMutableArray new];
+
 	for (ETUUID *persistentRootUUID in txnIDForPersistentRoot)
     {
 		stringTxnIDForPersistentRoot[[persistentRootUUID stringValue]] = txnIDForPersistentRoot[persistentRootUUID];
@@ -1063,10 +1028,20 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 	{
 		[deletedUUIDStrings addObject: persistentRootUUID.stringValue];
 	}
-	
+	for (ETUUID *persistentRootUUID in compactedUUIDs)
+	{
+		[compactedUUIDStrings addObject: persistentRootUUID.stringValue];
+	}
+	for (ETUUID *persistentRootUUID in finalizedUUIDs)
+	{
+		[finalizedUUIDStrings addObject: persistentRootUUID.stringValue];
+	}
+
 	NSDictionary *userInfo = @{kCOStorePersistentRootTransactionIDs : stringTxnIDForPersistentRoot,
 							   kCOStoreDeletedPersistentRoots : deletedUUIDStrings,
 							   kCOStoreInsertedPersistentRoots : insertedUUIDStrings,
+							   kCOStoreCompactedPersistentRoots : compactedUUIDStrings,
+							   kCOStoreFinalizedPersistentRoots : finalizedUUIDStrings,
 							   kCOStoreUUID : [[self UUID] stringValue],
 							   kCOStoreURL : [[self URL] absoluteString]};
 

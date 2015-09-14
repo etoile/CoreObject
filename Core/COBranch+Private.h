@@ -19,7 +19,8 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (void)updateWithBranchInfo: (COBranchInfo *)branchInfo;
+- (void)updateWithBranchInfo: (COBranchInfo *)branchInfo
+                   compacted: (BOOL)wasCompacted;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
@@ -53,7 +54,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (void)updateRevisions;
+- (void)updateRevisions: (BOOL)reload;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
