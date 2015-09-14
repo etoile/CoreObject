@@ -58,7 +58,6 @@
 
 @property (nonatomic, readonly) NSPointerArray *backing;
 
-- (NSUInteger)referencesCount;
 - (id)referenceAtIndex: (NSUInteger)index;
 - (void)addReference: (id)aReference;
 - (void)replaceReferenceAtIndex: (NSUInteger)index withReference: (id)aReference;
