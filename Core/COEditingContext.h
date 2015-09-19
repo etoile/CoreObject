@@ -14,6 +14,14 @@
 @class COCrossPersistentRootDeadRelationshipCache, CORevisionCache;
 @class COError;
 
+#ifndef NS_ENUM
+#	if __has_feature(objc_fixed_enum)
+#		define NS_ENUM(type, name) enum name : type name; enum name : type
+#	else
+#		define NS_ENUM(type, name) type name; enum
+#	endif
+#endif // NS_ENUM
+
 /**
  * The behavior to decide when the editing context should unload persistent 
  * roots.
