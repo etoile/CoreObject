@@ -9,6 +9,10 @@
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
 
+#ifndef DISPATCH_CURRENT_QUEUE_LABEL
+#	define DISPATCH_CURRENT_QUEUE_LABEL (dispatch_get_current_queue())
+#endif
+
 void dispatch_sync_now(dispatch_queue_t queue, dispatch_block_t block) {
 	const char *currentQueueLabel = dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL);
 
