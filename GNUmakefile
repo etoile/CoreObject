@@ -34,7 +34,8 @@ endif
 
 OTHER_HEADER_DIRS = . Core Debugging Diff Extras/Diff Extras/Model Extras/ValueTransformers Model Store Undo Synchronization Synchronization/Messages Utilities StorageDataModel SchemaMigration
 
-CoreObject_HEADER_FILES = $(foreach dir, ${OTHER_HEADER_DIRS}, $(addprefix ${dir}/, $(notdir $(wildcard ${dir}/*.h))))
+CoreObject_HEADER_FILES_DIR = $(COLLECTED_HEADER_DIR)
+CoreObject_HEADER_FILES = $(foreach dir, ${OTHER_HEADER_DIRS}, $(notdir $(wildcard ${dir}/*.h)))
 
 CoreObject_OBJC_FILES += $(wildcard Core/*.m)
 CoreObject_OBJC_FILES += $(wildcard Diff/*.m)
