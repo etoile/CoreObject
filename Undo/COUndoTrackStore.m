@@ -267,13 +267,15 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
     __block BOOL ok = NO;
 
-	dispatch_sync(_queue, ^() {
-		ok = [_db beginTransaction];
-	});
-
-	if (!ok)
-	{
-		dispatch_semaphore_signal(_transactionLock);
+	@try {
+		dispatch_sync(_queue, ^() {
+			ok = [_db beginTransaction];
+		});
+	} @finally {
+		if (!ok)
+		{
+			dispatch_semaphore_signal(_transactionLock);
+		}
 	}
 	return ok;
 }
@@ -508,50 +510,54 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
 	// If there is a transaction underway, wait until it is finished
 	dispatch_semaphore_wait(_transactionLock, DISPATCH_TIME_FOREVER);
-	
-	__block NSArray *compactedTrackNames = nil;
 
-	// This can be run in background
-	dispatch_sync(_queue, ^() {
-		[_db beginTransaction];
-
-		for (ETUUID *UUID in UUIDs)
-		{
-			[_db executeUpdate: @"UPDATE commands SET deleted = 1 WHERE uuid = ?", [UUID dataValue]];
-		}
-
-		compactedTrackNames =
-			[_db arrayForQuery: @"SELECT DISTINCT trackname FROM commands WHERE deleted = 1 "];
-
-		[_db commit];
-	});
-
-	/* This must be run in the main thread:
-	   - no one must access _modifiedTrackStateForTrackName at the same time
-	   - we must post the commit notification immediately
-	   
-	   If we post it with some delay, someone could touch 
-	   _modifiedTrackStateForTrackName and overwrite COUndoTrackState.compacted. */
-	dispatch_sync_now(dispatch_get_main_queue(), ^() {
+	@try
+	{
+		__block NSArray *compactedTrackNames = nil;
+		// This can be run in background
 		dispatch_sync(_queue, ^() {
 			[_db beginTransaction];
 
-			for (NSString *trackName in compactedTrackNames)
+			for (ETUUID *UUID in UUIDs)
 			{
-				if (_modifiedTrackStateForTrackName[trackName] == nil)
-				{
-					_modifiedTrackStateForTrackName[trackName] = [self stateForTrackNameInCurrentQueue: trackName];
-				}
-				((COUndoTrackState *)_modifiedTrackStateForTrackName[trackName]).compacted = YES;
+				[_db executeUpdate: @"UPDATE commands SET deleted = 1 WHERE uuid = ?", [UUID dataValue]];
 			}
+
+			compactedTrackNames =
+			[_db arrayForQuery: @"SELECT DISTINCT trackname FROM commands WHERE deleted = 1 "];
 
 			[_db commit];
 		});
 
-		[self postCommitNotifications];
-	});
+		/* This must be run in the main thread:
+		 - no one must access _modifiedTrackStateForTrackName at the same time
+		 - we must post the commit notification immediately
 
-	dispatch_semaphore_signal(_transactionLock);
+		 If we post it with some delay, someone could touch
+		 _modifiedTrackStateForTrackName and overwrite COUndoTrackState.compacted. */
+		dispatch_sync_now(dispatch_get_main_queue(), ^() {
+			dispatch_sync(_queue, ^() {
+				[_db beginTransaction];
+
+				for (NSString *trackName in compactedTrackNames)
+				{
+					if (_modifiedTrackStateForTrackName[trackName] == nil)
+					{
+						_modifiedTrackStateForTrackName[trackName] = [self stateForTrackNameInCurrentQueue: trackName];
+					}
+					((COUndoTrackState *)_modifiedTrackStateForTrackName[trackName]).compacted = YES;
+				}
+
+				[_db commit];
+			});
+
+			[self postCommitNotifications];
+		});
+	}
+	@finally
+	{
+		dispatch_semaphore_signal(_transactionLock);
+	}
 }
 
 - (void)finalizeDeletions
@@ -560,10 +566,16 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
 	// If there is a transaction underway, wait until it is finished
 	dispatch_semaphore_wait(_transactionLock, DISPATCH_TIME_FOREVER);
-	dispatch_sync(_queue, ^() {
-		[_db executeUpdate: @"DELETE FROM commands WHERE deleted = 1"];
-	});
-	dispatch_semaphore_signal(_transactionLock);
+	@try
+	{
+		dispatch_sync(_queue, ^() {
+			[_db executeUpdate: @"DELETE FROM commands WHERE deleted = 1"];
+		});
+	}
+	@finally
+	{
+		dispatch_semaphore_signal(_transactionLock);
+	}
 }
 
 /**
@@ -577,11 +589,16 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
 	// If there is a transaction underway, wait until it is finished
 	dispatch_semaphore_wait(_transactionLock, DISPATCH_TIME_FOREVER);
-	dispatch_sync(_queue, ^() {
-		success = [_db executeUpdate: @"VACUUM"];
-	});
-	dispatch_semaphore_signal(_transactionLock);
-	
+	@try
+	{
+		dispatch_sync(_queue, ^() {
+			success = [_db executeUpdate: @"VACUUM"];
+		});
+	}
+	@finally
+	{
+		dispatch_semaphore_signal(_transactionLock);
+	}
 	return success;
 }
 
