@@ -96,11 +96,12 @@
 	
 	NSString *oldName = [treeNodeRepObj name] != nil ? [treeNodeRepObj name] : @"";
 	NSString *newName = [object stringValue] != nil ? [object stringValue] : @"";
+	object = [newName stringByReplacingOccurrencesOfString: @"," withString: @""];
 	
 	[self.owner commitChangesInBlock: ^{
 		[(COObject *)treeNodeRepObj setName: object];
 	} withIdentifier: [treeNodeRepObj isTag] ? @"rename-tag" : @"rename-tag-group"
-descriptionArguments: @[oldName, newName]];
+descriptionArguments: @[oldName, object]];
 }
 
 - (EWTagGroupTagPair *)tagGroupTagPairForTreeNode: (NSTreeNode *)treeNode
