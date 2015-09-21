@@ -402,7 +402,6 @@ the following situations at least:
     - what else?
  
   - Write commit descriptor tests (localization is untested at this time)
-  - Implement .strings file loading (required for localization)
 	
   - Implement copying commit descriptor plist and string files to ~/Library/CoreObject/Commits, in order to support browsing changes done by applications uninstalled from the system
   - Integrate COCommitDescriptor with Schema Upgrade 

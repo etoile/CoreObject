@@ -15,7 +15,7 @@
 
 /* Commit descriptors by identifier */
 static NSMutableDictionary *descriptorTable = nil;
-static NSMutableDictionary *localizationTable = nil;
+static NSMutableDictionary *localizationTables = nil;
 /* Type descriptions (e.g. 'Object Renaming') by type (e.g. 'renaming') */
 static NSMutableDictionary *descriptorTypeTable = nil;
 
@@ -56,10 +56,31 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 	}
 }
 
++ (void)loadLocalizationFromFile: (NSString *)aStringsFile
+                        inTables: (NSMutableDictionary *)someLocalizationTables
+{
+	NSParameterAssert(aStringsFile != nil);
+	
+	if (![[NSFileManager defaultManager] fileExistsAtPath: aStringsFile isDirectory: NULL])
+		return;
+
+	NSError *error = nil;
+	NSString *content = [NSString stringWithContentsOfFile: aStringsFile
+	                                          usedEncoding: NULL
+	                                                 error: &error];
+	ETAssert(error == nil);
+	NSDictionary *plist = [content propertyListFromStringsFileFormat];
+	NSString *domain = [[aStringsFile lastPathComponent] stringByDeletingPathExtension];
+	
+	someLocalizationTables[domain] = plist;
+}
+
 + (void)loadCommitDescriptorsInTable: (NSMutableDictionary *)aDescriptorTable
                            typeTable: (NSMutableDictionary *)aTypeTable
+                  localizationTables: (NSMutableDictionary *)someLocalizationTables
 {
 	NSMutableArray *commitsFiles = [NSMutableArray array];
+	NSMutableArray *stringsFiles = [NSMutableArray array];
 	/* For the test suite on GNUstep, resources are packaged in the test bundle 
 	   (it doesn't link the CoreObject framework) */
 	NSBundle *coreObjectBundle = [NSBundle bundleForClass: self];
@@ -87,7 +108,8 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 				return [localizedDirectory stringByAppendingPathComponent: subpath];
 			}];
 
-			[commitsFiles addObjectsFromArray: [localizedFiles pathsMatchingExtensions: A(@"json")]];	
+			[commitsFiles addObjectsFromArray: [localizedFiles pathsMatchingExtensions: A(@"json")]];
+			[stringsFiles addObjectsFromArray: [localizedFiles pathsMatchingExtensions: A(@"strings")]];
 		}
 	}
 	
@@ -96,6 +118,11 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 		[self loadCommitDescriptorsFromFile: file
 		                            inTable: aDescriptorTable
 		                          typeTable: aTypeTable];
+	}
+	for (NSString *file in stringsFiles)
+	{
+		[self loadLocalizationFromFile: file
+		                      inTables: someLocalizationTables];
 	}
 }
 
@@ -106,10 +133,11 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 
 	descriptorTable = [NSMutableDictionary new];
 	descriptorTypeTable = [NSMutableDictionary new];
-	localizationTable = [NSMutableDictionary new];
+	localizationTables = [NSMutableDictionary new];
 
 	[self loadCommitDescriptorsInTable: descriptorTable
-	                         typeTable: descriptorTypeTable];
+	                         typeTable: descriptorTypeTable
+	                localizationTables: localizationTables];
 }
 
 // NOTE: va_list structure is not portable, so no hope to synthesize it. Still
@@ -139,7 +167,7 @@ static NSMutableDictionary *descriptorTypeTable = nil;
                               value: (NSString *)aFallbackString
                           arguments: (NSArray *)formatArgs
 {
-	NSString *localizedString = [localizationTable objectForKey: aKey];
+	NSString *localizedString = localizationTables[self.domain][aKey];
 	localizedString = (localizedString != nil ? localizedString : aFallbackString);
 	
 	if (formatArgs != nil)
@@ -230,13 +258,33 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 	                         arguments: nil];
 }
 
+- (NSArray *)localizedArgumentsFromArguments: (NSArray *)args
+{
+	return [args mappedCollectionWithBlock: ^(NSString *argument)
+	{
+		if ([argument hasPrefix: @"_"])
+		{
+			NSString *key = [argument substringFromIndex: 1];
+
+			return [self localizedStringForKey: key
+			                             value: key
+			                         arguments: nil];
+		}
+		else
+		{
+			return argument;
+		}
+	}];
+}
+
 - (NSString *)localizedShortDescriptionWithArguments: (NSArray *)args
 {
 	NSString *localizationKey =
 		[NSString stringWithFormat: @"descriptors/%@/ShortDescription", [self name]];
+
 	return [self localizedStringForKey: localizationKey
 	                             value: [self shortDescription]
-	                         arguments: args];
+	                         arguments: [self localizedArgumentsFromArguments: args]];
 }
 
 @end

@@ -122,8 +122,6 @@
  * descriptors/library-creation/ShortDescription = "Created a new library named %@";
  * </example>
  *
- * Note: Loading the .strings files is not yet implemented.
- *
  * @section Metamodel Integration
  *
  * You can use  -[ETPropertyDescription setCommitDescriptor:] (not yet 
@@ -302,5 +300,12 @@ extern NSString *kCOCommitMetadataShortDescription;
  * The value must be a string array that can used to interpolate the format 
  * string of -[COCommitDescriptor shortDescription] and 
  * -[COCommitDescriptor localizedShortDescription].
+ *
+ * If an argument begins with '_', -localizedShortDescriptionWithArguments: will
+ * treat it as a localization key and look up a localized argument in the 
+ * .strings file inside the Commits directory, before interpolating it into the 
+ * final description.
+ *
+ * See also COCommitDescription Localization documentation section.
  */
 extern NSString *kCOCommitMetadataShortDescriptionArguments;
