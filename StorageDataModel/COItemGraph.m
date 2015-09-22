@@ -145,6 +145,16 @@
     }
 }
 
+- (void)removeUnreachableItems
+{
+	NSSet *reachableUUIDs = COItemGraphReachableUUIDs(self);
+
+	NSMutableSet *unreachableUUIDs = [NSMutableSet setWithArray: [itemForUUID_ allKeys]];
+	[unreachableUUIDs minusSet: reachableUUIDs];
+	
+	[itemForUUID_ removeObjectsForKeys: [unreachableUUIDs allObjects]];
+}
+
 @end
 
 
@@ -330,6 +340,12 @@ static BOOL COItemGraphEqualToItemGraphComparingItemUUID(id<COItemGraph> first, 
 {
     COItem *my = [first itemForUUID: aUUID];
     COItem *other = [second itemForUUID: aUUID];
+	if (my == nil && other == nil)
+	{
+		// both item graphs are missing the same item
+		return YES;
+	}
+	
     if (![my isEqual: other])
     {
         return NO;

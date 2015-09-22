@@ -110,7 +110,7 @@
             }
         }
     }
-    
+	
 	[self beginTransaction];
 	
 	// N.B. UNIQUE constraint on uuid gives it an index automatically.
@@ -662,57 +662,78 @@ static NSData *Sha1Data(NSData *data)
     }
 
     // Debugging:
-//    NSLog(@"In response to delete %@", revids);
-//    FMResultSet *rs = [db_ executeQuery: @"SELECT revid, deltabase FROM commits WHERE deltabase IN (SELECT deltabase FROM commits GROUP BY deltabase HAVING garbage = 1)"];
-//    while ([rs next])
-//    {
-//        NSLog(@"Deleting %d (db: %d)", [rs intForColumnIndex:0], [rs intForColumnIndex: 1]);
-//    }
-//    [rs close];
-    
-    // For each delta base, delete the contiguous range of garbage revids starting at the maximum
-    // and extending down to the first non-garbage revid
-    
+	
     // Example which can be pasted in the sqlite3 prompt to experiment with this query:
     
     /*
      
      drop table c;
-     create table c (revid integer, deltabase integer, garbage boolean);
+     create table c (revid integer, deltabase integer, parent integer, garbage boolean);
      
-     insert into c values(0,0,0);
-     insert into c values(1,0,1); -- marked as garbage, will be selected for deletion
+     insert into c values(0,0,-1,0);
+     insert into c values(1,0,0,1); -- marked as garbage, will be selected for deletion
      
-     insert into c values(2,2,1); -- marked as garbage, will be selected for deletion
-     insert into c values(3,2,1); -- marked as garbage, will be selected for deletion
+     insert into c values(2,2,1,1); -- marked as garbage, will be selected for deletion
+     insert into c values(3,2,2,1); -- marked as garbage, will be selected for deletion
      
-     insert into c values(4,4,0);
-     insert into c values(5,4,0);
+     insert into c values(4,4,3,0);
+     insert into c values(5,4,4,0);
      
-     insert into c values(6,6,0);
-     insert into c values(7,6,1); -- marked as garbage, won't be deleted because there are higher non-garbage revids in this delta run
-     insert into c values(8,6,0);
+     insert into c values(6,6,5,0);
+     insert into c values(7,6,6,1); -- marked as garbage, will be selected for deletion
+     insert into c values(8,6,7,0); -- will be rebuit because it's not a full snapshot, but its parent is being deleted
      
-     SELECT commits.revid
-     FROM c AS commits
-     LEFT OUTER JOIN (SELECT deltabase, MAX(revid) AS maxkeptrevid FROM c WHERE garbage = 0 GROUP BY deltabase) AS info
-     USING (deltabase)
-     WHERE (commits.revid > info.maxkeptrevid) OR info.maxkeptrevid IS NULL;
-     
-     -- The "OR info.maxkeptrevid IS NULL" part is so that we delete all commits in delta runs where all commits are garbage.
-     
+	 
+	 -- Identifies the revisions that need to be rebuilt:
+	 
+	 SELECT revid
+	 FROM c
+	 LEFT OUTER JOIN (SELECT garbage AS parentgarbage, revid AS parentrevid FROM c)
+	 ON (parent = parentrevid)
+	 WHERE garbage = 0 AND parentgarbage = 1 AND deltabase != revid;
+	 
      */
-    
-    // Could be done at a later time
-    [db_ executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE revid IN (SELECT commits.revid "
-                         "FROM %@ AS commits "
-                         "LEFT OUTER JOIN (SELECT deltabase, MAX(revid) AS maxkeptrevid FROM %@ WHERE garbage = 0 GROUP BY deltabase) AS info "
-                         "USING (deltabase) "
-                         "WHERE (commits.revid > info.maxkeptrevid) OR info.maxkeptrevid IS NULL)",
-                         [self tableName], [self tableName], [self tableName]]];
-    
-    // TODO: Vacuum here?
-    
+	
+	// Gather the set of revids that need to be rebuilt
+	NSMutableIndexSet *rebuildRevids = [NSMutableIndexSet indexSet];
+	FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
+										  @"SELECT revid "
+										  "FROM %@ "
+										  "LEFT OUTER JOIN (SELECT garbage AS parentgarbage, revid AS parentrevid FROM %@) "
+										  "ON (parent = parentrevid) "
+										  "WHERE garbage = 0 AND parentgarbage = 1 AND deltabase != revid", [self tableName], [self tableName]]];
+	while ([rs next])
+	{
+		[rebuildRevids addIndex: [rs longLongIntForColumnIndex: 0]];
+	}
+	[rs close];
+	
+	// Rebuild each revision that needs it
+	[rebuildRevids enumerateIndexesUsingBlock: ^(NSUInteger revid, BOOL *stop){
+		COItemGraph *graph = [self itemGraphForRevid: revid];
+		
+		// GC unreachable items in graph
+		[graph removeUnreachableItems];
+		
+		NSData *contentsBlob = contentsBLOBWithItemTree(graph);
+		
+		BOOL ok = [db_ executeUpdate: [NSString stringWithFormat: @"UPDATE %@ SET contents = ?, hash = ?, deltabase = ?, bytesInDeltaRun = ? WHERE revid = ?", [self tableName]],
+				   /* contents        */ contentsBlob,
+				   /* hash            */ Sha1Data(contentsBlob),
+				   /* deltabase       */ @(revid),
+				   /* bytesInDeltaRun */ @([contentsBlob length]),
+				   /* revid           */ @(revid)];
+
+		if (!ok)
+		{
+			[db_ rollback];
+			ETAssert(NO);
+		}
+	}];
+	
+	// Delete _all_ revisions marked as garbage.
+    [db_ executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE garbage = 1", [self tableName]]];
+
     [self commit];
     
     return ![db_ hadError];
