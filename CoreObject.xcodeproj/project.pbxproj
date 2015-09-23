@@ -3807,6 +3807,7 @@
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 armv7";
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
@@ -3846,6 +3847,7 @@
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = "arm64 armv7";
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
