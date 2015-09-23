@@ -5,8 +5,7 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"TextItem"];
-    [entity setParent: (id)@"DocumentItem"];
+    ETEntityDescription *entity = [self newBasicEntityDescription];
     
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"attrString"
                                                                                  type: (id)@"COAttributedString"];

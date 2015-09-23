@@ -4,8 +4,7 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"Project"];
-    [entity setParent: (id)@"Anonymous.COObject"];
+	ETEntityDescription *entity = [self newBasicEntityDescription];
 	
     ETPropertyDescription *documentsProperty = [ETPropertyDescription descriptionWithName: @"documents"
                                                                                      type: (id)@"Document"];

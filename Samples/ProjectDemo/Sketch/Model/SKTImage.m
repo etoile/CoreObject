@@ -8,8 +8,7 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTImage"];
-	[entity setParent: (id)@"SKTGraphic"];
+    ETEntityDescription *entity = [self newBasicEntityDescription];
 	
     // FIXME: image data property    
     return entity;

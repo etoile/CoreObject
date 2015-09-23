@@ -8,8 +8,7 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTCircle"];
-	[entity setParent: (id)@"SKTGraphic"];
+    ETEntityDescription *entity = [self newBasicEntityDescription];
 	
     return entity;
 }

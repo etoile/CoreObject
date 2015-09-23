@@ -8,8 +8,7 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *itemReference = [ETEntityDescription descriptionWithName: @"ItemReference"];
-    [itemReference setParent: (id)@"DocumentItem"];
+    ETEntityDescription *itemReference = [self newBasicEntityDescription];
     
     // FIXME: Hack; we need a common superclass for OutlineItem and ItemReference, or make
     // ItemReference a subclass of OutlineItem

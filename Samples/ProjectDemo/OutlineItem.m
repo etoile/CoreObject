@@ -7,8 +7,7 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *outlineEntity = [ETEntityDescription descriptionWithName: @"OutlineItem"];
-    [outlineEntity setParent: (id)@"DocumentItem"];
+    ETEntityDescription *outlineEntity = [self newBasicEntityDescription];
     
     ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
                                                                                   type: outlineEntity];

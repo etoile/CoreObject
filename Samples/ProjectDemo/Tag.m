@@ -6,8 +6,7 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *tag = [ETEntityDescription descriptionWithName: @"Tag"];
-    [tag setParent: (id)@"COObject"];
+    ETEntityDescription *tag = [self newBasicEntityDescription];
     
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                  type: (id)@"Anonymous.NSString"];

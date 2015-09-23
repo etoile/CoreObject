@@ -11,8 +11,7 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTTextArea"];
-	[entity setParent: (id)@"SKTGraphic"];
+    ETEntityDescription *entity = [self newBasicEntityDescription];
 	
 	ETPropertyDescription *attrStrProperty = [ETPropertyDescription descriptionWithName: @"attrStr"
 																					  type: (id)@"COAttributedString"];

@@ -24,8 +24,7 @@ NSString *SKTDrawDocumentType = @"Apple Sketch Graphic Format";
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTDrawDocument"];
-    [entity setParent: (id)@"DocumentItem"];
+    ETEntityDescription *entity = [self newBasicEntityDescription];
 	
     ETPropertyDescription *graphicsProperty = [ETPropertyDescription descriptionWithName: @"graphics"
 																					type: (id)@"SKTGraphic"];

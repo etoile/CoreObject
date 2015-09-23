@@ -14,8 +14,7 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 + (ETEntityDescription*)newEntityDescription
 {
-    ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"SKTGraphic"];
-	[entity setParent: (id)@"COObject"];
+    ETEntityDescription *entity = [self newBasicEntityDescription];
     
     ETPropertyDescription *documentProperty = [ETPropertyDescription descriptionWithName: @"document"
                                                                                     type: (id)@"SKTDrawDocument"];
