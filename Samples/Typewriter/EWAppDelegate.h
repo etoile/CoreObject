@@ -11,7 +11,7 @@
 
 @class EWTypewriterWindowController;
 
-@interface EWAppDelegate : NSObject
+@interface EWAppDelegate : NSObject <NSApplicationDelegate>
 {
 	COEditingContext *ctx;
 	COPersistentRoot *library;

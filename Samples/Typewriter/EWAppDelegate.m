@@ -27,6 +27,12 @@
 {
 }
 
+- (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)flag
+{
+	[self orderFrontTypewriter: sender];
+	return NO;
+}
+
 #pragma mark -
 
 @synthesize editingContext = ctx;
