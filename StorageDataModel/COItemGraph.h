@@ -120,6 +120,10 @@
  * receiver.
  */
 - (void) addItemGraph: (id<COItemGraph>)aGraph;
+/**
+ * Removes all unreachable items.
+ */
+- (void)removeUnreachableItems;
 
 @end
 
