@@ -149,10 +149,10 @@
 {
 	NSSet *reachableUUIDs = COItemGraphReachableUUIDs(self);
 
-	NSMutableSet *unreachableUUIDs = [NSMutableSet setWithArray: [itemForUUID_ allKeys]];
+	NSMutableSet *unreachableUUIDs = [NSMutableSet setWithArray: itemForUUID_.allKeys];
 	[unreachableUUIDs minusSet: reachableUUIDs];
 	
-	[itemForUUID_ removeObjectsForKeys: [unreachableUUIDs allObjects]];
+	[itemForUUID_ removeObjectsForKeys: unreachableUUIDs.allObjects];
 }
 
 @end

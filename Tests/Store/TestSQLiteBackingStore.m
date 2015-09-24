@@ -114,16 +114,16 @@
 
 - (void) commitWithGraph: (COItemGraph *)graph parent: (int64_t)parentRevid
 {
-	ETUUID *revUUID = [ETUUID UUID];
-	BOOL ok = [backing writeItemGraph: graph
-						 revisionUUID: revUUID
-						 withMetadata: @{}
-						   withParent: parentRevid
-					  withMergeParent: -1
-						   branchUUID: branchUUID
-				   persistentrootUUID: prootUUID
-								error: NULL];
-	ETAssert(ok);
+    ETUUID *revUUID = [ETUUID UUID];
+    BOOL ok = [backing writeItemGraph: graph
+                         revisionUUID: revUUID
+                         withMetadata: @{}
+                           withParent: parentRevid
+                      withMergeParent: -1
+                           branchUUID: branchUUID
+                   persistentrootUUID: prootUUID
+                                error: NULL];
+    ETAssert(ok);
 }
 
 - (COItemGraph *) itemGraphForRevid: (int64_t)revid
@@ -138,7 +138,7 @@
 						   
 	for (NSData *blob in [store.database arrayForQuery: [NSString stringWithFormat: @"SELECT contents FROM %@", [backing tableName]]])
 	{
-		NSRange rangeOfPassword = [blob rangeOfData:passwordBytes options:0 range: NSMakeRange(0, [blob length])];
+		NSRange rangeOfPassword = [blob rangeOfData: passwordBytes options: 0 range: NSMakeRange(0, blob.length)];
 		if (rangeOfPassword.location != NSNotFound)
 		{
 			return YES;

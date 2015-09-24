@@ -709,25 +709,27 @@ static NSData *Sha1Data(NSData *data)
 	[rs close];
 	
 	// Rebuild each revision that needs it
-	[rebuildRevids enumerateIndexesUsingBlock: ^(NSUInteger revid, BOOL *stop){
+	[rebuildRevids enumerateIndexesUsingBlock: ^(NSUInteger revid, BOOL *stop) {
 		COItemGraph *graph = [self itemGraphForRevid: revid];
 		
 		// GC unreachable items in graph
 		[graph removeUnreachableItems];
 		
 		NSData *contentsBlob = contentsBLOBWithItemTree(graph);
+		NSNumber *deltabase = @(revid);
+		NSNumber *bytesInDeltaRun = @(contentsBlob.length);
 		
 		BOOL ok = [db_ executeUpdate: [NSString stringWithFormat: @"UPDATE %@ SET contents = ?, hash = ?, deltabase = ?, bytesInDeltaRun = ? WHERE revid = ?", [self tableName]],
-				   /* contents        */ contentsBlob,
-				   /* hash            */ Sha1Data(contentsBlob),
-				   /* deltabase       */ @(revid),
-				   /* bytesInDeltaRun */ @([contentsBlob length]),
-				   /* revid           */ @(revid)];
+				   contentsBlob,
+				   Sha1Data(contentsBlob),
+				   deltabase,
+				   bytesInDeltaRun,
+				   @(revid)];
 
 		if (!ok)
 		{
 			[db_ rollback];
-			ETAssert(NO);
+			ETAssertUnreachable();
 		}
 	}];
 	
