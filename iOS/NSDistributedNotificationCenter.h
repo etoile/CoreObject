@@ -5,9 +5,9 @@
 	License:  MIT  (see COPYING)
  */
 
-#if TARGET_OS_IPHONE
-
 #import <Foundation/Foundation.h>
+
+#if TARGET_OS_IPHONE
 
 /**
  * @group iOS
@@ -24,11 +24,11 @@
  *
  * See also COSQLiteStore and COUndoTrackStore.
  **/
-@interface NSDistributedNotificationCenter : NSNotificationCenter
+@interface CODistributedNotificationCenter : NSNotificationCenter
 /**
  * Returns the default distributed notification center.
  */
-+ (NSDistributedNotificationCenter *)defaultCenter;
++ (CODistributedNotificationCenter *)defaultCenter;
 /**
  * Posts a notification with the given sender and info.
  *
@@ -39,5 +39,11 @@
                     userInfo: (NSDictionary *)userInfo
 		  deliverImmediately: (BOOL)deliverImmediately;
 @end
+
+/**
+ * AppStore approval process treats NSDistributedNotificationCenter as a private
+ * API, so we use another name internally.
+ */
+@compatibility_alias NSDistributedNotificationCenter CODistributedNotificationCenter;
 
 #endif

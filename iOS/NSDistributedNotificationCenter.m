@@ -5,8 +5,6 @@
 	License:  MIT  (see COPYING)
  */
 
-#if TARGET_OS_IPHONE
-
 #import "NSDistributedNotificationCenter.h"
 
 /**
@@ -24,9 +22,9 @@
  *
  * See also COSQLiteStore and COUndoTrackStore.
  **/
-@implementation NSDistributedNotificationCenter
+@implementation CODistributedNotificationCenter
 
-static NSDistributedNotificationCenter *defaultCenter = nil;
+static CODistributedNotificationCenter *defaultCenter = nil;
 
 + (void)initialize
 {
@@ -36,7 +34,7 @@ static NSDistributedNotificationCenter *defaultCenter = nil;
 	defaultCenter = [[self alloc] init];
 }
 
-+ (NSDistributedNotificationCenter *)defaultCenter
++ (CODistributedNotificationCenter *)defaultCenter
 {
 	return defaultCenter;
 }
@@ -50,5 +48,3 @@ static NSDistributedNotificationCenter *defaultCenter = nil;
 }
 
 @end
-
-#endif
