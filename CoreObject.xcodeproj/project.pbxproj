@@ -31,6 +31,7 @@
 		6025EA3D1B60E960007DD28B /* COSQLiteUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 6025EA391B60E960007DD28B /* COSQLiteUtilities.m */; };
 		602837AF1A334A2100D7B0D1 /* TestSchemaMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 602837AE1A334A2100D7B0D1 /* TestSchemaMigration.m */; };
 		602837B01A334A2100D7B0D1 /* TestSchemaMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 602837AE1A334A2100D7B0D1 /* TestSchemaMigration.m */; };
+		6028484E1BBAB5820094CDB0 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6028484D1BBAB5820094CDB0 /* Default-568h@2x.png */; settings = {ASSET_TAGS = (); }; };
 		6036436C1B3800B400DC685B /* COHistoryCompaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 6036436A1B3800B400DC685B /* COHistoryCompaction.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6036436D1B3800B400DC685B /* COHistoryCompaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 6036436A1B3800B400DC685B /* COHistoryCompaction.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6036436E1B3800B400DC685B /* COHistoryCompaction.m in Sources */ = {isa = PBXBuildFile; fileRef = 6036436B1B3800B400DC685B /* COHistoryCompaction.m */; };
@@ -1006,6 +1007,7 @@
 		6025EA381B60E960007DD28B /* COSQLiteUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSQLiteUtilities.h; path = Store/COSQLiteUtilities.h; sourceTree = "<group>"; };
 		6025EA391B60E960007DD28B /* COSQLiteUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSQLiteUtilities.m; path = Store/COSQLiteUtilities.m; sourceTree = "<group>"; };
 		602837AE1A334A2100D7B0D1 /* TestSchemaMigration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSchemaMigration.m; path = Tests/SchemaMigration/TestSchemaMigration.m; sourceTree = SOURCE_ROOT; };
+		6028484D1BBAB5820094CDB0 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "../iOS/Default-568h@2x.png"; sourceTree = "<group>"; };
 		6036436A1B3800B400DC685B /* COHistoryCompaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COHistoryCompaction.h; path = Store/COHistoryCompaction.h; sourceTree = "<group>"; };
 		6036436B1B3800B400DC685B /* COHistoryCompaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COHistoryCompaction.m; path = Store/COHistoryCompaction.m; sourceTree = "<group>"; };
 		603643821B394E8800DC685B /* COUndoTrackHistoryCompaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COUndoTrackHistoryCompaction.h; sourceTree = "<group>"; };
@@ -1628,6 +1630,7 @@
 				60882F1E197E629F00484033 /* NSDistributedNotificationCenter.h */,
 				60882F1F197E629F00484033 /* NSDistributedNotificationCenter.m */,
 				60F91EC6197D1D1C009F47D7 /* main.m */,
+				6028484D1BBAB5820094CDB0 /* Default-568h@2x.png */,
 				60F91EC8197D1D7F009F47D7 /* TestCoreObject-Info.plist */,
 			);
 			name = iOS;
@@ -3026,6 +3029,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				60F91F3B197D32FF009F47D7 /* Commits in Resources */,
+				6028484E1BBAB5820094CDB0 /* Default-568h@2x.png in Resources */,
 				60F91F3A197D32F2009F47D7 /* 1b.json in Resources */,
 				60F91F39197D32F2009F47D7 /* 1a.json in Resources */,
 			);
