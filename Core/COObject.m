@@ -30,6 +30,11 @@
 #import "COAttachmentID.h"
 #include <objc/runtime.h>
 
+@interface NSObject ()
++ (NSString *)packageName;
+@end
+
+
 @implementation COObject
 
 @synthesize UUID = _UUID, entityDescription = _entityDescription,
@@ -44,6 +49,22 @@ See +[NSObject typePrefix]. */
 {
 	return @"CO";
 }
+
+#if (TARGET_OS_IPHONE)
+/**
+ * To support iOS 7, CoreObject is compiled as a static library, this means we
+ * have no CoreObject bundle (the bundle containing all CoreObject classes being
+ * the compiled application).
+ */
++ (NSString *) packageName
+{
+	if ([[self className] hasPrefix: @"CO"])
+	{
+		return @"org.etoile-project.CoreObject";
+	}
+	return [super packageName];
+}
+#endif
 
 + (ETEntityDescription *) newEntityDescription
 {
