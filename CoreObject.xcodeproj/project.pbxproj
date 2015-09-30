@@ -2873,7 +2873,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = "";
-				LastUpgradeCheck = 0610;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = "Étoilé";
 				TargetAttributes = {
 					60E08C6119792BEA00D1B7AD = {
@@ -3723,6 +3723,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = Test;
 				PRODUCT_NAME = BasicPersistence;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3755,6 +3756,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = Test;
 				PRODUCT_NAME = BasicPersistence;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3811,6 +3813,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "org.etoile-project.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = CoreObject;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -3850,6 +3853,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "org.etoile-project.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = CoreObject;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -3890,6 +3894,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = Test;
 				PRODUCT_NAME = TestCoreObject;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3922,6 +3927,7 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = Test;
 				PRODUCT_NAME = TestCoreObject;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -3961,6 +3967,7 @@
 					"-DSQLITE_ENABLE_FTS3",
 					"-DSQLITE_ENABLTE_ENABLE_FTS3_PARENTHESIS",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "org.etoile-project.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = CoreObject;
 				WARNING_CFLAGS = (
 					"-Wall",
@@ -3985,6 +3992,7 @@
 					"-DSQLITE_ENABLE_FTS3",
 					"-DSQLITE_ENABLTE_ENABLE_FTS3_PARENTHESIS",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "org.etoile-project.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = CoreObject;
 				WARNING_CFLAGS = (
 					"-Wall",
@@ -4035,6 +4043,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
 				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
