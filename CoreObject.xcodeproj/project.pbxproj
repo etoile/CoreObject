@@ -19,7 +19,6 @@
 		6002E290197FD91A00AC9150 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C913AD165BBE9E00E0C5F4 /* main.m */; };
 		600F72BF1858A71200CB6AC5 /* COPersistentObjectContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 600F72BD1858A71200CB6AC5 /* COPersistentObjectContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		600F72C01858A71200CB6AC5 /* COPersistentObjectContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 600F72BE1858A71200CB6AC5 /* COPersistentObjectContext.m */; };
-		6019CD75197FDF10009EDAFB /* NEWS.md in Sources */ = {isa = PBXBuildFile; fileRef = 6019CD74197FDF10009EDAFB /* NEWS.md */; };
 		601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D44180C0F5300CED07E /* COObject+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		601C1D4F180C115D00CED07E /* COObjectGraphContext+GarbageCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D4D180C115900CED07E /* COObjectGraphContext+GarbageCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		601C1D50180C115D00CED07E /* COObjectGraphContext+GarbageCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */; };
@@ -3517,7 +3516,6 @@
 				66457FED17E9683F003C51A8 /* CORevisionCache.m in Sources */,
 				608B3F4119FF045400304809 /* COMetamodel.m in Sources */,
 				601C1D50180C115D00CED07E /* COObjectGraphContext+GarbageCollection.m in Sources */,
-				6019CD75197FDF10009EDAFB /* NEWS.md in Sources */,
 				60EBC19C184CA38200F751F5 /* COPrimitiveCollection.m in Sources */,
 				600F72C01858A71200CB6AC5 /* COPersistentObjectContext.m in Sources */,
 				607335B518AB96A6008A02DC /* COSmartGroup.m in Sources */,
