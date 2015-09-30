@@ -10,7 +10,9 @@
 #	import <CoreObject/COCocoaTouchCompatibility.h>
 #else
 #	import <AppKit/AppKit.h>
-#	define NSTextStorageEditActions NSUInteger
+#	if defined(GNUSTEP) || MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_11
+#		define NSTextStorageEditActions NSUInteger
+#	endif
 #endif
 
 @class COAttributedString;
