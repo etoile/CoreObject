@@ -6,6 +6,10 @@
  */
 
 #import <Foundation/Foundation.h>
+// For building on versions earlier than 10.11
+#ifndef MAC_OS_X_VERSION_10_11
+#	define MAC_OS_X_VERSION_10_11 1011
+#endif
 #if (TARGET_OS_IPHONE)
 #	import <CoreObject/COCocoaTouchCompatibility.h>
 #else
