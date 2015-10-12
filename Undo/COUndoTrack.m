@@ -295,7 +295,12 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 {
 	INVALIDARG_EXCEPTION_TEST(aNode,
 		[aNode isKindOfClass: [COCommand class]] || [aNode isKindOfClass: [COCommandGroup class]]);
-	INVALIDARG_EXCEPTION_TEST(aNode, [(COCommand *)aNode parentUndoTrack] == self);
+	// NOTE: COCommand(Group).parentUndoTrack.name could be validated against
+	// the receiver name with -[COUndoTrackStore string:matchesGlobPattern:].
+	if ([aNode isKindOfClass: [COCommandGroup class]])
+	{
+		INVALIDARG_EXCEPTION_TEST(aNode, [((COCommandGroup *)aNode).trackName isEqual: self.name]);
+	}
 
 	COCommand *command = [(COCommand *)aNode inverse];
 	[command applyToContext: _editingContext];
@@ -320,7 +325,10 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 {
 	INVALIDARG_EXCEPTION_TEST(aNode,
 		[aNode isKindOfClass: [COCommand class]] || [aNode isKindOfClass: [COCommandGroup class]]);
-	INVALIDARG_EXCEPTION_TEST(aNode, [(COCommand *)aNode parentUndoTrack] == self);
+	if ([aNode isKindOfClass: [COCommandGroup class]])
+	{
+		INVALIDARG_EXCEPTION_TEST(aNode, [((COCommandGroup *)aNode).trackName isEqual: self.name]);
+	}
 
 	COCommand *command = (COCommand *)aNode;
 	[command applyToContext: _editingContext];

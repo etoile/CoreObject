@@ -498,6 +498,36 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	UKIntsEqual(3, _patternTrackNotificationCount);
 }
 
+- (void)testUndoNodeOnPatternTrack
+{
+	COCommandGroup *group1 = [self switchToNewBranch];
+	COCommandGroup *group2 = [self switchToNewBranch];
+
+	[_track recordCommand: group1];
+	[_track recordCommand: group2];
+	[_patternTrack undoNode: [_patternTrack nodes][1]];
+
+	COCommandGroup *undoGroup1 = [_patternTrack nodes].lastObject;
+
+	UKObjectsEqual(undoGroup1, [_track nodes].lastObject);
+
+	UKObjectsNotEqual(group1, undoGroup1);
+	UKObjectsNotEqual(group1.parentUndoTrack, undoGroup1.parentUndoTrack);
+	UKObjectsEqual([group1 inverse].contents, undoGroup1.contents);
+	UKObjectsEqual(group2, undoGroup1.parentNode);
+	UKIntsEqual(group2.sequenceNumber + 1, undoGroup1.sequenceNumber);
+
+	UKObjectsEqual(A(placeholderNode, group1, group2, undoGroup1), [_track nodes]);
+	UKObjectsEqual(undoGroup1, [_track currentNode]);
+	UKObjectsEqual(A(placeholderNode, group1, group2, undoGroup1), [_patternTrack nodes]);
+	UKObjectsEqual(undoGroup1, [_patternTrack currentNode]);
+
+	/* -recordCommand: reloads the track before recording the command */
+	UKIntsEqual(4, _trackNotificationCount);
+	UKIntsEqual(0, _track2NotificationCount);
+	UKIntsEqual(3, _patternTrackNotificationCount);
+}
+
 - (void)testRedoNode
 {
 	COCommandGroup *group1 = [self switchToNewBranch];
@@ -517,6 +547,34 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 
 	UKObjectsEqual(A(placeholderNode, group1, group2, redoGroup1), [_track nodes]);
 	UKObjectsEqual(redoGroup1, [_track currentNode]);
+
+	/* -recordCommand: reloads the track before recording the command */
+	UKIntsEqual(4, _trackNotificationCount);
+	UKIntsEqual(0, _track2NotificationCount);
+	UKIntsEqual(3, _patternTrackNotificationCount);
+}
+
+- (void)testRedoNodeOnPatternTrack
+{
+	COCommandGroup *group1 = [self switchToNewBranch];
+	COCommandGroup *group2 = [self switchToNewBranch];
+
+	[_track recordCommand: group1];
+	[_track recordCommand: group2];
+	[_patternTrack redoNode: (id <COTrackNode>)group1];
+	
+	COCommandGroup *redoGroup1 = [_patternTrack nodes].lastObject;
+	
+	UKObjectsNotEqual(group1, redoGroup1);
+	UKObjectsNotEqual(group1.parentUndoTrack, redoGroup1.parentUndoTrack);
+	UKObjectsEqual(group1.contents, redoGroup1.contents);
+	UKObjectsEqual(group2, redoGroup1.parentNode);
+	UKIntsEqual(group2.sequenceNumber + 1, redoGroup1.sequenceNumber);
+
+	UKObjectsEqual(A(placeholderNode, group1, group2, redoGroup1), [_track nodes]);
+	UKObjectsEqual(redoGroup1, [_track currentNode]);
+	UKObjectsEqual(A(placeholderNode, group1, group2, redoGroup1), [_patternTrack nodes]);
+	UKObjectsEqual(redoGroup1, [_patternTrack currentNode]);
 
 	/* -recordCommand: reloads the track before recording the command */
 	UKIntsEqual(4, _trackNotificationCount);
