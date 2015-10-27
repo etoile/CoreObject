@@ -285,6 +285,7 @@
 {
 	COSchemaMigration *migration = [self registerLabelUpdateMigrationWithVersion: 1];
 
+	tag.name = @"Vista";
 
 	[ctx commit];
 	[self prepareNewMigrationContextForDestinationVersion: 1];
@@ -301,6 +302,10 @@
 	UKIntsEqual(1, [self checkObject: migratedTag versionForPackageName: @"Test"]);
 	UKIntsEqual(1, [self checkObject: migratedParent versionForPackageName: @"Test"]);
 	UKIntsEqual(1, [self checkObject: migratedChild versionForPackageName: @"Test"]);
+
+	/* When some properties are not migrated while others are, we must not lose
+	   these properties that belong to non-migrated packages. */
+	UKStringsEqual(@"Vista", migratedTag.name);
 
 	UKNil(migratedTag.label);
 	UKStringsEqual(@"Untitled", migratedParent.label);

@@ -117,16 +117,16 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	
 	for (NSString *package in [versionsByPackageName allKeys])
 	{
-		ETPackageDescription *packageDesc = [_modelDescriptionRepository descriptionForName: package];
-		BOOL isDeletedPackage = (packageDesc == nil);
-		int64_t version = versionsByPackageName[package] != nil
-			? (int64_t)[versionsByPackageName[package] longLongValue]
-			: (int64_t)-1;
-
-		if (isDeletedPackage || version != (int64_t)packageDesc.version)
-		{
-			[packagesToMigrate addObject: package];
-		}
+		/* We migrate even when we encounter these special cases too:
+		   - deleted packages (packageDesc == nil)
+		   - removed package dependencies (versionsByPackageName[package] == nil)
+		   - up-to-date packages (version == packageDesc.version)
+		   
+		   Note: packageDesc = [_modelDescriptionRepository descriptionForName: package]
+		   
+		   For up-to-date packages, no migration will occur, but we must include 
+		   them, otherwise their properties would be omitted in -combineMigratedItems:. */
+		[packagesToMigrate addObject: package];
 	}
 	return packagesToMigrate;
 }
