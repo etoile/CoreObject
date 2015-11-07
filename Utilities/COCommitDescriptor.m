@@ -152,9 +152,13 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 
 		if (range.length == 0)
 		{
-			[NSException raise: NSInternalInconsistencyException
-						format: @"Format string %@ doesn't match the argument count in %@",
-			                    format, args];
+			// For now, we accept additional arguments not interpolated e.g.
+			// these arguments can be used to create a description subtitle.
+			//
+			//[NSException raise: NSInternalInconsistencyException
+			//			format: @"Format string %@ doesn't match the argument count in %@",
+			//                    format, args];
+			break;
 		}
 		
 		formattedString = [formattedString stringByReplacingCharactersInRange: range
