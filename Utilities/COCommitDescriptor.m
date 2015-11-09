@@ -297,3 +297,6 @@ NSString *kCOCommitMetadataIdentifier = @"kCOCommitMetadataIdentifier";
 NSString *kCOCommitMetadataTypeDescription = @"kCOCommitMetadataTypeDescription";
 NSString *kCOCommitMetadataShortDescription = @"kCOCommitMetadataShortDescription";
 NSString *kCOCommitMetadataShortDescriptionArguments = @"kCOCommitMetadataShortDescriptionArguments";
+NSString *kCOCommitMetadataNodeUUID = @"kCOCommitMetadataNodeUUID";
+NSString *kCOCommitMetadataNodeOperationIdentifier = @"kCOCommitMetadataNodeOperationIdentifier";
+NSString *kCOCommitMetadataNodeInversed = @"kCOCommitMetadataNodeInversed";

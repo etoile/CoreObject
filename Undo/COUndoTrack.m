@@ -293,60 +293,67 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 
 - (void)undoNode: (id <COTrackNode>)aNode
 {
-	INVALIDARG_EXCEPTION_TEST(aNode,
-		[aNode isKindOfClass: [COCommand class]] || [aNode isKindOfClass: [COCommandGroup class]]);
+	INVALIDARG_EXCEPTION_TEST(aNode, [aNode isKindOfClass: [COCommandGroup class]]);
 	// NOTE: COCommand(Group).parentUndoTrack.name could be validated against
 	// the receiver name with -[COUndoTrackStore string:matchesGlobPattern:].
-	if ([aNode isKindOfClass: [COCommandGroup class]])
-	{
-		INVALIDARG_EXCEPTION_TEST(aNode, [((COCommandGroup *)aNode).trackName isEqual: self.name]);
-	}
+	INVALIDARG_EXCEPTION_TEST(aNode, [((COCommandGroup *)aNode).trackName isEqual: self.name]);
 
-	COCommand *command = [(COCommand *)aNode inverse];
+	COCommandGroup *command = [(COCommandGroup *)aNode inverse];
 	[command applyToContext: _editingContext];
 	
-	NSString *commitShortDescription = [aNode localizedShortDescription];
-	if (commitShortDescription == nil)
-		commitShortDescription = @"";
-	
-	NSMutableDictionary *md = [@{kCOCommitMetadataShortDescriptionArguments : @[commitShortDescription]} mutableCopy];
+	NSMutableDictionary *md = [NSMutableDictionary new];
+	NSString *identifier = [(COCommandGroup *)aNode metadata][kCOCommitMetadataIdentifier];
+	NSString *shortDescription = [aNode localizedShortDescription];
+	NSNumber *inversedValue = aNode.metadata[kCOCommitMetadataNodeInversed];
+	BOOL inversed = inversedValue == nil || !inversedValue.boolValue;
+
+	if (identifier != nil)
+	{
+		md[kCOCommitMetadataIdentifier] = identifier;
+	}
+	md[kCOCommitMetadataShortDescriptionArguments] = @[(shortDescription != nil ? shortDescription : @"")];
+	md[kCOCommitMetadataNodeUUID] = [aNode.UUID stringValue];
+	md[kCOCommitMetadataNodeOperationIdentifier] = @"org.etoile.CoreObject.selective-undo";
+	md[kCOCommitMetadataNodeInversed] = @(inversed);
+
 	if (self.customRevisionMetadata != nil)
 	{
 		[md addEntriesFromDictionary: self.customRevisionMetadata];
 	}
 	
-	[_editingContext commitWithIdentifier: @"org.etoile.CoreObject.selective-undo"
-								 metadata: md
-								undoTrack: self
-									error: NULL];
+	[_editingContext commitWithMetadata: md
+	                          undoTrack: self
+	                              error: NULL];
 }
 
 - (void)redoNode: (id <COTrackNode>)aNode
 {
-	INVALIDARG_EXCEPTION_TEST(aNode,
-		[aNode isKindOfClass: [COCommand class]] || [aNode isKindOfClass: [COCommandGroup class]]);
-	if ([aNode isKindOfClass: [COCommandGroup class]])
-	{
-		INVALIDARG_EXCEPTION_TEST(aNode, [((COCommandGroup *)aNode).trackName isEqual: self.name]);
-	}
+	INVALIDARG_EXCEPTION_TEST(aNode, [aNode isKindOfClass: [COCommandGroup class]]);
+	INVALIDARG_EXCEPTION_TEST(aNode, [((COCommandGroup *)aNode).trackName isEqual: self.name]);
 
 	COCommand *command = (COCommand *)aNode;
 	[command applyToContext: _editingContext];
 	
-	NSString *commitShortDescription = [aNode localizedShortDescription];
-	if (commitShortDescription == nil)
-		commitShortDescription = @"";
-	
-	NSMutableDictionary *md = [@{kCOCommitMetadataShortDescriptionArguments : @[commitShortDescription]} mutableCopy];
+	NSMutableDictionary *md = [NSMutableDictionary new];
+	NSString *identifier = [(COCommandGroup *)aNode metadata][kCOCommitMetadataIdentifier];
+	NSString *shortDescription = [aNode localizedShortDescription];
+
+	if (identifier != nil)
+	{
+		md[kCOCommitMetadataIdentifier] = identifier;
+	}
+	md[kCOCommitMetadataNodeUUID] = [aNode.UUID stringValue];
+	md[kCOCommitMetadataNodeOperationIdentifier] = @"org.etoile.CoreObject.selective-redo";
+	md[kCOCommitMetadataShortDescriptionArguments] = @[(shortDescription != nil ? shortDescription : @"")];
+
 	if (self.customRevisionMetadata != nil)
 	{
 		[md addEntriesFromDictionary: self.customRevisionMetadata];
 	}
 	
-	[_editingContext commitWithIdentifier: @"org.etoile.CoreObject.selective-redo"
-								 metadata: md
-								undoTrack: self
-									error: NULL];
+	[_editingContext commitWithMetadata: md
+	                          undoTrack: self
+	                              error: NULL];
 }
 
 #pragma mark - COUndoTrack - Other Public Methods
@@ -566,13 +573,30 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 {
 	COCommandGroup *commandToApply = (inverse ? [aCommand inverse] : aCommand);
 	[commandToApply setParentUndoTrack: self];
-	
+
 	NSMutableDictionary *md = [NSMutableDictionary new];
-	md[kCOCommitMetadataIdentifier] = inverse ? @"org.etoile.CoreObject.undo" : @"org.etoile.CoreObject.redo";
-	if ([aCommand localizedShortDescription] != nil)
+	NSString *identifier = aCommand.metadata[kCOCommitMetadataIdentifier];
+	NSString *shortDescription = aCommand.metadata[kCOCommitMetadataShortDescription];
+	NSArray *args = aCommand.metadata[kCOCommitMetadataShortDescriptionArguments];
+	NSNumber *inversedValue = aCommand.metadata[kCOCommitMetadataNodeInversed];
+	BOOL inversed = inverse && (inversedValue == nil || !inversedValue.boolValue);
+
+	if (identifier != nil)
 	{
-		md[kCOCommitMetadataShortDescriptionArguments] = @[[aCommand localizedShortDescription]];
+		md[kCOCommitMetadataIdentifier] = identifier;
 	}
+	if (shortDescription != nil)
+	{
+		md[kCOCommitMetadataShortDescription] = shortDescription;
+	}
+	if (args != nil)
+	{
+		md[kCOCommitMetadataShortDescriptionArguments] = args;
+	}
+	md[kCOCommitMetadataNodeUUID] = [aCommand.UUID stringValue];
+	md[kCOCommitMetadataNodeOperationIdentifier] = inverse ? @"org.etoile.CoreObject.undo" : @"org.etoile.CoreObject.redo";
+	md[kCOCommitMetadataNodeInversed] = @(inversed);
+
 	if (self.customRevisionMetadata != nil)
 	{
 		[md addEntriesFromDictionary: self.customRevisionMetadata];

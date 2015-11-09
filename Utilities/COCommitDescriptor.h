@@ -309,3 +309,6 @@ extern NSString *kCOCommitMetadataShortDescription;
  * See also COCommitDescription Localization documentation section.
  */
 extern NSString *kCOCommitMetadataShortDescriptionArguments;
+extern NSString *kCOCommitMetadataNodeUUID;
+extern NSString *kCOCommitMetadataNodeOperationIdentifier;
+extern NSString *kCOCommitMetadataNodeInversed;
