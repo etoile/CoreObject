@@ -11,6 +11,7 @@
 
 @interface TestEditingContext : EditingContextTestCase <UKTest>
 {
+	NSNotification *unloadNotification;
 }
 @end
 
@@ -19,8 +20,22 @@
 - (id) init
 {
     SUPERINIT;
-	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorNever;
+	[[NSNotificationCenter defaultCenter]
+		addObserver: self
+		   selector: @selector(didUnloadPersistentRoots:)
+	           name: COEditingContextDidUnloadPersistentRootsNotification
+	         object: ctx];
     return self;
+}
+
+- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver: self];
+}
+
+- (void)didUnloadPersistentRoots: (NSNotification *)notif
+{
+	unloadNotification = notif;
 }
 
 - (void)testCustomModelDescriptionRepository
@@ -101,6 +116,15 @@
     
     [ctx commit];
 	
+	UKObjectsEqual(S(persistentRoot), unloadNotification.userInfo[kCOUnloadedPersistentRootsKey]);
+
+	// Force unloaded persistent root to be reloaded
+	persistentRoot = [ctx persistentRootForUUID: persistentRoot.UUID];
+
+    UKObjectsEqual([NSSet set], [ctx persistentRoots]);
+    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
+    UKObjectsEqual(S(persistentRoot), [ctx deletedPersistentRoots]);
+	
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
@@ -123,6 +147,11 @@
     
     persistentRoot.deleted = YES;
     [ctx commit];
+	
+	UKObjectsEqual(S(persistentRoot), unloadNotification.userInfo[kCOUnloadedPersistentRootsKey]);
+
+	// Force unloaded persistent root to be reloaded
+	persistentRoot = [ctx persistentRootForUUID: persistentRoot.UUID];
     
     [persistentRoot setDeleted: NO];
 
@@ -169,6 +198,8 @@
         [deletedOnDisk commit];
         deletedOnDisk.deleted = YES;
         [deletedOnDisk commit];
+		// Force unloaded persistent root to be reloaded
+		deletedOnDisk = [ctx persistentRootForUUID: deletedOnDisk.UUID];
         
         pendingInsertion = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
         
@@ -180,6 +211,8 @@
         [pendingUndeletion commit];
         pendingUndeletion.deleted = YES;
         [pendingUndeletion commit];
+		// Force unloaded persistent root to be reloaded
+		pendingUndeletion = [ctx persistentRootForUUID: pendingUndeletion.UUID];
         pendingUndeletion.deleted = NO;
         
         // Check that the constraints we wanted to set up hold

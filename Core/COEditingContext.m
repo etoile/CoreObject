@@ -174,6 +174,12 @@
 
 - (NSSet *)deletedPersistentRoots
 {
+	/* Force deleted persistent roots to be reloaded (see -unloadPersistentRoot:) */
+	for (ETUUID *persistentRootUUID in [self.store deletedPersistentRootUUIDs])
+	{
+		 [self persistentRootForUUID: persistentRootUUID];
+	}
+
 	return [NSSet setWithArray: [[_loadedPersistentRoots allValues] filteredCollectionWithBlock: ^(id obj) {
 		return ((COPersistentRoot *)obj).deleted;
 	}]];
