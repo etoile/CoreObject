@@ -309,6 +309,34 @@ extern NSString *kCOCommitMetadataShortDescription;
  * See also COCommitDescription Localization documentation section.
  */
 extern NSString *kCOCommitMetadataShortDescriptionArguments;
+/**
+ * The optional key that indicates the command group UUID used to synthesize
+ * the commit.
+ *
+ * When this key is set, two other keys are set:
+ *
+ * <list>
+ * <item>COCommitMetadataNodeOperationIdentifier</item>
+ * <item>kCOCommitMetadataNodeInversed</item>
+ * </list>
+ */
 extern NSString *kCOCommitMetadataNodeUUID;
+/**
+ * The optional key used to describe the commit operation (e.g. selective
+ * undo/redo or implicit undo due to a a pattern undo track manipulation).
+ *
+ * The value is a string representing a commit descriptor identifier.
+ *
+ * When this key is set, -[COCommitDescriptor localizedShortDescription] will 
+ * synthesize a special description by interpolating both 
+ * kCOCommitMetadataShortDescription + kCOCommitMetadataShortDescriptionArguments 
+ * into the short description template for the operation identifier.
+ */
 extern NSString *kCOCommitMetadataNodeOperationIdentifier;
+/**
+ * The optional key that indicates whether the commit was created by inversing 
+ * the command referenced by kCOCommitMetadataNodeUUID.
+ *
+ * The value is a NSNumber boolean.
+ */
 extern NSString *kCOCommitMetadataNodeInversed;
