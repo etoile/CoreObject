@@ -318,7 +318,7 @@ extern NSString *kCOCommitMetadataShortDescriptionArguments;
  * When this key is set, two other keys are set:
  *
  * <list>
- * <item>COCommitMetadataNodeOperationIdentifier</item>
+ * <item>kCOCommitMetadataNodeOperationIdentifier</item>
  * <item>kCOCommitMetadataNodeInversed</item>
  * </list>
  */
