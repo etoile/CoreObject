@@ -325,7 +325,7 @@ extern NSString *kCOCommitMetadataShortDescriptionArguments;
 extern NSString *kCOCommitMetadataNodeUUID;
 /**
  * The optional key used to describe the commit operation (e.g. selective
- * undo/redo or implicit undo due to a a pattern undo track manipulation).
+ * undo/redo or implicit undo due to a pattern undo track manipulation).
  *
  * The value is a string representing a commit descriptor identifier.
  *
