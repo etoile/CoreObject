@@ -313,6 +313,8 @@ extern NSString *kCOCommitMetadataShortDescriptionArguments;
  * The optional key that indicates the command group UUID used to synthesize
  * the commit.
  *
+ * The value is a UUID string.
+ *
  * When this key is set, two other keys are set:
  *
  * <list>
