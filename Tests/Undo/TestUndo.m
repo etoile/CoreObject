@@ -151,9 +151,9 @@
 		UKObjectsEqual(r3, [r4 parentRevision]);
 		UKObjectsEqual([r2 metadata][kCOCommitMetadataIdentifier], [r4 metadata][kCOCommitMetadataIdentifier]);
 
-		UKObjectsEqual(@"org.etoile.CoreObject.undo", [r4 metadata][kCOCommitMetadataNodeOperationIdentifier]);
-		UKObjectsEqual([[_rootEditTrack.nodes[1] UUID] stringValue], [r4 metadata][kCOCommitMetadataNodeUUID]);
-		UKTrue([[r4 metadata][kCOCommitMetadataNodeInversed] boolValue]);
+		UKObjectsEqual(@"org.etoile.CoreObject.undo", [r4 metadata][kCOCommitMetadataUndoType]);
+		UKObjectsEqual([[_rootEditTrack.nodes[1] UUID] stringValue], [r4 metadata][kCOCommitMetadataUndoBaseUUID]);
+		UKTrue([[r4 metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
 
 		UKObjectsEqual(@"extraValue", r4.metadata[@"extraKey"]);
 		
@@ -167,9 +167,9 @@
 		UKObjectsEqual(r4, [r5 parentRevision]);
 		UKObjectsEqual([r3 metadata][kCOCommitMetadataIdentifier], [r5 metadata][kCOCommitMetadataIdentifier]);
 
-		UKObjectsEqual(@"org.etoile.CoreObject.undo", [r5 metadata][kCOCommitMetadataNodeOperationIdentifier]);
-		UKObjectsEqual([[_childEditTrack.nodes[1] UUID] stringValue], [r5 metadata][kCOCommitMetadataNodeUUID]);
-		UKTrue([[r5 metadata][kCOCommitMetadataNodeInversed] boolValue]);
+		UKObjectsEqual(@"org.etoile.CoreObject.undo", [r5 metadata][kCOCommitMetadataUndoType]);
+		UKObjectsEqual([[_childEditTrack.nodes[1] UUID] stringValue], [r5 metadata][kCOCommitMetadataUndoBaseUUID]);
+		UKTrue([[r5 metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
 		
         UKNil([root valueForProperty: kCOLabel]);
         UKNil([child valueForProperty: kCOLabel]);
@@ -184,9 +184,9 @@
 		UKObjectsEqual(r5, [r6 parentRevision]);
 		UKObjectsEqual([r4 metadata][kCOCommitMetadataIdentifier], [r6 metadata][kCOCommitMetadataIdentifier]);
 
-		UKObjectsEqual(@"org.etoile.CoreObject.redo", [r6 metadata][kCOCommitMetadataNodeOperationIdentifier]);
-		UKObjectsEqual([[_rootEditTrack.nodes[1] UUID] stringValue], [r6 metadata][kCOCommitMetadataNodeUUID]);
-		UKFalse([[r6 metadata][kCOCommitMetadataNodeInversed] boolValue]);
+		UKObjectsEqual(@"org.etoile.CoreObject.redo", [r6 metadata][kCOCommitMetadataUndoType]);
+		UKObjectsEqual([[_rootEditTrack.nodes[1] UUID] stringValue], [r6 metadata][kCOCommitMetadataUndoBaseUUID]);
+		UKFalse([[r6 metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
 
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
         UKNil([child valueForProperty: kCOLabel]);
@@ -201,9 +201,9 @@
 		UKObjectsEqual(r6, [r7 parentRevision]);
 		UKObjectsEqual([r5 metadata][kCOCommitMetadataIdentifier], [r7 metadata][kCOCommitMetadataIdentifier]);
 
-		UKObjectsEqual(@"org.etoile.CoreObject.redo", [r7 metadata][kCOCommitMetadataNodeOperationIdentifier]);
-		UKObjectsEqual([[_childEditTrack.nodes[1] UUID] stringValue], [r7 metadata][kCOCommitMetadataNodeUUID]);
-		UKFalse([[r7 metadata][kCOCommitMetadataNodeInversed] boolValue]);
+		UKObjectsEqual(@"org.etoile.CoreObject.redo", [r7 metadata][kCOCommitMetadataUndoType]);
+		UKObjectsEqual([[_childEditTrack.nodes[1] UUID] stringValue], [r7 metadata][kCOCommitMetadataUndoBaseUUID]);
+		UKFalse([[r7 metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
         
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
         UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
@@ -687,10 +687,10 @@
 	UKStringsEqual([_testTrack.nodes[1] metadata][kCOCommitMetadataIdentifier],
 	               [_testTrack.nodes[3] metadata][kCOCommitMetadataIdentifier]);
 	UKStringsEqual(@"org.etoile.CoreObject.selective-undo",
-	              [_testTrack.nodes[3] metadata][kCOCommitMetadataNodeOperationIdentifier]);
+	              [_testTrack.nodes[3] metadata][kCOCommitMetadataUndoType]);
 	UKStringsEqual([[_testTrack.nodes[1] UUID] stringValue],
-	               [_testTrack.nodes[3] metadata][kCOCommitMetadataNodeUUID]);
-	UKTrue([[_testTrack.nodes[3] metadata][kCOCommitMetadataNodeInversed] boolValue]);
+	               [_testTrack.nodes[3] metadata][kCOCommitMetadataUndoBaseUUID]);
+	UKTrue([[_testTrack.nodes[3] metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
 	UKObjectsEqual(@"extraValue", doc1.currentRevision.metadata[@"extraKey"]);
 	
 	// Efficiency test: the r3 commit should only have written one item to the store
@@ -708,10 +708,10 @@
 	UKStringsEqual([_testTrack.nodes[1] metadata][kCOCommitMetadataIdentifier],
 	               [_testTrack.nodes[4] metadata][kCOCommitMetadataIdentifier]);
 	UKStringsEqual(@"org.etoile.CoreObject.selective-redo",
-	              [_testTrack.nodes[4] metadata][kCOCommitMetadataNodeOperationIdentifier]);
+	              [_testTrack.nodes[4] metadata][kCOCommitMetadataUndoType]);
 	UKStringsEqual([[_testTrack.nodes[1] UUID] stringValue],
-	               [_testTrack.nodes[4] metadata][kCOCommitMetadataNodeUUID]);
-	UKFalse([[_testTrack.nodes[4] metadata][kCOCommitMetadataNodeInversed] boolValue]);
+	               [_testTrack.nodes[4] metadata][kCOCommitMetadataUndoBaseUUID]);
+	UKFalse([[_testTrack.nodes[4] metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
 }
 
 - (void)testUndoCoalescing

@@ -310,19 +310,19 @@ extern NSString *kCOCommitMetadataShortDescription;
  */
 extern NSString *kCOCommitMetadataShortDescriptionArguments;
 /**
- * The optional key that indicates the command group UUID used to synthesize
- * the commit.
+ * The optional key that indicates the command group UUID which this commit 
+ * selectively applies or undoes.
  *
  * The value is a UUID string.
  *
  * When this key is set, two other keys are set:
  *
  * <list>
- * <item>kCOCommitMetadataNodeOperationIdentifier</item>
- * <item>kCOCommitMetadataNodeInversed</item>
+ * <item>kCOCommitMetadataUndoType</item>
+ * <item>kCOCommitMetadataUndoInitialBaseInversed</item>
  * </list>
  */
-extern NSString *kCOCommitMetadataNodeUUID;
+extern NSString *kCOCommitMetadataUndoBaseUUID;
 /**
  * The optional key used to describe the commit operation (e.g. selective
  * undo/redo or implicit undo due to a pattern undo track manipulation).
@@ -334,11 +334,12 @@ extern NSString *kCOCommitMetadataNodeUUID;
  * kCOCommitMetadataShortDescription + kCOCommitMetadataShortDescriptionArguments 
  * into the short description template for the operation identifier.
  */
-extern NSString *kCOCommitMetadataNodeOperationIdentifier;
+extern NSString *kCOCommitMetadataUndoType;
 /**
  * The optional key that indicates whether the commit was created by inversing 
- * the command referenced by kCOCommitMetadataNodeUUID.
+ * the oldest command found by traversing kCOCommitMetadataUndoBaseUUID (until
+ * it becomes nil).
  *
  * The value is a NSNumber boolean.
  */
-extern NSString *kCOCommitMetadataNodeInversed;
+extern NSString *kCOCommitMetadataUndoInitialBaseInversed;

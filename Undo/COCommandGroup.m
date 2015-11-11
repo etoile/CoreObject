@@ -267,7 +267,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 {
 	NSDictionary *metadata = self.metadata;
 	COCommitDescriptor *descriptor = self.commitDescriptor;
-	NSString *operationIdentifier = metadata[kCOCommitMetadataNodeOperationIdentifier];
+	NSString *operationIdentifier = metadata[kCOCommitMetadataUndoType];
 	NSString *description = nil;
 
 	if (descriptor == nil)
