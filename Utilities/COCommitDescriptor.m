@@ -287,9 +287,44 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 	                         arguments: [self localizedArgumentsFromArguments: args]];
 }
 
++ (NSString *)localizedShortDescriptionFromMetadata: (NSDictionary *)metadata
+{
+	NSString *identifier = metadata[kCOCommitMetadataIdentifier];
+	COCommitDescriptor *descriptor =
+		identifier != nil ? [self registeredDescriptorForIdentifier: identifier] : nil;
+	NSString *operationIdentifier = metadata[kCOCommitMetadataUndoType];
+	NSString *description = nil;
+
+	if (descriptor == nil)
+	{
+		description = metadata[kCOCommitMetadataShortDescription];
+	}
+	else
+	{
+		description = [descriptor localizedShortDescriptionWithArguments:
+			metadata[kCOCommitMetadataShortDescriptionArguments]];
+	}
+	
+	if (operationIdentifier != nil)
+	{
+		COCommitDescriptor *operationDescriptor =
+			[COCommitDescriptor registeredDescriptorForIdentifier: operationIdentifier];
+		NSString *validDescription = description != nil ? description : @"";
+
+		return [operationDescriptor localizedShortDescriptionWithArguments: @[validDescription]];
+	}
+	else
+	{
+		return description;
+	}
+}
+
 @end
 
 NSString *kCOCommitMetadataIdentifier = @"kCOCommitMetadataIdentifier";
 NSString *kCOCommitMetadataTypeDescription = @"kCOCommitMetadataTypeDescription";
 NSString *kCOCommitMetadataShortDescription = @"kCOCommitMetadataShortDescription";
 NSString *kCOCommitMetadataShortDescriptionArguments = @"kCOCommitMetadataShortDescriptionArguments";
+NSString *kCOCommitMetadataUndoBaseUUID = @"kCOCommitMetadataUndoBaseUUID";
+NSString *kCOCommitMetadataUndoType = @"kCOCommitMetadataUndoType";
+NSString *kCOCommitMetadataUndoInitialBaseInversed = @"kCOCommitMetadataUndoInitialBaseInversed";

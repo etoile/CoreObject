@@ -275,6 +275,12 @@
  * See also -shortDescription.
  */
 - (NSString *)localizedShortDescriptionWithArguments: (NSArray *)args;
+/**
+ * Looks up the commit descriptor from the metadata with 
+ * kCOCommitMetadataIdentifier, and returns a localized short description built
+ * by this descriptor with commit related metadata.
+ */
++ (NSString *)localizedShortDescriptionFromMetadata: (NSDictionary *)metadata;
 
 @end
 
@@ -309,3 +315,37 @@ extern NSString *kCOCommitMetadataShortDescription;
  * See also COCommitDescription Localization documentation section.
  */
 extern NSString *kCOCommitMetadataShortDescriptionArguments;
+/**
+ * The optional key that indicates the command group UUID which this commit 
+ * selectively applies or undoes.
+ *
+ * The value is a UUID string.
+ *
+ * When this key is set, two other keys are set:
+ *
+ * <list>
+ * <item>kCOCommitMetadataUndoType</item>
+ * <item>kCOCommitMetadataUndoInitialBaseInversed</item>
+ * </list>
+ */
+extern NSString *kCOCommitMetadataUndoBaseUUID;
+/**
+ * The optional key used to describe the commit operation (e.g. selective
+ * undo/redo or implicit undo due to a pattern undo track manipulation).
+ *
+ * The value is a string representing a commit descriptor identifier.
+ *
+ * When this key is set, -[COCommitDescriptor localizedShortDescription] will 
+ * synthesize a special description by interpolating both 
+ * kCOCommitMetadataShortDescription + kCOCommitMetadataShortDescriptionArguments 
+ * into the short description template for the operation identifier.
+ */
+extern NSString *kCOCommitMetadataUndoType;
+/**
+ * The optional key that indicates whether the commit was created by inversing 
+ * the oldest command found by traversing kCOCommitMetadataUndoBaseUUID (until
+ * it becomes nil).
+ *
+ * The value is a NSNumber boolean.
+ */
+extern NSString *kCOCommitMetadataUndoInitialBaseInversed;

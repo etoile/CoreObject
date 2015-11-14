@@ -265,13 +265,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (NSString *)localizedShortDescription
 {
-	COCommitDescriptor *descriptor = [self commitDescriptor];
-
-	if (descriptor == nil)
-		return [[self metadata] objectForKey: kCOCommitMetadataShortDescription];
-	
-	return [descriptor localizedShortDescriptionWithArguments:
-		[[self metadata] objectForKey: kCOCommitMetadataShortDescriptionArguments]];
+	return [COCommitDescriptor localizedShortDescriptionFromMetadata: self.metadata];
 }
 
 - (id<COTrackNode>)parentNode
@@ -316,7 +310,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (NSString *) description
 {
-	return [NSString stringWithFormat: @"COCommandGroup %@", _UUID];
+	return [NSString stringWithFormat: @"COCommandGroup %@\n\t%@", _UUID, self.localizedShortDescription];
 }
 
 @end

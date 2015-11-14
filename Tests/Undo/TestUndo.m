@@ -108,13 +108,13 @@
         COObject *root = [persistentRoot rootObject];
         COObject *child = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
         [root insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: kCOContents];
-        [ctx commitWithUndoTrack: _setupTrack];
+        [ctx commitWithIdentifier: @"insert-item" undoTrack: _setupTrack error: NULL];
         
         [root setValue: @"root" forProperty: kCOLabel];
-        [ctx commitWithUndoTrack: _rootEditTrack];
+        [ctx commitWithIdentifier: @"rename-item" undoTrack: _rootEditTrack error: NULL];
         
         [child setValue: @"child" forProperty: kCOLabel];
-        [ctx commitWithUndoTrack: _childEditTrack];
+        [ctx commitWithIdentifier: @"rename-item" undoTrack: _childEditTrack error: NULL];
     }
     
     // Load in another context
@@ -132,6 +132,7 @@
         UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
         
 		CORevision *r3 = ctx2persistentRoot.currentRevision;
+		CORevision *r2 = r3.parentRevision;
 
 		rootEditTrack.customRevisionMetadata = @{ @"extraKey" : @"extraValue" };
 		
@@ -148,7 +149,12 @@
 		CORevision *r4 = ctx2persistentRoot.currentRevision;
 		UKObjectsNotEqual(r3, r4);
 		UKObjectsEqual(r3, [r4 parentRevision]);
-		UKObjectsEqual(@"org.etoile.CoreObject.undo", [[r4 commitDescriptor] identifier]);
+		UKObjectsEqual([r2 metadata][kCOCommitMetadataIdentifier], [r4 metadata][kCOCommitMetadataIdentifier]);
+
+		UKObjectsEqual(@"org.etoile.CoreObject.undo", [r4 metadata][kCOCommitMetadataUndoType]);
+		UKObjectsEqual([[_rootEditTrack.nodes[1] UUID] stringValue], [r4 metadata][kCOCommitMetadataUndoBaseUUID]);
+		UKTrue([[r4 metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
+
 		UKObjectsEqual(@"extraValue", r4.metadata[@"extraKey"]);
 		
 		//
@@ -159,7 +165,11 @@
 		// Check that a new revision was created
 		CORevision *r5 = ctx2persistentRoot.currentRevision;
 		UKObjectsEqual(r4, [r5 parentRevision]);
-		UKObjectsEqual(@"org.etoile.CoreObject.undo", [[r5 commitDescriptor] identifier]);
+		UKObjectsEqual([r3 metadata][kCOCommitMetadataIdentifier], [r5 metadata][kCOCommitMetadataIdentifier]);
+
+		UKObjectsEqual(@"org.etoile.CoreObject.undo", [r5 metadata][kCOCommitMetadataUndoType]);
+		UKObjectsEqual([[_childEditTrack.nodes[1] UUID] stringValue], [r5 metadata][kCOCommitMetadataUndoBaseUUID]);
+		UKTrue([[r5 metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
 		
         UKNil([root valueForProperty: kCOLabel]);
         UKNil([child valueForProperty: kCOLabel]);
@@ -172,8 +182,12 @@
 		// Check that a new revision was created
 		CORevision *r6 = ctx2persistentRoot.currentRevision;
 		UKObjectsEqual(r5, [r6 parentRevision]);
-		UKObjectsEqual(@"org.etoile.CoreObject.redo", [[r6 commitDescriptor] identifier]);
-		
+		UKObjectsEqual([r4 metadata][kCOCommitMetadataIdentifier], [r6 metadata][kCOCommitMetadataIdentifier]);
+
+		UKObjectsEqual(@"org.etoile.CoreObject.redo", [r6 metadata][kCOCommitMetadataUndoType]);
+		UKObjectsEqual([[_rootEditTrack.nodes[1] UUID] stringValue], [r6 metadata][kCOCommitMetadataUndoBaseUUID]);
+		UKFalse([[r6 metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
+
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
         UKNil([child valueForProperty: kCOLabel]);
         
@@ -185,7 +199,11 @@
 		// Check that a new revision was created
 		CORevision *r7 = ctx2persistentRoot.currentRevision;
 		UKObjectsEqual(r6, [r7 parentRevision]);
-		UKObjectsEqual(@"org.etoile.CoreObject.redo", [[r7 commitDescriptor] identifier]);
+		UKObjectsEqual([r5 metadata][kCOCommitMetadataIdentifier], [r7 metadata][kCOCommitMetadataIdentifier]);
+
+		UKObjectsEqual(@"org.etoile.CoreObject.redo", [r7 metadata][kCOCommitMetadataUndoType]);
+		UKObjectsEqual([[_childEditTrack.nodes[1] UUID] stringValue], [r7 metadata][kCOCommitMetadataUndoBaseUUID]);
+		UKFalse([[r7 metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
         
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
         UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
@@ -626,12 +644,12 @@
 	
 	OutlineItem *child1 = [[doc1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[root addObject: child1];
-	[ctx commitWithUndoTrack: _testTrack];
+	[ctx commitWithIdentifier: @"insert-item" undoTrack: _testTrack error: nil];
 	CORevision *r1 = [doc1 currentRevision];
 	
 	OutlineItem *child2 = [[doc1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[root addObject: child2];
-	[ctx commitWithUndoTrack: _testTrack];
+	[ctx commitWithIdentifier: @"insert-item" undoTrack: _testTrack error: nil];
 	CORevision *r2 = [doc1 currentRevision];
 	
 	UKObjectsEqual((@[child1, child2]), [root contents]);
@@ -666,7 +684,13 @@
 	
 	// Check that the commit created by COUndoTrack has proper commit metadata
 	// FIXME: This next line tests the undo track node metadata, not the revision metadata.
-	UKObjectsEqual(@"org.etoile.CoreObject.selective-undo", [[_testTrack.nodes[3] commitDescriptor] identifier]);
+	UKStringsEqual([_testTrack.nodes[1] metadata][kCOCommitMetadataIdentifier],
+	               [_testTrack.nodes[3] metadata][kCOCommitMetadataIdentifier]);
+	UKStringsEqual(@"org.etoile.CoreObject.selective-undo",
+	              [_testTrack.nodes[3] metadata][kCOCommitMetadataUndoType]);
+	UKStringsEqual([[_testTrack.nodes[1] UUID] stringValue],
+	               [_testTrack.nodes[3] metadata][kCOCommitMetadataUndoBaseUUID]);
+	UKTrue([[_testTrack.nodes[3] metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
 	UKObjectsEqual(@"extraValue", doc1.currentRevision.metadata[@"extraKey"]);
 	
 	// Efficiency test: the r3 commit should only have written one item to the store
@@ -681,7 +705,13 @@
 	// get either [ child2, child1 ] or [ child1, child2 ]
 	//
 	UKObjectsEqual(S(child1.UUID, child2.UUID), SA([root valueForKeyPath: @"contents.UUID"]));
-	UKObjectsEqual(@"org.etoile.CoreObject.selective-redo", [[_testTrack.nodes[4] commitDescriptor] identifier]);
+	UKStringsEqual([_testTrack.nodes[1] metadata][kCOCommitMetadataIdentifier],
+	               [_testTrack.nodes[4] metadata][kCOCommitMetadataIdentifier]);
+	UKStringsEqual(@"org.etoile.CoreObject.selective-redo",
+	              [_testTrack.nodes[4] metadata][kCOCommitMetadataUndoType]);
+	UKStringsEqual([[_testTrack.nodes[1] UUID] stringValue],
+	               [_testTrack.nodes[4] metadata][kCOCommitMetadataUndoBaseUUID]);
+	UKFalse([[_testTrack.nodes[4] metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
 }
 
 - (void)testUndoCoalescing

@@ -130,13 +130,7 @@
 
 - (NSString *)localizedShortDescription
 {
-	COCommitDescriptor *descriptor = [self commitDescriptor];
-
-	if (descriptor == nil)
-		return [[self metadata] objectForKey: kCOCommitMetadataShortDescription];
-	
-	return [descriptor localizedShortDescriptionWithArguments:
-		[[self metadata] objectForKey: kCOCommitMetadataShortDescriptionArguments]];
+	return [COCommitDescriptor localizedShortDescriptionFromMetadata: self.metadata];
 }
 
 - (NSString *)type
