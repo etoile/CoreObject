@@ -294,7 +294,8 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 + (NSString *)localizedShortDescriptionFromMetadata: (NSDictionary *)metadata
 {
 	NSString *identifier = metadata[kCOCommitMetadataIdentifier];
-	COCommitDescriptor *descriptor = [self registeredDescriptorForIdentifier: identifier];
+	COCommitDescriptor *descriptor =
+		identifier != nil ? [self registeredDescriptorForIdentifier: identifier] : nil;
 	NSString *operationIdentifier = metadata[kCOCommitMetadataUndoType];
 	NSString *description = nil;
 
