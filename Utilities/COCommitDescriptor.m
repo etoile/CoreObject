@@ -291,6 +291,37 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 	                         arguments: [self localizedArgumentsFromArguments: args]];
 }
 
++ (NSString *)localizedShortDescriptionFromMetadata: (NSDictionary *)metadata
+{
+	NSString *identifier = metadata[kCOCommitMetadataIdentifier];
+	COCommitDescriptor *descriptor = [self registeredDescriptorForIdentifier: identifier];
+	NSString *operationIdentifier = metadata[kCOCommitMetadataUndoType];
+	NSString *description = nil;
+
+	if (descriptor == nil)
+	{
+		description = metadata[kCOCommitMetadataShortDescription];
+	}
+	else
+	{
+		description = [descriptor localizedShortDescriptionWithArguments:
+			metadata[kCOCommitMetadataShortDescriptionArguments]];
+	}
+	
+	if (operationIdentifier != nil)
+	{
+		COCommitDescriptor *operationDescriptor =
+			[COCommitDescriptor registeredDescriptorForIdentifier: operationIdentifier];
+		NSString *validDescription = description != nil ? description : @"";
+
+		return [operationDescriptor localizedShortDescriptionWithArguments: @[validDescription]];
+	}
+	else
+	{
+		return description;
+	}
+}
+
 @end
 
 NSString *kCOCommitMetadataIdentifier = @"kCOCommitMetadataIdentifier";

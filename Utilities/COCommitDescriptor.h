@@ -275,6 +275,12 @@
  * See also -shortDescription.
  */
 - (NSString *)localizedShortDescriptionWithArguments: (NSArray *)args;
+/**
+ * Looks up the commit descriptor from the metadata with 
+ * kCOCommitMetadataIdentifier, and returns a localized short description built
+ * by this descriptor with commit related metadata.
+ */
++ (NSString *)localizedShortDescriptionFromMetadata: (NSDictionary *)metadata;
 
 @end
 

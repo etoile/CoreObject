@@ -265,33 +265,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (NSString *)localizedShortDescription
 {
-	NSDictionary *metadata = self.metadata;
-	COCommitDescriptor *descriptor = self.commitDescriptor;
-	NSString *operationIdentifier = metadata[kCOCommitMetadataUndoType];
-	NSString *description = nil;
-
-	if (descriptor == nil)
-	{
-		description = metadata[kCOCommitMetadataShortDescription];
-	}
-	else
-	{
-		description = [descriptor localizedShortDescriptionWithArguments:
-			metadata[kCOCommitMetadataShortDescriptionArguments]];
-	}
-	
-	if (operationIdentifier != nil)
-	{
-		COCommitDescriptor *operationDescriptor =
-			[COCommitDescriptor registeredDescriptorForIdentifier: operationIdentifier];
-		NSString *validDescription = description != nil ? description : @"";
-
-		return [operationDescriptor localizedShortDescriptionWithArguments: @[validDescription]];
-	}
-	else
-	{
-		return description;
-	}
+	return [COCommitDescriptor localizedShortDescriptionFromMetadata: self.metadata];
 }
 
 - (id<COTrackNode>)parentNode
