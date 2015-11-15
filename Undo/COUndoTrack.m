@@ -302,8 +302,9 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	[command applyToContext: _editingContext];
 	
 	NSMutableDictionary *md = [NSMutableDictionary new];
-	NSString *identifier = [(COCommandGroup *)aNode metadata][kCOCommitMetadataIdentifier];
-	NSString *shortDescription = [aNode localizedShortDescription];
+	NSString *identifier = aNode.metadata[kCOCommitMetadataIdentifier];
+	NSString *shortDescription = aNode.metadata[kCOCommitMetadataShortDescription];
+	NSArray *shortDescriptionArgs = aNode.metadata[kCOCommitMetadataShortDescriptionArguments];
 	NSNumber *inversedValue = aNode.metadata[kCOCommitMetadataUndoInitialBaseInversed];
 	BOOL inversed = inversedValue == nil || !inversedValue.boolValue;
 
@@ -311,7 +312,14 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	{
 		md[kCOCommitMetadataIdentifier] = identifier;
 	}
-	md[kCOCommitMetadataShortDescriptionArguments] = @[(shortDescription != nil ? shortDescription : @"")];
+	if (shortDescription != nil)
+	{
+		md[kCOCommitMetadataShortDescription] = shortDescription;
+	}
+	if (shortDescriptionArgs != nil)
+	{
+		md[kCOCommitMetadataShortDescriptionArguments] = shortDescriptionArgs;
+	}
 	md[kCOCommitMetadataUndoBaseUUID] = [aNode.UUID stringValue];
 	md[kCOCommitMetadataUndoType] = @"org.etoile.CoreObject.selective-undo";
 	md[kCOCommitMetadataUndoInitialBaseInversed] = @(inversed);
@@ -335,16 +343,24 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	[command applyToContext: _editingContext];
 	
 	NSMutableDictionary *md = [NSMutableDictionary new];
-	NSString *identifier = [(COCommandGroup *)aNode metadata][kCOCommitMetadataIdentifier];
-	NSString *shortDescription = [aNode localizedShortDescription];
+	NSString *identifier = aNode.metadata[kCOCommitMetadataIdentifier];
+	NSString *shortDescription = aNode.metadata[kCOCommitMetadataShortDescription];
+	NSArray *shortDescriptionArgs = aNode.metadata[kCOCommitMetadataShortDescriptionArguments];
 
 	if (identifier != nil)
 	{
 		md[kCOCommitMetadataIdentifier] = identifier;
 	}
+	if (shortDescription != nil)
+	{
+		md[kCOCommitMetadataShortDescription] = shortDescription;
+	}
+	if (shortDescriptionArgs != nil)
+	{
+		md[kCOCommitMetadataShortDescriptionArguments] = shortDescriptionArgs;
+	}
 	md[kCOCommitMetadataUndoBaseUUID] = [aNode.UUID stringValue];
 	md[kCOCommitMetadataUndoType] = @"org.etoile.CoreObject.selective-redo";
-	md[kCOCommitMetadataShortDescriptionArguments] = @[(shortDescription != nil ? shortDescription : @"")];
 
 	if (self.customRevisionMetadata != nil)
 	{

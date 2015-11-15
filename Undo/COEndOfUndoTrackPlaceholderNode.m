@@ -35,7 +35,7 @@ static ETUUID *uuid;
 		  @"localizedTypeDescription", @"localizedShortDescription")];
 }
 
-- (NSDictionary *)metadata { return nil; }
+- (NSDictionary *)metadata { return [NSDictionary new]; }
 - (ETUUID *)UUID { return uuid; }
 - (ETUUID *)persistentRootUUID { return nil; }
 - (ETUUID *)branchUUID { return nil; }
