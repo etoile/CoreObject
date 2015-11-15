@@ -301,25 +301,10 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	COCommandGroup *command = [(COCommandGroup *)aNode inverse];
 	[command applyToContext: _editingContext];
 	
-	NSMutableDictionary *md = [NSMutableDictionary new];
-	NSString *identifier = aNode.metadata[kCOCommitMetadataIdentifier];
-	NSString *shortDescription = aNode.metadata[kCOCommitMetadataShortDescription];
-	NSArray *shortDescriptionArgs = aNode.metadata[kCOCommitMetadataShortDescriptionArguments];
+	NSMutableDictionary *md = [aNode.metadata mutableCopy];
 	NSNumber *inversedValue = aNode.metadata[kCOCommitMetadataUndoInitialBaseInversed];
 	BOOL inversed = inversedValue == nil || !inversedValue.boolValue;
 
-	if (identifier != nil)
-	{
-		md[kCOCommitMetadataIdentifier] = identifier;
-	}
-	if (shortDescription != nil)
-	{
-		md[kCOCommitMetadataShortDescription] = shortDescription;
-	}
-	if (shortDescriptionArgs != nil)
-	{
-		md[kCOCommitMetadataShortDescriptionArguments] = shortDescriptionArgs;
-	}
 	md[kCOCommitMetadataUndoBaseUUID] = [aNode.UUID stringValue];
 	md[kCOCommitMetadataUndoType] = @"org.etoile.CoreObject.selective-undo";
 	md[kCOCommitMetadataUndoInitialBaseInversed] = @(inversed);
@@ -342,23 +327,8 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	COCommand *command = (COCommand *)aNode;
 	[command applyToContext: _editingContext];
 	
-	NSMutableDictionary *md = [NSMutableDictionary new];
-	NSString *identifier = aNode.metadata[kCOCommitMetadataIdentifier];
-	NSString *shortDescription = aNode.metadata[kCOCommitMetadataShortDescription];
-	NSArray *shortDescriptionArgs = aNode.metadata[kCOCommitMetadataShortDescriptionArguments];
+	NSMutableDictionary *md = [aNode.metadata mutableCopy];
 
-	if (identifier != nil)
-	{
-		md[kCOCommitMetadataIdentifier] = identifier;
-	}
-	if (shortDescription != nil)
-	{
-		md[kCOCommitMetadataShortDescription] = shortDescription;
-	}
-	if (shortDescriptionArgs != nil)
-	{
-		md[kCOCommitMetadataShortDescriptionArguments] = shortDescriptionArgs;
-	}
 	md[kCOCommitMetadataUndoBaseUUID] = [aNode.UUID stringValue];
 	md[kCOCommitMetadataUndoType] = @"org.etoile.CoreObject.selective-redo";
 
@@ -590,25 +560,10 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	COCommandGroup *commandToApply = (inverse ? [aCommand inverse] : aCommand);
 	[commandToApply setParentUndoTrack: self];
 
-	NSMutableDictionary *md = [NSMutableDictionary new];
-	NSString *identifier = aCommand.metadata[kCOCommitMetadataIdentifier];
-	NSString *shortDescription = aCommand.metadata[kCOCommitMetadataShortDescription];
-	NSArray *args = aCommand.metadata[kCOCommitMetadataShortDescriptionArguments];
+	NSMutableDictionary *md = [aCommand.metadata mutableCopy];
 	NSNumber *inversedValue = aCommand.metadata[kCOCommitMetadataUndoInitialBaseInversed];
 	BOOL inversed = inverse && (inversedValue == nil || !inversedValue.boolValue);
 
-	if (identifier != nil)
-	{
-		md[kCOCommitMetadataIdentifier] = identifier;
-	}
-	if (shortDescription != nil)
-	{
-		md[kCOCommitMetadataShortDescription] = shortDescription;
-	}
-	if (args != nil)
-	{
-		md[kCOCommitMetadataShortDescriptionArguments] = args;
-	}
 	md[kCOCommitMetadataUndoBaseUUID] = [aCommand.UUID stringValue];
 	md[kCOCommitMetadataUndoType] = inverse ? @"org.etoile.CoreObject.undo" : @"org.etoile.CoreObject.redo";
 	md[kCOCommitMetadataUndoInitialBaseInversed] = @(inversed);
