@@ -896,7 +896,9 @@ static BOOL ignoresChangeTrackingNotifications = NO;
 	ignoresChangeTrackingNotifications = YES;
 	for (COObject *referrer in referringObjects)
 	{
-		// TODO: Skip referring objects which are not inner objects of the receiver
+        if (referrer.objectGraphContext != self)
+            continue;
+        
 		[referrer replaceReferencesToObjectIdenticalTo: anObject
 											withObject: aReplacement];
 	}
