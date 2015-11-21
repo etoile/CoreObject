@@ -11,6 +11,28 @@
 @class COObject;
 @class COItem;
 
+@interface COCachedRelationship : NSObject
+{
+@public
+    NSString *_targetProperty;
+    /**
+     * Weak reference.
+     */
+    COObject *__weak _sourceObject;
+    NSString *_sourceProperty;
+}
+
+@property (nonatomic, readonly) NSDictionary *descriptionDictionary;
+
+@property (readwrite, nonatomic, weak) COObject *sourceObject;
+@property (readwrite, nonatomic, copy) NSString *sourceProperty;
+@property (readwrite, nonatomic, copy) NSString *targetProperty;
+
+- (BOOL) isSourceObjectTrackingSpecificBranchForTargetObject: (COObject *)aTargetObject;
+- (BOOL)isSourceObjectBranchDeleted;
+
+@end
+
 /**
  * An instance of this class is owned by each COObject,
  * to cache incoming relationships for that object.
@@ -35,6 +57,8 @@
 - (COObject *) referringObjectForPropertyInTarget: (NSString *)aProperty;
 
 - (void) removeAllEntries;
+
+- (NSArray *) allEntries;
 
 - (void) removeReferencesForPropertyInSource: (NSString *)aTargetProperty
                                 sourceObject: (COObject *)anObject;

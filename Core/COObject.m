@@ -1716,6 +1716,18 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 {
     [self removeCachedOutgoingRelationships];
 	
+    // If there are any pointers in other object graph contexts to self, replace them
+    // with [COPath brokenPath]. This shouldn't normally happen, but does when deallocating
+    // one COObjectGraphContext but not another that has pointers to the first.
+    for (COCachedRelationship *cacheEntry in [_incomingRelationshipCache.allEntries copy])
+    {
+        if (cacheEntry.sourceObject.objectGraphContext != self.objectGraphContext)
+        {
+            [cacheEntry.sourceObject.objectGraphContext replaceObject: self
+                                                           withObject: (id)[COPath brokenPath]];
+        }
+    }
+    
 	/* For dead outgoing univalued relationship, the property value is nil and 
 	   not a COPath, so -removeCachedOutgoingRelationships does nothing, and 
 	   we have to remove the receiver manually.
