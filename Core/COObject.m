@@ -1876,6 +1876,8 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 						updated = YES;
 					}
 					[array replaceReferenceAtIndex: i withReference: replacement];
+                    // Make sure it wasn't wrongly rejected as a duplicate, etc.
+                    ETAssert([array referenceAtIndex: i] == replacement);
 				}
 			}
 			array.mutable = NO;
@@ -1894,6 +1896,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 				}
 				[set removeReference: object];
 				[set addReference: replacement];
+                ETAssert([set containsReference: replacement]);
 			}
 			set.mutable = NO;
 		}
@@ -1904,6 +1907,8 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 			// FIXME: We should call -setValue:forStorageKey here.
 			[self willChangeValueForProperty: key];
 			[self setValue: replacement forVariableStorageKey: key];
+            // TODO: Would be nice to have an assertion here
+            //ETAssert([self valueForVariableStorageKey: key] == replacement);
 			updated = YES;
 		}
 
