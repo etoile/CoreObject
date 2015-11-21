@@ -414,23 +414,17 @@
 		if (persistentRoot == aPersistentRoot)
 			continue;
 		
-		// TODO: Use -objectGraphWithoutUnfaulting or -allObjectGraphContexts to
-		// prevent loading every object graph contexts we check
-
-		/* Fix references pointing to any branch that belong to the deleted 
+		/* Fix references pointing to any branch that belong to the deleted
 		   persistent root (the relationship target) */
 		NSSet *targetObjectGraphs = nil;
 		
 		if (aBranch != nil)
 		{
-			targetObjectGraphs = [NSSet setWithObject: aBranch.objectGraphContext];
+            targetObjectGraphs = [NSSet setWithObject: aBranch.objectGraphContext];
 		}
 		else
 		{
-			targetObjectGraphs =
-				[(id)[[aPersistentRoot.branches mappedCollection] objectGraphContext] mutableCopy];
-
-			[(NSMutableSet *)targetObjectGraphs addObject: aPersistentRoot.objectGraphContext];
+            targetObjectGraphs = [NSSet setWithSet: [aPersistentRoot allObjectGraphContexts]];
 		}
 
 		for (COObjectGraphContext *target in targetObjectGraphs)
@@ -442,11 +436,7 @@
 			BOOL isTargetDeletion = isDeletion || target.branch.deleted;
 			/* Fix references in all branches that belong to persistent roots 
 			   referencing the deleted persistent root (those are relationship sources) */
-			NSMutableSet *sourceObjectGraphs =
-				[(id)[[persistentRoot.branches mappedCollection] objectGraphContext] mutableCopy];
-
-
-			[sourceObjectGraphs addObject: persistentRoot.objectGraphContext];
+			NSSet *sourceObjectGraphs = [NSSet setWithSet: [persistentRoot allObjectGraphContexts]];
 
 			for (COObjectGraphContext *source in sourceObjectGraphs)
 			{
