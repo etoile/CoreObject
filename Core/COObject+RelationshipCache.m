@@ -61,6 +61,12 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
 		}
 		else
 		{
+            if (![obj isKindOfClass: [COObject class]])
+            {
+                NSLog(@"%@: Warning, ignoring non-COObject instance %@ in %@ of %@", NSStringFromSelector(_cmd), obj, aProperty.name, self);
+                return;
+            }
+            
 			[[obj incomingRelationshipCache] removeReferencesForPropertyInSource: [aProperty name]
 																	sourceObject: self];
 		}

@@ -540,6 +540,13 @@ See +[NSObject typePrefix]. */
 
 - (BOOL)isEditingContextValidForObject: (COObject *)value
 {
+    if (value != nil && ![value isKindOfClass: [COObject class]])
+    {
+        // This can happen in -testNullDisallowedInCollection which leaves [NSNull null] instances
+        // in a collection.
+        return NO;
+    }
+    
 	COEditingContext *valueEditingContext = [[value persistentRoot] parentContext];
 	COEditingContext *currentEditingContext = [[self persistentRoot] parentContext];
 	BOOL involvesTransientObject = (valueEditingContext == nil || currentEditingContext == nil);
