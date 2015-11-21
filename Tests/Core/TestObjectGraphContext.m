@@ -600,6 +600,21 @@
 		withUserInfo: @{ CORelinquishedObjectsKey : @[garbage] }];
 }
 
+- (void) testRelinquishOnDealloc
+{
+    [self checkBlock: ^{
+        @autoreleasepool {
+            COObjectGraphContext *testCtx = [COObjectGraphContext new];
+            OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: testCtx];
+            child1.label = @"child1";
+            [testCtx setRootObject: child1];
+        }
+    } postsNotification: COObjectGraphContextWillRelinquishObjectsNotification
+              withCount: 1
+             fromObject: nil
+           withUserInfo: nil];
+}
+
 #pragma mark - COObjectGraphContextWillRelinquishObjectsNotification
 
 - (void) testBeginEndBatchNotification
