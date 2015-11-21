@@ -182,7 +182,10 @@
 
 - (void)testNullDisallowedInCollection
 {
+    UKObjectsEqual(A(child1, child2), parent.contents);
 	UKRaisesException([parent setContents: A([NSNull null])]);
+    // Unfortunately, the collection is modified
+    UKObjectsEqual(A([NSNull null]), parent.contents);
 }
 
 @end
