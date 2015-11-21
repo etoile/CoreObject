@@ -22,6 +22,10 @@
 
 @end
 
+static inline BOOL COIsTombstone(NSObject *obj)
+{
+    return [obj isKindOfClass: [COPath class]];
+}
 
 static inline void COThrowExceptionIfNotMutable(BOOL mutable)
 {
@@ -114,7 +118,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 - (void)addReference: (id)aReference
 {
 	COThrowExceptionIfNotMutable(_mutable);
-	if (![aReference isKindOfClass: [COPath class]])
+	if (!COIsTombstone(aReference))
 	{
 		[_externalIndexToBackingIndex addPointer: (void *)_backing.count];
 	}
@@ -154,8 +158,8 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 {
 	COThrowExceptionIfNotMutable(_mutable);
 	
-	const BOOL wasTombstone = [(id)[_backing pointerAtIndex: index] isKindOfClass: [COPath class]];
-	const BOOL willBeTombstone = [aReference isKindOfClass: [COPath class]];
+	const BOOL wasTombstone = COIsTombstone((id)[_backing pointerAtIndex: index]);
+	const BOOL willBeTombstone = COIsTombstone(aReference);
 	
 	if (!wasTombstone && willBeTombstone)
 	{
@@ -208,7 +212,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	COThrowExceptionIfNotMutable(_mutable);
 	COThrowExceptionIfOutOfBounds(self, index, YES);
 	
-	ETAssert(![anObject isKindOfClass: [COPath class]]);
+	ETAssert(!COIsTombstone(anObject));
 	
     // NSPointerArray on 10.7 doesn't allow inserting at the end using index == count, so
     // call addPointer in that case as a workaround.
@@ -258,7 +262,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 {
 	COThrowExceptionIfNotMutable(_mutable);
 	COThrowExceptionIfOutOfBounds(self, index, NO);
-	ETAssert(![anObject isKindOfClass: [COPath class]]);
+	ETAssert(!COIsTombstone(anObject));
 	[_backing replacePointerAtIndex: [self backingIndex: index]
 	                    withPointer: (__bridge void *)anObject];
 }
@@ -271,7 +275,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	COThrowExceptionIfNotMutable(_mutable);
 
 	NSArray *deadReferences = [_backing.allObjects filteredCollectionWithBlock: ^(id obj) {
-		return [obj isKindOfClass: [COPath class]];
+		return COIsTombstone(obj);
 	}];
 							   
 	[_backing setCount: 0];
@@ -354,7 +358,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	}
 	
 	[super addReference: aReference];
-	if ([aReference isKindOfClass: [COPath class]])
+	if (COIsTombstone(aReference))
 	{
 		[_deadReferences addObject: aReference];
 	}
@@ -373,13 +377,13 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	// remove old value from hash table
 	id oldValue = [_backing pointerAtIndex: index];
 	[_backingHashTable removeObject: oldValue];
-	if ([oldValue isKindOfClass: [COPath class]])
+	if (COIsTombstone(oldValue))
 	{
 		[_deadReferences removeObject: oldValue];
 	}
 
 	[super replaceReferenceAtIndex: index withReference: aReference];
-	if ([aReference isKindOfClass: [COPath class]])
+	if (COIsTombstone(aReference))
 	{
 		[_deadReferences addObject: aReference];
 	}
@@ -498,7 +502,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 {
 	COThrowExceptionIfNotMutable(_mutable);
 	[_backing addObject: aReference];
-	if ([aReference isKindOfClass: [COPath class]])
+	if (COIsTombstone(aReference))
 	{
 		[_deadReferences addObject: aReference];
 	}
@@ -508,7 +512,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 {
 	COThrowExceptionIfNotMutable(_mutable);
 	[_backing removeObject: aReference];
-	if ([aReference isKindOfClass: [COPath class]])
+	if (COIsTombstone(aReference))
 	{
 		[_deadReferences removeObject: aReference];
 	}
@@ -552,7 +556,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 - (void)addObject: (id)anObject
 {
 	COThrowExceptionIfNotMutable(_mutable);
-	ETAssert(![anObject isKindOfClass: [COPath class]]);
+	ETAssert(!COIsTombstone(anObject));
 		
 	[_backing addObject: anObject];
 }
@@ -560,7 +564,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 - (void)removeObject: (id)anObject
 {
 	COThrowExceptionIfNotMutable(_mutable);
-	ETAssert(![anObject isKindOfClass: [COPath class]]);
+	ETAssert(!COIsTombstone(anObject));
 	
 	[_backing removeObject: anObject];
 }
@@ -637,11 +641,11 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 - (void)setReference: (id)aReference forKey: (id<NSCopying>)aKey
 {
 	COThrowExceptionIfNotMutable(_mutable);
-	if ([aReference isKindOfClass: [COPath class]])
+	if (COIsTombstone(aReference))
 	{
 		[_deadKeys addObject: aKey];
 	}
-	if ([_backing[aKey] isKindOfClass: [COPath class]])
+	if (COIsTombstone(_backing[aKey]))
 	{
 		[_deadKeys removeObject: aKey];
 	}
