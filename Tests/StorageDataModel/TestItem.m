@@ -304,4 +304,18 @@
     [self validateRoundTrips: item1];
 }
 
+- (void) testNullInCollections
+{
+    COMutableItem *item = [COMutableItem item];
+
+    [item setValue: A([NSNull null])
+      forAttribute: @"array of null"
+              type: kCOTypeArray | kCOTypeString];
+    [item setValue: S([NSNull null])
+      forAttribute: @"array of null"
+              type: kCOTypeSet | kCOTypeString];
+    
+    [self validateRoundTrips: item];
+}
+
 @end

@@ -643,4 +643,21 @@
 #endif
 }
 
+- (void) testCrossContextReferenceSerializedAsNull
+{
+    COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+    
+    OutlineItem *ctx2root = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
+    ctx2root.label = @"ctx2root";
+    
+    // create a link from ctx1 to ctx2
+    [root1 addObject: ctx2root];
+    
+    // TODO: Perhaps attempting to serialize this should throw an exception?
+    COItem *item = [root1 storeItem];
+    NSArray *itemContentsArray = [item valueForAttribute: @"contents"];
+    UKIntsEqual(1, itemContentsArray.count);
+    UKObjectsEqual([NSNull null], itemContentsArray[0]);
+}
+
 @end
