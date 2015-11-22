@@ -700,7 +700,7 @@
     NSLog(@"%@", [ctx1 detailedDescription]);
 }
 
-- (void) test
+- (void) testCrossContextReferencedObjectDeallocatedWithTwoReferences
 {
     // add a child in ctx1
     OutlineItem *ctx1obj = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
