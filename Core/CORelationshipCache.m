@@ -150,7 +150,7 @@
 
 - (NSArray *) allEntries
 {
-    return _cachedRelationships;
+	return _cachedRelationships;
 }
 
 - (void) removeReferencesForPropertyInSource: (NSString *)aTargetProperty

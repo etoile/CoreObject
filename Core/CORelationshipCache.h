@@ -14,12 +14,12 @@
 @interface COCachedRelationship : NSObject
 {
 @public
-    NSString *_targetProperty;
-    /**
-     * Weak reference.
-     */
-    COObject *__weak _sourceObject;
-    NSString *_sourceProperty;
+	NSString *_targetProperty;
+	/**
+	 * Weak reference.
+	 */
+	COObject *__weak _sourceObject;
+	NSString *_sourceProperty;
 }
 
 @property (nonatomic, readonly) NSDictionary *descriptionDictionary;

@@ -807,34 +807,34 @@
 
 - (void)testMultipleBrokenPaths
 {
-    @autoreleasepool {
-        COPath *br1 = [COPath brokenPath];
-        COPath *br2 = [COPath brokenPath];
-        [array addReference: br1];
-        [array addReference: br2];
-    }
-    // Ensure the array retained both
-    UKTrue([[array referenceAtIndex: 0] isBroken]);
-    UKTrue([[array referenceAtIndex: 1] isBroken]);
+	@autoreleasepool {
+		COPath *br1 = [COPath brokenPath];
+		COPath *br2 = [COPath brokenPath];
+		[array addReference: br1];
+		[array addReference: br2];
+	}
+	// Ensure the array retained both
+	UKTrue([[array referenceAtIndex: 0] isBroken]);
+	UKTrue([[array referenceAtIndex: 1] isBroken]);
 }
 
 - (void)testMultipleBrokenPathsReplacement
 {
-    [array addObject: @"a"];
-    [array addObject: @"b"];
-    [array addObject: @"c"];
-    @autoreleasepool {
-        COPath *br1 = [COPath brokenPath];
-        COPath *br2 = [COPath brokenPath];
-        COPath *br3 = [COPath brokenPath];
-        [array replaceReferenceAtIndex: 0 withReference: br1];
-        [array replaceReferenceAtIndex: 1 withReference: br2];
-        [array replaceReferenceAtIndex: 2 withReference: br3];
-    }
-    // Ensure the array retained all
-    UKTrue([[array referenceAtIndex: 0] isBroken]);
-    UKTrue([[array referenceAtIndex: 1] isBroken]);
-    UKTrue([[array referenceAtIndex: 2] isBroken]);
+	[array addObject: @"a"];
+	[array addObject: @"b"];
+	[array addObject: @"c"];
+	@autoreleasepool {
+		COPath *br1 = [COPath brokenPath];
+		COPath *br2 = [COPath brokenPath];
+		COPath *br3 = [COPath brokenPath];
+		[array replaceReferenceAtIndex: 0 withReference: br1];
+		[array replaceReferenceAtIndex: 1 withReference: br2];
+		[array replaceReferenceAtIndex: 2 withReference: br3];
+	}
+	// Ensure the array retained all
+	UKTrue([[array referenceAtIndex: 0] isBroken]);
+	UKTrue([[array referenceAtIndex: 1] isBroken]);
+	UKTrue([[array referenceAtIndex: 2] isBroken]);
 }
 
 @end
@@ -916,30 +916,30 @@
 
 - (void)testMultipleBrokenPaths
 {
-    UKIntsEqual(0, set.count);
-    [set addObject: @"a"];
-    [set addObject: @"b"];
-    UKIntsEqual(2, set.count);
-    
-    @autoreleasepool {
-        [set removeReference: @"b"];
-        [set addReference: [COPath brokenPath]];
-        UKIntsEqual(1, set.count);
-    }
-    
-    @autoreleasepool {
-        [set removeReference: @"a"];
-        [set addReference: [COPath brokenPath]];
-        UKIntsEqual(0, set.count);
-    }
-    
-    UKIntsEqual(0, set.allObjects.count);
-    UKIntsEqual(2, set.allReferences.count);
-    
-    for (COPath *path in set.allReferences)
-    {
-        UKTrue(path.isBroken);
-    }
+	UKIntsEqual(0, set.count);
+	[set addObject: @"a"];
+	[set addObject: @"b"];
+	UKIntsEqual(2, set.count);
+	
+	@autoreleasepool {
+		[set removeReference: @"b"];
+		[set addReference: [COPath brokenPath]];
+		UKIntsEqual(1, set.count);
+	}
+	
+	@autoreleasepool {
+		[set removeReference: @"a"];
+		[set addReference: [COPath brokenPath]];
+		UKIntsEqual(0, set.count);
+	}
+	
+	UKIntsEqual(0, set.allObjects.count);
+	UKIntsEqual(2, set.allReferences.count);
+	
+	for (COPath *path in set.allReferences)
+	{
+		UKTrue(path.isBroken);
+	}
 }
 
 @end

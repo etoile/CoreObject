@@ -42,7 +42,7 @@
 
 + (COPath *) brokenPath
 {
-    return [COBrokenPath new];
+	return [COBrokenPath new];
 }
 
 + (COPath *) pathWithString: (NSString*) pathString
@@ -76,7 +76,7 @@
 
 - (BOOL) isBroken
 {
-    return NO;
+	return NO;
 }
 
 - (NSString *) stringValue
@@ -127,32 +127,32 @@
 
 - (BOOL) isBroken
 {
-    return YES;
+	return YES;
 }
 
 - (id) copyWithZone: (NSZone *)zone
 {
-    return self;
+	return self;
 }
 
 - (NSString *) stringValue
 {
-    return @"COBrokenPath";
+	return @"COBrokenPath";
 }
 
 - (NSUInteger) hash
 {
-    return (NSUInteger)self;
+	return (NSUInteger)self;
 }
 
 - (BOOL) isEqual: (id)anObject
 {
-    return NO;
+	return NO;
 }
 
 - (NSString *) description
 {
-    return [self stringValue];
+	return [self stringValue];
 }
 
 @end

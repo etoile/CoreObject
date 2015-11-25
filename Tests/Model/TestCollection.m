@@ -190,15 +190,15 @@
 
 - (void)testSimpleCrossReference
 {
-    COTag *tag = [[ctx insertNewPersistentRootWithEntityName: @"COTag"] rootObject];
-    COObject *original = [[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
-    
-    [ctx commit];
-    
-    [tag addObject: original];
-    
-    UKObjectsEqual(A(original), [tag content]);
-    UKObjectsEqual(S(tag), [original tags]);
+	COTag *tag = [[ctx insertNewPersistentRootWithEntityName: @"COTag"] rootObject];
+	COObject *original = [[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
+	
+	[ctx commit];
+	
+	[tag addObject: original];
+	
+	UKObjectsEqual(A(original), [tag content]);
+	UKObjectsEqual(S(tag), [original tags]);
 }
 - (void)testSmartGroup
 {

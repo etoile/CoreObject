@@ -602,17 +602,17 @@
 
 - (void) testRelinquishOnDealloc
 {
-    [self checkBlock: ^{
-        @autoreleasepool {
-            COObjectGraphContext *testCtx = [COObjectGraphContext new];
-            OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: testCtx];
-            child1.label = @"child1";
-            [testCtx setRootObject: child1];
-        }
-    } postsNotification: COObjectGraphContextWillRelinquishObjectsNotification
-              withCount: 1
-             fromObject: nil
-           withUserInfo: nil];
+	[self checkBlock: ^{
+		@autoreleasepool {
+			COObjectGraphContext *testCtx = [COObjectGraphContext new];
+			OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: testCtx];
+			child1.label = @"child1";
+			[testCtx setRootObject: child1];
+		}
+	} postsNotification: COObjectGraphContextWillRelinquishObjectsNotification
+			  withCount: 1
+			 fromObject: nil
+		   withUserInfo: nil];
 }
 
 #pragma mark - COObjectGraphContextWillRelinquishObjectsNotification
@@ -677,92 +677,92 @@
 
 - (void) testCrossContextReferencedObjectGraphContextDeallocated
 {
-    @autoreleasepool {
-        COObjectGraphContext *ctx2 = [COObjectGraphContext new];
-        
-        OutlineItem *ctx2root = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
-        ctx2root.label = @"ctx2root";
-        [ctx2 setRootObject: ctx2root];
+	@autoreleasepool {
+		COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+		
+		OutlineItem *ctx2root = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
+		ctx2root.label = @"ctx2root";
+		[ctx2 setRootObject: ctx2root];
 
-        // create a link from ctx1 to ctx2
-        [root1 addObject: ctx2root];
-        
-        UKObjectsNotSame(ctx1, ctx2root.objectGraphContext);
-        UKObjectsEqual(ctx2root, root1.contents[0]);
-        
-        NSLog(@"%@", ctx1.items);
-    }
-    
-    // check that ctx1 is still valid?
-    
-    UKTrue([root1.contents isEmpty]);
-    
-    NSLog(@"%@", [ctx1 detailedDescription]);
+		// create a link from ctx1 to ctx2
+		[root1 addObject: ctx2root];
+		
+		UKObjectsNotSame(ctx1, ctx2root.objectGraphContext);
+		UKObjectsEqual(ctx2root, root1.contents[0]);
+		
+		NSLog(@"%@", ctx1.items);
+	}
+	
+	// check that ctx1 is still valid?
+	
+	UKTrue([root1.contents isEmpty]);
+	
+	NSLog(@"%@", [ctx1 detailedDescription]);
 }
 
 - (void) testCrossContextReferencedObjectDeallocatedWithTwoReferences
 {
-    // add a child in ctx1
-    OutlineItem *ctx1obj = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
-    ctx1obj.label = @"ctx1obj";
-    
-    // create a ctx2
-    
-    COObjectGraphContext *ctx2 = [COObjectGraphContext new];
-    OutlineItem *ctx2root = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
-    ctx2root.label = @"ctx2root";
-    ctx2.rootObject = ctx2root;
-    
-    // create a ctx3
-    
-    COObjectGraphContext *ctx3 = [COObjectGraphContext new];
-    OutlineItem *ctx3root = [[OutlineItem alloc] initWithObjectGraphContext: ctx3];
-    ctx3root.label = @"ctx3root";
-    ctx3.rootObject = ctx3root;
-    
-    // create a link from ctx1 to ctx2 and 3
-    [ctx1obj addObject: ctx2root];
-    [ctx1obj addObject: ctx3root];
+	// add a child in ctx1
+	OutlineItem *ctx1obj = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+	ctx1obj.label = @"ctx1obj";
+	
+	// create a ctx2
+	
+	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+	OutlineItem *ctx2root = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
+	ctx2root.label = @"ctx2root";
+	ctx2.rootObject = ctx2root;
+	
+	// create a ctx3
+	
+	COObjectGraphContext *ctx3 = [COObjectGraphContext new];
+	OutlineItem *ctx3root = [[OutlineItem alloc] initWithObjectGraphContext: ctx3];
+	ctx3root.label = @"ctx3root";
+	ctx3.rootObject = ctx3root;
+	
+	// create a link from ctx1 to ctx2 and 3
+	[ctx1obj addObject: ctx2root];
+	[ctx1obj addObject: ctx3root];
 
-    UKObjectsSame(ctx1obj, [ctx2root parentContainer]);
-    UKObjectsSame(ctx1obj, [ctx3root parentContainer]);
-    
-    [ctx1 removeUnreachableObjects];
-    
-    UKNil([ctx2root parentContainer]);
-    UKNil([ctx3root parentContainer]);
+	UKObjectsSame(ctx1obj, [ctx2root parentContainer]);
+	UKObjectsSame(ctx1obj, [ctx3root parentContainer]);
+	
+	[ctx1 removeUnreachableObjects];
+	
+	UKNil([ctx2root parentContainer]);
+	UKNil([ctx3root parentContainer]);
 }
 
 - (void) testCrossContextReferencedObjectDeallocated
 {
-    COObjectGraphContext *ctx2 = [COObjectGraphContext new];
-    
-    OutlineItem *ctx2root = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
-    ctx2root.label = @"ctx2root";
-    ctx2.rootObject = ctx2root;
-    
-    OutlineItem *ctx2obj = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
-    ctx2obj.label = @"ctx2obj";
+	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+	
+	OutlineItem *ctx2root = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
+	ctx2root.label = @"ctx2root";
+	ctx2.rootObject = ctx2root;
+	
+	OutlineItem *ctx2obj = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
+	ctx2obj.label = @"ctx2obj";
 
-    // create a link from ctx1 to ctx2
-    [root1 addObject: ctx2obj];
-    
-    NSArray *ctx1ig = [ctx1 items];
-    UKFalse([root1.contents isEmpty]);
-    
-    // GC ctx2obj (it's not set as the root object)
-    UKFalse([ctx2obj isZombie]);
-    [ctx2 removeUnreachableObjects];
-    UKTrue([ctx2obj isZombie]);
-    
-    // check that ctx1 is still valid?
-    UKTrue([root1.contents isEmpty]);
-    
-    // It should serialize to COBrokenPath
-    COItem *item = [root1 storeItem];
-    NSArray *itemContentsArray = [item valueForAttribute: @"contents"];
-    UKIntsEqual(1, itemContentsArray.count);
-    UKTrue([itemContentsArray[0] isBroken]);
+	// create a link from ctx1 to ctx2
+	[root1 addObject: ctx2obj];
+	
+	NSArray *ctx1ig = [ctx1 items];
+	UKFalse([root1.contents isEmpty]);
+	
+	// GC ctx2obj (it's not set as the root object)
+	UKFalse([ctx2obj isZombie]);
+	[ctx2 removeUnreachableObjects];
+	UKTrue([ctx2obj isZombie]);
+	
+	// check that ctx1 is still valid?
+	UKTrue([root1.contents isEmpty]);
+	
+	// It should serialize to COBrokenPath
+	COItem *item = [root1 storeItem];
+	NSArray *itemContentsArray = [item valueForAttribute: @"contents"];
+	UKIntsEqual(1, itemContentsArray.count);
+	UKTrue([itemContentsArray[0] isBroken]);
 }
 
 @end
