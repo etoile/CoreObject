@@ -711,14 +711,14 @@
     COObjectGraphContext *ctx2 = [COObjectGraphContext new];
     OutlineItem *ctx2root = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
     ctx2root.label = @"ctx2root";
-    [ctx2 setRootObject: ctx2root];
+    ctx2.rootObject = ctx2root;
     
     // create a ctx3
     
     COObjectGraphContext *ctx3 = [COObjectGraphContext new];
     OutlineItem *ctx3root = [[OutlineItem alloc] initWithObjectGraphContext: ctx3];
     ctx3root.label = @"ctx3root";
-    [ctx3 setRootObject: ctx3root];
+    ctx3.rootObject = ctx3root;
     
     // create a link from ctx1 to ctx2 and 3
     [ctx1obj addObject: ctx2root];
@@ -739,7 +739,7 @@
     
     OutlineItem *ctx2root = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
     ctx2root.label = @"ctx2root";
-    [ctx2 setRootObject: ctx2root];
+    ctx2.rootObject = ctx2root;
     
     OutlineItem *ctx2obj = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
     ctx2obj.label = @"ctx2obj";
