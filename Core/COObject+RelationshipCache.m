@@ -69,7 +69,7 @@ static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescrip
                 // This is a hack so that -[COObjectGraphContext dealloc] can complete
                 // without throwing an exception below, because the invalid object doesn't respond
                 // to -incomingRelationshipCache.
-                NSLog(@"%@: Warning, ignoring non-COObject instance %@ in %@ of %@", NSStringFromSelector(_cmd), obj, aProperty.name, self);
+                NSLog(@"%@ - note - ignoring non-COObject instance %@ in %@ of %@", NSStringFromSelector(_cmd), obj, aProperty.name, self);
                 return;
             }
             
