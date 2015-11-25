@@ -118,17 +118,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (void)dealloc
 {
-	// TODO: We should rather do [self discardObjectsWithUUIDs:  [NSSet setWithArray: _loadedObjects.allKeys]];
-	// This breaks currently due to deallocated outer object references
-	// (representing cross persistent root relationships), when multiple
-	// persistent roots are released at the same time.
-	COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
-		self.editingContext.deadRelationshipCache;
-
-	for (ETUUID *uuid in _loadedObjects.allKeys)
-	{
-		[deadRelationshipCache removeReferringObject: [self loadedObjectForUUID: uuid]];
-	}
+	[self discardObjectsWithUUIDs:  [NSSet setWithArray: _loadedObjects.allKeys]];
 }
 
 - (NSString *)description

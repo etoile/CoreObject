@@ -9,6 +9,11 @@
 #import <EtoileFoundation/Macros.h>
 #import <EtoileFoundation/ETUUID.h>
 
+
+@interface COBrokenPath : COPath
+@end
+
+
 @implementation COPath
 
 @synthesize persistentRoot = _persistentRoot;
@@ -33,6 +38,11 @@
 							 branch: (ETUUID*)aBranch
 {
 	return [[self alloc] initWithPersistentRoot: aRoot branch: aBranch];
+}
+
++ (COPath *) brokenPath
+{
+	return [COBrokenPath new];
 }
 
 + (COPath *) pathWithString: (NSString*) pathString
@@ -62,6 +72,11 @@
 - (id) copyWithZone: (NSZone *)zone
 {
 	return self;
+}
+
+- (BOOL) isBroken
+{
+	return NO;
 }
 
 - (NSString *) stringValue
@@ -98,6 +113,41 @@
 		return NO;
 	
 	return YES;
+}
+
+- (NSString *) description
+{
+	return [self stringValue];
+}
+
+@end
+
+
+@implementation COBrokenPath
+
+- (BOOL) isBroken
+{
+	return YES;
+}
+
+- (id) copyWithZone: (NSZone *)zone
+{
+	return self;
+}
+
+- (NSString *) stringValue
+{
+	return @"COBrokenPath";
+}
+
+- (NSUInteger) hash
+{
+	return (NSUInteger)self;
+}
+
+- (BOOL) isEqual: (id)anObject
+{
+	return NO;
 }
 
 - (NSString *) description

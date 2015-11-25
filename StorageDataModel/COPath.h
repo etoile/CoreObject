@@ -42,6 +42,7 @@
 + (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot
                              branch: (ETUUID*)aBranch;
 
++ (COPath *) brokenPath;
 
 /** @taskunit Reference Properties */
 
@@ -59,6 +60,10 @@
  * branch of persistentRoot is.
  */
 @property (nonatomic, readonly, strong) ETUUID *branch;
+/**
+ * Returns whether this is a [COPath brokenPath]
+ */
+@property (nonatomic, readonly, assign) BOOL isBroken;
 
 
 /** @taskunit Persistent String Representation */

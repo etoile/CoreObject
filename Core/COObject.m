@@ -540,6 +540,13 @@ See +[NSObject typePrefix]. */
 
 - (BOOL)isEditingContextValidForObject: (COObject *)value
 {
+	if (value != nil && ![value isKindOfClass: [COObject class]])
+	{
+		// This can happen in -testNullDisallowedInCollection which leaves [NSNull null] instances
+		// in a collection.
+		return NO;
+	}
+	
 	COEditingContext *valueEditingContext = [[value persistentRoot] parentContext];
 	COEditingContext *currentEditingContext = [[self persistentRoot] parentContext];
 	BOOL involvesTransientObject = (valueEditingContext == nil || currentEditingContext == nil);
@@ -1709,6 +1716,18 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 {
     [self removeCachedOutgoingRelationships];
 	
+	// If there are any pointers in other object graph contexts to self, replace them
+	// with [COPath brokenPath]. This shouldn't normally happen, but does when deallocating
+	// one COObjectGraphContext but not another that has pointers to the first.
+	for (COCachedRelationship *cacheEntry in [_incomingRelationshipCache.allEntries copy])
+	{
+		if (cacheEntry.sourceObject.objectGraphContext != self.objectGraphContext)
+		{
+			[cacheEntry.sourceObject.objectGraphContext replaceObject: self
+														   withObject: (id)[COPath brokenPath]];
+		}
+	}
+	
 	/* For dead outgoing univalued relationship, the property value is nil and 
 	   not a COPath, so -removeCachedOutgoingRelationships does nothing, and 
 	   we have to remove the receiver manually.
@@ -1876,6 +1895,8 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 						updated = YES;
 					}
 					[array replaceReferenceAtIndex: i withReference: replacement];
+					// Make sure it wasn't wrongly rejected as a duplicate, etc.
+					ETAssert([array referenceAtIndex: i] == replacement);
 				}
 			}
 			array.mutable = NO;
@@ -1894,6 +1915,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 				}
 				[set removeReference: object];
 				[set addReference: replacement];
+				ETAssert([set containsReference: replacement]);
 			}
 			set.mutable = NO;
 		}
@@ -1904,6 +1926,8 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 			// FIXME: We should call -setValue:forStorageKey here.
 			[self willChangeValueForProperty: key];
 			[self setValue: replacement forVariableStorageKey: key];
+			// TODO: Would be nice to have an assertion here
+			//ETAssert([self valueForVariableStorageKey: key] == replacement);
 			updated = YES;
 		}
 
