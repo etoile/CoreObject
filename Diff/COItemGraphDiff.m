@@ -1061,7 +1061,15 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 				[conflict removeEdit: edit];
 			}
 		}
-		// FIXME: remove the conflict if it has no edits left?
+				
+		if ([conflict allEdits].count <= 1)
+		{
+			[embeddedItemInsertionConflicts removeObject: conflict];
+			[equalEditConflicts removeObject: conflict];
+			[sequenceEditConflicts removeObject: conflict];
+			[editTypeConflicts removeObject: conflict];
+			[valueConflicts removeObject: conflict];
+		}
 	}
 }
 
