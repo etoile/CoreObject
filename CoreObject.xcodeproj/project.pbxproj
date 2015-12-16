@@ -64,6 +64,8 @@
 		6083223919795D21008D9F9D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6083223819795D21008D9F9D /* UIKit.framework */; };
 		6083223D19797DE2008D9F9D /* COCocoaTouchCompatibility.h in Headers */ = {isa = PBXBuildFile; fileRef = 6083223C19797DE2008D9F9D /* COCocoaTouchCompatibility.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6083223E19797DE2008D9F9D /* COCocoaTouchCompatibility.h in Headers */ = {isa = PBXBuildFile; fileRef = 6083223C19797DE2008D9F9D /* COCocoaTouchCompatibility.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		608628961C12009A00B46119 /* COCommandDeletePersistentRoot.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE2B117C09DE700E729F5 /* COCommandDeletePersistentRoot.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		608628A11C12009A00B46119 /* COCommandDeletePersistentRoot.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE2B117C09DE700E729F5 /* COCommandDeletePersistentRoot.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60882F17197D509B00484033 /* COAttributedStringDiff.h in Headers */ = {isa = PBXBuildFile; fileRef = 66D3FCD81860EB61009BDF50 /* COAttributedStringDiff.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60882F18197D50B400484033 /* COColorToHTMLString.h in Headers */ = {isa = PBXBuildFile; fileRef = 6633F10A185515F1009CE6F7 /* COColorToHTMLString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60882F19197D50B700484033 /* COColorToHTMLString.m in Sources */ = {isa = PBXBuildFile; fileRef = 6633F10B185515F1009CE6F7 /* COColorToHTMLString.m */; };
@@ -2511,6 +2513,7 @@
 				60E08D5619792FFA00D1B7AD /* COStoreSetBranchMetadata.h in Headers */,
 				60E08D4719792FFA00D1B7AD /* COAttributedString.h in Headers */,
 				60E08D5519792FFA00D1B7AD /* COStoreDeletePersistentRoot.h in Headers */,
+				608628A11C12009A00B46119 /* COCommandDeletePersistentRoot.h in Headers */,
 				60E08D0519792FFA00D1B7AD /* COGroup.h in Headers */,
 				60E08D6B19792FFA00D1B7AD /* CODiffManager.h in Headers */,
 				60E08D2A19792FFA00D1B7AD /* COCommandDeleteBranch.h in Headers */,
@@ -2707,6 +2710,7 @@
 				66405DD1182A255800A6EF7A /* COSynchronizerServer.h in Headers */,
 				603643941B395A7100DC685B /* COBasicHistoryCompaction.h in Headers */,
 				66FD349A18314BC200898381 /* COSynchronizerJSONUtils.h in Headers */,
+				608628961C12009A00B46119 /* COCommandDeletePersistentRoot.h in Headers */,
 				66FD348E1830BB3800898381 /* COSynchronizerJSONClient.h in Headers */,
 				660D4CE517D689FC003C9ACC /* COMergeInfo.h in Headers */,
 				668084F01791FBAB003A3CC6 /* COObjectGraphContext.h in Headers */,
