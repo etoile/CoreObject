@@ -132,6 +132,43 @@
 	
 }
 
+- (void)testConflictResolvedByRemovingConflictingEdit
+{
+	ETUUID *UUID = [ETUUID UUID];
+	COItem *itemA = [[COItem alloc] initWithUUID: UUID
+	                          typesForAttributes: @{ @"value": @(kCOTypeInt64) }
+	                         valuesForAttributes: @{ @"value": @(1) }];
+	COItem *itemB = [[COItem alloc] initWithUUID: UUID
+	                          typesForAttributes: @{ @"value": @(kCOTypeInt64) }
+	                         valuesForAttributes: @{ @"value": @(2) }];
+	COItem *itemC = [[COItem alloc] initWithUUID: UUID
+	             typesForAttributes: @{ @"value": @(kCOTypeInt64) }
+	            valuesForAttributes: @{ @"value": @(3) }];
+	COItemGraph *A = [COItemGraph itemGraphWithItemsRootFirst: @[itemA]];
+	COItemGraph *B = [COItemGraph itemGraphWithItemsRootFirst: @[itemB]];
+	COItemGraph *C = [COItemGraph itemGraphWithItemsRootFirst: @[itemC]];
+	COItemGraphDiff *diffB = [COItemGraphDiff diffItemTree: A
+                                              withItemTree: B
+                                          sourceIdentifier: @"B"];
+	COItemGraphDiff *diffC = [COItemGraphDiff diffItemTree: A
+                                              withItemTree: C
+                                          sourceIdentifier: @"C"];
+	COItemGraphDiff *diff = [diffB itemTreeDiffByMergingWithDiff: diffC];
+	
+	UKTrue(diff.hasConflicts);
+	UKIntsEqual(1, [diff conflicts].count);
+	UKIntsEqual(2, [[diff conflicts].anyObject allEdits].count);
+	UKIntsEqual(2, [diff allEdits].count);
+	
+	COItemGraphEdit *edit = [[diff conflicts].anyObject allEdits].anyObject;
+	
+	[diff removeEdit: edit];
+	
+	UKFalse(diff.hasConflicts);
+	UKIntsEqual(0, [diff conflicts].count);
+	UKIntsEqual(1, [diff allEdits].count);
+}
+
 // FIXME: When run with testcoreobject-macosx.sh, this doesn't find the resource
 // (perhaps because tools don't really have bundles?)
 - (COItemGraph *) itemGraphForJSONResourceName: (NSString *)aResource

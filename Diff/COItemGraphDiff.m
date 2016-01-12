@@ -844,6 +844,8 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
  */
 - (void) removeConflict: (COItemGraphConflict *)aConflict
 {
+	_isRemovingConflict = YES;
+
 	for (COItemGraphEdit *edit in [aConflict allEdits])
 	{
 		[self removeEdit: edit];
@@ -853,6 +855,8 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	[sequenceEditConflicts removeObject: aConflict];
 	[editTypeConflicts removeObject: aConflict];
 	[valueConflicts removeObject: aConflict];
+	
+	_isRemovingConflict = NO;
 }
 
 - (COItemGraphConflict *) findOrCreateConflictInMutableSet: (NSMutableSet *)aSet containingEdit: (COItemGraphEdit *)existingEdit
@@ -1061,23 +1065,38 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 				[conflict removeEdit: edit];
 			}
 		}
-				
+	}
+
+	// Never add the edits back when we are called by -removeConflict:, the
+	// code calling -removeConflict: must do it.
+	if (_isRemovingConflict)
+		return;
+
+	for (COItemGraphConflict *conflict in [self conflicts])
+	{
 		if ([conflict allEdits].count <= 1)
 		{
-			[embeddedItemInsertionConflicts removeObject: conflict];
-			[equalEditConflicts removeObject: conflict];
-			[sequenceEditConflicts removeObject: conflict];
-			[editTypeConflicts removeObject: conflict];
-			[valueConflicts removeObject: conflict];
+			id edit = [conflict allEdits].anyObject;
+			// Will call -removeEdit: and -_updateConflictsForRemovingEdit:,
+			// we don't want to add the edits back when we reenter the current
+			// method, but wait until -removeConflict: returns, that's why we
+			// check _isRemovingConflict.
+			[self removeConflict: conflict];
+			
+			if (edit == nil)
+				continue;
+
+			[self addEdit: edit];
 		}
 	}
 }
 
 - (void) removeEdit: (COItemGraphEdit *)anEdit
 {
-	[self _updateConflictsForRemovingEdit: anEdit];
-	
 	[diffDict removeEdit: anEdit];
+	// The edit must have been removed, otherwise -addEdit: will recreate the
+	// conflict in the conflict removal loop of _updateConflictsForRemovingEdit:.
+	[self _updateConflictsForRemovingEdit: anEdit];
 }
 
 - (void) resolveConflictsFavoringSourceIdentifier: (NSString*)anIdentifier
