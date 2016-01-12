@@ -844,19 +844,15 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
  */
 - (void) removeConflict: (COItemGraphConflict *)aConflict
 {
-	_isRemovingConflict = YES;
-
 	for (COItemGraphEdit *edit in [aConflict allEdits])
 	{
-		[self removeEdit: edit];
+		[self removeEdit: edit isRemovingConflict: YES];
 	}
 	[embeddedItemInsertionConflicts removeObject: aConflict];
 	[equalEditConflicts removeObject: aConflict];
 	[sequenceEditConflicts removeObject: aConflict];
 	[editTypeConflicts removeObject: aConflict];
 	[valueConflicts removeObject: aConflict];
-	
-	_isRemovingConflict = NO;
 }
 
 - (COItemGraphConflict *) findOrCreateConflictInMutableSet: (NSMutableSet *)aSet containingEdit: (COItemGraphEdit *)existingEdit
@@ -1054,7 +1050,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	[self _updateConflictsForAddingEdit: anEdit];
 }
 
-- (void) _updateConflictsForRemovingEdit: (COItemGraphEdit *)anEdit
+- (void) _updateConflictsForRemovingEdit: (COItemGraphEdit *)anEdit isRemovingConflict: (BOOL)isRemovingConflict
 {
 	for (COItemGraphConflict *conflict in [self conflicts])
 	{
@@ -1069,7 +1065,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 	// Never add the edits back when we are called by -removeConflict:, the
 	// code calling -removeConflict: must do it.
-	if (_isRemovingConflict)
+	if (isRemovingConflict)
 		return;
 
 	for (COItemGraphConflict *conflict in [self conflicts])
@@ -1080,7 +1076,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 			// Will call -removeEdit: and -_updateConflictsForRemovingEdit:,
 			// we don't want to add the edits back when we reenter the current
 			// method, but wait until -removeConflict: returns, that's why we
-			// check _isRemovingConflict.
+			// check isRemovingConflict.
 			[self removeConflict: conflict];
 			
 			if (edit == nil)
@@ -1091,12 +1087,17 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	}
 }
 
-- (void) removeEdit: (COItemGraphEdit *)anEdit
+- (void) removeEdit: (COItemGraphEdit *)anEdit isRemovingConflict: (BOOL)isRemovingConflict
 {
 	[diffDict removeEdit: anEdit];
 	// The edit must have been removed, otherwise -addEdit: will recreate the
 	// conflict in the conflict removal loop of _updateConflictsForRemovingEdit:.
-	[self _updateConflictsForRemovingEdit: anEdit];
+	[self _updateConflictsForRemovingEdit: anEdit isRemovingConflict: isRemovingConflict];
+}
+
+- (void) removeEdit: (COItemGraphEdit *)anEdit
+{
+    [self removeEdit: anEdit isRemovingConflict: NO];
 }
 
 - (void) resolveConflictsFavoringSourceIdentifier: (NSString*)anIdentifier
