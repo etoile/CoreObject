@@ -32,25 +32,38 @@
 	compactableBranchUUIDs = _compactableBranchUUIDs,
 	deadRevisionUUIDs = _deadRevisionUUIDs, liveRevisionUUIDs = _liveRevisionUUIDs;
 
-- (COCommandGroup *)oldestCommandToKeepOnUndoTrack: (COUndoTrack *)aTrack
-                               withProposedCommand: (COCommandGroup *)aCommand
+/**
+ * When aTrack is a pattern track, aNode.parentNode won't return the previous 
+ * node on the given track, but the one on aNode.parentUndoTrack.
+ */
+- (id <COTrackNode>)previousNode: (id <COTrackNode>)aNode onTrack: (COUndoTrack *)aTrack
 {
-	id <COTrackNode> current = [aTrack currentNode];
+	NSUInteger index = [aTrack.nodes indexOfObject: aNode];
+	ETAssert(index != NSNotFound);
 
-	if ([current isKindOfClass: [COCommandGroup class]])
+	return index == 0 ? nil : aTrack.nodes[index - 1];
+}
+
+- (COCommandGroup *)newestCommandToDiscardOnUndoTrack: (COUndoTrack *)aTrack
+                                  withProposedCommand: (COCommandGroup *)aCommand
+{
+	id <COTrackNode> current = aTrack.currentNode;
+	id <COTrackNode> currentPredecessor = [self previousNode: current onTrack: aTrack];
+	
+	/* For current or its predecessor as placeholder node, we compact nothing */
+	if (![current isKindOfClass: [COCommandGroup class]]
+	 || ![currentPredecessor isKindOfClass: [COCommandGroup class]])
 	{
-		if ([(COCommandGroup *)current sequenceNumber] < aCommand.sequenceNumber)
-		{
-			return (COCommandGroup *)current;
-		}
-		else
-		{
-			return aCommand;
-		}
+		return nil;
+	}
+
+	if ([(COCommandGroup *)current sequenceNumber] <= aCommand.sequenceNumber)
+	{
+		return (COCommandGroup *)currentPredecessor;
 	}
 	else
 	{
-		return [aTrack nodes][1];
+		return aCommand;
 	}
 }
 
@@ -58,11 +71,12 @@
 {
 	NILARG_EXCEPTION_TEST(aTrack);
 	INVALIDARG_EXCEPTION_TEST(aCommand, [aCommand isKindOfClass: [COCommandGroup class]]);
+	INVALIDARG_EXCEPTION_TEST(aCommand, [aTrack.allCommands containsObject: aCommand]);
 	SUPERINIT;
 	_undoTrack = aTrack;
-	_oldestCommandToKeep = [self oldestCommandToKeepOnUndoTrack: aTrack
-	                                        withProposedCommand: aCommand];
-	ETAssert([_oldestCommandToKeep isKindOfClass: [COCommandGroup class]]);
+	_newestCommandToDiscard = [self newestCommandToDiscardOnUndoTrack: aTrack
+	                                              withProposedCommand: aCommand];
+	ETAssert(_newestCommandToDiscard == nil || [_newestCommandToDiscard isKindOfClass: [COCommandGroup class]]);
 	_finalizablePersistentRootUUIDs = [NSMutableSet setWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
 	_compactablePersistentRootUUIDs = [NSMutableSet setWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
 	_finalizableBranchUUIDs = [NSMutableSet setWithCapacity: BRANCH_CAPACITY_HINT];
@@ -92,11 +106,12 @@
 - (void)scanPersistentRoots
 {
 	BOOL isScanningLiveCommands = NO;
+	
+	if (_newestCommandToDiscard == nil)
+		return;
 
 	for (COCommandGroup *commandGroup in _undoTrack.allCommands)
 	{
-		isScanningLiveCommands = isScanningLiveCommands || [commandGroup isEqual: _oldestCommandToKeep];
-
 		for (COCommand *command in commandGroup.contents)
 		{
 			if (isScanningLiveCommands)
@@ -108,6 +123,7 @@
 				[self scanPersistentRootInDeadCommand: command];
 			}
 		}
+		isScanningLiveCommands = isScanningLiveCommands || [commandGroup isEqual: _newestCommandToDiscard];
 	}
 }
 
@@ -134,6 +150,9 @@
 - (void)scanRevisions
 {
 	BOOL isScanningLiveCommands = NO;
+
+	if (_newestCommandToDiscard == nil)
+		return;
 	
 	[self allocateRevisionSets];
 
@@ -141,8 +160,6 @@
 	// to the end isScanningLiveCommands condition and assignment.
 	for (COCommandGroup *commandGroup in _undoTrack.allCommands)
 	{
-		isScanningLiveCommands = isScanningLiveCommands || [commandGroup isEqual: _oldestCommandToKeep];
-
 		for (COCommand *command in commandGroup.contents)
 		{
 			/* For persistent roots to be finalized, all their revisions are 
@@ -159,7 +176,7 @@
 				[self scanRevisionInDeadCommand: command];
 			}
 		}
-
+		isScanningLiveCommands = isScanningLiveCommands || [commandGroup isEqual: _newestCommandToDiscard];
 	}
 }
 
@@ -371,12 +388,13 @@
 - (void)beginCompaction
 {
 	NSArray *allCommands = [_undoTrack allCommands];
-	NSUInteger upToCommandIndex = [allCommands indexOfObject: _oldestCommandToKeep];
-	ETAssert(upToCommandIndex != NSNotFound);
-	NSArray *deletedCommands = [allCommands subarrayWithRange: NSMakeRange(0, upToCommandIndex)];
+	NSInteger newestDiscardedCommandIndex =
+		_newestCommandToDiscard == nil ? -1 : [allCommands indexOfObject: _newestCommandToDiscard];
+	ETAssert(newestDiscardedCommandIndex != NSNotFound);
+	NSArray *deletedCommands = [allCommands subarrayWithRange: NSMakeRange(0, newestDiscardedCommandIndex + 1)];
 	NSArray *deletedUUIDs = (id)[[deletedCommands mappedCollection] UUID];
 
-	ETAssert(![deletedUUIDs containsObject: _oldestCommandToKeep.UUID]);
+	ETAssert(_newestCommandToDiscard == nil || [deletedUUIDs containsObject: _newestCommandToDiscard.UUID]);
 	ETAssert(![deletedUUIDs containsObject: _undoTrack.currentNode.UUID]);
 
 	// TODO: Decide whether we should run it in background

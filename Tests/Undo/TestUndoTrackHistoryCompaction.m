@@ -202,13 +202,11 @@
 	compaction.deadRevisionUUIDs = @{ persistentRoot.UUID : SA((id)[[deadRevs mappedCollection] UUID]) };
 
 	NSArray *liveCommands = [track.allCommands subarrayFromIndex: 3];
-	/* COCommandSetCurrentVersionForBranch.oldRevisionID is kept alive by 
-	   COUndoTrackHistoryCompaction logic, this means the oldest kept revision 
-	   will be the revision prior to track.allCommands[3].newRevisionID.
+	/* The oldest kept revision is track.allCommands[3].oldRevision, so
+	   track.allCommands[2] is discarded but track.allCommands[2].revision isn't.
 
-	   This explains the index mistmatch between [oldRevs subarrayFromIndex: 2]
-	   and the next line. */
-	NSDictionary *newRevs = [self compactUpToCommand: track.allCommands[3]
+	   We discard 3 commands and 2 revisions. */
+	NSDictionary *newRevs = [self compactUpToCommand: track.allCommands[2]
 	                             expectingCompaction: compaction];
 
 	UKObjectsEqual(liveRevs, newRevs[persistentRoot.UUID]);
@@ -240,7 +238,7 @@
 
 	NSArray *liveCommands = [track.allCommands subarrayFromIndex: 2];
 	/* See comment in -testCompactPersistentRootWithTrivialHistory */
-	NSDictionary *newRevs = [self compactUpToCommand: track.allCommands[2]
+	NSDictionary *newRevs = [self compactUpToCommand: track.allCommands[1]
 	                             expectingCompaction: compaction];
 	
 	/* Second compaction */
@@ -256,19 +254,15 @@
 	compaction.liveRevisionUUIDs = @{ persistentRoot.UUID : SA((id)[[liveRevs mappedCollection] UUID]) };
 	compaction.deadRevisionUUIDs = @{ persistentRoot.UUID : SA((id)[[deadRevs mappedCollection] UUID]) };
 
-	/* COCommandSetCurrentVersionForBranch.oldRevisionID is kept alive by 
-	   COUndoTrackHistoryCompaction logic, this means the oldest kept revision 
-	   will be the revision prior to track.allCommands[2].newRevisionID.
-
-	   However oldRevs starts with the old revision ID for track.allCommands[0]
-	   and the old revision ID for track.allCommands[1] (which happens to be the
-	   revision ID bound to track.allCommands[0]). Both will be discarded.
+	/* The oldest kept revision is track.allCommands[2].oldRevision, so
+	   track.allCommands[1] is discarded but track.allCommands[1].revision isn't.
 	   
-	   After a first compaction, we always have an old revision to discard 
-	   together with the first command, so there is no index mismatch between 
-	   [oldRevs subarrayFromIndex: 2] and the next line. */
+	   The latest discarded revision is track.allCommands[0].oldRevision, that
+	   isn't nil since this is the second compaction.
+
+	   We discard 2 commands and 2 revisions. */
 	liveCommands = [track.allCommands subarrayFromIndex: 2];
-	newRevs = [self compactUpToCommand: track.allCommands[2]
+	newRevs = [self compactUpToCommand: track.allCommands[1]
 	               expectingCompaction: compaction];
 
 	UKObjectsEqual(liveRevs, newRevs[persistentRoot.UUID]);
@@ -298,7 +292,7 @@
 
 	NSArray *liveCommands = [track.allCommands subarrayFromIndex: 6];
 	/* See comment in -testCompactPersistentRootWithTrivialHistory */
-	NSDictionary *newRevs = [self compactUpToCommand: track.allCommands[6]
+	NSDictionary *newRevs = [self compactUpToCommand: track.allCommands[5]
 	                             expectingCompaction: compaction];
 
 	UKObjectsEqual(mainLiveRevs, newRevs[persistentRoot.UUID]);
@@ -519,7 +513,7 @@
 	   command on the other concrete track. The old revision corresponding to 
 	   'Bop' is not kept, and we only delete the two first revisions.
 	   See also -testCompactPersistentRootWithTrivialHistory. */
-	NSDictionary *newRevs = [self compactUpToCommand: track.allCommands[3]
+	NSDictionary *newRevs = [self compactUpToCommand: track.allCommands[2]
 	                             expectingCompaction: compaction];
 
 	UKObjectsEqual(liveRevs, newRevs[persistentRoot.UUID]);

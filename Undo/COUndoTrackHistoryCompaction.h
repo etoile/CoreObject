@@ -23,7 +23,7 @@
  * after compacting the history in the store.
  *
  * The undo track tail can be cut, but the remaing part up to the head will
- * be kept intact.
+ * be kept intact, as explained in -initWithUndoTrack:upToCommand:.
  *
  * Revisions, persistent roots and branches referenced by other undo tracks or
  * none are not protected by this strategy. This means you must be careful not 
@@ -37,12 +37,21 @@
  * you must always call -compute.
  *
  * For now, COUndoTrackHistoryCompaction is not thread-safe.
+ *
+ * @section Pattern Undo Track
+ *
+ * You can pass a pattern undo track to the initalizer, then the compaction 
+ * can discard any commands on child tracks, prior to the pattern track current
+ * node. 
+ *
+ * A child track current node can be discarded, when it's not the current node 
+ * on the pattern track.
  */
 @interface COUndoTrackHistoryCompaction : NSObject <COHistoryCompaction>
 {
 	@private
 	COUndoTrack *_undoTrack;
-	COCommandGroup *_oldestCommandToKeep;
+	COCommandGroup *_newestCommandToDiscard;
 	NSMutableSet *_finalizablePersistentRootUUIDs;
 	NSMutableSet *_compactablePersistentRootUUIDs;
 	NSMutableSet *_finalizableBranchUUIDs;
@@ -56,15 +65,20 @@
  * Initializes a compaction strategy to discard any history older than the given
  * command.
  *
- * After compaction, this command becomes the undo track tail. If you undo it, 
- * you can access the oldest kept state (represented by the track placeholder 
- * node).
+ * After compaction, this command is discarded and the next one becomes the undo
+ * track tail. The former command becomes the oldest kept state, represented by
+ * the track placeholder node.
  *
- * If you pass the track head or current, all the commands between tail and 
- * current are discarded (including divergent commands not returned by 
- * -[COUndoTrack nodes]).
+ * If you pass the track head or current command, or any command in-between:
  *
- * For nil track or command, raises a NSInvalidArgumentException.
+ * <list>
+ * <item>all commands between tail and current commands are discarded, 
+ * including divergent commands not returned by -[COUndoTrack nodes]</item>
+ * <item>the current command and all commands more recent than it are kept</item>
+ * </list>
+ *
+ * For nil track or command, or a command that doesn't on the track, raises an
+ * NSInvalidArgumentException.
  */
 - (instancetype)initWithUndoTrack: (COUndoTrack *)aTrack upToCommand: (COCommandGroup *)aCommand;
 
