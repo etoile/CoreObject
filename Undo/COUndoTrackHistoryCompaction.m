@@ -32,13 +32,37 @@
 	compactableBranchUUIDs = _compactableBranchUUIDs,
 	deadRevisionUUIDs = _deadRevisionUUIDs, liveRevisionUUIDs = _liveRevisionUUIDs;
 
+- (COCommandGroup *)oldestCommandToKeepOnUndoTrack: (COUndoTrack *)aTrack
+                               withProposedCommand: (COCommandGroup *)aCommand
+{
+	id <COTrackNode> current = [aTrack currentNode];
+
+	if ([current isKindOfClass: [COCommandGroup class]])
+	{
+		if ([(COCommandGroup *)current sequenceNumber] < aCommand.sequenceNumber)
+		{
+			return (COCommandGroup *)current;
+		}
+		else
+		{
+			return aCommand;
+		}
+	}
+	else
+	{
+		return [aTrack nodes][1];
+	}
+}
+
 - (instancetype)initWithUndoTrack: (COUndoTrack *)aTrack upToCommand: (COCommandGroup *)aCommand
 {
+	NILARG_EXCEPTION_TEST(aTrack);
 	INVALIDARG_EXCEPTION_TEST(aCommand, [aCommand isKindOfClass: [COCommandGroup class]]);
 	SUPERINIT;
 	_undoTrack = aTrack;
-	_oldestCommandToKeep = aCommand;
-	_additionalCommandsToKeep = [NSMutableSet new];
+	_oldestCommandToKeep = [self oldestCommandToKeepOnUndoTrack: aTrack
+	                                        withProposedCommand: aCommand];
+	ETAssert([_oldestCommandToKeep isKindOfClass: [COCommandGroup class]]);
 	_finalizablePersistentRootUUIDs = [NSMutableSet setWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
 	_compactablePersistentRootUUIDs = [NSMutableSet setWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
 	_finalizableBranchUUIDs = [NSMutableSet setWithCapacity: BRANCH_CAPACITY_HINT];
@@ -46,54 +70,6 @@
 	_deadRevisionUUIDs = [NSMutableDictionary dictionaryWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
 	_liveRevisionUUIDs = [NSMutableDictionary dictionaryWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
 	return self;
-}
-
-/**
- * Prevents the dead commands on child tracks that make up a pattern track to
- * get deleted, when they are the latest recorded command on each child track.
- *
- * We want to keep at least one command per track, so we have something 
- * representing the latest state. This is especially important when we hide
- * the placeholder node 'initial state' once tracks have been compacted.
- *
- * We could delete tracks where no commands remain, but this is currently
- * unsupported by COUndoTrack/COUndoTrackStore and would require some substantial
- * code refactoring, without much benefit from a user experience viewpoint 
- * (keeping at least one command and hiding the placeholder node seems better).
- */
-- (void)substractAdditionalCommandsToKeep
-{
-	if (![_undoTrack isKindOfClass: NSClassFromString(@"COPatternUndoTrack")])
-		return;
-	
-	NSArray *matchingTrackNames = [_undoTrack.store trackNamesMatchingGlobPattern:  _undoTrack.name];
-	NSArray *childTracks = [matchingTrackNames mappedCollectionWithBlock: ^(NSString *name) {
-		return [COUndoTrack trackForName: name withEditingContext: _undoTrack.editingContext];
-	}];
-
-	for (COUndoTrack *track in childTracks)
-	{
-		COCommandGroup *current = (COCommandGroup *)[track currentNode];
-		COCommandGroup *head = (COCommandGroup *)[[track nodes] lastObject];
-
-		if (![current isKindOfClass: [COEndOfUndoTrackPlaceholderNode class]])
-		{
-			[_additionalCommandsToKeep addObject: current];
-		}
-		if (![head isKindOfClass: [COEndOfUndoTrackPlaceholderNode class]])
-		{
-			[_additionalCommandsToKeep addObject: head];
-		}
-	}
-	
-	for (COCommandGroup *commandGroup in _additionalCommandsToKeep)
-	{
-		for (COCommand *command in commandGroup.contents)
-		{
-			[self scanPersistentRootInLiveCommand: command];
-			[self scanRevisionInLiveCommand: command];
-		}
-	}
 }
 
 /**
@@ -108,7 +84,6 @@
 	ETAssert([NSThread isMainThread]);
 	[self scanPersistentRoots];
 	[self scanRevisions];
-	[self substractAdditionalCommandsToKeep];
 }
 
 /**
@@ -399,9 +374,6 @@
 	NSUInteger upToCommandIndex = [allCommands indexOfObject: _oldestCommandToKeep];
 	ETAssert(upToCommandIndex != NSNotFound);
 	NSArray *deletedCommands = [allCommands subarrayWithRange: NSMakeRange(0, upToCommandIndex)];
-	
-	deletedCommands = [deletedCommands arrayByRemovingObjectsInArray: _additionalCommandsToKeep.allObjects];
-
 	NSArray *deletedUUIDs = (id)[[deletedCommands mappedCollection] UUID];
 
 	ETAssert(![deletedUUIDs containsObject: _oldestCommandToKeep.UUID]);

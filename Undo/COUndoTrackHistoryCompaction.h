@@ -43,7 +43,6 @@
 	@private
 	COUndoTrack *_undoTrack;
 	COCommandGroup *_oldestCommandToKeep;
-	NSMutableSet *_additionalCommandsToKeep;
 	NSMutableSet *_finalizablePersistentRootUUIDs;
 	NSMutableSet *_compactablePersistentRootUUIDs;
 	NSMutableSet *_finalizableBranchUUIDs;
@@ -52,6 +51,21 @@
 	NSMutableDictionary *_liveRevisionUUIDs;
 }
 
+/**
+ * <init />
+ * Initializes a compaction strategy to discard any history older than the given
+ * command.
+ *
+ * After compaction, this command becomes the undo track tail. If you undo it, 
+ * you can access the oldest kept state (represented by the track placeholder 
+ * node).
+ *
+ * If you pass the track head or current, all the commands between tail and 
+ * current are discarded (including divergent commands not returned by 
+ * -[COUndoTrack nodes]).
+ *
+ * For nil track or command, raises a NSInvalidArgumentException.
+ */
 - (instancetype)initWithUndoTrack: (COUndoTrack *)aTrack upToCommand: (COCommandGroup *)aCommand;
 
 @property (nonatomic, readonly) COUndoTrack *undoTrack;
