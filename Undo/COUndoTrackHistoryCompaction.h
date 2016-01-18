@@ -41,11 +41,8 @@
  * @section Pattern Undo Track
  *
  * You can pass a pattern undo track to the initalizer, then the compaction 
- * can discard any commands on child tracks, prior to the pattern track current
- * node. 
- *
- * A child track current node can be discarded, when it's not the current node 
- * on the pattern track.
+ * can discard any commands on child tracks, up to the pattern track current
+ * node.
  */
 @interface COUndoTrackHistoryCompaction : NSObject <COHistoryCompaction>
 {
@@ -58,6 +55,7 @@
 	NSMutableSet *_compactableBranchUUIDs;
 	NSMutableDictionary *_deadRevisionUUIDs;
 	NSMutableDictionary *_liveRevisionUUIDs;
+	NSMutableDictionary *_newestDeadRevisionUUIDs;
 }
 
 /**
@@ -73,8 +71,8 @@
  *
  * <list>
  * <item>all commands between tail and current commands are discarded, 
- * including divergent commands not returned by -[COUndoTrack nodes]</item>
- * <item>the current command and all commands more recent than it are kept</item>
+ * including the current command and divergent commands not returned by -[COUndoTrack nodes]</item>
+ * <item>all commands more recent than the current command are kept</item>
  * </list>
  *
  * For nil track or command, or a command that doesn't on the track, raises an
@@ -101,8 +99,10 @@
  * The deletable revision sets when compacting the history, organized by 
  * persistent root UUID.
  *
- * These revisions won't be deleted, when they are inside a live revision range. 
- * See -liveRevisionUUIDs.
+ * These revisions won't be deleted, when they are inside a live revision range.
+ *
+ * This method is a debugging utility, it is never used when compacting the 
+ * store unlike -liveRevisionUUIDs.
  */
 @property (nonatomic, readonly) NSDictionary *deadRevisionUUIDs;
 /**
@@ -113,5 +113,12 @@
  * -deadRevisionUUIDs.
  */
 @property (nonatomic, readonly) NSDictionary *liveRevisionUUIDs;
+/**
+ * Returns the dead revisions per persistent root. 
+ *
+ * This method is similar to -liveRevisionUUIDsForPersistentRootUUIDs:, but is
+ * only available for debugging purpose.
+ */
+- (NSSet *)deadRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs;
 
 @end

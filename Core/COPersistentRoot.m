@@ -849,6 +849,13 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     
     COPersistentRootInfo *info =
 		[[self store] persistentRootInfoForUUID: [self UUID]];
+	
+	/* If we are receiving a changed/compacted notification but the persistent
+	   root has been finalized in the meantime (distributed notifications are 
+	   delivered in LIFO order). */
+	if (info == nil)
+		return;
+
     _savedState = info;
     
     for (ETUUID *uuid in [info branchUUIDs])

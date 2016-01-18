@@ -32,34 +32,18 @@
 	compactableBranchUUIDs = _compactableBranchUUIDs,
 	deadRevisionUUIDs = _deadRevisionUUIDs, liveRevisionUUIDs = _liveRevisionUUIDs;
 
-/**
- * When aTrack is a pattern track, aNode.parentNode won't return the previous 
- * node on the given track, but the one on aNode.parentUndoTrack.
- */
-- (id <COTrackNode>)previousNode: (id <COTrackNode>)aNode onTrack: (COUndoTrack *)aTrack
-{
-	NSUInteger index = [aTrack.nodes indexOfObject: aNode];
-	ETAssert(index != NSNotFound);
-
-	return index == 0 ? nil : aTrack.nodes[index - 1];
-}
-
 - (COCommandGroup *)newestCommandToDiscardOnUndoTrack: (COUndoTrack *)aTrack
                                   withProposedCommand: (COCommandGroup *)aCommand
 {
 	id <COTrackNode> current = aTrack.currentNode;
-	id <COTrackNode> currentPredecessor = [self previousNode: current onTrack: aTrack];
 	
-	/* For current or its predecessor as placeholder node, we compact nothing */
-	if (![current isKindOfClass: [COCommandGroup class]]
-	 || ![currentPredecessor isKindOfClass: [COCommandGroup class]])
-	{
+	/* For current as placeholder node, we compact nothing */
+	if (![current isKindOfClass: [COCommandGroup class]])
 		return nil;
-	}
 
-	if ([(COCommandGroup *)current sequenceNumber] <= aCommand.sequenceNumber)
+	if ([(COCommandGroup *)current sequenceNumber] < aCommand.sequenceNumber)
 	{
-		return (COCommandGroup *)currentPredecessor;
+		return (COCommandGroup *)current;
 	}
 	else
 	{
@@ -83,6 +67,7 @@
 	_compactableBranchUUIDs = [NSMutableSet setWithCapacity: BRANCH_CAPACITY_HINT];
 	_deadRevisionUUIDs = [NSMutableDictionary dictionaryWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
 	_liveRevisionUUIDs = [NSMutableDictionary dictionaryWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
+	_newestDeadRevisionUUIDs = [NSMutableDictionary dictionaryWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
 	return self;
 }
 
@@ -98,6 +83,7 @@
 	ETAssert([NSThread isMainThread]);
 	[self scanPersistentRoots];
 	[self scanRevisions];
+	[self chooseLiveRevisionsIfFoundNone];
 }
 
 /**
@@ -311,10 +297,14 @@
 		[_deadRevisionUUIDs[persistentRootUUID] addObject: [command oldRevisionUUID]];
 		[_deadRevisionUUIDs[persistentRootUUID] addObject: [command headRevisionUUID]];
 		[_deadRevisionUUIDs[persistentRootUUID] addObject: [command oldHeadRevisionUUID]];
+		
+		_newestDeadRevisionUUIDs[persistentRootUUID] = [command revisionUUID];
 	}
 	else if ([command isKindOfClass: [COCommandCreatePersistentRoot class]])
 	{
 		[_deadRevisionUUIDs[persistentRootUUID] addObject: [command initialRevisionID]];
+		
+		_newestDeadRevisionUUIDs[persistentRootUUID] = [command initialRevisionID];
 	}
 	ETAssert([_liveRevisionUUIDs[persistentRootUUID] isEmpty]);
 }
@@ -355,6 +345,26 @@
 	}
 }
 
+/** 
+ * If we discard all commands referencing a persistent root, we'll end up with 
+ * no live revisions, so we turn the most recent dead revision into a live one.
+ *
+ * We could also choose the current revision, but this is more complex to
+ * implement and requires a new public API to provide the current revision per 
+ * branch.
+ */
+- (void)chooseLiveRevisionsIfFoundNone
+{
+	[_liveRevisionUUIDs enumerateKeysAndObjectsUsingBlock:
+		^(ETUUID *persistentRootUUID, NSMutableSet *revisionUUIDs, BOOL *stop)
+	{
+		if (revisionUUIDs.isEmpty)
+		{
+			[revisionUUIDs addObject: _newestDeadRevisionUUIDs[persistentRootUUID]];
+		}
+	}];
+}
+
 - (NSSet *)deadRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs
 {
 	NSMutableSet *revisionUUIDs = [NSMutableSet new];
@@ -385,17 +395,36 @@
 	return revisionUUIDs;
 }
 
+/**
+ * When aTrack is a pattern track, aNode.parentNode won't return the next node
+ * on the given track, but the one on aNode.parentUndoTrack.
+ */
+- (id <COTrackNode>)nextNode: (id <COTrackNode>)aNode onTrack: (COUndoTrack *)aTrack
+{
+	if (aNode == nil)
+		return nil;
+
+	NSUInteger index = [aTrack.nodes indexOfObject: aNode];
+	ETAssert(index != NSNotFound);
+
+	return index == aTrack.nodes.count - 1 ? nil : aTrack.nodes[index + 1];
+}
+
 - (void)beginCompaction
 {
 	NSArray *allCommands = [_undoTrack allCommands];
 	NSInteger newestDiscardedCommandIndex =
 		_newestCommandToDiscard == nil ? -1 : [allCommands indexOfObject: _newestCommandToDiscard];
 	ETAssert(newestDiscardedCommandIndex != NSNotFound);
-	NSArray *deletedCommands = [allCommands subarrayWithRange: NSMakeRange(0, newestDiscardedCommandIndex + 1)];
+	NSArray *deletedCommands =
+		[allCommands subarrayWithRange: NSMakeRange(0, newestDiscardedCommandIndex + 1)];
 	NSArray *deletedUUIDs = (id)[[deletedCommands mappedCollection] UUID];
+	COCommandGroup *oldestKeptCommand =
+		(COCommandGroup *)[self nextNode: _newestCommandToDiscard
+	                             onTrack: _undoTrack];
 
 	ETAssert(_newestCommandToDiscard == nil || [deletedUUIDs containsObject: _newestCommandToDiscard.UUID]);
-	ETAssert(![deletedUUIDs containsObject: _undoTrack.currentNode.UUID]);
+	ETAssert(oldestKeptCommand == nil || ![deletedUUIDs containsObject: oldestKeptCommand.UUID]);
 
 	// TODO: Decide whether we should run it in background
 	[_undoTrack.store markCommandsAsDeletedForUUIDs: deletedUUIDs];

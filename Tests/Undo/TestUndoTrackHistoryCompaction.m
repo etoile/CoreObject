@@ -409,10 +409,30 @@
 
 	COUndoTrackHistoryCompaction *compaction =
 		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+		                                            upToCommand: (COCommandGroup *)track.currentNode.parentNode];
+	[compaction compute];
+	[store compactHistory: compaction];
+
+	UKObjectsNotEqual(NODES(@[]), track.nodes);
+   	UKObjectsEqual(fakeAttachment, [NSString stringWithContentsOfURL: URL
+                                                            encoding: NSUTF8StringEncoding
+	                                                           error: NULL]);
+    UKTrue([[NSFileManager defaultManager] fileExistsAtPath: URL.path]);
+}
+
+- (void)testKeepAttachmentReferencedByLiveRevisionsOnEmptyTrack
+{
+	NSString *fakeAttachment = @"this is a large attachment";
+	OutlineItem *item = [self createPersistentRootWithAttachmentInHistory : fakeAttachment];
+	NSURL *URL = [store URLForAttachmentID: item.attachmentID];
+
+	COUndoTrackHistoryCompaction *compaction =
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
 		                                            upToCommand: (COCommandGroup *)track.currentNode];
 	[compaction compute];
 	[store compactHistory: compaction];
 
+	UKObjectsEqual(NODES(@[]), track.nodes);
    	UKObjectsEqual(fakeAttachment, [NSString stringWithContentsOfURL: URL
                                                             encoding: NSUTF8StringEncoding
 	                                                           error: NULL]);
@@ -437,10 +457,40 @@
 	
 	COUndoTrackHistoryCompaction *compaction =
 		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
+		                                            upToCommand: (COCommandGroup *)track.currentNode.parentNode];
+	[compaction compute];
+	[store compactHistory: compaction];
+	
+	UKObjectsNotEqual(NODES(@[]), track.nodes);
+   	UKNil([NSString stringWithContentsOfURL: URL
+                                   encoding: NSUTF8StringEncoding
+	                                  error: NULL]);
+    UKFalse([[NSFileManager defaultManager] fileExistsAtPath: URL.path]);
+}
+
+- (void)testFinalizeAttachmentReferencedByDeadRevisionsOnEmptyTrack
+{
+	NSString *fakeAttachment = @"this is a large attachment";
+	OutlineItem *item = [self createPersistentRootWithAttachmentInHistory : fakeAttachment];
+	NSURL *URL = [store URLForAttachmentID: item.attachmentID];
+
+	item.attachmentID = nil;
+	[ctx commitWithUndoTrack: track];
+	
+	// At this point, the revision that created the attachment is still
+	// referenced by track.currentNode.oldRevisionUUID.
+	// We make one more commit to ensure the attachment won't be referenced,
+	// if we compact up to the current node.
+	item.name = @"Oak";
+	[ctx commitWithUndoTrack: track];
+	
+	COUndoTrackHistoryCompaction *compaction =
+		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
 		                                            upToCommand: (COCommandGroup *)track.currentNode];
 	[compaction compute];
 	[store compactHistory: compaction];
 	
+	UKObjectsEqual(NODES(@[]), track.nodes);
    	UKNil([NSString stringWithContentsOfURL: URL
                                    encoding: NSUTF8StringEncoding
 	                                  error: NULL]);
@@ -567,7 +617,7 @@
 	UKIntsEqual(2, [track nodes].count);
 	UKDoesNotRaiseException([compaction compute]);
 	UKDoesNotRaiseException([store compactHistory: compaction]);
-	UKIntsEqual(2, [track nodes].count);
+	UKIntsEqual(1, [track nodes].count);
 	
 	object.name = @"Ding";
 	[ctx commitWithUndoTrack: concreteTrack1];
@@ -576,26 +626,26 @@
 		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
 		                                            upToCommand: (COCommandGroup *)track.nodes.lastObject];
 
-	UKIntsEqual(3, track.nodes.count);
+	UKIntsEqual(2, track.nodes.count);
 	UKDoesNotRaiseException([compaction compute]);
 	UKDoesNotRaiseException([store compactHistory: compaction]);
-	UKIntsEqual(2, track.nodes.count);
+	UKIntsEqual(1, track.nodes.count);
 
 	object.persistentRoot.deleted = YES;
 	[ctx commitWithUndoTrack: concreteTrack2];
 	
 	/* Undo Deletion */
-	
+
 	[track undo];
 
 	compaction =
 		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
 		                                            upToCommand: (COCommandGroup *)track.nodes.lastObject];
 
-	UKIntsEqual(3, track.nodes.count);
+	UKIntsEqual(2, track.nodes.count);
 	UKDoesNotRaiseException([compaction compute]);
 	UKDoesNotRaiseException([store compactHistory: compaction]);
-	UKIntsEqual(3, track.nodes.count);
+	UKIntsEqual(2, track.nodes.count);
 
 	/* Redo Deletion */
 
@@ -605,23 +655,10 @@
 		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
 		                                            upToCommand: (COCommandGroup *)track.nodes.lastObject];
 
-	UKIntsEqual(3, track.nodes.count);
-	UKDoesNotRaiseException([compaction compute]);
-	UKDoesNotRaiseException([store compactHistory: compaction]);
-	UKIntsEqual(2, track.nodes.count);
-
-	/* Undo Deletion */
-	
-	[track undo];
-	
-	compaction =
-		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
-		                                            upToCommand: (COCommandGroup *)track.nodes.lastObject];
-
 	UKIntsEqual(2, track.nodes.count);
 	UKDoesNotRaiseException([compaction compute]);
 	UKDoesNotRaiseException([store compactHistory: compaction]);
-	UKIntsEqual(2, track.nodes.count);
+	UKIntsEqual(1, track.nodes.count);
 
 	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], track.currentNode);
 }

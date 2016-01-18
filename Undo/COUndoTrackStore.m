@@ -329,7 +329,7 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
 	COUndoTrackState *result = nil;
 	FMResultSet *rs = [_db executeQuery:
-		@"SELECT track.trackname, head.uuid AS headuuid, current.uuid AS currentuuid, head.deleted AS headdeleted "
+		@"SELECT track.trackname, head.uuid AS headuuid, current.uuid AS currentuuid, head.deleted AS headdeleted, current.deleted AS currentdeleted "
 		 "FROM tracks AS track "
 		 "LEFT OUTER JOIN commands AS head ON track.headid = head.id "
 		 "LEFT OUTER JOIN commands AS current ON track.currentid = current.id "
@@ -343,7 +343,7 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 		ETAssert([result.trackName isEqual: [rs stringForColumn: @"trackname"]]);
 
 		result.headCommandUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"headuuid"]];
-		if ([rs dataForColumn: @"currentuuid"] != nil)
+		if ([rs dataForColumn: @"currentuuid"] != nil && ![rs boolForColumn: @"currentdeleted"])
 		{
 			result.currentCommandUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"currentuuid"]];
 		}
@@ -601,7 +601,15 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 				}
 				else
 				{
+					BOOL currentMarkedAsDeleted =
+						([_modifiedTrackStateForTrackName[trackName] currentCommandUUID] == nil);
+
+					if (currentMarkedAsDeleted)
+					{
+						[_db executeUpdate: @"UPDATE tracks SET currentid = NULL WHERE trackname = ?", trackName];
+					}
 					[_db executeUpdate: @"DELETE FROM commands WHERE deleted = 1"];
+					
 				}
 			}
 		});
