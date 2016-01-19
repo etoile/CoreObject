@@ -15,24 +15,6 @@
 @implementation COObject (Accessors)
 
 /**
- * Converts "foo" to "setFoo:".
- *
- * Preconditions: 
- *   - setter has room for (5 + strlen(prop)) bytes
- *   - proplen is strlen(prop)
- */
-void PropertyToSetter(const char *prop, size_t proplen, char *setter)
-{
-    setter[0] = 's';
-    setter[1] = 'e';
-    setter[2] = 't';
-    memcpy(setter+3, prop, proplen);
-    setter[3] = toupper(setter[3]);
-    setter[3+proplen] = ':';
-    setter[3+proplen+1] = '\0';
-}
-
-/**
  * Converts "setFoo:" to "foo".
  *
  * Preconditions:
