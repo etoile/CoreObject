@@ -14,18 +14,37 @@
 
 @implementation COObject (Accessors)
 
-NSString *PropertyToSetter(NSString *prop)
+/**
+ * Converts "foo" to "setFoo:".
+ *
+ * Preconditions: 
+ *   - setter has room for (5 + strlen(prop)) bytes
+ *   - proplen is strlen(prop)
+ */
+void PropertyToSetter(const char *prop, size_t proplen, char *setter)
 {
-    return [NSString stringWithFormat: @"set%@%@:",
-            [[prop substringWithRange: NSMakeRange(0, 1)] uppercaseString],
-            [prop substringFromIndex: 1]];
+    setter[0] = 's';
+    setter[1] = 'e';
+    setter[2] = 't';
+    memcpy(setter+3, prop, proplen);
+    setter[3] = toupper(setter[3]);
+    setter[3+proplen] = ':';
+    setter[3+proplen+1] = '\0';
 }
 
-NSString *SetterToProperty(NSString *prop)
+/**
+ * Converts "setFoo:" to "foo".
+ *
+ * Preconditions:
+ *  - setterlen is strlen(setter)
+ *  - strlen(setter) >= 4
+ *  - prop has room for (strlen(setter) - 3) bytes
+ */
+void SetterToProperty(const char *setter, size_t setterlen, char *prop)
 {
-    return [NSString stringWithFormat: @"%@%@",
-            [[prop substringWithRange: NSMakeRange(3, 1)] lowercaseString],
-            [prop substringWithRange: NSMakeRange(4,  [prop length] - 5)]];
+    memcpy(prop, setter + 3, setterlen - 4);
+    prop[0] = tolower(prop[0]);
+    prop[setterlen - 4] = '\0';
 }
 
 static id genericGetter(id self, SEL theCmd)
@@ -41,7 +60,18 @@ static void genericSetter(id self, SEL theCmd, id value)
 {
     // FIXME: Same comment as the genericGetter
 
-    NSString *key = SetterToProperty(NSStringFromSelector(theCmd));
+    const char *setter_cstring = sel_getName(theCmd);
+    size_t setter_cstring_len = strlen(setter_cstring);
+    char key_cstring[setter_cstring_len];
+    
+    if (setter_cstring_len < 4)
+    {
+        return;
+    }
+    
+    SetterToProperty(setter_cstring, setter_cstring_len, key_cstring);
+    
+    NSString *key = [NSString stringWithUTF8String: key_cstring];
 
 	[self willChangeValueForProperty: key];
 	[self setValue: value forVariableStorageKey: key];
@@ -50,7 +80,9 @@ static void genericSetter(id self, SEL theCmd, id value)
 
 + (BOOL)resolveInstanceMethod:(SEL)sel
 {
-	//NSLog(@"Resolving %@", NSStringFromSelector(sel));
+    //NSLog(@"Resolving %@", NSStringFromSelector(sel));
+    
+    const char *selname = sel_getName(sel);
     Class classToCheck = self;
 
 	// FIXME: Don't iterate over all properties but access a single property using class_getProperty()
@@ -62,8 +94,8 @@ static void genericSetter(id self, SEL theCmd, id value)
         for (unsigned int i=0; i<propertyCount; i++)
         {
             objc_property_t property = propertyList[i];
-			NSString *attributes = [NSString stringWithUTF8String: property_getAttributes(property)];
-			BOOL isDynamic = ([attributes rangeOfString: @"D"].location != NSNotFound);
+            const char *attributes = property_getAttributes(property);
+            BOOL isDynamic = (strchr(attributes, 'D') != NULL);
 
             // FIXME: Check other property attributes are correct e.g. readwrite and not readonly
             if (isDynamic == NO)
@@ -71,18 +103,18 @@ static void genericSetter(id self, SEL theCmd, id value)
 
             // TODO: Implement more accessors for performance.
             
-            NSString *propName = [NSString stringWithUTF8String: property_getName(property)];
-            NSString *setterName = PropertyToSetter(propName);
+            const char *propname = property_getName(property);
+            size_t propname_len = strlen(propname);
+            char settername[propname_len + 5];
+            PropertyToSetter(propname, propname_len, settername);
             
-            NSString *selName = NSStringFromSelector(sel);
-            
-            if ([selName isEqual: propName])
+            if (!strcmp(selname, propname))
             {
                 class_addMethod(classToCheck, sel, (IMP)&genericGetter, "@@:");
                 free(propertyList);
                 return YES;
             }
-            else if ([selName isEqual: setterName])
+            else if (!strcmp(selname, settername))
             {
                 class_addMethod(classToCheck, sel, (IMP)&genericSetter, "v@:@");
                 free(propertyList);

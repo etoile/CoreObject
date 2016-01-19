@@ -76,4 +76,24 @@
     UKObjectsEqual(@[], [item contents]);
 }
 
+- (void) testPropertyToSetter
+{
+    const char *property = "foo";
+    char *setter = malloc(5+strlen(property));
+    PropertyToSetter(property, strlen(property), setter);
+    
+    UKTrue(!strcmp("setFoo:", setter));
+    free(setter);
+}
+
+- (void) testSetterToProperty
+{
+    const char *setter = "setFoo:";
+    char *property = malloc(strlen(setter)-3);
+    SetterToProperty(setter, strlen(setter), property);
+    
+    UKTrue(!strcmp("foo", property));
+    free(property);
+}
+
 @end
