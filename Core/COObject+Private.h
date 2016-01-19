@@ -13,6 +13,7 @@
 
 void PropertyToSetter(const char *prop, size_t proplen, char *setter);
 void SetterToProperty(const char *setter, size_t setterlen, char *prop);
+BOOL IsSetter(const char *selname, size_t sellen);
 
 @interface COObject ()
 /**

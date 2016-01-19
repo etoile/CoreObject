@@ -47,6 +47,30 @@ void SetterToProperty(const char *setter, size_t setterlen, char *prop)
     prop[setterlen - 4] = '\0';
 }
 
+/**
+ * Returns YES if the string matches "setXXX:" for some nonempty XXX.
+ * Otherwise, returns NO.
+ */
+BOOL IsSetter(const char *selname, size_t sellen)
+{
+    if (sellen <= 4)
+    {
+        return NO;
+    }
+
+    if (memcmp("set", selname, 3))
+    {
+        return NO;
+    }
+    
+    if (selname[sellen - 1] != ':')
+    {
+        return NO;
+    }
+    
+    return YES;
+}
+
 static id genericGetter(id self, SEL theCmd)
 {
     // FIXME: Variable storage should be changed to an array. This should be
@@ -83,47 +107,43 @@ static void genericSetter(id self, SEL theCmd, id value)
     //NSLog(@"Resolving %@", NSStringFromSelector(sel));
     
     const char *selname = sel_getName(sel);
-    Class classToCheck = self;
-
-	// FIXME: Don't iterate over all properties but access a single property using class_getProperty()
-    while (classToCheck != Nil)
+    const size_t selname_len = strlen(selname);
+    const BOOL issetter = IsSetter(selname, selname_len);
+    
+    // Get the property name
+    
+    char propname[selname_len];
+    if (issetter)
     {
-        unsigned int propertyCount;
-        objc_property_t *propertyList = class_copyPropertyList(classToCheck, &propertyCount);
-
-        for (unsigned int i=0; i<propertyCount; i++)
-        {
-            objc_property_t property = propertyList[i];
-            const char *attributes = property_getAttributes(property);
-            BOOL isDynamic = (strchr(attributes, 'D') != NULL);
-
-            // FIXME: Check other property attributes are correct e.g. readwrite and not readonly
-            if (isDynamic == NO)
-				continue;
-
-            // TODO: Implement more accessors for performance.
-            
-            const char *propname = property_getName(property);
-            size_t propname_len = strlen(propname);
-            char settername[propname_len + 5];
-            PropertyToSetter(propname, propname_len, settername);
-            
-            if (!strcmp(selname, propname))
-            {
-                class_addMethod(classToCheck, sel, (IMP)&genericGetter, "@@:");
-                free(propertyList);
-                return YES;
-            }
-            else if (!strcmp(selname, settername))
-            {
-                class_addMethod(classToCheck, sel, (IMP)&genericSetter, "v@:@");
-                free(propertyList);
-                return YES;
-            }
-        }
-        free(propertyList);
+        SetterToProperty(selname, selname_len, propname);
+    }
+    else
+    {
+        strcpy(propname, selname);
+    }
+    
+    // Get the property
+    
+    objc_property_t property = class_getProperty(self, propname);
+    if (property != NULL)
+    {
+        const char *attributes = property_getAttributes(property);
+        BOOL isDynamic = (strchr(attributes, 'D') != NULL);
         
-        classToCheck = class_getSuperclass(classToCheck);
+        // FIXME: Check other property attributes are correct e.g. readwrite and not readonly
+        if (isDynamic == NO)
+            return NO;
+        
+        if (!issetter)
+        {
+            class_addMethod(self, sel, (IMP)&genericGetter, "@@:");
+            return YES;
+        }
+        else
+        {
+            class_addMethod(self, sel, (IMP)&genericSetter, "v@:@");
+            return YES;
+        }
     }
     return NO;
 }
