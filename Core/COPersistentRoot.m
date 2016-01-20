@@ -483,13 +483,17 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSSet *)allObjectGraphContexts
 {
-	NSMutableSet *objectGraphs = [NSMutableSet new];
+	NSMutableSet *objectGraphs = [NSMutableSet setWithCapacity: _branchForUUID.count + 1];
 	[objectGraphs addObject: _currentBranchObjectGraph];
-	for (COBranch *branch in self.branches)
+
+	for (COBranch *branch in _branchForUUID.objectEnumerator)
 	{
 		COObjectGraphContext *branchObjectGraph = [branch objectGraphContextWithoutUnfaulting];
+
 		if (branchObjectGraph != nil)
+		{
 			[objectGraphs addObject: branchObjectGraph];
+		}
 	}
  	return objectGraphs;
 }
