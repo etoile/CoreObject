@@ -51,18 +51,18 @@ static void genericSetter(id self, SEL theCmd, id value)
 {
     // FIXME: Same comment as the genericGetter
 
-    const char *setter_cstring = sel_getName(theCmd);
-    size_t setter_cstring_len = strlen(setter_cstring);
-    char key_cstring[setter_cstring_len];
+    const char *selname = sel_getName(theCmd);
+    size_t sellen = strlen(selname);
+    char propname[sellen];
     
-    if (setter_cstring_len < 4)
+    if (sellen < 4)
     {
         return;
     }
     
-    SetterToProperty(setter_cstring, setter_cstring_len, key_cstring);
+    SetterToProperty(selname, sellen, propname);
     
-    NSString *key = [NSString stringWithUTF8String: key_cstring];
+    NSString *key = [NSString stringWithUTF8String: propname];
 
 	[self willChangeValueForProperty: key];
 	[self setValue: value forVariableStorageKey: key];
@@ -74,15 +74,15 @@ static void genericSetter(id self, SEL theCmd, id value)
     //NSLog(@"Resolving %@", NSStringFromSelector(sel));
     
     const char *selname = sel_getName(sel);
-    const size_t selname_len = strlen(selname);
-    const BOOL issetter = IsSetter(selname, selname_len);
+    const size_t sellen = strlen(selname);
+    const BOOL isSetter = IsSetter(selname, sellen);
     
     // Get the property name
     
-    char propname[selname_len];
-    if (issetter)
+    char propname[sellen];
+    if (isSetter)
     {
-        SetterToProperty(selname, selname_len, propname);
+        SetterToProperty(selname, sellen, propname);
     }
     else
     {
@@ -101,7 +101,7 @@ static void genericSetter(id self, SEL theCmd, id value)
         if (isDynamic == NO)
             return NO;
         
-        if (!issetter)
+        if (!isSetter)
         {
             class_addMethod(self, sel, (IMP)&genericGetter, "@@:");
             return YES;

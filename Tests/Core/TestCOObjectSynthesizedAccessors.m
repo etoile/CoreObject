@@ -82,7 +82,7 @@
     char *property = malloc(strlen(setter)-3);
     SetterToProperty(setter, strlen(setter), property);
     
-    UKTrue(!strcmp("foo", property));
+    UKIntsEqual(0, strcmp("foo", property));
     free(property);
 }
 
