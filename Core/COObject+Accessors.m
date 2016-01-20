@@ -35,22 +35,7 @@ void SetterToProperty(const char *setter, size_t setterlen, char *prop)
  */
 BOOL IsSetter(const char *selname, size_t sellen)
 {
-    if (sellen <= 4)
-    {
-        return NO;
-    }
-
-    if (memcmp("set", selname, 3))
-    {
-        return NO;
-    }
-    
-    if (selname[sellen - 1] != ':')
-    {
-        return NO;
-    }
-    
-    return YES;
+    return sellen > 4 && memcmp("set", selname, 3) == 0 && selname[sellen - 1] == ':';
 }
 
 static id genericGetter(id self, SEL theCmd)
