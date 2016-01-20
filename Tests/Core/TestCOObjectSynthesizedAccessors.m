@@ -76,4 +76,30 @@
     UKObjectsEqual(@[], [item contents]);
 }
 
+- (void) testSetterToProperty
+{
+    const char *setter = "setFoo:";
+    char *property = malloc(strlen(setter)-3);
+    SetterToProperty(setter, strlen(setter), property);
+    
+    UKIntsEqual(0, strcmp("foo", property));
+    free(property);
+}
+
+static BOOL IsSetterWrapper(const char *selname)
+{
+    return IsSetter(selname, strlen(selname));
+}
+
+- (void) testIsSetter
+{
+    UKTrue(IsSetterWrapper("setFoo:"));
+    UKTrue(IsSetterWrapper("seta:"));
+    
+    UKFalse(IsSetterWrapper("set:"));
+    UKFalse(IsSetterWrapper("setFoo"));
+    UKFalse(IsSetterWrapper("foo:"));
+    UKFalse(IsSetterWrapper(""));
+}
+
 @end

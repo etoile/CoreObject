@@ -14,18 +14,28 @@
 
 @implementation COObject (Accessors)
 
-NSString *PropertyToSetter(NSString *prop)
+/**
+ * Converts "setFoo:" to "foo".
+ *
+ * Preconditions:
+ *  - setterlen is strlen(setter)
+ *  - strlen(setter) >= 4
+ *  - prop has room for (strlen(setter) - 3) bytes
+ */
+void SetterToProperty(const char *setter, size_t setterlen, char *prop)
 {
-    return [NSString stringWithFormat: @"set%@%@:",
-            [[prop substringWithRange: NSMakeRange(0, 1)] uppercaseString],
-            [prop substringFromIndex: 1]];
+    memcpy(prop, setter + 3, setterlen - 4);
+    prop[0] = tolower(prop[0]);
+    prop[setterlen - 4] = '\0';
 }
 
-NSString *SetterToProperty(NSString *prop)
+/**
+ * Returns YES if the string matches "setXXX:" for some nonempty XXX.
+ * Otherwise, returns NO.
+ */
+BOOL IsSetter(const char *selname, size_t sellen)
 {
-    return [NSString stringWithFormat: @"%@%@",
-            [[prop substringWithRange: NSMakeRange(3, 1)] lowercaseString],
-            [prop substringWithRange: NSMakeRange(4,  [prop length] - 5)]];
+    return sellen > 4 && memcmp("set", selname, 3) == 0 && selname[sellen - 1] == ':';
 }
 
 static id genericGetter(id self, SEL theCmd)
@@ -41,7 +51,18 @@ static void genericSetter(id self, SEL theCmd, id value)
 {
     // FIXME: Same comment as the genericGetter
 
-    NSString *key = SetterToProperty(NSStringFromSelector(theCmd));
+    const char *selname = sel_getName(theCmd);
+    size_t sellen = strlen(selname);
+    char propname[sellen];
+    
+    if (sellen < 4)
+    {
+        return;
+    }
+    
+    SetterToProperty(selname, sellen, propname);
+    
+    NSString *key = [NSString stringWithUTF8String: propname];
 
 	[self willChangeValueForProperty: key];
 	[self setValue: value forVariableStorageKey: key];
@@ -50,48 +71,46 @@ static void genericSetter(id self, SEL theCmd, id value)
 
 + (BOOL)resolveInstanceMethod:(SEL)sel
 {
-	//NSLog(@"Resolving %@", NSStringFromSelector(sel));
-    Class classToCheck = self;
-
-	// FIXME: Don't iterate over all properties but access a single property using class_getProperty()
-    while (classToCheck != Nil)
+    //NSLog(@"Resolving %@", NSStringFromSelector(sel));
+    
+    const char *selname = sel_getName(sel);
+    const size_t sellen = strlen(selname);
+    const BOOL isSetter = IsSetter(selname, sellen);
+    
+    // Get the property name
+    
+    char propname[sellen];
+    if (isSetter)
     {
-        unsigned int propertyCount;
-        objc_property_t *propertyList = class_copyPropertyList(classToCheck, &propertyCount);
-
-        for (unsigned int i=0; i<propertyCount; i++)
-        {
-            objc_property_t property = propertyList[i];
-			NSString *attributes = [NSString stringWithUTF8String: property_getAttributes(property)];
-			BOOL isDynamic = ([attributes rangeOfString: @"D"].location != NSNotFound);
-
-            // FIXME: Check other property attributes are correct e.g. readwrite and not readonly
-            if (isDynamic == NO)
-				continue;
-
-            // TODO: Implement more accessors for performance.
-            
-            NSString *propName = [NSString stringWithUTF8String: property_getName(property)];
-            NSString *setterName = PropertyToSetter(propName);
-            
-            NSString *selName = NSStringFromSelector(sel);
-            
-            if ([selName isEqual: propName])
-            {
-                class_addMethod(classToCheck, sel, (IMP)&genericGetter, "@@:");
-                free(propertyList);
-                return YES;
-            }
-            else if ([selName isEqual: setterName])
-            {
-                class_addMethod(classToCheck, sel, (IMP)&genericSetter, "v@:@");
-                free(propertyList);
-                return YES;
-            }
-        }
-        free(propertyList);
+        SetterToProperty(selname, sellen, propname);
+    }
+    else
+    {
+        strcpy(propname, selname);
+    }
+    
+    // Get the property
+    
+    objc_property_t property = class_getProperty(self, propname);
+    if (property != NULL)
+    {
+        const char *attributes = property_getAttributes(property);
+        BOOL isDynamic = (strchr(attributes, 'D') != NULL);
         
-        classToCheck = class_getSuperclass(classToCheck);
+        // FIXME: Check other property attributes are correct e.g. readwrite and not readonly
+        if (isDynamic == NO)
+            return NO;
+        
+        if (!isSetter)
+        {
+            class_addMethod(self, sel, (IMP)&genericGetter, "@@:");
+            return YES;
+        }
+        else
+        {
+            class_addMethod(self, sel, (IMP)&genericSetter, "v@:@");
+            return YES;
+        }
     }
     return NO;
 }
