@@ -70,14 +70,15 @@
 
 - (void)removeReferringObject: (COObject *)aReferrer
 {
-	NSMutableSet *paths = [[_referringObjectToPaths objectForKey: aReferrer] copy];
-	
+	NSMutableSet *paths = [_referringObjectToPaths objectForKey: aReferrer];
+
 	if (paths == nil)
 		return;
 
+	[_referringObjectToPaths removeObjectForKey: aReferrer];
 	for (COPath *path in paths)
 	{
-		[self removeReferringObject: aReferrer forPath: path];
+		[_pathToReferringObjects[path] removeObject: aReferrer];
 	}
 }
 
