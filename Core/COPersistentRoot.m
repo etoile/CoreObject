@@ -488,9 +488,6 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 	for (COBranch *branch in _branchForUUID.objectEnumerator)
 	{
-		if (branch.isDeleted)
-			continue;
-
 		COObjectGraphContext *branchObjectGraph = [branch objectGraphContextWithoutUnfaulting];
 
 		if (branchObjectGraph != nil)
