@@ -136,7 +136,7 @@
 {
 	NSData *passwordBytes = [@"password" dataUsingEncoding: NSUTF8StringEncoding];
 						   
-	for (NSData *blob in [store.database arrayForQuery: [NSString stringWithFormat: @"SELECT contents FROM %@", [backing tableName]]])
+	for (NSData *blob in [store.database arrayForQuery: @"SELECT contents FROM commits WHERE backinguuid = ?", [[backing UUID] dataValue]])
 	{
 		NSRange rangeOfPassword = [blob rangeOfData: passwordBytes options: 0 range: NSMakeRange(0, blob.length)];
 		if (rangeOfPassword.location != NSNotFound)

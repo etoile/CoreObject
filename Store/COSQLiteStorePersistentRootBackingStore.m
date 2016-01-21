@@ -46,30 +46,6 @@
 
 @implementation COSQLiteStorePersistentRootBackingStore
 
-- (NSString *) tableName
-{
-    if (_shareDB)
-    {
-        return [NSString stringWithFormat: @"`commits-%@`", _uuid];
-    }
-    else
-    {
-        return @"commits";
-    }
-}
-
-- (NSString *) metadataTableName
-{
-    if (_shareDB)
-    {
-        return [NSString stringWithFormat: @"`metadata-%@`", _uuid];
-    }
-    else
-    {
-        return @"metadata";
-    }
-}
-
 - (id)initWithPersistentRootUUID: (ETUUID*)aUUID
                            store: (COSQLiteStore *)store
                       useStoreDB: (BOOL)share
@@ -114,15 +90,14 @@
 	[self beginTransaction];
 	
 	// N.B. UNIQUE constraint on uuid gives it an index automatically.
-    [db_ executeUpdate: [NSString stringWithFormat:
-                         @"CREATE TABLE IF NOT EXISTS %@ (revid INTEGER PRIMARY KEY ASC, "
+    [db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS commits (revid INTEGER PRIMARY KEY ASC, backinguuid BLOB NOT NULL, "
                          "contents BLOB, hash BLOB, metadata BLOB, timestamp INTEGER, parent INTEGER, mergeparent INTEGER, branchuuid BLOB, persistentrootuuid BLOB, deltabase INTEGER, "
-                         "bytesInDeltaRun INTEGER, garbage BOOLEAN, uuid BLOB NOT NULL UNIQUE)", [self tableName]]];
+                         "bytesInDeltaRun INTEGER, garbage BOOLEAN, uuid BLOB NOT NULL UNIQUE)"];
 
-	// This table always contains exactly one row
-	[db_ executeUpdate: [NSString stringWithFormat:
-						 @"CREATE TABLE IF NOT EXISTS %@ (root BLOB NOT NULL CHECK (length(root) = 16))", [self metadataTableName]]];
+	[db_ executeUpdate:  @"CREATE TABLE IF NOT EXISTS backingmetadata (backinguuid BLOB PRIMARY KEY, root BLOB NOT NULL CHECK (length(root) = 16))"];
 	
+        [db_ executeUpdate: @"CREATE INDEX IF NOT EXISTS commits_backinguuid_index ON commits(backinguuid)"];
+    
 	[self commit];
 	
 	// FIXME: -hadError only looks at the success of the last statement.
@@ -138,8 +113,8 @@
 - (void) clearBackingStore
 {
 	[self beginTransaction];
-	[db_ executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@", [self tableName]]];
-	[db_ executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@", [self metadataTableName]]];
+	[db_ executeUpdate: @"DELETE FROM commits WHERE backinguuid = ?", [_uuid dataValue]];
+	[db_ executeUpdate: @"DELETE FROM backingmetadata WHERE backinguuid = ?", [_uuid dataValue]];
 	ETAssert([self commit]);
 }
 
@@ -202,9 +177,7 @@
 
 - (ETUUID *) revisionUUIDForRevid: (int64_t)aRevid
 {
-    NSData *revUUID = [db_ dataForQuery:
-					   [NSString stringWithFormat: @"SELECT uuid FROM %@ WHERE revid = ?", [self tableName]],
-					   [NSNumber numberWithLongLong: aRevid]];
+    NSData *revUUID = [db_ dataForQuery: @"SELECT uuid FROM commits WHERE revid = ?", [NSNumber numberWithLongLong: aRevid]];
     
     if (revUUID != nil)
     {
@@ -219,8 +192,7 @@
 - (CORevisionInfo *) revisionInfoForRevisionUUID: (ETUUID *)aRevisionUUID
 {
     CORevisionInfo *result = nil;
-    FMResultSet *rs = [db_ executeQuery:
-                       [NSString stringWithFormat: @"SELECT parent, mergeparent, branchuuid, persistentrootuuid, metadata, timestamp FROM %@ WHERE uuid = ?", [self tableName]],
+    FMResultSet *rs = [db_ executeQuery: @"SELECT parent, mergeparent, branchuuid, persistentrootuuid, metadata, timestamp FROM commits WHERE uuid = ?",
                        [aRevisionUUID dataValue]];
 	if ([rs next])
 	{
@@ -248,8 +220,7 @@
 
 - (int64_t) revidForUUID: (ETUUID *)aUUID
 {
-    NSNumber *revid = [db_ numberForQuery:
-                       [NSString stringWithFormat: @"SELECT revid FROM %@ WHERE uuid = ?", [self tableName]], [aUUID dataValue]];
+    NSNumber *revid = [db_ numberForQuery: @"SELECT revid FROM commits WHERE uuid = ?", [aUUID dataValue]];
     if (revid == nil)
     {
         return -1;
@@ -259,20 +230,18 @@
 
 - (NSIndexSet *)revidsForUUIDs: (NSArray *)UUIDs
 {
-	NSSet *UUIDDataValues = (id)[[[NSSet setWithArray: UUIDs] mappedCollection] dataValue];
 	NSMutableIndexSet *revids = [NSMutableIndexSet new];
-	FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
-		@"SELECT revid, uuid FROM %@", [self tableName]]];
 
-	while ([rs next])
-	{
-		if ([UUIDDataValues containsObject: [rs dataForColumnIndex: 1]])
-		{
-			[revids addIndex: [rs int64ForColumnIndex: 0]];
-		}
-	}
-	[rs close];
-
+        for (ETUUID *uuid in UUIDs)
+        {
+            FMResultSet *rs = [db_ executeQuery: @"SELECT revid FROM commits WHERE uuid = ?", [uuid dataValue]];
+            if ([rs next])
+            {
+                [revids addIndex: [rs int64ForColumnIndex: 0]];
+            }
+            [rs close];
+        }
+	
 	return revids;
 }
 
@@ -280,7 +249,7 @@
 {
 	if (_rootObjectUUID == nil)
 	{
-		FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat: @"SELECT root FROM %@", [self metadataTableName]]];
+		FMResultSet *rs = [db_ executeQuery: @"SELECT root FROM backingmetadata WHERE backinguuid = ?", [_uuid dataValue]];
 		if ([rs next])
 		{
 			_rootObjectUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
@@ -293,8 +262,9 @@
 
 - (BOOL) hasRevid: (int64_t)revid
 {
-    return [db_ boolForQuery: [NSString stringWithFormat: @"SELECT 1 FROM %@ WHERE revid = ?", [self tableName]],
-            [NSNumber numberWithLongLong: revid]];
+    return [db_ boolForQuery: @"SELECT 1 FROM commits WHERE revid = ? AND backinguuid = ?",
+            [NSNumber numberWithLongLong: revid],
+            [_uuid dataValue]];
 }
 
 /**
@@ -308,12 +278,11 @@
     
     NSMutableDictionary *dataForUUID = [NSMutableDictionary dictionary];
     
-    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
-                                          @"SELECT revid, contents, hash, parent, deltabase "
-                                          "FROM %@ "
-                                          "WHERE revid <= ? AND revid >= (SELECT deltabase FROM %@ WHERE revid = ?) "
-                                          "ORDER BY revid DESC", [self tableName], [self tableName]],
-                                        revidObj, revidObj];
+    FMResultSet *rs = [db_ executeQuery:  @"SELECT revid, contents, hash, parent, deltabase "
+                                          "FROM commits "
+                                          "WHERE revid <= ? AND revid >= (SELECT deltabase FROM commits WHERE revid = ?) AND backinguuid = ? "
+                                          "ORDER BY revid DESC",
+                                        revidObj, revidObj, [_uuid dataValue]];
     
     int64_t nextRevId = -1;
   
@@ -436,7 +405,7 @@ NSData *contentsBLOBWithItemTree(id<COItemGraph> itemGraph)
 - (int64_t) nextRowid
 {
     int64_t result = 0;
-    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat: @"SELECT MAX(rowid) FROM %@", [self tableName]]];
+    FMResultSet *rs = [db_ executeQuery: @"SELECT MAX(rowid) FROM commits"];
 	if ([rs next])
 	{
         if (![rs columnIndexIsNull: 0])
@@ -453,7 +422,7 @@ NSData *contentsBLOBWithItemTree(id<COItemGraph> itemGraph)
 {
     int64_t deltabase = -1;
     
-    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat: @"SELECT deltabase FROM %@ WHERE rowid = ?", [self tableName]],
+    FMResultSet *rs = [db_ executeQuery: @"SELECT deltabase FROM commits WHERE rowid = ?",
                        [NSNumber numberWithLongLong: aRowid]];
     if ([rs next])
     {
@@ -468,7 +437,7 @@ NSData *contentsBLOBWithItemTree(id<COItemGraph> itemGraph)
 {
     int64_t bytesInDeltaRun = 0;
     
-    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat: @"SELECT bytesInDeltaRun FROM %@ WHERE rowid = ?", [self tableName]],
+    FMResultSet *rs = [db_ executeQuery: @"SELECT bytesInDeltaRun FROM commits WHERE rowid = ?",
                        [NSNumber numberWithLongLong: aRowid]];
     if ([rs next])
     {
@@ -571,10 +540,11 @@ static NSData *Sha1Data(NSData *data)
         metadataBlob = CODataWithJSONObject(metadata, NULL);
     }
     
-    BOOL ok = [db_ executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (revid, "
+    BOOL ok = [db_ executeUpdate: @"INSERT INTO commits (revid, backinguuid, "
         "contents, hash, metadata, timestamp, parent, mergeparent, branchuuid, persistentrootuuid, deltabase, "
-        "bytesInDeltaRun, garbage, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)", [self tableName]],
+        "bytesInDeltaRun, garbage, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)",
         [NSNumber numberWithLongLong: rowid],
+        [_uuid dataValue],
         contentsBlob,
 		Sha1Data(contentsBlob),
         metadataBlob,
@@ -593,7 +563,8 @@ static NSData *Sha1Data(NSData *data)
 	
 	if (currentRoot == nil)
 	{
-		ok = ok && [db_ executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (root) VALUES (?)", [self metadataTableName]],
+		ok = ok && [db_ executeUpdate: @"INSERT INTO backingmetadata (backinguuid, root) VALUES (?, ?)",
+                 [_uuid dataValue],
 		 [[anItemTree rootItemUUID] dataValue]];
 	}
 	else if (![currentRoot isEqual: [anItemTree rootItemUUID]])
@@ -613,13 +584,13 @@ static NSData *Sha1Data(NSData *data)
     
     NSMutableIndexSet *result = [NSMutableIndexSet indexSet];
 
-    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
-                                          @"SELECT revid, parent "
-                                          "FROM %@ "
-                                          "WHERE revid <= ? AND revid >= ? "
-                                          "ORDER BY revid DESC", [self tableName]],
+    FMResultSet *rs = [db_ executeQuery: @"SELECT revid, parent "
+                                          "FROM commits "
+                                          "WHERE revid <= ? AND revid >= ? AND backinguuid = ? "
+                                          "ORDER BY revid DESC",
                         [NSNumber numberWithLongLong: revid],
-                        [NSNumber numberWithLongLong: baseRevid]];
+                        [NSNumber numberWithLongLong: baseRevid],
+                        [_uuid dataValue]];
     
     int64_t nextRevId = revid;
     
@@ -657,7 +628,7 @@ static NSData *Sha1Data(NSData *data)
     
     for (NSUInteger i = [revids firstIndex]; i != NSNotFound; i = [revids indexGreaterThanIndex: i])
     {
-        [db_ executeUpdate: [NSString stringWithFormat: @"UPDATE %@ SET garbage = 1 WHERE revid = ?", [self tableName]],
+        [db_ executeUpdate: @"UPDATE commits SET garbage = 1 WHERE revid = ?",
             [NSNumber numberWithUnsignedInteger: i]];
     }
 
@@ -696,12 +667,11 @@ static NSData *Sha1Data(NSData *data)
 	
 	// Gather the set of revids that need to be rebuilt
 	NSMutableIndexSet *rebuildRevids = [NSMutableIndexSet indexSet];
-	FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
-										  @"SELECT revid "
-										  "FROM %@ "
-										  "LEFT OUTER JOIN (SELECT garbage AS parentgarbage, revid AS parentrevid FROM %@) "
-										  "ON (parent = parentrevid) "
-										  "WHERE garbage = 0 AND parentgarbage = 1 AND deltabase != revid", [self tableName], [self tableName]]];
+	FMResultSet *rs = [db_ executeQuery: @"SELECT revid "
+                            "FROM commits "
+                            "LEFT OUTER JOIN (SELECT garbage AS parentgarbage, revid AS parentrevid FROM commits) "
+                            "ON (parent = parentrevid) "
+                            "WHERE garbage = 0 AND parentgarbage = 1 AND deltabase != revid AND backinguuid = ?", [_uuid dataValue]];
 	while ([rs next])
 	{
 		[rebuildRevids addIndex: [rs longLongIntForColumnIndex: 0]];
@@ -719,7 +689,7 @@ static NSData *Sha1Data(NSData *data)
 		NSNumber *deltabase = @(revid);
 		NSNumber *bytesInDeltaRun = @(contentsBlob.length);
 		
-		BOOL ok = [db_ executeUpdate: [NSString stringWithFormat: @"UPDATE %@ SET contents = ?, hash = ?, deltabase = ?, bytesInDeltaRun = ? WHERE revid = ?", [self tableName]],
+		BOOL ok = [db_ executeUpdate: @"UPDATE commits SET contents = ?, hash = ?, deltabase = ?, bytesInDeltaRun = ? WHERE revid = ?",
 				   contentsBlob,
 				   Sha1Data(contentsBlob),
 				   deltabase,
@@ -734,7 +704,7 @@ static NSData *Sha1Data(NSData *data)
 	}];
 	
 	// Delete _all_ revisions marked as garbage.
-    [db_ executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE garbage = 1", [self tableName]]];
+    [db_ executeUpdate: @"DELETE FROM commits WHERE garbage = 1 AND backinguuid = ?", [_uuid dataValue]];
 
     [self commit];
     
@@ -745,8 +715,8 @@ static NSData *Sha1Data(NSData *data)
 {
 	// NOTE: For performance, we use two distinct queries, see
 	// http://stackoverflow.com/questions/11515165/sqlite3-select-min-max-together-is-much-slower-than-select-them-separately
-    NSNumber *min = [db_ numberForQuery: [NSString stringWithFormat: @"SELECT MIN(rowid) FROM %@", [self tableName]]];
-    NSNumber *max = [db_ numberForQuery: [NSString stringWithFormat: @"SELECT MAX(rowid) FROM %@", [self tableName]]];
+    NSNumber *min = [db_ numberForQuery: @"SELECT MIN(rowid) FROM commits WHERE backinguuid = ?", [_uuid dataValue]];
+    NSNumber *max = [db_ numberForQuery: @"SELECT MAX(rowid) FROM commits WHERE backinguuid = ?", [_uuid dataValue]];
 
 	if (min == nil && max == nil)
 	{
@@ -815,19 +785,20 @@ static NSData *Sha1Data(NSData *data)
 
 	if (options & COBranchRevisionReadingDivergentRevisions)
 	{
-		rs = [db_ executeQuery: [NSString stringWithFormat:
+		rs = [db_ executeQuery:
 			@"SELECT revid, parent, branchuuid, persistentrootuuid, metadata, timestamp, mergeparent, uuid "
-		 	 "FROM %@ WHERE revid BETWEEN 0 AND (SELECT MAX(revid) FROM %@ WHERE branchuuid = ?) "
-			 "ORDER BY revid DESC", [self tableName], [self tableName]], [aBranchUUID dataValue]];
+		 	 "FROM commits WHERE revid BETWEEN 0 AND (SELECT MAX(revid) FROM commits WHERE branchuuid = ? AND backinguuid = ?) AND backinguuid = ? "
+                      "ORDER BY revid DESC", [aBranchUUID dataValue], [_uuid dataValue], [_uuid dataValue]];
 	}
 	else
 	{
 		int64_t headRevid = [self revidForUUID: aHeadRevUUID];
 
-		rs = [db_ executeQuery: [NSString stringWithFormat:
+                rs = [db_ executeQuery:
 			@"SELECT revid, parent, branchuuid, persistentrootuuid, metadata, timestamp, mergeparent, uuid "
-			 "FROM %@ WHERE revid BETWEEN 0 AND ? ORDER BY revid DESC",
-			 [self tableName]], [NSNumber numberWithLongLong: headRevid]];
+			 "FROM commits WHERE revid BETWEEN 0 AND ? AND backinguuid = ? ORDER BY revid DESC",
+			 [NSNumber numberWithLongLong: headRevid],
+                        [_uuid dataValue]];
 	}
 
 	NSUInteger suggestedMaxRevCount = 50000;
@@ -873,10 +844,8 @@ static NSData *Sha1Data(NSData *data)
 
 - (NSArray *)revisionInfos
 {
-	FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
-										  @"SELECT revid, parent, branchuuid, persistentrootuuid, metadata, timestamp, mergeparent, uuid "
-										  "FROM %@ ORDER BY revid DESC",
-										  [self tableName]]];
+	FMResultSet *rs = [db_ executeQuery: @"SELECT revid, parent, branchuuid, persistentrootuuid, metadata, timestamp, mergeparent, uuid "
+                           "FROM commits WHERE backinguuid = ? ORDER BY revid DESC", [_uuid dataValue]];
 	
 	NSUInteger suggestedMaxRevCount = 50000;
 	NSMutableArray *revInfos = [NSMutableArray arrayWithCapacity: suggestedMaxRevCount];
