@@ -162,6 +162,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
      "proot BLOB NOT NULL, current_revid BLOB NOT NULL, "
      "head_revid BLOB NOT NULL, metadata BLOB, deleted BOOLEAN DEFAULT 0, parentbranch BLOB)"];
     
+    [db_ executeUpdate: @"CREATE INDEX IF NOT EXISTS branches_by_proot ON branches(proot)"];
+    
 	[db_ executeUpdate: @"CREATE TABLE IF NOT EXISTS persistentroot_backingstores ("
      "uuid BLOB PRIMARY KEY NOT NULL, backingstore BLOB NOT NULL)"];
 	

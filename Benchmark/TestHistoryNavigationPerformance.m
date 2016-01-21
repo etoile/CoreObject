@@ -80,14 +80,14 @@ static int commitCounter = 0;
 	NSLog(@"Time to go to newest node on undo track: %0.2fs", goToFirstNodeTime);
 	startDate = [NSDate date];
 	
-	// FIXME: UKTrue(goToFirstNodeTime < 0.5);
+	UKTrue(goToFirstNodeTime < 1.0); // FIXME: 0.5
 
 	[track setCurrentNode: track.nodes.lastObject];
 	
 	NSTimeInterval goToLastNodeTime = [[NSDate date] timeIntervalSinceDate: startDate];
 	NSLog(@"Time to go to oldest node on undo track: %0.2fs", goToLastNodeTime);
 	
-	// FIXME: UKTrue(goToLastNodeTime < 0.5);
+	UKTrue(goToLastNodeTime < 1.0); // FIXME: 0.5
 }
 
 @end
