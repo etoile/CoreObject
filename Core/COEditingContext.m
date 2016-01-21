@@ -10,7 +10,7 @@
 #import "COPersistentRoot+Private.h"
 #import "COError.h"
 #import "COObject.h"
-//#import "COObject+Private.h"
+#import "COObject+Private.h"
 #import "COMetamodel.h"
 #import "COSQLiteStore.h"
 #import "CORevision.h"
@@ -409,40 +409,67 @@
 	NSParameterAssert(aBranch == nil
 		|| (!aBranch.isCurrentBranch && aBranch.persistentRoot == aPersistentRoot));
 
-	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
+	/* Fix references pointing to any branch that belong to the deleted
+	 persistent root (the relationship target) */
+	NSSet *targetObjectGraphs = nil;
+	
+	if (aBranch != nil)
 	{
-		if (persistentRoot == aPersistentRoot)
-			continue;
+		targetObjectGraphs = [NSSet setWithObject: aBranch.objectGraphContext];
+	}
+	else
+	{
+		targetObjectGraphs = [aPersistentRoot allObjectGraphContexts];
+	}
+	
+	for (COObjectGraphContext *target in targetObjectGraphs)
+	{
+		/* When we are not deleting a persistent root or branch explicitly,
+		 but reloading persistent roots, we must take in account that
+		 branches can become deleted when their persistent root doesn't
+		 (isDeletion is NO) */
+		BOOL isTargetDeletion = isDeletion || target.branch.deleted;
+		/* Fix references in all branches that belong to persistent roots
+		 referencing the deleted persistent root (those are relationship sources) */
+		NSMutableSet *sourceObjectGraphs = [NSMutableSet new];
 		
-		/* Fix references pointing to any branch that belong to the deleted
-		   persistent root (the relationship target) */
-		NSSet *targetObjectGraphs = nil;
+		// Quickly lookup the COObjects that have currently dead references that
+		// should point at `target`.
 		
-		if (aBranch != nil)
+		// TODO: Factor out this object graph context -> COPath conversion.
+		COPath *targetPath;
+		if (target == aPersistentRoot.objectGraphContext)
 		{
-            targetObjectGraphs = [NSSet setWithObject: aBranch.objectGraphContext];
+			targetPath = [COPath pathWithPersistentRoot: target.persistentRoot.UUID];
 		}
 		else
 		{
-            targetObjectGraphs = [aPersistentRoot allObjectGraphContexts];
+			targetPath = [COPath pathWithPersistentRoot: target.persistentRoot.UUID branch: target.branch.UUID];
 		}
-
-		for (COObjectGraphContext *target in targetObjectGraphs)
+		
+		NSHashTable *referrersWithDeadReferences = [_deadRelationshipCache referringObjectsForPath: targetPath];
+		for (COObject *sourceObject in referrersWithDeadReferences)
 		{
-			/* When we are not deleting a persistent root or branch explicitly,
-			   but reloading persistent roots, we must take in account that  
-			   branches can become deleted when their persistent root doesn't 
-			   (isDeletion is NO) */
-			BOOL isTargetDeletion = isDeletion || target.branch.deleted;
-			/* Fix references in all branches that belong to persistent roots 
-			   referencing the deleted persistent root (those are relationship sources) */
-			NSSet *sourceObjectGraphs = [persistentRoot allObjectGraphContexts];
-
-			for (COObjectGraphContext *source in sourceObjectGraphs)
-			{
-				[source replaceObject: (isTargetDeletion ? target.rootObject : nil)
-						   withObject: (isTargetDeletion ? nil : target.rootObject)];
-			}
+			[sourceObjectGraphs addObject: sourceObject.objectGraphContext];
+		}
+		
+		// Quickly lookup COObjects with live references to `target`
+		NSSet *referrersWithLiveReferences = [target.rootObject referringObjects];
+		for (COObject *sourceObject in referrersWithLiveReferences)
+		{
+			[sourceObjectGraphs addObject: sourceObject.objectGraphContext];
+		}
+		
+		// Fix up the references
+		for (COObjectGraphContext *source in sourceObjectGraphs)
+		{
+			if (source.persistentRoot == aPersistentRoot)
+				continue;
+			
+			// TODO: We could easily skip traversing all inner objects, since
+			// we already know which ones need fixing up.
+			[source replaceObject: (isTargetDeletion ? target.rootObject : nil)
+					   withObject: (isTargetDeletion ? nil : target.rootObject)];
 		}
 	}
 }
