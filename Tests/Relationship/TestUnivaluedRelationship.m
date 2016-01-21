@@ -212,9 +212,39 @@
 
 - (void)testTargetPersistentRootDeletion
 {
+	UKObjectsSame(item1, group1.content);
 	item1.persistentRoot.deleted = YES;
+	UKNil(group1.content);
 	[ctx commit];
 
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKNil(testGroup1.content);
+		UKTrue([testItem1 referringObjects].isEmpty);
+
+		UKNil(testCurrentGroup1.content);
+		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+	}];
+}
+
+- (void)testTargetPersistentRootDeletionThroughSeparateContext
+{
+	UKObjectsSame(item1, group1.content);
+	
+	// Perform the deletion in a separate context
+	{
+		COEditingContext *ctx2 = [self newContext];
+		[ctx2 persistentRootForUUID: item1.persistentRoot.UUID].deleted = YES;
+		
+		// The cross-reference is not cleared in `ctx` yet.
+		UKObjectsSame(item1, group1.content);
+		
+		[ctx2 commit];
+	}
+	
+	// Wait a bit for a distributed notification to arrive to ctx
+	[self wait];
+	
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		UKNil(testGroup1.content);
@@ -230,7 +260,9 @@
 	item1.persistentRoot.deleted = YES;
 	[ctx commit];
 	
+	UKNil(group1.content);
 	item1.persistentRoot.deleted = NO;
+	UKObjectsSame(item1, group1.content);
 	[ctx commit];
 
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
@@ -248,6 +280,35 @@
 		// Bidirectional cross persistent root relationships are supported
 		// accross current branches, but materialized accross tracking branches
 		// in memory (they are not visible accross the current branches in memory).
+		UKObjectsEqual(testItem1, testCurrentGroup1.content);
+		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+	}];
+}
+
+- (void)testTargetPersistentRootUndeletionThroughSeparateContext
+{
+	item1.persistentRoot.deleted = YES;
+	[ctx commit];
+
+	// Perform the undeletion in a separate context
+	{
+		COEditingContext *ctx2 = [self newContext];
+		[ctx2 persistentRootForUUID: item1.persistentRoot.UUID].deleted = NO;
+
+		// The cross-reference is not restored in `ctx` yet.
+		UKNil(group1.content);
+
+		[ctx2 commit];
+	}
+
+	// Wait a bit for a distributed notification to arrive to ctx
+	[self wait];
+
+	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
+	{
+		UKObjectsEqual(testItem1, testGroup1.content);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
+
 		UKObjectsEqual(testItem1, testCurrentGroup1.content);
 		UKTrue([testCurrentItem1 referringObjects].isEmpty);
 	}];

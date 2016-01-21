@@ -326,6 +326,13 @@ doesNotPostNotification: (NSString *)notif
     [runLoop runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.2]];
 }
 
+- (COEditingContext *)newContext
+{
+    return [[COEditingContext alloc] initWithStore: [[COSQLiteStore alloc] initWithURL: ctx.store.URL]
+                        modelDescriptionRepository: ctx.modelDescriptionRepository
+                                    undoTrackStore: ctx.undoTrackStore];
+}
+
 @end
 
 @implementation COObjectGraphContext (TestCommon)

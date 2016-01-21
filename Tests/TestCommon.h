@@ -205,6 +205,12 @@ doesNotPostNotification: (NSString *)notif;
  */
 - (void) wait;
 
+/**
+ * Returns a new context with its own store object, open on the same store URL
+ * as the receiver.
+ */
+- (COEditingContext *) newContext;
+
 @end
 
 @interface COObjectGraphContext (TestCommon)

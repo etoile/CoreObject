@@ -42,13 +42,6 @@
     return self;
 }
 
-- (COEditingContext *)newContext
-{
-	return [[COEditingContext alloc] initWithStore: [[COSQLiteStore alloc] initWithURL: ctx.store.URL]
-	                    modelDescriptionRepository: ctx.modelDescriptionRepository
-	                                undoTrackStore: ctx.undoTrackStore];
-}
-
 - (void)testUndoSetCurrentVersionForBranchBasic
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
