@@ -493,8 +493,11 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 - (void) deleteBackingStoreWithUUID: (ETUUID *)aUUID
 {
 #if BACKING_STORES_SHARE_SAME_SQLITE_DB == 1
-	[db_ executeUpdate: [NSString stringWithFormat: @"DROP TABLE IF EXISTS `commits-%@`", aUUID]];
-	[db_ executeUpdate: [NSString stringWithFormat: @"DROP TABLE IF EXISTS `metadata-%@`", aUUID]];
+    COSQLiteStorePersistentRootBackingStore *backing = [backingStores_ objectForKey: aUUID];
+    if (backing != nil)
+    {
+        [backing clearBackingStore];
+    }
 #else
 	
 	// FIXME: Test this

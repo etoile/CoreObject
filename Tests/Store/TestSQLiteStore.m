@@ -678,18 +678,15 @@ static ETUUID *childUUID2;
 {
 #if BACKING_STORES_SHARE_SAME_SQLITE_DB == 1
 	[store testingRunBlockInStoreQueue: ^() {
-		BOOL hasCommitsTable = [[store database] tableExists: [NSString stringWithFormat: @"commits-%@", aUUID]];
-		BOOL hasMetadataTable = [[store database] tableExists: [NSString stringWithFormat: @"metadata-%@", aUUID]];
+		BOOL hasCommits = [[store database] intForQuery: @"SELECT 1 FROM commits WHERE backinguuid = ?", [aUUID dataValue]];
 		
 		if (flag)
 		{
-			UKTrue(hasCommitsTable);
-			UKTrue(hasMetadataTable);
+			UKTrue(hasCommits);
 		}
 		else
 		{
-			UKFalse(hasCommitsTable);
-			UKFalse(hasMetadataTable);
+			UKFalse(hasCommits);
 		}
 	}];
 #endif
