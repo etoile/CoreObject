@@ -194,7 +194,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (BOOL) isTrackingSpecificBranch
 {
-	return [self persistentRoot] != nil && self != [[self persistentRoot] objectGraphContext];
+	return _persistentRoot != nil && self != [_persistentRoot objectGraphContext];
 }
 
 #pragma mark -
@@ -824,27 +824,33 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
  * outgoing relationships of the receiver inner objects.
  *
  * The referring objects are the inner objects that hold a reference to it.
+ *
+ * For -updateCrossPersistentRootReferencesToPersistentRoot:branch:isDeleted:,
+ * this method is a bottleneck. To make it even faster, we could access ivars
+ * directly and preallocate some COPath objects.
  */
 - (NSSet *)referringObjectsWithDeadReferencesToObject: (COObject *)undeletedObject
 {
-	ETAssert(undeletedObject.objectGraphContext != self);
-	ETAssert(undeletedObject.isRoot);
+	COObjectGraphContext *undeletedObjectGraphContext = undeletedObject.objectGraphContext;
 
-	if (self.persistentRoot == nil)
+	ETAssert(undeletedObjectGraphContext != self);
+	ETDebugAssert(undeletedObject == undeletedObjectGraphContext.rootObject);
+
+	if (_persistentRoot == nil)
 		return [NSSet set];
 
 	COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
-		self.editingContext.deadRelationshipCache;
+		_persistentRoot.parentContext.deadRelationshipCache;
 	COPath *pathToUndeletedObject = nil;
 	
-	if ([undeletedObject.objectGraphContext isTrackingSpecificBranch])
+	if ([undeletedObjectGraphContext isTrackingSpecificBranch])
 	{
-		pathToUndeletedObject = [COPath pathWithPersistentRoot: undeletedObject.persistentRoot.UUID
-		                                                branch: undeletedObject.branch.UUID];
+		pathToUndeletedObject = [COPath pathWithPersistentRoot: undeletedObjectGraphContext.persistentRoot.UUID
+		                                                branch: undeletedObjectGraphContext.branch.UUID];
 	}
 	else
 	{
-		pathToUndeletedObject = [COPath pathWithPersistentRoot: undeletedObject.persistentRoot.UUID];
+		pathToUndeletedObject = [COPath pathWithPersistentRoot: undeletedObjectGraphContext.persistentRoot.UUID];
 	}
 
 	return [deadRelationshipCache referringObjectsForPath: pathToUndeletedObject].setRepresentation;

@@ -424,7 +424,7 @@
 		}
 		else
 		{
-            targetObjectGraphs = [NSSet setWithSet: [aPersistentRoot allObjectGraphContexts]];
+            targetObjectGraphs = [aPersistentRoot allObjectGraphContexts];
 		}
 
 		for (COObjectGraphContext *target in targetObjectGraphs)
@@ -436,7 +436,7 @@
 			BOOL isTargetDeletion = isDeletion || target.branch.deleted;
 			/* Fix references in all branches that belong to persistent roots 
 			   referencing the deleted persistent root (those are relationship sources) */
-			NSSet *sourceObjectGraphs = [NSSet setWithSet: [persistentRoot allObjectGraphContexts]];
+			NSSet *sourceObjectGraphs = [persistentRoot allObjectGraphContexts];
 
 			for (COObjectGraphContext *source in sourceObjectGraphs)
 			{
