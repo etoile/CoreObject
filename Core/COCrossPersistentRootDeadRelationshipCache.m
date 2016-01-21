@@ -70,24 +70,25 @@
 
 - (void)removeReferringObject: (COObject *)aReferrer
 {
-	NSMutableSet *paths = [_referringObjectToPaths objectForKey: aReferrer];
+	NSMutableSet *paths = [[_referringObjectToPaths objectForKey: aReferrer] copy];
 	
 	if (paths == nil)
 		return;
 
-	[_referringObjectToPaths removeObjectForKey: aReferrer];
-	[_pathToReferringObjects removeObjectsForKeys: paths.allObjects];
+	for (COPath *path in paths)
+	{
+		[self removeReferringObject: aReferrer forPath: path];
+	}
 }
 
 - (void)removePath: (COPath *)aPath
 {
-	NSHashTable *referringObjects = _pathToReferringObjects[aPath];
+	NSHashTable *referringObjects = [_pathToReferringObjects[aPath] copy];
 
 	for (COObject *referrer in referringObjects)
 	{
-		[_referringObjectToPaths removeObjectForKey: referrer];
+		[self removeReferringObject: referrer forPath: aPath];
 	}
-	[_pathToReferringObjects removeObjectForKey: aPath];
 }
 
 @end
