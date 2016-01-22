@@ -755,10 +755,22 @@ See +[NSObject typePrefix]. */
 	return result;
 }
 
-- (ETValidationResult *)validateValueUsingModel: (id)value forProperty: (NSString *)key
+- (ETValidationResult *)validateValueUsingModel: (id)value forProperty: (NSString *)property
 {
-	SEL keySelector = NSSelectorFromString([NSString stringWithFormat: @"validate%@:",
-		[key stringByCapitalizingFirstLetter]]);
+	const char *key = property.UTF8String;
+	size_t keyLength = strlen(key);
+	const char *prefix = "validate";
+	size_t prefixLength = strlen(prefix);
+	char validator[prefixLength + keyLength + 1];
+	
+	memcpy(validator, prefix, prefixLength);
+	memcpy(validator + prefixLength, key, keyLength);
+	
+	validator[prefixLength] = toupper(key[0]);
+	validator[prefixLength + keyLength] = ':';
+	validator[prefixLength + keyLength + 1] = '\0';
+
+	SEL keySelector = sel_getUid(validator);
 
 	if ([self respondsToSelector: keySelector] == NO)
 		return [ETValidationResult validResult: value];
