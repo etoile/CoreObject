@@ -163,7 +163,7 @@
 	NSLog(@"Time to go to first commit node on undo track: %0.2fs", goToNodeTime);
 	startDate = [NSDate date];
 	
-	UKTrue(goToNodeTime < 1.0); // FIXME: 0.5
+	UKTrue(goToNodeTime < 3.0); // FIXME: 1.0
 }
 
 

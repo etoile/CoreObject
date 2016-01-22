@@ -185,6 +185,11 @@
 	}]];
 }
 
+- (NSSet *)loadedPersistentRoots
+{
+	return [NSSet setWithArray: _loadedPersistentRoots.allValues];
+}
+
 #pragma mark Managing Persistent Roots -
 
 /**
