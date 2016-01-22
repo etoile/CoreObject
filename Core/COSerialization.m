@@ -486,10 +486,21 @@ serialization. */
 
 - (SEL)serializationGetterForProperty: (NSString *)property
 {
-	NSString *capitalizedKey = [property stringByCapitalizingFirstLetter];
-	SEL getter = NSSelectorFromString([@"serialized" stringByAppendingString: capitalizedKey]);
+	const char *key = property.UTF8String;
+	size_t keyLength = strlen(key);
+	const char *prefix = "serialized";
+	size_t prefixLength = strlen(prefix);
+	char getter[prefixLength + keyLength];
 	
-	return ([self respondsToSelector: getter] ? getter : NULL);
+	memcpy(getter, prefix, prefixLength);
+	memcpy(getter + prefixLength, key, keyLength);
+	
+	getter[prefixLength] = toupper(key[0]);
+	getter[prefixLength + keyLength] = '\0';
+	
+	SEL selector = sel_getUid(getter);
+
+	return ([self respondsToSelector: selector] ? selector : NULL);
 }
 
 // TODO: Could be changed to -serializedValueForProperty: once the previous
@@ -899,12 +910,22 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 
 - (SEL)serializationSetterForProperty: (NSString *)property
 {
-	NSString *capitalizedKey = [property stringByCapitalizingFirstLetter];
-	NSString *setterString =
-		[NSString stringWithFormat: @"%@%@%@", @"setSerialized", capitalizedKey, @":"];
-	SEL setter = NSSelectorFromString(setterString);
+	const char *key = property.UTF8String;
+	size_t keyLength = strlen(key);
+	const char *prefix = "setSerialized";
+	size_t prefixLength = strlen(prefix);
+	char setter[prefixLength + keyLength + 1];
+	
+	memcpy(setter, prefix, prefixLength);
+	memcpy(setter + prefixLength, key, keyLength);
+	
+	setter[prefixLength] = toupper(key[0]);
+	setter[prefixLength + keyLength] = ':';
+	setter[prefixLength + keyLength + 1] = '\0';
 
-	return ([self respondsToSelector: setter] ? setter : NULL);
+	SEL selector = sel_getUid(setter);
+
+	return ([self respondsToSelector: selector] ? selector : NULL);
 }
 
 // TODO: Could be changed to -setSerializedValue:forProperty: once the previous
