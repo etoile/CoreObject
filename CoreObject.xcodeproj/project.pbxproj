@@ -49,6 +49,9 @@
 		6043D4D31757B4F9002103CC /* COCommitDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 6043D4C717575D79002103CC /* COCommitDescriptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6043D4D41757B4FB002103CC /* COCommitDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6043D4C817575D7A002103CC /* COCommitDescriptor.m */; };
 		6048468818B6C245006E4EDC /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048465518B6C03E006E4EDC /* UnitKit.framework */; };
+		6061B8311C524DF100813C18 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 6061B8301C524DF100813C18 /* Person.m */; };
+		6061B8321C524DF100813C18 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 6061B8301C524DF100813C18 /* Person.m */; };
+		6061B8331C524DF100813C18 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 6061B8301C524DF100813C18 /* Person.m */; };
 		606E3DC11787A07E00ED42DA /* COSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 606E3DBF1787A07E00ED42DA /* COSerialization.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		606E3DC21787A07E00ED42DA /* COSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 606E3DC01787A07E00ED42DA /* COSerialization.m */; };
 		607335B418AB96A6008A02DC /* COSmartGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 607335B218AB96A6008A02DC /* COSmartGroup.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1020,6 +1023,8 @@
 		6036439B1B3965E900DC685B /* TestUndoTrackHistoryCompaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUndoTrackHistoryCompaction.m; sourceTree = "<group>"; };
 		6043D4C717575D79002103CC /* COCommitDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCommitDescriptor.h; path = Utilities/COCommitDescriptor.h; sourceTree = "<group>"; };
 		6043D4C817575D7A002103CC /* COCommitDescriptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCommitDescriptor.m; path = Utilities/COCommitDescriptor.m; sourceTree = "<group>"; };
+		6061B82F1C524DF100813C18 /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Person.h; path = Tests/TestModelObjects/Person.h; sourceTree = "<group>"; };
+		6061B8301C524DF100813C18 /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Person.m; path = Tests/TestModelObjects/Person.m; sourceTree = "<group>"; };
 		606E3DBF1787A07E00ED42DA /* COSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSerialization.h; path = Core/COSerialization.h; sourceTree = "<group>"; };
 		606E3DC01787A07E00ED42DA /* COSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSerialization.m; path = Core/COSerialization.m; sourceTree = "<group>"; };
 		607335B218AB96A6008A02DC /* COSmartGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSmartGroup.h; path = Model/COSmartGroup.h; sourceTree = "<group>"; };
@@ -2305,6 +2310,8 @@
 				6621BF2518482159000809CF /* Folder.m */,
 				6634B3E3196B15AE00C7AD6A /* FolderWithNoClass.h */,
 				6634B3E4196B15AE00C7AD6A /* FolderWithNoClass.m */,
+				6061B82F1C524DF100813C18 /* Person.h */,
+				6061B8301C524DF100813C18 /* Person.m */,
 				66101153184D89A4001A3E24 /* OrderedGroupNoOpposite.h */,
 				66101154184D89A4001A3E24 /* OrderedGroupNoOpposite.m */,
 				66101156184D8ACB001A3E24 /* UnivaluedGroupNoOpposite.h */,
@@ -3276,6 +3283,7 @@
 			files = (
 				60F91F30197D32E2009F47D7 /* OrderedAttributeModel.m in Sources */,
 				60F91F20197D32E2009F47D7 /* Tag.m in Sources */,
+				6061B8331C524DF100813C18 /* Person.m in Sources */,
 				60F91EE6197D324B009F47D7 /* TestUndoUseCases.m in Sources */,
 				602837B01A334A2100D7B0D1 /* TestSchemaMigration.m in Sources */,
 				60F91F22197D32E2009F47D7 /* Child.m in Sources */,
@@ -3377,6 +3385,7 @@
 			files = (
 				66BA3D4A18DA6C4B00641D40 /* TestAttributedStringCommon.m in Sources */,
 				66488DFE18DA41B9009F4C55 /* TestAttributedStringDiffPerformance.m in Sources */,
+				6061B8321C524DF100813C18 /* Person.m in Sources */,
 				664F27A1188E69C000DF36FC /* COSynchronizerFakeMessageTransport.m in Sources */,
 				664F27A0188E69AD00DF36FC /* TestSynchronizerCommon.m in Sources */,
 				66E6824118B972C4003294EB /* BenchmarkCommon.m in Sources */,
@@ -3604,6 +3613,7 @@
 				66E40D741836D08E00E5B4A7 /* TestSynchronizerMultiUser.m in Sources */,
 				6610115B184D8B9E001A3E24 /* UnorderedGroupNoOpposite.m in Sources */,
 				66101170184D8E2D001A3E24 /* KeyedRelationshipModel.m in Sources */,
+				6061B8311C524DF100813C18 /* Person.m in Sources */,
 				661E2B7A184C4C0200226D3D /* TestKeyedRelationship.m in Sources */,
 				6621BF2618482159000809CF /* Folder.m in Sources */,
 				660EE3AF186E3D8700E8C22C /* TestAttributedStringWrapper.m in Sources */,
