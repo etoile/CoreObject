@@ -34,6 +34,23 @@
 + (NSString *)packageName;
 @end
 
+@interface CONotFoundMarker : NSObject
+@end
+
+static CONotFoundMarker *notFoundMarker = nil;
+
+@implementation  CONotFoundMarker
+
++ (void)initialize
+{
+	if (self != [CONotFoundMarker class])
+		return;
+	
+	notFoundMarker = [CONotFoundMarker new];
+}
+
+@end
+
 
 @implementation COObject
 
@@ -890,15 +907,19 @@ See +[NSObject typePrefix]. */
 	id value = [_variableStorage objectForKey: key];
 	
 	// Convert value stored in variable storage to a form we can return to the user
-	if (value == [NSNull null])
+	if (value == nil)
+	{
+		return notFoundMarker;
+	}
+	else if (value == [NSNull null])
 	{
 		return nil;
 	}
-	if ([value isKindOfClass: [COWeakRef class]])
+	else if ([value isKindOfClass: [COWeakRef class]])
 	{
 		return ((COWeakRef *)value)->_object;
 	}
-	if ([value isKindOfClass: [COPath class]])
+	else if ([value isKindOfClass: [COPath class]])
 	{
 		return nil;
 	}
@@ -915,11 +936,15 @@ See +[NSObject typePrefix]. */
 	id value = _variableStorage[key];
 	
 	// Convert value stored in variable storage to a form we can return to the user
-	if (value == [NSNull null])
+	if (value == nil)
+	{
+		return notFoundMarker;
+	}
+	else if (value == [NSNull null])
 	{
 		return nil;
 	}
-	if ([value isKindOfClass: [COWeakRef class]])
+	else if ([value isKindOfClass: [COWeakRef class]])
 	{
 		return ((COWeakRef *)value)->_object;
 	}
@@ -1047,22 +1072,22 @@ See +[NSObject typePrefix]. */
 
 - (id)valueForStorageKey: (NSString *)key
 {
-	id value = nil;
+	id value = [self valueForVariableStorageKey: key];
 
-	if (ETGetInstanceVariableValueForKey(self, &value, key) == NO)
+	if (value == notFoundMarker)
 	{
-		value = [self valueForVariableStorageKey: key];
+		ETGetInstanceVariableValueForKey(self, &value, key);
 	}
 	return value;
 }
 
 - (id)serializableValueForStorageKey: (NSString *)key
 {
-	id value = nil;
+	id value = [self serializableValueForVariableStorageKey: key];
 
-	if (ETGetInstanceVariableValueForKey(self, &value, key) == NO)
+	if (value == notFoundMarker)
 	{
-		value = [self serializableValueForVariableStorageKey: key];
+		ETGetInstanceVariableValueForKey(self, &value, key);
 	}
 	return value;
 }
