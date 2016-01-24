@@ -1710,7 +1710,15 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 			continue;
 
 		Class class = [self collectionClassForPropertyDescription: propDesc];
-		id collection = [self valueForProperty: [propDesc name]];
+		/* For performance reasons, we use -valueForVariableStorageKey: and 
+		   -valueForKey: rather than just -valueForProperty: */
+		id collection = [self valueForVariableStorageKey: propDesc.name];
+		
+		if (collection == nil)
+		{
+			// NOTE: For ivar-backed and derived properties
+			collection = [self valueForKey: propDesc.name];
+		}
 
 		if ([collection isKindOfClass: class] == NO)
 		{
