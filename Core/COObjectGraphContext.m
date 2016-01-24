@@ -645,17 +645,18 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 {
 	if (ignoresChangeTrackingNotifications)
 		return;
+	
+	ETAssert([aProperty isKindOfClass: [NSString class]]);
 
 	ETUUID *uuid = obj.UUID;
-	if (nil == [_updatedPropertiesByUUID objectForKey: uuid])
+	NSMutableArray *updatedProperties = _updatedPropertiesByUUID[uuid];
+
+	if (nil == updatedProperties)
 	{
-		_updatedPropertiesByUUID[uuid] = [NSMutableArray array];
+		updatedProperties = [NSMutableArray array];
+		_updatedPropertiesByUUID[uuid] = updatedProperties;
 	}
-	if (aProperty != nil)
-	{
-		ETAssert([aProperty isKindOfClass: [NSString class]]);
-		[_updatedPropertiesByUUID[uuid] addObject: aProperty];
-	}
+	[updatedProperties addObject: aProperty];
     
     // If it's already marked as inserted, don't mark it as updated
     if (![_insertedObjectUUIDs containsObject: uuid])

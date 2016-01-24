@@ -1201,11 +1201,6 @@ See +[NSObject typePrefix]. */
 	[self didChangeValueForKey: property atIndexes: indexes withObjects: objects mutationKind: mutationKind];
 }
 
-- (void) markAsUpdatedIfNeededForProperty: (NSString*)prop
-{	
-	[_objectGraphContext markObjectAsUpdated: self forProperty: prop];
-}
-
 // TODO: Move this method to ETModelDescriptionRepository
 - (ETEntityDescription *) entityDescriptionForObject: (id)anObject
 {
@@ -1545,8 +1540,8 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	[self addCachedOutgoingRelationshipsForValue: newValue
 					   ofPropertyWithDescription: propertyDesc];
 
-	[self markAsUpdatedIfNeededForProperty: key];	
-
+	[_objectGraphContext markObjectAsUpdated: self
+	                             forProperty: key];
 }
 
 /**
@@ -1620,7 +1615,8 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 									 ofPropertyWithDescription: propertyDesc];
 	}
 	
-	[self markAsUpdatedIfNeededForProperty: propertyDesc.name];
+	[_objectGraphContext markObjectAsUpdated: self
+	                             forProperty: key];
 }
 
 - (void)didChangeValueForProperty: (NSString *)key
