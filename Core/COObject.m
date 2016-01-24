@@ -268,8 +268,18 @@ See +[NSObject typePrefix]. */
 
 - (NSArray *)keyedPersistentPropertyDescriptions
 {
-	return [[_entityDescription allPersistentPropertyDescriptions]
-		filteredCollectionWithBlock: ^ (id propDesc) { return [propDesc isKeyed]; }];
+	NSArray *propertyDescs = _entityDescription.allPersistentPropertyDescriptions;
+	NSMutableArray *keyedPropertyDescs = [NSMutableArray new];
+
+	for (ETPropertyDescription *propertyDesc in propertyDescs)
+	{
+		if (propertyDesc.isKeyed)
+		{
+			[keyedPropertyDescs addObject: propertyDesc];
+		}
+	}
+
+	return keyedPropertyDescs;
 }
 
 - (NSMutableDictionary *)newAdditionalStoreItemUUIDs: (BOOL)isDeserialization
