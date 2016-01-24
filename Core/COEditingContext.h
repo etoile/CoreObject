@@ -169,6 +169,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
 	/** Detect illegal recursive calls to commit */
 	BOOL _inCommit;
 	COObjectGraphContext *_internalTransientObjectGraphContext;
+	NSMutableDictionary *_lastTransactionIDForPersistentRootUUID;
 }
 
 
