@@ -319,24 +319,31 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
     return result;
 }
 
+/**
+ * If all commands have been marked as deleted on the track, returns a track 
+ * state where head and current commands are both nil.
+ */
 - (COUndoTrackState *)stateForTrackNameInCurrentQueue: (NSString *)aName
 {
     assert(dispatch_get_current_queue() == _queue);
 
 	COUndoTrackState *result = nil;
 	FMResultSet *rs = [_db executeQuery:
-		@"SELECT track.trackname, head.uuid AS headuuid, current.uuid AS currentuuid "
+		@"SELECT track.trackname, head.uuid AS headuuid, current.uuid AS currentuuid, head.deleted AS headdeleted, current.deleted AS currentdeleted "
 		 "FROM tracks AS track "
 		 "LEFT OUTER JOIN commands AS head ON track.headid = head.id "
 		 "LEFT OUTER JOIN commands AS current ON track.currentid = current.id "
-		 "WHERE track.trackname = ?", aName];
+		 "WHERE track.trackname = ? AND headdeleted = 0", aName];
+
+	result = [COUndoTrackState new];
+	result.trackName = aName;
 
 	if ([rs next])
 	{
-		result = [COUndoTrackState new];
-		result.trackName = [rs stringForColumn: @"trackname"];
+		ETAssert([result.trackName isEqual: [rs stringForColumn: @"trackname"]]);
+
 		result.headCommandUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"headuuid"]];
-		if ([rs dataForColumn: @"currentuuid"] != nil)
+		if ([rs dataForColumn: @"currentuuid"] != nil && ![rs boolForColumn: @"currentdeleted"])
 		{
 			result.currentCommandUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"currentuuid"]];
 		}
@@ -569,7 +576,42 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 	@try
 	{
 		dispatch_sync(_queue, ^() {
-			[_db executeUpdate: @"DELETE FROM commands WHERE deleted = 1"];
+			NSArray *compactedTrackNames =
+				[_db arrayForQuery: @"SELECT DISTINCT trackname FROM commands WHERE deleted = 1 "];
+			
+			for (NSString *trackName in compactedTrackNames)
+			{
+				if (_modifiedTrackStateForTrackName[trackName] == nil)
+				{
+					_modifiedTrackStateForTrackName[trackName] = [self stateForTrackNameInCurrentQueue: trackName];
+				}
+				
+				/* When we compact up to the head, we delete all commands
+				   between head and tail including divergent ones, this means
+				   the track becomes empty. */
+				BOOL isEmptyTrack = ([_modifiedTrackStateForTrackName[trackName] headCommandUUID] == nil);
+				
+				if (isEmptyTrack)
+				{
+					[_db executeUpdate: @"DELETE FROM tracks WHERE trackname = ?", trackName];
+					/* If the head was moved back to the past just before the
+					   compaction, then any divergent commands more recent than
+					   the head won't be marked as deleted. */
+					[_db executeUpdate: @"DELETE FROM commands WHERE trackname = ?", trackName];
+				}
+				else
+				{
+					BOOL currentMarkedAsDeleted =
+						([_modifiedTrackStateForTrackName[trackName] currentCommandUUID] == nil);
+
+					if (currentMarkedAsDeleted)
+					{
+						[_db executeUpdate: @"UPDATE tracks SET currentid = NULL WHERE trackname = ?", trackName];
+					}
+					[_db executeUpdate: @"DELETE FROM commands WHERE deleted = 1"];
+					
+				}
+			}
 		});
 	}
 	@finally
@@ -639,7 +681,10 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 		NSMutableDictionary *userInfo = [NSMutableDictionary new];
   
 		userInfo[COUndoTrackStoreTrackName] = modifiedTrack;
-		userInfo[COUndoTrackStoreTrackHeadCommandUUID] = [state.headCommandUUID stringValue];
+		if (state.headCommandUUID != nil)
+		{
+			userInfo[COUndoTrackStoreTrackHeadCommandUUID] = [state.headCommandUUID stringValue];
+		}
 		if (state.currentCommandUUID != nil)
 		{
 			userInfo[COUndoTrackStoreTrackCurrentCommandUUID] = [state.currentCommandUUID stringValue];
