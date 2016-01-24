@@ -68,8 +68,8 @@
     _isRecordingUndo = YES;
 	_revisionCache = [[CORevisionCache alloc] initWithParentEditingContext: self];
 	_internalTransientObjectGraphContext = [[COObjectGraphContext alloc] initWithModelDescriptionRepository: aRepo];
-	CORegisterCoreObjectMetamodel(_modelDescriptionRepository);
 	_lastTransactionIDForPersistentRootUUID = [NSMutableDictionary new];
+	CORegisterCoreObjectMetamodel(_modelDescriptionRepository);
 
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(storePersistentRootsDidChange:)
