@@ -68,6 +68,7 @@
     _isRecordingUndo = YES;
 	_revisionCache = [[CORevisionCache alloc] initWithParentEditingContext: self];
 	_internalTransientObjectGraphContext = [[COObjectGraphContext alloc] initWithModelDescriptionRepository: aRepo];
+	_lastTransactionIDForPersistentRootUUID = [NSMutableDictionary new];
 	CORegisterCoreObjectMetamodel(_modelDescriptionRepository);
 
     [[NSNotificationCenter defaultCenter] addObserver: self
@@ -970,6 +971,17 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 		return [proot branchForUUID: aBranch];
 	}
 	return nil;
+}
+
+- (int64_t)lastTransactionIDForPersistentRootUUID: (ETUUID *)aUUID
+{
+	NSNumber *num = _lastTransactionIDForPersistentRootUUID[aUUID];
+	return [num longLongValue];
+}
+
+- (void)setLastTransactionID: (int64_t)lastTransactionID forPersistentRootUUID: (ETUUID *)aUUID
+{
+	_lastTransactionIDForPersistentRootUUID[aUUID] = @(lastTransactionID);
 }
 
 @end

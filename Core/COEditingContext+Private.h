@@ -85,5 +85,13 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
  * This method is only exposed to be used internally by CoreObject.
  */
 - (COBranch *)branchForUUID: (ETUUID *)aBranch;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
+- (int64_t)lastTransactionIDForPersistentRootUUID: (ETUUID *)aUUID;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
+- (void)setLastTransactionID: (int64_t)lastTransactionID forPersistentRootUUID: (ETUUID *)aUUID;
 
 @end
