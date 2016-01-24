@@ -16,6 +16,22 @@
 
 @implementation TestMetamodelCornerCases
 
+- (void)testCoreObjectPrimitiveEntities
+{
+	ETModelDescriptionRepository *repo = ctx.modelDescriptionRepository;
+	ETEntityDescription *data = [repo descriptionForName: @"NSData"];
+	ETEntityDescription *attachmentID = [repo descriptionForName: @"COAttachmentID"];
+
+	UKObjectKindOf(data, ETPrimitiveEntityDescription);
+	UKObjectKindOf(attachmentID, ETPrimitiveEntityDescription);
+
+	UKTrue([data isPrimitive]);
+	UKTrue([attachmentID isPrimitive]);
+	
+	UKObjectsSame(data, [repo entityDescriptionForClass: [NSData class]]);
+	UKObjectsSame(attachmentID, [repo entityDescriptionForClass: [COAttachmentID class]]);
+}
+
 /**
  * Q: do we support both aggregate and composite references (EMOF) or just
  *    composite (FM3)?

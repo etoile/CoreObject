@@ -191,7 +191,7 @@ See +[NSObject typePrefix]. */
 	}
 	else
 	{
-		if ([self isCoreObjectRelationship: propDesc])
+		if (propDesc.isPersistentRelationship)
 		{
 			return ([propDesc isOrdered] ? [COUnsafeRetainedMutableArray class] : [COUnsafeRetainedMutableSet class]);
 		}
@@ -616,18 +616,6 @@ See +[NSObject typePrefix]. */
 	}
 }
 
-- (BOOL)isCoreObjectRelationship: (ETPropertyDescription *)propertyDesc
-{
-	if ([propertyDesc isPersistent] == NO)
-		return NO;
-
-	ETModelDescriptionRepository *repo = [_objectGraphContext modelDescriptionRepository];
-	ETEntityDescription *rootCoreObjectEntity =
-		[repo entityDescriptionForClass: [COObject class]];
-
-	return [[propertyDesc type] isKindOfEntity: rootCoreObjectEntity];
-}
-
 /**
  * Counterpart to -validateEditingContextForNewValue:propertyDescription:, but it only validates
  * a single value being added to a multivalued property, rather than the whole collection.
@@ -635,7 +623,7 @@ See +[NSObject typePrefix]. */
 - (void)validateEditingContextForNewCollectionValue: (id)value
 								propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if ([self isCoreObjectRelationship: propertyDesc] == NO)
+	if (propertyDesc.isPersistentRelationship == NO)
 		return;
 	
 	ETAssert([propertyDesc isMultivalued]);
@@ -645,7 +633,7 @@ See +[NSObject typePrefix]. */
 - (void)validateEditingContextForNewValue: (id)value
                       propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if ([self isCoreObjectRelationship: propertyDesc] == NO)
+	if (propertyDesc.isPersistentRelationship == NO)
 		return;
 
 	if ([value isPrimitiveCollection])
@@ -672,7 +660,7 @@ See +[NSObject typePrefix]. */
 - (void)validateObjectGraphContextForNewCollectionValue: (id)value
 									propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if ([self isCoreObjectRelationship: propertyDesc] == NO)
+	if (propertyDesc.isPersistentRelationship == NO)
 		return;
 	
 	ETAssert([propertyDesc isMultivalued]);
@@ -684,7 +672,7 @@ See +[NSObject typePrefix]. */
 - (void)validateObjectGraphContextForNewValue: (id)value
 						  propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if ([self isCoreObjectRelationship: propertyDesc] == NO)
+	if (propertyDesc.isPersistentRelationship == NO)
 		return;
 
 	if ([value isPrimitiveCollection])
@@ -1239,7 +1227,7 @@ See +[NSObject typePrefix]. */
 {
 	return [value isKindOfClass: [COPath class]]
 		&& !propertyDesc.multivalued
-		&& [self isCoreObjectRelationship: propertyDesc];
+		&& propertyDesc.isPersistentRelationship;
 }
 
 - (void)  validateSingleValue: (id)singleValue
@@ -1353,7 +1341,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 {
 	NSString *key = [propertyDesc name];
 	
-	if (![self isCoreObjectRelationship: propertyDesc])
+	if (!propertyDesc.isPersistentRelationship)
 		return NO;
 	
 	if (![propertyDesc isMultivalued])

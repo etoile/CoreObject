@@ -285,22 +285,6 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	}
 }
 
-- (BOOL) isCoreObjectEntityType: (ETEntityDescription *)aType
-{
-	ETEntityDescription *type = aType;
-	// TODO: Determine more directly
-	do
-	{
-		if ([[type name] isEqualToString: @"COObject"])
-			return YES;
-
-		type = [type parent];
-	}
-	while (type != nil);
-
-	return NO;
-}
-
 /* Returns whether the given value is a scalar type name supported by CoreObject 
 serialization. */
 - (BOOL) isSerializableScalarTypeName: (NSString *)aTypeName
@@ -398,7 +382,7 @@ serialization. */
 		typeName = [self primitiveTypeNameFromValue: value];
 	}
 
-	if ([self isCoreObjectEntityType: type])
+	if (aPropertyDesc.isPersistentRelationship)
 	{
 		return ([aPropertyDesc isComposite] ? kCOTypeCompositeReference : kCOTypeReference);
 	}
