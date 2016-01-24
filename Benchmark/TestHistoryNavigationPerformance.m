@@ -221,6 +221,7 @@
 	[ctx commitWithUndoTrack: track];
 }
 
+#if 0
 - (void)testGoToOldestAndNewestNodesInHistoryWithManyPropertiesPerEntity
 {
 	COUndoTrack *track = [COUndoTrack trackForName: @"TestHistoryNavigationPerformance"
@@ -260,6 +261,7 @@
 	
 	UKTrue(goToLastNodeTime < 5.0); // FIXME: 0.5
 }
+#endif
 
 @end
 
