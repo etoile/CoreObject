@@ -449,7 +449,7 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		UKObjectsEqual(testItem1, testOtherGroup1.content);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
 		
 		UKObjectsEqual(testItem1, testCurrentGroup1.content);
 		UKTrue([testCurrentItem1 referringObjects].isEmpty);
@@ -472,7 +472,7 @@
 		UKStringsEqual(@"other", testOtherGroup1.label);
 		UKStringsEqual(@"current", testGroup1.label);
 		UKObjectsEqual(testItem1, testOtherGroup1.content);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
 		
 		UKObjectsEqual(testItem1, testCurrentGroup1.content);
 		UKTrue([testCurrentItem1 referringObjects].isEmpty);
@@ -490,7 +490,7 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		 UKObjectsEqual(testItem1, testOtherGroup1.content);
-		 UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentGroup1), [testItem1 referringObjects]);
+		 UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
 		 
 		 UKObjectsEqual(testItem1, testCurrentGroup1.content);
 		 UKTrue([testCurrentItem1 referringObjects].isEmpty);
@@ -513,7 +513,7 @@
 		UKStringsEqual(@"other", testOtherItem1.label);
 		UKStringsEqual(@"current", testItem1.label);
 		UKObjectsEqual(testItem1, testGroup1.content);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
 
 		UKObjectsEqual(testItem1, testCurrentGroup1.content);
 		UKTrue([testCurrentItem1 referringObjects].isEmpty);

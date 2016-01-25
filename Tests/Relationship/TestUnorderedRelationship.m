@@ -400,7 +400,7 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		UKObjectsEqual(S(testItem1, testItem2), testOtherGroup1.contents);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
 		
 		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
 		UKTrue([testCurrentItem1 referringObjects].isEmpty);
@@ -423,7 +423,7 @@
 		UKStringsEqual(@"other", testOtherGroup1.label);
 		UKStringsEqual(@"current", testGroup1.label);
 		UKObjectsEqual(S(testItem1, testItem2), testOtherGroup1.contents);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
 		
 		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
 		UKTrue([testCurrentItem1 referringObjects].isEmpty);
@@ -441,7 +441,7 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		 UKObjectsEqual(S(testItem1, testItem2), testOtherGroup1.contents);
-		 UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentGroup1), [testItem1 referringObjects]);
+		 UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
 		 
 		 UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
 		 UKTrue([testCurrentItem1 referringObjects].isEmpty);
@@ -464,7 +464,7 @@
 		UKStringsEqual(@"other", testOtherItem1.label);
 		UKStringsEqual(@"current", testItem1.label);
 		UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
 
 		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
 		UKTrue([testCurrentItem1 referringObjects].isEmpty);
