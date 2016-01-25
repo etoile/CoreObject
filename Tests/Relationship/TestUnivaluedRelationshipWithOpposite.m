@@ -119,7 +119,7 @@
 	return self;
 }
 
-#define CHECK_BLOCK_ARGS COEditingContext *testCtx, UnivaluedGroupWithOpposite *testGroup1, UnivaluedGroupContent *testItem1, UnivaluedGroupContent *testOtherItem1, UnivaluedGroupWithOpposite *testOtherGroup1, UnivaluedGroupWithOpposite *testCurrentGroup1, UnivaluedGroupContent *testCurrentItem1, UnivaluedGroupContent *testCurrentOtherItem1, UnivaluedGroupWithOpposite *testCurrentOtherGroup1, BOOL isNewContext
+#define CHECK_BLOCK_ARGS COEditingContext *testCtx, UnivaluedGroupWithOpposite *testGroup1, UnivaluedGroupContent *testItem1, UnivaluedGroupContent *testOtherItem1, UnivaluedGroupWithOpposite *testOtherGroup1, UnivaluedGroupWithOpposite *testCurrentGroup1, UnivaluedGroupContent *testCurrentItem1, BOOL isNewContext
 
 - (void)checkPersistentRootsWithExistingAndNewContextInBlock: (void (^)(CHECK_BLOCK_ARGS))block
 {
@@ -143,7 +143,10 @@
 		UnivaluedGroupWithOpposite *testCurrentOtherGroup1 =
 			[testCtx persistentRootForUUID: otherGroup1.persistentRoot.UUID].currentBranch.rootObject;
 
-		block(testCtx, testGroup1, testItem1, testOtherItem1, testOtherGroup1, testCurrentGroup1, testCurrentItem1, testCurrentOtherItem1, testCurrentOtherGroup1, isNewContext);
+		UKObjectsSame(testCurrentGroup1, testCurrentOtherGroup1);
+		UKObjectsSame(testCurrentItem1, testCurrentOtherItem1);
+		
+		block(testCtx, testGroup1, testItem1, testOtherItem1, testOtherGroup1, testCurrentGroup1, testCurrentItem1, isNewContext);
 	}];
 }
 
@@ -227,7 +230,7 @@
 		UKObjectsEqual(S(testGroup1), testOtherItem1.parents);
 		
 		UKObjectsEqual(testOtherItem1, testCurrentGroup1.content);
-		UKTrue(testCurrentOtherItem1.parents.isEmpty);
+		UKTrue(testCurrentItem1.parents.isEmpty);
 	}];
 }
 
@@ -249,7 +252,7 @@
 		UKTrue(testOtherItem1.parents.isEmpty);
 
 		UKNil(testCurrentGroup1.content);
-		UKTrue(testCurrentOtherItem1.parents.isEmpty);
+		UKTrue(testCurrentItem1.parents.isEmpty);
 	}];
 }
 
@@ -272,7 +275,7 @@
 		UKObjectsEqual(S(testGroup1), testOtherItem1.parents);
 
 		UKObjectsEqual(testOtherItem1, testCurrentGroup1.content);
-		UKTrue(testCurrentOtherItem1.parents.isEmpty);
+		UKTrue(testCurrentItem1.parents.isEmpty);
 	}];
 }
 
@@ -326,7 +329,7 @@
 		UKObjectsEqual(testItem1, testOtherGroup1.content);
 		UKTrue(testItem1.parents.isEmpty);
 		
-		UKObjectsEqual(testItem1, testCurrentOtherGroup1.content);
+		UKObjectsEqual(testItem1, testCurrentGroup1.content);
 		UKTrue(testCurrentItem1.parents.isEmpty);
 	}];
 }
@@ -355,7 +358,7 @@
 		// they are all the same parent from the child viewpoint.
 		UKObjectsEqual(S(testGroup1), testItem1.parents);
 		
-		UKObjectsEqual(testItem1, testCurrentOtherGroup1.content);
+		UKObjectsEqual(testItem1, testCurrentGroup1.content);
 		UKObjectsEqual(S(testGroup1), testCurrentItem1.parents);
 	}];
 }
