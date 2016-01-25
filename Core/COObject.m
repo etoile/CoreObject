@@ -1217,32 +1217,43 @@ See +[NSObject typePrefix]. */
 	}
 }
 
-- (BOOL)isValidDeadReference: (id)value
-      forPropertyDescription: (ETPropertyDescription *)propertyDesc
+static inline BOOL isValidDeadReferenceForPropertyDescription(id value, ETPropertyDescription *propertyDesc)
 {
 	return [value isKindOfClass: [COPath class]]
 		&& !propertyDesc.multivalued
 		&& propertyDesc.isPersistentRelationship;
 }
 
-- (void)  validateSingleValue: (id)singleValue
-conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
+static inline ETEntityDescription *entityDescriptionForObjectInRepository(id anObject, ETModelDescriptionRepository *repo)
 {
-	ETAssert(_objectGraphContext != nil);
+	if ([anObject isKindOfClass: [COObject class]])
+	{
+		// special case to support the case when we're using COObject class
+		// and not a user-supplied subclass
+		return ((COObject *)anObject)->_entityDescription;
+	}
+	else
+	{
+		return [repo entityDescriptionForClass: [anObject class]];
+	}
+}
 
+static void validateSingleValueConformsToPropertyDescriptionInRepository(id singleValue, ETPropertyDescription *propertyDesc, ETModelDescriptionRepository *repo)
+{
 	// TODO: We should move this nil check inside -isValidValue:type:
 	// nil is an allowed value for all CoreObject univalued property types
 	if (singleValue == nil)
 		return;
 	
-	ETEntityDescription *newValueEntityDesc = [self entityDescriptionForObject: singleValue];
-	ETAssert(newValueEntityDesc != nil);
+	ETEntityDescription *newValueEntityDesc = entityDescriptionForObjectInRepository(singleValue, repo);
+	assert(newValueEntityDesc != nil);
 	
-	if ([[propertyDesc type] isValidValue: singleValue type: newValueEntityDesc]
-	 || [self isValidDeadReference: singleValue forPropertyDescription: propertyDesc])
-	{
+	BOOL isValidValue = [propertyDesc.type isValidValue: singleValue
+	                                               type: newValueEntityDesc];
+	
+	if (isValidValue || isValidDeadReferenceForPropertyDescription(singleValue, propertyDesc))
 		return;
-	}
+
 	[NSException raise: NSInvalidArgumentException
 	            format: @"single value '%@' (entity %@) does not conform to type %@ (property %@)",
 	                    singleValue, newValueEntityDesc, [propertyDesc type], propertyDesc];
@@ -1263,36 +1274,9 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	
 	ETAssert([propertyDesc isMultivalued]);
 	
-	[self validateSingleValue: value conformsToPropertyDescription: propertyDesc];
-}
+	ETModelDescriptionRepository *repo = _objectGraphContext.modelDescriptionRepository;
 
-- (void)validateTypeForNewValue: (id)newValue
-            propertyDescription: (ETPropertyDescription *)propertyDesc
-{
-	if ([propertyDesc isPersistent] == NO)
-		return;
-
-	if ([self serializationGetterForProperty: [propertyDesc name]] != NULL)
-		return;
-
-	if ([newValue isPrimitiveCollection])
-	{
-		ETAssert([propertyDesc isMultivalued]);
-
-		Class expectedCollectionClass =
-			[self collectionClassForPropertyDescription: propertyDesc];
-
-		ETAssert([newValue isKindOfClass: expectedCollectionClass]);
-
-		for (id object in [newValue objectEnumerator])
-		{
-			[self validateSingleValue: object conformsToPropertyDescription: propertyDesc];
-		}
-	}
-	else
-	{
-		[self validateSingleValue: newValue conformsToPropertyDescription: propertyDesc];
-	}
+	validateSingleValueConformsToPropertyDescriptionInRepository(value, propertyDesc, repo);
 }
 
 /**
@@ -1313,13 +1297,49 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 - (void)validateNewValue: (id)newValue
      propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	// NOTE: For the CoreObject benchmark, no visible slowdowns.
-	[self validateEditingContextForNewValue: newValue
-                        propertyDescription: propertyDesc];
-	[self validateObjectGraphContextForNewValue: newValue
-							propertyDescription: propertyDesc];
-	[self validateTypeForNewValue: newValue
-	          propertyDescription: propertyDesc];
+	if (!propertyDesc.isPersistent)
+		return;
+	
+	ETModelDescriptionRepository *repo = _objectGraphContext.modelDescriptionRepository;
+	BOOL isPersistentRelationship = propertyDesc.isPersistentRelationship;
+	BOOL isValidatableType = ([self serializationGetterForProperty: propertyDesc.name] == NULL);
+
+	if ([propertyDesc isMultivalued])
+	{
+		// We count on -objectEnumerator to detect when newValue isn't a collection
+		for (COObject *object in [newValue objectEnumerator])
+		{
+			ETAssert([newValue isKindOfClass: [self collectionClassForPropertyDescription: propertyDesc]]);
+
+			if (isPersistentRelationship)
+			{
+				ETAssert([self isEditingContextValidForObject: object]);
+				ETAssert([self isObjectGraphContextValidForObject: object
+			                                  propertyDescription: propertyDesc]);
+			}
+			
+			if (isValidatableType)
+			{
+				validateSingleValueConformsToPropertyDescriptionInRepository(object, propertyDesc, repo);
+			}
+		}
+	}
+	else
+	{
+		if (isPersistentRelationship)
+		{
+			BOOL isDeadRef = [newValue isKindOfClass: [COPath class]];
+
+			ETAssert(isDeadRef || [self isEditingContextValidForObject: (COObject *)newValue]);
+			ETAssert(isDeadRef || [self isObjectGraphContextValidForObject: (COObject *)newValue
+			                                           propertyDescription: propertyDesc]);
+		}
+		
+		if (isValidatableType)
+		{
+			validateSingleValueConformsToPropertyDescriptionInRepository(newValue, propertyDesc, repo);
+		}
+	}
 }
 
 /**
