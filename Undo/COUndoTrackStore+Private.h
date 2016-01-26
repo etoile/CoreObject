@@ -61,6 +61,19 @@ NSString * const COUndoTrackStoreTrackCompacted;
 @interface COUndoTrackStore ()
 
 
+/** @taskunit Initialization */
+
+
+/**
+ * Clears all content in memory and on disk, then resets the store schema.
+ *
+ * This is an alternative to deleting the database file on disk.
+ *
+ * See also -[COSQLiteStore clearStore].
+ */
+- (void) clearStore;
+
+
 /** @taskunit Batch Operations */
 
 

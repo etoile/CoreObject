@@ -174,6 +174,7 @@
 	
 	UKTrue(goToNodeTime < 3.0); // FIXME: 1.0
 }
+
 - (void)updatePerson: (Person *)person includesNewStudents: (BOOL)includesNewStudents
 {
 	person.name = [NSString randomString];
@@ -221,7 +222,6 @@
 	[ctx commitWithUndoTrack: track];
 }
 
-#if 0
 - (void)testGoToOldestAndNewestNodesInHistoryWithManyPropertiesPerEntity
 {
 	COUndoTrack *track = [COUndoTrack trackForName: @"TestHistoryNavigationPerformance"
@@ -261,7 +261,6 @@
 	
 	UKTrue(goToLastNodeTime < 5.0); // FIXME: 0.5
 }
-#endif
 
 @end
 

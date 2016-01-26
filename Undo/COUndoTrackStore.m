@@ -219,8 +219,6 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
 	if (![_db tableExists: @"storeMetadata"])
 	{
-		NSAssert(![_db tableExists: @"commands"], @"Unsupported unversioned schema");
-
 		[_db executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER)"];
 		[_db executeUpdate: @"INSERT INTO storeMetadata VALUES(1)"];
 	}
@@ -255,6 +253,22 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
         return NO;
     }
     return YES;
+}
+
+- (void)clearStore
+{
+    dispatch_sync(_queue, ^() {
+        [_db beginTransaction];
+		
+        [_db executeUpdate: @"DELETE FROM commands"];
+        [_db executeUpdate: @"DELETE FROM tracks"];
+		[_db executeUpdate: @"DROP TABLE IF EXISTS storeMetadata"];
+        [_db commit];
+        
+		[_modifiedTrackStateForTrackName removeAllObjects];
+		
+        [self setupSchema];
+    });
 }
 
 - (BOOL) beginTransaction
