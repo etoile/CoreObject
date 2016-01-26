@@ -94,7 +94,7 @@
 	NSLog(@"Time to go to newest node on undo track: %0.2fs", goToFirstNodeTime);
 	startDate = [NSDate date];
 	
-	UKTrue(goToFirstNodeTime < 1.0); // FIXME: 0.5
+	UKTrue(goToFirstNodeTime < 1.1); // FIXME: 0.5
 
 	[track setCurrentNode: track.nodes.lastObject];
 	
