@@ -1202,22 +1202,6 @@ See +[NSObject typePrefix]. */
 	[self didChangeValueForKey: property atIndexes: indexes withObjects: objects mutationKind: mutationKind];
 }
 
-// TODO: Move this method to ETModelDescriptionRepository
-- (ETEntityDescription *) entityDescriptionForObject: (id)anObject
-{
-	if ([anObject isKindOfClass: [COObject class]])
-	{
-		// special case to support the case when we're using COObject class
-		// and not a user-supplied subclass
-		return [(COObject *)anObject entityDescription];
-	}
-	else
-	{
-		return [[_objectGraphContext modelDescriptionRepository]
-				entityDescriptionForClass: [anObject class]];
-	}
-}
-
 static inline BOOL isValidDeadReferenceForPropertyDescription(id value, ETPropertyDescription *propertyDesc)
 {
 	return [value isKindOfClass: [COPath class]]
@@ -1225,7 +1209,7 @@ static inline BOOL isValidDeadReferenceForPropertyDescription(id value, ETProper
 		&& propertyDesc.isPersistentRelationship;
 }
 
-static inline ETEntityDescription *entityDescriptionForObjectInRepository(id anObject, ETModelDescriptionRepository *repo)
+ETEntityDescription *entityDescriptionForObjectInRepository(id anObject, ETModelDescriptionRepository *repo)
 {
 	if ([anObject isKindOfClass: [COObject class]])
 	{

@@ -214,14 +214,15 @@ static id transformedValueOfPropertyDescription(COObject *self, id value, ETProp
 	// TODO: Move in the caller
 	assert(isSerializablePersistentType(aPropertyDesc));
 
-	ETEntityDescription *valueEntity = [self entityDescriptionForObject: value];
+	ETModelDescriptionRepository *repo = self->_objectGraphContext.modelDescriptionRepository;
+	ETEntityDescription *valueEntity = entityDescriptionForObjectInRepository(value, repo);
 	
 	assert(value == nil || [valueEntity isKindOfEntity: aPropertyDesc.type]);
 
 	NSValueTransformer *transformer = valueTransformerForPropertyDescription(aPropertyDesc);
 	id result = [transformer transformedValue: value];
 
-	ETEntityDescription *resultEntity = [self entityDescriptionForObject: result];
+	ETEntityDescription *resultEntity = entityDescriptionForObjectInRepository(result, repo);
 	
 	assert(result == nil || [resultEntity isKindOfEntity: aPropertyDesc.persistentType]);
 	assert(result == nil || isSerializablePrimitiveValue(result));
@@ -785,7 +786,8 @@ static id reverseTransformedValueOfPropertyDescription(COObject *self, id value,
 	// TODO: Move in the caller
 	assert(isSerializablePersistentType(aPropertyDesc));
 
-	ETEntityDescription *valueEntity = [self entityDescriptionForObject: value];
+	ETModelDescriptionRepository *repo = self->_objectGraphContext.modelDescriptionRepository;
+	ETEntityDescription *valueEntity = entityDescriptionForObjectInRepository(value, repo);;
 
 	assert(value == nil || [valueEntity isKindOfEntity: [aPropertyDesc persistentType]]);
 	assert(value == nil || isSerializablePrimitiveValue(value));
@@ -795,7 +797,7 @@ static id reverseTransformedValueOfPropertyDescription(COObject *self, id value,
 	NSValueTransformer *transformer = valueTransformerForPropertyDescription(aPropertyDesc);
 	id result = [transformer reverseTransformedValue: value];
 
-	ETEntityDescription *resultEntityDesc = [self entityDescriptionForObject: result];
+	ETEntityDescription *resultEntityDesc = entityDescriptionForObjectInRepository(result, repo);
 
 	assert(result == nil || [resultEntityDesc isKindOfEntity: [aPropertyDesc type]]);
 	
