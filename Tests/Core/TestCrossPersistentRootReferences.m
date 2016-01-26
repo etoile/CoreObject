@@ -356,10 +356,13 @@
 	 {
 		 OrderedGroupContent *testLucyARoot = [testBranch rootObject];
 		 UKObjectsEqual(@"Lucy", testLucyARoot.label);
+	
+		 // HACK: Have to unfault the group proot to populate testLucyARoot.parentGroups
+		 OrderedGroupWithOpposite *testGroup = [testCtx persistentRootForUUID: group.UUID].rootObject;
 		 
 		 // The parent ref points to the current branch of Group
 		 UKIntsEqual(1, [testLucyARoot.parentGroups count]);
-		 OrderedGroupWithOpposite *testGroup = [testLucyARoot.parentGroups anyObject];
+		 UKObjectsSame(testGroup, [testLucyARoot.parentGroups anyObject]);
 		 
 		 UKFalse([[testGroup objectGraphContext] isTrackingSpecificBranch]);
 		 UKObjectsEqual(@"GroupA", testGroup.label);
@@ -371,9 +374,12 @@
 		 OrderedGroupContent *testLucyBRoot = [testBranch rootObject];
 		 UKObjectsEqual(@"LucyB", testLucyBRoot.label);
 		 
+		 // HACK: Have to unfault the group proot to populate testLucyARoot.parentGroups
+		 OrderedGroupWithOpposite *testGroup = [testCtx persistentRootForUUID: group.UUID].rootObject;
+		 
 		 // The parent ref points to the current branch of Group
 		 UKIntsEqual(1, [testLucyBRoot.parentGroups count]);
-		 OrderedGroupWithOpposite *testGroup = [testLucyBRoot.parentGroups anyObject];
+		 UKObjectsSame(testGroup, [testLucyBRoot.parentGroups anyObject]);
 		 
 		 UKFalse([[testGroup objectGraphContext] isTrackingSpecificBranch]);
 		 UKObjectsEqual(@"GroupA", testGroup.label);
