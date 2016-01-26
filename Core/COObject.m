@@ -934,11 +934,16 @@ See +[NSObject typePrefix]. */
 	   COPrimitiveCollection that wasn't instantiated by the receiver (we could 
 	   bypass this step during the deserialization as an optimization). */
 	if ([self isCoreObjectCollection: content])
+	{
+		/* This is unreachable because the calling code checks
+		   ![self isCoreObjectCollection: content] before calling this method. */
+		ETAssertUnreachable();
 		return [content copy];
+	}
 
 	if ([self isCoreObjectCollection: collection])
 	{
-		[collection setMutable: YES];
+		[collection beginTemporaryModification];
 	}
 
 	if ([propDesc isKeyed])
@@ -949,7 +954,18 @@ See +[NSObject typePrefix]. */
 	{
 		// FIXME: Remove this copy hack to ensure KVO doesn't report a old value
 		// identical to the new one.
-		collection = [collection mutableCopy];
+		
+		// NOTE: This mess is because -copy on a COPrimitiveCollection preserves
+		// the number of -beginTemporaryModification calls, and we want the copy
+		// to go back to being immutable once we are finished modifying it.
+		if ([self isCoreObjectCollection: collection])
+		{
+			collection = [collection copy];
+		}
+		else
+		{
+			collection = [collection mutableCopy];
+		}
 		[(NSMutableArray *)collection setArray: content];
 	}
 	else
@@ -959,7 +975,7 @@ See +[NSObject typePrefix]. */
 	
 	if ([self isCoreObjectCollection: collection])
 	{
-		[collection setMutable: NO];
+		[collection endTemporaryModification];
 	}
 	
 	return collection;
@@ -1073,7 +1089,7 @@ See +[NSObject typePrefix]. */
 	[self pushProperty: key];
 	if ([self isCoreObjectCollection: oldValue])
 	{
-		[(id <COPrimitiveCollection>)oldValue setMutable: YES];
+		[(id <COPrimitiveCollection>)oldValue beginTemporaryModification];
 	}
 
 	// Used to be done in -commonDidChangeValueForProperty: when we kept a snapshot
@@ -1100,7 +1116,7 @@ See +[NSObject typePrefix]. */
 	[self pushProperty: key];
 	if ([self isCoreObjectCollection: oldValue])
 	{
-		[(id <COPrimitiveCollection>)oldValue setMutable: YES];
+		[(id <COPrimitiveCollection>)oldValue beginTemporaryModification];
 	}
 	
 	NSArray *replacedOrRemoved;
@@ -1489,7 +1505,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	
 	if ([self isCoreObjectCollection: newValue])
 	{
-		[(id <COPrimitiveCollection>)newValue setMutable: NO];
+		[(id <COPrimitiveCollection>)newValue endTemporaryModification];
 	}
 	else
 	{
@@ -1547,7 +1563,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	// Fast path:
 	
 	[self popProperty: key];
-	[(id <COPrimitiveCollection>)newValue setMutable: NO];
+	[(id <COPrimitiveCollection>)newValue endTemporaryModification];
 	
 	// We must figure out which objects were added, and which were replaced or removed
 	
@@ -1884,7 +1900,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 			COMutableArray *array = value;
 			const NSUInteger count = array.backing.count;
 
-			array.mutable = YES;
+			[array beginTemporaryModification];
 			for (NSUInteger i=0; i<count; i++)
 			{
 				if ([[array referenceAtIndex: i] isEqual: object])
@@ -1899,13 +1915,13 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 					ETAssert([array referenceAtIndex: i] == replacement);
 				}
 			}
-			array.mutable = NO;
+			[array endTemporaryModification];
 		}
 		else if ([value isKindOfClass: [COMutableSet class]])
 		{
 			COMutableSet *set = value;
 			
-			set.mutable = YES;
+			[set beginTemporaryModification];
 			if ([set containsReference: object])
 			{
 				if (!updated)
@@ -1917,7 +1933,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 				[set addReference: replacement];
 				ETAssert([set containsReference: replacement]);
 			}
-			set.mutable = NO;
+			[set endTemporaryModification];
 		}
 		else if ([value isEqual: object])
 		{

@@ -22,14 +22,17 @@
 
 
 @protocol COPrimitiveCollection <NSObject>
-@property (nonatomic, getter=isMutable) BOOL mutable;
+- (void) beginTemporaryModification;
+- (void) endTemporaryModification;
+@property (nonatomic, readonly) BOOL isMutable;
 @property (nonatomic, readonly) id <NSFastEnumeration> enumerableReferences;
 @end
 
 @interface COMutableSet : NSMutableSet <COPrimitiveCollection>
 {
 	@public
-	BOOL _mutable;
+	BOOL _permanentlyMutable;
+	int _temporaryMutable;
 	NSHashTable *_backing;
 	NSHashTable *_deadReferences;
 }
@@ -47,7 +50,8 @@
 @interface COMutableArray : NSMutableArray <COPrimitiveCollection>
 {
 @public
-	BOOL _mutable;
+	BOOL _permanentlyMutable;
+	int _temporaryMutable;
 	NSPointerArray *_backing;
 	/**
 	 * Array of integers, the ith entry gives the backing index for
@@ -78,7 +82,8 @@
 @interface COMutableDictionary : NSMutableDictionary <COPrimitiveCollection>
 {
 	@public
-	BOOL _mutable;
+	BOOL _permanentlyMutable;
+	int _temporaryMutable;
 	NSMutableDictionary *_backing;
 	NSMutableSet *_deadKeys;
 }

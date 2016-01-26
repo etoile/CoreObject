@@ -85,7 +85,7 @@
 {
 	SUPERINIT;
 	array = [COMutableArray new];
-	array.mutable = YES;
+	[array beginTemporaryModification];
 	alive1 = @"alive1";
 	alive2 = @"alive2";
 	alive3 = @"alive3";
@@ -535,6 +535,35 @@
 	UKDoesNotRaiseException([array removeLastObject]);
 }
 
+- (void)testTemporaryMutation
+{
+	UKTrue(array.isMutable); // We called -beginTemporaryModification in -init
+	UKDoesNotRaiseException([array addObject: @"a"]);
+	[array endTemporaryModification];
+	
+	UKFalse(array.isMutable);
+	UKRaisesException([array addObject: @"a"]);
+	
+	// Now test two -beginTemporaryModification calls
+	[array beginTemporaryModification];
+	[array beginTemporaryModification];
+	
+	// Maknig a copy should preserve the "level" of -beginTemporaryModification calls
+	COMutableArray *arrayCopy = [array copy];
+	UKTrue(arrayCopy.isMutable);
+	UKDoesNotRaiseException([arrayCopy addObject: @"a"]);
+	
+	[arrayCopy endTemporaryModification];
+	
+	UKTrue(arrayCopy.isMutable);
+	UKDoesNotRaiseException([arrayCopy addObject: @"a"]);
+	
+	[arrayCopy endTemporaryModification];
+	
+	UKFalse(arrayCopy.isMutable);
+	UKRaisesException([arrayCopy addObject: @"a"]);
+}
+
 @end
 
 #pragma mark - TestMutableSet
@@ -556,7 +585,7 @@
 {
 	SUPERINIT;
 	set = [COMutableSet new];
-	set.mutable = YES;
+	[set beginTemporaryModification];
 	alive1 = @"alive1";
 	alive2 = @"alive2";
 	dead1 = [COPath pathWithPersistentRoot: [ETUUID UUID]];
@@ -728,6 +757,35 @@
 	UKIntsEqual(0, set.count);
 }
 
+- (void)testTemporaryMutation
+{
+	UKTrue(set.isMutable); // We called -beginTemporaryModification in -init
+	UKDoesNotRaiseException([set addObject: @"a"]);
+	[set endTemporaryModification];
+	
+	UKFalse(set.isMutable);
+	UKRaisesException([set addObject: @"a"]);
+	
+	// Now test two -beginTemporaryModification calls
+	[set beginTemporaryModification];
+	[set beginTemporaryModification];
+	
+	// Maknig a copy should preserve the "level" of -beginTemporaryModification calls
+	COMutableArray *setCopy = [set copy];
+	UKTrue(setCopy.isMutable);
+	UKDoesNotRaiseException([setCopy addObject: @"a"]);
+	
+	[setCopy endTemporaryModification];
+	
+	UKTrue(setCopy.isMutable);
+	UKDoesNotRaiseException([setCopy addObject: @"a"]);
+	
+	[setCopy endTemporaryModification];
+	
+	UKFalse(setCopy.isMutable);
+	UKRaisesException([setCopy addObject: @"a"]);
+}
+
 @end
 
 
@@ -746,7 +804,7 @@
 {
 	SUPERINIT;
 	array = [COUnsafeRetainedMutableArray new];
-	array.mutable = YES;
+	[array beginTemporaryModification];
 	return self;
 }
 
@@ -854,7 +912,7 @@
 {
 	SUPERINIT;
 	set = [COUnsafeRetainedMutableSet new];
-	set.mutable = YES;
+	[set beginTemporaryModification];
 	return self;
 }
 
