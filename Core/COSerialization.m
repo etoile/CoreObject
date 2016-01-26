@@ -25,8 +25,6 @@
 #include <objc/runtime.h>
 
 static NSNull *null = nil;
-static Class objectClass = Nil;
-static Class pathClass = Nil;
 static NSDictionary *serializablePersistentTypes = nil;
 
 @implementation COObject (COSerialization)
@@ -34,8 +32,6 @@ static NSDictionary *serializablePersistentTypes = nil;
 + (void)initializeSerialization
 {
 	null = [NSNull null];
-	objectClass = [COObject class];
-	pathClass = [COPath class];
 	// TODO: We should use -[COObjectGraphContext serializablePersistentTypes]
 	// and construct it when the context is initialized with the model description repository.
 	serializablePersistentTypes = @{ @"NSString" : @(kCOTypeString), @"NSData" : @(kCOTypeBlob) };
@@ -246,11 +242,11 @@ static id serializeUnivalue(COObject *self, id aValue, ETPropertyDescription *aP
 	{
 		return null;
 	}
-	else if ([value isKindOfClass: objectClass])
+	else if ([value isKindOfClass: [COObject class]])
 	{
 		return serializedReferenceInContextForObject(self->_objectGraphContext, value);
 	}
-	else if ([value isKindOfClass: pathClass])
+	else if ([value isKindOfClass: [COPath class]])
 	{
 		return value;
 	}
@@ -337,7 +333,7 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
 		// NOTE: We use an arbitrary type
 		return @"NSData";
 	}
-	else if ([value isKindOfClass: objectClass])
+	else if ([value isKindOfClass: [COObject class]])
 	{
 		return @"COObject";
 	}
@@ -830,7 +826,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyD
 										   ofType: type
 							  propertyDescription: aPropertyDesc];
 
-		BOOL isCrossPersistentRootRef = [value isKindOfClass: pathClass];
+		BOOL isCrossPersistentRootRef = [value isKindOfClass: [COPath class]];
 		BOOL isDeletedCrossPersistentRootRef = isCrossPersistentRootRef
 			&& ([(COObject *)result persistentRoot].isDeleted || [(COObject *)result branch].isDeleted);
 		BOOL isDeadCrossPersistentRootRef = (result == nil && isCrossPersistentRootRef);
