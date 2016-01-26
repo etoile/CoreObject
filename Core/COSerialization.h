@@ -91,14 +91,8 @@
  */
 @property (nonatomic, copy) COItem *storeItem;
 
-/** @taskunit Querying Serialization Types */
-
-- (BOOL) isSerializablePrimitiveValue: (id)value;
-- (BOOL) isSerializableScalarValue: (id)value;
-
 /** @taskunit Serialization */
 
-- (id)serializedReferenceForObject: (COObject *)value;
 - (id)serializedValueForValue: (id)aValue
           propertyDescription: (ETPropertyDescription *)aPropertyDesc;
 - (id)serializedTypeForPropertyDescription: (ETPropertyDescription *)aPropertyDesc value: (id)value;

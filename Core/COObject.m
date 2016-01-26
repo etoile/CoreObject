@@ -34,21 +34,14 @@
 + (NSString *)packageName;
 @end
 
+@interface COObject (COSerializationPrivate)
++ (void)initializeSerialization;
+@end
+
 @interface CONotFoundMarker : NSObject
 @end
 
-static CONotFoundMarker *notFoundMarker = nil;
-
 @implementation  CONotFoundMarker
-
-+ (void)initialize
-{
-	if (self != [CONotFoundMarker class])
-		return;
-	
-	notFoundMarker = [CONotFoundMarker new];
-}
-
 @end
 
 
@@ -56,6 +49,20 @@ static CONotFoundMarker *notFoundMarker = nil;
 
 @synthesize UUID = _UUID, entityDescription = _entityDescription,
 	objectGraphContext = _objectGraphContext;
+
+static CONotFoundMarker *notFoundMarker = nil;
+static NSNull *null = nil;
+
++ (void)initialize
+{
+	if (self != [COObject class])
+		return;
+	
+	notFoundMarker = [CONotFoundMarker new];
+	null = [NSNull null];
+
+	[self initializeSerialization];
+}
 
 // For EtoileUI
 /** <override-dummy />
@@ -560,8 +567,8 @@ See +[NSObject typePrefix]. */
 {  
 	return ([value isKindOfClass: [COObject class]]
 		 || [value isKindOfClass: [COAttachmentID class]]
-	     || [self isSerializablePrimitiveValue: value]
-	     || [self isSerializableScalarValue: value]
+	     || isSerializablePrimitiveValue(value)
+	     || isSerializableScalarValue(value)
 		 || value == nil);
 }
 
@@ -870,13 +877,13 @@ See +[NSObject typePrefix]. */
  * variable storage. This allows -valueForStorageKey: and -valueForProperty: to 
  * both return incoming relationships.
  */
-- (id)valueForVariableStorageKey: (NSString *)key
+- (id)valueForVariableStorageKey: (NSString *)key notFoundMarker: (id)aNotFoundMarker
 {
 	// NOTE: This is just a debugging aid, and the check is only placed
 	// here because -valueForVariableStorageKey: is a commonly called method.
 	[self checkIsNotRemovedFromContext];
 	
-    ETPropertyDescription *propDesc = [[self entityDescription] propertyDescriptionForName: key];
+    ETPropertyDescription *propDesc = [_entityDescription propertyDescriptionForName: key];
 
 	// NOTE: In CoreObject, incoming relationships (e.g. parent(s)) are stored 
 	// in an incoming relationship cache per object and not persisted, unlike
@@ -897,9 +904,9 @@ See +[NSObject typePrefix]. */
 	// Convert value stored in variable storage to a form we can return to the user
 	if (value == nil)
 	{
-		return notFoundMarker;
+		return aNotFoundMarker;
 	}
-	else if (value == [NSNull null])
+	else if (value == null)
 	{
 		return nil;
 	}
@@ -915,29 +922,9 @@ See +[NSObject typePrefix]. */
 	return value;
 }
 
-- (id)serializableValueForVariableStorageKey: (NSString *)key
+- (id)valueForVariableStorageKey: (NSString *)key
 {
-	// NOTE: This is just a debugging aid, and the check is only placed
-	// here because -valueForVariableStorageKey: is a commonly called method.
-	[self checkIsNotRemovedFromContext];
-
-	id value = _variableStorage[key];
-	
-	// Convert value stored in variable storage to a form we can return to the user
-	if (value == nil)
-	{
-		return notFoundMarker;
-	}
-	else if (value == [NSNull null])
-	{
-		return nil;
-	}
-	else if ([value isKindOfClass: [COWeakRef class]])
-	{
-		return ((COWeakRef *)value)->_object;
-	}
-	
-	return value;
+	return [self valueForVariableStorageKey: key notFoundMarker: nil];
 }
 
 - (BOOL)isCoreObjectCollection: (id)aCollection
@@ -1010,14 +997,14 @@ See +[NSObject typePrefix]. */
 {
 	// TODO: Raise an exception on an attempt to set an outgoing relationship
 	// (or may be in -setValue:forStorageKey:).
-	ETPropertyDescription *propertyDesc = [[self entityDescription] propertyDescriptionForName: key];
+	ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
     id storageValue;
 			
 	// Convert user value to the form we store it in the variable storage
 
 	if (aValue == nil)
 	{
-		storageValue = [NSNull null];
+		storageValue = null;
 	}
 	else if ([aValue isKindOfClass: [COObject class]])
 	{
@@ -1060,23 +1047,37 @@ See +[NSObject typePrefix]. */
 
 - (id)valueForStorageKey: (NSString *)key
 {
-	id value = [self valueForVariableStorageKey: key];
+	id value = [self valueForVariableStorageKey: key notFoundMarker: notFoundMarker];
 
 	if (value == notFoundMarker)
 	{
 		ETGetInstanceVariableValueForKey(self, &value, key);
 	}
-	return value;
+	return (value == notFoundMarker ? nil : value);
 }
 
 - (id)serializableValueForStorageKey: (NSString *)key
 {
-	id value = [self serializableValueForVariableStorageKey: key];
+	// NOTE: This is just a debugging aid, and the check is only placed
+	// here because -valueForVariableStorageKey: is a commonly called method.
+	[self checkIsNotRemovedFromContext];
 
-	if (value == notFoundMarker)
+	id value = _variableStorage[key];
+	
+	// Convert value stored in variable storage to a form we can return to the user
+	if (value == nil)
 	{
 		ETGetInstanceVariableValueForKey(self, &value, key);
 	}
+	else if (value == null)
+	{
+		return nil;
+	}
+	else if ([value isKindOfClass: [COWeakRef class]])
+	{
+		return ((COWeakRef *)value)->_object;
+	}
+	
 	return value;
 }
 

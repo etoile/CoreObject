@@ -14,6 +14,9 @@
 void SetterToProperty(const char *setter, size_t setterlen, char *prop);
 BOOL IsSetter(const char *selname, size_t sellen);
 
+BOOL isSerializablePrimitiveValue(id value);
+BOOL isSerializableScalarValue(id value);
+
 @interface COObject ()
 /**
  * This method is only exposed to be used internally by CoreObject.
