@@ -315,6 +315,33 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 @end
 
+
+@implementation COMutableArray (TestPrimitiveCollection)
+
+- (NSIndexSet *)deadIndexes
+{
+	return [self.allReferences indexesOfObjectsPassingTest: ^(id obj, NSUInteger idx, BOOL *stop) {
+		return [obj isKindOfClass: [COPath class]];
+	}];
+}
+
+- (NSArray *)deadReferences
+{
+	return [self.allReferences objectsAtIndexes: [self deadIndexes]];
+}
+
+- (NSArray *)allReferences
+{
+	NSMutableArray *results = [NSMutableArray new];
+	for (id ref in self.enumerableReferences) {
+		[results addObject: ref];
+	}
+	return results;
+}
+
+@end
+
+
 @implementation COUnsafeRetainedMutableArray
 
 - (NSPointerArray *) makeBacking
@@ -610,6 +637,28 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 }
 
 @end
+
+
+@implementation COMutableSet (TestPrimitiveCollection)
+
+- (NSSet *)deadReferences
+{
+	return [self.allReferences objectsPassingTest:^(id obj, BOOL *stop) {
+		return [obj isKindOfClass: [COPath class]];
+	}];
+}
+
+- (NSSet *)allReferences
+{
+	NSMutableSet *results = [NSMutableSet new];
+	for (id ref in self.enumerableReferences) {
+		[results addObject: ref];
+	}
+	return results;
+}
+
+@end
+
 
 @implementation COUnsafeRetainedMutableSet
 

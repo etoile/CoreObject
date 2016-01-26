@@ -41,6 +41,14 @@
 - (BOOL)containsReference: (id)aReference;
 @end
 
+@interface COMutableSet (TestPrimitiveCollection)
+
+@property (nonatomic, readonly) NSSet *deadReferences;
+@property (nonatomic, readonly) NSSet *allReferences;
+
+@end
+
+
 /**
  * References are either COPath or any other object.
  *
@@ -65,6 +73,14 @@
 - (id)referenceAtIndex: (NSUInteger)index;
 - (void)addReference: (id)aReference;
 - (void)replaceReferenceAtIndex: (NSUInteger)index withReference: (id)aReference;
+@end
+
+@interface COMutableArray (TestPrimitiveCollection)
+
+@property (nonatomic, readonly) NSIndexSet *deadIndexes;
+@property (nonatomic, readonly) NSArray *deadReferences;
+@property (nonatomic, readonly) NSArray *allReferences;
+
 @end
 
 @interface COUnsafeRetainedMutableSet : COMutableSet

@@ -9,62 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "TestCommon.h"
 
-@interface COMutableArray (TestPrimitiveCollection)
-@property (nonatomic, readonly) NSIndexSet *deadIndexes;
-@property (nonatomic, readonly) NSArray *deadReferences;
-@property (nonatomic, readonly) NSArray *allReferences;
-@end
-
-@interface COMutableSet (TestPrimitiveCollection)
-@property (nonatomic, readonly) NSSet *deadReferences;
-@property (nonatomic, readonly) NSSet *allReferences;
-@end
-
-@implementation COMutableArray (TestPrimitiveCollection)
-
-- (NSIndexSet *)deadIndexes
-{
-	return [self.allReferences indexesOfObjectsPassingTest: ^(id obj, NSUInteger idx, BOOL *stop) {
-		return [obj isKindOfClass: [COPath class]];
-	}];
-}
-
-- (NSArray *)deadReferences
-{
-	return [self.allReferences objectsAtIndexes: [self deadIndexes]];
-}
-
-- (NSArray *)allReferences
-{
-	NSMutableArray *results = [NSMutableArray new];
-	for (id ref in self.enumerableReferences) {
-		[results addObject: ref];
-	}
-	return results;
-}
-
-@end
-
-@implementation COMutableSet (TestPrimitiveCollection)
-
-- (NSSet *)deadReferences
-{
-	return [self.allReferences objectsPassingTest:^(id obj, BOOL *stop) {
-		return [obj isKindOfClass: [COPath class]];
-	}];
-}
-
-- (NSSet *)allReferences
-{
-	NSMutableSet *results = [NSMutableSet new];
-	for (id ref in self.enumerableReferences) {
-		[results addObject: ref];
-	}
-	return results;
-}
-
-@end
-
 @interface TestMutableArray : NSObject <UKTest>
 {
 	COMutableArray *array;
