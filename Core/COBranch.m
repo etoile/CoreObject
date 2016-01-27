@@ -145,7 +145,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 {
 	if (_objectGraph == nil)
 	{
-		NSLog(@"%@: unfaulting object graph context", self);
+		//NSLog(@"%@: unfaulting object graph context", self);
 		
 		_objectGraph = [[COObjectGraphContext alloc] initWithBranch: self];
 		
