@@ -68,6 +68,9 @@
  *
  * Branches not previously marked as deleted are ignored.
  *
+ * To finalize a parent branch, the child branches must all appear in the
+ * returned set and have been previously marked as deleted.
+ *
  * To attempt finalizing all branches, return -compactableBranchUUIDs.
  */
 @property (nonatomic, readonly) NSSet *finalizableBranchUUIDs;
@@ -87,7 +90,19 @@
 /** @taskunit Revision Status */
 
 
-- (NSSet *)deadRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs;
+/**
+ * Returns the live revision sets per persistent root.
+ *
+ * When compacting the store, all revisions older than the oldest revision in 
+ * this set will be discarded, and all revisions newer will be kept.
+ *
+ * Any branch with revisions appearing in this set will be kept.
+ *
+ * For a branch forked from another branch, the revision corresponding to the 
+ * branch creation is always treated as a live one until the forked branch is 
+ * deleted (not yet implemented). No matter which revisions you return, this 
+ * ensures you cannot accidentally create detached branches.
+ */
 - (NSSet *)liveRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs;
 
 

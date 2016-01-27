@@ -183,7 +183,6 @@ extern NSString * const COPersistentRootDidChangeNotification;
     ETUUID *_cheapCopyPersistentRootUUID;
 	NSDictionary *_metadata;    
     BOOL _metadataChanged;
-    int64_t _lastTransactionID;
 	COObjectGraphContext *_currentBranchObjectGraph;
 }
 

@@ -164,7 +164,7 @@
 	return self;
 }
 
-#define CHECK_BLOCK_ARGS COEditingContext *testCtx, UnorderedGroupNoOpposite *testGroup1, OutlineItem *testItem1, OutlineItem *testItem2, OutlineItem *testOtherItem1, UnorderedGroupNoOpposite *testOtherGroup1, UnorderedGroupNoOpposite *testCurrentGroup1, OutlineItem *testCurrentItem1, OutlineItem *testCurrentItem2, OutlineItem *testCurrentOtherItem1, UnorderedGroupNoOpposite *testCurrentOtherGroup1, BOOL isNewContext
+#define CHECK_BLOCK_ARGS COEditingContext *testCtx, UnorderedGroupNoOpposite *testGroup1, OutlineItem *testItem1, OutlineItem *testItem2, OutlineItem *testOtherItem1, UnorderedGroupNoOpposite *testOtherGroup1, UnorderedGroupNoOpposite *testCurrentGroup1, OutlineItem *testCurrentItem1, OutlineItem *testCurrentItem2, BOOL isNewContext
 
 - (void)checkPersistentRootsWithExistingAndNewContextInBlock: (void (^)(CHECK_BLOCK_ARGS))block
 {
@@ -192,7 +192,10 @@
 		UnorderedGroupNoOpposite *testCurrentOtherGroup1 =
 			[testCtx persistentRootForUUID: otherGroup1.persistentRoot.UUID].currentBranch.rootObject;
 
-		block(testCtx, testGroup1, testItem1, testItem2, testOtherItem1, testOtherGroup1, testCurrentGroup1, testCurrentItem1, testCurrentItem2, testCurrentOtherItem1, testCurrentOtherGroup1, isNewContext);
+		UKObjectsSame(testCurrentGroup1, testCurrentOtherGroup1);
+		UKObjectsSame(testCurrentItem1, testCurrentOtherItem1);
+		
+		block(testCtx, testGroup1, testItem1, testItem2, testOtherItem1, testOtherGroup1, testCurrentGroup1, testCurrentItem1, testCurrentItem2, isNewContext);
 	}];
 }
 
@@ -302,7 +305,7 @@
 		UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testOtherItem1 referringObjects]);
 		
 		UKObjectsEqual(S(testOtherItem1, testItem2), testCurrentGroup1.contents);
-		UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
+		UKTrue([testCurrentItem1 referringObjects].isEmpty);
 	}];
 }
 
@@ -324,7 +327,7 @@
 		UKTrue([testOtherItem1 referringObjects].isEmpty);
 
 		UKObjectsEqual(S(testItem2), testCurrentGroup1.contents);
-		UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
+		UKTrue([testCurrentItem1 referringObjects].isEmpty);
 	}];
 }
 
@@ -347,7 +350,7 @@
 		UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testOtherItem1 referringObjects]);
 
 		UKObjectsEqual(S(testOtherItem1, testItem2), testCurrentGroup1.contents);
-		UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
+		UKTrue([testCurrentItem1 referringObjects].isEmpty);
 	}];
 }
 
@@ -397,9 +400,9 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		UKObjectsEqual(S(testItem1, testItem2), testOtherGroup1.contents);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentOtherGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
 		
-		UKObjectsEqual(S(testItem1, testItem2), testCurrentOtherGroup1.contents);
+		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
 		UKTrue([testCurrentItem1 referringObjects].isEmpty);
 	}];
 }
@@ -420,9 +423,9 @@
 		UKStringsEqual(@"other", testOtherGroup1.label);
 		UKStringsEqual(@"current", testGroup1.label);
 		UKObjectsEqual(S(testItem1, testItem2), testOtherGroup1.contents);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentOtherGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
 		
-		UKObjectsEqual(S(testItem1, testItem2), testCurrentOtherGroup1.contents);
+		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
 		UKTrue([testCurrentItem1 referringObjects].isEmpty);
 	}];
 }
@@ -438,10 +441,10 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		 UKObjectsEqual(S(testItem1, testItem2), testOtherGroup1.contents);
-		 UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentOtherGroup1), [testItem1 referringObjects]);
+		 UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
 		 
 		 UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
-		 UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
+		 UKTrue([testCurrentItem1 referringObjects].isEmpty);
 	}];
 }
 
@@ -461,10 +464,10 @@
 		UKStringsEqual(@"other", testOtherItem1.label);
 		UKStringsEqual(@"current", testItem1.label);
 		UKObjectsEqual(S(testItem1, testItem2), testGroup1.contents);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1, testCurrentOtherGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
 
 		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
-		UKTrue([testCurrentOtherItem1 referringObjects].isEmpty);
+		UKTrue([testCurrentItem1 referringObjects].isEmpty);
 	}];
 }
 

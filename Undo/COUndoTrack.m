@@ -491,10 +491,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		[ancestorUUIDsOfA addObject: temp.UUID];
 	}
 
-	if ([[self nodes].firstObject isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance]])
-	{
-		ETAssert([ancestorUUIDsOfA containsObject: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
-	}
+	ETAssert([ancestorUUIDsOfA containsObject: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
 
 	for (id<COTrackNode> temp = commitB; temp != nil; temp = [temp parentNode])
 	{
@@ -543,12 +540,12 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	// Set the last transaction IDs so the store will accept our transaction
 	for (ETUUID *uuid in [txn persistentRootUUIDs])
 	{
-		COPersistentRoot *proot = [_editingContext persistentRootForUUID: uuid];
-		[txn setOldTransactionID: proot.lastTransactionID forPersistentRoot: uuid];
+		int64_t lastTransactionID = [_editingContext lastTransactionIDForPersistentRootUUID: uuid];
+		[txn setOldTransactionID: lastTransactionID forPersistentRoot: uuid];
 		
-		// N.B.: We DO NOT MODIFY proot's lastTransactionID property here, because the
-		// in-memory state is out of date with respect to the store, and we need the
-		// notification mechanism to refresh the in-memory state
+		// N.B.: For loaded persistent roots in ctx, the
+		// in-memory state is out of date with respect to the store, and the
+		// notification mechanism will refresh the in-memory state
 	}
 	
 	BOOL ok = [[_editingContext store] commitStoreTransaction: txn];
@@ -671,7 +668,6 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	{
 		NSMutableArray *undoNodes = [NSMutableArray new];
 		NSMutableArray *redoNodes = [NSMutableArray new];
-		BOOL isCompacted = NO;
 		
 		for (COUndoTrackState *trackState in [_trackStateForName allValues])
 		{
@@ -688,7 +684,6 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	
 				if (isDeletedCommand)
 				{
-					isCompacted = YES;
 					break;
 				}
 
@@ -712,11 +707,8 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		
 		[redoNodes sortUsingDescriptors:
 		 @[[NSSortDescriptor sortDescriptorWithKey: @"sequenceNumber" ascending: YES]]];
-		
-		if (!isCompacted)
-		{
-			[_nodesOnCurrentUndoBranch addObject: [COEndOfUndoTrackPlaceholderNode sharedInstance]];
-		}
+
+		[_nodesOnCurrentUndoBranch addObject: [COEndOfUndoTrackPlaceholderNode sharedInstance]];
 		[_nodesOnCurrentUndoBranch addObjectsFromArray: undoNodes];
 		[_nodesOnCurrentUndoBranch addObjectsFromArray: redoNodes];
 	}
@@ -827,7 +819,10 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	NSDictionary *userInfo = [notif userInfo];
 	COUndoTrackState *notifState = [COUndoTrackState new];
 	notifState.trackName = userInfo[COUndoTrackStoreTrackName];
-	notifState.headCommandUUID = [ETUUID UUIDWithString: userInfo[COUndoTrackStoreTrackHeadCommandUUID]];
+	if (userInfo[COUndoTrackStoreTrackHeadCommandUUID] != nil)
+	{
+		notifState.headCommandUUID = [ETUUID UUIDWithString: userInfo[COUndoTrackStoreTrackHeadCommandUUID]];
+	}
 	if (userInfo[COUndoTrackStoreTrackCurrentCommandUUID] != nil)
 	{
 		notifState.currentCommandUUID = [ETUUID UUIDWithString: userInfo[COUndoTrackStoreTrackCurrentCommandUUID]];

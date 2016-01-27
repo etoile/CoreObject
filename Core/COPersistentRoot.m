@@ -124,7 +124,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
         }
         
         _currentBranchUUID =  [_savedState currentBranchUUID];
-		_lastTransactionID = _savedState.transactionID;
+		[_parentContext setLastTransactionID: _savedState.transactionID forPersistentRootUUID: _UUID];
 		_metadata = _savedState.metadata;
 		
 		[self reloadCurrentBranchObjectGraph];
@@ -542,12 +542,12 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (int64_t)lastTransactionID
 {
-	return _lastTransactionID;
+	return [_parentContext lastTransactionIDForPersistentRootUUID: _UUID];
 }
 
 - (void)setLastTransactionID: (int64_t) value
 {
-	_lastTransactionID = value;
+	[_parentContext setLastTransactionID: value forPersistentRootUUID: _UUID];
 }
 
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
@@ -853,6 +853,13 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     
     COPersistentRootInfo *info =
 		[[self store] persistentRootInfoForUUID: [self UUID]];
+	
+	/* If we are receiving a changed/compacted notification but the persistent
+	   root has been finalized in the meantime (distributed notifications are 
+	   delivered in LIFO order). */
+	if (info == nil)
+		return;
+
     _savedState = info;
     
     for (ETUUID *uuid in [info branchUUIDs])
@@ -869,7 +876,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	// TODO: Test that _everything_ is reloaded
 	
     _currentBranchUUID =  [_savedState currentBranchUUID];
-    _lastTransactionID = _savedState.transactionID;
+    self.lastTransactionID = _savedState.transactionID;
     _metadata = _savedState.metadata;
 	
 	[self reloadCurrentBranchObjectGraph];
