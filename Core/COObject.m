@@ -51,7 +51,7 @@
 	objectGraphContext = _objectGraphContext;
 
 static CONotFoundMarker *notFoundMarker = nil;
-static NSNull *null = nil;
+static NSNull *cachedNSNull = nil;
 
 + (void)initialize
 {
@@ -59,7 +59,7 @@ static NSNull *null = nil;
 		return;
 	
 	notFoundMarker = [CONotFoundMarker new];
-	null = [NSNull null];
+	cachedNSNull = [NSNull null];
 
 	[self initializeSerialization];
 }
@@ -312,7 +312,7 @@ See +[NSObject typePrefix]. */
 
 	for (ETPropertyDescription *propertyDesc in [self keyedPersistentPropertyDescriptions])
 	{
-		[storeItemUUIDs setObject: (isDeserialization ? [NSNull null] : [ETUUID UUID])
+		[storeItemUUIDs setObject: (isDeserialization ? cachedNSNull : [ETUUID UUID])
 		                   forKey: [propertyDesc name]];
 	}
 	return storeItemUUIDs;
@@ -906,7 +906,7 @@ See +[NSObject typePrefix]. */
 	{
 		return aNotFoundMarker;
 	}
-	else if (value == null)
+	else if (value == cachedNSNull)
 	{
 		return nil;
 	}
@@ -1004,7 +1004,7 @@ See +[NSObject typePrefix]. */
 
 	if (aValue == nil)
 	{
-		storageValue = null;
+		storageValue = cachedNSNull;
 	}
 	else if ([aValue isKindOfClass: [COObject class]])
 	{
@@ -1069,7 +1069,7 @@ See +[NSObject typePrefix]. */
 	{
 		ETGetInstanceVariableValueForKey(self, &value, key);
 	}
-	else if (value == null)
+	else if (value == cachedNSNull)
 	{
 		return nil;
 	}
@@ -1740,7 +1740,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 
 - (void)awakeFromDeserialization
 {
-	ETAssert([[_additionalStoreItemUUIDs allValues] containsObject: [NSNull null]] == NO);
+	ETAssert([[_additionalStoreItemUUIDs allValues] containsObject: cachedNSNull] == NO);
 }
 
 - (void)willLoadObjectGraph
