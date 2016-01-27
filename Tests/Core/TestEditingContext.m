@@ -361,4 +361,15 @@
 	[[NSNotificationCenter defaultCenter] removeObserver: observer];
 }
 
+- (void) testPersistentRootsPropertyNotLazy
+{
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	[ctx commit];
+
+	COEditingContext *ctx2 = [self newContext];
+	NSSet *ctx2persistentRoots = ctx2.persistentRoots;
+	UKIntsEqual(1, ctx2persistentRoots.count);
+	UKObjectsEqual(persistentRoot.UUID, [ctx2persistentRoots.anyObject UUID]);
+}
+
 @end

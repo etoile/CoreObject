@@ -170,6 +170,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
 	BOOL _inCommit;
 	COObjectGraphContext *_internalTransientObjectGraphContext;
 	NSMutableDictionary *_lastTransactionIDForPersistentRootUUID;
+	BOOL _hasLoadedPersistentRootUUIDs;
 }
 
 

@@ -161,8 +161,23 @@
 
 #pragma mark Accessing All Persistent Roots -
 
+- (void)loadAllPersistentRootsIfNeeded
+{
+	if (!_hasLoadedPersistentRootUUIDs)
+	{
+		for (ETUUID *uuid in [_store persistentRootUUIDs])
+		{
+			[self persistentRootForUUID: uuid];
+		}
+		
+		_hasLoadedPersistentRootUUIDs = YES;
+	}
+}
+
 - (NSSet *)persistentRoots
 {
+	[self loadAllPersistentRootsIfNeeded];
+	
 	return [NSSet setWithArray: [[_loadedPersistentRoots allValues] filteredCollectionWithBlock: ^(id obj) {
 		return (BOOL) !((COPersistentRoot *)obj).deleted;
 	}]];
@@ -170,6 +185,8 @@
 
 - (NSSet *)deletedPersistentRoots
 {
+	[self loadAllPersistentRootsIfNeeded];
+	
 	/* Force deleted persistent roots to be reloaded (see -unloadPersistentRoot:) */
 	for (ETUUID *persistentRootUUID in [self.store deletedPersistentRootUUIDs])
 	{
