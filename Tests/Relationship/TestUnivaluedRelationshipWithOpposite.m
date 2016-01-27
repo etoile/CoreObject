@@ -437,6 +437,50 @@
 	UKFalse([ctx2 hasChanges]);
 }
 
+- (void)testTargetBranchLazyLoading
+{
+	COPath *otherItemPath = [COPath pathWithPersistentRoot: item1uuid
+										   branch: otherItem1.branch.UUID];
+	
+	group1.content = otherItem1;
+	[ctx commit];
+	
+	COEditingContext *ctx2 = [self newContext];
+	
+	// First, all persistent roots should be unloaded.
+	UKNil([ctx2 loadedPersistentRootForUUID: group1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKFalse([ctx2 hasChanges]);
+	
+	// Load group1
+	UnivaluedGroupWithOpposite *group1ctx2 = [ctx2 persistentRootForUUID: group1uuid].rootObject;
+	UKObjectsEqual(@"current", group1ctx2.label);
+	
+	// Check group1ctx2.contents without triggering loading
+	UKNotNil(otherItem1.branch.UUID);
+	UKObjectsEqual(otherItemPath, [group1ctx2 serializableValueForStorageKey: @"content"]);
+	
+	NSArray *referrers = [[[ctx2 deadRelationshipCache] referringObjectsForPath: otherItemPath] allObjects];
+	UKObjectsEqual(A(group1ctx2), referrers);
+	
+	// Ensure item1 persistent root is still unloaded
+	UKNil([ctx2 loadedPersistentRootForUUID: item1.persistentRoot.UUID]);
+	UKFalse([ctx2 hasChanges]);
+	
+	// Load item1, but not the other branch yet
+	UnivaluedGroupContent *item1ctx2 = [ctx2 persistentRootForUUID: item1uuid].rootObject;
+	UKObjectsEqual(item1.UUID, item1ctx2.UUID);
+	UKNotNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKObjectsEqual(otherItemPath, [group1ctx2 serializableValueForStorageKey: @"content"]);
+	UKFalse([ctx2 hasChanges]);
+	
+	// Finally load the other branch.
+	// This should trigger group1ctx2 to unfault its reference.
+	UnivaluedGroupContent *otherItem1ctx2 = [item1ctx2.persistentRoot branchForUUID: otherItem1.branch.UUID].rootObject;
+	UKObjectsEqual(otherItem1ctx2, [group1ctx2 serializableValueForStorageKey: @"content"]);
+	UKFalse([ctx2 hasChanges]);
+}
+
 - (void) testSourcePersistentRootLazyLoading
 {
 	COEditingContext *ctx2 = [self newContext];
