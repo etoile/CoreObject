@@ -85,7 +85,7 @@
 {
 	SUPERINIT;
 	array = [COMutableArray new];
-	[array beginTemporaryModification];
+	[array beginMutation];
 	alive1 = @"alive1";
 	alive2 = @"alive2";
 	alive3 = @"alive3";
@@ -537,28 +537,28 @@
 
 - (void)testTemporaryMutation
 {
-	UKTrue(array.isMutable); // We called -beginTemporaryModification in -init
+	UKTrue(array.isMutable); // We called -beginMutation in -init
 	UKDoesNotRaiseException([array addObject: @"a"]);
-	[array endTemporaryModification];
+	[array endMutation];
 	
 	UKFalse(array.isMutable);
 	UKRaisesException([array addObject: @"a"]);
 	
-	// Now test two -beginTemporaryModification calls
-	[array beginTemporaryModification];
-	[array beginTemporaryModification];
+	// Now test two -beginMutation calls
+	[array beginMutation];
+	[array beginMutation];
 	
-	// Maknig a copy should preserve the "level" of -beginTemporaryModification calls
+	// Maknig a copy should preserve the "level" of -beginMutation calls
 	COMutableArray *arrayCopy = [array copy];
 	UKTrue(arrayCopy.isMutable);
 	UKDoesNotRaiseException([arrayCopy addObject: @"a"]);
 	
-	[arrayCopy endTemporaryModification];
+	[arrayCopy endMutation];
 	
 	UKTrue(arrayCopy.isMutable);
 	UKDoesNotRaiseException([arrayCopy addObject: @"a"]);
 	
-	[arrayCopy endTemporaryModification];
+	[arrayCopy endMutation];
 	
 	UKFalse(arrayCopy.isMutable);
 	UKRaisesException([arrayCopy addObject: @"a"]);
@@ -585,7 +585,7 @@
 {
 	SUPERINIT;
 	set = [COMutableSet new];
-	[set beginTemporaryModification];
+	[set beginMutation];
 	alive1 = @"alive1";
 	alive2 = @"alive2";
 	dead1 = [COPath pathWithPersistentRoot: [ETUUID UUID]];
@@ -759,28 +759,28 @@
 
 - (void)testTemporaryMutation
 {
-	UKTrue(set.isMutable); // We called -beginTemporaryModification in -init
+	UKTrue(set.isMutable); // We called -beginMutation in -init
 	UKDoesNotRaiseException([set addObject: @"a"]);
-	[set endTemporaryModification];
+	[set endMutation];
 	
 	UKFalse(set.isMutable);
 	UKRaisesException([set addObject: @"a"]);
 	
-	// Now test two -beginTemporaryModification calls
-	[set beginTemporaryModification];
-	[set beginTemporaryModification];
+	// Now test two -beginMutation calls
+	[set beginMutation];
+	[set beginMutation];
 	
-	// Maknig a copy should preserve the "level" of -beginTemporaryModification calls
+	// Maknig a copy should preserve the "level" of -beginMutation calls
 	COMutableArray *setCopy = [set copy];
 	UKTrue(setCopy.isMutable);
 	UKDoesNotRaiseException([setCopy addObject: @"a"]);
 	
-	[setCopy endTemporaryModification];
+	[setCopy endMutation];
 	
 	UKTrue(setCopy.isMutable);
 	UKDoesNotRaiseException([setCopy addObject: @"a"]);
 	
-	[setCopy endTemporaryModification];
+	[setCopy endMutation];
 	
 	UKFalse(setCopy.isMutable);
 	UKRaisesException([setCopy addObject: @"a"]);
@@ -804,7 +804,7 @@
 {
 	SUPERINIT;
 	array = [COUnsafeRetainedMutableArray new];
-	[array beginTemporaryModification];
+	[array beginMutation];
 	return self;
 }
 
@@ -912,7 +912,7 @@
 {
 	SUPERINIT;
 	set = [COUnsafeRetainedMutableSet new];
-	[set beginTemporaryModification];
+	[set beginMutation];
 	return self;
 }
 

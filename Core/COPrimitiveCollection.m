@@ -52,12 +52,12 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 @synthesize backing = _backing;
 
-- (void) beginTemporaryModification
+- (void) beginMutation
 {
 	_temporaryMutable++;
 }
 
-- (void) endTemporaryModification
+- (void) endMutation
 {
 	_temporaryMutable--;
 	if (_temporaryMutable < 0)
@@ -91,12 +91,12 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	_backing = [self makeBacking];
 	_externalIndexToBackingIndex = [NSPointerArray pointerArrayWithOptions:NSPointerFunctionsOpaqueMemory | NSPointerFunctionsIntegerPersonality];
 	
-	[self beginTemporaryModification];
+	[self beginMutation];
 	for (NSUInteger i=0; i<count; i++)
 	{
 		[self addReference: objects[i]];
 	}
-	[self endTemporaryModification];
+	[self endMutation];
 
 	return self;
 }
@@ -464,12 +464,12 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 @implementation COMutableSet
 
-- (void) beginTemporaryModification
+- (void) beginMutation
 {
 	_temporaryMutable++;
 }
 
-- (void) endTemporaryModification
+- (void) endMutation
 {
 	_temporaryMutable--;
 	if (_temporaryMutable < 0)
@@ -499,12 +499,12 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	_backing = [self makeBacking];
 	_deadReferences = [NSHashTable new];
 
-	[self beginTemporaryModification];
+	[self beginMutation];
 	for (NSUInteger i=0; i<count; i++)
 	{
 		[self addReference: objects[i]];
 	}
-	[self endTemporaryModification];
+	[self endMutation];
 
 	return self;
 }
@@ -627,12 +627,12 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 @implementation COMutableDictionary
 
-- (void) beginTemporaryModification
+- (void) beginMutation
 {
 	_temporaryMutable++;
 }
 
-- (void) endTemporaryModification
+- (void) endMutation
 {
 	_temporaryMutable--;
 	if (_temporaryMutable < 0)
@@ -657,12 +657,12 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	_backing = [[NSMutableDictionary alloc] initWithCapacity: count];
 	_deadKeys = [NSMutableSet new];
 	
-	[self beginTemporaryModification];
+	[self beginMutation];
 	for (NSUInteger i=0; i<count; i++)
 	{
 		[self setReference: objects[i] forKey: keys[i]];
 	}
-	[self endTemporaryModification];
+	[self endMutation];
 
 	return self;
 }

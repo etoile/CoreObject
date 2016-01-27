@@ -22,8 +22,8 @@
 
 
 @protocol COPrimitiveCollection <NSObject>
-- (void) beginTemporaryModification;
-- (void) endTemporaryModification;
+- (void) beginMutation;
+- (void) endMutation;
 @property (nonatomic, readonly) BOOL isMutable;
 @property (nonatomic, readonly) id <NSFastEnumeration> enumerableReferences;
 @end

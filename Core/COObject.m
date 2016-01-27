@@ -943,7 +943,7 @@ See +[NSObject typePrefix]. */
 
 	if ([self isCoreObjectCollection: collection])
 	{
-		[collection beginTemporaryModification];
+		[collection beginMutation];
 	}
 
 	if ([propDesc isKeyed])
@@ -956,7 +956,7 @@ See +[NSObject typePrefix]. */
 		// identical to the new one.
 		
 		// NOTE: This mess is because -copy on a COPrimitiveCollection preserves
-		// the number of -beginTemporaryModification calls, and we want the copy
+		// the number of -beginMutation calls, and we want the copy
 		// to go back to being immutable once we are finished modifying it.
 		if ([self isCoreObjectCollection: collection])
 		{
@@ -975,7 +975,7 @@ See +[NSObject typePrefix]. */
 	
 	if ([self isCoreObjectCollection: collection])
 	{
-		[collection endTemporaryModification];
+		[collection endMutation];
 	}
 	
 	return collection;
@@ -1089,7 +1089,7 @@ See +[NSObject typePrefix]. */
 	[self pushProperty: key];
 	if ([self isCoreObjectCollection: oldValue])
 	{
-		[(id <COPrimitiveCollection>)oldValue beginTemporaryModification];
+		[(id <COPrimitiveCollection>)oldValue beginMutation];
 	}
 
 	// Used to be done in -commonDidChangeValueForProperty: when we kept a snapshot
@@ -1116,7 +1116,7 @@ See +[NSObject typePrefix]. */
 	[self pushProperty: key];
 	if ([self isCoreObjectCollection: oldValue])
 	{
-		[(id <COPrimitiveCollection>)oldValue beginTemporaryModification];
+		[(id <COPrimitiveCollection>)oldValue beginMutation];
 	}
 	
 	NSArray *replacedOrRemoved;
@@ -1505,7 +1505,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	
 	if ([self isCoreObjectCollection: newValue])
 	{
-		[(id <COPrimitiveCollection>)newValue endTemporaryModification];
+		[(id <COPrimitiveCollection>)newValue endMutation];
 	}
 	else
 	{
@@ -1563,7 +1563,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	// Fast path:
 	
 	[self popProperty: key];
-	[(id <COPrimitiveCollection>)newValue endTemporaryModification];
+	[(id <COPrimitiveCollection>)newValue endMutation];
 	
 	// We must figure out which objects were added, and which were replaced or removed
 	
@@ -1900,7 +1900,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 			COMutableArray *array = value;
 			const NSUInteger count = array.backing.count;
 
-			[array beginTemporaryModification];
+			[array beginMutation];
 			for (NSUInteger i=0; i<count; i++)
 			{
 				if ([[array referenceAtIndex: i] isEqual: object])
@@ -1915,13 +1915,13 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 					ETAssert([array referenceAtIndex: i] == replacement);
 				}
 			}
-			[array endTemporaryModification];
+			[array endMutation];
 		}
 		else if ([value isKindOfClass: [COMutableSet class]])
 		{
 			COMutableSet *set = value;
 			
-			[set beginTemporaryModification];
+			[set beginMutation];
 			if ([set containsReference: object])
 			{
 				if (!updated)
@@ -1933,7 +1933,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 				[set addReference: replacement];
 				ETAssert([set containsReference: replacement]);
 			}
-			[set endTemporaryModification];
+			[set endMutation];
 		}
 		else if ([value isEqual: object])
 		{
