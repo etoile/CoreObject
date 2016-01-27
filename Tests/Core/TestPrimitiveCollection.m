@@ -85,7 +85,7 @@
 {
 	SUPERINIT;
 	array = [COMutableArray new];
-	array.mutable = YES;
+	[array beginMutation];
 	alive1 = @"alive1";
 	alive2 = @"alive2";
 	alive3 = @"alive3";
@@ -535,6 +535,35 @@
 	UKDoesNotRaiseException([array removeLastObject]);
 }
 
+- (void)testTemporaryMutation
+{
+	UKTrue(array.isMutable); // We called -beginMutation in -init
+	UKDoesNotRaiseException([array addObject: @"a"]);
+	[array endMutation];
+	
+	UKFalse(array.isMutable);
+	UKRaisesException([array addObject: @"a"]);
+	
+	// Now test two -beginMutation calls
+	[array beginMutation];
+	[array beginMutation];
+	
+	// Making a copy should preserve the "level" of -beginMutation calls
+	COMutableArray *arrayCopy = [array copy];
+	UKTrue(arrayCopy.isMutable);
+	UKDoesNotRaiseException([arrayCopy addObject: @"a"]);
+	
+	[arrayCopy endMutation];
+	
+	UKTrue(arrayCopy.isMutable);
+	UKDoesNotRaiseException([arrayCopy addObject: @"a"]);
+	
+	[arrayCopy endMutation];
+	
+	UKFalse(arrayCopy.isMutable);
+	UKRaisesException([arrayCopy addObject: @"a"]);
+}
+
 @end
 
 #pragma mark - TestMutableSet
@@ -556,7 +585,7 @@
 {
 	SUPERINIT;
 	set = [COMutableSet new];
-	set.mutable = YES;
+	[set beginMutation];
 	alive1 = @"alive1";
 	alive2 = @"alive2";
 	dead1 = [COPath pathWithPersistentRoot: [ETUUID UUID]];
@@ -728,6 +757,35 @@
 	UKIntsEqual(0, set.count);
 }
 
+- (void)testTemporaryMutation
+{
+	UKTrue(set.isMutable); // We called -beginMutation in -init
+	UKDoesNotRaiseException([set addObject: @"a"]);
+	[set endMutation];
+	
+	UKFalse(set.isMutable);
+	UKRaisesException([set addObject: @"a"]);
+	
+	// Now test two -beginMutation calls
+	[set beginMutation];
+	[set beginMutation];
+	
+	// Making a copy should preserve the "level" of -beginMutation calls
+	COMutableArray *setCopy = [set copy];
+	UKTrue(setCopy.isMutable);
+	UKDoesNotRaiseException([setCopy addObject: @"a"]);
+	
+	[setCopy endMutation];
+	
+	UKTrue(setCopy.isMutable);
+	UKDoesNotRaiseException([setCopy addObject: @"a"]);
+	
+	[setCopy endMutation];
+	
+	UKFalse(setCopy.isMutable);
+	UKRaisesException([setCopy addObject: @"a"]);
+}
+
 @end
 
 
@@ -746,7 +804,7 @@
 {
 	SUPERINIT;
 	array = [COUnsafeRetainedMutableArray new];
-	array.mutable = YES;
+	[array beginMutation];
 	return self;
 }
 
@@ -854,7 +912,7 @@
 {
 	SUPERINIT;
 	set = [COUnsafeRetainedMutableSet new];
-	set.mutable = YES;
+	[set beginMutation];
 	return self;
 }
 

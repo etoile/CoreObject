@@ -701,7 +701,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		COMutableArray *resultCollection =
 			[[self coreObjectCollectionClassForPropertyDescription: aPropertyDesc] new];
 		
-		resultCollection.mutable = YES;
+		[resultCollection beginMutation];
 		for (id subvalue in value)
 		{
 			id deserializedValue =
@@ -709,7 +709,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 			
 			[resultCollection addReference: deserializedValue];
 		}
-		resultCollection.mutable = NO;
+		[resultCollection endMutation];
 
 		return resultCollection;
 	}
@@ -721,7 +721,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 		COMutableSet *resultCollection =
 			[[self coreObjectCollectionClassForPropertyDescription: aPropertyDesc] new];
 		
-		resultCollection.mutable = YES;
+		[resultCollection beginMutation];
 		for (id subvalue in value)
 		{
 			id deserializedValue =
@@ -729,7 +729,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 
 			[resultCollection addReference: deserializedValue];
 		}
-		resultCollection.mutable = NO;
+		[resultCollection endMutation];
 
 		return resultCollection;
 	}

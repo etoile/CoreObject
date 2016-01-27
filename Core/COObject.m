@@ -956,11 +956,16 @@ See +[NSObject typePrefix]. */
 	   COPrimitiveCollection that wasn't instantiated by the receiver (we could 
 	   bypass this step during the deserialization as an optimization). */
 	if ([self isCoreObjectCollection: content])
+	{
+		/* This is unreachable because the calling code checks
+		   ![self isCoreObjectCollection: content] before calling this method. */
+		ETAssertUnreachable();
 		return [content copy];
+	}
 
 	if ([self isCoreObjectCollection: collection])
 	{
-		[collection setMutable: YES];
+		[collection beginMutation];
 	}
 
 	if ([propDesc isKeyed])
@@ -971,7 +976,18 @@ See +[NSObject typePrefix]. */
 	{
 		// FIXME: Remove this copy hack to ensure KVO doesn't report a old value
 		// identical to the new one.
-		collection = [collection mutableCopy];
+		
+		// NOTE: This mess is because -copy on a COPrimitiveCollection preserves
+		// the number of -beginMutation calls, and we want the copy
+		// to go back to being immutable once we are finished modifying it.
+		if ([self isCoreObjectCollection: collection])
+		{
+			collection = [collection copy];
+		}
+		else
+		{
+			collection = [collection mutableCopy];
+		}
 		[(NSMutableArray *)collection setArray: content];
 	}
 	else
@@ -981,7 +997,7 @@ See +[NSObject typePrefix]. */
 	
 	if ([self isCoreObjectCollection: collection])
 	{
-		[collection setMutable: NO];
+		[collection endMutation];
 	}
 	
 	return collection;
@@ -1109,7 +1125,7 @@ See +[NSObject typePrefix]. */
 	[self pushProperty: key];
 	if ([self isCoreObjectCollection: oldValue])
 	{
-		[(id <COPrimitiveCollection>)oldValue setMutable: YES];
+		[(id <COPrimitiveCollection>)oldValue beginMutation];
 	}
 
 	// Used to be done in -commonDidChangeValueForProperty: when we kept a snapshot
@@ -1136,7 +1152,7 @@ See +[NSObject typePrefix]. */
 	[self pushProperty: key];
 	if ([self isCoreObjectCollection: oldValue])
 	{
-		[(id <COPrimitiveCollection>)oldValue setMutable: YES];
+		[(id <COPrimitiveCollection>)oldValue beginMutation];
 	}
 	
 	NSArray *replacedOrRemoved;
@@ -1524,7 +1540,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 	
 	if ([self isCoreObjectCollection: newValue])
 	{
-		[(id <COPrimitiveCollection>)newValue setMutable: NO];
+		[(id <COPrimitiveCollection>)newValue endMutation];
 	}
 	else
 	{
@@ -1582,7 +1598,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 	// Fast path:
 	
 	[self popProperty: key];
-	[(id <COPrimitiveCollection>)newValue setMutable: NO];
+	[(id <COPrimitiveCollection>)newValue endMutation];
 	
 	// We must figure out which objects were added, and which were replaced or removed
 	
@@ -1928,7 +1944,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 			COMutableArray *array = value;
 			const NSUInteger count = array.backing.count;
 
-			array.mutable = YES;
+			[array beginMutation];
 			for (NSUInteger i=0; i<count; i++)
 			{
 				if ([[array referenceAtIndex: i] isEqual: object])
@@ -1943,13 +1959,13 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 					ETAssert([array referenceAtIndex: i] == replacement);
 				}
 			}
-			array.mutable = NO;
+			[array endMutation];
 		}
 		else if ([value isKindOfClass: [COMutableSet class]])
 		{
 			COMutableSet *set = value;
 			
-			set.mutable = YES;
+			[set beginMutation];
 			if ([set containsReference: object])
 			{
 				if (!updated)
@@ -1961,7 +1977,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 				[set addReference: replacement];
 				ETAssert([set containsReference: replacement]);
 			}
-			set.mutable = NO;
+			[set endMutation];
 		}
 		else if ([value isEqual: object])
 		{
