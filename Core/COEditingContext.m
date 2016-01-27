@@ -186,6 +186,11 @@
 	}]];
 }
 
+- (NSSet *)loadedPersistentRoots
+{
+	return [NSSet setWithArray: _loadedPersistentRoots.allValues];
+}
+
 #pragma mark Managing Persistent Roots -
 
 /**
@@ -973,10 +978,9 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 	return nil;
 }
 
-- (int64_t)lastTransactionIDForPersistentRootUUID: (ETUUID *)aUUID
+- (NSNumber *)lastTransactionIDForPersistentRootUUID: (ETUUID *)aUUID
 {
-	NSNumber *num = _lastTransactionIDForPersistentRootUUID[aUUID];
-	return [num longLongValue];
+	return _lastTransactionIDForPersistentRootUUID[aUUID];
 }
 
 - (void)setLastTransactionID: (int64_t)lastTransactionID forPersistentRootUUID: (ETUUID *)aUUID

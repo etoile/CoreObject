@@ -34,11 +34,35 @@
 + (NSString *)packageName;
 @end
 
+@interface COObject (COSerializationPrivate)
++ (void)initializeSerialization;
+@end
+
+@interface CONotFoundMarker : NSObject
+@end
+
+@implementation  CONotFoundMarker
+@end
+
 
 @implementation COObject
 
 @synthesize UUID = _UUID, entityDescription = _entityDescription,
 	objectGraphContext = _objectGraphContext;
+
+static CONotFoundMarker *notFoundMarker = nil;
+static NSNull *cachedNSNull = nil;
+
++ (void)initialize
+{
+	if (self != [COObject class])
+		return;
+	
+	notFoundMarker = [CONotFoundMarker new];
+	cachedNSNull = [NSNull null];
+
+	[self initializeSerialization];
+}
 
 // For EtoileUI
 /** <override-dummy />
@@ -174,7 +198,7 @@ See +[NSObject typePrefix]. */
 	}
 	else
 	{
-		if ([self isCoreObjectRelationship: propDesc])
+		if (propDesc.isPersistentRelationship)
 		{
 			return ([propDesc isOrdered] ? [COUnsafeRetainedMutableArray class] : [COUnsafeRetainedMutableSet class]);
 		}
@@ -268,8 +292,18 @@ See +[NSObject typePrefix]. */
 
 - (NSArray *)keyedPersistentPropertyDescriptions
 {
-	return [[_entityDescription allPersistentPropertyDescriptions]
-		filteredCollectionWithBlock: ^ (id propDesc) { return [propDesc isKeyed]; }];
+	NSArray *propertyDescs = _entityDescription.allPersistentPropertyDescriptions;
+	NSMutableArray *keyedPropertyDescs = [NSMutableArray new];
+
+	for (ETPropertyDescription *propertyDesc in propertyDescs)
+	{
+		if (propertyDesc.isKeyed)
+		{
+			[keyedPropertyDescs addObject: propertyDesc];
+		}
+	}
+
+	return keyedPropertyDescs;
 }
 
 - (NSMutableDictionary *)newAdditionalStoreItemUUIDs: (BOOL)isDeserialization
@@ -278,7 +312,7 @@ See +[NSObject typePrefix]. */
 
 	for (ETPropertyDescription *propertyDesc in [self keyedPersistentPropertyDescriptions])
 	{
-		[storeItemUUIDs setObject: (isDeserialization ? [NSNull null] : [ETUUID UUID])
+		[storeItemUUIDs setObject: (isDeserialization ? cachedNSNull : [ETUUID UUID])
 		                   forKey: [propertyDesc name]];
 	}
 	return storeItemUUIDs;
@@ -533,8 +567,8 @@ See +[NSObject typePrefix]. */
 {  
 	return ([value isKindOfClass: [COObject class]]
 		 || [value isKindOfClass: [COAttachmentID class]]
-	     || [self isSerializablePrimitiveValue: value]
-	     || [self isSerializableScalarValue: value]
+	     || isSerializablePrimitiveValue(value)
+	     || isSerializableScalarValue(value)
 		 || value == nil);
 }
 
@@ -589,18 +623,6 @@ See +[NSObject typePrefix]. */
 	}
 }
 
-- (BOOL)isCoreObjectRelationship: (ETPropertyDescription *)propertyDesc
-{
-	if ([propertyDesc isPersistent] == NO)
-		return NO;
-
-	ETModelDescriptionRepository *repo = [_objectGraphContext modelDescriptionRepository];
-	ETEntityDescription *rootCoreObjectEntity =
-		[repo entityDescriptionForClass: [COObject class]];
-
-	return [[propertyDesc type] isKindOfEntity: rootCoreObjectEntity];
-}
-
 /**
  * Counterpart to -validateEditingContextForNewValue:propertyDescription:, but it only validates
  * a single value being added to a multivalued property, rather than the whole collection.
@@ -608,7 +630,7 @@ See +[NSObject typePrefix]. */
 - (void)validateEditingContextForNewCollectionValue: (id)value
 								propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if ([self isCoreObjectRelationship: propertyDesc] == NO)
+	if (propertyDesc.isPersistentRelationship == NO)
 		return;
 	
 	ETAssert([propertyDesc isMultivalued]);
@@ -618,7 +640,7 @@ See +[NSObject typePrefix]. */
 - (void)validateEditingContextForNewValue: (id)value
                       propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if ([self isCoreObjectRelationship: propertyDesc] == NO)
+	if (propertyDesc.isPersistentRelationship == NO)
 		return;
 
 	if ([value isPrimitiveCollection])
@@ -645,7 +667,7 @@ See +[NSObject typePrefix]. */
 - (void)validateObjectGraphContextForNewCollectionValue: (id)value
 									propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if ([self isCoreObjectRelationship: propertyDesc] == NO)
+	if (propertyDesc.isPersistentRelationship == NO)
 		return;
 	
 	ETAssert([propertyDesc isMultivalued]);
@@ -657,7 +679,7 @@ See +[NSObject typePrefix]. */
 - (void)validateObjectGraphContextForNewValue: (id)value
 						  propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if ([self isCoreObjectRelationship: propertyDesc] == NO)
+	if (propertyDesc.isPersistentRelationship == NO)
 		return;
 
 	if ([value isPrimitiveCollection])
@@ -755,10 +777,22 @@ See +[NSObject typePrefix]. */
 	return result;
 }
 
-- (ETValidationResult *)validateValueUsingModel: (id)value forProperty: (NSString *)key
+- (ETValidationResult *)validateValueUsingModel: (id)value forProperty: (NSString *)property
 {
-	SEL keySelector = NSSelectorFromString([NSString stringWithFormat: @"validate%@:",
-		[key stringByCapitalizingFirstLetter]]);
+	const char *key = property.UTF8String;
+	size_t keyLength = strlen(key);
+	const char *prefix = "validate";
+	size_t prefixLength = strlen(prefix);
+	char validator[prefixLength + keyLength + 1];
+	
+	memcpy(validator, prefix, prefixLength);
+	memcpy(validator + prefixLength, key, keyLength);
+	
+	validator[prefixLength] = toupper(key[0]);
+	validator[prefixLength + keyLength] = ':';
+	validator[prefixLength + keyLength + 1] = '\0';
+
+	SEL keySelector = sel_getUid(validator);
 
 	if ([self respondsToSelector: keySelector] == NO)
 		return [ETValidationResult validResult: value];
@@ -843,13 +877,13 @@ See +[NSObject typePrefix]. */
  * variable storage. This allows -valueForStorageKey: and -valueForProperty: to 
  * both return incoming relationships.
  */
-- (id)valueForVariableStorageKey: (NSString *)key
+- (id)valueForVariableStorageKey: (NSString *)key notFoundMarker: (id)aNotFoundMarker
 {
 	// NOTE: This is just a debugging aid, and the check is only placed
 	// here because -valueForVariableStorageKey: is a commonly called method.
 	[self checkIsNotRemovedFromContext];
 	
-    ETPropertyDescription *propDesc = [[self entityDescription] propertyDescriptionForName: key];
+    ETPropertyDescription *propDesc = [_entityDescription propertyDescriptionForName: key];
 
 	// NOTE: In CoreObject, incoming relationships (e.g. parent(s)) are stored 
 	// in an incoming relationship cache per object and not persisted, unlike
@@ -868,15 +902,19 @@ See +[NSObject typePrefix]. */
 	id value = [_variableStorage objectForKey: key];
 	
 	// Convert value stored in variable storage to a form we can return to the user
-	if (value == [NSNull null])
+	if (value == nil)
+	{
+		return aNotFoundMarker;
+	}
+	else if (value == cachedNSNull)
 	{
 		return nil;
 	}
-	if ([value isKindOfClass: [COWeakRef class]])
+	else if ([value isKindOfClass: [COWeakRef class]])
 	{
 		return ((COWeakRef *)value)->_object;
 	}
-	if ([value isKindOfClass: [COPath class]])
+	else if ([value isKindOfClass: [COPath class]])
 	{
 		return nil;
 	}
@@ -884,25 +922,9 @@ See +[NSObject typePrefix]. */
 	return value;
 }
 
-- (id)serializableValueForVariableStorageKey: (NSString *)key
+- (id)valueForVariableStorageKey: (NSString *)key
 {
-	// NOTE: This is just a debugging aid, and the check is only placed
-	// here because -valueForVariableStorageKey: is a commonly called method.
-	[self checkIsNotRemovedFromContext];
-
-	id value = _variableStorage[key];
-	
-	// Convert value stored in variable storage to a form we can return to the user
-	if (value == [NSNull null])
-	{
-		return nil;
-	}
-	if ([value isKindOfClass: [COWeakRef class]])
-	{
-		return ((COWeakRef *)value)->_object;
-	}
-	
-	return value;
+	return [self valueForVariableStorageKey: key notFoundMarker: nil];
 }
 
 - (BOOL)isCoreObjectCollection: (id)aCollection
@@ -975,14 +997,14 @@ See +[NSObject typePrefix]. */
 {
 	// TODO: Raise an exception on an attempt to set an outgoing relationship
 	// (or may be in -setValue:forStorageKey:).
-	ETPropertyDescription *propertyDesc = [[self entityDescription] propertyDescriptionForName: key];
+	ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
     id storageValue;
 			
 	// Convert user value to the form we store it in the variable storage
 
 	if (aValue == nil)
 	{
-		storageValue = [NSNull null];
+		storageValue = cachedNSNull;
 	}
 	else if ([aValue isKindOfClass: [COObject class]])
 	{
@@ -1025,23 +1047,37 @@ See +[NSObject typePrefix]. */
 
 - (id)valueForStorageKey: (NSString *)key
 {
-	id value = nil;
+	id value = [self valueForVariableStorageKey: key notFoundMarker: notFoundMarker];
 
-	if (ETGetInstanceVariableValueForKey(self, &value, key) == NO)
+	if (value == notFoundMarker)
 	{
-		value = [self valueForVariableStorageKey: key];
+		ETGetInstanceVariableValueForKey(self, &value, key);
 	}
-	return value;
+	return (value == notFoundMarker ? nil : value);
 }
 
 - (id)serializableValueForStorageKey: (NSString *)key
 {
-	id value = nil;
+	// NOTE: This is just a debugging aid, and the check is only placed
+	// here because -valueForVariableStorageKey: is a commonly called method.
+	[self checkIsNotRemovedFromContext];
 
-	if (ETGetInstanceVariableValueForKey(self, &value, key) == NO)
+	id value = _variableStorage[key];
+	
+	// Convert value stored in variable storage to a form we can return to the user
+	if (value == nil)
 	{
-		value = [self serializableValueForVariableStorageKey: key];
+		ETGetInstanceVariableValueForKey(self, &value, key);
 	}
+	else if (value == cachedNSNull)
+	{
+		return nil;
+	}
+	else if ([value isKindOfClass: [COWeakRef class]])
+	{
+		return ((COWeakRef *)value)->_object;
+	}
+	
 	return value;
 }
 
@@ -1166,53 +1202,43 @@ See +[NSObject typePrefix]. */
 	[self didChangeValueForKey: property atIndexes: indexes withObjects: objects mutationKind: mutationKind];
 }
 
-- (void) markAsUpdatedIfNeededForProperty: (NSString*)prop
-{	
-	[_objectGraphContext markObjectAsUpdated: self forProperty: prop];
+static inline BOOL isValidDeadReferenceForPropertyDescription(id value, ETPropertyDescription *propertyDesc)
+{
+	return [value isKindOfClass: [COPath class]]
+		&& !propertyDesc.multivalued
+		&& propertyDesc.isPersistentRelationship;
 }
 
-// TODO: Move this method to ETModelDescriptionRepository
-- (ETEntityDescription *) entityDescriptionForObject: (id)anObject
+ETEntityDescription *entityDescriptionForObjectInRepository(id anObject, ETModelDescriptionRepository *repo)
 {
 	if ([anObject isKindOfClass: [COObject class]])
 	{
 		// special case to support the case when we're using COObject class
 		// and not a user-supplied subclass
-		return [(COObject *)anObject entityDescription];
+		return ((COObject *)anObject)->_entityDescription;
 	}
 	else
 	{
-		return [[_objectGraphContext modelDescriptionRepository]
-				entityDescriptionForClass: [anObject class]];
+		return [repo entityDescriptionForClass: [anObject class]];
 	}
 }
 
-- (BOOL)isValidDeadReference: (id)value
-      forPropertyDescription: (ETPropertyDescription *)propertyDesc
+static void validateSingleValueConformsToPropertyDescriptionInRepository(id singleValue, ETPropertyDescription *propertyDesc, ETModelDescriptionRepository *repo)
 {
-	return [value isKindOfClass: [COPath class]]
-		&& !propertyDesc.multivalued
-		&& [self isCoreObjectRelationship: propertyDesc];
-}
-
-- (void)  validateSingleValue: (id)singleValue
-conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
-{
-	ETAssert(_objectGraphContext != nil);
-
 	// TODO: We should move this nil check inside -isValidValue:type:
 	// nil is an allowed value for all CoreObject univalued property types
 	if (singleValue == nil)
 		return;
 	
-	ETEntityDescription *newValueEntityDesc = [self entityDescriptionForObject: singleValue];
-	ETAssert(newValueEntityDesc != nil);
+	ETEntityDescription *newValueEntityDesc = entityDescriptionForObjectInRepository(singleValue, repo);
+	assert(newValueEntityDesc != nil);
 	
-	if ([[propertyDesc type] isValidValue: singleValue type: newValueEntityDesc]
-	 || [self isValidDeadReference: singleValue forPropertyDescription: propertyDesc])
-	{
+	BOOL isValidValue = [propertyDesc.type isValidValue: singleValue
+	                                               type: newValueEntityDesc];
+	
+	if (isValidValue || isValidDeadReferenceForPropertyDescription(singleValue, propertyDesc))
 		return;
-	}
+
 	[NSException raise: NSInvalidArgumentException
 	            format: @"single value '%@' (entity %@) does not conform to type %@ (property %@)",
 	                    singleValue, newValueEntityDesc, [propertyDesc type], propertyDesc];
@@ -1233,36 +1259,9 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	
 	ETAssert([propertyDesc isMultivalued]);
 	
-	[self validateSingleValue: value conformsToPropertyDescription: propertyDesc];
-}
+	ETModelDescriptionRepository *repo = _objectGraphContext.modelDescriptionRepository;
 
-- (void)validateTypeForNewValue: (id)newValue
-            propertyDescription: (ETPropertyDescription *)propertyDesc
-{
-	if ([propertyDesc isPersistent] == NO)
-		return;
-
-	if ([self serializationGetterForProperty: [propertyDesc name]] != NULL)
-		return;
-
-	if ([newValue isPrimitiveCollection])
-	{
-		ETAssert([propertyDesc isMultivalued]);
-
-		Class expectedCollectionClass =
-			[self collectionClassForPropertyDescription: propertyDesc];
-
-		ETAssert([newValue isKindOfClass: expectedCollectionClass]);
-
-		for (id object in [newValue objectEnumerator])
-		{
-			[self validateSingleValue: object conformsToPropertyDescription: propertyDesc];
-		}
-	}
-	else
-	{
-		[self validateSingleValue: newValue conformsToPropertyDescription: propertyDesc];
-	}
+	validateSingleValueConformsToPropertyDescriptionInRepository(value, propertyDesc, repo);
 }
 
 /**
@@ -1283,13 +1282,49 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 - (void)validateNewValue: (id)newValue
      propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	// NOTE: For the CoreObject benchmark, no visible slowdowns.
-	[self validateEditingContextForNewValue: newValue
-                        propertyDescription: propertyDesc];
-	[self validateObjectGraphContextForNewValue: newValue
-							propertyDescription: propertyDesc];
-	[self validateTypeForNewValue: newValue
-	          propertyDescription: propertyDesc];
+	if (!propertyDesc.isPersistent)
+		return;
+	
+	ETModelDescriptionRepository *repo = _objectGraphContext.modelDescriptionRepository;
+	BOOL isPersistentRelationship = propertyDesc.isPersistentRelationship;
+	BOOL isValidatableType = ([self serializationGetterForProperty: propertyDesc.name] == NULL);
+
+	if ([propertyDesc isMultivalued])
+	{
+		// We count on -objectEnumerator to detect when newValue isn't a collection
+		for (COObject *object in [newValue objectEnumerator])
+		{
+			ETAssert([newValue isKindOfClass: [self collectionClassForPropertyDescription: propertyDesc]]);
+
+			if (isPersistentRelationship)
+			{
+				ETAssert([self isEditingContextValidForObject: object]);
+				ETAssert([self isObjectGraphContextValidForObject: object
+			                                  propertyDescription: propertyDesc]);
+			}
+			
+			if (isValidatableType)
+			{
+				validateSingleValueConformsToPropertyDescriptionInRepository(object, propertyDesc, repo);
+			}
+		}
+	}
+	else
+	{
+		if (isPersistentRelationship)
+		{
+			BOOL isDeadRef = [newValue isKindOfClass: [COPath class]];
+
+			ETAssert(isDeadRef || [self isEditingContextValidForObject: (COObject *)newValue]);
+			ETAssert(isDeadRef || [self isObjectGraphContextValidForObject: (COObject *)newValue
+			                                           propertyDescription: propertyDesc]);
+		}
+		
+		if (isValidatableType)
+		{
+			validateSingleValueConformsToPropertyDescriptionInRepository(newValue, propertyDesc, repo);
+		}
+	}
 }
 
 /**
@@ -1306,7 +1341,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 {
 	NSString *key = [propertyDesc name];
 	
-	if (![self isCoreObjectRelationship: propertyDesc])
+	if (!propertyDesc.isPersistentRelationship)
 		return NO;
 	
 	if (![propertyDesc isMultivalued])
@@ -1510,8 +1545,8 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 	[self addCachedOutgoingRelationshipsForValue: newValue
 					   ofPropertyWithDescription: propertyDesc];
 
-	[self markAsUpdatedIfNeededForProperty: key];	
-
+	[_objectGraphContext markObjectAsUpdated: self
+	                             forProperty: key];
 }
 
 /**
@@ -1585,7 +1620,8 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 									 ofPropertyWithDescription: propertyDesc];
 	}
 	
-	[self markAsUpdatedIfNeededForProperty: propertyDesc.name];
+	[_objectGraphContext markObjectAsUpdated: self
+	                             forProperty: key];
 }
 
 - (void)didChangeValueForProperty: (NSString *)key
@@ -1679,7 +1715,15 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 			continue;
 
 		Class class = [self collectionClassForPropertyDescription: propDesc];
-		id collection = [self valueForProperty: [propDesc name]];
+		/* For performance reasons, we use -valueForVariableStorageKey: and 
+		   -valueForKey: rather than just -valueForProperty: */
+		id collection = [self valueForVariableStorageKey: propDesc.name];
+		
+		if (collection == nil)
+		{
+			// NOTE: For ivar-backed and derived properties
+			collection = [self valueForKey: propDesc.name];
+		}
 
 		if ([collection isKindOfClass: class] == NO)
 		{
@@ -1696,7 +1740,7 @@ conformsToPropertyDescription: (ETPropertyDescription *)propertyDesc
 
 - (void)awakeFromDeserialization
 {
-	ETAssert([[_additionalStoreItemUUIDs allValues] containsObject: [NSNull null]] == NO);
+	ETAssert([[_additionalStoreItemUUIDs allValues] containsObject: cachedNSNull] == NO);
 }
 
 - (void)willLoadObjectGraph

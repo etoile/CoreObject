@@ -30,7 +30,7 @@
 		6025EA3D1B60E960007DD28B /* COSQLiteUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 6025EA391B60E960007DD28B /* COSQLiteUtilities.m */; };
 		602837AF1A334A2100D7B0D1 /* TestSchemaMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 602837AE1A334A2100D7B0D1 /* TestSchemaMigration.m */; };
 		602837B01A334A2100D7B0D1 /* TestSchemaMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 602837AE1A334A2100D7B0D1 /* TestSchemaMigration.m */; };
-		6028484E1BBAB5820094CDB0 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6028484D1BBAB5820094CDB0 /* Default-568h@2x.png */; settings = {ASSET_TAGS = (); }; };
+		6028484E1BBAB5820094CDB0 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6028484D1BBAB5820094CDB0 /* Default-568h@2x.png */; };
 		603447901C5008A6008A1B9D /* TestHistoryNavigationPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 6034478F1C5008A6008A1B9D /* TestHistoryNavigationPerformance.m */; };
 		6036436C1B3800B400DC685B /* COHistoryCompaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 6036436A1B3800B400DC685B /* COHistoryCompaction.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6036436D1B3800B400DC685B /* COHistoryCompaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 6036436A1B3800B400DC685B /* COHistoryCompaction.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -49,6 +49,39 @@
 		6043D4D31757B4F9002103CC /* COCommitDescriptor.h in Headers */ = {isa = PBXBuildFile; fileRef = 6043D4C717575D79002103CC /* COCommitDescriptor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6043D4D41757B4FB002103CC /* COCommitDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 6043D4C817575D7A002103CC /* COCommitDescriptor.m */; };
 		6048468818B6C245006E4EDC /* UnitKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048465518B6C03E006E4EDC /* UnitKit.framework */; };
+		6061B8311C524DF100813C18 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 6061B8301C524DF100813C18 /* Person.m */; };
+		6061B8321C524DF100813C18 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 6061B8301C524DF100813C18 /* Person.m */; };
+		6061B8331C524DF100813C18 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 6061B8301C524DF100813C18 /* Person.m */; };
+		6061B8C81C57E89700813C18 /* libSystem.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F91ED6197D2CA2009F47D7 /* libSystem.dylib */; };
+		6061B8C91C57E89700813C18 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6083223819795D21008D9F9D /* UIKit.framework */; };
+		6061B8CA1C57E89700813C18 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B1D3F919791F8800ACAC9C /* Foundation.framework */; };
+		6061B8CB1C57E89700813C18 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6083223619795D18008D9F9D /* CoreGraphics.framework */; };
+		6061B8CC1C57E89700813C18 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B1D3FB19791F9400ACAC9C /* libsqlite3.dylib */; };
+		6061B8CD1C57E89700813C18 /* libUnitKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048465F18B6C03E006E4EDC /* libUnitKit.a */; };
+		6061B8CE1C57E89700813C18 /* libCoreObject.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60E08C6219792BEA00D1B7AD /* libCoreObject.a */; };
+		6061B8D01C57E89700813C18 /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 669A728D1885C43B00E98795 /* Commits */; };
+		6061B8D11C57E89700813C18 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6028484D1BBAB5820094CDB0 /* Default-568h@2x.png */; };
+		6061B8D21C57E89700813C18 /* 1b.json in Resources */ = {isa = PBXBuildFile; fileRef = 664E075D18C9592700CBFF74 /* 1b.json */; };
+		6061B8D31C57E89700813C18 /* 1a.json in Resources */ = {isa = PBXBuildFile; fileRef = 664E075C18C9592700CBFF74 /* 1a.json */; };
+		6061B8E31C57E91300813C18 /* TestSQLiteStorePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550C0617D51D9000327657 /* TestSQLiteStorePerformance.m */; };
+		6061B8E41C57E91300813C18 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550BF617D51CB100327657 /* main.m */; };
+		6061B8E51C57E91300813C18 /* TestObjectGraphPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550BE817D51C6100327657 /* TestObjectGraphPerformance.m */; };
+		6061B8E61C57E91300813C18 /* TestBinaryReadWritePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550C0817D51E8F00327657 /* TestBinaryReadWritePerformance.m */; };
+		6061B8E71C57E91300813C18 /* BenchmarkItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 66D7980817ED18A200B07A2A /* BenchmarkItem.m */; };
+		6061B8E81C57E91300813C18 /* TestMultiplePersistentRootPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66568C91189598BB0075FD9A /* TestMultiplePersistentRootPerformance.m */; };
+		6061B8E91C57E91300813C18 /* BenchmarkCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E6824018B972C4003294EB /* BenchmarkCommon.m */; };
+		6061B8EA1C57E91300813C18 /* TestObjectPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E6826018BA9B5D003294EB /* TestObjectPerformance.m */; };
+		6061B8EB1C57E91300813C18 /* TestAttributedStringDiffPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66488DEF18DA3F6D009F4C55 /* TestAttributedStringDiffPerformance.m */; };
+		6061B8EC1C57E91300813C18 /* TestHistoryNavigationPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 6034478F1C5008A6008A1B9D /* TestHistoryNavigationPerformance.m */; };
+		6061B8ED1C57E91A00813C18 /* TestSynchronizerPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 664F279C188E683400DF36FC /* TestSynchronizerPerformance.m */; };
+		6061B8EE1C57E92100813C18 /* OutlineItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E451D517CC461F00205679 /* OutlineItem.m */; };
+		6061B8EF1C57E92A00813C18 /* Tag.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E451D817CC565100205679 /* Tag.m */; };
+		6061B8F01C57E93000813C18 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 6061B8301C524DF100813C18 /* Person.m */; };
+		6061B8F11C57E9F300813C18 /* TestCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00591704C24C00D01AAB /* TestCommon.m */; };
+		6061B8F21C57EA0A00813C18 /* TestSynchronizerCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 664F2799188E2DC900DF36FC /* TestSynchronizerCommon.m */; };
+		6061B8F31C57EA1700813C18 /* OrderedGroupNoOpposite.m in Sources */ = {isa = PBXBuildFile; fileRef = 66101154184D89A4001A3E24 /* OrderedGroupNoOpposite.m */; };
+		6061B8F41C57EA2300813C18 /* COSynchronizerFakeMessageTransport.m in Sources */ = {isa = PBXBuildFile; fileRef = 66E40D491836D08D00E5B4A7 /* COSynchronizerFakeMessageTransport.m */; };
+		6061B8F51C57EA6A00813C18 /* TestAttributedStringCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 660EE3B1186E3DA600E8C22C /* TestAttributedStringCommon.m */; };
 		606E3DC11787A07E00ED42DA /* COSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 606E3DBF1787A07E00ED42DA /* COSerialization.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		606E3DC21787A07E00ED42DA /* COSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 606E3DC01787A07E00ED42DA /* COSerialization.m */; };
 		607335B418AB96A6008A02DC /* COSmartGroup.h in Headers */ = {isa = PBXBuildFile; fileRef = 607335B218AB96A6008A02DC /* COSmartGroup.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -775,7 +808,7 @@
 		66EEB2B7186D3CBA003695E6 /* TestItemGraph.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EEB2B6186D3CBA003695E6 /* TestItemGraph.m */; };
 		66EF4276186251A800E15C59 /* TestDiffCAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EF4275186251A800E15C59 /* TestDiffCAPI.m */; };
 		66F1985919667265001EAEB0 /* TestMetamodelCornerCases.m in Sources */ = {isa = PBXBuildFile; fileRef = 66F1985819667265001EAEB0 /* TestMetamodelCornerCases.m */; };
-		66F1BE841BB1D9C900CC9E23 /* TestSQLiteBackingStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 66F1BE831BB1D9C900CC9E23 /* TestSQLiteBackingStore.m */; settings = {ASSET_TAGS = (); }; };
+		66F1BE841BB1D9C900CC9E23 /* TestSQLiteBackingStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 66F1BE831BB1D9C900CC9E23 /* TestSQLiteBackingStore.m */; };
 		66FB15DA17AB31F6003BFC9B /* COObject+Accessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB15D817AB31F5003BFC9B /* COObject+Accessors.m */; };
 		66FD348B1830B84C00898381 /* COSynchronizerJSONServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FD34891830B84C00898381 /* COSynchronizerJSONServer.m */; };
 		66FD348E1830BB3800898381 /* COSynchronizerJSONClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 66FD348C1830BB3800898381 /* COSynchronizerJSONClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -866,6 +899,20 @@
 			proxyType = 2;
 			remoteGlobalIDString = 609A557718C209FE0096927F;
 			remoteInfo = "TestEtoileFoundation (iOS)";
+		};
+		6061B8641C57E89700813C18 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3D01D08A1646BEF400917AC8 /* UnitKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 60A71B4118B505DA0038CE05;
+			remoteInfo = "UnitKit (iOS)";
+		};
+		6061B8661C57E89700813C18 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 60E08C6119792BEA00D1B7AD;
+			remoteInfo = "CoreObject (iOS)";
 		};
 		60C8BC20163223D300A2B4EE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -1020,6 +1067,10 @@
 		6036439B1B3965E900DC685B /* TestUndoTrackHistoryCompaction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUndoTrackHistoryCompaction.m; sourceTree = "<group>"; };
 		6043D4C717575D79002103CC /* COCommitDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCommitDescriptor.h; path = Utilities/COCommitDescriptor.h; sourceTree = "<group>"; };
 		6043D4C817575D7A002103CC /* COCommitDescriptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COCommitDescriptor.m; path = Utilities/COCommitDescriptor.m; sourceTree = "<group>"; };
+		6061B82F1C524DF100813C18 /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Person.h; path = Tests/TestModelObjects/Person.h; sourceTree = "<group>"; };
+		6061B8301C524DF100813C18 /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Person.m; path = Tests/TestModelObjects/Person.m; sourceTree = "<group>"; };
+		6061B8D71C57E89700813C18 /* BenchmarkCoreObject (iOS).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "BenchmarkCoreObject (iOS).app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6061B8D81C57E89800813C18 /* TestCoreObject (iOS) copy2-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "TestCoreObject (iOS) copy2-Info.plist"; path = "/Users/qmathe/reps/Etoile/Frameworks/CoreObject/TestCoreObject (iOS) copy2-Info.plist"; sourceTree = "<absolute>"; };
 		606E3DBF1787A07E00ED42DA /* COSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSerialization.h; path = Core/COSerialization.h; sourceTree = "<group>"; };
 		606E3DC01787A07E00ED42DA /* COSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSerialization.m; path = Core/COSerialization.m; sourceTree = "<group>"; };
 		607335B218AB96A6008A02DC /* COSmartGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSmartGroup.h; path = Model/COSmartGroup.h; sourceTree = "<group>"; };
@@ -1457,6 +1508,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6061B8C71C57E89700813C18 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6061B8C81C57E89700813C18 /* libSystem.dylib in Frameworks */,
+				6061B8C91C57E89700813C18 /* UIKit.framework in Frameworks */,
+				6061B8CA1C57E89700813C18 /* Foundation.framework in Frameworks */,
+				6061B8CB1C57E89700813C18 /* CoreGraphics.framework in Frameworks */,
+				6061B8CC1C57E89700813C18 /* libsqlite3.dylib in Frameworks */,
+				6061B8CD1C57E89700813C18 /* libUnitKit.a in Frameworks */,
+				6061B8CE1C57E89700813C18 /* libCoreObject.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		60C913B0165BBED000E0C5F4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1547,6 +1612,7 @@
 				60E08C6219792BEA00D1B7AD /* libCoreObject.a */,
 				60F91E9D197D1B8F009F47D7 /* TestCoreObject.app */,
 				6002E28E197FD90300AC9150 /* BasicPersistence.app */,
+				6061B8D71C57E89700813C18 /* BenchmarkCoreObject (iOS).app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1574,6 +1640,7 @@
 				60C913AC165BBE7500E0C5F4 /* Samples */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
+				6061B8D81C57E89800813C18 /* TestCoreObject (iOS) copy2-Info.plist */,
 			);
 			name = ObjectMerging;
 			sourceTree = "<group>";
@@ -2305,6 +2372,8 @@
 				6621BF2518482159000809CF /* Folder.m */,
 				6634B3E3196B15AE00C7AD6A /* FolderWithNoClass.h */,
 				6634B3E4196B15AE00C7AD6A /* FolderWithNoClass.m */,
+				6061B82F1C524DF100813C18 /* Person.h */,
+				6061B8301C524DF100813C18 /* Person.m */,
 				66101153184D89A4001A3E24 /* OrderedGroupNoOpposite.h */,
 				66101154184D89A4001A3E24 /* OrderedGroupNoOpposite.m */,
 				66101156184D8ACB001A3E24 /* UnivaluedGroupNoOpposite.h */,
@@ -2754,6 +2823,25 @@
 			productReference = 6002E28E197FD90300AC9150 /* BasicPersistence.app */;
 			productType = "com.apple.product-type.application";
 		};
+		6061B8621C57E89700813C18 /* BenchmarkCoreObject (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6061B8D41C57E89700813C18 /* Build configuration list for PBXNativeTarget "BenchmarkCoreObject (iOS)" */;
+			buildPhases = (
+				6061B8671C57E89700813C18 /* Sources */,
+				6061B8C71C57E89700813C18 /* Frameworks */,
+				6061B8CF1C57E89700813C18 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6061B8631C57E89700813C18 /* PBXTargetDependency */,
+				6061B8651C57E89700813C18 /* PBXTargetDependency */,
+			);
+			name = "BenchmarkCoreObject (iOS)";
+			productName = "TestCoreObject (iOS)";
+			productReference = 6061B8D71C57E89700813C18 /* BenchmarkCoreObject (iOS).app */;
+			productType = "com.apple.product-type.application";
+		};
 		60C913B2165BBED000E0C5F4 /* BasicPersistence */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 60C913BE165BBED100E0C5F4 /* Build configuration list for PBXNativeTarget "BasicPersistence" */;
@@ -2923,6 +3011,7 @@
 				60E08C6119792BEA00D1B7AD /* CoreObject (iOS) */,
 				60F91E9C197D1B8F009F47D7 /* TestCoreObject (iOS) */,
 				6002E21F197FD90300AC9150 /* BasicPersistence (iOS) */,
+				6061B8621C57E89700813C18 /* BenchmarkCoreObject (iOS) */,
 			);
 		};
 /* End PBXProject section */
@@ -3030,6 +3119,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		6061B8CF1C57E89700813C18 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6061B8D01C57E89700813C18 /* Commits in Resources */,
+				6061B8D11C57E89700813C18 /* Default-568h@2x.png in Resources */,
+				6061B8D21C57E89700813C18 /* 1b.json in Resources */,
+				6061B8D31C57E89700813C18 /* 1a.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		60F91E9B197D1B8F009F47D7 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3127,6 +3227,32 @@
 			buildActionMask = 2147483647;
 			files = (
 				6002E290197FD91A00AC9150 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6061B8671C57E89700813C18 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6061B8E91C57E91300813C18 /* BenchmarkCommon.m in Sources */,
+				6061B8EB1C57E91300813C18 /* TestAttributedStringDiffPerformance.m in Sources */,
+				6061B8F01C57E93000813C18 /* Person.m in Sources */,
+				6061B8E41C57E91300813C18 /* main.m in Sources */,
+				6061B8F31C57EA1700813C18 /* OrderedGroupNoOpposite.m in Sources */,
+				6061B8F11C57E9F300813C18 /* TestCommon.m in Sources */,
+				6061B8E31C57E91300813C18 /* TestSQLiteStorePerformance.m in Sources */,
+				6061B8EA1C57E91300813C18 /* TestObjectPerformance.m in Sources */,
+				6061B8EC1C57E91300813C18 /* TestHistoryNavigationPerformance.m in Sources */,
+				6061B8EF1C57E92A00813C18 /* Tag.m in Sources */,
+				6061B8F41C57EA2300813C18 /* COSynchronizerFakeMessageTransport.m in Sources */,
+				6061B8F51C57EA6A00813C18 /* TestAttributedStringCommon.m in Sources */,
+				6061B8ED1C57E91A00813C18 /* TestSynchronizerPerformance.m in Sources */,
+				6061B8F21C57EA0A00813C18 /* TestSynchronizerCommon.m in Sources */,
+				6061B8E61C57E91300813C18 /* TestBinaryReadWritePerformance.m in Sources */,
+				6061B8E81C57E91300813C18 /* TestMultiplePersistentRootPerformance.m in Sources */,
+				6061B8E71C57E91300813C18 /* BenchmarkItem.m in Sources */,
+				6061B8E51C57E91300813C18 /* TestObjectGraphPerformance.m in Sources */,
+				6061B8EE1C57E92100813C18 /* OutlineItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3276,6 +3402,7 @@
 			files = (
 				60F91F30197D32E2009F47D7 /* OrderedAttributeModel.m in Sources */,
 				60F91F20197D32E2009F47D7 /* Tag.m in Sources */,
+				6061B8331C524DF100813C18 /* Person.m in Sources */,
 				60F91EE6197D324B009F47D7 /* TestUndoUseCases.m in Sources */,
 				602837B01A334A2100D7B0D1 /* TestSchemaMigration.m in Sources */,
 				60F91F22197D32E2009F47D7 /* Child.m in Sources */,
@@ -3377,6 +3504,7 @@
 			files = (
 				66BA3D4A18DA6C4B00641D40 /* TestAttributedStringCommon.m in Sources */,
 				66488DFE18DA41B9009F4C55 /* TestAttributedStringDiffPerformance.m in Sources */,
+				6061B8321C524DF100813C18 /* Person.m in Sources */,
 				664F27A1188E69C000DF36FC /* COSynchronizerFakeMessageTransport.m in Sources */,
 				664F27A0188E69AD00DF36FC /* TestSynchronizerCommon.m in Sources */,
 				66E6824118B972C4003294EB /* BenchmarkCommon.m in Sources */,
@@ -3604,6 +3732,7 @@
 				66E40D741836D08E00E5B4A7 /* TestSynchronizerMultiUser.m in Sources */,
 				6610115B184D8B9E001A3E24 /* UnorderedGroupNoOpposite.m in Sources */,
 				66101170184D8E2D001A3E24 /* KeyedRelationshipModel.m in Sources */,
+				6061B8311C524DF100813C18 /* Person.m in Sources */,
 				661E2B7A184C4C0200226D3D /* TestKeyedRelationship.m in Sources */,
 				6621BF2618482159000809CF /* Folder.m in Sources */,
 				660EE3AF186E3D8700E8C22C /* TestAttributedStringWrapper.m in Sources */,
@@ -3650,6 +3779,16 @@
 			isa = PBXTargetDependency;
 			target = 60E08C6119792BEA00D1B7AD /* CoreObject (iOS) */;
 			targetProxy = 6002E223197FD90300AC9150 /* PBXContainerItemProxy */;
+		};
+		6061B8631C57E89700813C18 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "UnitKit (iOS)";
+			targetProxy = 6061B8641C57E89700813C18 /* PBXContainerItemProxy */;
+		};
+		6061B8651C57E89700813C18 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 60E08C6119792BEA00D1B7AD /* CoreObject (iOS) */;
+			targetProxy = 6061B8661C57E89700813C18 /* PBXContainerItemProxy */;
 		};
 		60C913C3165BBEED00E0C5F4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3765,6 +3904,77 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = Test;
 				PRODUCT_NAME = BasicPersistence;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wno-unused-variable",
+					"-Wno-unused-value",
+				);
+			};
+			name = Release;
+		};
+		6061B8D51C57E89700813C18 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_BITCODE = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "TestCoreObject (iOS) copy2-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/usr/lib/system",
+				);
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = Test;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wno-unused-variable",
+					"-Wno-unused-value",
+				);
+			};
+			name = Debug;
+		};
+		6061B8D61C57E89700813C18 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_BITCODE = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "TestCoreObject (iOS) copy2-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SDKROOT)/usr/lib/system",
+				);
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = Test;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -4107,6 +4317,15 @@
 			buildConfigurations = (
 				6002E28C197FD90300AC9150 /* Debug */,
 				6002E28D197FD90300AC9150 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6061B8D41C57E89700813C18 /* Build configuration list for PBXNativeTarget "BenchmarkCoreObject (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6061B8D51C57E89700813C18 /* Debug */,
+				6061B8D61C57E89700813C18 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

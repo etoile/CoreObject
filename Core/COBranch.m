@@ -845,26 +845,31 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 		postNotificationName: ETCollectionDidUpdateNotification object: self];
 }
 
-- (void)updateRevisions: (BOOL)reload
+/**
+ * When compacted or rebased, we discard all revisions, the next time -revisions 
+ * is called, the latest revisions will be reloaded.
+ */
+- (void)updateRevisions: (BOOL)wasCompactedOrRebased
 {
-	CORevision *currentRev = [[self editingContext] revisionForRevisionUUID: _currentRevisionUUID
-	                                                     persistentRootUUID: [[self persistentRoot] UUID]];
-	BOOL isUpToDate = [currentRev isEqual: [_revisions lastObject]] || _revisions == nil;
-
-	if (!reload && isUpToDate)
+	if (_revisions == nil)
 		return;
 
-	BOOL isNewCommit = [[currentRev parentRevision] isEqual: [_revisions lastObject]];
+	CORevision *currentRev = [[self editingContext] revisionForRevisionUUID: _currentRevisionUUID
+	                                                     persistentRootUUID: [[self persistentRoot] UUID]];
+	BOOL isUpToDate = [currentRev isEqual: [_revisions lastObject]] && !wasCompactedOrRebased;
+
+	if (isUpToDate)
+		return;
+
+	BOOL isNewCommit = [[currentRev parentRevision] isEqual: [_revisions lastObject]] && !wasCompactedOrRebased;
 
 	if (isNewCommit)
 	{
-		ETAssert(!reload);
 		[_revisions addObject: currentRev];
 	}
 	else
 	{
-		// TODO: Optimize to reload just the new nodes
-		[self reloadRevisions];
+		_revisions = nil;
 	}
 	[self didUpdate];
 }

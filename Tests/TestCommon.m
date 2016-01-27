@@ -276,9 +276,12 @@ doesNotPostNotification: (NSString *)notif
 - (id) init
 {
 	SUPERINIT;
+	COUndoTrackStore *undoStore = [[COUndoTrackStore alloc] initWithURL: [[self class] undoTrackStoreURL]];
+	[undoStore clearStore];
+
 	ctx = [[COEditingContext alloc] initWithStore: store
 	                   modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]
-	                               undoTrackStore: [[COUndoTrackStore alloc] initWithURL: [[self class] undoTrackStoreURL]]];
+	                               undoTrackStore: undoStore];
     return self;
 }
 

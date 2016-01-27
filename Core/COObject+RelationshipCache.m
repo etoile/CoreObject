@@ -18,29 +18,12 @@
 
 @implementation COObject (RelationshipCache)
 
-// FIXME: Copied from COSerialization
-static BOOL isCoreObjectEntityType(ETEntityDescription *aType)
-{
-	ETEntityDescription *type = aType;
-	// TODO: Determine more directly
-	do
-	{
-		if ([[type name] isEqualToString: @"COObject"])
-			return YES;
-        
-		type = [type parent];
-	}
-	while (type != nil);
-    
-	return NO;
-}
-
-static BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescription *prop)
+static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETPropertyDescription *prop)
 {
 	// NOTE: For now, we don't support keyed relationships, and we don't want to
 	// interpret a CODictionary as a relationship, when we use it as a
 	// multivalued collection.
-    return ([prop isPersistent] && isCoreObjectEntityType([prop type]) && ![prop isKeyed]);
+    return prop.isPersistentRelationship && !prop.isKeyed;
 }
 
 - (void) removeCachedOutgoingRelationshipsForCollectionValue: (id)obj

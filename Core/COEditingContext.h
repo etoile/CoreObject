@@ -250,6 +250,14 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  * are pending undeletion, plus those pending deletion.
  */
 @property (nonatomic, readonly) NSSet *deletedPersistentRoots;
+/**
+ * Returns all persistent roots loaded in memory.
+ *
+ * The returned set includes those that are pending insertion, undeletion or 
+ * deletion, and deleted ones (explicitly loaded with -persistentRootForUUID: or 
+ * when using COEditingContextUnloadingBehaviorNever).
+ */
+@property (nonatomic, readonly) NSSet *loadedPersistentRoots;
 
 
 /** @taskunit Store and Metamodel Access */

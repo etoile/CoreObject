@@ -67,6 +67,11 @@
 
 /** @taskunit Transaction ID */
 
+- (BOOL) hasOldTransactionIDForPersistentRoot: (ETUUID *)aPersistentRoot
+{
+    return nil != _oldTransactionIDForPersistentRootUUID[aPersistentRoot];
+}
+
 - (int64_t) oldTransactionIDForPersistentRoot: (ETUUID *)aPersistentRoot
 {
 	return [_oldTransactionIDForPersistentRootUUID[aPersistentRoot] longLongValue];

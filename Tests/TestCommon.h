@@ -37,6 +37,7 @@
 #import "Child.h"
 #import "Folder.h"
 #import "FolderWithNoClass.h"
+#import "Person.h"
 #import "OrderedGroupNoOpposite.h"
 #import "UnivaluedGroupNoOpposite.h"
 #import "UnorderedGroupNoOpposite.h"

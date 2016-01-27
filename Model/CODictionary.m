@@ -7,6 +7,7 @@
 
 #import "CODictionary.h"
 #import "COObjectGraphContext+Private.h"
+#import "COObject+Private.h"
 #import "COSerialization.h"
 
 @interface COObject ()
@@ -37,7 +38,7 @@
 
 	for (NSString *key in [dict allKeys])
 	{
-		NSAssert2([self isSerializablePrimitiveValue: key],
+		NSAssert2(isSerializablePrimitiveValue(key),
 			@"Unsupported key type %@ in %@. For dictionary serialization, "
 			  "keys must be a primitive CoreObject values (NSString, NSNumber or NSData).",
 			  key, dict);

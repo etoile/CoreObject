@@ -6,8 +6,28 @@
  */
 
 #import "COMetamodel.h"
+#import "COAttachmentID.h"
 #import "COObject.h"
 #import "COLibrary.h"
+#include <objc/runtime.h>
+
+/**
+ * Extends the FM3 metamodel with data/blob and attachment as attribute types.
+ */
+void CORegisterPrimitiveEntityDescriptions(ETModelDescriptionRepository *repo)
+{
+	ETEntityDescription *dataEntity = [NSData newEntityDescription];
+	ETEntityDescription *attachmentIDEntity = [COAttachmentID newEntityDescription];
+
+	object_setClass(dataEntity, [ETPrimitiveEntityDescription class]);
+	object_setClass(attachmentIDEntity, [ETPrimitiveEntityDescription class]);
+
+	[repo addUnresolvedDescription: dataEntity];
+	[repo addUnresolvedDescription: attachmentIDEntity];
+	
+	[repo setEntityDescription: dataEntity forClass: [NSData class]];
+	[repo setEntityDescription: attachmentIDEntity forClass: [COAttachmentID class]];
+}
 
 void CORegisterAdditionalEntityDescriptions(ETModelDescriptionRepository *repo)
 {
@@ -29,7 +49,9 @@ void CORegisterCoreObjectMetamodel(ETModelDescriptionRepository *repo)
 	if (wereRegisteredPreviously)
 		return;
 
+	CORegisterPrimitiveEntityDescriptions(repo);
 	CORegisterAdditionalEntityDescriptions(repo);
+
 	[repo collectEntityDescriptionsFromClass: [COObject class]
 	                         excludedClasses: nil
 	                              resolveNow: YES];
