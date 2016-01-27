@@ -260,8 +260,8 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
     dispatch_sync(_queue, ^() {
         [_db beginTransaction];
 		
+		[_db executeUpdate: @"DELETE FROM tracks"];
         [_db executeUpdate: @"DELETE FROM commands"];
-        [_db executeUpdate: @"DELETE FROM tracks"];
 		[_db executeUpdate: @"DROP TABLE IF EXISTS storeMetadata"];
         [_db commit];
         
