@@ -234,10 +234,17 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 			const BOOL modifiesMutableState = [aTransaction touchesMutableStateForPersistentRootUUID: modifiedUUID];
 			int64_t currentValue = [db_ int64ForQuery: @"SELECT transactionid FROM persistentroots WHERE uuid = ?", [modifiedUUID dataValue]];
 			int64_t clientValue = [aTransaction oldTransactionIDForPersistentRoot: modifiedUUID];
+			const BOOL wasLoaded = [aTransaction hasOldTransactionIDForPersistentRoot: modifiedUUID];
 			
 			if (!modifiesMutableState)
 				continue;
 			
+			// Sort of a hack: we allow committing without providing a transaction ID. (if wasLoaded is NO)
+			if (!wasLoaded)
+			{
+				clientValue = currentValue;
+			}
+
 			if (clientValue != currentValue && isPresent)
 			{
 				ok = NO;

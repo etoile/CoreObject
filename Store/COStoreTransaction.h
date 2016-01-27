@@ -41,6 +41,8 @@
 
 - (int64_t) oldTransactionIDForPersistentRoot: (ETUUID *)aPersistentRoot;
 
+- (BOOL) hasOldTransactionIDForPersistentRoot: (ETUUID *)aPersistentRoot;
+
 /**
  * The value oldID MUST be one that was previously a committed state of the
  * persistent root. In particular, it is illegal to pass an oldID value 

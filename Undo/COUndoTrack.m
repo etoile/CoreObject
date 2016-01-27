@@ -540,8 +540,11 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	// Set the last transaction IDs so the store will accept our transaction
 	for (ETUUID *uuid in [txn persistentRootUUIDs])
 	{
-		int64_t lastTransactionID = [_editingContext lastTransactionIDForPersistentRootUUID: uuid];
-		[txn setOldTransactionID: lastTransactionID forPersistentRoot: uuid];
+		NSNumber *lastTransactionID = [_editingContext lastTransactionIDForPersistentRootUUID: uuid];
+		if (lastTransactionID != nil)
+		{
+			[txn setOldTransactionID: lastTransactionID.longLongValue forPersistentRoot: uuid];
+		}
 		
 		// N.B.: For loaded persistent roots in ctx, the
 		// in-memory state is out of date with respect to the store, and the

@@ -542,7 +542,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (int64_t)lastTransactionID
 {
-	return [_parentContext lastTransactionIDForPersistentRootUUID: _UUID];
+	return [_parentContext lastTransactionIDForPersistentRootUUID: _UUID].longLongValue;
 }
 
 - (void)setLastTransactionID: (int64_t) value
