@@ -480,7 +480,7 @@
 	}];
 }
 
-- (void) testPersistentRootLazyLoading
+- (void) testTargetPersistentRootLazyLoading
 {
 	COEditingContext *ctx2 = [self newContext];
 	
@@ -507,6 +507,64 @@
 	UKObjectsEqual(item2.UUID, item2ctx2.UUID);
 	UKNotNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
 	UKNotNil([ctx2 loadedPersistentRootForUUID: item2uuid]);
+	UKFalse([ctx2 hasChanges]);
+}
+
+- (void) testSourcePersistentRootLazyLoading
+{
+	COEditingContext *ctx2 = [self newContext];
+	
+	// First, all persistent roots should be unloaded.
+	UKNil([ctx2 loadedPersistentRootForUUID: group1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item2uuid]);
+	UKFalse([ctx2 hasChanges]);
+	
+	// Load item1
+	OutlineItem *item1ctx2 = [ctx2 persistentRootForUUID: item1uuid].rootObject;
+	
+	// Because group1 is not currently loaded, we have no way of
+	// knowing that it has a cross-reference to item1.
+	// So item1ctx2.referringObjects is currently empty.
+	// This is sort of a leak in the abstraction of lazy loading.
+	UKObjectsEqual(S(), item1ctx2.referringObjects);
+	
+	// Load group1
+	UnorderedGroupNoOpposite *group1ctx2 = [ctx2 persistentRootForUUID: group1uuid].rootObject;
+	UKObjectsEqual(@"current", group1ctx2.label);
+	
+	// That should have updated the referringObjects
+	UKObjectsEqual(S(group1ctx2), item1ctx2.referringObjects);
+	
+	UKFalse([ctx2 hasChanges]);
+}
+
+- (void) testSourcePersistentRootLazyLoadingReverseOrder
+{
+	COEditingContext *ctx2 = [self newContext];
+	
+	// First, all persistent roots should be unloaded.
+	UKNil([ctx2 loadedPersistentRootForUUID: group1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item2uuid]);
+	UKFalse([ctx2 hasChanges]);
+	
+	// Load group1
+	UnorderedGroupNoOpposite *group1ctx2 = [ctx2 persistentRootForUUID: group1uuid].rootObject;
+	
+	// Ensure the references are faulted
+	UKObjectsEqual(S([COPath pathWithPersistentRoot: item1uuid],
+					 [COPath pathWithPersistentRoot: item2uuid]), [[group1ctx2 serializableValueForStorageKey: @"contents"] allReferences]);
+	
+	// Load item1
+	OutlineItem *item1ctx2 = [ctx2 persistentRootForUUID: item1uuid].rootObject;
+	
+	// Check that the reference in group1 was unfaulted by the loading of item1
+	UKObjectsEqual(S(item1ctx2,
+					 [COPath pathWithPersistentRoot: item2uuid]), [[group1ctx2 serializableValueForStorageKey: @"contents"] allReferences]);
+	
+	UKObjectsEqual(S(group1ctx2), item1ctx2.referringObjects);
+	
 	UKFalse([ctx2 hasChanges]);
 }
 

@@ -477,7 +477,6 @@
 	UKFalse([ctx2 hasChanges]);
 }
 
-
 - (void) testSourcePersistentRootLazyLoading
 {
 	COEditingContext *ctx2 = [self newContext];
