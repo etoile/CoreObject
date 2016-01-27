@@ -548,7 +548,7 @@
 	[array beginMutation];
 	[array beginMutation];
 	
-	// Maknig a copy should preserve the "level" of -beginMutation calls
+	// Making a copy should preserve the "level" of -beginMutation calls
 	COMutableArray *arrayCopy = [array copy];
 	UKTrue(arrayCopy.isMutable);
 	UKDoesNotRaiseException([arrayCopy addObject: @"a"]);
@@ -770,7 +770,7 @@
 	[set beginMutation];
 	[set beginMutation];
 	
-	// Maknig a copy should preserve the "level" of -beginMutation calls
+	// Making a copy should preserve the "level" of -beginMutation calls
 	COMutableArray *setCopy = [set copy];
 	UKTrue(setCopy.isMutable);
 	UKDoesNotRaiseException([setCopy addObject: @"a"]);
