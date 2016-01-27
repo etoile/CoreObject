@@ -643,7 +643,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (void)markObjectAsUpdated: (COObject *)obj forProperty: (NSString *)aProperty
 {
-	if (ignoresChangeTrackingNotifications)
+	if (self.ignoresChangeTrackingNotifications)
 		return;
 	
 	ETAssert([aProperty isKindOfClass: [NSString class]]);
@@ -857,7 +857,23 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	return [deadRelationshipCache referringObjectsForPath: pathToUndeletedObject].setRepresentation;
 }
 
-static BOOL ignoresChangeTrackingNotifications = NO;
+- (BOOL) ignoresChangeTrackingNotifications
+{
+	return _ignoresChangeTrackingNotifications > 0;
+}
+
+- (void) setIgnoresChangeTrackingNotifications: (BOOL)flag
+{
+	if (flag)
+	{
+		_ignoresChangeTrackingNotifications++;
+	}
+	else
+	{
+		_ignoresChangeTrackingNotifications--;
+		ETAssert(_ignoresChangeTrackingNotifications >= 0);
+	}
+}
 
 /**
  * This method is called on every object graph containing one or more referring 
@@ -890,7 +906,7 @@ static BOOL ignoresChangeTrackingNotifications = NO;
 		referringObjects = [[anObject incomingRelationshipCache] referringObjects];
 	}
 
-	ignoresChangeTrackingNotifications = YES;
+	self.ignoresChangeTrackingNotifications = YES;
 	for (COObject *referrer in referringObjects)
 	{
         if (referrer.objectGraphContext != self)
@@ -899,7 +915,7 @@ static BOOL ignoresChangeTrackingNotifications = NO;
 		[referrer replaceReferencesToObjectIdenticalTo: anObject
 											withObject: aReplacement];
 	}
-	ignoresChangeTrackingNotifications = NO;
+	self.ignoresChangeTrackingNotifications = NO;
 }
 
 - (COItemGraph *)modifiedItemsSnapshot

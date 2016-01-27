@@ -163,6 +163,11 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 			[_objectGraph setItemGraph: self.persistentRoot.objectGraphContext];
 		}
 		ETAssert(![_objectGraph hasChanges]);
+		
+		// Lazy loading support
+		[self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: self.persistentRoot
+																		  branch: self
+																	   isDeleted: NO];
 	}
 	return _objectGraph;
 }

@@ -81,11 +81,6 @@
 	       selector: @selector(distributedStorePersistentRootsDidChange:)
 		       name: COStorePersistentRootsDidChangeNotification
 		     object: nil];
-
-	for (ETUUID *uuid in [_store persistentRootUUIDs])
-    {
-        [self persistentRootForUUID: uuid];
-    }
 	
 	return self;
 }
@@ -218,6 +213,11 @@
 	return persistentRoot;
 }
 
+- (COPersistentRoot *)loadedPersistentRootForUUID: (ETUUID *)aUUID
+{
+    return _loadedPersistentRoots[aUUID];
+}
+
 - (COPersistentRoot *)makePersistentRootWithInfo: (COPersistentRootInfo *)info
                               objectGraphContext: (COObjectGraphContext *)anObjectGrapContext
 {
@@ -231,6 +231,12 @@
                                                                 parentContext: self];
 	[_loadedPersistentRoots setObject: persistentRoot
 							   forKey: [persistentRoot UUID]];
+	
+	// Lazy loading support:
+	// Cause any faulted references to this newly loaded persistet root to be unfaulted
+	[self updateCrossPersistentRootReferencesToPersistentRoot: persistentRoot
+													   branch: nil
+													isDeleted: NO];
 	return persistentRoot;
 }
 
@@ -369,6 +375,11 @@
  */
 - (void)updateDeadRelationshipCacheForUndeletedPersistentRoot: (COPersistentRoot *)aPersistentRoot
 {
+	// FIXME:
+	// With lazy loading, this is no longer correct. There may still be some dead references
+	// after undeletion, so we must not remove them from the cache.
+	// We need tests that check the changes to the dead relationship cache
+#if 0
 	NSSet *allBranches = [aPersistentRoot.branches setByAddingObjectsFromSet: aPersistentRoot.deletedBranches];
 	
 	for (COBranch *branch in allBranches)
@@ -377,6 +388,7 @@
 		                                                            branch: branch.UUID]];
 	}
 	[_deadRelationshipCache removePath: [COPath pathWithPersistentRoot: aPersistentRoot.UUID]];
+#endif
 }
 
 /**
@@ -412,8 +424,10 @@
 {
 	NSParameterAssert(aPersistentRoot != nil);
 	// NOTE: -delete/undeleteBranch: enforce !aBranch.isCurrentBranch already.
-	NSParameterAssert(aBranch == nil
-		|| (!aBranch.isCurrentBranch && aBranch.persistentRoot == aPersistentRoot));
+	// NOTE: This is used by lazy loading now, and the following assertion no longer holds.
+	// Is this a problem?
+//	NSParameterAssert(aBranch == nil
+//		|| (!aBranch.isCurrentBranch && aBranch.persistentRoot == aPersistentRoot));
 
 	/* Fix references pointing to any branch that belong to the deleted
 	 persistent root (the relationship target) */
@@ -502,19 +516,41 @@
 
 #pragma mark Referencing Other Persistent Roots -
 
-- (id)crossPersistentRootReferenceWithPath: (COPath *)aPath
+- (id)crossPersistentRootReferenceWithPath: (COPath *)aPath shouldLoad: (BOOL)shouldLoad
 {
     ETUUID *persistentRootUUID = [aPath persistentRoot];
     ETAssert(persistentRootUUID != nil);
 
 	ETUUID *branchUUID = [aPath branch];
 
-	COPersistentRoot *persistentRoot = [self persistentRootForUUID: persistentRootUUID];
-
-if (branchUUID != nil)
+	COPersistentRoot *persistentRoot;
+	if (shouldLoad)
+	{
+		persistentRoot = [self persistentRootForUUID: persistentRootUUID];
+	}
+	else
+	{
+		persistentRoot = [self loadedPersistentRootForUUID: persistentRootUUID];
+	}
+	
+    if (persistentRoot == nil)
+    {
+        return nil;
+    }
+	if (persistentRoot.deleted)
+	{
+		return nil;
+	}
+		
+    
+	if (branchUUID != nil)
 	{
 		COBranch *branch = [persistentRoot branchForUUID: branchUUID];
 		
+		if (branch.deleted)
+		{
+			return nil;
+		}
 		return [branch rootObject];
 	}
 	else

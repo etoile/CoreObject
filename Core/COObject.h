@@ -424,6 +424,7 @@
 	 */
 	NSMutableDictionary *_additionalStoreItemUUIDs;
 	BOOL _isPrepared;
+	int _skipLoading;
 }
 
 

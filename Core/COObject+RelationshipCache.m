@@ -178,8 +178,8 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
     {
         if (isPersistentCoreObjectReferencePropertyDescription(prop))
         {
-            id value = [self valueForStorageKey: [prop name]];
-            
+			id value = [self valueForStorageKey: [prop name] shouldLoad: NO];
+			
             [self removeCachedOutgoingRelationshipsForValue: value
                                   ofPropertyWithDescription: prop];
         }

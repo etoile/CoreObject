@@ -61,7 +61,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (id)crossPersistentRootReferenceWithPath: (COPath *)aPath;
+- (id)crossPersistentRootReferenceWithPath: (COPath *)aPath shouldLoad: (BOOL)shouldLoad;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

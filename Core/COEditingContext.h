@@ -292,6 +292,11 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  */
 - (COPersistentRoot *)persistentRootForUUID: (ETUUID *)aUUID;
 /**
+ * Same as -persistentRootForUUID: but doesn't cause loading.
+ */
+- (COPersistentRoot *)loadedPersistentRootForUUID: (ETUUID *)aUUID;
+
+/**
  * Returns a new persistent root that uses the given root object.
  *
  * The returned persistent root is added to -persistentRootsPendingInsertion 
