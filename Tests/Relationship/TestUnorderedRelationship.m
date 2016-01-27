@@ -471,4 +471,40 @@
 	}];
 }
 
+- (void) testPersistentRootLazyLoading
+{
+	ETUUID *group1uuid = group1.persistentRoot.UUID;
+	ETUUID *item1uuid = item1.persistentRoot.UUID;
+	ETUUID *item2uuid = item2.persistentRoot.UUID;
+	
+	{
+		COEditingContext *ctx2 = [self newContext];
+		
+		// First, all persistent roots should be unloaded.
+		UKNil([ctx2 loadedPersistentRootForUUID: group1uuid]);
+		UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+		UKNil([ctx2 loadedPersistentRootForUUID: item2uuid]);
+		UKFalse([ctx2 hasChanges]);
+		
+		// Load group1
+		UnorderedGroupNoOpposite *group1ctx2 = [ctx2 persistentRootForUUID: group1uuid].rootObject;
+		UKObjectsEqual(@"current", group1ctx2.label);
+		
+		// Ensure both persistent roots are still unloaded
+		UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+		UKNil([ctx2 loadedPersistentRootForUUID: item2uuid]);
+		UKFalse([ctx2 hasChanges]);
+		
+		// Access collection to trigger loading
+		UKIntsEqual(2, group1ctx2.contents.count);
+		OutlineItem *item1ctx2 = [[group1ctx2.contents objectsPassingTest:^(id obj, BOOL*stop){ return [[obj UUID] isEqual: item1.UUID]; }] anyObject];
+		OutlineItem *item2ctx2 = [[group1ctx2.contents objectsPassingTest:^(id obj, BOOL*stop){ return [[obj UUID] isEqual: item2.UUID]; }] anyObject];
+		UKObjectsEqual(item1.UUID, item1ctx2.UUID);
+		UKObjectsEqual(item2.UUID, item2ctx2.UUID);
+		UKNotNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+		UKNotNil([ctx2 loadedPersistentRootForUUID: item2uuid]);
+		UKFalse([ctx2 hasChanges]);
+	}
+}
+
 @end

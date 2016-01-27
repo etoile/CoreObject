@@ -310,7 +310,7 @@ doesNotPostNotification: (NSString *)notif
 	// was persistent.
 	
 	block([aPersistentRoot editingContext], aPersistentRoot, [aPersistentRoot currentBranch], NO);
-	
+
 	// Create a second, isolated context that opens a new store object
 	// at the current one's URL
 	

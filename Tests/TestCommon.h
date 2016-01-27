@@ -12,6 +12,7 @@
 #import "COObjectGraphContext+GarbageCollection.h"
 #import "COPrimitiveCollection.h"
 #import "CODateSerialization.h"
+#import "COCrossPersistentRootDeadRelationshipCache.h"
 
 #import "COSynchronizerRevision.h"
 #import "COSynchronizerPushedRevisionsToClientMessage.h"
