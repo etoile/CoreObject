@@ -964,26 +964,9 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 		}
 		else if (![deletedPersistentRootUUIDs containsObject: persistentRootUUID])
 		{
-			/* For a finalized persistent root, insertedOrUndeleted is nil */
-			COPersistentRoot *insertedOrUndeleted = [self persistentRootForUUID: persistentRootUUID];
-
-			if (insertedOrUndeleted != nil)
-			{
-				hadChanges = YES;
-				/* When -[COUndoTrack setCurrentNode:] is used or we receive
-				   another application commit notification, the store is updated
-				   directly and the newly inserted persistent root can be one
-				   just undeleted by the undo track (or in another app). This
-				   means we must check other persistent roots in case they have
-				   dead references pointing it. */
-				[self updateCrossPersistentRootReferencesToPersistentRoot: insertedOrUndeleted
-			                                                       branch: nil
-			                                                    isDeleted: insertedOrUndeleted.isDeleted];
-				/* For the sake of simplicity, we update the dead relationship
-				   cache in the same way on insertion and undeletion (insertion 
-				   is simply a no-op). */
-				[self updateDeadRelationshipCacheForUndeletedPersistentRoot: insertedOrUndeleted];
-			}
+			// The persistent root is not loaded, but it changed in the store.
+			// Clear out any stored transaction ID.
+			[_lastTransactionIDForPersistentRootUUID removeObjectForKey: persistentRootUUID];
 		}
 	}
 	
@@ -1000,6 +983,9 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 		__unused COPersistentRoot *loaded = [_loadedPersistentRoots objectForKey: persistentRootUUID];
 
 		// TODO: [self unloadPersistentRoot: loaded]
+		// Temporary hack until we have -unloadPersistentRoot:
+		[_lastTransactionIDForPersistentRootUUID removeObjectForKey: persistentRootUUID];
+		
 		hadChanges = YES;
 	}
 	

@@ -372,4 +372,45 @@
 	UKObjectsEqual(persistentRoot.UUID, [ctx2persistentRoots.anyObject UUID]);
 }
 
+- (void) testDeletedPersistentRootsPropertyNotLazy
+{
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	[ctx commit];
+	
+	persistentRoot.deleted = YES;
+	[ctx commit];
+	
+	COEditingContext *ctx2 = [self newContext];
+	NSSet *ctx2deletedPersistentRoots = ctx2.deletedPersistentRoots;
+	UKIntsEqual(1, ctx2deletedPersistentRoots.count);
+	UKObjectsEqual(persistentRoot.UUID, [ctx2deletedPersistentRoots.anyObject UUID]);
+}
+
+- (void) testPersistentRootInsertionInOtherContextIsLazy
+{
+	ETUUID *uuid;
+	UKObjectsEqual(S(), ctx.loadedPersistentRoots);
+	
+	// Insert a persistent root in a second context
+	{
+		COEditingContext *ctx2 = [self newContext];
+		COPersistentRoot *persistentRoot = [ctx2 insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+		uuid = persistentRoot.UUID;
+		[ctx2 commit];
+		
+		UKObjectsEqual(S(persistentRoot), ctx2.loadedPersistentRoots);
+	}
+	
+	[self wait];	
+	
+	// That should not have caused `ctx` to load the persistent root
+	UKObjectsEqual(S(), ctx.loadedPersistentRoots);
+	
+	// Check that we can load it explicitly
+	COPersistentRoot *persistentRoot = [ctx persistentRootForUUID: uuid];
+	UKNotNil(persistentRoot);
+	UKObjectsEqual(S(persistentRoot), ctx.loadedPersistentRoots);
+}
+
+
 @end
