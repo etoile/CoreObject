@@ -177,4 +177,40 @@
 	UKObjectsEqual(branch1_b, [backing itemGraphForRevid: 3]);
 }
 
+- (void) testFullSave
+{
+	NSArray *graphs = @[[self graphWithParent: @"parent0"],
+						[self graphWithParent: @"parent1" child: @"child1"],
+						[self graphWithParent: @"parent2" child: @"child2"],
+						[self graphWithParent: @"parent3"],
+						[self graphWithParent: @"parent4"], // full save
+						[self graphWithParent: @"parent5" child: @"child5"],
+						[self graphWithParent: @"parent6"],
+						[self graphWithParent: @"parent7" child: @"child7"],
+						[self graphWithParent: @"parent8" child: @"child8"], // full save
+						[self graphWithParent: @"parent9"],
+						];
+	
+	for (int i=0; i<graphs.count; i++)
+	{
+		[self commitWithGraph: graphs[i] parent: i-1];
+	}
+	
+	// check for delta commits and full saves
+	UKIntsEqual(0, [backing deltabaseForRowid: 0]); // full save
+	UKIntsEqual(0, [backing deltabaseForRowid: 1]);
+	UKIntsEqual(0, [backing deltabaseForRowid: 2]);
+	UKIntsEqual(0, [backing deltabaseForRowid: 3]);
+	UKIntsEqual(4, [backing deltabaseForRowid: 4]); // full save
+	UKIntsEqual(4, [backing deltabaseForRowid: 5]);
+	UKIntsEqual(4, [backing deltabaseForRowid: 6]);
+	UKIntsEqual(4, [backing deltabaseForRowid: 7]);
+	UKIntsEqual(8, [backing deltabaseForRowid: 8]); // full save
+	UKIntsEqual(8, [backing deltabaseForRowid: 9]);
+	
+	// check that the full saves don't have garbage in them.
+	UKNotNil([[backing itemGraphForRevid: 3] itemForUUID: childitemUUID]);
+	UKNil([[backing itemGraphForRevid: 4] itemForUUID: childitemUUID]);
+}
+
 @end

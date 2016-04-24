@@ -558,9 +558,12 @@ static NSData *Sha1Data(NSData *data)
         }
         else
         {
-            combinedGraph = anItemTree;
+            combinedGraph = [[COItemGraph alloc] initWithItemGraph: anItemTree];
         }
-        
+		
+		// GC before doing a full save so garbage isn't written to the snapshot
+		[combinedGraph removeUnreachableItems];
+		
         contentsBlob = contentsBLOBWithItemTree(combinedGraph);
         bytesInDeltaRun = [contentsBlob length];
     }
