@@ -191,7 +191,7 @@
 						[self graphWithParent: @"parent9"],
 						];
 	
-	for (int i=0; i<[graphs count]; i++)
+	for (int i=0; i<graphs.count; i++)
 	{
 		[self commitWithGraph: graphs[i] parent: i-1];
 	}
