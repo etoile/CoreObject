@@ -79,14 +79,15 @@ static void genericSetter(id self, SEL theCmd, id value)
     
     // Get the property name
     
-    char propname[sellen];
+    char propname[sellen + 1];
     if (isSetter)
     {
         SetterToProperty(selname, sellen, propname);
     }
     else
     {
-        strcpy(propname, selname);
+        strncpy(propname, selname, sellen + 1);
+		assert(propname[sellen] == '\0');
     }
     
     // Get the property

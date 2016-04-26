@@ -478,13 +478,14 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
 	size_t keyLength = strlen(key);
 	const char *prefix = "serialized";
 	size_t prefixLength = strlen(prefix);
-	char getter[prefixLength + keyLength];
+	char getter[prefixLength + keyLength + 1];
 	
-	memcpy(getter, prefix, prefixLength);
-	memcpy(getter + prefixLength, key, keyLength);
+	strncpy(getter, prefix, prefixLength);
+	strncpy(getter + prefixLength, key, keyLength + 1);
 	
 	getter[prefixLength] = toupper(key[0]);
-	getter[prefixLength + keyLength] = '\0';
+
+	assert(getter[prefixLength + keyLength] == '\0');
 	
 	SEL selector = sel_getUid(getter);
 
@@ -901,14 +902,15 @@ static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyD
 	size_t keyLength = strlen(key);
 	const char *prefix = "setSerialized";
 	size_t prefixLength = strlen(prefix);
-	char setter[prefixLength + keyLength + 1];
+	char setter[prefixLength + keyLength + 2];
 	
-	memcpy(setter, prefix, prefixLength);
-	memcpy(setter + prefixLength, key, keyLength);
+	strncpy(setter, prefix, prefixLength);
+	strncpy(setter + prefixLength, key, keyLength + 2);
 	
 	setter[prefixLength] = toupper(key[0]);
 	setter[prefixLength + keyLength] = ':';
-	setter[prefixLength + keyLength + 1] = '\0';
+
+	assert(setter[prefixLength + keyLength + 1] == '\0');
 
 	SEL selector = sel_getUid(setter);
 
