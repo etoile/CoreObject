@@ -112,6 +112,12 @@
     NSMutableSet *result = [NSMutableSet set];
     for (COCachedRelationship *entry in _cachedRelationships)
     {
+		/* When deallocating an object graph and replacing references to its
+		   inner objects with -[COPath brokenPath], some of them might be 
+		   already deallocated. */
+		if (entry->_sourceObject == nil)
+			continue;
+
 		// N.B.: Don't filter by !isSourceObjectTrackingSpecificBranch as the other methods do
 		[result addObject: entry->_sourceObject];
     }
