@@ -172,6 +172,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 {
 	@private
 	ETModelDescriptionRepository *_modelDescriptionRepository;
+	Class _migrationDriverClass;
 	COBranch *__weak _branch;
 	COPersistentRoot *__weak _persistentRoot;
 	ETUUID *_futureBranchUUID;
@@ -257,7 +258,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 @property (nonatomic, readonly) BOOL isObjectGraphContext;
 
 
-/** @taskunit Metamodel Access */
+/** @taskunit Metamodel Access and Migration Support */
 
 
 /**
@@ -265,7 +266,16 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * describes all the objects managed by the context.
  */
 @property (nonatomic, readonly) ETModelDescriptionRepository *modelDescriptionRepository;
-@property (nonatomic, readonly) int64_t schemaVersion;
+/**
+ * The migration driver used to migrate items to the latest package versions.
+ *
+ * By default, returns COSchemaMigrationDriver.
+ *
+ * You should usually use COSchemaMigration rather than writing your own custom 
+ * migration driver subclass.
+ */
+@property (nonatomic, strong) Class migrationDriverClass;
+
 
 /** @taskunit Related Persistency Management Objects */
 

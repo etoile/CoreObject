@@ -21,6 +21,7 @@
 /* Schema Migration */
 
 #import <CoreObject/COSchemaMigration.h>
+#import <CoreObject/COSchemaMigrationDriver.h>
 #import <CoreObject/COModelElementMove.h>
 
 /* Model */
