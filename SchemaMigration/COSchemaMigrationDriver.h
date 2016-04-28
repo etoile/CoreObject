@@ -10,8 +10,33 @@
 
 @class COItem;
 
+
+/**
+ * @group Schema Migration
+ * @abstract A migration driver is a schema update mechanism operating on the 
+ * "semi-serialized" representation of COObject instances.
+ *
+ * @section Conceptual Model
+ *
+ * The driver processes a collection of COItem (representing a a partial or 
+ * entire object graph) with -migrateItems: through multiple COSchemaMigration.
+ *
+ * @section Common Use Cases
+ *
+ * You should almost never need to use this class directly. COSchemaMigration 
+ * can be used to write most migration cases in a way that is easier and safer.
+ *
+ * In some edge cases, like changing item entities/properties accross packages
+ * without altering the metamodel, COSchemaMigrationDriver can be subclassed 
+ * to override -migrateItems:, then set as -[COEditingContext migrationDriverClass].
+ *
+ * For example, this makes possible to recover from item graph creation mistakes
+ * when the metamodel doesn't require changes (e.g. forgetting to subclass an 
+ * entity located in another package).
+ */
 @interface COSchemaMigrationDriver : NSObject
 {
+	@private
 	ETModelDescriptionRepository *_modelDescriptionRepository;
 	NSMutableDictionary *itemsToMigrate;
 }
