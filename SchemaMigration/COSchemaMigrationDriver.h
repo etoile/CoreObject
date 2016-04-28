@@ -20,16 +20,29 @@
 /** @taskunit Initialization */
 
 
+/** 
+ * <init />
+ * Initializes a driver to migrate items to the metamodel in the given model 
+ * description repository.
+ *
+ * For a nil repository, raises a NSInvalidArgumentException.
+ */
 - (instancetype)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
 
 
 /** @taskunit Triggering a Migration */
 
 
+/**
+ * Migrates the items to lastest package versions found in -modelDescriptionRepository.
+ *
+ * Can be overriden to implement a custom migration strategy.
+ */
 - (NSArray *)migrateItems: (NSArray *)storeItems;
 
 
 /** @taskunit Framework private */
+
 
 - (NSDictionary *) versionsByPackageNameForItem: (COItem *)item;
 

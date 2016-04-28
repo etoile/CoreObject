@@ -28,6 +28,12 @@
 	return self;
 }
 
+- (instancetype)init
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return nil;
+}
+
 #pragma mark Grouping Item by Packages -
 
 static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSString *key)

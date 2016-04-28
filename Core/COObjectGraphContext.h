@@ -213,7 +213,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 - (id)initWithBranch: (COBranch *)aBranch;
 /**
  * Initializes a transient object graph context using the given model
- * description repository.
+ * description repository and migration driver.
  *
  * To register your metamodel in the model description repository, see
  * -[COEditingContext initWithStore:modelDescriptionRepository:]. This 
@@ -222,8 +222,14 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * If you intend to pass the object graph to 
  * -[COEditingContext insertNewPersistentRootWithRootObject:], the repository 
  * must be the same than the one used by the editing context.
+ *
+ * For a nil model description repository, raises a NSInvalidArgumentException.
+ *
+ * For a migration driver class that is neither nil nor a subclass of 
+ * COSchemaMigrationDriver, raises a NSInvalidArgumentException.
  */
-- (id)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo;
+- (id)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
+                    migrationDriverClass: (Class)aDriverClass;
 /**
  * Returns a new transient object graph context using the main model description 
  * repository.
@@ -269,12 +275,9 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 /**
  * The migration driver used to migrate items to the latest package versions.
  *
- * By default, returns COSchemaMigrationDriver.
- *
- * You should usually use COSchemaMigration rather than writing your own custom 
- * migration driver subclass.
+ * For more details, see -[COEditingContext migrationDriverClass].
  */
-@property (nonatomic, strong) Class migrationDriverClass;
+@property (nonatomic, readonly) Class migrationDriverClass;
 
 
 /** @taskunit Related Persistency Management Objects */

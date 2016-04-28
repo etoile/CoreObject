@@ -70,7 +70,10 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (id)initWithBranch: (COBranch *)aBranch
      modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
+	       migrationDriverClass: (Class)aDriverClass
 {
+	INVALIDARG_EXCEPTION_TEST(aDriverClass, aDriverClass == Nil || [aDriverClass isSubclassOfClass: [COSchemaMigrationDriver class]]);
+
     SUPERINIT;
     _loadedObjects = [[NSMutableDictionary alloc] init];
 	_objectsByAdditionalItemUUIDs = [[NSMutableDictionary alloc] init];
@@ -88,24 +91,39 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	{
 		CORegisterCoreObjectMetamodel(aRepo);
 	}
-    _modelDescriptionRepository =  aRepo;
-	_migrationDriverClass = [COSchemaMigrationDriver class];
+    _modelDescriptionRepository = aRepo;
+	if (aDriverClass == Nil)
+	{
+		_migrationDriverClass = _persistentRoot.editingContext.migrationDriverClass;
+	}
+	else
+	{
+		_migrationDriverClass = aDriverClass;
+	}
+	
+	ETAssert(_modelDescriptionRepository != nil);
+	ETAssert(_migrationDriverClass != Nil);
+
     return self;
 }
 
 - (id)initWithBranch: (COBranch *)aBranch
 {
-    return [self initWithBranch: aBranch modelDescriptionRepository: nil];
+    return [self initWithBranch: aBranch modelDescriptionRepository: nil migrationDriverClass: Nil];
 }
 
 - (id)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
+                    migrationDriverClass: (Class)aDriverClass
 {
-    return [self initWithBranch: nil modelDescriptionRepository: aRepo];
+	NILARG_EXCEPTION_TEST(aRepo);
+	NILARG_EXCEPTION_TEST(aDriverClass);
+    return [self initWithBranch: nil modelDescriptionRepository: aRepo migrationDriverClass: aDriverClass];
 }
 
 - (id)init
 {
-    return [self initWithModelDescriptionRepository: [ETModelDescriptionRepository mainRepository]];
+    return [self initWithModelDescriptionRepository: [ETModelDescriptionRepository mainRepository]
+	                           migrationDriverClass: [COSchemaMigrationDriver class]];
 }
 
 + (COObjectGraphContext *)objectGraphContext
@@ -115,7 +133,8 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 + (COObjectGraphContext *)objectGraphContextWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
 {
-    return [[self alloc] initWithModelDescriptionRepository: aRepo];
+    return [[self alloc] initWithModelDescriptionRepository: aRepo
+	                                   migrationDriverClass: [COSchemaMigrationDriver class]];
 }
 
 - (void)dealloc
