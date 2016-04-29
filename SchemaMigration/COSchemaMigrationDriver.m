@@ -18,6 +18,8 @@
 
 @implementation COSchemaMigrationDriver
 
+@synthesize modelDescriptionRepository = _modelDescriptionRepository;
+
 #pragma mark Initialization -
 
 - (instancetype)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)repo

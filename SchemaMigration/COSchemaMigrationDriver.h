@@ -55,6 +55,16 @@
 - (instancetype)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
 
 
+/** @taskunit Metamodel Access */
+
+
+/**
+ * Returns the model description repository, that holds the metamodel to which
+ * items must be migrated to.
+ */
+@property (nonatomic, readonly) ETModelDescriptionRepository *modelDescriptionRepository;
+
+
 /** @taskunit Triggering a Migration */
 
 
