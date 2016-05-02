@@ -88,14 +88,6 @@ static NSMutableDictionary *dependencies;
 	return [migrations allValues];
 }
 
-#pragma mark - Triggering a Migration
-
-+ (NSArray *)migrateItems: (NSArray *)storeItems withModelDescriptionRepository: (ETModelDescriptionRepository *)repo
-{
-	return [[[COSchemaMigrationDriver alloc]
-		initWithModelDescriptionRepository: repo] migrateItems: storeItems];
-}
-
 #pragma mark Targeted Versions -
 
 - (int64_t)sourceVersion

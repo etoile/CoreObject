@@ -15,7 +15,7 @@
 #import "COObject+RelationshipCache.h"
 #import "COMetamodel.h"
 #import "COSerialization.h"
-#import "COSchemaMigration.h"
+#import "COSchemaMigrationDriver.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
 #import "COBranch+Private.h"
@@ -64,12 +64,16 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 @synthesize modelDescriptionRepository = _modelDescriptionRepository;
 @synthesize insertedObjectUUIDs = _insertedObjectUUIDs;
 @synthesize updatedObjectUUIDs = _updatedObjectUUIDs;
+@synthesize migrationDriverClass = _migrationDriverClass;
 
 #pragma mark Creation
 
 - (id)initWithBranch: (COBranch *)aBranch
      modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
+	       migrationDriverClass: (Class)aDriverClass
 {
+	INVALIDARG_EXCEPTION_TEST(aDriverClass, aDriverClass == Nil || [aDriverClass isSubclassOfClass: [COSchemaMigrationDriver class]]);
+
     SUPERINIT;
     _loadedObjects = [[NSMutableDictionary alloc] init];
 	_objectsByAdditionalItemUUIDs = [[NSMutableDictionary alloc] init];
@@ -87,23 +91,39 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	{
 		CORegisterCoreObjectMetamodel(aRepo);
 	}
-    _modelDescriptionRepository =  aRepo;
+    _modelDescriptionRepository = aRepo;
+	if (aDriverClass == Nil)
+	{
+		_migrationDriverClass = _persistentRoot.editingContext.migrationDriverClass;
+	}
+	else
+	{
+		_migrationDriverClass = aDriverClass;
+	}
+	
+	ETAssert(_modelDescriptionRepository != nil);
+	ETAssert(_migrationDriverClass != Nil);
+
     return self;
 }
 
 - (id)initWithBranch: (COBranch *)aBranch
 {
-    return [self initWithBranch: aBranch modelDescriptionRepository: nil];
+    return [self initWithBranch: aBranch modelDescriptionRepository: nil migrationDriverClass: Nil];
 }
 
 - (id)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
+                    migrationDriverClass: (Class)aDriverClass
 {
-    return [self initWithBranch: nil modelDescriptionRepository: aRepo];
+	NILARG_EXCEPTION_TEST(aRepo);
+	NILARG_EXCEPTION_TEST(aDriverClass);
+    return [self initWithBranch: nil modelDescriptionRepository: aRepo migrationDriverClass: aDriverClass];
 }
 
 - (id)init
 {
-    return [self initWithModelDescriptionRepository: [ETModelDescriptionRepository mainRepository]];
+    return [self initWithModelDescriptionRepository: [ETModelDescriptionRepository mainRepository]
+	                           migrationDriverClass: [COSchemaMigrationDriver class]];
 }
 
 + (COObjectGraphContext *)objectGraphContext
@@ -113,7 +133,8 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 + (COObjectGraphContext *)objectGraphContextWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
 {
-    return [[self alloc] initWithModelDescriptionRepository: aRepo];
+    return [[self alloc] initWithModelDescriptionRepository: aRepo
+	                                   migrationDriverClass: [COSchemaMigrationDriver class]];
 }
 
 - (void)dealloc
@@ -145,12 +166,6 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 - (BOOL)isObjectGraphContext
 {
 	return YES;
-}
-
-- (int64_t)schemaVersion
-{
-	COObject *rootObject = self.rootObject;
-	return (rootObject == nil ? 0 : (int64_t)rootObject.entityDescription.owner.version);
 }
 
 #pragma mark -
@@ -494,8 +509,9 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	// We could also change -[COObjectGraphContext itemForUUID:] to search
 	// itemGraph during the loading rather than the loaded objects (but that's
 	// roughly the same than we do currently).
-	NSArray *migratedItems = [COSchemaMigration migrateItems: itemGraph.items
-	                          withModelDescriptionRepository: self.modelDescriptionRepository];
+	COSchemaMigrationDriver *migrationDriver = [[self.migrationDriverClass alloc]
+		initWithModelDescriptionRepository: self.modelDescriptionRepository];
+	NSArray *migratedItems = [migrationDriver migrateItems: itemGraph.items];
 	_loadingItemGraph = [[COItemGraph alloc] initWithItems: migratedItems
 	                                          rootItemUUID: itemGraph.rootItemUUID];
 	// TODO: Decide how we update the change tracking in regard to additional items.

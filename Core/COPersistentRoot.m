@@ -109,7 +109,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	else
 	{
 		_currentBranchObjectGraph = [[COObjectGraphContext alloc]
-			initWithModelDescriptionRepository: aCtxt.modelDescriptionRepository];
+			initWithModelDescriptionRepository: aCtxt.modelDescriptionRepository
+			              migrationDriverClass: aCtxt.migrationDriverClass];
 	}
 	[_currentBranchObjectGraph setPersistentRoot: self];
 	
@@ -896,7 +897,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 - (COObjectGraphContext *)objectGraphContextForPreviewingRevision: (CORevision *)aRevision
 {
     COObjectGraphContext *ctx = [[COObjectGraphContext alloc]
-		initWithModelDescriptionRepository: [[self editingContext] modelDescriptionRepository]];
+		initWithModelDescriptionRepository: self.editingContext.modelDescriptionRepository
+		              migrationDriverClass: self.editingContext.migrationDriverClass];
     id <COItemGraph> items = [[self store] itemGraphForRevisionUUID: [aRevision UUID]
 	                                                 persistentRoot: _UUID];
 

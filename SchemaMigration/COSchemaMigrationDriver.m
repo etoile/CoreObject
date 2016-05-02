@@ -18,6 +18,8 @@
 
 @implementation COSchemaMigrationDriver
 
+@synthesize modelDescriptionRepository = _modelDescriptionRepository;
+
 #pragma mark Initialization -
 
 - (instancetype)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)repo
@@ -26,6 +28,12 @@
 	SUPERINIT;
 	_modelDescriptionRepository = repo;
 	return self;
+}
+
+- (instancetype)init
+{
+	[self doesNotRecognizeSelector: _cmd];
+	return nil;
 }
 
 #pragma mark Grouping Item by Packages -
