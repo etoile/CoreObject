@@ -508,6 +508,21 @@
 	UKRaisesException([arrayCopy addObject: @"a"]);
 }
 
+- (void)testFastEnumeration
+{
+	NSMutableArray *enumeratedObjects = [NSMutableArray new];
+
+	[array addReference: dead1];
+	[array addReference: alive1];
+	
+	for (NSString *alive in array)
+	{
+		[enumeratedObjects addObject: alive];
+	}
+	
+	UKObjectsEqual(@[alive1], enumeratedObjects);
+}
+
 @end
 
 #pragma mark - TestMutableSet
@@ -728,6 +743,21 @@
 	
 	UKFalse(setCopy.isMutable);
 	UKRaisesException([setCopy addObject: @"a"]);
+}
+
+- (void)testFastEnumeration
+{
+	NSMutableSet *enumeratedObjects = [NSMutableSet new];
+
+	[set addReference: dead1];
+	[set addReference: alive1];
+	
+	for (NSString *alive in set)
+	{
+		[enumeratedObjects addObject: alive];
+	}
+	
+	UKObjectsEqual(S(alive1), enumeratedObjects);
 }
 
 @end

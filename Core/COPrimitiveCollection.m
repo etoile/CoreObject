@@ -615,14 +615,6 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	return [_deadReferences member: anObject] == nil ? [_backing member: anObject] : nil;
 }
 
-- (NSUInteger)countByEnumeratingWithState: (NSFastEnumerationState *)state 
-                                  objects: (__unsafe_unretained id[])stackbuf 
-                                    count: (NSUInteger)len
-{
-	// TODO: Don't recreate aliveObjects on every invocation
-	return [[self aliveObjects] countByEnumeratingWithState: state objects: stackbuf count: len];
-}
-
 - (NSEnumerator *)objectEnumerator
 {
 	return [[self aliveObjects] objectEnumerator];
