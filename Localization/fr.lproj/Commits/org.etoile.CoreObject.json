@@ -1,0 +1,63 @@
+{
+    "types":
+	{
+		"history": "Manipulation de l'historique",
+	},
+
+	"descriptors":
+	{
+		"selective-undo":
+		{
+			"type": "history",
+			"shortDescription": "Annuler sélectivement'%@'"
+		},
+
+		"selective-redo":
+		{
+			"type": "history",
+			"shortDescription": "Rétablir sélectivement '%@'"
+		},
+		
+		"undo":
+		{
+			"type": "history",
+			"shortDescription": "Annuler '%@'"
+		},
+		
+		"redo":
+		{
+			"type": "history",
+			"shortDescription": "Rétablir '%@'"
+		},
+		
+		"step-backward":
+		{
+			"type": "history",
+			"shortDescription": "Avancer"
+		},
+		
+		"step-forward":
+		{
+			"type": "history",
+			"shortDescription": "Reculer"
+		},
+		
+		"revert":
+		{
+			"type": "history",
+			"shortDescription": "Revenir à la dernière marque"
+		},
+		
+		"checkpoint":
+		{
+			"type": "history",
+			"shortDescription": "Marquer"
+		},
+		
+		"merge":
+		{
+			"type": "history",
+			"shortDescription": "Fusionner les changements de '%@'"
+		}
+	}
+}
