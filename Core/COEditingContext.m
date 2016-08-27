@@ -948,6 +948,9 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 		else if (![deletedPersistentRootUUIDs containsObject: persistentRootUUID])
 		{
 			// The persistent root is not loaded, but it changed in the store.
+			// This occurs when the store is updated directly, usually on another
+			// app commit, synchronization or history navigation with COUndoTrack.
+			//
 			// Clear out any stored transaction ID.
 			[_lastTransactionIDForPersistentRootUUID removeObjectForKey: persistentRootUUID];
 		}
