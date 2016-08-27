@@ -160,7 +160,7 @@
 		609CB4D01A5E9384003E8052 /* COTopologicalSort.h in Headers */ = {isa = PBXBuildFile; fileRef = 609CB4CD1A5E9384003E8052 /* COTopologicalSort.h */; };
 		609CB4D11A5E9384003E8052 /* COTopologicalSort.m in Sources */ = {isa = PBXBuildFile; fileRef = 609CB4CE1A5E9384003E8052 /* COTopologicalSort.m */; };
 		609CB4D21A5E9384003E8052 /* COTopologicalSort.m in Sources */ = {isa = PBXBuildFile; fileRef = 609CB4CE1A5E9384003E8052 /* COTopologicalSort.m */; };
-		60AA7EB11A641FCD00897498 /* COSchemaMigrationDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 60FA55DE1A447A8600A2D8A7 /* COSchemaMigrationDriver.h */; };
+		60AA7EB11A641FCD00897498 /* COSchemaMigrationDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 60FA55DE1A447A8600A2D8A7 /* COSchemaMigrationDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60AA7EBC1A641FDE00897498 /* COSchemaMigrationDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 60FA55DF1A447A8600A2D8A7 /* COSchemaMigrationDriver.m */; };
 		60AD2F521B0A5BB000A9F473 /* TestPrimitiveCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 60AD2F511B0A5BB000A9F473 /* TestPrimitiveCollection.m */; };
 		60AD2F531B0A5BB000A9F473 /* TestPrimitiveCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 60AD2F511B0A5BB000A9F473 /* TestPrimitiveCollection.m */; };
@@ -508,7 +508,7 @@
 		60F91F39197D32F2009F47D7 /* 1a.json in Resources */ = {isa = PBXBuildFile; fileRef = 664E075C18C9592700CBFF74 /* 1a.json */; };
 		60F91F3A197D32F2009F47D7 /* 1b.json in Resources */ = {isa = PBXBuildFile; fileRef = 664E075D18C9592700CBFF74 /* 1b.json */; };
 		60F91F3B197D32FF009F47D7 /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 669A728D1885C43B00E98795 /* Commits */; };
-		60FA55E01A447A8600A2D8A7 /* COSchemaMigrationDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 60FA55DE1A447A8600A2D8A7 /* COSchemaMigrationDriver.h */; };
+		60FA55E01A447A8600A2D8A7 /* COSchemaMigrationDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 60FA55DE1A447A8600A2D8A7 /* COSchemaMigrationDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60FA55E11A447A8600A2D8A7 /* COSchemaMigrationDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 60FA55DF1A447A8600A2D8A7 /* COSchemaMigrationDriver.m */; };
 		60FB09D313C3079000C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
 		660179C8182AFA4B006E7D7B /* COSynchronizerRevision.h in Headers */ = {isa = PBXBuildFile; fileRef = 660179C6182AFA4B006E7D7B /* COSynchronizerRevision.h */; settings = {ATTRIBUTES = (Public, ); }; };

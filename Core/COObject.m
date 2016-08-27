@@ -817,7 +817,7 @@ See +[NSObject typePrefix]. */
 	size_t keyLength = strlen(key);
 	const char *prefix = "validate";
 	size_t prefixLength = strlen(prefix);
-	char validator[prefixLength + keyLength + 1];
+	char validator[prefixLength + keyLength + 2];
 	
 	memcpy(validator, prefix, prefixLength);
 	memcpy(validator + prefixLength, key, keyLength);
@@ -825,6 +825,7 @@ See +[NSObject typePrefix]. */
 	validator[prefixLength] = toupper(key[0]);
 	validator[prefixLength + keyLength] = ':';
 	validator[prefixLength + keyLength + 1] = '\0';
+	assert(validator[prefixLength + keyLength + 1] == '\0');
 
 	SEL keySelector = sel_getUid(validator);
 

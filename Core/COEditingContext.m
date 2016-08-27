@@ -32,6 +32,7 @@
 @implementation COEditingContext
 
 @synthesize store = _store, modelDescriptionRepository = _modelDescriptionRepository;
+@synthesize migrationDriverClass = _migrationDriverClass;
 @synthesize unloadingBehavior = _unloadingBehavior;
 @synthesize persistentRootsPendingDeletion = _persistentRootsPendingDeletion;
 @synthesize persistentRootsPendingUndeletion = _persistentRootsPendingUndeletion;
@@ -48,17 +49,21 @@
 
 - (instancetype)initWithStore: (COSQLiteStore *)store
    modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
+         migrationDriverClass: (Class)aDriverClass
                undoTrackStore: (COUndoTrackStore *)anUndoTrackStore
 {
 	NILARG_EXCEPTION_TEST(store);
 	NILARG_EXCEPTION_TEST(aRepo);
-	NILARG_EXCEPTION_TEST(anUndoTrackStore);
 	INVALIDARG_EXCEPTION_TEST(aRepo, [aRepo entityDescriptionForClass: [COObject class]] != nil);
+	INVALIDARG_EXCEPTION_TEST(aDriverClass, [aDriverClass isSubclassOfClass: [COSchemaMigrationDriver class]]);
+	NILARG_EXCEPTION_TEST(anUndoTrackStore);
+
 
 	SUPERINIT;
 
 	_store =  store;
 	_modelDescriptionRepository = aRepo;
+	_migrationDriverClass = aDriverClass;
 	_loadedPersistentRoots = [NSMutableDictionary new];
 	_unloadingBehavior = COEditingContextUnloadingBehaviorOnDeletion;
 	_persistentRootsPendingDeletion = [NSMutableSet new];
@@ -67,7 +72,9 @@
 	_undoTrackStore = anUndoTrackStore;
     _isRecordingUndo = YES;
 	_revisionCache = [[CORevisionCache alloc] initWithParentEditingContext: self];
-	_internalTransientObjectGraphContext = [[COObjectGraphContext alloc] initWithModelDescriptionRepository: aRepo];
+	_internalTransientObjectGraphContext = [[COObjectGraphContext alloc]
+		initWithModelDescriptionRepository: aRepo
+		              migrationDriverClass: aDriverClass];
 	_lastTransactionIDForPersistentRootUUID = [NSMutableDictionary new];
 	CORegisterCoreObjectMetamodel(_modelDescriptionRepository);
 
@@ -90,6 +97,7 @@
 {
 	return [self initWithStore: store
 	modelDescriptionRepository: aRepo
+	      migrationDriverClass: [COSchemaMigrationDriver class]
 	            undoTrackStore: [COUndoTrackStore defaultStore]];
 }
 

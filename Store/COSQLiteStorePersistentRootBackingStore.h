@@ -102,6 +102,8 @@
 
 - (void) clearBackingStore;
 
+- (int64_t) deltabaseForRowid: (int64_t)aRowid;
+
 @end
 
 NSData *contentsBLOBWithItemTree(id<COItemGraph> itemGraph);

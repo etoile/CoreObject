@@ -62,6 +62,14 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	_temporaryMutable--;
 	if (_temporaryMutable < 0)
 	{
+		/*
+		 * Currently, we need to "eat" extra -endTemporaryModification calls because
+		 * during deserialization, we create a new COPrimitiveCollection, add it to the
+		 * variable storage, and then -didChangeValueForProperty: will make a
+		 * -endTemporaryModification call. Since the collection was created after the
+		 * -willChangeValueForProperty:, it didn't get the matching
+		 * beginTemporaryModification call.
+		 */
 		_temporaryMutable = 0;
 	}
 }
@@ -605,14 +613,6 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 - (id)member: (id)anObject
 {
 	return [_deadReferences member: anObject] == nil ? [_backing member: anObject] : nil;
-}
-
-- (NSUInteger)countByEnumeratingWithState: (NSFastEnumerationState *)state 
-                                  objects: (__unsafe_unretained id[])stackbuf 
-                                    count: (NSUInteger)len
-{
-	// TODO: Don't recreate aliveObjects on every invocation
-	return [[self aliveObjects] countByEnumeratingWithState: state objects: stackbuf count: len];
 }
 
 - (NSEnumerator *)objectEnumerator

@@ -338,13 +338,6 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
 + (NSArray *)migrations;
 
 
-/** @taskunit Migrating to Future Versions */
-
-
-+ (NSArray *)migrateItems: (NSArray *)storeItems
-withModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
-
-
 /** @taskunit Targeted Versions */
 
 

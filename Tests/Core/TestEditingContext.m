@@ -78,7 +78,7 @@
 	[newRepo setEntityDescription: rootEntity forClass: [COObject class]];
 
 	COObjectGraphContext *objectGraph =
-		[[COObjectGraphContext alloc] initWithModelDescriptionRepository: newRepo];
+		[COObjectGraphContext objectGraphContextWithModelDescriptionRepository: newRepo];
 	COObject *rootObject = [[COObject alloc] initWithObjectGraphContext: objectGraph];
 
 	UKObjectsNotEqual(newRepo, [ctx modelDescriptionRepository]);
@@ -272,6 +272,7 @@
 	                               modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]]);
 	UKRaisesException([[COEditingContext alloc] initWithStore: nil
 	                               modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]
+	                                     migrationDriverClass: [COSchemaMigrationDriver class]
 	                                           undoTrackStore: [COUndoTrackStore defaultStore]]);
 	UKRaisesException([[COEditingContext alloc] init]);
 }
@@ -281,6 +282,7 @@
 	// Will retain the store as argument but not release it due to the exception
 	UKRaisesException([[COEditingContext alloc] initWithStore: store
 	                               modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]
+	                                     migrationDriverClass: [COSchemaMigrationDriver class]
 	                                           undoTrackStore: nil]);
 }
 

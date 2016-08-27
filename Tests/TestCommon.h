@@ -81,6 +81,10 @@
 
 #define SA(x) [NSSet setWithArray: x]
 
+// Replace S macro with a stricter UNIQUESET that requires all arguments to be unique
+#undef S
+#define S(...) UNIQUESET(__VA_ARGS__)
+
 extern NSString * const kCOLabel;
 extern NSString * const kCOContents;
 extern NSString * const kCOParent;
