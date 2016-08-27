@@ -67,7 +67,7 @@
 
 	if (referringObjects.count == 0)
 	{
-		_pathToReferringObjects[path] = nil;
+		[_pathToReferringObjects removeObjectForKey: path];
 	}
 }
 
