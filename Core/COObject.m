@@ -1953,7 +1953,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
  */
 - (void) replaceReferencesToObjectIdenticalTo: (COObject *)anObject withObject: (COObject *)aReplacement
 {
-	ETAssert((anObject == nil || aReplacement == nil) || (anObject != nil && aReplacement != nil));
+	ETAssert(!(anObject == nil && aReplacement == nil));
 	id object = anObject;
 	id replacement = aReplacement;
 	BOOL isUndeletion = (anObject == nil);
