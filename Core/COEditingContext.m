@@ -915,7 +915,6 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 			}
 			
 			int64_t notifTransaction = [notifTransactionObj longLongValue];
-			BOOL wasDeleted = loaded.isDeleted;
 
 			/* When we have committed the changes explicitly, we send
 			   COPersistentRootDidChangeNotification later with 
