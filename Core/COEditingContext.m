@@ -438,7 +438,7 @@
 	}
 
 	/* Fix references pointing to any branch that belong to the deleted
-	 persistent root (the relationship target) */
+	   persistent root (the relationship target) */
 	NSSet *targetObjectGraphs = nil;
 	
 	if (aBranch != nil)
@@ -452,13 +452,12 @@
 	
 	for (COObjectGraphContext *target in targetObjectGraphs)
 	{
-		/* When we are not deleting a persistent root or branch explicitly,
-		 but reloading persistent roots, we must take in account that
-		 branches can become deleted when their persistent root doesn't
-		 (isDeletion is NO) */
+		/* When we are not deleting a persistent root or branch explicitly, but 
+		   reloading persistent roots, we must take in account that branches can 
+		   become deleted when their persistent root doesn't (isDeletion is NO) */
 		BOOL isTargetDeletion = isDeletion || target.branch.deleted;
 		/* Fix references in all branches that belong to persistent roots
-		 referencing the deleted persistent root (those are relationship sources) */
+		   referencing the deleted persistent root (those are relationship sources) */
 		NSMutableSet *sourceObjectGraphs = [NSMutableSet new];
 		
 		// Quickly lookup the COObjects that have currently dead references that
@@ -472,7 +471,8 @@
 		}
 		else
 		{
-			targetPath = [COPath pathWithPersistentRoot: target.persistentRoot.UUID branch: target.branch.UUID];
+			targetPath = [COPath pathWithPersistentRoot: target.persistentRoot.UUID
+			                                     branch: target.branch.UUID];
 		}
 		
 		NSHashTable *referrersWithDeadReferences = [_deadRelationshipCache referringObjectsForPath: targetPath];
