@@ -171,6 +171,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
 	BOOL _inCommit;
 	COObjectGraphContext *_internalTransientObjectGraphContext;
 	NSMutableDictionary *_lastTransactionIDForPersistentRootUUID;
+	BOOL _hasLoadedPersistentRootUUIDs;
 }
 
 
@@ -306,6 +307,11 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  * but the loading is restricted to the requested persistent root.
  */
 - (COPersistentRoot *)persistentRootForUUID: (ETUUID *)aUUID;
+/**
+ * Same as -persistentRootForUUID: but doesn't cause loading.
+ */
+- (COPersistentRoot *)loadedPersistentRootForUUID: (ETUUID *)aUUID;
+
 /**
  * Returns a new persistent root that uses the given root object.
  *

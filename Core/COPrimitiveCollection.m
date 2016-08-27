@@ -636,6 +636,11 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	[_backing removeObject: anObject];
 }
 
+- (NSArray *)deadReferencesArray
+{
+	return [_deadReferences allObjects];
+}
+
 @end
 
 

@@ -539,7 +539,23 @@ See +[NSObject typePrefix]. */
 	return NSSelectorFromString(setterName);
 }
 
-- (id) valueForProperty: (NSString *)key
+- (void) disableLoading
+{
+	_skipLoading++;
+}
+
+- (void) enableLoading
+{
+	_skipLoading--;
+	ETAssert(_skipLoading >= 0);
+}
+
+- (BOOL) isLoadingEnabled
+{
+	return _skipLoading == 0;
+}
+
+- (id) valueForProperty: (NSString *)key shouldLoad: (BOOL)shouldLoad
 {
 	if (![[self propertyNames] containsObject: key])
 	{
@@ -553,14 +569,31 @@ See +[NSObject typePrefix]. */
 	if ([self respondsToSelector: [self getterForKey: key useIsPrefix: NO]]
 	 || [self respondsToSelector: [self getterForKey: key useIsPrefix: YES]])
 	{
+		if (!shouldLoad)
+		{
+			[self disableLoading];
+		}
+		
 		// NOTE: Don't use -performSelector:withObject: because it doesn't
 		// support unboxing scalar values as Key-Value Coding does.
-		return [self valueForKey: key];
+		id result = [self valueForKey: key];
+		
+		if (!shouldLoad)
+		{
+			[self enableLoading];
+		}
+		
+		return result;
 	}
 
 	/* Otherwise access ivar or variable storage */
 
-	return [self valueForStorageKey: key];
+	return [self valueForStorageKey: key shouldLoad: shouldLoad];
+}
+
+- (id) valueForProperty: (NSString *)key
+{
+	return [self valueForProperty: key shouldLoad: YES];
 }
 
 - (BOOL)isCoreObjectValue: (id)value
@@ -747,13 +780,14 @@ See +[NSObject typePrefix]. */
 - (NSArray *)validateAllValues
 {
 	NSMutableArray *results = [NSMutableArray array];
-
+	
 	// TODO: We might want to coalesce bidirectional relationships validation results
 	for (NSString *key in [self persistentPropertyNames])
 	{
-		[results addObjectsFromArray: [self validateValue: [self valueForProperty: key] 
+		[results addObjectsFromArray: [self validateValue: [self valueForProperty: key shouldLoad: NO]
 		                                      forProperty: key]];
 	}
+	
 	return results;
 }
 
@@ -878,7 +912,7 @@ See +[NSObject typePrefix]. */
  * variable storage. This allows -valueForStorageKey: and -valueForProperty: to 
  * both return incoming relationships.
  */
-- (id)valueForVariableStorageKey: (NSString *)key notFoundMarker: (id)aNotFoundMarker
+- (id)valueForVariableStorageKey: (NSString *)key notFoundMarker: (id)aNotFoundMarker shouldLoad: (BOOL)shouldLoad
 {
 	// NOTE: This is just a debugging aid, and the check is only placed
 	// here because -valueForVariableStorageKey: is a commonly called method.
@@ -902,6 +936,12 @@ See +[NSObject typePrefix]. */
 
 	id value = [_variableStorage objectForKey: key];
 	
+	// If the value is a collection, try to load all of the cross persistent root references
+	if ([self isLoadingEnabled] && shouldLoad && [self isCoreObjectCollection: value])
+	{
+		[self replaceReferencesWithLoadedObjectsForKey: key collection: value];
+	}
+	
 	// Convert value stored in variable storage to a form we can return to the user
 	if (value == nil)
 	{
@@ -917,6 +957,10 @@ See +[NSObject typePrefix]. */
 	}
 	else if ([value isKindOfClass: [COPath class]])
 	{
+		if ([self isLoadingEnabled] && shouldLoad)
+		{
+			return [self.editingContext crossPersistentRootReferenceWithPath: value shouldLoad: YES];
+		}
 		return nil;
 	}
 	
@@ -925,7 +969,7 @@ See +[NSObject typePrefix]. */
 
 - (id)valueForVariableStorageKey: (NSString *)key
 {
-	return [self valueForVariableStorageKey: key notFoundMarker: nil];
+	return [self valueForVariableStorageKey: key notFoundMarker: nil shouldLoad: YES];
 }
 
 - (BOOL)isCoreObjectCollection: (id)aCollection
@@ -1062,15 +1106,20 @@ See +[NSObject typePrefix]. */
 	[self didChangeValueForProperty: key];
 }
 
-- (id)valueForStorageKey: (NSString *)key
+- (id)valueForStorageKey: (NSString *)key shouldLoad: (BOOL)shouldLoad
 {
-	id value = [self valueForVariableStorageKey: key notFoundMarker: notFoundMarker];
+	id value = [self valueForVariableStorageKey: key notFoundMarker: notFoundMarker shouldLoad: shouldLoad];
 
 	if (value == notFoundMarker)
 	{
 		ETGetInstanceVariableValueForKey(self, &value, key);
 	}
 	return (value == notFoundMarker ? nil : value);
+}
+
+- (id)valueForStorageKey: (NSString *)key
+{
+	return [self valueForStorageKey: key shouldLoad: YES];
 }
 
 - (id)serializableValueForStorageKey: (NSString *)key
@@ -1422,7 +1471,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 	
 	// FIXME: EtoileUI handles removing the object from its old parent.
 	// In that case, don't try to do it ourselves.
-	id <ETCollection> oldParentChildren = [oldParent valueForStorageKey: key];
+	id <ETCollection> oldParentChildren = [oldParent valueForStorageKey: key shouldLoad: NO];
 	BOOL alreadyRemoved = (![oldParentChildren containsObject: child]);
 	
 	if (alreadyRemoved)
@@ -1732,9 +1781,9 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 			continue;
 
 		Class class = [self collectionClassForPropertyDescription: propDesc];
-		/* For performance reasons, we use -valueForVariableStorageKey: and 
+		/* For performance reasons, we use -valueForVariableStorageKey: and
 		   -valueForKey: rather than just -valueForProperty: */
-		id collection = [self valueForVariableStorageKey: propDesc.name];
+		id collection = [self valueForVariableStorageKey: propDesc.name notFoundMarker: nil shouldLoad: NO];
 		
 		if (collection == nil)
 		{
@@ -1904,7 +1953,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
  */
 - (void) replaceReferencesToObjectIdenticalTo: (COObject *)anObject withObject: (COObject *)aReplacement
 {
-	ETAssert((anObject == nil || aReplacement == nil) || (anObject != nil && aReplacement != nil));
+	ETAssert(!(anObject == nil && aReplacement == nil));
 	id object = anObject;
 	id replacement = aReplacement;
 	BOOL isUndeletion = (anObject == nil);
@@ -2000,6 +2049,90 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 
 		// FIXME: COMutableDictionary
 	}
+}
+
+/**
+ * Used for lazy loading.
+ * TODO: Combine with -replaceReferencesToObjectIdenticalTo: ?
+ */
+- (void) replaceReferencesWithLoadedObjectsForKey: (NSString *)key
+									   collection: (id)value
+{
+	BOOL updated = NO;
+	
+	self.objectGraphContext.ignoresChangeTrackingNotifications = YES;
+	
+	if ([value isKindOfClass: [COMutableArray class]])
+	{
+		COMutableArray *array = value;
+		if (array.count == array.backing.count)
+		{
+			// All references are unfaulted
+			self.objectGraphContext.ignoresChangeTrackingNotifications = NO;
+			return;
+		}
+		
+		[array beginMutation];
+		const NSUInteger count = array.backing.count;
+		for (NSUInteger i = 0; i < count; i++)
+		{
+			id pathOrCOObject = [array referenceAtIndex: i];
+			if ([pathOrCOObject isKindOfClass: [COPath class]])
+			{
+				COObject *target = [self.editingContext crossPersistentRootReferenceWithPath: pathOrCOObject shouldLoad: YES];
+				if (target != nil)
+				{
+					if (!updated)
+					{
+						[self willChangeValueForProperty: key];
+						updated = YES;
+					}
+					[array replaceReferenceAtIndex: i withReference: target];
+					// Make sure it wasn't wrongly rejected as a duplicate, etc.
+					ETAssert([array referenceAtIndex: i] == target);
+				}
+			}
+		}
+		[array endMutation];
+	}
+	else if ([value isKindOfClass: [COMutableSet class]])
+	{
+		COMutableSet *set = value;
+	
+		if (set.deadReferencesArray.count == 0)
+		{
+			self.objectGraphContext.ignoresChangeTrackingNotifications = NO;
+			return;
+		}
+		
+		[set beginMutation];
+		for (COPath *ref in set.deadReferencesArray)
+		{
+			COObject *target = [self.editingContext crossPersistentRootReferenceWithPath: ref shouldLoad: YES];
+			if (target != nil)
+			{
+				if (!updated)
+				{
+					[self willChangeValueForProperty: key];
+					updated = YES;
+				}
+				[set removeReference: ref];
+				[set addReference: target];
+				ETAssert([set containsReference: target]);
+			}
+		}
+		[set endMutation];
+	}
+	
+	if (updated)
+	{
+		// Will update the dead relationship cache
+		[self didChangeValueForProperty: key];
+	}
+	
+	self.objectGraphContext.ignoresChangeTrackingNotifications = NO;
+	// FIXME: COMutableDictionary
+
 }
 
 #pragma mark - Debugging / Testing

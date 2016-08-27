@@ -664,7 +664,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 	else /* COPath */
 	{
 		NSParameterAssert(COTypePrimitivePart(type) == kCOTypeReference);
-		object = [[[self persistentRoot] parentContext] crossPersistentRootReferenceWithPath: (COPath *)value];
+		object = [[[self persistentRoot] parentContext] crossPersistentRootReferenceWithPath: (COPath *)value shouldLoad: NO];
 		/* object may be nil for dead reference */
 	}
 

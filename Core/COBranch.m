@@ -145,7 +145,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 {
 	if (_objectGraph == nil)
 	{
-		NSLog(@"%@: unfaulting object graph context", self);
+		//NSLog(@"%@: unfaulting object graph context", self);
 		
 		_objectGraph = [[COObjectGraphContext alloc] initWithBranch: self];
 		
@@ -163,6 +163,11 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 			[_objectGraph setItemGraph: self.persistentRoot.objectGraphContext];
 		}
 		ETAssert(![_objectGraph hasChanges]);
+		
+		// Lazy loading support
+		[self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: self.persistentRoot
+																		  branch: self
+																	   isDeleted: self.deleted || self.persistentRoot.deleted];
 	}
 	return _objectGraph;
 }
@@ -247,6 +252,21 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     _metadataChanged = YES;
 }
 
+- (BOOL)isDeletedInStore
+{
+	if ([self isBranchUncommitted])
+	{
+		return NO;
+	}
+	
+	COBranchInfo *info = [self branchInfo];
+	if (info == nil)
+	{
+		return YES;
+	}
+	return info.isDeleted;
+}
+
 - (BOOL)isDeleted
 {
     if ([[_persistentRoot branchesPendingUndeletion] containsObject: self])
@@ -255,7 +275,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     if ([[_persistentRoot branchesPendingDeletion] containsObject: self])
         return YES;
     
-    return [[self branchInfo] isDeleted];
+    return [self isDeletedInStore];
 }
 
 - (void) setDeleted:(BOOL)deleted
@@ -401,7 +421,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 - (BOOL)hasChanges
 {
-    if ([self isDeleted] != [[self branchInfo] isDeleted])
+    if ([self isDeleted] != [self isDeletedInStore])
     {
         return YES;
     }
@@ -444,9 +464,9 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 			                            persistentRootUUID: [[self persistentRoot] UUID]]];
     }
 	
-    if ([self isDeleted] != [[self branchInfo] isDeleted])
+    if ([self isDeleted] != [self isDeletedInStore])
     {
-        [self setDeleted: [[self branchInfo] isDeleted]];
+        [self setDeleted: [self isDeletedInStore]];
     }
     
     self.shouldMakeEmptyCommit = NO;
@@ -576,7 +596,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 - (void)saveCommitWithMetadata: (NSDictionary *)metadata transaction: (COStoreTransaction *)txn
 {
 	if ([self hasChangesOtherThanDeletionOrUndeletion]
-		&& [[self branchInfo] isDeleted]
+		&& [self isDeletedInStore]
 		&& self.isDeleted)
 	{
 		[NSException raise: NSGenericException
@@ -711,7 +731,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
     // Write branch undeletion
     
-    if (![self isDeleted] && [[self branchInfo] isDeleted])
+    if (![self isDeleted] && [self isDeletedInStore])
     {
         [txn undeleteBranch: _UUID
 		   ofPersistentRoot: [[self persistentRoot] UUID]];
@@ -722,7 +742,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 - (void)saveDeletionWithTransaction: (COStoreTransaction *)txn
 {
-    if ([self isDeleted] && ![[self branchInfo] isDeleted])
+    if ([self isDeleted] && ![self isDeletedInStore])
     {
         [txn deleteBranch: _UUID ofPersistentRoot: [[self persistentRoot] UUID]];
         [[self editingContext] recordBranchDeletion: self];

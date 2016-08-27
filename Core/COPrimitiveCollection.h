@@ -39,6 +39,9 @@
 - (void)addReference: (id)aReference;
 - (void)removeReference: (id)aReference;
 - (BOOL)containsReference: (id)aReference;
+
+- (NSArray *)deadReferencesArray;
+
 @end
 
 @interface COMutableSet (TestPrimitiveCollection)

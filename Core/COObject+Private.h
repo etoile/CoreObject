@@ -72,6 +72,10 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
+- (id)valueForStorageKey: (NSString *)key shouldLoad: (BOOL)shouldLoad;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
 - (id)serializableValueForStorageKey: (NSString *)key;
 /**
  * This method is only exposed to be used internally by CoreObject.
@@ -128,5 +132,8 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
  * This method is only exposed to be used internally by CoreObject.
  */
 - (void) replaceReferencesToObjectIdenticalTo: (COObject *)anObject withObject: (COObject *)aReplacement;
-
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
+- (id) valueForProperty: (NSString *)key shouldLoad: (BOOL)shouldLoad;
 @end

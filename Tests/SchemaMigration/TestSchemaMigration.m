@@ -251,7 +251,11 @@
 	[ctx commit];
 	// Will retain the current context store and never release it due to the exception
 	// (the store is retained when passed in argument to COEditingContext initializer)
-	UKRaisesException([self prepareNewMigrationContextForDestinationVersion: 1]);
+	UKRaisesException({
+		[self prepareNewMigrationContextForDestinationVersion: 1];
+		// Trigger persistent root loading
+		COTag *testTag = [[migrationCtx persistentRootForUUID: tag.persistentRoot.UUID] rootObject];
+	});
 }
 
 - (id)registerLabelUpdateMigrationWithVersion: (int64_t)version

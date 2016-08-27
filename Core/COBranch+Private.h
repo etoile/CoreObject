@@ -27,6 +27,10 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
 - (COBranchInfo *)branchInfo;
 /**
  * This method is only exposed to be used internally by CoreObject.
+ */
+- (BOOL)isDeletedInStore;
+/**
+ * This method is only exposed to be used internally by CoreObject.
  *
  * Forces the branch to reload an older or more recent state.
  *

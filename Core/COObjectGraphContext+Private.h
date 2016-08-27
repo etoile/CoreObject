@@ -126,4 +126,6 @@
  */
 - (void) doPreCommitChecks;
 
+@property (nonatomic, readwrite) BOOL ignoresChangeTrackingNotifications;
+
 @end

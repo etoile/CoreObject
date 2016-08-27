@@ -135,6 +135,11 @@
 	OutlineItem *item2;
 	OutlineItem *otherItem1;
 	UnorderedGroupNoOpposite *otherGroup1;
+	
+	// Convenience - persistent root UUIDs
+	ETUUID *group1uuid;
+	ETUUID *item1uuid;
+	ETUUID *item2uuid;
 }
 
 @end
@@ -161,6 +166,10 @@
 	otherGroup1.label = @"other";
 	[ctx commit];
 
+	group1uuid = group1.persistentRoot.UUID;
+	item1uuid = item1.persistentRoot.UUID;
+	item2uuid = item2.persistentRoot.UUID;
+	
 	return self;
 }
 
@@ -469,6 +478,161 @@
 		UKObjectsEqual(S(testItem1, testItem2), testCurrentGroup1.contents);
 		UKTrue([testCurrentItem1 referringObjects].isEmpty);
 	}];
+}
+
+- (void) testTargetPersistentRootLazyLoading
+{
+	COEditingContext *ctx2 = [self newContext];
+	
+	// First, all persistent roots should be unloaded.
+	UKNil([ctx2 loadedPersistentRootForUUID: group1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item2uuid]);
+	UKFalse([ctx2 hasChanges]);
+	
+	// Load group1
+	UnorderedGroupNoOpposite *group1ctx2 = [ctx2 persistentRootForUUID: group1uuid].rootObject;
+	UKObjectsEqual(@"current", group1ctx2.label);
+	
+	// Ensure both persistent roots are still unloaded
+	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item2uuid]);
+	UKFalse([ctx2 hasChanges]);
+	
+	// Access collection to trigger loading
+	UKIntsEqual(2, group1ctx2.contents.count);
+	OutlineItem *item1ctx2 = [[group1ctx2.contents objectsPassingTest:^(id obj, BOOL*stop){ return [[obj UUID] isEqual: item1.UUID]; }] anyObject];
+	OutlineItem *item2ctx2 = [[group1ctx2.contents objectsPassingTest:^(id obj, BOOL*stop){ return [[obj UUID] isEqual: item2.UUID]; }] anyObject];
+	UKObjectsEqual(item1.UUID, item1ctx2.UUID);
+	UKObjectsEqual(item2.UUID, item2ctx2.UUID);
+	UKNotNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKNotNil([ctx2 loadedPersistentRootForUUID: item2uuid]);
+	UKFalse([ctx2 hasChanges]);
+	
+	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
+	COPath *item2Path = [COPath pathWithPersistentRoot: item2uuid];
+
+	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
+	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item2Path]);
+}
+
+- (void)testTargetBranchLazyLoading
+{
+	COPath *otherItem1Path = [COPath pathWithPersistentRoot: item1uuid
+													 branch: otherItem1.branch.UUID];
+	COPath *item2Path = [COPath pathWithPersistentRoot: item2uuid];
+	
+	group1.contents = S(otherItem1, item2);
+	[ctx commit];
+	
+	COEditingContext *ctx2 = [self newContext];
+	
+	// First, all persistent roots should be unloaded.
+	UKNil([ctx2 loadedPersistentRootForUUID: group1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKFalse([ctx2 hasChanges]);
+	
+	// Load group1
+	UnorderedGroupNoOpposite *group1ctx2 = [ctx2 persistentRootForUUID: group1uuid].rootObject;
+	UKObjectsEqual(@"current", group1ctx2.label);
+	
+	// Check group1ctx2.contents without triggering loading
+	UKNotNil(otherItem1.branch.UUID);
+	UKObjectsEqual(S(otherItem1Path, item2Path), [[group1ctx2 serializableValueForStorageKey: @"contents"] allReferences]);
+	
+	UKObjectsEqual(A(group1ctx2), [[[ctx2 deadRelationshipCache] referringObjectsForPath: otherItem1Path] allObjects]);
+	UKObjectsEqual(A(group1ctx2), [[[ctx2 deadRelationshipCache] referringObjectsForPath: item2Path] allObjects]);
+	
+	// Ensure item1 persistent root is still unloaded
+	UKNil([ctx2 loadedPersistentRootForUUID: item1.persistentRoot.UUID]);
+	UKFalse([ctx2 hasChanges]);
+	
+	// Load item1, but not the other branch yet
+	OutlineItem *item1ctx2 = [ctx2 persistentRootForUUID: item1uuid].rootObject;
+	UKObjectsEqual(item1.UUID, item1ctx2.UUID);
+	UKNotNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKObjectsEqual(S(otherItem1Path, item2Path), [[group1ctx2 serializableValueForStorageKey: @"contents"] allReferences]);
+	UKFalse([ctx2 hasChanges]);
+	
+	// Finally load the other branch.
+	// This should trigger group1ctx2 to unfault its reference.
+	OutlineItem *otherItem1ctx2 = [item1ctx2.persistentRoot branchForUUID: otherItem1.branch.UUID].rootObject;
+	UKObjectsEqual(S(otherItem1ctx2), [group1ctx2 serializableValueForStorageKey: @"contents"]);
+	UKObjectsEqual(S(otherItem1ctx2, item2Path), [[group1ctx2 serializableValueForStorageKey: @"contents"] allReferences]);
+	UKFalse([ctx2 hasChanges]);
+
+	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: otherItem1Path]);
+	UKObjectsEqual(A(group1ctx2), [[[ctx2 deadRelationshipCache] referringObjectsForPath: item2Path] allObjects]);
+}
+
+- (void) testSourcePersistentRootLazyLoading
+{
+	COEditingContext *ctx2 = [self newContext];
+	
+	// First, all persistent roots should be unloaded.
+	UKNil([ctx2 loadedPersistentRootForUUID: group1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item2uuid]);
+	UKFalse([ctx2 hasChanges]);
+	
+	// Load item1
+	OutlineItem *item1ctx2 = [ctx2 persistentRootForUUID: item1uuid].rootObject;
+	
+	// Because group1 is not currently loaded, we have no way of
+	// knowing that it has a cross-reference to item1.
+	// So item1ctx2.referringObjects is currently empty.
+	// This is sort of a leak in the abstraction of lazy loading.
+	UKObjectsEqual(S(), item1ctx2.referringObjects);
+	
+	// Load group1
+	UnorderedGroupNoOpposite *group1ctx2 = [ctx2 persistentRootForUUID: group1uuid].rootObject;
+	UKObjectsEqual(@"current", group1ctx2.label);
+	
+	// That should have updated the referringObjects
+	UKObjectsEqual(S(group1ctx2), item1ctx2.referringObjects);
+	
+	UKFalse([ctx2 hasChanges]);
+
+	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
+	COPath *item2Path = [COPath pathWithPersistentRoot: item2uuid];
+	
+	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
+	UKObjectsEqual(A(group1ctx2), [[[ctx2 deadRelationshipCache] referringObjectsForPath: item2Path] allObjects]);
+}
+
+- (void) testSourcePersistentRootLazyLoadingReverseOrder
+{
+	COEditingContext *ctx2 = [self newContext];
+	
+	// First, all persistent roots should be unloaded.
+	UKNil([ctx2 loadedPersistentRootForUUID: group1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item2uuid]);
+	UKFalse([ctx2 hasChanges]);
+	
+	// Load group1
+	UnorderedGroupNoOpposite *group1ctx2 = [ctx2 persistentRootForUUID: group1uuid].rootObject;
+	
+	// Ensure the references are faulted
+	UKObjectsEqual(S([COPath pathWithPersistentRoot: item1uuid],
+					 [COPath pathWithPersistentRoot: item2uuid]), [[group1ctx2 serializableValueForStorageKey: @"contents"] allReferences]);
+	
+	// Load item1
+	OutlineItem *item1ctx2 = [ctx2 persistentRootForUUID: item1uuid].rootObject;
+	
+	// Check that the reference in group1 was unfaulted by the loading of item1
+	UKObjectsEqual(S(item1ctx2,
+					 [COPath pathWithPersistentRoot: item2uuid]), [[group1ctx2 serializableValueForStorageKey: @"contents"] allReferences]);
+	
+	UKObjectsEqual(S(group1ctx2), item1ctx2.referringObjects);
+	
+	UKFalse([ctx2 hasChanges]);
+
+	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
+	COPath *item2Path = [COPath pathWithPersistentRoot: item2uuid];
+	
+	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
+	UKObjectsEqual(A(group1ctx2), [[[ctx2 deadRelationshipCache] referringObjectsForPath: item2Path] allObjects]);
 }
 
 @end

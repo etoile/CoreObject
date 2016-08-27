@@ -187,6 +187,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
     NSMutableDictionary *_updatedPropertiesByUUID;
 	/** How many commits have been done since last garbage collection */
 	uint64_t _numberOfCommitsSinceLastGC;
+	int _ignoresChangeTrackingNotifications;
 }
 
 

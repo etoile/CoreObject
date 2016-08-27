@@ -9,6 +9,7 @@
 #import "COObjectGraphContext+GarbageCollection.h"
 #import "COObjectGraphContext+Debugging.h"
 #import "COObject.h"
+#import "COObject+Private.h"
 
 @implementation COObjectGraphContext (COGarbageCollection)
 
@@ -27,8 +28,8 @@ static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject, COObjectG
 		}
 		
 		NSString *propertyName = [propDesc name];
-		id value = [anObject valueForKey: propertyName];
-        
+		id value = [anObject valueForProperty: propertyName shouldLoad: NO];
+		
         if ([propDesc isMultivalued])
         {
 			if ([propDesc isKeyed])
