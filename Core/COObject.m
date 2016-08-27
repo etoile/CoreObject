@@ -1981,15 +1981,6 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 		{
 			object = [COPath pathWithPersistentRoot: aReplacement.persistentRoot.UUID];
 		}
-		
-		// HACK: Now using -replaceReferencesToObjectIdenticalTo in the lazy loadying system
-		// rather than just deletion/undeletion, so we need the logic in -crossPersistentRootReferenceWithPath
-		// that checks whether branches/persistent roots are deleted
-		COObject *testReplacement = [self.editingContext crossPersistentRootReferenceWithPath: object shouldLoad: NO];
-		if (testReplacement == nil)
-		{
-			return;
-		}
 	}
 
 	for (NSString *key in [self persistentPropertyNames])
