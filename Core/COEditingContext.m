@@ -423,11 +423,6 @@
                                                   isDeleted: (BOOL)isDeletion
 {
 	NSParameterAssert(aPersistentRoot != nil);
-	// NOTE: -delete/undeleteBranch: enforce !aBranch.isCurrentBranch already.
-	// NOTE: This is used by lazy loading now, and the following assertion no longer holds.
-	// Is this a problem?
-	//NSParameterAssert(aBranch == nil
-	//	|| (!aBranch.isCurrentBranch && aBranch.persistentRoot == aPersistentRoot));
 	
 	// See documentation above
 	if (isDeletion)
