@@ -560,6 +560,12 @@
 	UKNotNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
 	UKNotNil([ctx2 loadedPersistentRootForUUID: item2uuid]);
 	UKFalse([ctx2 hasChanges]);
+
+	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
+	COPath *item2Path = [COPath pathWithPersistentRoot: item2uuid];
+
+	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
+	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item2Path]);
 }
 
 - (void)testTargetBranchLazyLoading
@@ -606,6 +612,9 @@
 	UKObjectsEqual(A(otherItem1ctx2), [group1ctx2 serializableValueForStorageKey: @"contents"]);
 	UKObjectsEqual(A(otherItem1ctx2, item2Path), [[group1ctx2 serializableValueForStorageKey: @"contents"] allReferences]);
 	UKFalse([ctx2 hasChanges]);
+	
+	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: otherItem1Path]);
+	UKObjectsEqual(A(group1ctx2), [[[ctx2 deadRelationshipCache] referringObjectsForPath: item2Path] allObjects]);
 }
 
 - (void) testSourcePersistentRootLazyLoading
@@ -620,7 +629,7 @@
 	
 	// Load item1
 	OutlineItem *item1ctx2 = [ctx2 persistentRootForUUID: item1uuid].rootObject;
-	
+
 	// Because group1 is not currently loaded, we have no way of
 	// knowing that it has a cross-reference to item1.
 	// So item1ctx2.referringObjects is currently empty.
@@ -635,6 +644,12 @@
 	UKObjectsEqual(S(group1ctx2), item1ctx2.referringObjects);
 	
 	UKFalse([ctx2 hasChanges]);
+	
+	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
+	COPath *item2Path = [COPath pathWithPersistentRoot: item2uuid];
+	
+	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
+	UKObjectsEqual(A(group1ctx2), [[[ctx2 deadRelationshipCache] referringObjectsForPath: item2Path] allObjects]);
 }
 
 - (void) testSourcePersistentRootLazyLoadingReverseOrder
@@ -664,6 +679,12 @@
 	UKObjectsEqual(S(group1ctx2), item1ctx2.referringObjects);
 	
 	UKFalse([ctx2 hasChanges]);
+
+	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
+	COPath *item2Path = [COPath pathWithPersistentRoot: item2uuid];
+
+	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
+	UKObjectsEqual(A(group1ctx2), [[[ctx2 deadRelationshipCache] referringObjectsForPath: item2Path] allObjects]);
 }
 
 @end

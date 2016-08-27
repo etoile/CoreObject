@@ -253,7 +253,7 @@
 	// Cause any faulted references to this newly loaded persistet root to be unfaulted
 	[self updateCrossPersistentRootReferencesToPersistentRoot: persistentRoot
 													   branch: nil
-													isDeleted: NO];
+													isDeleted: persistentRoot.deleted];
 	return persistentRoot;
 }
 
@@ -381,31 +381,6 @@
 	[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
 	                                                   branch: nil
 	                                                isDeleted: NO];
-	[self updateDeadRelationshipCacheForUndeletedPersistentRoot: aPersistentRoot];
-}
-
-/**
- * Once all the dead references are fixed, remove them from the cache.
- *
- * -updateCrossPersistentRootReferencesToPersistentRoot:branch:isDeleted: must 
- * be called just before.
- */
-- (void)updateDeadRelationshipCacheForUndeletedPersistentRoot: (COPersistentRoot *)aPersistentRoot
-{
-	// FIXME:
-	// With lazy loading, this is no longer correct. There may still be some dead references
-	// after undeletion, so we must not remove them from the cache.
-	// We need tests that check the changes to the dead relationship cache
-#if 0
-	NSSet *allBranches = [aPersistentRoot.branches setByAddingObjectsFromSet: aPersistentRoot.deletedBranches];
-	
-	for (COBranch *branch in allBranches)
-	{
-		[_deadRelationshipCache removePath: [COPath pathWithPersistentRoot: aPersistentRoot.UUID
-		                                                            branch: branch.UUID]];
-	}
-	[_deadRelationshipCache removePath: [COPath pathWithPersistentRoot: aPersistentRoot.UUID]];
-#endif
 }
 
 /**
@@ -443,8 +418,21 @@
 	// NOTE: -delete/undeleteBranch: enforce !aBranch.isCurrentBranch already.
 	// NOTE: This is used by lazy loading now, and the following assertion no longer holds.
 	// Is this a problem?
-//	NSParameterAssert(aBranch == nil
-//		|| (!aBranch.isCurrentBranch && aBranch.persistentRoot == aPersistentRoot));
+	//NSParameterAssert(aBranch == nil
+	//	|| (!aBranch.isCurrentBranch && aBranch.persistentRoot == aPersistentRoot));
+	
+	// See documentation above
+	if (isDeletion)
+	{
+		// TODO: For an uncommitted persistent root and branch, could be better if
+		// -deletePersistentRoot/Branch: marked it temporarily as pending deletion.
+		ETAssert(aPersistentRoot.deleted || aPersistentRoot.isPersistentRootUncommitted
+			|| (aBranch != nil && (aBranch.deleted || aBranch.isBranchUncommitted)));
+	}
+	else
+	{
+		ETAssert(!aPersistentRoot.deleted && (aBranch == nil || !aBranch.deleted));
+	}
 
 	/* Fix references pointing to any branch that belong to the deleted
 	 persistent root (the relationship target) */
@@ -953,13 +941,6 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 			                                                    isDeleted: loaded.isDeleted];
 				// TODO: Unload the persistent root when deleted (this represents
 				// an external deletion)
-				
-				BOOL isUndeletion = wasDeleted && !loaded.isDeleted;
-				
-				if (isUndeletion)
-				{
-					[self updateDeadRelationshipCacheForUndeletedPersistentRoot: loaded];
-				}
 			}
 		}
 		else if (![deletedPersistentRootUUIDs containsObject: persistentRootUUID])

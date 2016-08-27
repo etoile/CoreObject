@@ -394,7 +394,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     }
 	[self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: aBranch.persistentRoot
 	                                                                  branch: aBranch
-	                                                               isDeleted: NO];
+	                                                               isDeleted: aBranch.persistentRoot.deleted];
 }
 
 #pragma mark Pending Changes -

@@ -457,6 +457,12 @@
 	UKNotNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
 	UKNotNil([ctx2 loadedPersistentRootForUUID: item2uuid]);
 	UKFalse([ctx2 hasChanges]);
+
+	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
+	COPath *item2Path = [COPath pathWithPersistentRoot: item2uuid];
+
+	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
+	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item2Path]);
 }
 
 - (void)testTargetBranchLazyLoading
@@ -503,6 +509,9 @@
 	UKObjectsEqual(S(otherItem1ctx2), [group1ctx2 serializableValueForStorageKey: @"contents"]);
 	UKObjectsEqual(S(otherItem1ctx2, item2Path), [[group1ctx2 serializableValueForStorageKey: @"contents"] allReferences]);
 	UKFalse([ctx2 hasChanges]);
+
+	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: otherItem1Path]);
+	UKObjectsEqual(A(group1ctx2), [[[ctx2 deadRelationshipCache] referringObjectsForPath: item2Path] allObjects]);
 }
 
 - (void) testSourcePersistentRootLazyLoading
@@ -532,6 +541,12 @@
 	UKObjectsEqual(S(group1ctx2), item1ctx2.parentGroups);
 	
 	UKFalse([ctx2 hasChanges]);
+
+	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
+	COPath *item2Path = [COPath pathWithPersistentRoot: item2uuid];
+	
+	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
+	UKObjectsEqual(A(group1ctx2), [[[ctx2 deadRelationshipCache] referringObjectsForPath: item2Path] allObjects]);
 }
 
 - (void) testSourcePersistentRootLazyLoadingReverseOrder
@@ -561,6 +576,12 @@
 	UKObjectsEqual(S(group1ctx2), item1ctx2.parentGroups);
 	
 	UKFalse([ctx2 hasChanges]);
+
+	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
+	COPath *item2Path = [COPath pathWithPersistentRoot: item2uuid];
+	
+	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
+	UKObjectsEqual(A(group1ctx2), [[[ctx2 deadRelationshipCache] referringObjectsForPath: item2Path] allObjects]);
 }
 
 @end
