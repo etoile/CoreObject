@@ -690,6 +690,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 	return item;
 }
 
+// NOTE: If we add more collection attributes to the metamodel, we should update this method assertions.
 - (id) valueForSerializedValue: (id)value
                         ofType: (COType)type
 multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc

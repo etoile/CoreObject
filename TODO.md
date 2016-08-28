@@ -385,9 +385,6 @@ the following situations at least:
 
   - Make a strict set of supported types, see: Scraps/serialization_todo.txt
 
-  - For collection metamodel assertions, check all collection metamodel attributes (isKeyed, isOrdered, isMultivalued) and document we should update these assertions if we add more collection attributes to the metamodel:
-        
-        NSAssert([aPropertyDesc isKeyed] && [aPropertyDesc isMultivalued], @"Serialization type doesn't match metamodel");
 
 - Utilities
 
