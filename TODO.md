@@ -235,10 +235,6 @@ Future Work (Minor features, refactoring, cleanup)
     
   - Throw an exception if the developer names a property that conflicts with a NSObject/COObject method
 
-  - Remove -copyWithZone: in COObject and CODictionary (but EtoileUI must be migrated to COCopier first)
-
-  - Turn _variableStorage into a private ivar once EtoileUI doesn't access it directly
-  
   - Add dictionary update tests to TestObjectUpdate.m
   
   - Add relationship update check to detect persistent objects inserted into a transient relationship. The object put in the relationship could belong to:
@@ -438,17 +434,10 @@ the following situations at least:
     - talk about change notifications in the class descriptions. mention the notifications we support for each class description.
 
 
-- EtoileUI
-
-  - Standardizing on -setValue:forProperty: and -valueForProperty: for COObject/NSObject. Existing methods in ETLayoutItem and ETViewpoint will become -setValue:forRepresentedProperty: and -valueForRepresentedProperty:.
-
-  - Fix properly EtoileUI test suite crash on assertion in -checkIsNotRemoveFromContext (for now, we just override it in ETUIObject)
-
-
-
 - Code Quality
 
 	- Reviewed classes: none (COObjectGraphContext, COEditingContext, COBranch underwent a preliminary review)
+
 
 - COAttributedString
 
