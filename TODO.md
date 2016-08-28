@@ -4,8 +4,6 @@ TODO
 Major Missing Features
 ----------------------
 
-- Supporting broken cross-references. Since we don't support it, you must not permanently delete anything from a store (with `-[COSQLiteStore finalizeDeletionsForPersistentRoot:error:]`) unless your application doesn't use cross-references.
-
 - COUndoTrack doesn't cope with attempts by the user to undo changes in persistent roots that are not present in the store (assetions will fail)
 
 - Persistent root faulting; currently the entire store is loaded in memory
@@ -28,8 +26,6 @@ Major Missing Features
         {
             return  [[[self objectGraphContext] modelDescriptionRepository] descriptionForName: @"COObject"];
         }
-
-- Schema Upgrade
 
 - Better query support (in-memory and in-store as sketched in COQuery)
 
@@ -118,11 +114,6 @@ Future Work (Minor features, refactoring, cleanup)
   - Perhaps don't treat `-[NSSet countByEnumeratingWithState:objects:count:]` as a primitive method to match Mac OS X behavior
 
 
-- iOS
-
-  - iOS 5 and higher support
-
-
 - Store
 
   - exportRevisions: and importRevisions: that take a set of CORevisionID an returns a delta-compressed NSData
@@ -146,8 +137,6 @@ Future Work (Minor features, refactoring, cleanup)
 
 
 - COEditingContext
-
-  - Implement support for "dead cross-references"; currently an assertion will fail.
 
   - Expose COSQLiteStore's attachments feature
 
