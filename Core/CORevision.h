@@ -130,22 +130,4 @@
 - (id)initWithCache: (CORevisionCache *)aCache revisionInfo: (CORevisionInfo *)aRevInfo;
 
 
-/** @taskunit Deprecated */
-
-
-/** 
- * Returns the revision type.
- *
- * e.g. merge, persistent root creation, minor edit, etc.
- *
- * Note: This type notion is a bit vague currently. 
- */
-- (NSString *)type;
-/** 
- * Returns the revision short description.
- *
- * This description is optional.
- */
-- (NSString *)shortDescription;
-
 @end

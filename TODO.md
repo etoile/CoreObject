@@ -444,7 +444,6 @@ the following situations at least:
 
   - Fix properly EtoileUI test suite crash on assertion in -checkIsNotRemoveFromContext (for now, we just override it in ETUIObject)
 
-  - Remove deprecated -type and -shortDescription in CORevision (all EtoileUI-based applications need to be check)
 
 
 - Code Quality

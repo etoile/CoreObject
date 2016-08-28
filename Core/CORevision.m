@@ -133,16 +133,6 @@
 	return [COCommitDescriptor localizedShortDescriptionFromMetadata: self.metadata];
 }
 
-- (NSString *)type
-{
-	return [[self metadata] objectForKey: @"type"];
-}
-
-- (NSString *)shortDescription
-{
-	return [[self metadata] objectForKey: @"shortDescription"];
-}
-
 - (NSString *)description
 {
 	return [NSString stringWithFormat: @"%@ (%@ <= %@)", 
