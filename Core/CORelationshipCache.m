@@ -23,7 +23,7 @@
 
 - (NSDictionary *)descriptionDictionary
 {
-	return D(_targetProperty, @"property",
+	return D(_targetProperty != nil ? _targetProperty : @"nil", @"property",
 	         _sourceProperty, @"opposite property",
 	        [_sourceObject UUID], @"opposite object");
 }
