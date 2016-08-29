@@ -261,7 +261,7 @@
 	// Cause any faulted references to this newly loaded persistet root to be unfaulted
 	[self updateCrossPersistentRootReferencesToPersistentRoot: persistentRoot
 													   branch: nil
-													isDeleted: persistentRoot.deleted];
+													  isFault: persistentRoot.deleted];
 	return persistentRoot;
 }
 
@@ -372,7 +372,7 @@
 
 	[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
 	                                                   branch: nil
-	                                                isDeleted: YES];
+	                                                  isFault: YES];
 	
 	if ([aPersistentRoot isPersistentRootUncommitted])
     {
@@ -395,27 +395,26 @@
 
 	[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
 	                                                   branch: nil
-	                                                isDeleted: NO];
+	                                                  isFault: NO];
 }
 
 /**
- * When isDeleted is YES, turns live references to the given persistent root 
+ * When isFault is YES, turns live references to the given persistent root
  * into dead ones in referring persistent roots.
  *
- * When isDeleted is NO, turns dead references to the given persistent root
+ * When isFault is NO, turns dead references to the given persistent root
  * into live ones in referring persistent roots.
  *
- * When isDeleted is YES and branch is nil, this means the persistent root 
- * itself is deleted. In this case, we consider the branches to be all 
- * transively deleted for this method logic, although there aren't marked as 
- * deleted.
+ * When isFault is YES and branch is nil, this means the persistent root
+ * itself is deleted or unloaded. In this case, we consider the branches to be 
+ * all transively deleted/unloaded for this method logic.
  *
  * The implementation must take in account deletion/undeletion can be:
  *
  * <list>
  * <item>explicit with COPersistentRoot and COBranch API</item>
  * <item>implicit deletion/undeletion when reloading persistent roots or branches 
- * (e.g. isTargetDeletion comment).</item>
+ * (e.g. isTargetFaulting comment).</item>
  * </list>
  *
  * IMPORTANT: This method must never result in new changes to be committed, 
@@ -427,12 +426,12 @@
  */
 - (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot
                                                      branch: (COBranch *)aBranch
-                                                  isDeleted: (BOOL)isDeletion
+                                                    isFault: (BOOL)faulting
 {
 	NSParameterAssert(aPersistentRoot != nil);
 	
 	// See documentation above
-	if (isDeletion)
+	if (faulting)
 	{
 		BOOL isUnloaded = _loadedPersistentRoots[aPersistentRoot.UUID] == nil;
 
@@ -464,7 +463,7 @@
 		/* When we are not deleting a persistent root or branch explicitly, but 
 		   reloading persistent roots, we must take in account that branches can 
 		   become deleted when their persistent root doesn't (isDeletion is NO) */
-		BOOL isTargetDeletion = isDeletion || target.branch.deleted;
+		BOOL isTargetFaulting = faulting || target.branch.deleted;
 		/* Fix references in all branches that belong to persistent roots
 		   referencing the deleted persistent root (those are relationship sources) */
 		NSMutableSet *sourceObjectGraphs = [NSMutableSet new];
@@ -505,8 +504,8 @@
 			
 			// TODO: We could easily skip traversing all inner objects, since
 			// we already know which ones need fixing up.
-			[source replaceObject: (isTargetDeletion ? target.rootObject : nil)
-					   withObject: (isTargetDeletion ? nil : target.rootObject)];
+			[source replaceObject: (isTargetFaulting ? target.rootObject : nil)
+					   withObject: (isTargetFaulting ? nil : target.rootObject)];
 		}
 	}
 }
@@ -524,7 +523,7 @@
 		// Turn faulted references to this persistent root back into faults
 		[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
 		                                                   branch: nil
-		                                                isDeleted: YES];
+		                                                  isFault: YES];
 	}
 	// Clear inner objects from both dead relationship cache and incoming relationship caches
 	// of other objects holding references to the discarded object graphs. If we wait until
@@ -962,7 +961,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 				   notifTransaction > loaded.lastTransactionID is NO). */
 				[self updateCrossPersistentRootReferencesToPersistentRoot: loaded
 			                                                       branch: nil
-			                                                    isDeleted: loaded.isDeleted];
+			                                                      isFault: loaded.isDeleted];
 				// TODO: Unload the persistent root when deleted (this represents
 				// an external deletion)
 			}

@@ -167,7 +167,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 		// Lazy loading support
 		[self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: self.persistentRoot
 																		  branch: self
-																	   isDeleted: self.deleted || self.persistentRoot.deleted];
+																	     isFault: self.deleted || self.persistentRoot.deleted];
 	}
 	return _objectGraph;
 }

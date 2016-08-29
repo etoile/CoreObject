@@ -385,7 +385,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	}
 	[self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: aBranch.persistentRoot
 	                                                                  branch: aBranch
-	                                                               isDeleted: YES];
+	                                                                 isFault: YES];
 }
 
 - (void)undeleteBranch: (COBranch *)aBranch
@@ -400,7 +400,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     }
 	[self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: aBranch.persistentRoot
 	                                                                  branch: aBranch
-	                                                               isDeleted: aBranch.persistentRoot.deleted];
+	                                                                 isFault: aBranch.persistentRoot.deleted];
 }
 
 #pragma mark Pending Changes -

@@ -847,7 +847,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
  *
  * The referring objects are the inner objects that hold a reference to it.
  *
- * For -updateCrossPersistentRootReferencesToPersistentRoot:branch:isDeleted:,
+ * For -updateCrossPersistentRootReferencesToPersistentRoot:branch:isFault:,
  * this method is a bottleneck. To make it even faster, we could access ivars
  * directly and preallocate some COPath objects.
  */

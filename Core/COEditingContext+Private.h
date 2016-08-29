@@ -67,7 +67,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
  */
 - (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot
                                                      branch: (COBranch *)aBranch
-                                                  isDeleted: (BOOL)isDeletion;
+                                                    isFault: (BOOL)faulting;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
