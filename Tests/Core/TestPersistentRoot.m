@@ -42,7 +42,7 @@
 	// To cope with this, the check block could cover more cases:
 	// - valid/loaded deleted persistent root reference
 	// - invalid/unloaded deleted persistent root reference
-	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorNever;
+	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorManual;
 
     persistentRoot =  [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 	rootObj = [persistentRoot rootObject];

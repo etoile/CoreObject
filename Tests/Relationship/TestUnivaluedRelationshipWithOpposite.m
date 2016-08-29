@@ -105,7 +105,7 @@
 {
 	SUPERINIT;
 	
-	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorNever;
+	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorManual;
 
 	group1 = [ctx insertNewPersistentRootWithEntityName: @"UnivaluedGroupWithOpposite"].rootObject;
 	item1 = [ctx insertNewPersistentRootWithEntityName: @"UnivaluedGroupContent"].rootObject;

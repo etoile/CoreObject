@@ -373,6 +373,13 @@
 	[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
 	                                                   branch: nil
 	                                                isDeleted: YES];
+	
+	if ([aPersistentRoot isPersistentRootUncommitted])
+    {
+        [self unloadPersistentRoot: aPersistentRoot
+		                 isDeleted: YES
+		                    forces: NO];
+    }
 }
 
 - (void)undeletePersistentRoot: (COPersistentRoot *)aPersistentRoot
@@ -427,9 +434,11 @@
 	// See documentation above
 	if (isDeletion)
 	{
+		BOOL isUnloaded = _loadedPersistentRoots[aPersistentRoot.UUID] == nil;
+
 		// TODO: For an uncommitted persistent root and branch, could be better if
 		// -deletePersistentRoot/Branch: marked it temporarily as pending deletion.
-		ETAssert(aPersistentRoot.deleted || aPersistentRoot.isPersistentRootUncommitted
+		ETAssert(aPersistentRoot.deleted || aPersistentRoot.isPersistentRootUncommitted || isUnloaded
 			|| (aBranch != nil && (aBranch.deleted || aBranch.isBranchUncommitted)));
 	}
 	else
@@ -502,24 +511,35 @@
 	}
 }
 
-- (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot
+- (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot isDeleted: (BOOL)deleted forces: (BOOL)forced
 {
-	if (_unloadingBehavior == COEditingContextUnloadingBehaviorNever
-		&& ![aPersistentRoot isPersistentRootUncommitted])
-	{
+	if (!forced && _unloadingBehavior == COEditingContextUnloadingBehaviorManual)
 		return;
-	}
-
-    // FIXME: Implement. For now, since we don't support faulting persistent
-    // roots, only release a persistent root if it's deleted.
-	COPersistentRoot *unloadedPersistentRoot = aPersistentRoot;
 
     [_loadedPersistentRoots removeObjectForKey: [aPersistentRoot UUID]];
 
+	// For a deleted persistent root, references are fixed in -deletePersistentRoot:
+	if (!deleted)
+	{
+		// Turn faulted references to this persistent root back into faults
+		[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
+		                                                   branch: nil
+		                                                isDeleted: YES];
+	}
+	// Clear inner objects from both dead relationship cache and incoming relationship caches
+	// of other objects holding references to the discarded object graphs. If we wait until
+	// -[COObjectGraphContext dealloc], COObject.deadRelationshipCache will be nil.
+	[[[aPersistentRoot allObjectGraphContexts] mappedCollection] discardAllObjects];
+	
 	[[NSNotificationCenter defaultCenter]
 		postNotificationName: COEditingContextDidUnloadPersistentRootsNotification
 		              object: self
-		            userInfo: @{ kCOUnloadedPersistentRootsKey : S(unloadedPersistentRoot) }];
+		            userInfo: @{ kCOUnloadedPersistentRootsKey : S(aPersistentRoot) }];
+}
+
+- (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot
+{
+	[self unloadPersistentRoot: aPersistentRoot isDeleted: aPersistentRoot.deleted forces: YES];
 }
 
 #pragma mark Referencing Other Persistent Roots -
@@ -801,7 +821,9 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 			{
 				[_persistentRootsPendingDeletion removeObject: persistentRoot];
 				
-				[self unloadPersistentRoot: persistentRoot];
+				[self unloadPersistentRoot: persistentRoot
+				                 isDeleted: YES
+				                    forces: NO];
 			}
 			else if ([_persistentRootsPendingUndeletion containsObject: persistentRoot])
 			{

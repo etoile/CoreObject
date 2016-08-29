@@ -343,6 +343,11 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	// TODO: Update cross persistent root references
 }
 
+- (NSSet *)allBranches
+{
+	return [NSSet setWithArray: _branchForUUID.allValues];
+}
+
 - (NSSet *)branches
 {
     return [NSSet setWithArray: [[_branchForUUID allValues] filteredCollectionWithBlock: ^(id obj)

@@ -81,6 +81,10 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
+- (void) discardAllObjects;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
 - (void)replaceObject: (COObject *)anObject withObject: (COObject *)aReplacement;
 /**
  * This method is only exposed to be used internally by CoreObject.

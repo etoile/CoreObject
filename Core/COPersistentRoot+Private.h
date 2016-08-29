@@ -89,6 +89,11 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (void) sendChangeNotification;
 
+/**
+ * This property is only exposed to be used internally by CoreObject.
+ */
+@property (nonatomic, readonly) NSSet *allBranches;
+
 - (void)deleteBranch: (COBranch *)aBranch;
 - (void)undeleteBranch: (COBranch *)aBranch;
 

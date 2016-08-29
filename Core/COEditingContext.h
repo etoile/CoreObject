@@ -30,12 +30,14 @@
  */
 typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
 	/**
-	 * Persistent roots cannot be unloaded, except uncommitted persistent roots
-	 * on deletion.
+	 * Persistent roots are never unloaded automatically, except uncommitted persistent roots on
+	 * deletion.
+	 *
+	 * -unloadPersistentRoot: can still be used to unload persistent roots explicitly.
 	 */
-	COEditingContextUnloadingBehaviorNever,
+	COEditingContextUnloadingBehaviorManual,
 	/**
-	 * Persistent roots can be unloaded on deletion.
+	 * Persistent roots are unloaded on deletion.
 	 *
      * For external deletions committed in other editing contexts, persistent
 	 * roots will be unloaded in the current one.
@@ -261,7 +263,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  *
  * The returned set includes those that are pending insertion, undeletion or 
  * deletion, and deleted ones (explicitly loaded with -persistentRootForUUID: or 
- * when using COEditingContextUnloadingBehaviorNever).
+ * when using COEditingContextUnloadingBehaviorManual).
  */
 @property (nonatomic, readonly) NSSet *loadedPersistentRoots;
 
@@ -311,7 +313,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  * Same as -persistentRootForUUID: but doesn't cause loading.
  */
 - (COPersistentRoot *)loadedPersistentRootForUUID: (ETUUID *)aUUID;
-
+- (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot;
 /**
  * Returns a new persistent root that uses the given root object.
  *

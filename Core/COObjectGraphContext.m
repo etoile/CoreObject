@@ -139,7 +139,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (void)dealloc
 {
-	[self discardObjectsWithUUIDs:  [NSSet setWithArray: _loadedObjects.allKeys]];
+	[self discardAllObjects];
 }
 
 - (NSString *)description
@@ -691,7 +691,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 {
 	if ([self branch] == nil)
 	{
-		[self discardObjectsWithUUIDs: [NSSet setWithArray: [_loadedObjects allKeys]]];
+		[self discardAllObjects];
 		[self acceptAllChanges];
 		ETAssert([[self loadedObjects] isEmpty]);
 	}
@@ -699,6 +699,11 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	{
 		[[self branch] reloadAtRevision: [[self branch] currentRevision]];
 	}
+}
+
+- (void)discardAllObjects
+{
+	[self discardObjectsWithUUIDs:  [NSSet setWithArray: _loadedObjects.allKeys]];
 }
 
 /**
