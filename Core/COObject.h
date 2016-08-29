@@ -403,9 +403,7 @@
 	ETEntityDescription *_entityDescription;
 	ETUUID *_UUID;
 	COObjectGraphContext *__weak _objectGraphContext;
-	@protected
 	NSMutableDictionary *_variableStorage;
-	@private
 	/** 
 	 * Storage for incoming relationships e.g. parent(s). CoreObject doesn't
 	 * allow storing incoming relationships in ivars or variable storage. 
