@@ -47,6 +47,24 @@
 	UKDoesNotRaiseException([ctx insertNewPersistentRootWithEntityName: @"OutlineItem"]);
 }
 
+
+- (void)testExceptionOnNewPersistentRootForModelDescriptionRepositoryMismatch
+{
+	ETModelDescriptionRepository *newRepo = [ETModelDescriptionRepository new];
+	ETEntityDescription *rootEntity =
+		[[ctx modelDescriptionRepository] entityDescriptionForClass: [COObject class]];
+
+	[newRepo addDescription: rootEntity];
+	[newRepo setEntityDescription: rootEntity forClass: [COObject class]];
+
+	COObjectGraphContext *objectGraph =
+		[COObjectGraphContext objectGraphContextWithModelDescriptionRepository: newRepo];
+	COObject *rootObject = [[COObject alloc] initWithObjectGraphContext: objectGraph];
+
+	UKObjectsNotEqual(newRepo, [ctx modelDescriptionRepository]);
+	UKRaisesException([ctx insertNewPersistentRootWithRootObject: rootObject]);
+}
+
 - (void) validateNewPersistentRoot: (COPersistentRoot *)persistentRoot UUID: (ETUUID *)uuid
 {
     UKTrue([ctx hasChanges]);
@@ -87,23 +105,6 @@
     UKTrue([[ctx persistentRootsPendingUndeletion] isEmpty]);
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNil([store persistentRootInfoForUUID: uuid]);
-}
-
-- (void)testExceptionOnNewPersistentRootForModelDescriptionRepositoryMismatch
-{
-	ETModelDescriptionRepository *newRepo = [ETModelDescriptionRepository new];
-	ETEntityDescription *rootEntity =
-		[[ctx modelDescriptionRepository] entityDescriptionForClass: [COObject class]];
-
-	[newRepo addDescription: rootEntity];
-	[newRepo setEntityDescription: rootEntity forClass: [COObject class]];
-
-	COObjectGraphContext *objectGraph =
-		[COObjectGraphContext objectGraphContextWithModelDescriptionRepository: newRepo];
-	COObject *rootObject = [[COObject alloc] initWithObjectGraphContext: objectGraph];
-
-	UKObjectsNotEqual(newRepo, [ctx modelDescriptionRepository]);
-	UKRaisesException([ctx insertNewPersistentRootWithRootObject: rootObject]);
 }
 
 - (void)testDeleteCommittedPersistentRoot
@@ -197,6 +198,37 @@
 		UKObjectsEqual([NSSet set], [testCtx deletedPersistentRoots]);
 		UKFalse([testProot isDeleted]);
 	 }];
+}
+
+- (void)testUnloadPeristentRoot
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    ETUUID *uuid = persistentRoot.UUID;
+	
+	[ctx commit];
+	[ctx unloadPersistentRoot: persistentRoot];
+	
+	UKObjectsEqual(S(persistentRoot), unloadNotification.userInfo[kCOUnloadedPersistentRootsKey]);
+	
+    UKFalse(ctx.hasChanges);
+    UKNil([ctx loadedPersistentRootForUUID: uuid]);
+    UKNotNil([store persistentRootInfoForUUID: uuid]);
+    UKNotNil([ctx persistentRootForUUID: uuid]);
+}
+
+- (void)testUnloadUncommittedPersistentRoot
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    ETUUID *uuid = persistentRoot.UUID;
+	
+	[ctx unloadPersistentRoot: persistentRoot];
+	
+	UKObjectsEqual(S(persistentRoot), unloadNotification.userInfo[kCOUnloadedPersistentRootsKey]);
+	
+    UKFalse(ctx.hasChanges);
+    UKNil([ctx loadedPersistentRootForUUID: uuid]);
+    UKNil([store persistentRootInfoForUUID: uuid]);
+    UKNil([ctx persistentRootForUUID: uuid]);
 }
 
 /**

@@ -30,8 +30,8 @@
  */
 typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
 	/**
-	 * Persistent roots are never unloaded automatically, except uncommitted persistent roots on
-	 * deletion.
+	 * Persistent roots are never unloaded automatically, except uncommitted 
+	 * persistent roots on deletion.
 	 *
 	 * -unloadPersistentRoot: can still be used to unload persistent roots explicitly.
 	 */
@@ -313,6 +313,20 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  * Same as -persistentRootForUUID: but doesn't cause loading.
  */
 - (COPersistentRoot *)loadedPersistentRootForUUID: (ETUUID *)aUUID;
+/**
+ * Unloads the persistent root including its branches, object graphs and inner
+ * objects.
+ *
+ * To reload a persistent root, use -persistentRootForUUID:.
+ *
+ * Cross persistent root references pointing to inner objects that belongs to 
+ * the unloaded persistent root will be turned into faults. Any future attempts
+ * to access them with -[COObject valueForProperty:] will cause this persistent 
+ * root to be transparently reloaded.
+ *
+ * See -[COEditingContext setUnloadingBehavior:] to control when persistent 
+ * roots are unloaded or prevent unloading to happen.
+ */
 - (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot;
 /**
  * Returns a new persistent root that uses the given root object.
