@@ -359,8 +359,6 @@
 
 - (void) testDeleteUncommittedBranch
 {
-    [ctx commit];
-    
     COBranch *branch = [originalBranch makeBranchWithLabel: @"branch"];
     
     UKObjectsEqual(S(branch, originalBranch), [persistentRoot branches]);
@@ -371,13 +369,12 @@
     
     [ctx commit];
     
-    UKObjectsEqual(A([originalBranch UUID]), [[[store persistentRootInfoForUUID: [persistentRoot UUID]] branchForUUID] allKeys]);
+    UKObjectsEqual(S([originalBranch UUID]),
+	               SA([[[store persistentRootInfoForUUID: [persistentRoot UUID]] branchForUUID] allKeys]));
 }
 
 - (void) testDeleteCommittedBranch
 {
-    [ctx commit];
-    
     COBranch *branch = [originalBranch makeBranchWithLabel: @"branch"];
     
     UKObjectsEqual(S(branch, originalBranch), [persistentRoot branches]);
@@ -406,6 +403,58 @@
 		 UKObjectsEqual(S(testBranch), [testProot deletedBranches]);
 		 UKTrue([testBranch isDeleted]);
 	 }];
+}
+
+- (void) testUndeleteUncommittedBranch
+{
+    COBranch *branch = [originalBranch makeBranchWithLabel: @"branch"];
+    
+    UKObjectsEqual(S(branch, originalBranch), [persistentRoot branches]);
+    
+    branch.deleted = NO;
+    
+    UKObjectsEqual(S(branch, originalBranch), [persistentRoot branches]);
+    
+    [ctx commit];
+    
+    UKObjectsEqual(S([branch UUID], [originalBranch UUID]),
+	               SA([[[store persistentRootInfoForUUID: [persistentRoot UUID]] branchForUUID] allKeys]));
+}
+
+- (void) testUndeleteCommittedBranch
+{
+    COBranch *branch = [originalBranch makeBranchWithLabel: @"branch"];
+
+	[ctx commit];
+
+	branch.deleted = YES;
+
+    UKObjectsEqual(S(originalBranch), [persistentRoot branches]);
+	
+    [ctx commit];
+    
+    UKObjectsEqual(S([originalBranch UUID], [branch UUID]),
+                   SA([[[store persistentRootInfoForUUID: [persistentRoot UUID]] branchForUUID] allKeys]));
+    
+    branch.deleted = NO;
+    
+    UKObjectsEqual(S(branch, originalBranch), [persistentRoot branches]);
+    UKObjectsEqual(S(branch), [persistentRoot branchesPendingUndeletion]);
+    UKTrue([[persistentRoot deletedBranches] isEmpty]);
+    UKFalse([branch isDeleted]);
+    
+    [ctx commit];
+    
+	[self checkBranchWithExistingAndNewContext: branch
+	                                   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+	{
+		 COBranch *testOriginalBranch = [testProot branchForUUID: [originalBranch UUID]];
+		 
+		 UKObjectsEqual(S(testBranch, testOriginalBranch), [testProot branches]);
+		 UKTrue([[testProot branchesPendingUndeletion] isEmpty]);
+		 UKTrue([[testProot deletedBranches] isEmpty]);
+		 UKFalse([testBranch isDeleted]);
+	}];
 }
 
 // Check that attempting to commit modifications to a deleted persistent root
@@ -504,8 +553,6 @@
 
 - (void) testPersistentRootMetadata
 {
-    [ctx commit];
-	
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {

@@ -47,24 +47,45 @@
 	UKDoesNotRaiseException([ctx insertNewPersistentRootWithEntityName: @"OutlineItem"]);
 }
 
-- (void)testDeleteUncommittedPersistentRoot
+- (void) validateNewPersistentRoot: (COPersistentRoot *)persistentRoot UUID: (ETUUID *)uuid
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    ETUUID *uuid = [persistentRoot UUID];
-    
     UKTrue([ctx hasChanges]);
     UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
     UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNil([store persistentRootInfoForUUID: uuid]);
     UKFalse([persistentRoot isDeleted]);
+}
+
+- (void)testDeleteUncommittedPersistentRoot
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    ETUUID *uuid = [persistentRoot UUID];
+    
+	[self validateNewPersistentRoot: persistentRoot UUID: uuid];
     
     persistentRoot.deleted = YES;
     
     UKFalse([ctx hasChanges]);
-    UKObjectsEqual([NSSet set], [ctx persistentRoots]);
-    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
+    UKTrue([[ctx persistentRoots] isEmpty]);
+    UKTrue([[ctx persistentRootsPendingDeletion] isEmpty]);
     UKNil([ctx persistentRootForUUID: uuid]);
+    UKNil([store persistentRootInfoForUUID: uuid]);
+}
+
+- (void)testUndeleteUncommittedPersistentRoot
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    ETUUID *uuid = [persistentRoot UUID];
+    
+	[self validateNewPersistentRoot: persistentRoot UUID: uuid];
+    
+    persistentRoot.deleted = NO;
+    
+    UKTrue([ctx hasChanges]);
+    UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
+    UKTrue([[ctx persistentRootsPendingUndeletion] isEmpty]);
+    UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNil([store persistentRootInfoForUUID: uuid]);
 }
 

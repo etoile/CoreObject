@@ -371,12 +371,9 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (void)deleteBranch: (COBranch *)aBranch
 {
-    if ([aBranch isBranchUncommitted])
-    {
-        [_branchForUUID removeObjectForKey: [aBranch UUID]];
-    }
-	else if ([_branchesPendingUndeletion containsObject: aBranch])
+	if ([_branchesPendingUndeletion containsObject: aBranch])
 	{
+		ETAssert(!aBranch.isBranchUncommitted);
 		[_branchesPendingUndeletion removeObject: aBranch];
 	}
 	else
@@ -386,12 +383,19 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	[self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: aBranch.persistentRoot
 	                                                                  branch: aBranch
 	                                                                 isFault: YES];
+	
+    if (aBranch.isBranchUncommitted)
+    {
+		[_branchesPendingDeletion removeObject: aBranch];
+        [_branchForUUID removeObjectForKey: aBranch.UUID];
+    }
 }
 
 - (void)undeleteBranch: (COBranch *)aBranch
 {
     if ([_branchesPendingDeletion containsObject: aBranch])
     {
+		ETAssert(!aBranch.isBranchUncommitted);
         [_branchesPendingDeletion removeObject: aBranch];
     }
     else
@@ -401,6 +405,11 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	[self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: aBranch.persistentRoot
 	                                                                  branch: aBranch
 	                                                                 isFault: aBranch.persistentRoot.deleted];
+
+    if (aBranch.isBranchUncommitted)
+    {
+		[_branchesPendingUndeletion removeObject: aBranch];
+	}
 }
 
 #pragma mark Pending Changes -

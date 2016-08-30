@@ -356,12 +356,9 @@
 
 - (void)deletePersistentRoot: (COPersistentRoot *)aPersistentRoot
 {
-    if ([aPersistentRoot isPersistentRootUncommitted])
+    if ([_persistentRootsPendingUndeletion containsObject: aPersistentRoot])
     {
-        [self unloadPersistentRoot: aPersistentRoot];
-    }
-    else if ([_persistentRootsPendingUndeletion containsObject: aPersistentRoot])
-    {
+		ETAssert(!aPersistentRoot.isPersistentRootUncommitted);
         [_persistentRootsPendingUndeletion removeObject: aPersistentRoot];
     }
     else
@@ -374,8 +371,9 @@
 	                                                   branch: nil
 	                                                  isFault: YES];
 	
-	if ([aPersistentRoot isPersistentRootUncommitted])
+	if (aPersistentRoot.isPersistentRootUncommitted)
     {
+		[_persistentRootsPendingDeletion removeObject: aPersistentRoot];
         [self unloadPersistentRoot: aPersistentRoot
 		                 isDeleted: YES
 		                    forces: NO];
@@ -386,6 +384,7 @@
 {
     if ([_persistentRootsPendingDeletion containsObject: aPersistentRoot])
     {
+		ETAssert(!aPersistentRoot.isPersistentRootUncommitted);
         [_persistentRootsPendingDeletion removeObject: aPersistentRoot];
     }
     else
@@ -396,6 +395,11 @@
 	[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
 	                                                   branch: nil
 	                                                  isFault: NO];
+	
+	if (aPersistentRoot.isPersistentRootUncommitted)
+    {
+		[_persistentRootsPendingUndeletion removeObject: aPersistentRoot];
+    }
 }
 
 /**
@@ -435,10 +439,7 @@
 	{
 		BOOL isUnloaded = _loadedPersistentRoots[aPersistentRoot.UUID] == nil;
 
-		// TODO: For an uncommitted persistent root and branch, could be better if
-		// -deletePersistentRoot/Branch: marked it temporarily as pending deletion.
-		ETAssert(aPersistentRoot.deleted || aPersistentRoot.isPersistentRootUncommitted || isUnloaded
-			|| (aBranch != nil && (aBranch.deleted || aBranch.isBranchUncommitted)));
+		ETAssert(aPersistentRoot.deleted  || isUnloaded || (aBranch != nil && aBranch.deleted));
 	}
 	else
 	{
