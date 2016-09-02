@@ -91,8 +91,6 @@
 
 - (void) dealloc
 {
-	NSLog(@"COASW %p dealloc", self);
-
 	[self unregisterToObserveBacking];
 }
 
