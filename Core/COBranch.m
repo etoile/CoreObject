@@ -113,6 +113,10 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 - (NSString *)description
 {
+	if ([self isZombie])
+	{
+		return @"<zombie branch>";
+	}
 	return [NSString stringWithFormat: @"<%@ %p - %@ (%@) - revision: %@>",
 		NSStringFromClass([self class]), self, _UUID, [self label], [[self currentRevision] UUID]];
 }
@@ -472,6 +476,11 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     self.shouldMakeEmptyCommit = NO;
     
 	[_objectGraph discardAllChanges];
+}
+
+- (BOOL) isZombie
+{
+	return (_persistentRoot == nil);
 }
 
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel

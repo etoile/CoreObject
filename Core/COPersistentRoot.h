@@ -392,6 +392,12 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * See also -hasChanges and -[COBranch discardAllChanges].
  */
 - (void)discardAllChanges;
+/**
+ * Returns whether the persistent root's editing context has relinquished
+ * control over this object. If YES, this instance can no longer be used
+ * and calling any methods may throw an exception
+ */
+@property (nonatomic, readonly) BOOL isZombie;
 
 
 /** @taskunit Convenience */

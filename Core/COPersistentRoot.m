@@ -172,6 +172,10 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSString *)description
 {
+	if ([self isZombie])
+	{
+		return @"<zombie persistent root>";
+	}
 	return [NSString stringWithFormat: @"<%@ %p - %@ - %@>",
 		NSStringFromClass([self class]), self, _UUID, [[[self rootObject] entityDescription] name]];
 }
@@ -487,6 +491,11 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	[_currentBranchObjectGraph discardAllChanges];
 	
 	ETAssert([self hasChanges] == NO);
+}
+
+- (BOOL) isZombie
+{
+	return (_parentContext == nil);
 }
 
 #pragma mark Convenience -
