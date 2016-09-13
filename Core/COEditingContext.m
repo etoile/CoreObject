@@ -376,7 +376,7 @@
 		[_persistentRootsPendingDeletion removeObject: aPersistentRoot];
         [self unloadPersistentRoot: aPersistentRoot
 		                 isDeleted: YES
-		                    forces: NO];
+		                    force: NO];
     }
 }
 
@@ -511,7 +511,7 @@
 	}
 }
 
-- (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot isDeleted: (BOOL)deleted forces: (BOOL)forced
+- (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot isDeleted: (BOOL)deleted force: (BOOL)forced
 {
 	if (!forced && _unloadingBehavior == COEditingContextUnloadingBehaviorManual)
 		return;
@@ -539,7 +539,7 @@
 
 - (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot
 {
-	[self unloadPersistentRoot: aPersistentRoot isDeleted: aPersistentRoot.deleted forces: YES];
+	[self unloadPersistentRoot: aPersistentRoot isDeleted: aPersistentRoot.deleted force: YES];
 }
 
 #pragma mark Referencing Other Persistent Roots -
@@ -823,7 +823,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 				
 				[self unloadPersistentRoot: persistentRoot
 				                 isDeleted: YES
-				                    forces: NO];
+				                    force: NO];
 			}
 			else if ([_persistentRootsPendingUndeletion containsObject: persistentRoot])
 			{
