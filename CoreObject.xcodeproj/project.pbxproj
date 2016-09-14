@@ -15,7 +15,6 @@
 		6002E283197FD90300AC9150 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6083223619795D18008D9F9D /* CoreGraphics.framework */; };
 		6002E284197FD90300AC9150 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B1D3FB19791F9400ACAC9C /* libsqlite3.dylib */; };
 		6002E286197FD90300AC9150 /* libCoreObject.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60E08C6219792BEA00D1B7AD /* libCoreObject.a */; };
-		6002E288197FD90300AC9150 /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 669A728D1885C43B00E98795 /* Commits */; };
 		6002E290197FD91A00AC9150 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C913AD165BBE9E00E0C5F4 /* main.m */; };
 		600F72BF1858A71200CB6AC5 /* COPersistentObjectContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 600F72BD1858A71200CB6AC5 /* COPersistentObjectContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		600F72C01858A71200CB6AC5 /* COPersistentObjectContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 600F72BE1858A71200CB6AC5 /* COPersistentObjectContext.m */; };
@@ -59,7 +58,6 @@
 		6061B8CC1C57E89700813C18 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B1D3FB19791F9400ACAC9C /* libsqlite3.dylib */; };
 		6061B8CD1C57E89700813C18 /* libUnitKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6048465F18B6C03E006E4EDC /* libUnitKit.a */; };
 		6061B8CE1C57E89700813C18 /* libCoreObject.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 60E08C6219792BEA00D1B7AD /* libCoreObject.a */; };
-		6061B8D01C57E89700813C18 /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 669A728D1885C43B00E98795 /* Commits */; };
 		6061B8D11C57E89700813C18 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6028484D1BBAB5820094CDB0 /* Default-568h@2x.png */; };
 		6061B8D21C57E89700813C18 /* 1b.json in Resources */ = {isa = PBXBuildFile; fileRef = 664E075D18C9592700CBFF74 /* 1b.json */; };
 		6061B8D31C57E89700813C18 /* 1a.json in Resources */ = {isa = PBXBuildFile; fileRef = 664E075C18C9592700CBFF74 /* 1a.json */; };
@@ -92,6 +90,7 @@
 		6076D1021A31E4110023C97A /* COSchemaMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 6076D0FE1A31E4110023C97A /* COSchemaMigration.m */; };
 		607EB349178881E60024B34D /* CODictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = 607EB347178881E60024B34D /* CODictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		607EB34A178881E60024B34D /* CODictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 607EB348178881E60024B34D /* CODictionary.m */; };
+		60811AF41D7193DA00D4DEEA /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 60811AF21D7193DA00D4DEEA /* Commits */; };
 		6083222F19793D27008D9F9D /* COClassToString.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C81D0A195DA82200AEEC68 /* COClassToString.m */; };
 		6083223019793D2D008D9F9D /* COClassToString.h in Headers */ = {isa = PBXBuildFile; fileRef = 60C81D18195DA83F00AEEC68 /* COClassToString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6083223719795D18008D9F9D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6083223619795D18008D9F9D /* CoreGraphics.framework */; };
@@ -507,7 +506,6 @@
 		60F91F38197D32E9009F47D7 /* TestAttributedStringAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 66BA3D6218DACFAC00641D40 /* TestAttributedStringAttribute.m */; };
 		60F91F39197D32F2009F47D7 /* 1a.json in Resources */ = {isa = PBXBuildFile; fileRef = 664E075C18C9592700CBFF74 /* 1a.json */; };
 		60F91F3A197D32F2009F47D7 /* 1b.json in Resources */ = {isa = PBXBuildFile; fileRef = 664E075D18C9592700CBFF74 /* 1b.json */; };
-		60F91F3B197D32FF009F47D7 /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 669A728D1885C43B00E98795 /* Commits */; };
 		60FA55E01A447A8600A2D8A7 /* COSchemaMigrationDriver.h in Headers */ = {isa = PBXBuildFile; fileRef = 60FA55DE1A447A8600A2D8A7 /* COSchemaMigrationDriver.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60FA55E11A447A8600A2D8A7 /* COSchemaMigrationDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 60FA55DF1A447A8600A2D8A7 /* COSchemaMigrationDriver.m */; };
 		60FB09D313C3079000C2AB94 /* EtoileFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60FB087D13C3066300C2AB94 /* EtoileFoundation.framework */; };
@@ -708,7 +706,6 @@
 		6699DDAC184887E70003E803 /* TestOrderedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDAB184887E70003E803 /* TestOrderedRelationship.m */; };
 		6699DDAF184887F60003E803 /* TestUnivaluedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDAE184887F60003E803 /* TestUnivaluedRelationship.m */; };
 		6699DDB2184888050003E803 /* TestUnorderedRelationship.m in Sources */ = {isa = PBXBuildFile; fileRef = 6699DDB1184888050003E803 /* TestUnorderedRelationship.m */; };
-		669A728F1885C43B00E98795 /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 669A728D1885C43B00E98795 /* Commits */; };
 		66A00A21187DFA8D005CFE16 /* TestAttributedStringMerge.m in Sources */ = {isa = PBXBuildFile; fileRef = 66A00A20187DFA8D005CFE16 /* TestAttributedStringMerge.m */; };
 		66A00A29187E7BA1005CFE16 /* CORevision+Graphviz.h in Headers */ = {isa = PBXBuildFile; fileRef = 66A00A27187E7BA1005CFE16 /* CORevision+Graphviz.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		66A00A2A187E7BA1005CFE16 /* CORevision+Graphviz.m in Sources */ = {isa = PBXBuildFile; fileRef = 66A00A28187E7BA1005CFE16 /* CORevision+Graphviz.m */; };
@@ -1070,7 +1067,6 @@
 		6061B82F1C524DF100813C18 /* Person.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Person.h; path = Tests/TestModelObjects/Person.h; sourceTree = "<group>"; };
 		6061B8301C524DF100813C18 /* Person.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Person.m; path = Tests/TestModelObjects/Person.m; sourceTree = "<group>"; };
 		6061B8D71C57E89700813C18 /* BenchmarkCoreObject (iOS).app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "BenchmarkCoreObject (iOS).app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		6061B8D81C57E89800813C18 /* TestCoreObject (iOS) copy2-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "TestCoreObject (iOS) copy2-Info.plist"; path = "/Users/qmathe/reps/Etoile/Frameworks/CoreObject/TestCoreObject (iOS) copy2-Info.plist"; sourceTree = "<absolute>"; };
 		606E3DBF1787A07E00ED42DA /* COSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSerialization.h; path = Core/COSerialization.h; sourceTree = "<group>"; };
 		606E3DC01787A07E00ED42DA /* COSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSerialization.m; path = Core/COSerialization.m; sourceTree = "<group>"; };
 		607335B218AB96A6008A02DC /* COSmartGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSmartGroup.h; path = Model/COSmartGroup.h; sourceTree = "<group>"; };
@@ -1079,6 +1075,8 @@
 		6076D0FE1A31E4110023C97A /* COSchemaMigration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSchemaMigration.m; path = SchemaMigration/COSchemaMigration.m; sourceTree = SOURCE_ROOT; };
 		607EB347178881E60024B34D /* CODictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CODictionary.h; path = Model/CODictionary.h; sourceTree = "<group>"; };
 		607EB348178881E60024B34D /* CODictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CODictionary.m; path = Model/CODictionary.m; sourceTree = "<group>"; };
+		60811AF31D7193DA00D4DEEA /* Base */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Base; path = Localization/Base.lproj/Commits; sourceTree = "<group>"; };
+		60811AF51D7193DD00D4DEEA /* fr */ = {isa = PBXFileReference; lastKnownFileType = folder; name = fr; path = Localization/fr.lproj/Commits; sourceTree = "<group>"; };
 		6083223619795D18008D9F9D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		6083223819795D21008D9F9D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		6083223C19797DE2008D9F9D /* COCocoaTouchCompatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCocoaTouchCompatibility.h; path = iOS/COCocoaTouchCompatibility.h; sourceTree = SOURCE_ROOT; };
@@ -1372,8 +1370,6 @@
 		6699DDAB184887E70003E803 /* TestOrderedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestOrderedRelationship.m; sourceTree = "<group>"; };
 		6699DDAE184887F60003E803 /* TestUnivaluedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnivaluedRelationship.m; sourceTree = "<group>"; };
 		6699DDB1184888050003E803 /* TestUnorderedRelationship.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestUnorderedRelationship.m; sourceTree = "<group>"; };
-		669A728E1885C43B00E98795 /* English */ = {isa = PBXFileReference; lastKnownFileType = folder; name = English; path = Commits; sourceTree = "<group>"; };
-		669A72901885C46100E98795 /* org.etoile.CoreObject.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = org.etoile.CoreObject.json; path = Commits/org.etoile.CoreObject.json; sourceTree = "<group>"; };
 		66A00A18187DDB6A005CFE16 /* COObjectGraphContext+Debugging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+Debugging.h"; path = "Core/COObjectGraphContext+Debugging.h"; sourceTree = "<group>"; };
 		66A00A20187DFA8D005CFE16 /* TestAttributedStringMerge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestAttributedStringMerge.m; sourceTree = "<group>"; };
 		66A00A27187E7BA1005CFE16 /* CORevision+Graphviz.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "CORevision+Graphviz.h"; path = "Debugging/CORevision+Graphviz.h"; sourceTree = "<group>"; };
@@ -1620,7 +1616,6 @@
 		29B97314FDCFA39411CA2CEA /* ObjectMerging */ = {
 			isa = PBXGroup;
 			children = (
-				669A72821885C42C00E98795 /* English.lproj */,
 				66E62257185BEEB5002A22C1 /* Debugging */,
 				6633F107185515F1009CE6F7 /* Extras */,
 				6699633B115F0C4200359BE6 /* Documentation */,
@@ -1634,13 +1629,13 @@
 				6686BDCB12592C1B0065DE1A /* Diff & Merge (Low-level API) */,
 				663CE28617C07ED800E729F5 /* Undo */,
 				6686BDC712592C1B0065DE1A /* Utilities */,
+				60811AC81D718F3A00D4DEEA /* Localization */,
 				6646977017CE789700A1B767 /* Synchronization */,
 				6083223B19797DB7008D9F9D /* iOS */,
 				6686BDB212592C1B0065DE1A /* Supporting Files */,
 				60C913AC165BBE7500E0C5F4 /* Samples */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
-				6061B8D81C57E89800813C18 /* TestCoreObject (iOS) copy2-Info.plist */,
 			);
 			name = ObjectMerging;
 			sourceTree = "<group>";
@@ -1693,6 +1688,16 @@
 			);
 			name = "Schema Migration";
 			path = StorageDataModel;
+			sourceTree = "<group>";
+		};
+		60811AC81D718F3A00D4DEEA /* Localization */ = {
+			isa = PBXGroup;
+			children = (
+				6043D4C717575D79002103CC /* COCommitDescriptor.h */,
+				6043D4C817575D7A002103CC /* COCommitDescriptor.m */,
+				60811AF21D7193DA00D4DEEA /* Commits */,
+			);
+			name = Localization;
 			sourceTree = "<group>";
 		};
 		6083223B19797DB7008D9F9D /* iOS */ = {
@@ -2105,8 +2110,6 @@
 			children = (
 				609C00E21704C42200D01AAB /* COError.h */,
 				609C00E31704C42200D01AAB /* COError.m */,
-				6043D4C717575D79002103CC /* COCommitDescriptor.h */,
-				6043D4C817575D7A002103CC /* COCommitDescriptor.m */,
 				6612113E1821986B003AEC29 /* CODateSerialization.h */,
 				6612113F1821986B003AEC29 /* CODateSerialization.m */,
 				60DBD0A81A822AEE009F3935 /* COJSONSerialization.h */,
@@ -2196,15 +2199,6 @@
 			);
 			name = Relationship;
 			path = Tests/Relationship;
-			sourceTree = "<group>";
-		};
-		669A72821885C42C00E98795 /* English.lproj */ = {
-			isa = PBXGroup;
-			children = (
-				669A72901885C46100E98795 /* org.etoile.CoreObject.json */,
-				669A728D1885C43B00E98795 /* Commits */,
-			);
-			path = English.lproj;
 			sourceTree = "<group>";
 		};
 		66D09D58129CE477006BEDC3 /* Model */ = {
@@ -2989,8 +2983,9 @@
 				Japanese,
 				French,
 				German,
-				en,
 				Base,
+				fr,
+				en,
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* ObjectMerging */;
 			projectDirPath = "";
@@ -3117,7 +3112,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6002E288197FD90300AC9150 /* Commits in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3125,7 +3119,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6061B8D01C57E89700813C18 /* Commits in Resources */,
 				6061B8D11C57E89700813C18 /* Default-568h@2x.png in Resources */,
 				6061B8D21C57E89700813C18 /* 1b.json in Resources */,
 				6061B8D31C57E89700813C18 /* 1a.json in Resources */,
@@ -3136,7 +3129,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				60F91F3B197D32FF009F47D7 /* Commits in Resources */,
 				6028484E1BBAB5820094CDB0 /* Default-568h@2x.png in Resources */,
 				60F91F3A197D32F2009F47D7 /* 1b.json in Resources */,
 				60F91F39197D32F2009F47D7 /* 1a.json in Resources */,
@@ -3147,8 +3139,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				669A728F1885C43B00E98795 /* Commits in Resources */,
 				66E62285185CF875002A22C1 /* COPYING in Resources */,
+				60811AF41D7193DA00D4DEEA /* Commits in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3835,10 +3827,11 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		669A728D1885C43B00E98795 /* Commits */ = {
+		60811AF21D7193DA00D4DEEA /* Commits */ = {
 			isa = PBXVariantGroup;
 			children = (
-				669A728E1885C43B00E98795 /* English */,
+				60811AF31D7193DA00D4DEEA /* Base */,
+				60811AF51D7193DD00D4DEEA /* fr */,
 			);
 			name = Commits;
 			sourceTree = "<group>";

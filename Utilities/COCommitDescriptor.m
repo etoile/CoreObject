@@ -75,12 +75,32 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 	someLocalizationTables[domain] = plist;
 }
 
+static NSString *languageDirectoryForLocalization(NSString *localization, NSBundle *bundle)
+{
+	NSString *lang = localization;
+	NSFileManager *fileManager = [NSFileManager defaultManager];
+	BOOL isDir = NO;
+
+	if ([localization isEqualToString: bundle.developmentLocalization])
+	{
+		NSString *baseDirectory = [[bundle resourcePath]
+			stringByAppendingPathComponent: [@"Base" stringByAppendingPathExtension: @"lproj"]];
+		
+		if ([fileManager fileExistsAtPath: baseDirectory isDirectory: &isDir] && isDir)
+		{
+			lang = @"Base";
+		}
+	}
+	return [[bundle resourcePath] stringByAppendingPathComponent:
+		[lang stringByAppendingPathExtension: @"lproj"]];
+}
+
 + (void)loadCommitDescriptorsInTable: (NSMutableDictionary *)aDescriptorTable
                            typeTable: (NSMutableDictionary *)aTypeTable
                   localizationTables: (NSMutableDictionary *)someLocalizationTables
 {
-	NSMutableArray *commitsFiles = [NSMutableArray array];
-	NSMutableArray *stringsFiles = [NSMutableArray array];
+	NSMutableSet *commitsFiles = [NSMutableSet new];
+	NSMutableSet *stringsFiles = [NSMutableSet new];
 	/* For the test suite on GNUstep, resources are packaged in the test bundle 
 	   (it doesn't link the CoreObject framework) */
 	NSBundle *coreObjectBundle = [NSBundle bundleForClass: self];
@@ -89,12 +109,12 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 
 	for (NSBundle *bundle in bundles)
 	{
-		// FIXME: Once -[NSBundle pathsForResourcesOfType:inDirectory:] searches 
+		// FIXME: Once -[NSBundle pathsForResourcesOfType:inDirectory:] searches
 		// language directories correctly on GNUstep, remove this inner loop.
-		for (NSString *lang in [bundle localizations])
+		for (NSString *localization in [bundle preferredLocalizations])
 		{
-			NSString *localizedDirectory = [[[bundle resourcePath] stringByAppendingPathComponent: 
-				[lang stringByAppendingPathExtension: @"lproj"]] stringByAppendingPathComponent: @"Commits"];
+			NSString *languageDirectory = languageDirectoryForLocalization(localization, bundle);
+			NSString *localizedDirectory = [languageDirectory stringByAppendingPathComponent: @"Commits"];
 			NSFileManager *fileManager = [NSFileManager defaultManager];
 			BOOL isDir = NO;
 
