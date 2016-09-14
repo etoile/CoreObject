@@ -96,5 +96,12 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (void)deleteBranch: (COBranch *)aBranch;
 - (void)undeleteBranch: (COBranch *)aBranch;
-
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
+- (void)assertNotZombie;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
+- (void)makeZombie;
 @end

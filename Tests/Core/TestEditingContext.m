@@ -73,6 +73,7 @@
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNil([store persistentRootInfoForUUID: uuid]);
     UKFalse([persistentRoot isDeleted]);
+	UKFalse(persistentRoot.isZombie);
 }
 
 - (void)testDeleteUncommittedPersistentRoot
@@ -88,7 +89,9 @@
     UKTrue([[ctx persistentRoots] isEmpty]);
     UKTrue([[ctx persistentRootsPendingDeletion] isEmpty]);
     UKNil([ctx persistentRootForUUID: uuid]);
+	UKNil([ctx loadedPersistentRootForUUID: uuid]);
     UKNil([store persistentRootInfoForUUID: uuid]);
+	UKTrue(persistentRoot.isZombie);
 }
 
 - (void)testUndeleteUncommittedPersistentRoot
@@ -97,14 +100,19 @@
     ETUUID *uuid = [persistentRoot UUID];
     
 	[self validateNewPersistentRoot: persistentRoot UUID: uuid];
-    
-    persistentRoot.deleted = NO;
-    
-    UKTrue([ctx hasChanges]);
-    UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
-    UKTrue([[ctx persistentRootsPendingUndeletion] isEmpty]);
-    UKNotNil([ctx persistentRootForUUID: uuid]);
-    UKNil([store persistentRootInfoForUUID: uuid]);
+	
+	persistentRoot.deleted = YES;
+	
+	// can't undelete since it's a zombie
+	UKRaisesException(persistentRoot.deleted = NO);
+	
+	UKFalse([ctx hasChanges]);
+	UKTrue([[ctx persistentRoots] isEmpty]);
+	UKTrue([[ctx persistentRootsPendingDeletion] isEmpty]);
+	UKNil([ctx persistentRootForUUID: uuid]);
+	UKNil([ctx loadedPersistentRootForUUID: uuid]);
+	UKNil([store persistentRootInfoForUUID: uuid]);
+	UKTrue(persistentRoot.isZombie);
 }
 
 - (void)testDeleteCommittedPersistentRoot
@@ -211,9 +219,13 @@
 	UKObjectsEqual(S(persistentRoot), unloadNotification.userInfo[kCOUnloadedPersistentRootsKey]);
 	
     UKFalse(ctx.hasChanges);
+	UKFalse(persistentRoot.isZombie);
     UKNil([ctx loadedPersistentRootForUUID: uuid]);
     UKNotNil([store persistentRootInfoForUUID: uuid]);
+	
+	// Triggers reload
     UKNotNil([ctx persistentRootForUUID: uuid]);
+	UKNotNil([ctx loadedPersistentRootForUUID: uuid]);
 }
 
 - (void)testUnloadUncommittedPersistentRoot
@@ -226,6 +238,7 @@
 	UKObjectsEqual(S(persistentRoot), unloadNotification.userInfo[kCOUnloadedPersistentRootsKey]);
 	
     UKFalse(ctx.hasChanges);
+	UKTrue(persistentRoot.isZombie);
     UKNil([ctx loadedPersistentRootForUUID: uuid]);
     UKNil([store persistentRootInfoForUUID: uuid]);
     UKNil([ctx persistentRootForUUID: uuid]);

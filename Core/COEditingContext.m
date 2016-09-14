@@ -535,6 +535,11 @@
 		postNotificationName: COEditingContextDidUnloadPersistentRootsNotification
 		              object: self
 		            userInfo: @{ kCOUnloadedPersistentRootsKey : S(aPersistentRoot) }];
+	
+	if ([aPersistentRoot isPersistentRootUncommitted])
+	{
+		[aPersistentRoot makeZombie];
+	}
 }
 
 - (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot

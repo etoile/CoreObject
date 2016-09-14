@@ -261,6 +261,12 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (void)setDeleted: (BOOL)deleted
 {
+	[self assertNotZombie];
+	if (deleted == [self isDeleted])
+	{
+		return;
+	}
+	
     if (deleted)
     {
         [_parentContext deletePersistentRoot: self];
@@ -928,6 +934,21 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     [ctx setItemGraph: items];
 
     return ctx;
+}
+
+- (void)assertNotZombie
+{
+	if (self.isZombie)
+	{
+		[NSException raise: NSInternalInconsistencyException
+					format: @"Method called on zombie COPersistentRoot"];
+	}
+}
+
+- (void)makeZombie
+{
+	[self assertNotZombie];
+	_parentContext = nil;
 }
 
 @end
