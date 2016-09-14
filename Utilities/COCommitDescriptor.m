@@ -110,8 +110,11 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 	for (NSBundle *bundle in bundles)
 	{
 		// FIXME: Once -[NSBundle pathsForResourcesOfType:inDirectory:] searches
-		// language directories correctly on GNUstep, remove this inner loop.
-		for (NSString *localization in [bundle preferredLocalizations])
+		// language directories correctly on GNUstep, remove the inner loop below.
+		
+		/* Collect localized files according to the preferred localizations of
+		   the app or test runner tool (the main bundle in both cases) */
+		for (NSString *localization in [NSBundle mainBundle].preferredLocalizations)
 		{
 			NSString *languageDirectory = languageDirectoryForLocalization(localization, bundle);
 			NSString *localizedDirectory = [languageDirectory stringByAppendingPathComponent: @"Commits"];
