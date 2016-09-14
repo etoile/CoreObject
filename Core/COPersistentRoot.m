@@ -172,6 +172,10 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSString *)description
 {
+	if ([self isZombie])
+	{
+		return @"<zombie persistent root>";
+	}
 	return [NSString stringWithFormat: @"<%@ %p - %@ - %@>",
 		NSStringFromClass([self class]), self, _UUID, [[[self rootObject] entityDescription] name]];
 }
@@ -257,6 +261,12 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (void)setDeleted: (BOOL)deleted
 {
+	[self assertNotZombie];
+	if (deleted == [self isDeleted])
+	{
+		return;
+	}
+	
     if (deleted)
     {
         [_parentContext deletePersistentRoot: self];
@@ -343,6 +353,11 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	// TODO: Update cross persistent root references
 }
 
+- (NSSet *)allBranches
+{
+	return [NSSet setWithArray: _branchForUUID.allValues];
+}
+
 - (NSSet *)branches
 {
     return [NSSet setWithArray: [[_branchForUUID allValues] filteredCollectionWithBlock: ^(id obj)
@@ -366,12 +381,9 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (void)deleteBranch: (COBranch *)aBranch
 {
-    if ([aBranch isBranchUncommitted])
-    {
-        [_branchForUUID removeObjectForKey: [aBranch UUID]];
-    }
-	else if ([_branchesPendingUndeletion containsObject: aBranch])
+	if ([_branchesPendingUndeletion containsObject: aBranch])
 	{
+		ETAssert(!aBranch.isBranchUncommitted);
 		[_branchesPendingUndeletion removeObject: aBranch];
 	}
 	else
@@ -380,13 +392,20 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	}
 	[self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: aBranch.persistentRoot
 	                                                                  branch: aBranch
-	                                                               isDeleted: YES];
+	                                                                 isFault: YES];
+	
+    if (aBranch.isBranchUncommitted)
+    {
+		[_branchesPendingDeletion removeObject: aBranch];
+        [_branchForUUID removeObjectForKey: aBranch.UUID];
+    }
 }
 
 - (void)undeleteBranch: (COBranch *)aBranch
 {
     if ([_branchesPendingDeletion containsObject: aBranch])
     {
+		ETAssert(!aBranch.isBranchUncommitted);
         [_branchesPendingDeletion removeObject: aBranch];
     }
     else
@@ -395,7 +414,12 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     }
 	[self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: aBranch.persistentRoot
 	                                                                  branch: aBranch
-	                                                               isDeleted: aBranch.persistentRoot.deleted];
+	                                                                 isFault: aBranch.persistentRoot.deleted];
+
+    if (aBranch.isBranchUncommitted)
+    {
+		[_branchesPendingUndeletion removeObject: aBranch];
+	}
 }
 
 #pragma mark Pending Changes -
@@ -473,6 +497,11 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	[_currentBranchObjectGraph discardAllChanges];
 	
 	ETAssert([self hasChanges] == NO);
+}
+
+- (BOOL) isZombie
+{
+	return (_parentContext == nil);
 }
 
 #pragma mark Convenience -
@@ -905,6 +934,21 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     [ctx setItemGraph: items];
 
     return ctx;
+}
+
+- (void)assertNotZombie
+{
+	if (self.isZombie)
+	{
+		[NSException raise: NSInternalInconsistencyException
+					format: @"Method called on zombie COPersistentRoot"];
+	}
+}
+
+- (void)makeZombie
+{
+	[self assertNotZombie];
+	_parentContext = nil;
 }
 
 @end

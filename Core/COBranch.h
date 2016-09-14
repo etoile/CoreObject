@@ -304,7 +304,12 @@ extern NSString * const kCOBranchLabel;
  * Use it to cause a "checkpoint" revision to be written.
  */
 @property (nonatomic, assign) BOOL shouldMakeEmptyCommit;
-
+/**
+ * Returns whether the editing context has relinquished
+ * control over this object. If YES, this instance can no longer be used
+ * and calling any methods may throw an exception
+ */
+@property (nonatomic, readonly) BOOL isZombie;
 
 /** @taskunit Undo / Redo */
 

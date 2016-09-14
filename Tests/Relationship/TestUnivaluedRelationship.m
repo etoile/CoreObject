@@ -145,21 +145,23 @@
 {
 	SUPERINIT;
 	
-	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorNever;
+	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorManual;
 
-	group1 = [ctx insertNewPersistentRootWithEntityName: @"UnivaluedGroupNoOpposite"].rootObject;
-	item1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
-	item1.label = @"current";
-	group1.label = @"current";
-	group1.content = item1;
-	[ctx commit];
+	@autoreleasepool {
+		group1 = [ctx insertNewPersistentRootWithEntityName: @"UnivaluedGroupNoOpposite"].rootObject;
+		item1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
+		item1.label = @"current";
+		group1.label = @"current";
+		group1.content = item1;
+		[ctx commit];
 
-	otherItem1 = [item1.persistentRoot.currentBranch makeBranchWithLabel: @"other"].rootObject;
-	otherItem1.label = @"other";
-	otherGroup1 = [group1.persistentRoot.currentBranch makeBranchWithLabel: @"other"].rootObject;
-	otherGroup1.label = @"other";
-	[ctx commit];
-	
+		otherItem1 = [item1.persistentRoot.currentBranch makeBranchWithLabel: @"other"].rootObject;
+		otherItem1.label = @"other";
+		otherGroup1 = [group1.persistentRoot.currentBranch makeBranchWithLabel: @"other"].rootObject;
+		otherGroup1.label = @"other";
+		[ctx commit];
+	}
+
 	group1uuid = group1.persistentRoot.UUID;
 	item1uuid = item1.persistentRoot.UUID;
 
@@ -661,6 +663,53 @@
 	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
 
 	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
+}
+
+- (void)testSourcePersistentRootUnloadingOnDeletion
+{
+	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorOnDeletion;
+
+	@autoreleasepool {
+		item1.persistentRoot.deleted = YES;
+		[ctx commit];
+		item1 = nil;
+	}
+
+	UKObjectsEqual([COPath pathWithPersistentRoot: item1uuid], [group1 serializableValueForStorageKey: @"content"]);
+
+	@autoreleasepool {
+		group1.persistentRoot.deleted = YES;
+		[ctx commit];
+		group1 = nil;
+	}
+
+	group1 = [ctx persistentRootForUUID: group1uuid].rootObject;
+
+	UKObjectsEqual([COPath pathWithPersistentRoot: item1uuid], [group1 serializableValueForStorageKey: @"content"]);
+	UKNil(group1.content);
+}
+
+- (void)testSourcePersistentRootManualUnloading
+{
+	@autoreleasepool {
+		[ctx unloadPersistentRoot: item1.persistentRoot];
+		item1 = nil;
+	}
+
+	UKObjectsEqual([COPath pathWithPersistentRoot: item1uuid], [group1 serializableValueForStorageKey: @"content"]);
+	
+	@autoreleasepool {
+		[ctx unloadPersistentRoot: group1.persistentRoot];
+		group1 = nil;
+	}
+
+	group1 = [ctx persistentRootForUUID: group1uuid].rootObject;
+	// Force lazy loading of item1
+	COObject *reloadedContent = group1.content;
+	item1 = [ctx persistentRootForUUID: item1uuid].rootObject;
+
+	UKObjectsEqual(item1, reloadedContent);
+	UKObjectsEqual(S(group1), [item1.incomingRelationshipCache referringObjects]);
 }
 
 @end

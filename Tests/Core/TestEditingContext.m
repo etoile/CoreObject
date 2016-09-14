@@ -47,26 +47,6 @@
 	UKDoesNotRaiseException([ctx insertNewPersistentRootWithEntityName: @"OutlineItem"]);
 }
 
-- (void)testDeleteUncommittedPersistentRoot
-{
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    ETUUID *uuid = [persistentRoot UUID];
-    
-    UKTrue([ctx hasChanges]);
-    UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
-    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
-    UKNotNil([ctx persistentRootForUUID: uuid]);
-    UKNil([store persistentRootInfoForUUID: uuid]);
-    UKFalse([persistentRoot isDeleted]);
-    
-    persistentRoot.deleted = YES;
-    
-    UKFalse([ctx hasChanges]);
-    UKObjectsEqual([NSSet set], [ctx persistentRoots]);
-    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
-    UKNil([ctx persistentRootForUUID: uuid]);
-    UKNil([store persistentRootInfoForUUID: uuid]);
-}
 
 - (void)testExceptionOnNewPersistentRootForModelDescriptionRepositoryMismatch
 {
@@ -83,6 +63,56 @@
 
 	UKObjectsNotEqual(newRepo, [ctx modelDescriptionRepository]);
 	UKRaisesException([ctx insertNewPersistentRootWithRootObject: rootObject]);
+}
+
+- (void) validateNewPersistentRoot: (COPersistentRoot *)persistentRoot UUID: (ETUUID *)uuid
+{
+    UKTrue([ctx hasChanges]);
+    UKObjectsEqual(S(persistentRoot), [ctx persistentRoots]);
+    UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
+    UKNotNil([ctx persistentRootForUUID: uuid]);
+    UKNil([store persistentRootInfoForUUID: uuid]);
+    UKFalse([persistentRoot isDeleted]);
+	UKFalse(persistentRoot.isZombie);
+}
+
+- (void)testDeleteUncommittedPersistentRoot
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    ETUUID *uuid = [persistentRoot UUID];
+    
+	[self validateNewPersistentRoot: persistentRoot UUID: uuid];
+    
+    persistentRoot.deleted = YES;
+    
+    UKFalse([ctx hasChanges]);
+    UKTrue([[ctx persistentRoots] isEmpty]);
+    UKTrue([[ctx persistentRootsPendingDeletion] isEmpty]);
+    UKNil([ctx persistentRootForUUID: uuid]);
+	UKNil([ctx loadedPersistentRootForUUID: uuid]);
+    UKNil([store persistentRootInfoForUUID: uuid]);
+	UKTrue(persistentRoot.isZombie);
+}
+
+- (void)testUndeleteUncommittedPersistentRoot
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    ETUUID *uuid = [persistentRoot UUID];
+    
+	[self validateNewPersistentRoot: persistentRoot UUID: uuid];
+	
+	persistentRoot.deleted = YES;
+	
+	// can't undelete since it's a zombie
+	UKRaisesException(persistentRoot.deleted = NO);
+	
+	UKFalse([ctx hasChanges]);
+	UKTrue([[ctx persistentRoots] isEmpty]);
+	UKTrue([[ctx persistentRootsPendingDeletion] isEmpty]);
+	UKNil([ctx persistentRootForUUID: uuid]);
+	UKNil([ctx loadedPersistentRootForUUID: uuid]);
+	UKNil([store persistentRootInfoForUUID: uuid]);
+	UKTrue(persistentRoot.isZombie);
 }
 
 - (void)testDeleteCommittedPersistentRoot
@@ -176,6 +206,42 @@
 		UKObjectsEqual([NSSet set], [testCtx deletedPersistentRoots]);
 		UKFalse([testProot isDeleted]);
 	 }];
+}
+
+- (void)testUnloadPeristentRoot
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    ETUUID *uuid = persistentRoot.UUID;
+	
+	[ctx commit];
+	[ctx unloadPersistentRoot: persistentRoot];
+	
+	UKObjectsEqual(S(persistentRoot), unloadNotification.userInfo[kCOUnloadedPersistentRootsKey]);
+	
+    UKFalse(ctx.hasChanges);
+	UKFalse(persistentRoot.isZombie);
+    UKNil([ctx loadedPersistentRootForUUID: uuid]);
+    UKNotNil([store persistentRootInfoForUUID: uuid]);
+	
+	// Triggers reload
+    UKNotNil([ctx persistentRootForUUID: uuid]);
+	UKNotNil([ctx loadedPersistentRootForUUID: uuid]);
+}
+
+- (void)testUnloadUncommittedPersistentRoot
+{
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    ETUUID *uuid = persistentRoot.UUID;
+	
+	[ctx unloadPersistentRoot: persistentRoot];
+	
+	UKObjectsEqual(S(persistentRoot), unloadNotification.userInfo[kCOUnloadedPersistentRootsKey]);
+	
+    UKFalse(ctx.hasChanges);
+	UKTrue(persistentRoot.isZombie);
+    UKNil([ctx loadedPersistentRootForUUID: uuid]);
+    UKNil([store persistentRootInfoForUUID: uuid]);
+    UKNil([ctx persistentRootForUUID: uuid]);
 }
 
 /**

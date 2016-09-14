@@ -113,7 +113,7 @@
 {
 	SUPERINIT;
 	
-	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorNever;
+	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorManual;
 
 	group1 = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupWithOpposite"].rootObject;
 	item1 = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupContent"].rootObject;
@@ -582,6 +582,67 @@
 	
 	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
 	UKObjectsEqual(A(group1ctx2), [[[ctx2 deadRelationshipCache] referringObjectsForPath: item2Path] allObjects]);
+}
+
+- (void)testSourcePersistentRootUnloadingOnDeletion
+{
+	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorOnDeletion;
+
+	@autoreleasepool {
+		item1.persistentRoot.deleted = YES;
+		[ctx commit];
+		item1 = nil;
+	}
+
+	UKObjectsEqual(S([COPath pathWithPersistentRoot: item1uuid], item2),
+	               [[group1 serializableValueForStorageKey: @"contents"] allReferences]);
+
+	@autoreleasepool {
+		group1.persistentRoot.deleted = YES;
+		[ctx commit];
+		group1 = nil;
+	}
+
+	UKTrue(item2.parentGroups.isEmpty);
+
+	group1 = [ctx persistentRootForUUID: group1uuid].rootObject;
+
+	UKObjectsEqual(S([COPath pathWithPersistentRoot: item1uuid], item2),
+	               [[group1 serializableValueForStorageKey: @"contents"] allReferences]);
+
+	// Force lazy loading of item1
+	NSSet *reloadedContents = group1.contents;
+	item1 = [ctx persistentRootForUUID: item1uuid].rootObject;
+
+	UKObjectsEqual(S(item2), reloadedContents);
+	// group1 is deleted so it's hidden by the incoming relationship cache
+	UKTrue(item2.parentGroups.isEmpty);
+}
+
+- (void)testSourcePersistentRootManualUnloading
+{
+	@autoreleasepool {
+		[ctx unloadPersistentRoot: item1.persistentRoot];
+		item1 = nil;
+	}
+
+	UKObjectsEqual(S([COPath pathWithPersistentRoot: item1uuid], item2),
+	               [[group1 serializableValueForStorageKey: @"contents"] allReferences]);
+	
+	@autoreleasepool {
+		[ctx unloadPersistentRoot: group1.persistentRoot];
+		group1 = nil;
+	}
+	
+	UKTrue(item2.parentGroups.isEmpty);
+
+	group1 = [ctx persistentRootForUUID: group1uuid].rootObject;
+	// Force lazy loading of item1
+	NSSet *reloadedContents = group1.contents;
+	item1 = [ctx persistentRootForUUID: item1uuid].rootObject;
+
+	UKObjectsEqual(S(item1, item2), reloadedContents);
+	UKObjectsEqual(S(group1), item2.parentGroups);
 }
 
 @end
