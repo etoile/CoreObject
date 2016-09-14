@@ -530,16 +530,16 @@
 	// of other objects holding references to the discarded object graphs. If we wait until
 	// -[COObjectGraphContext dealloc], COObject.deadRelationshipCache will be nil.
 	[[[aPersistentRoot allObjectGraphContexts] mappedCollection] discardAllObjects];
+		
+	if ([aPersistentRoot isPersistentRootUncommitted])
+	{
+		[aPersistentRoot makeZombie];
+	}
 	
 	[[NSNotificationCenter defaultCenter]
 		postNotificationName: COEditingContextDidUnloadPersistentRootsNotification
 		              object: self
 		            userInfo: @{ kCOUnloadedPersistentRootsKey : S(aPersistentRoot) }];
-	
-	if ([aPersistentRoot isPersistentRootUncommitted])
-	{
-		[aPersistentRoot makeZombie];
-	}
 }
 
 - (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot
