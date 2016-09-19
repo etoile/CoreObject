@@ -32,7 +32,7 @@
 	parentStringProperty.derived = YES;
 	parentStringProperty.opposite = (id)@"Anonymous.COAttributedString.chunks";
 	
-	[entity setPropertyDescriptions: @[textProperty, attributesProperty, parentStringProperty]];
+	entity.propertyDescriptions = @[textProperty, attributesProperty, parentStringProperty];
 	
 	entity.diffAlgorithm = @"COAttributedStringDiff";
 	
@@ -73,7 +73,7 @@
 // NOTE: This gets called a lot by AppKit
 - (NSUInteger) length
 {
-	return [text length];
+	return text.length;
 }
 
 - (NSString *) attributesDebugDescription
@@ -100,19 +100,19 @@
 
 - (NSRange) characterRange
 {
-	return NSMakeRange([self characterIndex], [self length]);
+	return NSMakeRange([self characterIndex], self.length);
 }
 
 - (NSString *) description
 {
 	NSMutableString *result = [NSMutableString new];
-	if ([self.attributes count] == 0)
+	if (self.attributes.count == 0)
 	{
 		[result appendFormat: @"<span>%@</span>", self.text];
 	}
 	else
 	{
-		NSArray *attrs = [[self.attributes allObjects] sortedArrayUsingDescriptors:
+		NSArray *attrs = [self.attributes.allObjects sortedArrayUsingDescriptors:
 						  @[[NSSortDescriptor sortDescriptorWithKey: @"htmlCode" ascending: YES]]];
 		for (COAttributedStringAttribute *attr in attrs)
 		{

@@ -29,7 +29,7 @@
  *
  * See also -loadedObjectUUIDs.
  */
-- (NSArray *)loadedObjects;
+@property (nonatomic, readonly) NSArray *loadedObjects;
 /**
  * Returns the root objects presently managed by the receiver in memory.
  *
@@ -37,7 +37,7 @@
  *
  * The returned objects are a subset of -loadedObjects.
  */
-- (NSArray *)loadedRootObjects;
+@property (nonatomic, readonly) NSArray *loadedRootObjects;
 
 
 /** @taskunit Pending Changes */
@@ -49,20 +49,20 @@
  *
  * After a commit, returns an empty set.
  */
-- (NSArray *)insertedObjects;
+@property (nonatomic, readonly) NSArray *insertedObjects;
 /**
  * Returns the objects whose properties have been edited in the context and to
  * be updated in the store on the next commit.
  *
  * After a commit, returns an empty set.
  */
-- (NSArray *)updatedObjects;
+@property (nonatomic, readonly) NSArray *updatedObjects;
 /**
  * Returns the union of the inserted and updated objects. See -insertedObjects
  * and -updatedObjects.
  *
  * After a commit, returns an empty set.
  */
-- (NSArray *)changedObjects;
+@property (nonatomic, readonly) NSArray *changedObjects;
 
 @end

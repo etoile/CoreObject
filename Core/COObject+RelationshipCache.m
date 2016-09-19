@@ -56,7 +56,7 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
 				return;
 			}
 			
-			[[obj incomingRelationshipCache] removeReferencesForPropertyInSource: [aProperty name]
+			[[obj incomingRelationshipCache] removeReferencesForPropertyInSource: aProperty.name
 																	sourceObject: self];
 		}
 	}
@@ -69,9 +69,9 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
     {
         if (isPersistentCoreObjectReferencePropertyDescription(aProperty))
         {
-            if ([aProperty isMultivalued])
+            if (aProperty.multivalued)
             {
-                for (id obj in [(id <COPrimitiveCollection>)aValue enumerableReferences])
+                for (id obj in ((id <COPrimitiveCollection>)aValue).enumerableReferences)
                 {
 					[self removeCachedOutgoingRelationshipsForCollectionValue: obj
 													ofPropertyWithDescription: aProperty];
@@ -96,7 +96,7 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
 	{
 		COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
 		self.editingContext.deadRelationshipCache;
-		ETPropertyDescription *propertyInTarget = [aProperty opposite]; // May be nil
+		ETPropertyDescription *propertyInTarget = aProperty.opposite; // May be nil
 		
 		// Metamodel sanity check
 		ETAssert(![aProperty isDerived]);
@@ -116,8 +116,8 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
 		else
 		{
 			[[obj incomingRelationshipCache] addReferenceFromSourceObject: self
-														   sourceProperty: [aProperty name]
-														   targetProperty: [propertyInTarget name]];
+														   sourceProperty: aProperty.name
+														   targetProperty: propertyInTarget.name];
 		}
 	}
 
@@ -131,7 +131,7 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
     {
         if (isPersistentCoreObjectReferencePropertyDescription(aProperty))
         {
-            ETPropertyDescription *propertyInTarget = [aProperty opposite]; // May be nil
+            ETPropertyDescription *propertyInTarget = aProperty.opposite; // May be nil
 
 			// Metamodel sanity check
 			ETAssert(![aProperty isDerived]);
@@ -141,9 +141,9 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
 				ETAssert(![propertyInTarget isPersistent]);
 			}
 			
-			if ([aProperty isMultivalued])
+			if (aProperty.multivalued)
 			{
-				for (id obj in [(id <COPrimitiveCollection>)aValue enumerableReferences])
+				for (id obj in ((id <COPrimitiveCollection>)aValue).enumerableReferences)
 				{
 					[self addCachedOutgoingRelationshipsForCollectionValue: obj
 												 ofPropertyWithDescription: aProperty];
@@ -174,11 +174,11 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
 
 - (void) removeCachedOutgoingRelationships
 {
-    for (ETPropertyDescription *prop in [[self entityDescription] propertyDescriptions])
+    for (ETPropertyDescription *prop in self.entityDescription.propertyDescriptions)
     {
         if (isPersistentCoreObjectReferencePropertyDescription(prop))
         {
-			id value = [self valueForStorageKey: [prop name] shouldLoad: NO];
+			id value = [self valueForStorageKey: prop.name shouldLoad: NO];
 			
             [self removeCachedOutgoingRelationshipsForValue: value
                                   ofPropertyWithDescription: prop];

@@ -34,7 +34,7 @@
  *
  * For a nil URL, raises an NSInvalidArgumentException.
  */
-- (id) initWithURL: (NSURL *)aURL;
+- (instancetype) initWithURL: (NSURL *)aURL NS_DESIGNATED_INITIALIZER;
 /**
  * Intializes and returns a bookmark from the URL location file at the given 
  * path.
@@ -45,7 +45,7 @@
  *
  * For a nil URL, raises an NSInvalidArgumentException.
  */
-- (id) initWithURLFile: (NSString *)aFilePath;
+- (instancetype) initWithURLFile: (NSString *)aFilePath;
 
 
 /** @taskunit Bookmark Properties */
@@ -87,5 +87,5 @@
 /**
  * Returns the image data of the fav icon that symbolizes the given URL. 
  */
-- (NSData *)favIconData;
+@property (nonatomic, readonly) NSData *favIconData;
 @end

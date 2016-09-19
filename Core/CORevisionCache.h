@@ -22,7 +22,7 @@
 
 @property (nonatomic, readonly, weak) COEditingContext *parentEditingContext;
 
-- (id) initWithParentEditingContext: (COEditingContext *)aCtx;
+- (instancetype) initWithParentEditingContext: (COEditingContext *)aCtx NS_DESIGNATED_INITIALIZER;
 - (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
 					  persistentRootUUID: (ETUUID *)aPersistentRoot;
 

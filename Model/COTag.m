@@ -16,13 +16,13 @@
 
 	// For subclasses that don't override -newEntityDescription, we must not add the 
 	// property descriptions that we will inherit through the parent
-	if ([[collection name] isEqual: [COTag className]] == NO) 
+	if ([collection.name isEqual: [COTag className]] == NO) 
 		return collection;
 
 	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COTag"
 	                               description: @"Core Object Tag"
-	                          supertypeStrings: [NSArray array]
-	                                  typeTags: [NSDictionary dictionary]];
+	                          supertypeStrings: @[]
+	                                  typeTags: @{}];
 	ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
 
 	[collection setLocalizedDescription: _(@"Tag")];
@@ -34,7 +34,7 @@
 	ETPropertyDescription *tagGroups =
 		[ETPropertyDescription descriptionWithName: @"tagGroups" type: (id)@"COTagGroup"];
 	[tagGroups setMultivalued: YES];
-	[tagGroups setOpposite: (id)@"COTagGroup.objects"];
+	tagGroups.opposite = (id)@"COTagGroup.objects";
 	[tagGroups setDerived: YES];
 
 	[collection setPropertyDescriptions: A(objects, tagGroups)];
@@ -53,7 +53,7 @@
 
 - (NSString *)tagString
 {
-	return [[self name] lowercaseString];
+	return self.name.lowercaseString;
 }
 
 - (NSSet *)tagGroups
@@ -72,13 +72,13 @@
 
 	// For subclasses that don't override -newEntityDescription, we must not add the 
 	// property descriptions that we will inherit through the parent
-	if ([[collection name] isEqual: [COTagGroup className]] == NO) 
+	if ([collection.name isEqual: [COTagGroup className]] == NO) 
 		return collection;
 
 	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COTagGroup"
 	                               description: @"Core Object Tag Group"
-	                          supertypeStrings: [NSArray array]
-	                                  typeTags: [NSDictionary dictionary]];
+	                          supertypeStrings: @[]
+	                                  typeTags: @{}];
 	ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
 
 	[collection setLocalizedDescription: _(@"Tag Group")];
@@ -106,7 +106,7 @@
 	
 	// For subclasses that don't override -newEntityDescription, we must not add the
 	// property descriptions that we will inherit through the parent
-	if ([[collection name] isEqual: [COTagLibrary className]] == NO)
+	if ([collection.name isEqual: [COTagLibrary className]] == NO)
 		return collection;
 
 	 ETPropertyDescription *tagGroups =
@@ -124,13 +124,13 @@
 	return collection;
 }
 
-- (id)initWithObjectGraphContext: (COObjectGraphContext *)aContext
+- (instancetype)initWithObjectGraphContext: (COObjectGraphContext *)aContext
 {
 	self = [super initWithObjectGraphContext: aContext];
 	if (self == nil)
 		return nil;
 
-	[self setIdentifier: kCOLibraryIdentifierTag];
+	self.identifier = kCOLibraryIdentifierTag;
 	[self setName: _(@"Tags")];
 	return self;
 }

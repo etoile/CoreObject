@@ -25,16 +25,16 @@
     NSDate *_date;
 }
 
-@property (readwrite, nonatomic, strong) ETUUID *revisionUUID;
-@property (readwrite, nonatomic, strong) ETUUID *parentRevisionUUID;
-@property (readwrite, nonatomic, strong) ETUUID *mergeParentRevisionUUID;
+@property (nonatomic, readwrite, strong) ETUUID *revisionUUID;
+@property (nonatomic, readwrite, strong) ETUUID *parentRevisionUUID;
+@property (nonatomic, readwrite, strong) ETUUID *mergeParentRevisionUUID;
 
-@property (readwrite, nonatomic, strong) ETUUID *persistentRootUUID;
-@property (readwrite, nonatomic, strong) ETUUID *branchUUID;
+@property (nonatomic, readwrite, strong) ETUUID *persistentRootUUID;
+@property (nonatomic, readwrite, strong) ETUUID *branchUUID;
 @property (readwrite, nonatomic, copy) NSDictionary *metadata;
-@property (readwrite, nonatomic, strong) NSDate *date;
+@property (nonatomic, readwrite, strong) NSDate *date;
 
-- (id) plist;
+@property (nonatomic, readonly, strong) id plist;
 + (CORevisionInfo *) revisionInfoWithPlist: (id)aPlist;
 
 @end

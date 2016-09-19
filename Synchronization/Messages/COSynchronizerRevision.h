@@ -26,9 +26,9 @@
 		 persistentRootUUID: (ETUUID *)persistentRoot
 				 branchUUID: (ETUUID *)branch;
 
-- (id) initWithUUID: (ETUUID *)aUUID persistentRoot: (ETUUID *)aPersistentRoot store: (COSQLiteStore *)store recordAsDeltaAgainstParent: (BOOL)delta;
+- (instancetype) initWithUUID: (ETUUID *)aUUID persistentRoot: (ETUUID *)aPersistentRoot store: (COSQLiteStore *)store recordAsDeltaAgainstParent: (BOOL)delta NS_DESIGNATED_INITIALIZER;
 
-- (id) propertyList;
-- (id) initWithPropertyList: (id)aPropertyList;
+@property (nonatomic, readonly, strong) id propertyList;
+- (instancetype) initWithPropertyList: (id)aPropertyList NS_DESIGNATED_INITIALIZER;
 
 @end

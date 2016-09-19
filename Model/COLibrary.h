@@ -52,7 +52,7 @@
 /**
  * Returns YES.
  */
-- (BOOL)isLibrary;
+@property (nonatomic, getter=isLibrary, readonly) BOOL library;
 
 
 /** @taskunit Private */
@@ -108,31 +108,31 @@
  *
  * If the library doesn't exist yet, returns a new library but won't commit it.
  */
-- (COTagLibrary *)tagLibrary;
+@property (nonatomic, readonly, strong) COTagLibrary *tagLibrary;
 /**
  * Returns a library listing the bookmarks in the store.
  *
  * If the library doesn't exist yet, returns a new library but won't commit it.
  */
-- (COLibrary *)bookmarkLibrary;
+@property (nonatomic, readonly, strong) COLibrary *bookmarkLibrary;
 /**
  * Returns a library listing the notes in the store.
  *
  * If the library doesn't exist yet, returns a new library but won't commit it.
  */
-- (COLibrary *)noteLibrary;
+@property (nonatomic, readonly, strong) COLibrary *noteLibrary;
 /**
  * Returns a group listing the pictures in the store.
  *
  * If the library doesn't exist yet, returns a new library but won't commit it.
  */
-- (COLibrary *)photoLibrary;
+@property (nonatomic, readonly, strong) COLibrary *photoLibrary;
 /**
  * Returns a group listing the music tracks in the store.
  *
  * If the library doesn't exist yet, returns a new library but won't commit it.
  */
-- (COLibrary *)musicLibrary;
+@property (nonatomic, readonly, strong) COLibrary *musicLibrary;
 
 @end
 

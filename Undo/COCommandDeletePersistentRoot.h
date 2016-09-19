@@ -20,6 +20,6 @@
  * If the command is a undelete inverse or was not obtained using 
  * -[COCommand inverse], returns nil.
  */
-@property (nonatomic, copy) ETUUID *initialRevisionID;
+@property (nonatomic, readwrite, copy) ETUUID *initialRevisionID;
 
 @end

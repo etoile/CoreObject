@@ -26,12 +26,15 @@
 /** @taskunit Basic Properties */
 
 
-@property (nonatomic, copy) ETUUID *branchUUID;
-@property (nonatomic, copy) ETUUID *oldRevisionUUID;
-@property (nonatomic, copy) ETUUID *revisionUUID;
+/**
+ * The concerned branch UUID.
+ */
+@property (nonatomic, readwrite, copy) ETUUID *branchUUID;
+@property (nonatomic, readwrite, copy) ETUUID *oldRevisionUUID;
+@property (nonatomic, readwrite, copy) ETUUID *revisionUUID;
 
-@property (nonatomic, copy) ETUUID *oldHeadRevisionUUID;
-@property (nonatomic, copy) ETUUID *headRevisionUUID;
+@property (nonatomic, readwrite, copy) ETUUID *oldHeadRevisionUUID;
+@property (nonatomic, readwrite, copy) ETUUID *headRevisionUUID;
 
 
 @property (nonatomic, readonly) CORevision *oldRevision;
@@ -44,22 +47,18 @@
 /** 
  * Returns the set revision UUID. 
  */
-- (ETUUID *)UUID;
-/**
- * Returns the concerned branch UUID.
- */
-- (ETUUID *)branchUUID;
+@property (nonatomic, readonly) ETUUID *UUID;
 /**
  * Returns the set revision metadata.
  *
  * See -[CORevision metadata].
  */
-- (NSDictionary *)metadata;
+@property (nonatomic, readonly) NSDictionary *metadata;
 /**
  * Returns the short description for the set revision.
  *
  * See -[CORevision localizedShortDescription].
  */
-- (NSString *)localizedShortDescription;
+@property (nonatomic, readonly) NSString *localizedShortDescription;
 
 @end

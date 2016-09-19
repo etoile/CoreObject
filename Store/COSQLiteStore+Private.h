@@ -15,7 +15,7 @@
  */
 @interface COSQLiteStore ()
 
-- (FMDatabase *) database;
+@property (nonatomic, readonly, strong) FMDatabase *database;
 
 @property (nonatomic, assign) NSUInteger maxNumberOfDeltaCommits;
 

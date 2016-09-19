@@ -42,7 +42,7 @@
 	
 	NSMutableArray *siblingsArray = [NSMutableArray arrayWithObject: commitB];
 	
-	while ([siblingsArray count] > 0)
+	while (siblingsArray.count > 0)
 	{
 		NSMutableArray *nextSiblingsArray = [NSMutableArray new];
 		

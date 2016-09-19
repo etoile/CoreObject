@@ -16,7 +16,7 @@
 	__weak COObject *_object;
 }
 
-- (instancetype)initWithObject: (COObject *)anObject;
+- (instancetype)initWithObject: (COObject *)anObject NS_DESIGNATED_INITIALIZER;
 
 @end
 
@@ -40,7 +40,7 @@
 - (void)removeReference: (id)aReference;
 - (BOOL)containsReference: (id)aReference;
 
-- (NSArray *)deadReferencesArray;
+@property (nonatomic, readonly) NSArray *deadReferencesArray;
 
 @end
 

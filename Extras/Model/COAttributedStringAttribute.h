@@ -18,7 +18,7 @@
  */
 @property (nonatomic, readwrite, strong) NSString *styleValue;
 
-- (COItemGraph *) attributeItemGraph;
+@property (nonatomic, readonly) COItemGraph *attributeItemGraph;
 
 + (BOOL) isAttributeSet: (NSSet *)aSet equalToSet: (NSSet *)anotherSet;
 + (NSSet *) attributeSet: (NSSet *)aSet minusSet: (NSSet *)anotherSet;

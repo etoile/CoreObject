@@ -27,7 +27,7 @@
 	styleValueProperty.persistent = YES;
 
 	
-	[entity setPropertyDescriptions: @[styleKeyProperty, styleValueProperty]];
+	entity.propertyDescriptions = @[styleKeyProperty, styleValueProperty];
 	
 	entity.diffAlgorithm = @"COAttributedStringDiff";
 	
@@ -39,8 +39,8 @@
 	COItemGraph *result = [[COItemGraph alloc] init];
 	
 	COCopier *copier = [COCopier new];
-	ETUUID *copyUUID = [copier copyItemWithUUID: [self UUID] fromGraph: self.objectGraphContext toGraph: result];
-	[result setRootItemUUID: copyUUID];
+	ETUUID *copyUUID = [copier copyItemWithUUID: self.UUID fromGraph: self.objectGraphContext toGraph: result];
+	result.rootItemUUID = copyUUID;
 	
 	return result;
 }
@@ -89,11 +89,11 @@
 {
 	COObjectGraphContext *ctx1 = [COObjectGraphContext new];
 	[ctx1 setItemGraph: aGraph];
-	COAttributedStringAttribute *anAttr = [ctx1 rootObject];
+	COAttributedStringAttribute *anAttr = ctx1.rootObject;
 	
 	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
 	[ctx2 setItemGraph: anotherGraph];
-	COAttributedStringAttribute *anotherAttr = [ctx2 rootObject];
+	COAttributedStringAttribute *anotherAttr = ctx2.rootObject;
 	
 	return [anAttr isDeeplyEqualToAttribute: anotherAttr];
 }

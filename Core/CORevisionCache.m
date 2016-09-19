@@ -14,15 +14,18 @@
 
 @synthesize parentEditingContext = _parentContext;
 
-- (id) initWithParentEditingContext: (COEditingContext *)aCtx
+- (instancetype) initWithParentEditingContext: (COEditingContext *)aCtx
 {
 	NILARG_EXCEPTION_TEST(aCtx);
-	
     SUPERINIT;
 	_parentContext = aCtx;
     _revisionForRevisionID = [[NSMutableDictionary alloc] init];
-
     return self;
+}
+
+- (instancetype)init
+{
+	return [self initWithParentEditingContext: nil];
 }
 
 - (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
@@ -30,7 +33,7 @@
 {
 	ETAssert(_parentContext != nil);
 	
-    CORevision *cached = [_revisionForRevisionID objectForKey: aRevid];
+    CORevision *cached = _revisionForRevisionID[aRevid];
     if (cached == nil)
     {
 		COSQLiteStore *store = _parentContext.store;
@@ -44,7 +47,7 @@
 
         cached = [[CORevision alloc] initWithCache: self revisionInfo: info];
         
-        [_revisionForRevisionID setObject: cached forKey: aRevid];
+        _revisionForRevisionID[aRevid] = cached;
     }
     return cached;
 }

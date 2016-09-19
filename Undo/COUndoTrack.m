@@ -60,7 +60,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	                                 editingContext: aContext];
 }
 
-- (id) initWithName: (NSString *)aName
+- (instancetype) initWithName: (NSString *)aName
      editingContext: (COEditingContext *)aContext
 {
     SUPERINIT;
@@ -127,13 +127,13 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		nodeIndex++;
 	}
 	
-	BOOL hasNoPreviousOrNextNode = (nodeIndex < 0 || nodeIndex >= [[self nodes] count]);
+	BOOL hasNoPreviousOrNextNode = (nodeIndex < 0 || nodeIndex >= [self nodes].count);
 	
 	if (hasNoPreviousOrNextNode)
 	{
 		return nil;
 	}
-	return [[self nodes] objectAtIndex: nodeIndex];
+	return [self nodes][nodeIndex];
 }
 
 #pragma mark - Track Protocol - Primitive Methods
@@ -440,7 +440,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	
 	NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey: @"sequenceNumber"
 	                                                             ascending: YES];
-	return [[_commandsByUUID allValues] sortedArrayUsingDescriptors: @[descriptor]];
+	return [_commandsByUUID.allValues sortedArrayUsingDescriptors: @[descriptor]];
 }
 
 - (NSArray *) childrenOfNode: (id<COTrackNode>)aNode
@@ -475,7 +475,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
         {
             return YES;
         }
-        rev = [[self commandForUUID: rev] parentUUID];
+        rev = [self commandForUUID: rev].parentUUID;
 		if ([rev isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
 			rev = nil;
     }
@@ -551,14 +551,14 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		// notification mechanism will refresh the in-memory state
 	}
 	
-	BOOL ok = [[_editingContext store] commitStoreTransaction: txn];
+	BOOL ok = [_editingContext.store commitStoreTransaction: txn];
 	ETAssert(ok);
 }
 
 - (void) doCommand: (COCommandGroup *)aCommand inverse: (BOOL)inverse addToStoreTransaction: (COStoreTransaction *)txn
 {
 	COCommandGroup *commandToApply = (inverse ? [aCommand inverse] : aCommand);
-	[commandToApply setParentUndoTrack: self];
+	commandToApply.parentUndoTrack = self;
 
 	NSMutableDictionary *md = [aCommand.metadata mutableCopy];
 	NSNumber *inversedValue = aCommand.metadata[kCOCommitMetadataUndoInitialBaseInversed];
@@ -628,7 +628,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	[self loadIfNeeded];
 	
 	NSMutableArray *potentialCurrentCommands = [NSMutableArray new];
-	for (COUndoTrackState *state in [_trackStateForName allValues])
+	for (COUndoTrackState *state in _trackStateForName.allValues)
 	{
 		if (state.currentCommandUUID != nil)
 		{
@@ -667,12 +667,12 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	[_nodesOnCurrentUndoBranch removeAllObjects];
 	
 	// Populate _nodesOnCurrentUndoBranch, from the head backwards
-	if ([_trackStateForName count] > 0)
+	if (_trackStateForName.count > 0)
 	{
 		NSMutableArray *undoNodes = [NSMutableArray new];
 		NSMutableArray *redoNodes = [NSMutableArray new];
 		
-		for (COUndoTrackState *trackState in [_trackStateForName allValues])
+		for (COUndoTrackState *trackState in _trackStateForName.allValues)
 		{
 			NSMutableArray *targetArray = redoNodes;
 			ETUUID *commandUUID = trackState.headCommandUUID;
@@ -819,7 +819,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 
 - (void) storeTrackDidChange: (NSNotification *)notif
 {
-	NSDictionary *userInfo = [notif userInfo];
+	NSDictionary *userInfo = notif.userInfo;
 	COUndoTrackState *notifState = [COUndoTrackState new];
 	notifState.trackName = userInfo[COUndoTrackStoreTrackName];
 	if (userInfo[COUndoTrackStoreTrackHeadCommandUUID] != nil)
@@ -917,7 +917,7 @@ static BOOL coalesceOpPair(COCommand *op, COCommand *nextOp)
 
 static void coalesceOpsInternal(NSMutableArray *ops, NSUInteger i)
 {
-	if (i+1 >= [ops count])
+	if (i+1 >= ops.count)
 		return;
 	
 	if (coalesceOpPair(ops[i], ops[i+1]))
@@ -997,7 +997,7 @@ static void coalesceOps(NSMutableArray *ops)
 - (void) recordCommand: (COCommand *)aCommand
 {
     [NSException raise: NSGenericException
-	            format: @"You can't push actions to a %@", [self className]];
+	            format: @"You can't push actions to a %@", self.className];
 }
 
 @end

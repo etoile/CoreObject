@@ -14,14 +14,21 @@
 
 @implementation CORevision
 
-- (id)initWithCache: (CORevisionCache *)aCache
+- (instancetype)initWithCache: (CORevisionCache *)aCache
        revisionInfo: (CORevisionInfo *)aRevInfo
 {
+	NILARG_EXCEPTION_TEST(aCache);
+	NILARG_EXCEPTION_TEST(aRevInfo);
 	SUPERINIT;
 	cache = aCache;
 	revisionInfo =  aRevInfo;
     assert([revisionInfo revisionUUID] != nil);
 	return self;
+}
+
+- (instancetype)init
+{
+	return [self initWithCache: nil revisionInfo: nil];
 }
 
 - (BOOL)isEqual: (id)rhs
@@ -34,7 +41,7 @@
 
 - (NSUInteger)hash
 {
-	return [revisionInfo.revisionUUID hash];
+	return (revisionInfo.revisionUUID).hash;
 }
 
 - (NSArray *)propertyNames
@@ -46,7 +53,7 @@
 
 - (ETUUID *)UUID
 {
-	return [revisionInfo revisionUUID];
+	return revisionInfo.revisionUUID;
 }
 
 - (CORevisionCache *) cache
@@ -59,41 +66,41 @@
 
 - (CORevision *)parentRevision
 {
-    if ([revisionInfo parentRevisionUUID] == nil)
+    if (revisionInfo.parentRevisionUUID == nil)
     {
         return nil;
     }
     
-	ETUUID *parentRevID = [revisionInfo parentRevisionUUID];
+	ETUUID *parentRevID = revisionInfo.parentRevisionUUID;
     return [[self cache] revisionForRevisionUUID: parentRevID
-							  persistentRootUUID: [revisionInfo persistentRootUUID]];
+							  persistentRootUUID: revisionInfo.persistentRootUUID];
 }
 
 - (CORevision *)mergeParentRevision
 {
-    if ([revisionInfo mergeParentRevisionUUID] == nil)
+    if (revisionInfo.mergeParentRevisionUUID == nil)
     {
         return nil;
     }
     
-	ETUUID *revID = [revisionInfo mergeParentRevisionUUID];
+	ETUUID *revID = revisionInfo.mergeParentRevisionUUID;
     return [[self cache] revisionForRevisionUUID: revID
-							  persistentRootUUID: [revisionInfo persistentRootUUID]];
+							  persistentRootUUID: revisionInfo.persistentRootUUID];
 }
 
 - (ETUUID *)persistentRootUUID
 {
-	return [revisionInfo persistentRootUUID];
+	return revisionInfo.persistentRootUUID;
 }
 
 - (ETUUID *)branchUUID
 {
-	return [revisionInfo branchUUID];
+	return revisionInfo.branchUUID;
 }
 
 - (NSDate *)date
 {
-	return [revisionInfo date];
+	return revisionInfo.date;
 }
 
 // TODO: Implement it in the metadata for the new store
@@ -104,13 +111,13 @@
 
 - (NSDictionary *)metadata
 {
-	return [revisionInfo metadata];
+	return revisionInfo.metadata;
 }
 
 - (COCommitDescriptor *)commitDescriptor
 {
 	NSString *commitDescriptorId =
-		[[self metadata] objectForKey: kCOCommitMetadataIdentifier];
+		[self metadata][kCOCommitMetadataIdentifier];
 
 	if (commitDescriptorId == nil)
 		return nil;
@@ -123,9 +130,9 @@
 	COCommitDescriptor *descriptor = [self commitDescriptor];
 
 	if (descriptor == nil)
-		return [[self metadata] objectForKey: kCOCommitMetadataTypeDescription];
+		return [self metadata][kCOCommitMetadataTypeDescription];
 
-	return [descriptor localizedTypeDescription];
+	return descriptor.localizedTypeDescription;
 }
 
 - (NSString *)localizedShortDescription

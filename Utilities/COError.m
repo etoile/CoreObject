@@ -11,7 +11,7 @@
 
 @synthesize errors, validationResult;
 
-- (id)initWithValidationResult: (ETValidationResult *)aResult errors: (id <ETCollection>)suberrors
+- (instancetype)initWithValidationResult: (ETValidationResult *)aResult errors: (id <ETCollection>)suberrors
 {
 	NILARG_EXCEPTION_TEST(suberrors);
 	
@@ -32,14 +32,14 @@
 	return self;
 }
 
-+ (id)errorWithErrors: (id <ETCollection>)errors
++ (instancetype)errorWithErrors: (id <ETCollection>)errors
 {
     return [[self alloc] initWithValidationResult: nil errors: errors];
 }
 
-+ (id)errorWithValidationResult: (ETValidationResult *)aResult
++ (instancetype)errorWithValidationResult: (ETValidationResult *)aResult
 {
-    return [[self alloc] initWithValidationResult: aResult errors: [NSArray array]];
+    return [[self alloc] initWithValidationResult: aResult errors: @[]];
 }
 
 + (NSArray *)errorsWithValidationResults: (id <ETCollection>)results

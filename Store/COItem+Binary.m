@@ -97,7 +97,7 @@ static inline void writePrimitiveValue(co_buffer_t *dest, id aValue, COType aTyp
             }
             break;
         case kCOTypeAttachment:
-            co_buffer_store_bytes(dest, [[aValue dataValue] bytes], [[aValue dataValue] length]);
+            co_buffer_store_bytes(dest, [aValue dataValue].bytes, [aValue dataValue].length);
             break;
         default:
             [NSException raise: NSInvalidArgumentException format: @"unknown type %d", aType];
@@ -153,7 +153,7 @@ static inline void writeArrayContents(co_buffer_t *dest, NSArray *anArray, COTyp
 static inline void writeSetContents(co_buffer_t *dest, NSSet *aSet, COType aType, co_buffer_t *temp)
 {
 	assert([aSet isKindOfClass: [NSSet class]]);
-	const size_t setCount = [aSet count];
+	const size_t setCount = aSet.count;
 	
 	// We need to sort the serialized values since NSSet has no order.
 	
@@ -261,8 +261,7 @@ static void co_read_object_value(COReaderState *state, id obj) {
     }
     else
     {
-        [state->values setObject: obj
-                          forKey: state->currentProperty];
+        state->values[state->currentProperty] = obj;
         state->state = co_reader_expect_property;
     }
 }
@@ -274,12 +273,11 @@ static void co_read_int64(void *ctx, int64_t val)
     switch (state->state)
     {
         case co_reader_expect_value:
-            co_read_object_value(state, [NSNumber numberWithLongLong: val]);
+            co_read_object_value(state, @(val));
             break;
         case co_reader_expect_type:
             state->currentType = (COType)val;
-            [state->types setObject: [NSNumber numberWithLongLong: val]
-                             forKey: state->currentProperty];
+            state->types[state->currentProperty] = @(val);
             state->state = co_reader_expect_value;
             break;
         default:
@@ -293,7 +291,7 @@ static void co_read_double(void *ctx, double val)
     switch (state->state)
     {
         case co_reader_expect_value:
-            co_read_object_value(state, [NSNumber numberWithDouble: val]);
+            co_read_object_value(state, @(val));
             break;
         default:
             state->state = co_reader_error;
@@ -401,8 +399,7 @@ static void co_read_end_array(void *ctx)
     state->isReadingMultivalue = NO;
     
     // Save the value
-    [state->values setObject: state->multivalue
-                      forKey: state->currentProperty];
+    state->values[state->currentProperty] = state->multivalue;
     state->multivalue =  nil;
     
     // Do state transition
@@ -422,7 +419,10 @@ static void co_read_null(void *ctx)
     }
 }
 
-- (id) initWithData: (NSData *)aData
+/* Initializers in categories cannot be marked with NS_DESIGNATED_INITIALIZER */
+#pragma clang diagnostic ignored "-Wobjc-designated-initializers"
+
+- (instancetype) initWithData: (NSData *)aData
 {
     COReaderState *state = [[COReaderState alloc] init];
     
@@ -438,8 +438,8 @@ static void co_read_null(void *ctx)
         co_read_end_array,
         co_read_null
     };
-    co_reader_read([aData bytes],
-                   [aData length],
+    co_reader_read(aData.bytes,
+                   aData.length,
                    (__bridge void *)state,
                    cb);
     

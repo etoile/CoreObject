@@ -24,7 +24,7 @@
 	ETAssert([value isKindOfClass: [NSValue class]]);
 	NSValue *nsvalue = value;
 
-	return NSStringFromRect([nsvalue rectValue]);
+	return NSStringFromRect(nsvalue.rectValue);
 }
 
 - (id)reverseTransformedValue: (id)value

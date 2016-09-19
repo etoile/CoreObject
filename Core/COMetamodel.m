@@ -35,7 +35,7 @@ void CORegisterAdditionalEntityDescriptions(ETModelDescriptionRepository *repo)
 
 	for (ETEntityDescription *entity in entityDescriptions)
 	{
-		if ([repo descriptionForName: [entity fullName]] != nil)
+		if ([repo descriptionForName: entity.fullName] != nil)
 			continue;
 			
 		[repo addUnresolvedDescription: entity];

@@ -83,7 +83,7 @@
 	ETUUID *currentDest = dest;
 	for (ETUUID *sourceRev in sourceRevs)
 	{
-		NSDictionary *sourceMetadata = [[store revisionInfoForRevisionUUID: sourceRev persistentRootUUID: persistentRoot] metadata];
+		NSDictionary *sourceMetadata = [store revisionInfoForRevisionUUID: sourceRev persistentRootUUID: persistentRoot].metadata;
 		id <COItemGraph> currentSourceGraph = [cache graphForUUID: sourceRev];
 		id <COItemGraph> currentDestGraph = [cache graphForUUID: currentDest];
 		id <COItemGraph> currentLCAGraph = [cache graphForUUID: currentLCA];

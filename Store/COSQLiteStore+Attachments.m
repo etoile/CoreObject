@@ -46,7 +46,7 @@ static NSData *hashItemAtURL(NSURL *aURL)
 	                                                       error: NULL];
 #endif
     
-    int fd = [fh fileDescriptor];
+    int fd = fh.fileDescriptor;
     
     unsigned char buf[4096];
     
@@ -92,12 +92,12 @@ static NSData *hashItemWithData(NSData *data)
 
 static NSString *hexString(NSData *aData)
 {
-    const NSUInteger len = [aData length];
+    const NSUInteger len = aData.length;
     if (0 == len)
     {
         return @"";
     }
-    const unsigned char *bytes = (const unsigned char *)[aData bytes];
+    const unsigned char *bytes = (const unsigned char *)aData.bytes;
     
     NSMutableString *result = [NSMutableString stringWithCapacity: len * 2];
     for (NSUInteger i = 0; i < len; i++)
@@ -109,8 +109,8 @@ static NSString *hexString(NSData *aData)
 
 static NSData *dataFromHexString(NSString *hexString)
 {
-    NSMutableData *result = [NSMutableData dataWithCapacity: [hexString length] / 2];
-    const char *cstring = [hexString UTF8String];
+    NSMutableData *result = [NSMutableData dataWithCapacity: hexString.length / 2];
+    const char *cstring = hexString.UTF8String;
     
     unsigned byteAsInt;
     while (1 == sscanf(cstring, "%2x", &byteAsInt))
@@ -157,7 +157,7 @@ static NSData *dataFromHexString(NSString *hexString)
 	COAttachmentID *attachmentID = [[COAttachmentID alloc] initWithData: hash];
     NSURL *attachmentURL = [self URLForAttachmentID: attachmentID];
     
-    if ([fm fileExistsAtPath: [attachmentURL path]])
+    if ([fm fileExistsAtPath: attachmentURL.path])
 		return attachmentID;
 
 	NSError *error = nil;
@@ -185,7 +185,7 @@ static NSData *dataFromHexString(NSString *hexString)
 - (NSArray *) attachments
 {
     NSMutableArray *result = [NSMutableArray array];
-    NSString *path = [[self attachmentsURL] path];
+    NSString *path = [self attachmentsURL].path;
     
     if (![[NSFileManager defaultManager] fileExistsAtPath: path])
     {
@@ -199,7 +199,7 @@ static NSData *dataFromHexString(NSString *hexString)
 
     for (NSString *file in files)
     {
-        NSString *attachmentHexString = [file stringByDeletingPathExtension];
+        NSString *attachmentHexString = file.stringByDeletingPathExtension;
         NSData *hash = dataFromHexString(attachmentHexString);
         [result addObject: [[COAttachmentID alloc] initWithData: hash]];
     }
@@ -208,7 +208,7 @@ static NSData *dataFromHexString(NSString *hexString)
 
 - (BOOL) deleteAttachment: (COAttachmentID *)hash
 {
-    return [[NSFileManager defaultManager] removeItemAtPath: [[self URLForAttachmentID: hash] path]
+    return [[NSFileManager defaultManager] removeItemAtPath: [self URLForAttachmentID: hash].path
                                                       error: NULL];
 }
 

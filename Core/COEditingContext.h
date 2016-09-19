@@ -224,7 +224,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
 - (instancetype)initWithStore: (COSQLiteStore *)store
    modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
          migrationDriverClass: (Class)aDriverClass
-               undoTrackStore: (COUndoTrackStore *)aUndoTrackStore;
+               undoTrackStore: (COUndoTrackStore *)aUndoTrackStore NS_DESIGNATED_INITIALIZER;
 /**
  * Initializes a context which persists its content in the given store, and
  * manages it using the metamodel provided by the model description repository.
@@ -386,7 +386,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  *
  * See also -discardAllChanges and -[COPersistentRoot hasChanges].
  */
-- (BOOL)hasChanges;
+@property (nonatomic, readonly) BOOL hasChanges;
 /**
  * Discards the uncommitted changes to reset the context to its last commit state.
  *
@@ -473,7 +473,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  *
  * See also -commitWithMetadata:undoTrack:error:.
  */
-- (BOOL)commit;
+@property (nonatomic, readonly) BOOL commit;
 /**
  * Commits the current changes to the store, records them on the undo track and 
  * returns whether it succeeds.
@@ -492,12 +492,12 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
 /**
  * Returns a short description to summarize the receiver.
  */
-- (NSString *)description;
+@property (nonatomic, readonly, copy) NSString *description;
 /**
  * Returns a multi-line description including informations about the pending 
  * changes.
  */
-- (NSString *)detailedDescription;
+@property (nonatomic, readonly) NSString *detailedDescription;
 
 
 /** @taskunit Deprecated */

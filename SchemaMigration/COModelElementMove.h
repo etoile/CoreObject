@@ -31,7 +31,7 @@
 /**
  * The name of the entity or property to move.
  */
-@property (nonatomic, copy) NSString *name;
+@property (nonatomic, readwrite, copy) NSString *name;
 /**
  * The name of the entity that owns the property to move.
  *
@@ -39,7 +39,7 @@
  *
  * For moving a property, must be set.
  */
-@property (nonatomic, copy) NSString *ownerName;
+@property (nonatomic, readwrite, copy) NSString *ownerName;
 
 
 /** @taskunit Targeted Package and Version */
@@ -52,7 +52,7 @@
  *
  * See -[ETPackageDescription name] and -[COCommitDescriptor domain].
  */
-@property (nonatomic, copy) NSString *packageName;
+@property (nonatomic, readwrite, copy) NSString *packageName;
 /**
  * The package version that requires the moved entity or property.
  *

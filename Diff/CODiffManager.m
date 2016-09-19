@@ -44,7 +44,7 @@
 		if (diffClass == Nil)
 		{
 			NSLog(@"WARNING: Item %@ (entity name %@) specified a diff algorithm (%@) for which there is no corresponding class",
-				  [anItem UUID], [entity name], entity.diffAlgorithm);
+				  [anItem UUID], entity.name, entity.diffAlgorithm);
 		}
 	}
 	
@@ -169,13 +169,13 @@
 	//COItemGraph *preview = [[COItemGraph alloc] initWithItemGraph: dest];
 	//[preview insertOrUpdateItems: [itemsByUUID allValues]];
 
-	[dest insertOrUpdateItems: [itemsByUUID allValues]];
+	[dest insertOrUpdateItems: itemsByUUID.allValues];
 	return ![itemsByUUID isEmpty];
 }
 
 - (BOOL) isEmpty
 {
-	for (id<CODiffAlgorithm> diff in [subDiffsByAlgorithmName allValues])
+	for (id<CODiffAlgorithm> diff in subDiffsByAlgorithmName.allValues)
 	{
 		if (![diff isEmpty])
 			return NO;
@@ -185,7 +185,7 @@
 
 - (BOOL) hasConflicts
 {
-	for (id<CODiffAlgorithm> diff in [subDiffsByAlgorithmName allValues])
+	for (id<CODiffAlgorithm> diff in subDiffsByAlgorithmName.allValues)
 	{
 		if ([diff hasConflicts])
 			return YES;
@@ -195,7 +195,7 @@
 
 - (void) resolveConflictsFavoringSourceIdentifier: (id)aSource
 {
-	for (id<CODiffAlgorithm> diff in [subDiffsByAlgorithmName allValues])
+	for (id<CODiffAlgorithm> diff in subDiffsByAlgorithmName.allValues)
 	{
 		[diff resolveConflictsFavoringSourceIdentifier: aSource];
 	}
@@ -203,7 +203,7 @@
 
 - (NSString *) description
 {
-	return [subDiffsByAlgorithmName description];
+	return subDiffsByAlgorithmName.description;
 }
 
 @end

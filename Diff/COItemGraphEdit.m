@@ -18,9 +18,9 @@
 @synthesize attribute;
 @synthesize sourceIdentifier;
 
-- (id) initWithUUID: (ETUUID *)aUUID
-		  attribute: (NSString *)anAttribute
-   sourceIdentifier: (id)aSourceIdentifier
+- (instancetype) initWithUUID: (ETUUID *)aUUID
+                    attribute: (NSString *)anAttribute
+             sourceIdentifier: (id)aSourceIdentifier
 {
 	NILARG_EXCEPTION_TEST(aUUID);
 	NILARG_EXCEPTION_TEST(anAttribute);
@@ -32,11 +32,15 @@
 	return self;
 }
 
+- (instancetype)init
+{
+	return [self initWithUUID: nil attribute: nil sourceIdentifier: nil];
+}
+
 - (id) copyWithZone: (NSZone *)aZone
 {
 	return self;
 }
-
 
 - (BOOL) isEqualIgnoringSourceIdentifier: (id)other
 {
@@ -47,7 +51,7 @@
 
 - (NSUInteger) hash
 {
-	return 17540461545992478206ULL ^ [UUID hash] ^ [attribute hash] ^ [sourceIdentifier hash];
+	return 17540461545992478206ULL ^ UUID.hash ^ attribute.hash ^ [sourceIdentifier hash];
 }
 
 - (BOOL) isEqual: (id)other

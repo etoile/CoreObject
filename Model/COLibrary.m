@@ -19,7 +19,7 @@
 
 	// For subclasses that don't override -newEntityDescription, we must not add the 
 	// property descriptions that we will inherit through the parent
-	if ([[collection name] isEqual: [COLibrary className]] == NO) 
+	if ([collection.name isEqual: [COLibrary className]] == NO) 
 		return collection;
 
 	[collection setLocalizedDescription: _(@"Library")];
@@ -41,7 +41,7 @@
 		                                    type: (id)aType
 		                                opposite: nil];
 
-	[collection setParent: (id)@"COLibrary"];
+	collection.parent = (id)@"COLibrary";
 	[collection addPropertyDescription: objects];
 
 	return collection;
@@ -86,14 +86,14 @@
 	COSmartGroup *group = [[COSmartGroup alloc]
 		initWithObjectGraphContext: _internalTransientObjectGraphContext];
 	[group setName: _(@"All Objects")];
-	[group setTargetCollection: [[[[self persistentRoots] mappedCollection] rootObject] allObjects]];
+	group.targetCollection = [[[self.persistentRoots mappedCollection] rootObject] allObjects];
 #ifdef GNUSTEP
 	[group setQuery: [COQuery queryWithPredicate: [NSPredicate predicateWithFormat: @"isLibrary == YES"]]];
 #else
-	[group setQuery: [COQuery queryWithPredicateBlock: ^ BOOL (id object, NSDictionary *bindings)
+	group.query = [COQuery queryWithPredicateBlock: ^ BOOL (id object, NSDictionary *bindings)
 	{
 		return [object isLibrary];
-	}]];
+	}];
 #endif
 	return group;
 }
@@ -102,10 +102,10 @@
 {
 	NILARG_EXCEPTION_TEST(aType);
 
-	for (COLibrary *lib in [self libraryGroup])
+	for (COLibrary *lib in self.libraryGroup)
 	{
 		ETEntityDescription *contentType =
-			[[[lib entityDescription] propertyDescriptionForName: [lib contentKey]] type];
+			[lib.entityDescription propertyDescriptionForName: [lib contentKey]].type;
 											
 		if ([aType isKindOfEntity: contentType])
 			return lib;
@@ -115,63 +115,63 @@
 
 - (COTagLibrary *)tagLibrary
 {
-	COTagLibrary *lib = [[self libraryGroup] objectForIdentifier: kCOLibraryIdentifierTag];
+	COTagLibrary *lib = [self.libraryGroup objectForIdentifier: kCOLibraryIdentifierTag];
 
 	if (lib == nil)
 	{
-		lib = [[self insertNewPersistentRootWithEntityName: @"Anonymous.COTagLibrary"] rootObject];
+		lib = [self insertNewPersistentRootWithEntityName: @"Anonymous.COTagLibrary"].rootObject;
 	}
 	return lib;
 }
 
 - (COLibrary *)bookmarkLibrary
 {
-	COLibrary *lib = [[self libraryGroup] objectForIdentifier: kCOLibraryIdentifierBookmark];
+	COLibrary *lib = [self.libraryGroup objectForIdentifier: kCOLibraryIdentifierBookmark];
 	
 	if (lib == nil)
 	{
-		lib = [[self insertNewPersistentRootWithEntityName: @"Anonymous.COBookmarkLibrary"] rootObject];
+		lib = [self insertNewPersistentRootWithEntityName: @"Anonymous.COBookmarkLibrary"].rootObject;
 		[lib setName: _(@"Bookmarks")];
-		[lib setIdentifier: kCOLibraryIdentifierBookmark];
+		lib.identifier = kCOLibraryIdentifierBookmark;
 	}
 	return lib;
 }
 
 - (COLibrary *)noteLibrary
 {
-	COLibrary *lib = [[self libraryGroup] objectForIdentifier: kCOLibraryIdentifierNote];
+	COLibrary *lib = [self.libraryGroup objectForIdentifier: kCOLibraryIdentifierNote];
 	
 	if (lib == nil)
 	{
-		lib = [[self insertNewPersistentRootWithEntityName: @"Anonymous.CONoteLibrary"] rootObject];
+		lib = [self insertNewPersistentRootWithEntityName: @"Anonymous.CONoteLibrary"].rootObject;
 		[lib setName: _(@"Notes")];
-		[lib setIdentifier: kCOLibraryIdentifierNote];
+		lib.identifier = kCOLibraryIdentifierNote;
 	}
 	return lib;
 }
 
 - (COLibrary *)photoLibrary
 {
-	COLibrary *lib = [[self libraryGroup] objectForIdentifier: kCOLibraryIdentifierPhoto];
+	COLibrary *lib = [self.libraryGroup objectForIdentifier: kCOLibraryIdentifierPhoto];
 
 	if (lib == nil)
 	{
-		lib = [[self insertNewPersistentRootWithEntityName: @"Anonymous.COLibrary"] rootObject];
+		lib = [self insertNewPersistentRootWithEntityName: @"Anonymous.COLibrary"].rootObject;
 		[lib setName: _(@"Photos")];
-		[lib setIdentifier: kCOLibraryIdentifierPhoto];
+		lib.identifier = kCOLibraryIdentifierPhoto;
 	}
 	return lib;
 }
 
 - (COLibrary *)musicLibrary
 {
-	COLibrary *lib = [[self libraryGroup] objectForIdentifier: kCOLibraryIdentifierMusic];
+	COLibrary *lib = [self.libraryGroup objectForIdentifier: kCOLibraryIdentifierMusic];
 
 	if (lib == nil)
 	{
-		lib = [[self insertNewPersistentRootWithEntityName: @"Anonymous.COLibrary"] rootObject];
+		lib = [self insertNewPersistentRootWithEntityName: @"Anonymous.COLibrary"].rootObject;
 		[lib setName: _(@"Music")];
-		[lib setIdentifier: kCOLibraryIdentifierMusic];
+		lib.identifier = kCOLibraryIdentifierMusic;
 	}
 	return lib;
 }

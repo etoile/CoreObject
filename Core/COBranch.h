@@ -148,7 +148,7 @@ extern NSString * const kCOBranchLabel;
 /**
  * The branch label (used as the branch name in most cases).
  */
-@property (nonatomic, copy) NSString *label;
+@property (nonatomic, readwrite, copy) NSString *label;
 /**
  * The metadata in JSON format attached to the branch.
  *
@@ -156,7 +156,7 @@ extern NSString * const kCOBranchLabel;
  *
  * You must never overwrite any existing metadata set by CoreObject.
  */
-@property (nonatomic, copy) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy) NSDictionary *metadata;
 /** 
  * The branch deletion status.
  *
@@ -286,7 +286,7 @@ extern NSString * const kCOBranchLabel;
  *
  * See also -discardAllChanges and -[COObjectGraphContext hasChanges].
  */
-- (BOOL)hasChanges;
+@property (nonatomic, readonly) BOOL hasChanges;
 /**
  * Discards the uncommitted changes to reset the branch to its last commit state.
  *
@@ -402,7 +402,7 @@ extern NSString * const kCOBranchLabel;
  *
  * See -makePersistentRootCopyFromRevision:
  */
-- (COPersistentRoot *)makePersistentRootCopy;
+@property (nonatomic, readonly) COPersistentRoot *makePersistentRootCopy;
 
 
 /** @taskunit Merging Between Branches */
@@ -469,12 +469,12 @@ extern NSString * const kCOBranchLabel;
 /**
  * Returns a short description to summarize the receiver.
  */
-- (NSString *)description;
+@property (nonatomic, readonly, copy) NSString *description;
 /**
  * Returns a multi-line description including informations about the branch kind, 
  * deletion status, revisions and pending changes.
  */
-- (NSString *)detailedDescription;
+@property (nonatomic, readonly) NSString *detailedDescription;
 
 
 @end

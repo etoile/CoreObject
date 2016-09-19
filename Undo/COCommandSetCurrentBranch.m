@@ -22,19 +22,19 @@ static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
 @synthesize oldBranchUUID = _oldBranchUUID;
 @synthesize branchUUID = _newBranchUUID;
 
-- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
+- (instancetype) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
     self = [super initWithPropertyList: plist parentUndoTrack: aParent];
-    self.oldBranchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandOldBranchUUID]];
-    self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandNewBranchUUID]];
+    self.oldBranchUUID = [ETUUID UUIDWithString: plist[kCOCommandOldBranchUUID]];
+    self.branchUUID = [ETUUID UUIDWithString: plist[kCOCommandNewBranchUUID]];
     return self;
 }
 
 - (id) propertyList
 {
     NSMutableDictionary *result = [super propertyList];
-    [result setObject: [_oldBranchUUID stringValue] forKey: kCOCommandOldBranchUUID];
-    [result setObject: [_newBranchUUID stringValue] forKey: kCOCommandNewBranchUUID];
+    result[kCOCommandOldBranchUUID] = [_oldBranchUUID stringValue];
+    result[kCOCommandNewBranchUUID] = [_newBranchUUID stringValue];
     return result;
 }
 
@@ -67,7 +67,7 @@ static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
     COBranch *branch = [proot branchForUUID: _newBranchUUID];
     ETAssert(branch != nil);
 	
-    [proot setCurrentBranch: branch];
+    proot.currentBranch = branch;
 }
 
 - (NSString *)kind

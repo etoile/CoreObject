@@ -39,7 +39,7 @@
 	NSInteger _lengthDeltaInBatch;
 }
 
-- (instancetype) initWithBacking: (COAttributedString *)aBacking;
+- (instancetype) initWithBacking: (COAttributedString *)aBacking NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readwrite, strong) COAttributedString *backing;
 

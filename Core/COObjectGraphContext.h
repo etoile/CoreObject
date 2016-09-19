@@ -211,7 +211,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 /**
  * Initializes a persistent object graph context owned by a branch.
  */
-- (id)initWithBranch: (COBranch *)aBranch;
+- (instancetype)initWithBranch: (COBranch *)aBranch;
 /**
  * Initializes a transient object graph context using the given model
  * description repository and migration driver.
@@ -229,7 +229,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * For a migration driver class that is neither nil nor a subclass of 
  * COSchemaMigrationDriver, raises a NSInvalidArgumentException.
  */
-- (id)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
+- (instancetype)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
                     migrationDriverClass: (Class)aDriverClass;
 /**
  * Returns a new transient object graph context using the main model description 
@@ -237,7 +237,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  *
  * See also -[ETModelDescriptionRepository mainRepository].
  */
-- (id)init;
+- (instancetype)init;
 
 
 /** @taskunit Description */
@@ -246,12 +246,12 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 /**
  * Returns a short description to summarize the receiver.
  */
-- (NSString *)description;
+@property (nonatomic, readonly, copy) NSString *description;
 /**
  * Returns a description detailing the item graph representation (the serialized 
  * representation).
  */
-- (NSString *)detailedDescription;
+@property (nonatomic, readonly) NSString *detailedDescription;
 
 
 /** @taskunit Type Querying */
@@ -310,7 +310,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 /**
  * Returns the root object UUID.
  */
-- (ETUUID *)rootItemUUID;
+@property (nonatomic, readonly, strong) ETUUID *rootItemUUID;
 /**
  * Returns the immutable item that corresponds to the given inner object UUID.
  */
@@ -318,13 +318,13 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 /**
  * Returns all the inner object UUIDs.
  */
-- (NSArray *)itemUUIDs;
+@property (nonatomic, readonly) NSArray *itemUUIDs;
 /**
  * Returns the immutable items that corresponds to the inner objects.
  *
  * The returned item count is the same than -itemUUIDs.
  */
-- (NSArray *)items;
+@property (nonatomic, readonly) NSArray *items;
 /**
  * Updates the inner object graph to match the given item set.
  *
@@ -351,7 +351,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * at the root object.
  *
  * As a special case, if both the receiver and aTree have a nil root object, 
- * loads all objects from aTree. If <code>[aTree rootItemUUID]</code> is not nil, 
+ * loads all objects from aTree. If <code>aTree.rootItemUUID</code> is not nil, 
  * it must match -rootItemUUID, otherwise a NSInvalidArgumentException is raised.
  *
  * For a nil argument, raises a NSInvalidArgumentException.
@@ -429,7 +429,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  *
  * See also -discardAllChanges.
  */
-- (BOOL)hasChanges;
+@property (nonatomic, readonly) BOOL hasChanges;
 /**
  * If the receiver is owned by a branch, reloads to the current revision, clearing
  * all changes.

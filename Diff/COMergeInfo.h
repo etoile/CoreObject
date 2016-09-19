@@ -15,10 +15,10 @@
  */
 @interface COMergeInfo : NSObject
 
-@property (readwrite, nonatomic, strong) CORevision *baseRevision;
-@property (readwrite, nonatomic, strong) CORevision *mergeSourceRevision;
-@property (readwrite, nonatomic, strong) CORevision *mergeDestinationRevision;
+@property (nonatomic, readwrite, strong) CORevision *baseRevision;
+@property (nonatomic, readwrite, strong) CORevision *mergeSourceRevision;
+@property (nonatomic, readwrite, strong) CORevision *mergeDestinationRevision;
 
-@property (readwrite, nonatomic, strong) CODiffManager *diff;
+@property (nonatomic, readwrite, strong) CODiffManager *diff;
 
 @end

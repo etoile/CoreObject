@@ -32,7 +32,7 @@
 	chunksProperty.persistent = YES;
 	chunksProperty.opposite = (id)@"Anonymous.COAttributedStringChunk.parentString";
 	
-	[entity setPropertyDescriptions: @[chunksProperty]];
+	entity.propertyDescriptions = @[chunksProperty];
 	
 	entity.diffAlgorithm = @"COAttributedStringDiff";
 	
@@ -103,7 +103,7 @@
 			forAttribute: @"text"
 					type: kCOTypeString];
 	
-	COMutableItem *lastChunk = [result itemForUUID: [copiedUUIDs lastObject]];
+	COMutableItem *lastChunk = [result itemForUUID: copiedUUIDs.lastObject];
 	[lastChunk setValue: [[lastChunk valueForAttribute: @"text"] substringToIndex: ([[lastChunk valueForAttribute: @"text"] length] - excessAtEnd)]
 			forAttribute: @"text"
 					type: kCOTypeString];
@@ -119,7 +119,7 @@
 	[rootItem setValue: copiedUUIDs forAttribute: @"chunks" type: COTypeMakeArrayOf(kCOTypeCompositeReference)];
 
 	[result insertOrUpdateItems: @[rootItem]];
-	[result setRootItemUUID: [rootItem UUID]];
+	result.rootItemUUID = [rootItem UUID];
 	
 	return result;
 }
@@ -169,8 +169,8 @@
 {
 	ETAssert(characterIndex <= [self length]);
 	
-	if (characterIndex == [self length])
-		return [self.chunks count];
+	if (characterIndex == self.length)
+		return (self.chunks).count;
 	
 	NSUInteger chunkIndex = 0, chunkStart = 0;
 	COAttributedStringChunk *chunk = [self chunkContainingIndex: characterIndex chunkStart: &chunkStart chunkIndex: &chunkIndex];
@@ -198,7 +198,7 @@
 	// they are being aliased and not copied.
 	
 	COCopier *copier = [COCopier new];
-	ETUUID *rightChunkUUID = [copier copyItemWithUUID: [chunk UUID] fromGraph: self.objectGraphContext toGraph: self.objectGraphContext];
+	ETUUID *rightChunkUUID = [copier copyItemWithUUID: chunk.UUID fromGraph: self.objectGraphContext toGraph: self.objectGraphContext];
 	COAttributedStringChunk *rightChunk = [self.objectGraphContext loadedObjectForUUID: rightChunkUUID];
 	rightChunk.text = rightString;
 	
@@ -241,7 +241,7 @@
 		
 		// Look right
 		
-		for (NSInteger j=chunkIndex+1; j<[self.chunks count]; j++)
+		for (NSInteger j=chunkIndex+1; j<(self.chunks).count; j++)
 		{
 			COAttributedStringChunk *rightChunk = self.chunks[j];
 			if ([COAttributedStringAttribute isAttributeSet: rightChunk.attributes equalToSet: attribs])
@@ -271,8 +271,8 @@
 	[ctx1 setItemGraph: aGraph];
 	[ctx2 setItemGraph: anotherGraph];
 	
-	COAttributedStringWrapper *actualWrapper = [[COAttributedStringWrapper alloc] initWithBacking: [ctx1 rootObject]];
-	COAttributedStringWrapper *expectedWrapper = [[COAttributedStringWrapper alloc] initWithBacking: [ctx2 rootObject]];
+	COAttributedStringWrapper *actualWrapper = [[COAttributedStringWrapper alloc] initWithBacking: ctx1.rootObject];
+	COAttributedStringWrapper *expectedWrapper = [[COAttributedStringWrapper alloc] initWithBacking: ctx2.rootObject];
 	
 	return [expectedWrapper isEqual: actualWrapper];
 }

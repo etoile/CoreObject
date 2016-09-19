@@ -28,11 +28,11 @@
 /**
  * See -[NSObject isEditingContext].
  */
-- (BOOL)isEditingContext;
+@property (nonatomic, readonly) BOOL isEditingContext;
 /**
  * See -[NSObject isObjectGraphContext].
  */
-- (BOOL)isObjectGraphContext;
+@property (nonatomic, readonly) BOOL isObjectGraphContext;
 @required
 /**
  * Returns the editing context for the receiver.
@@ -41,7 +41,7 @@
  *
  * See COEditingContext and -[COPersistentRoot parentContext].
  */
-- (COEditingContext *)editingContext;
+@property (nonatomic, readonly) COEditingContext *editingContext;
 /**
  * See -[COEditingContext discardAllChanges], -[COPersistentRoot discardAllChanges], 
  * -[COBranch discardAllChanges] and -[COObjectGraphContext discardAllChanges].
@@ -51,7 +51,7 @@
  * See -[COEditingContext hasChanges], -[COPersistentRoot hasChanges], 
  *  -[COBranch hasChanges] and -[COObjectGraphContext hasChanges].
  */
-- (BOOL)hasChanges;
+@property (nonatomic, readonly) BOOL hasChanges;
 @end
 
 /** 
@@ -69,18 +69,18 @@
  *
  * See also -[COEditingContext isEditingContext].
  */
-- (BOOL)isEditingContext;
+@property (nonatomic, readonly) BOOL isEditingContext;
 /**
  * Returns whether the receiver is a persistent root or not.
  *
  * See also -[COPersistentRoot isPersistentRoot].
  */
-- (BOOL)isPersistentRoot;
+@property (nonatomic, readonly) BOOL isPersistentRoot;
 /**
  * Returns whether the receiver is an object graph context or not.
  *
  * See also -[COObjectGraphContext isObjectGraphContext].
  */
-- (BOOL)isObjectGraphContext;
+@property (nonatomic, readonly) BOOL isObjectGraphContext;
 
 @end

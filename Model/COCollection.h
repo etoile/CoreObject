@@ -76,7 +76,7 @@
  *
  * See also -[ETController currentObjectType] in EtoileUI.
  */
-- (ETUTI *)objectType;
+@property (nonatomic, readonly) ETUTI *objectType;
 /**
  * <override-never />
  * Returns whether the collection is ordered.
@@ -84,7 +84,7 @@
  * The returned value is controlled by -[ETPropertyDescription isOrdered] for 
  * the content property description (looked up using -contentKey).
  */
-- (BOOL)isOrdered;
+@property (nonatomic, getter=isOrdered, readonly) BOOL ordered;
 
 
 /** @taskunit Content Access */
@@ -103,7 +103,7 @@
  *
  * By default, returns <em>objects</em>.
  */
-- (NSString *)contentKey;
+@property (nonatomic, readonly) NSString *contentKey;
 
 
 /** @taskunit Collection Mutation Additions */
@@ -154,21 +154,21 @@
 /**
  * Returns whether the receiver is a group or not.
  */
-- (BOOL)isGroup;
+@property (nonatomic, getter=isGroup, readonly) BOOL group;
 /**
  * Returns whether the receiver is a tag or not.
  *
  * A tag is group that belongs to -[COEditingContext tagGroup].
  */
-- (BOOL)isTag;
+@property (nonatomic, getter=isTag, readonly) BOOL tag;
 /**
  * Returns whether the receiver is a container or not.
  */
-- (BOOL)isContainer;
+@property (nonatomic, getter=isContainer, readonly) BOOL container;
 /**
  * Returns whether the receiver is a library or not.
  *
  * A library is a container.
  */
-- (BOOL)isLibrary;
+@property (nonatomic, getter=isLibrary, readonly) BOOL library;
 @end

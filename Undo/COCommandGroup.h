@@ -60,17 +60,17 @@
  * across reads and writes to the database, but not preserved across calls to 
  * -inverse.
  */
-@property (nonatomic, copy) ETUUID *UUID;
+@property (nonatomic, readwrite, copy) ETUUID *UUID;
 /**
  * The atomic commands grouped in the receiver for a commit. 
  *
  * Cannot contain COCommandGroup objects.
  */
-@property (nonatomic, copy) NSMutableArray *contents;
+@property (nonatomic, readwrite, copy) NSMutableArray *contents;
 /**
  * The commit metadata.
  */
-@property (nonatomic, copy) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy) NSDictionary *metadata;
 /**
  * The commit descriptor matching the commit identifier in -metadata.
  *
@@ -104,7 +104,7 @@
 /**
  * The commit time.
  */
-@property (nonatomic, copy) NSDate *timestamp;
+@property (nonatomic, readwrite, copy) NSDate *timestamp;
 /**
  * The commit order in the Undo track store.
  */
@@ -133,7 +133,7 @@
  * <code>[[command inverse] inverse]</code> must be equal 
  * <code>[command inverse]</code>.
  */
-- (COCommandGroup *) inverse;
+@property (nonatomic, readonly) COCommandGroup *inverse;
 /** 
  * Returns whether the receiver changes can be applied to the editing context.
  */
@@ -159,10 +159,10 @@
  * undo track.
  */
 - (instancetype) initWithSerializedCommand: (COUndoTrackSerializedCommand *)aCommand
-									 owner: (COUndoTrack *)anOwner;
+									 owner: (COUndoTrack *)anOwner NS_DESIGNATED_INITIALIZER;
 /**
  * Returns a serialized represention.
  */
-- (COUndoTrackSerializedCommand *) serializedCommand;
+@property (nonatomic, readonly, strong) COUndoTrackSerializedCommand *serializedCommand;
 
 @end

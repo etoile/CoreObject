@@ -71,7 +71,7 @@ typedef NSArray *(^COContentBlock)(void);
  *
  * See -targetCollection and -query.
  */
-@property (nonatomic, copy) COContentBlock contentBlock;
+@property (nonatomic, readwrite, copy) COContentBlock contentBlock;
 
 
 /** @taskunit Accessing the Content */
@@ -82,7 +82,7 @@ typedef NSArray *(^COContentBlock)(void);
  *
  * See -[ETCollection content].
  */
-- (id)content;
+@property (nonatomic, readonly, strong) id content;
 
 
 /** @taskunit Updating */

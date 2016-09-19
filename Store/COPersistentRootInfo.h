@@ -25,22 +25,22 @@
 	NSDictionary *_metadata;
 }
 
-- (NSSet *) branchUUIDs;
-- (NSArray *) branches;
+@property (nonatomic, readonly) NSSet *branchUUIDs;
+@property (nonatomic, readonly) NSArray *branches;
 
 - (COBranchInfo *)branchInfoForUUID: (ETUUID *)aUUID;
-- (COBranchInfo *)currentBranchInfo;
+@property (nonatomic, readonly, strong) COBranchInfo *currentBranchInfo;
 /**
  * Convenience method that returns the current branch's current revision ID
  */
-- (ETUUID *)currentRevisionUUID;
+@property (nonatomic, readonly) ETUUID *currentRevisionUUID;
 
-@property (readwrite, nonatomic, strong) ETUUID *UUID;
-@property (readwrite, nonatomic, strong) ETUUID *currentBranchUUID;
-@property (readwrite, nonatomic, strong) NSDictionary *branchForUUID;
+@property (nonatomic, readwrite, strong) ETUUID *UUID;
+@property (nonatomic, readwrite, strong) ETUUID *currentBranchUUID;
+@property (nonatomic, readwrite, strong) NSDictionary *branchForUUID;
 @property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
 @property (readwrite, nonatomic, assign) int64_t transactionID;
-@property (readwrite, nonatomic, strong) NSDictionary *metadata;
+@property (nonatomic, readwrite, strong) NSDictionary *metadata;
 
 - (NSArray *)branchInfosWithMetadataValue: (id)aValue forKey: (NSString *)aKey;
 

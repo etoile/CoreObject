@@ -20,7 +20,7 @@
  *
  * Throws an exception if [self rootObject] is nil.
  */
-- (NSSet *) allReachableObjectUUIDs;
+@property (nonatomic, readonly) NSSet *allReachableObjectUUIDs;
 
 - (void) checkForCyclesInCompositeRelationshipsInChangedObjects;
 

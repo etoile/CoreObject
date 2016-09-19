@@ -17,7 +17,7 @@
 	
 	// For subclasses that don't override -newEntityDescription, we must not add the
 	// property descriptions that we will inherit through the parent
-	if ([[bookmark name] isEqual: [COBookmark className]] == NO)
+	if ([bookmark.name isEqual: [COBookmark className]] == NO)
 		return bookmark;
 	
 	ETPropertyDescription *URL =
@@ -30,13 +30,13 @@
 	NSArray *persistentProperties = A(URL, lastVisitedDate, favIconData);
 	
 	[[persistentProperties mappedCollection] setPersistent: YES];
-	[bookmark setPropertyDescriptions: persistentProperties];
+	bookmark.propertyDescriptions = persistentProperties;
 
 	return bookmark;
 }
 
 
-- (id) initWithURL: (NSURL *)aURL
+- (instancetype) initWithURL: (NSURL *)aURL
 {
 	NILARG_EXCEPTION_TEST(aURL);
 	SUPERINIT;
@@ -45,7 +45,7 @@
 	return self;
 }
 
-- (id) initWithURLFile: (NSString *)aFilePath
+- (instancetype) initWithURLFile: (NSString *)aFilePath
 {
 	// TODO: Finish to implement
 	NSURL *URL = nil;
@@ -63,7 +63,7 @@
 support bookmark search based on URL text. */
 - (NSString *)serializedURL
 {
-	return [_URL relativeString];
+	return _URL.relativeString;
 }
 
 - (void)setSerializedURL: (NSString *)aURLString

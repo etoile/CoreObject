@@ -307,8 +307,8 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 		return COIsTombstone(obj);
 	}];
 							   
-	[_backing setCount: 0];
-	[_externalIndexToBackingIndex setCount: 0];
+	_backing.count = 0;
+	_externalIndexToBackingIndex.count = 0;
 
 	NSArray *validLiveObjects = (liveObjects != nil ? liveObjects : [NSArray new]);
 
@@ -335,7 +335,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 - (NSArray *)deadReferences
 {
-	return [self.allReferences objectsAtIndexes: [self deadIndexes]];
+	return [self.allReferences objectsAtIndexes: self.deadIndexes];
 }
 
 - (NSArray *)allReferences
@@ -463,7 +463,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	COThrowExceptionIfNotMutable(_permanentlyMutable, _temporaryMutable);
 	
 	// remove old value from hash table
-	[_backingHashTable removeObject: [self objectAtIndex: index]];
+	[_backingHashTable removeObject: self[index]];
 	
 	[super removeObjectAtIndex: index];
 }
@@ -479,7 +479,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 	}
 	
 	// remove old value from hash table
-	[_backingHashTable removeObject: [self objectAtIndex: index]];
+	[_backingHashTable removeObject: self[index]];
 	
 	[super replaceObjectAtIndex: index withObject: anObject];
 }
@@ -638,7 +638,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 - (NSArray *)deadReferencesArray
 {
-	return [_deadReferences allObjects];
+	return _deadReferences.allObjects;
 }
 
 @end
@@ -768,7 +768,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 - (NSDictionary *)aliveEntries
 {
 	NSMutableDictionary *aliveEntries = [_backing mutableCopy];
-	[_backing removeObjectsForKeys: [_deadKeys allObjects]];
+	[_backing removeObjectsForKeys: _deadKeys.allObjects];
 	return aliveEntries;
 }
 
@@ -779,7 +779,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 
 - (id)objectForKey: (id)key
 {
-	return ![_deadKeys containsObject: key] ? [_backing objectForKey: key] : nil;
+	return ![_deadKeys containsObject: key] ? _backing[key] : nil;
 }
 
 - (NSEnumerator *)objectEnumerator
@@ -801,7 +801,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self, NSUIntege
 - (void)setObject: (id)anObject forKey: (id <NSCopying>)aKey
 {
 	COThrowExceptionIfNotMutable(_permanentlyMutable, _temporaryMutable);
-	[_backing setObject: anObject forKey: aKey];
+	_backing[aKey] = anObject;
 }
 
 @end

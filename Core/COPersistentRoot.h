@@ -208,7 +208,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * You must never overwrite any existing metadata set by CoreObject.
  */
-@property (nonatomic, copy) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy) NSDictionary *metadata;
 /**
  * The persistent root deletion status.
  *
@@ -274,7 +274,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * TODO: Rename to -displayName or -label to emphasize that this is the user-facing name?
  */
-@property (nonatomic, copy) NSString *name;
+@property (nonatomic, readwrite, copy) NSString *name;
 
 /** @taskunit Accessing Branches */
 
@@ -375,7 +375,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * See also -discardAllChanges and -[COBranch hasChanges].
  */
-- (BOOL)hasChanges;
+@property (nonatomic, readonly) BOOL hasChanges;
 /**
  * Discards the uncommitted changes to reset the branch to its last commit state.
  *
@@ -494,7 +494,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * See -commitWithIdentifier:metadata:undoTrack:error:.
  */
-- (BOOL)commit;
+@property (nonatomic, readonly) BOOL commit;
 
 
 /** @taskunit Previewing Old Revision */
@@ -514,12 +514,12 @@ extern NSString * const COPersistentRootDidChangeNotification;
 /**
  * Returns a short description to summarize the receiver.
  */
-- (NSString *)description;
+@property (nonatomic, readonly, copy) NSString *description;
 /**
  * Returns a multi-line description including informations about the branches,  
  * deletion status, attached metadata and pending changes.
  */
-- (NSString *)detailedDescription;
+@property (nonatomic, readonly) NSString *detailedDescription;
 
 
 /** @taskunit Deprecated */

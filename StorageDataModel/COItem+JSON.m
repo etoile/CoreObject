@@ -60,8 +60,8 @@ COJSONPrimitiveTypeToString(COType type)
 			case kCOTypeReference: return referencePrefix;
 			case kCOTypeCompositeReference: return compositePrefix;
 			case kCOTypeAttachment: return attachmentPrefix;
+			default: return @"";
     }
-    return @"";
 }
 
 NSString *
@@ -163,7 +163,7 @@ static id plistValueForValue(id aValue, COType aType)
  */
 static inline NSNumber * basicNumberFromDecimalNumber(NSNumber *aValue)
 {
-	return [NSNumber numberWithDouble: [[aValue description] doubleValue]];
+	return @(aValue.description.doubleValue);
 }
 													
 static id valueForPrimitivePlistValue(id aValue, COType aType)
@@ -236,13 +236,12 @@ static COType importTypeFromPlist(id typeValuePair)
 
 - (id) JSONPlist
 {
-	NSMutableDictionary *plistValues = [NSMutableDictionary dictionaryWithCapacity: [values count]];
+	NSMutableDictionary *plistValues = [NSMutableDictionary dictionaryWithCapacity: values.count];
 	
 	for (NSString *key in values)
 	{
-		id plistValue = plistValueForValue([values objectForKey: key], [[types objectForKey: key] intValue]);
-		[plistValues setObject: plistValue
-						forKey: key];
+		id plistValue = plistValueForValue(values[key], [types[key] intValue]);
+		plistValues[key] = plistValue;
 	}
 	
 	ETAssert(plistValues[kCOJSONObjectUUIDProperty] == nil);
@@ -254,7 +253,7 @@ static COType importTypeFromPlist(id typeValuePair)
     return plistValues;
 }
 
-- (id) initWithJSONPlist: (id)aPlist
+- (instancetype) initWithJSONPlist: (id)aPlist
 {
 	ETUUID *aUUID = [ETUUID UUIDWithString: aPlist[kCOJSONObjectUUIDProperty]];
     
@@ -278,11 +277,9 @@ static COType importTypeFromPlist(id typeValuePair)
 		
 		id typeValuePair = aPlist[key];
 		
-		[importedValues setObject: importValueFromPlist(typeValuePair)
-						   forKey: key];
+		importedValues[key] = importValueFromPlist(typeValuePair);
 		
-		[importedTypes setObject: [NSNumber numberWithInt: importTypeFromPlist(typeValuePair)]
-						  forKey: key];
+		importedTypes[key] = @(importTypeFromPlist(typeValuePair));
 	}
 	
 	self = [self initWithUUID: aUUID
@@ -298,7 +295,7 @@ static COType importTypeFromPlist(id typeValuePair)
     return CODataWithJSONObject(plist, NULL);
 }
 
-- (id) initWithJSONData: (NSData *)data
+- (instancetype) initWithJSONData: (NSData *)data
 {
     id plist = COJSONObjectWithData(data, NULL);
     return [self initWithJSONPlist: plist];

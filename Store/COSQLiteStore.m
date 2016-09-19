@@ -58,11 +58,12 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 
 @synthesize maxNumberOfDeltaCommits = _maxNumberOfDeltaCommits;
 
-- (id)initWithURL: (NSURL*)aURL
+- (instancetype)initWithURL: (NSURL*)aURL
 {
+	NILARG_EXCEPTION_TEST(aURL);
 	SUPERINIT;
     
-    queue_ = dispatch_queue_create([[NSString stringWithFormat: @"COSQLiteStore-%p", self] UTF8String], NULL);
+    queue_ = dispatch_queue_create([NSString stringWithFormat: @"COSQLiteStore-%p", self].UTF8String, NULL);
     
 	url_ = aURL;
 	backingStores_ = [[NSMutableDictionary alloc] init];
@@ -74,12 +75,12 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     dispatch_sync(queue_, ^() {
         // Ignore if this fails (it will fail if the directory already exists.)
         // If it really fails, we will notice later when we try to open the sqlite db
-        [[NSFileManager defaultManager] createDirectoryAtPath: [url_ path]
+        [[NSFileManager defaultManager] createDirectoryAtPath: url_.path
                                   withIntermediateDirectories: YES
                                                    attributes: nil
                                                         error: NULL];
         
-        db_ = [[FMDatabase alloc] initWithPath: [[url_ path] stringByAppendingPathComponent: @"index.sqlite"]];
+        db_ = [[FMDatabase alloc] initWithPath: [url_.path stringByAppendingPathComponent: @"index.sqlite"]];
         
         [db_ setShouldCacheStatements: YES];
         [db_ setCrashOnErrors: NO];
@@ -108,6 +109,11 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     }
     
 	return self;
+}
+
+- (instancetype)init
+{
+	return [self initWithURL: nil];
 }
 
 - (void) dealloc
@@ -434,7 +440,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 {
     assert(dispatch_get_current_queue() == queue_);
     
-    ETUUID *backingUUID = [backingStoreUUIDForPersistentRootUUID_ objectForKey: aUUID];
+    ETUUID *backingUUID = backingStoreUUIDForPersistentRootUUID_[aUUID];
     if (backingUUID == nil)
     {
         NSData *data = [db_ dataForQuery: @"SELECT backingstore FROM persistentroot_backingstores WHERE uuid = ?", [aUUID dataValue]];
@@ -454,7 +460,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 			}
         }
         
-        [backingStoreUUIDForPersistentRootUUID_ setObject: backingUUID forKey: aUUID];
+        backingStoreUUIDForPersistentRootUUID_[aUUID] = backingUUID;
     }
     return backingUUID;
 }
@@ -478,7 +484,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 
 - (COSQLiteStorePersistentRootBackingStore *) backingStoreForUUID: (ETUUID *)aUUID error: (NSError **)error
 {
-    COSQLiteStorePersistentRootBackingStore *result = [backingStores_ objectForKey: aUUID];
+    COSQLiteStorePersistentRootBackingStore *result = backingStores_[aUUID];
     if (result == nil)
     {
         result = [[COSQLiteStorePersistentRootBackingStore alloc] initWithPersistentRootUUID: aUUID store: self useStoreDB: BACKING_STORES_SHARE_SAME_SQLITE_DB error: error];
@@ -487,14 +493,14 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
             return nil;
         }
         
-        [backingStores_ setObject: result forKey: aUUID];
+        backingStores_[aUUID] = result;
     }
     return result;
 }
 
 - (NSString *)backingStorePathForUUID: (ETUUID *)aUUID
 {
-	return [[[self URL] path] stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.sqlite", aUUID]];
+	return [[self URL].path stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.sqlite", aUUID]];
 }
 
 - (void) deleteBackingStoreWithUUID: (ETUUID *)aUUID
@@ -653,7 +659,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
      [aRevision dataValue]];
     
     [db_ executeUpdate: @"INSERT INTO fts(docid, text) VALUES(?,?)",
-     [NSNumber numberWithLongLong: [db_ lastInsertRowId]],
+     @([db_ lastInsertRowId]),
      allItemsFtsContent];
     
     [db_ releaseSavepoint: @"updateSearchIndexesForItemUUIDs"];
@@ -839,7 +845,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 					? [ETUUID UUIDWithData: [rs dataForColumnIndex: 5]]
 					: nil;
                 
-                [branchDict setObject: state forKey: branch];
+                branchDict[branch] = state;
             }
             [rs close];
         }
@@ -1008,7 +1014,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 
 	[[NSDistributedNotificationCenter defaultCenter]
 		postNotificationName: COStorePersistentRootsDidChangeNotification
-		              object: [[self UUID] stringValue]
+		              object: [self.UUID stringValue]
 		            userInfo: userInfo
 		  deliverImmediately: YES];
 }
@@ -1051,8 +1057,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 							   kCOStoreInsertedPersistentRoots : insertedUUIDStrings,
 							   kCOStoreCompactedPersistentRoots : compactedUUIDStrings,
 							   kCOStoreFinalizedPersistentRoots : finalizedUUIDStrings,
-							   kCOStoreUUID : [[self UUID] stringValue],
-							   kCOStoreURL : [[self URL] absoluteString]};
+							   kCOStoreUUID : [self.UUID stringValue],
+							   kCOStoreURL : [self URL].absoluteString};
 
 	[self postCommitNotificationsWithUserInfo: userInfo];
 }

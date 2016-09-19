@@ -54,7 +54,7 @@
  *
  * See -setItemGraph: and -insertAndUpdateItems:.
  */
-- (id <COItemGraph>)loadingItemGraph;
+@property (nonatomic, readonly, strong) id<COItemGraph> loadingItemGraph;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -89,7 +89,7 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (BOOL) isTrackingSpecificBranch;
+@property (nonatomic, getter=isTrackingSpecificBranch, readonly) BOOL trackingSpecificBranch;
 
 
 /** @taskunit Metamodel Access */
@@ -115,7 +115,7 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (COItemGraph *)modifiedItemsSnapshot;
+@property (nonatomic, readonly, strong) COItemGraph *modifiedItemsSnapshot;
 
 
 /** @taskunit Garbage collection */
@@ -123,7 +123,7 @@
 /**
  * Should be called by COBranch at every commit.
  */
-- (BOOL) incrementCommitCounterAndCheckIfGCNeeded;
+@property (nonatomic, readonly) BOOL incrementCommitCounterAndCheckIfGCNeeded;
 
 /**
  * Perform tasks needed before each commit. (GC, check for cycles in composites)

@@ -38,7 +38,7 @@ NSString * const COPersistentRootName = @"org.etoile.coreobject.name";
 
 #pragma mark Creating a New Persistent Root -
 
-- (id)init
+- (instancetype)init
 {
 	[self doesNotRecognizeSelector: _cmd];
 	return nil;
@@ -77,7 +77,7 @@ NSString * const COPersistentRootName = @"org.etoile.coreobject.name";
 		[newContext loadedObjectsForUUIDs: [mismatchedItemUUIDsInNewContext allObjects]]);
 }
 
-- (id) initWithInfo: (COPersistentRootInfo *)info
+- (instancetype) initWithInfo: (COPersistentRootInfo *)info
 cheapCopyRevisionUUID: (ETUUID *)cheapCopyRevisionID
 cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
    parentBranchUUID: (ETUUID *)aBranchUUID
@@ -116,15 +116,15 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	
     if (_savedState != nil)
     {
-        _UUID =  [_savedState UUID];
+        _UUID =  _savedState.UUID;
         
-        for (COBranchInfo *branchInfo in [[_savedState branchForUUID] allValues])
+        for (COBranchInfo *branchInfo in _savedState.branchForUUID.allValues)
         {
             [self updateBranchWithBranchInfo: branchInfo
 			                       compacted: NO];
         }
         
-        _currentBranchUUID =  [_savedState currentBranchUUID];
+        _currentBranchUUID =  _savedState.currentBranchUUID;
 		[_parentContext setLastTransactionID: _savedState.transactionID forPersistentRootUUID: _UUID];
 		_metadata = _savedState.metadata;
 		
@@ -139,7 +139,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		// in COBranch initializer in some cases. Would make possible to write:
 		//ETUUID *branchUUID = [anObjectGraphContext branchUUID];
         ETUUID *branchUUID =
-			(anObjectGraphContext != nil ? [anObjectGraphContext branchUUID] : [ETUUID UUID]);
+			(anObjectGraphContext != nil ? anObjectGraphContext.branchUUID : [ETUUID UUID]);
         COBranch *branch = [[COBranch alloc] initWithUUID: branchUUID
                                             persistentRoot: self
                                           parentBranchUUID: aBranchUUID
@@ -154,7 +154,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		[self validateNewObjectGraphContext: _currentBranchObjectGraph
 		                        createdFrom: [branch objectGraphContextWithoutUnfaulting]];
 
-        [_branchForUUID setObject: branch forKey: branchUUID];
+        _branchForUUID[branchUUID] = branch;
         
         _currentBranchUUID =  branchUUID;
         _cheapCopyRevisionUUID =  cheapCopyRevisionID;
@@ -172,12 +172,12 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSString *)description
 {
-	if ([self isZombie])
+	if (self.isZombie)
 	{
 		return @"<zombie persistent root>";
 	}
 	return [NSString stringWithFormat: @"<%@ %p - %@ - %@>",
-		NSStringFromClass([self class]), self, _UUID, [[[self rootObject] entityDescription] name]];
+		NSStringFromClass([self class]), self, _UUID, [self.rootObject entityDescription].name];
 }
 
 - (NSString *)detailedDescription
@@ -213,7 +213,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 - (void) setCurrentBranchObjectGraphToRevisionUUID: (ETUUID *)aRevision
 								persistentRootUUID: (ETUUID*)aPersistentRoot
 {
-	id <COItemGraph> aGraph = [[self store] itemGraphForRevisionUUID: aRevision
+	id <COItemGraph> aGraph = [self.store itemGraphForRevisionUUID: aRevision
 													  persistentRoot: aPersistentRoot];
 	[_currentBranchObjectGraph setItemGraph: aGraph];
 	[_currentBranchObjectGraph removeUnreachableObjects];
@@ -245,24 +245,24 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (COEditingContext *)editingContext
 {
-	return [self parentContext];
+	return self.parentContext;
 }
 
 - (BOOL)isDeleted
 {
-	if ([[_parentContext persistentRootsPendingUndeletion] containsObject: self])
+	if ([_parentContext.persistentRootsPendingUndeletion containsObject: self])
 		return NO;
 	
-	if ([[_parentContext persistentRootsPendingDeletion] containsObject: self])
+	if ([_parentContext.persistentRootsPendingDeletion containsObject: self])
 		return YES;
 	
-    return [_savedState isDeleted];
+    return _savedState.deleted;
 }
 
 - (void)setDeleted: (BOOL)deleted
 {
 	[self assertNotZombie];
-	if (deleted == [self isDeleted])
+	if (deleted == self.deleted)
 	{
 		return;
 	}
@@ -281,9 +281,9 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 {
 	NSDate *maxDate = nil;
 
-	for (COBranch *branch in [self branches])
+	for (COBranch *branch in self.branches)
 	{
-		NSDate *date = [[branch headRevision] date];
+		NSDate *date = [branch.headRevision date];
 
 		if (maxDate != nil && [[date earlierDate: maxDate] isEqualToDate: date])
 			continue;
@@ -295,7 +295,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSDate *)creationDate
 {
-	return [[[self currentBranch] firstRevision] date];
+	return [self.currentBranch.firstRevision date];
 }
 
 - (COPersistentRoot *)parentPersistentRoot
@@ -305,7 +305,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	if (uuidString == nil)
 		return nil;
 
-	return [[self editingContext] persistentRootForUUID: [ETUUID UUIDWithString: uuidString]];
+	return [self.editingContext persistentRootForUUID: [ETUUID UUIDWithString: uuidString]];
 }
 
 - (BOOL)isCopy
@@ -315,7 +315,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSDictionary *)attributes
 {
-	return [[self store] attributesForPersistentRootWithUUID: _UUID];
+	return [self.store attributesForPersistentRootWithUUID: _UUID];
 }
 
 - (NSString *) name
@@ -341,12 +341,12 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (COBranch *)currentBranch
 {
-	return [_branchForUUID objectForKey: _currentBranchUUID];
+	return _branchForUUID[_currentBranchUUID];
 }
 
 - (void)setCurrentBranch: (COBranch *)aBranch
 {
-    _currentBranchUUID = [aBranch UUID];
+    _currentBranchUUID = aBranch.UUID;
 	_currentBranchObjectGraph.branch = aBranch;
 	
 	[self reloadCurrentBranchObjectGraph];
@@ -360,7 +360,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSSet *)branches
 {
-    return [NSSet setWithArray: [[_branchForUUID allValues] filteredCollectionWithBlock: ^(id obj)
+    return [NSSet setWithArray: [_branchForUUID.allValues filteredCollectionWithBlock: ^(id obj)
 	{
 		return (BOOL)![obj isDeleted];
 	}]];
@@ -368,7 +368,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSSet *)deletedBranches
 {
-    return [NSSet setWithArray: [[_branchForUUID allValues] filteredCollectionWithBlock: ^(id obj)
+    return [NSSet setWithArray: [_branchForUUID.allValues filteredCollectionWithBlock: ^(id obj)
 	{
 		return (BOOL)[obj isDeleted];
 	}]];
@@ -376,7 +376,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (COBranch *)branchForUUID: (ETUUID *)aUUID
 {
-    return [_branchForUUID objectForKey: aUUID];
+    return _branchForUUID[aUUID];
 }
 
 - (void)deleteBranch: (COBranch *)aBranch
@@ -426,7 +426,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSSet *)branchesPendingInsertion
 {
-    return [[self branches] filteredCollectionWithBlock: ^(id obj)
+    return [self.branches filteredCollectionWithBlock: ^(id obj)
 	{
 		return [obj isBranchUncommitted];
 	}];
@@ -434,7 +434,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSSet *)branchesPendingUpdate
 {
-    return [[self branches] filteredCollectionWithBlock: ^(id obj)
+    return [self.branches filteredCollectionWithBlock: ^(id obj)
 	{
 		return [obj hasChanges];
 	}];
@@ -442,10 +442,10 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (BOOL)hasChanges
 {
-	if ([_branchesPendingDeletion count] > 0)
+	if (_branchesPendingDeletion.count > 0)
         return YES;
     
-    if ([_branchesPendingUndeletion count] > 0)
+    if (_branchesPendingUndeletion.count > 0)
         return YES;
 	
 	if (_metadataChanged)
@@ -454,7 +454,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	if ([_currentBranchObjectGraph hasChanges])
 		return YES;
 	
-	for (COBranch *branch in [self branches])
+	for (COBranch *branch in self.branches)
 	{
 		if ([branch isBranchUncommitted])
             return YES;
@@ -469,7 +469,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 {
 	/* Discard changes in branches */
 
-	for (COBranch *branch in [self branches])
+	for (COBranch *branch in self.branches)
 	{
 		if ([branch isBranchUncommitted])
 			continue;
@@ -479,7 +479,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 	/* Clear branches pending insertion */
 	
-	NSArray *branchesPendingInsertion = [[self branchesPendingInsertion] allObjects];
+	NSArray *branchesPendingInsertion = self.branchesPendingInsertion.allObjects;
 	
 	[_branchForUUID removeObjectsForKeys: (id)[[branchesPendingInsertion mappedCollection] UUID]];
 	ETAssert([[self branchesPendingInsertion] isEmpty]);
@@ -490,7 +490,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 	if (_metadataChanged)
     {
-		_metadata = [[[self persistentRootInfo] metadata] copy];
+		_metadata = [[self persistentRootInfo].metadata copy];
         _metadataChanged = NO;
     }
 	
@@ -530,42 +530,42 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (id)rootObject
 {
-	return [[self objectGraphContext] rootObject];
+	return self.objectGraphContext.rootObject;
 }
 
 - (void)setRootObject: (COObject *)aRootObject
 {
-	[[self objectGraphContext] setRootObject: aRootObject];
+	self.objectGraphContext.rootObject = aRootObject;
 }
 
 - (COObject *)loadedObjectForUUID: (ETUUID *)uuid
 {
-	return [[self objectGraphContext] loadedObjectForUUID: uuid];
+	return [self.objectGraphContext loadedObjectForUUID: uuid];
 }
 
 - (CORevision *)currentRevision
 {
-    return [[self currentBranch] currentRevision];
+    return self.currentBranch.currentRevision;
 }
 
 - (void)setCurrentRevision: (CORevision *)revision
 {
-    [[self currentBranch] setCurrentRevision: revision];
+    self.currentBranch.currentRevision = revision;
 }
 
 - (CORevision *)headRevision
 {
-    return [[self currentBranch] headRevision];
+    return self.currentBranch.headRevision;
 }
 
 - (void)setHeadRevision: (CORevision *)revision
 {
-    [[self currentBranch] setHeadRevision: revision];
+    self.currentBranch.headRevision = revision;
 }
 
 - (COSQLiteStore *)store
 {
-	return [_parentContext store];
+	return _parentContext.store;
 }
 
 #pragma mark Committing Changes -
@@ -604,7 +604,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (BOOL)commit
 {
-	return [self commitWithMetadata: [NSDictionary dictionary]];
+	return [self commitWithMetadata: @{}];
 }
 
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
@@ -624,7 +624,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 {
 	if ([self hasChanges]
 		&& self.isDeleted
-		&& [[self persistentRootInfo] isDeleted])
+		&& [self persistentRootInfo].deleted)
 	{
 		[NSException raise: NSGenericException
 					format: @"Attempted to commit changes to deleted persistent root %@", self];
@@ -648,10 +648,10 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 			// and make that take a id<COItemGraph>
 
 			COObjectGraphContext *graphCtx = _currentBranchObjectGraph;
-			if ([[[self currentBranch] objectGraphContextWithoutUnfaulting] hasChanges])
+			if ([[self.currentBranch objectGraphContextWithoutUnfaulting] hasChanges])
 			{
 				usingCurrentBranchObjectGraph = NO;
-				graphCtx = [[self currentBranch] objectGraphContextWithoutUnfaulting];
+				graphCtx = [self.currentBranch objectGraphContextWithoutUnfaulting];
 			}
 			
 			[graphCtx doPreCommitChecks];
@@ -661,19 +661,19 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 			COItemGraph *graphCopy = [[COItemGraph alloc] initWithItemGraph: graphCtx];
 						
             _savedState = [txn createPersistentRootWithInitialItemGraph: graphCopy
-																   UUID: [self UUID]
-                                                             branchUUID: [[self currentBranch] UUID]
+																   UUID: self.UUID
+                                                             branchUUID: self.currentBranch.UUID
 													   revisionMetadata: metadata];
         }
         else
         {
 			// Committing a cheap copy, so there must be a parent branch
-			ETUUID *parentBranchUUID = [[[self currentBranch] parentBranch] UUID];
+			ETUUID *parentBranchUUID = self.currentBranch.parentBranch.UUID;
 			ETAssert(parentBranchUUID != nil);
 			ETAssert(_cheapCopyPersistentRootUUID != nil);
 			
 			const BOOL currentBranchObjectGraphHasChanges = [_currentBranchObjectGraph hasChanges];
-			const BOOL specificBranchObjectGraphHasChanges = [[[self currentBranch] objectGraphContextWithoutUnfaulting] hasChanges];
+			const BOOL specificBranchObjectGraphHasChanges = [[self.currentBranch objectGraphContextWithoutUnfaulting] hasChanges];
 			
 			ETAssert(!(currentBranchObjectGraphHasChanges && specificBranchObjectGraphHasChanges));
 			
@@ -683,7 +683,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 				
 				_savedState = [txn createPersistentRootCopyWithUUID: _UUID
 										   parentPersistentRootUUID: _cheapCopyPersistentRootUUID
-														 branchUUID: [[self currentBranch] UUID]
+														 branchUUID: self.currentBranch.UUID
 												   parentBranchUUID: parentBranchUUID
 												initialRevisionUUID: newRevisionUUID];
 				
@@ -694,7 +694,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 				}
 				else
 				{
-					modifiedItems = [[[self currentBranch] objectGraphContextWithoutUnfaulting] modifiedItemsSnapshot];
+					modifiedItems = [[self.currentBranch objectGraphContextWithoutUnfaulting] modifiedItemsSnapshot];
 					usingCurrentBranchObjectGraph = NO;
 				}
 				
@@ -704,19 +704,19 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 								   parentRevisionID: _cheapCopyRevisionUUID
 							  mergeParentRevisionID: nil
 								 persistentRootUUID: _UUID
-										 branchUUID: [[self currentBranch] UUID]];
+										 branchUUID: self.currentBranch.UUID];
 			}
 			else
 			{
 				_savedState = [txn createPersistentRootCopyWithUUID: _UUID
 										   parentPersistentRootUUID: _cheapCopyPersistentRootUUID
-														 branchUUID: [[self currentBranch] UUID]
+														 branchUUID: self.currentBranch.UUID
 												   parentBranchUUID: parentBranchUUID
 												initialRevisionUUID: _cheapCopyRevisionUUID];
 			}
         }
         ETAssert(_savedState != nil);
-		ETUUID *initialRevID = [[_savedState currentBranchInfo] currentRevisionUUID];
+		ETUUID *initialRevID = [_savedState currentBranchInfo].currentRevisionUUID;
 		ETAssert(initialRevID != nil);
 
         [_parentContext recordPersistentRootCreation: self
@@ -726,46 +726,46 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
         // because the store call -createPersistentRootWithInitialContents:
         // handles creating the initial branch.
         
-        [[self currentBranch] didMakeInitialCommitWithRevisionUUID: initialRevID transaction: txn];
+        [self.currentBranch didMakeInitialCommitWithRevisionUUID: initialRevID transaction: txn];
 		
 		if (usingCurrentBranchObjectGraph)
 		{
 			[_currentBranchObjectGraph acceptAllChanges];
-			[[[self currentBranch] objectGraphContextWithoutUnfaulting] setItemGraph: _currentBranchObjectGraph];
+			[[self.currentBranch objectGraphContextWithoutUnfaulting] setItemGraph: _currentBranchObjectGraph];
 		}
 		else
 		{
-			[[[self currentBranch] objectGraphContextWithoutUnfaulting] acceptAllChanges];
-			[_currentBranchObjectGraph setItemGraph: [[self currentBranch] objectGraphContext]];
+			[[self.currentBranch objectGraphContextWithoutUnfaulting] acceptAllChanges];
+			[_currentBranchObjectGraph setItemGraph: self.currentBranch.objectGraphContext];
 		}
 
 		[self validateNewObjectGraphContext: _currentBranchObjectGraph
-		                        createdFrom: [[self currentBranch] objectGraphContextWithoutUnfaulting]];
+		                        createdFrom: [self.currentBranch objectGraphContextWithoutUnfaulting]];
 	}
     else
     {
         // Commit changes in our branches
         
         // N.B. Don't use -branches because that only returns non-deleted branches
-        for (COBranch *branch in [_branchForUUID allValues])
+        for (COBranch *branch in _branchForUUID.allValues)
         {
             [branch saveCommitWithMetadata: metadata transaction: txn];
         }
         
         // Commit a change to the current branch, if needed.
         // Needs to be done after because the above loop may create the branch
-        if (![[_savedState currentBranchUUID] isEqual: _currentBranchUUID])
+        if (![_savedState.currentBranchUUID isEqual: _currentBranchUUID])
         {
 			[txn setCurrentBranch: _currentBranchUUID
-				forPersistentRoot: [self UUID]];
+				forPersistentRoot: self.UUID];
 			
             [_parentContext recordPersistentRoot: self
-                                setCurrentBranch: [self currentBranch]
-                                       oldBranch: [self branchForUUID: [_savedState currentBranchUUID]]];
+                                setCurrentBranch: self.currentBranch
+                                       oldBranch: [self branchForUUID: _savedState.currentBranchUUID]];
         }
         
         // N.B.: Ugly, the ordering of changes needs to be carefully controlled
-        for (COBranch *branch in [_branchForUUID allValues])
+        for (COBranch *branch in _branchForUUID.allValues)
         {
             [branch saveDeletionWithTransaction: txn];
         }
@@ -776,7 +776,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		[txn setMetadata: _metadata forPersistentRoot: _UUID];
 		
 		[_parentContext recordPersistentRootSetMetadata: self
-		                                    oldMetadata: [_savedState metadata]];
+		                                    oldMetadata: _savedState.metadata];
 		
 		_metadataChanged = NO;
 	}
@@ -797,7 +797,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (void)reloadPersistentRootInfo
 {
-    COPersistentRootInfo *newInfo = [[self store] persistentRootInfoForUUID: [self UUID]];
+    COPersistentRootInfo *newInfo = [self.store persistentRootInfoForUUID: self.UUID];
 
     if (newInfo == nil)
 		return;
@@ -809,7 +809,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 {
 	[self reloadPersistentRootInfo];
 	
-	for (COBranch *branch in [self branches])
+	for (COBranch *branch in self.branches)
 	{
 		[branch updateRevisions: NO];
 	}
@@ -823,12 +823,12 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 {
     COBranch *newBranch = [[COBranch alloc] initWithUUID: [ETUUID UUID]
                                           persistentRoot: self
-                                        parentBranchUUID: [aParent UUID]
+                                        parentBranchUUID: aParent.UUID
                               parentRevisionForNewBranch: [aRev UUID]];
     
     [newBranch setMetadata: D(aLabel, @"COBranchLabel")];
     
-    [_branchForUUID setObject: newBranch forKey: [newBranch UUID]];
+    _branchForUUID[newBranch.UUID] = newBranch;
     
     return newBranch;
 }
@@ -840,31 +840,31 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 {
     COBranch *newBranch = [[COBranch alloc] initWithUUID: aUUID
                                           persistentRoot: self
-                                        parentBranchUUID: [aParent UUID]
+                                        parentBranchUUID: aParent.UUID
                               parentRevisionForNewBranch: [aRev UUID]];
     
     if (metadata != nil)
     {
-        [newBranch setMetadata: metadata];
+        newBranch.metadata = metadata;
     }
 
-    [_branchForUUID setObject: newBranch forKey: [newBranch UUID]];
+    _branchForUUID[newBranch.UUID] = newBranch;
     
     return newBranch;
 }
 
 - (void)updateBranchWithBranchInfo: (COBranchInfo *)branchInfo compacted: (BOOL)wasCompacted
 {
-    COBranch *branch = [_branchForUUID objectForKey: [branchInfo UUID]];
+    COBranch *branch = _branchForUUID[branchInfo.UUID];
     
     if (branch == nil)
     {
-        branch = [[COBranch alloc] initWithUUID: [branchInfo UUID]
+        branch = [[COBranch alloc] initWithUUID: branchInfo.UUID
                                  persistentRoot: self
-                               parentBranchUUID: [branchInfo parentBranchUUID]
+                               parentBranchUUID: branchInfo.parentBranchUUID
                      parentRevisionForNewBranch: nil];
         
-        [_branchForUUID setObject: branch forKey: [branchInfo UUID]];
+        _branchForUUID[branchInfo.UUID] = branch;
     }
     else
     {
@@ -882,7 +882,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 //		  (int)notifTransaction, (int)_lastTransactionID, (int)isDistributed);
     
     COPersistentRootInfo *info =
-		[[self store] persistentRootInfoForUUID: [self UUID]];
+		[self.store persistentRootInfoForUUID: self.UUID];
 	
 	/* If we are receiving a changed/compacted notification but the persistent
 	   root has been finalized in the meantime (distributed notifications are 
@@ -905,7 +905,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	// FIXME: Factor out like -[COBranch updateBranchWithBranchInfo:compacted:]
 	// TODO: Test that _everything_ is reloaded
 	
-    _currentBranchUUID =  [_savedState currentBranchUUID];
+    _currentBranchUUID =  _savedState.currentBranchUUID;
     self.lastTransactionID = _savedState.transactionID;
     _metadata = _savedState.metadata;
 	
@@ -928,7 +928,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
     COObjectGraphContext *ctx = [[COObjectGraphContext alloc]
 		initWithModelDescriptionRepository: self.editingContext.modelDescriptionRepository
 		              migrationDriverClass: self.editingContext.migrationDriverClass];
-    id <COItemGraph> items = [[self store] itemGraphForRevisionUUID: [aRevision UUID]
+    id <COItemGraph> items = [self.store itemGraphForRevisionUUID: [aRevision UUID]
 	                                                 persistentRoot: _UUID];
 
     [ctx setItemGraph: items];

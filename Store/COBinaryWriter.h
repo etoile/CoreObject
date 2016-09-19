@@ -200,7 +200,7 @@ co_buffer_store_string(co_buffer_t *dest, NSString *value)
         return;
     }
     
-    const NSUInteger numChars = [value length];
+    const NSUInteger numChars = value.length;
     NSUInteger length = 0;
     [value getBytes: NULL
           maxLength: 0

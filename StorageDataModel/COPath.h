@@ -76,6 +76,6 @@
 /**
  * Returns a string representation of the path.
  */
-- (NSString *) stringValue;
+@property (nonatomic, readonly) NSString *stringValue;
 
 @end

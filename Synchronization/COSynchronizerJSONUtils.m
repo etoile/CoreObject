@@ -54,7 +54,7 @@
 		{
 			NSURL *url = [aStore URLForAttachmentID: attachmentID];
 			
-			if (![[NSFileManager defaultManager] fileExistsAtPath: [url path]])
+			if (![[NSFileManager defaultManager] fileExistsAtPath: url.path])
 			{
 				return attachmentID;
 			}

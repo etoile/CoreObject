@@ -30,7 +30,7 @@
 
 - (NSString *)description
 {
-	return [[self descriptionDictionary] description];
+	return self.descriptionDictionary.description;
 }
 
 - (BOOL) isSourceObjectTrackingSpecificBranchForTargetObject: (COObject *)aTargetObject
@@ -53,19 +53,25 @@
 
 #define INITIAL_ARRAY_CAPACITY 8
 
-- (id) initWithOwner: (COObject *)owner
+- (instancetype) initWithOwner: (COObject *)owner
 {
+	NILARG_EXCEPTION_TEST(owner);
     SUPERINIT;
     _cachedRelationships = [[NSMutableArray alloc] initWithCapacity: INITIAL_ARRAY_CAPACITY];
     _owner = owner;
     return self;
 }
 
+- (instancetype)init
+{
+	return [self initWithOwner: nil];
+}
+
 - (NSString *)description
 {
 	NSArray *relationships =
 		(id)[[_cachedRelationships mappedCollection] descriptionDictionary];
-	return [D([_owner UUID], @"owner", relationships, @"relationships") description];
+	return (D([_owner UUID], @"owner", relationships, @"relationships")).description;
 }
 
 - (NSSet *) referringObjectsForPropertyInTarget: (NSString *)aProperty
@@ -99,7 +105,7 @@
 	   Group (A). */
 	if ([_owner.objectGraphContext isTrackingSpecificBranch])
 	{
-		COObject *currentBranchRootObject = [[_owner persistentRoot] rootObject];
+		COObject *currentBranchRootObject = _owner.persistentRoot.rootObject;
 		NSSet *referringObjectsToCurrentBranch = [[currentBranchRootObject incomingRelationshipCache] referringObjectsForPropertyInTarget: aProperty];		
 		[result unionSet: referringObjectsToCurrentBranch];
 	}
@@ -142,7 +148,7 @@
     assert([results count] == 0
            || [results count] == 1);
     
-    if ([results count] == 0)
+    if (results.count == 0)
     {
         return nil;
     }
@@ -165,9 +171,9 @@
     // FIXME: Ugly, rewrite
     
     NSUInteger i = 0;
-    while (i < [_cachedRelationships count])
+    while (i < _cachedRelationships.count)
     {
-        COCachedRelationship *entry = [_cachedRelationships objectAtIndex: i];
+        COCachedRelationship *entry = _cachedRelationships[i];
         if ([aTargetProperty isEqualToString: entry->_sourceProperty]
             && entry.sourceObject == anObject)
         {
@@ -184,8 +190,8 @@
                        sourceProperty: (NSString *)aSource
                        targetProperty: (NSString *)aTarget
 {
-    ETPropertyDescription *prop = [[_owner entityDescription] propertyDescriptionForName: aTarget];
-    if (![prop isMultivalued])
+    ETPropertyDescription *prop = [_owner.entityDescription propertyDescriptionForName: aTarget];
+    if (!prop.multivalued)
     {
         // We are setting the value of a non-multivalued property, so assert
         // that it is currently not already set.

@@ -33,7 +33,7 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
  * dictionary contains mutable collections that matches the metamodel.
  * 
  */
- - (NSMutableDictionary *)newVariableStorage;
+- (NSMutableDictionary *)newVariableStorage;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -56,11 +56,11 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (NSDictionary *)additionalStoreItemUUIDs;
+@property (nonatomic, readonly) NSDictionary *additionalStoreItemUUIDs;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (CORelationshipCache *)incomingRelationshipCache;
+@property (nonatomic, readonly, strong) CORelationshipCache *incomingRelationshipCache;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
@@ -127,7 +127,7 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
 /**
  * This method is only exposed to be used in the CoreObject tests.
  */
-- (NSSet *) referringObjects;
+@property (nonatomic, readonly) NSSet *referringObjects;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

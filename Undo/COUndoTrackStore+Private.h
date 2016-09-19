@@ -85,7 +85,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
  *
  * This method must be run in the main thread.
  */
-- (BOOL) beginTransaction;
+@property (nonatomic, readonly) BOOL beginTransaction;
 /**
  * Ends a COUndoTrackStore transaction previously initiated with 
  * -beginTransaction.
@@ -94,7 +94,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
  *
  * This method must be run in the main thread.
  */
-- (BOOL) commitTransaction;
+@property (nonatomic, readonly) BOOL commitTransaction;
 
 
 /** @taskunit Managing Undo Tracks */
@@ -106,7 +106,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
  * Once a track persistent state is saved with -setStateForTrackName:, the
  * track appears in the returned array until -removeTrackWithName: is called.
  */
-- (NSArray *) trackNames;
+@property (nonatomic, readonly) NSArray *trackNames;
 /**
  * Returns the current track names that match a pattern built with '*'.
  *
@@ -209,7 +209,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
  * 
  * See also -[COSQLiteStore vacuum].
  */
-- (BOOL)vacuum;
+@property (nonatomic, readonly) BOOL vacuum;
 /**
  * See -[COSQLiteStore pageStatistics].
  */

@@ -139,7 +139,7 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
 	_URL = aURL;
 	_modifiedTrackStateForTrackName = [NSMutableDictionary new];
-	_queue = dispatch_queue_create([[NSString stringWithFormat: @"COUndoTrackStore-%p", self] UTF8String], NULL);
+	_queue = dispatch_queue_create([NSString stringWithFormat: @"COUndoTrackStore-%p", self].UTF8String, NULL);
 	_transactionLock = dispatch_semaphore_create(1);
 
    	__block BOOL ok = YES;

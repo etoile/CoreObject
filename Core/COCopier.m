@@ -40,7 +40,7 @@
 		}
 	}
 	
-	return [result allObjects];
+	return result.allObjects;
 }
 
 - (void) collectItemAndAllDescendents: (ETUUID *)aUUID
@@ -128,8 +128,7 @@
     NSMutableDictionary *mapping = [NSMutableDictionary dictionary];
     for (ETUUID *oldUUID in uuidsToCopy)
     {
-        [mapping setObject: [ETUUID UUID]
-                    forKey: oldUUID];
+        mapping[oldUUID] = [ETUUID UUID];
     }
     
     NSMutableArray *result = [NSMutableArray array];
@@ -144,7 +143,7 @@
     [dest insertOrUpdateItems: result];
     
 	return [uuids mappedCollectionWithBlock:
-			^(id inputUUID){ return [mapping objectForKey: inputUUID]; }];
+			^(id inputUUID){ return mapping[inputUUID]; }];
 }
 
 @end

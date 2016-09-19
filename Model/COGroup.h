@@ -30,6 +30,6 @@
 /**
  * Returns YES.
  */
-- (BOOL)isGroup;
+@property (nonatomic, getter=isGroup, readonly) BOOL group;
 
 @end

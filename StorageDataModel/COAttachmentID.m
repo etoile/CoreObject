@@ -10,14 +10,14 @@
 
 @implementation COAttachmentID
 
-- (id) init
+- (instancetype) init
 {
-	[NSException raise: NSGenericException format: @"Must use designated initializer -initWithData:"];
-	return nil;
+	return [self initWithData: nil];
 }
 
-- (id) initWithData:(NSData *)aData
+- (instancetype) initWithData:(NSData *)aData
 {
+	NILARG_EXCEPTION_TEST(aData);
 	SUPERINIT;
 	_data = [aData copy];
 	return self;
@@ -30,7 +30,7 @@
 
 - (NSUInteger) hash
 {
-	return [_data hash];
+	return _data.hash;
 }
 
 - (BOOL) isEqual:(id)object

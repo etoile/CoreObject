@@ -30,7 +30,7 @@
 @interface COAttributedString : COObject
 @property (nonatomic, readwrite, strong) NSArray *chunks;
 
-- (NSString *)string;
+@property (nonatomic, readonly) NSString *string;
 
 - (COItemGraph *) substringItemGraphWithRange: (NSRange)aRange;
 

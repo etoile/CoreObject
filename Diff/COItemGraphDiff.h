@@ -28,9 +28,9 @@
 	NSMutableDictionary *editsForSourceIdentifier; /* id => NSMutableSet of COSubtreeEdit*/
 }
 
-- (COItemGraphDiff *) parentDiff;
+@property (nonatomic, readonly, weak) COItemGraphDiff *parentDiff;
 
-- (NSSet *) sourceIdentifiers;
+@property (nonatomic, readonly) NSSet *sourceIdentifiers;
 
 /**
  * @returns a set of COCommand objects owned by the parent
@@ -39,9 +39,9 @@
  */
 - (NSSet *) editsForSourceIdentifier: (id)anIdentifier;
 
-- (NSSet *) allEdits;
+@property (nonatomic, readonly) NSSet *allEdits;
 
-- (BOOL) isNonconflicting;
+@property (nonatomic, getter=isNonconflicting, readonly) BOOL nonconflicting;
 
 // private
 
@@ -93,31 +93,31 @@
 /**
  * Returns whether the diff contains any edits.
  */
-- (BOOL) isEmpty;
+@property (nonatomic, getter=isEmpty, readonly) BOOL empty;
 
 - (COItemGraph *) itemTreeWithDiffAppliedToItemGraph: (id<COItemGraph>)aSubtree;
 
 - (COItemGraphDiff *)itemTreeDiffByMergingWithDiff: (COItemGraphDiff *)other;
 
-- (BOOL) hasConflicts;
+@property (nonatomic, readonly) BOOL hasConflicts;
 
 #pragma mark access (sub-objects may be mutated by caller)
 
-- (NSSet *)allEdits;
+@property (nonatomic, readonly) NSSet *allEdits;
 /**
  * FIXME: Should this return "equal edit" conflicts?
  */
-- (NSSet *)conflicts;
+@property (nonatomic, readonly) NSSet *conflicts;
 
-- (NSSet *) embeddedItemInsertionConflicts; // insert item uuid X at two different places
-- (NSSet *) equalEditConflicts; // e.g. set [4:2] to ("h", "i") and [4:2] to ("h", "i")
-- (NSSet *) sequenceEditConflicts; // e.g. set [4:5] and [4:3]. doesn't include equal sequence edit conflicts
-- (NSSet *) editTypeConflicts; // e.g. delete + set
-- (NSSet *) valueConflicts; // e.g. set attr to 'x' + set attr to 'y'
+@property (nonatomic, readonly) NSSet *embeddedItemInsertionConflicts; // insert item uuid X at two different places
+@property (nonatomic, readonly) NSSet *equalEditConflicts; // e.g. set [4:2] to ("h", "i") and [4:2] to ("h", "i")
+@property (nonatomic, readonly) NSSet *sequenceEditConflicts; // e.g. set [4:5] and [4:3]. doesn't include equal sequence edit conflicts
+@property (nonatomic, readonly) NSSet *editTypeConflicts; // e.g. delete + set
+@property (nonatomic, readonly) NSSet *valueConflicts; // e.g. set attr to 'x' + set attr to 'y'
 
 #pragma mark access
 
-- (NSSet *)modifiedItemUUIDs;
+@property (nonatomic, readonly) NSSet *modifiedItemUUIDs;
 
 - (NSSet *) modifiedAttributesForUUID: (ETUUID *)aUUID;
 - (NSSet *) editsForUUID: (ETUUID *)aUUID;

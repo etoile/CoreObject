@@ -22,14 +22,14 @@
     if ([object isKindOfClass: [CORevisionInfo class]])
     {
         CORevisionInfo *other = (CORevisionInfo *)object;
-        return [_revisionID isEqual: [other revisionUUID]];
+        return [_revisionID isEqual: other.revisionUUID];
     }
     return NO;
 }
 
 - (NSUInteger) hash
 {
-    return [_revisionID hash] ^ 15497645834521126867ULL;
+    return _revisionID.hash ^ 15497645834521126867ULL;
 }
 
 - (NSString *)description

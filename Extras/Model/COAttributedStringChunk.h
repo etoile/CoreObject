@@ -27,13 +27,13 @@
 /**
  * Returns a string like @"b,u" if the chunk is bold and underlined
  */
-- (NSString *) attributesDebugDescription;
+@property (nonatomic, readonly) NSString *attributesDebugDescription;
 
 /**
  * Character index of the start of the chunk. Currently O(N)
  */
-- (NSUInteger) characterIndex;
+@property (nonatomic, readonly) NSUInteger characterIndex;
 
-- (NSRange) characterRange;
+@property (nonatomic, readonly) NSRange characterRange;
 
 @end

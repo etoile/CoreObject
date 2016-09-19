@@ -27,13 +27,13 @@ static void FindAllParents(NSMutableSet *resultSet, ETUUID *rev, ETUUID *persist
     
     CORevisionInfo *revision = [store revisionInfoForRevisionUUID: rev persistentRootUUID: persistentRootUUID];
 	
-    if ([revision parentRevisionUUID] != nil)
+    if (revision.parentRevisionUUID != nil)
     {
-        FindAllParents(resultSet, [revision parentRevisionUUID], persistentRootUUID, store, stopSet);
+        FindAllParents(resultSet, revision.parentRevisionUUID, persistentRootUUID, store, stopSet);
     }
-    if ([revision mergeParentRevisionUUID] != nil)
+    if (revision.mergeParentRevisionUUID != nil)
     {
-        FindAllParents(resultSet, [revision mergeParentRevisionUUID], persistentRootUUID, store, stopSet);
+        FindAllParents(resultSet, revision.mergeParentRevisionUUID, persistentRootUUID, store, stopSet);
     }
 }
 
@@ -69,7 +69,7 @@ For now we do.
     
 	// 1. Calculate the set of revision ETUUID the client has
     NSMutableSet *revisionsClientHas = [NSMutableSet set];
-    for (NSString *revisionUUIDString in [[aRequest objectForKey: @"clientNewestRevisionIDForBranchUUID"] allValues])
+    for (NSString *revisionUUIDString in [aRequest[@"clientNewestRevisionIDForBranchUUID"] allValues])
     {
         ETUUID *revid = [ETUUID UUIDWithString: revisionUUIDString];
 
@@ -82,7 +82,7 @@ For now we do.
     {
 		if ([self shouldSendBranch: branch])
 		{
-			FindAllParents(revisionsClientLacks, [branch currentRevisionUUID], persistentRoot, aStore, revisionsClientHas);
+			FindAllParents(revisionsClientLacks, branch.currentRevisionUUID, persistentRoot, aStore, revisionsClientHas);
 		}
     }
     
@@ -103,8 +103,7 @@ For now we do.
             branchPlist[@"metadata"] = branch.metadata;
         }
         
-        [branches setObject: branchPlist
-                     forKey: [[branch UUID] stringValue]];
+        branches[[branch.UUID stringValue]] = branchPlist;
     }
     
     NSMutableDictionary *contentsForRevisionID = [NSMutableDictionary dictionary];
@@ -130,8 +129,7 @@ For now we do.
         
         id graphPlist = COItemGraphToJSONPropertyList(graph);
         
-        [contentsForRevisionID setObject: @{ @"graph" : graphPlist, @"info" : revInfoPlist }
-                                  forKey: [revid stringValue]];
+        contentsForRevisionID[[revid stringValue]] = @{ @"graph" : graphPlist, @"info" : revInfoPlist };
     }
     
     return @{@"persistentRoot" : [persistentRoot stringValue],

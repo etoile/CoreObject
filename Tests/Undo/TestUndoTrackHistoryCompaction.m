@@ -12,16 +12,21 @@
 - (void)reloadRevisions;
 @end
 
-@interface COUndoTrackHistoryCompaction (TestUndoTrackHistoryCompaction)
+@interface COExpectedCompaction : COUndoTrackHistoryCompaction
 @property (nonatomic, readwrite) NSSet *finalizablePersistentRootUUIDs;
 @property (nonatomic, readwrite) NSSet *compactablePersistentRootUUIDs;
 @property (nonatomic, readwrite) NSDictionary *deadRevisionUUIDs;
 @property (nonatomic, readwrite) NSDictionary *liveRevisionUUIDs;
 @end
 
-@implementation COUndoTrackHistoryCompaction (TestUndoTrackHistoryCompaction)
+@implementation COExpectedCompaction
 
 @dynamic finalizablePersistentRootUUIDs, compactablePersistentRootUUIDs, deadRevisionUUIDs, liveRevisionUUIDs;
+
+- (instancetype)init
+{
+	return self;
+}
 
 - (void)setFinalizablePersistentRootUUIDs: (NSSet *)finalizablePersistentRootUUIDs
 {
@@ -194,7 +199,7 @@
 
 	NSArray *liveRevs = [oldRevs subarrayFromIndex: 2];
 	NSArray *deadRevs = [oldRevs arrayByRemovingObjectsInArray: liveRevs];
-	COUndoTrackHistoryCompaction *compaction = [COUndoTrackHistoryCompaction new];
+	COExpectedCompaction *compaction = [COExpectedCompaction new];
 
 	compaction.finalizablePersistentRootUUIDs = [NSSet set];
 	compaction.compactablePersistentRootUUIDs = S(persistentRoot.UUID);
@@ -229,7 +234,7 @@
 
 	NSArray *liveRevs = [oldRevs subarrayFromIndex: 1];
 	NSArray *deadRevs = [oldRevs arrayByRemovingObjectsInArray: liveRevs];
-	COUndoTrackHistoryCompaction *compaction = [COUndoTrackHistoryCompaction new];
+	COExpectedCompaction *compaction = [COExpectedCompaction new];
 
 	compaction.finalizablePersistentRootUUIDs = [NSSet set];
 	compaction.compactablePersistentRootUUIDs = S(persistentRoot.UUID);
@@ -247,7 +252,7 @@
 
 	liveRevs = [oldRevs subarrayFromIndex: 2];
 	deadRevs = [oldRevs arrayByRemovingObjectsInArray: liveRevs];
-	compaction = [COUndoTrackHistoryCompaction new];
+	compaction = [COExpectedCompaction new];
 
 	compaction.finalizablePersistentRootUUIDs = [NSSet set];
 	compaction.compactablePersistentRootUUIDs = S(persistentRoot.UUID);
@@ -281,7 +286,7 @@
 	   revision and the one just before, so we keep 2 revisions. */
 	NSArray *mainLiveRevs = [oldRevs[persistentRoot.UUID] subarrayFromIndex: 2];
 	NSArray *mainDeadRevs = [oldRevs[persistentRoot.UUID] arrayByRemovingObjectsInArray: mainLiveRevs];
-	COUndoTrackHistoryCompaction *compaction = [COUndoTrackHistoryCompaction new];
+	COExpectedCompaction *compaction = [COExpectedCompaction new];
 
 	compaction.finalizablePersistentRootUUIDs = S(otherPersistentRoot.UUID);
 	compaction.compactablePersistentRootUUIDs = S(persistentRoot.UUID);
@@ -551,7 +556,7 @@
 
 	NSArray *liveRevs = [oldRevs subarrayFromIndex: 2];
 	NSArray *deadRevs = [oldRevs arrayByRemovingObjectsInArray: liveRevs];
-	COUndoTrackHistoryCompaction *compaction = [COUndoTrackHistoryCompaction new];
+	COExpectedCompaction *compaction = [COExpectedCompaction new];
 
 	compaction.finalizablePersistentRootUUIDs = [NSSet set];
 	compaction.compactablePersistentRootUUIDs = S(persistentRoot.UUID);
