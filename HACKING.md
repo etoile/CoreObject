@@ -159,6 +159,8 @@ retain attributes
 		@private
 		id __weak _owner;
 		id _owned;
+		NSMutableSet *_collection;
+		NSMutableSet *_container
 		NSString *_name;
 		NSDictionary *_elementsByName;
 		id relatedObject;
@@ -167,6 +169,9 @@ retain attributes
 	@property (nonatomic, readonly, weak) id owner;
 	@property (nonatomic, readonly) id derivedOwner;
 	@property (nonatomic, readonly, strong) id owned;
+
+	@property (nonatomic, readonly) NSSet *collection;
+	@property (nonatomic, readonly, strong) NSMutableSet *container;
 
 	@property (nonatomic, readwrite, copy) NSString *name;
 	@property (nonatomic, readwrite, copy) NSDictionary *elementsByName;
@@ -177,7 +182,11 @@ retain attributes
 - Invalid: @property (nonatomic, readonly, weak) id derivedOwner
 
 	- don't declare a weak or strong property when there is no _derivedOwner ivar
-	
+
+- Invalid: @property (nonatomic, readonly, strong) NSSet *collection
+
+	- don't declare a readonly property as strong when the returned value is a defensive copy or might be (if ivar and property types are not identical, this is usually the case)
+
 - Invalid: @property (nonatomic, readonly, copy) NSDictionary *elementsByName;
 
 	- don't declare a readonly property as copy (copy only describes if the 
