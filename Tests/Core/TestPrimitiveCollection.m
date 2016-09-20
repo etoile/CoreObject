@@ -54,7 +54,7 @@
 	UKTrue(array.deadIndexes.isEmpty);
 	UKTrue(array.deadReferences.isEmpty);
 	UKIntsEqual(1, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
+	UKObjectsEqual(alive1, array[0]);
 }
 
 - (void)testDeadReferenceAddition
@@ -66,7 +66,7 @@
 	UKObjectsEqual(A(dead1), array.allReferences);
 	UKIntsEqual(0, array.count);
 	UKFalse([array containsObject: dead1]);
-	UKRaisesException([array objectAtIndex: 0]);
+	UKRaisesException(array[0]);
 }
 
 - (void)testDeadBeforeAliveReferenceAddition
@@ -78,8 +78,8 @@
 	UKObjectsEqual(A(dead1), array.deadReferences);
 	UKObjectsEqual(A(dead1, alive1), array.allReferences);
 	UKIntsEqual(1, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
-	UKRaisesException([array objectAtIndex: 1]);
+	UKObjectsEqual(alive1, array[0]);
+	UKRaisesException(array[1]);
 }
 
 - (void)testDeadAfterAliveReferenceAddition
@@ -91,8 +91,8 @@
 	UKObjectsEqual(A(dead1), array.deadReferences);
 	UKObjectsEqual(A(alive1, dead1), array.allReferences);
 	UKIntsEqual(1, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
-	UKRaisesException([array objectAtIndex: 1]);
+	UKObjectsEqual(alive1, array[0]);
+	UKRaisesException(array[1]);
 }
 
 - (void)testDeadAndAliveMixedReferenceAddition
@@ -107,9 +107,9 @@
 	UKObjectsEqual(A(dead1, dead2, dead3), array.deadReferences);
 	UKObjectsEqual(A(alive1, dead1, dead2, alive2, dead3), array.allReferences);
 	UKIntsEqual(2, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive2, [array objectAtIndex: 1]);
-	UKRaisesException([array objectAtIndex: 2]);
+	UKObjectsEqual(alive1, array[0]);
+	UKObjectsEqual(alive2, array[1]);
+	UKRaisesException(array[2]);
 }
 
 - (void)testDeadReferenceReplacement
@@ -125,9 +125,9 @@
 	UKObjectsEqual(A(dead1, dead3), array.deadReferences);
 	UKObjectsEqual(A(alive1, dead1, alive2, dead3), array.allReferences);
 	UKIntsEqual(2, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive2, [array objectAtIndex: 1]);
-	UKRaisesException([array objectAtIndex: 2]);
+	UKObjectsEqual(alive1, array[0]);
+	UKObjectsEqual(alive2, array[1]);
+	UKRaisesException(array[2]);
 }
 
 - (void)testAliveReferenceReplacement
@@ -143,9 +143,9 @@
 	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
 	UKObjectsEqual(A(alive1, dead1, alive3, dead2), array.allReferences);
 	UKIntsEqual(2, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive3, [array objectAtIndex: 1]);
-	UKRaisesException([array objectAtIndex: 2]);
+	UKObjectsEqual(alive1, array[0]);
+	UKObjectsEqual(alive3, array[1]);
+	UKRaisesException(array[2]);
 }
 
 - (void)testDeadReferenceToAliveReplacementAtStart
@@ -160,9 +160,9 @@
 	UKObjectsEqual(A(dead2), array.deadReferences);
 	UKObjectsEqual(A(alive1, alive2, dead2), array.allReferences);
 	UKIntsEqual(2, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive2, [array objectAtIndex: 1]);
-	UKRaisesException([array objectAtIndex: 2]);
+	UKObjectsEqual(alive1, array[0]);
+	UKObjectsEqual(alive2, array[1]);
+	UKRaisesException(array[2]);
 }
 
 - (void)testDeadReferenceToAliveReplacementInMiddle
@@ -178,10 +178,10 @@
 	UKObjectsEqual(A(dead2), array.deadReferences);
 	UKObjectsEqual(A(alive1, alive2, alive3, dead2), array.allReferences);
 	UKIntsEqual(3, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive2, [array objectAtIndex: 1]);
-	UKObjectsEqual(alive3, [array objectAtIndex: 2]);
-	UKRaisesException([array objectAtIndex: 3]);
+	UKObjectsEqual(alive1, array[0]);
+	UKObjectsEqual(alive2, array[1]);
+	UKObjectsEqual(alive3, array[2]);
+	UKRaisesException(array[3]);
 }
 
 - (void)testDeadReferenceToAliveReplacementAtEnd
@@ -196,9 +196,9 @@
 	UKObjectsEqual(A(dead1), array.deadReferences);
 	UKObjectsEqual(A(dead1, alive2, alive3), array.allReferences);
 	UKIntsEqual(2, array.count);
-	UKObjectsEqual(alive2, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive3, [array objectAtIndex: 1]);
-	UKRaisesException([array objectAtIndex: 2]);
+	UKObjectsEqual(alive2, array[0]);
+	UKObjectsEqual(alive3, array[1]);
+	UKRaisesException(array[2]);
 }
 
 - (void)testAliveReferenceToDeadReplacementAtStart
@@ -213,8 +213,8 @@
 	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
 	UKObjectsEqual(A(dead1, dead2, alive2), array.allReferences);
 	UKIntsEqual(1, array.count);
-	UKObjectsEqual(alive2, [array objectAtIndex: 0]);
-	UKRaisesException([array objectAtIndex: 1]);
+	UKObjectsEqual(alive2, array[0]);
+	UKRaisesException(array[1]);
 }
 
 - (void)testAliveReferenceToDeadReplacementInMiddle
@@ -230,8 +230,8 @@
 	UKObjectsEqual(A(dead1, dead2, dead3), array.deadReferences);
 	UKObjectsEqual(A(alive1, dead1, dead2, dead3), array.allReferences);
 	UKIntsEqual(1, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
-	UKRaisesException([array objectAtIndex: 1]);
+	UKObjectsEqual(alive1, array[0]);
+	UKRaisesException(array[1]);
 }
 
 - (void)testAliveReferenceToDeadReplacementAtEnd
@@ -246,8 +246,8 @@
 	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
 	UKObjectsEqual(A(alive1, dead1, dead2), array.allReferences);
 	UKIntsEqual(1, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
-	UKRaisesException([array objectAtIndex: 1]);
+	UKObjectsEqual(alive1, array[0]);
+	UKRaisesException(array[1]);
 }
 
 #pragma mark - Alive Objects Primitive Operations
@@ -271,10 +271,10 @@
 	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
 	UKObjectsEqual(A(alive3, alive1, dead1, alive2, dead2), array.allReferences);
 	UKIntsEqual(3, array.count);
-	UKObjectsEqual(alive3, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive1, [array objectAtIndex: 1]);
-	UKObjectsEqual(alive2, [array objectAtIndex: 2]);
-	UKRaisesException([array objectAtIndex: 3]);
+	UKObjectsEqual(alive3, array[0]);
+	UKObjectsEqual(alive1, array[1]);
+	UKObjectsEqual(alive2, array[2]);
+	UKRaisesException(array[3]);
 }
 
 - (void)testMiddleObjectInsertion
@@ -290,10 +290,10 @@
 	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
 	UKObjectsEqual(A(alive1, dead1, alive3, alive2, dead2), array.allReferences);
 	UKIntsEqual(3, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive3, [array objectAtIndex: 1]);
-	UKObjectsEqual(alive2, [array objectAtIndex: 2]);
-	UKRaisesException([array objectAtIndex: 3]);
+	UKObjectsEqual(alive1, array[0]);
+	UKObjectsEqual(alive3, array[1]);
+	UKObjectsEqual(alive2, array[2]);
+	UKRaisesException(array[3]);
 }
 
 - (void)testLastObjectInsertion
@@ -309,10 +309,10 @@
 	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
 	UKObjectsEqual(A(alive1, dead1, alive2, dead2, alive3), array.allReferences);
 	UKIntsEqual(3, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive2, [array objectAtIndex: 1]);
-	UKObjectsEqual(alive3, [array objectAtIndex: 2]);
-	UKRaisesException([array objectAtIndex: 3]);
+	UKObjectsEqual(alive1, array[0]);
+	UKObjectsEqual(alive2, array[1]);
+	UKObjectsEqual(alive3, array[2]);
+	UKRaisesException(array[3]);
 }
 
 - (void)testFirstObjectRemoval
@@ -329,9 +329,9 @@
 	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
 	UKObjectsEqual(A(dead1, alive2, dead2, alive3), array.allReferences);
 	UKIntsEqual(2, array.count);
-	UKObjectsEqual(alive2, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive3, [array objectAtIndex: 1]);
-	UKRaisesException([array objectAtIndex: 2]);
+	UKObjectsEqual(alive2, array[0]);
+	UKObjectsEqual(alive3, array[1]);
+	UKRaisesException(array[2]);
 }
 
 - (void)testMiddleObjectRemoval
@@ -348,9 +348,9 @@
 	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
 	UKObjectsEqual(A(alive1, dead1, dead2, alive3), array.allReferences);
 	UKIntsEqual(2, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive3, [array objectAtIndex: 1]);
-	UKRaisesException([array objectAtIndex: 2]);
+	UKObjectsEqual(alive1, array[0]);
+	UKObjectsEqual(alive3, array[1]);
+	UKRaisesException(array[2]);
 }
 
 - (void)testLastObjectRemoval
@@ -367,9 +367,9 @@
 	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
 	UKObjectsEqual(A(alive1, dead1, alive2, dead2), array.allReferences);
 	UKIntsEqual(2, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive2, [array objectAtIndex: 1]);
-	UKRaisesException([array objectAtIndex: 3]);
+	UKObjectsEqual(alive1, array[0]);
+	UKObjectsEqual(alive2, array[1]);
+	UKRaisesException(array[3]);
 }
 
 - (void)testFirstObjectReplacement
@@ -379,15 +379,15 @@
 	[array addReference: alive2];
 	[array addReference: dead2];
 	
-	[array replaceObjectAtIndex: 0 withObject: alive3];
+	array[0] = alive3;
 	
 	UKObjectsEqual(INDEXSET(1, 3), array.deadIndexes);
 	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
 	UKObjectsEqual(A(alive3, dead1, alive2, dead2), array.allReferences);
 	UKIntsEqual(2, array.count);
-	UKObjectsEqual(alive3, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive2, [array objectAtIndex: 1]);
-	UKRaisesException([array objectAtIndex: 2]);
+	UKObjectsEqual(alive3, array[0]);
+	UKObjectsEqual(alive2, array[1]);
+	UKRaisesException(array[2]);
 }
 
 - (void)testLastObjectReplacement
@@ -397,15 +397,15 @@
 	[array addReference: alive2];
 	[array addReference: dead2];
 	
-	[array replaceObjectAtIndex: 1 withObject: alive3];
+	array[1] = alive3;
 	
 	UKObjectsEqual(INDEXSET(1, 3), array.deadIndexes);
 	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
 	UKObjectsEqual(A(alive1, dead1, alive3, dead2), array.allReferences);
 	UKIntsEqual(2, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive3, [array objectAtIndex: 1]);
-	UKRaisesException([array objectAtIndex: 2]);
+	UKObjectsEqual(alive1, array[0]);
+	UKObjectsEqual(alive3, array[1]);
+	UKRaisesException(array[2]);
 }
 
 #pragma mark - Alive Objects Additional Operations
@@ -428,10 +428,10 @@
 	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
 	UKObjectsEqual(A(alive3, alive1, dead1, alive2, dead2), array.allReferences);
 	UKIntsEqual(3, array.count);
-	UKObjectsEqual(alive3, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive1, [array objectAtIndex: 1]);
-	UKObjectsEqual(alive2, [array objectAtIndex: 2]);
-	UKRaisesException([array objectAtIndex: 3]);
+	UKObjectsEqual(alive3, array[0]);
+	UKObjectsEqual(alive1, array[1]);
+	UKObjectsEqual(alive2, array[2]);
+	UKRaisesException(array[3]);
 }
 
 - (void)testLastObjectAddition
@@ -448,10 +448,10 @@
 	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
 	UKObjectsEqual(A(alive1, dead1, alive2, dead2, alive3), array.allReferences);
 	UKIntsEqual(3, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive2, [array objectAtIndex: 1]);
-	UKObjectsEqual(alive3, [array objectAtIndex: 2]);
-	UKRaisesException([array objectAtIndex: 3]);
+	UKObjectsEqual(alive1, array[0]);
+	UKObjectsEqual(alive2, array[1]);
+	UKObjectsEqual(alive3, array[2]);
+	UKRaisesException(array[3]);
 }
 
 - (void)testRemoveLastObject
@@ -469,9 +469,9 @@
 	UKObjectsEqual(A(dead1, dead2), array.deadReferences);
 	UKObjectsEqual(A(alive1, dead1, alive2, dead2), array.allReferences);
 	UKIntsEqual(2, array.count);
-	UKObjectsEqual(alive1, [array objectAtIndex: 0]);
-	UKObjectsEqual(alive2, [array objectAtIndex: 1]);
-	UKRaisesException([array objectAtIndex: 3]);
+	UKObjectsEqual(alive1, array[0]);
+	UKObjectsEqual(alive2, array[1]);
+	UKRaisesException(array[3]);
 }
 
 - (void)testRemoveLastObjectWhenEmpty

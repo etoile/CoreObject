@@ -117,8 +117,8 @@
 		[self appendString: @" a test" htmlCode: nil toAttributedString: attributedString];
 	}
 	
-	CODiffManager *diffBaseBranchA = [CODiffManager diffItemGraph: base withItemGraph: branchA modelDescriptionRepository: [base modelDescriptionRepository] sourceIdentifier: @"branchA"];
-	CODiffManager *diffBaseBranchB = [CODiffManager diffItemGraph: base withItemGraph: branchB modelDescriptionRepository: [base modelDescriptionRepository] sourceIdentifier: @"branchB"];
+	CODiffManager *diffBaseBranchA = [CODiffManager diffItemGraph: base withItemGraph: branchA modelDescriptionRepository: base.modelDescriptionRepository sourceIdentifier: @"branchA"];
+	CODiffManager *diffBaseBranchB = [CODiffManager diffItemGraph: base withItemGraph: branchB modelDescriptionRepository: base.modelDescriptionRepository sourceIdentifier: @"branchB"];
 	
 	CODiffManager *merged = [diffBaseBranchA diffByMergingWithDiff: diffBaseBranchB];
 	

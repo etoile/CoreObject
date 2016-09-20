@@ -21,14 +21,14 @@
 
 - (void) validateJSONRoundTrip: (COItem*)item
 {
-    NSData *data = [item JSONData];
+    NSData *data = item.JSONData;
     COItem *roundTrip = [[COItem alloc] initWithJSONData: data];
     UKObjectsEqual(item, roundTrip);
 }
 
 - (void) validateBinaryRoundTrip: (COItem*)item
 {
-    NSData *data = [item dataValue];
+    NSData *data = item.dataValue;
     COItem *roundTrip = [[COItem alloc] initWithData: data];
     UKObjectsEqual(item, roundTrip);
 }
@@ -42,23 +42,23 @@
 - (void) testInt
 {
 	COMutableItem *item = [COMutableItem item];
-    [item setValue: [NSNumber numberWithInt: 1] forAttribute: @"1" type: kCOTypeInt64];
-    [item setValue: [NSNumber numberWithInt: -1] forAttribute: @"-1" type: kCOTypeInt64];
-    [item setValue: [NSNumber numberWithInt: 256] forAttribute: @"256" type: kCOTypeInt64];
-    [item setValue: [NSNumber numberWithInt: -256] forAttribute: @"-256" type: kCOTypeInt64];
-    [item setValue: [NSNumber numberWithInt: -65535] forAttribute: @"-65535" type: kCOTypeInt64];
-    [item setValue: [NSNumber numberWithInt: 65535] forAttribute: @"65535" type: kCOTypeInt64];
-    [item setValue: [NSNumber numberWithInt: 2000000000] forAttribute: @"2000000000" type: kCOTypeInt64];
-    [item setValue: [NSNumber numberWithInt: -2000000000] forAttribute: @"-2000000000" type: kCOTypeInt64];
-    [item setValue: [NSNumber numberWithLongLong: 8000000000] forAttribute: @"8000000000" type: kCOTypeInt64];
-    [item setValue: [NSNumber numberWithLongLong: -8000000000] forAttribute: @"-8000000000" type: kCOTypeInt64];
+    [item setValue: @1 forAttribute: @"1" type: kCOTypeInt64];
+    [item setValue: @-1 forAttribute: @"-1" type: kCOTypeInt64];
+    [item setValue: @256 forAttribute: @"256" type: kCOTypeInt64];
+    [item setValue: @-256 forAttribute: @"-256" type: kCOTypeInt64];
+    [item setValue: @-65535 forAttribute: @"-65535" type: kCOTypeInt64];
+    [item setValue: @65535 forAttribute: @"65535" type: kCOTypeInt64];
+    [item setValue: @2000000000 forAttribute: @"2000000000" type: kCOTypeInt64];
+    [item setValue: @-2000000000 forAttribute: @"-2000000000" type: kCOTypeInt64];
+    [item setValue: @8000000000LL forAttribute: @"8000000000" type: kCOTypeInt64];
+    [item setValue: @-8000000000LL forAttribute: @"-8000000000" type: kCOTypeInt64];
     [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeInt64];
     
-    [item setValue: A([NSNumber numberWithInt: 1], [NSNumber numberWithLongLong: 8000000000])
+    [item setValue: A(@1, @8000000000LL)
       forAttribute: @"[1, 8000000000]"
               type: kCOTypeArray | kCOTypeInt64];
 
-    [item setValue: S([NSNumber numberWithInt: 1], [NSNumber numberWithLongLong: 8000000000])
+    [item setValue: S(@1, @8000000000LL)
       forAttribute: @"(1, 8000000000)"
               type: kCOTypeSet | kCOTypeInt64];
 
@@ -68,16 +68,16 @@
 /* See basicNumberFromDecimalNumber() in COItem+JSON.m */
 - (void) testJSONDoubleEquality
 {
-	NSNumber *value = [NSNumber numberWithDouble: 123.456789012];
+	NSNumber *value = @123.456789012;
 
 	UKTrue(strcmp([value objCType], "d") == 0);
 
 	NSNumber *decimalValue = [NSDecimalNumber numberWithDouble: 123.456789012];
 	NSData *data = [NSJSONSerialization dataWithJSONObject: D(value, @"number") options: 0 error: NULL];
 	NSNumber *roundTripValue =
-		[[NSJSONSerialization JSONObjectWithData: data options: 0 error: NULL] objectForKey: @"number"];
-	NSNumber *newValue = [NSNumber numberWithDouble: [roundTripValue doubleValue]];
-	NSNumber *newValueFromDesc = [NSNumber numberWithDouble: [[roundTripValue description] doubleValue]];
+		[NSJSONSerialization JSONObjectWithData: data options: 0 error: NULL][@"number"];
+	NSNumber *newValue = @(roundTripValue.doubleValue);
+	NSNumber *newValueFromDesc = @(roundTripValue.description.doubleValue);
 
 #ifndef GNUSTEP
 	// NOTE: Doesn't matter on GNUstep since newValue is not a NSDecimalNumber, 
@@ -91,15 +91,15 @@
 	/* Rounding is visible in the ouput for numbers that contain more than two 
 	   decimals on 10.7 (e.g. 123.45 output is the same for all numbers). */
 	NSLog(@"value            doubleValue: %.20f, description: %@, class: %@",
-		  [value doubleValue], value, [value class]);
+		  value.doubleValue, value, [value class]);
 	NSLog(@"decimalValue     doubleValue: %.20f, description: %@, class: %@",
-		  [decimalValue doubleValue], decimalValue, [decimalValue class]);
+		  decimalValue.doubleValue, decimalValue, [decimalValue class]);
 	NSLog(@"roundTripValue   doubleValue: %.20f, description: %@, class: %@",
-		  [roundTripValue doubleValue], roundTripValue, [roundTripValue class]);
+		  roundTripValue.doubleValue, roundTripValue, [roundTripValue class]);
 	NSLog(@"newValue         doubleValue: %.20f, description: %@, class: %@",
-		  [newValue doubleValue], newValue, [newValue class]);
+		  newValue.doubleValue, newValue, [newValue class]);
 	NSLog(@"newValueFromDesc doubleValue: %.20f, description: %@, class: %@",
-		  [newValueFromDesc doubleValue], newValueFromDesc, [newValueFromDesc class]);
+		  newValueFromDesc.doubleValue, newValueFromDesc, [newValueFromDesc class]);
 
 	UKTrue([value compare: newValueFromDesc] == NSOrderedSame);
 	UKTrue([newValueFromDesc compare: value] == NSOrderedSame);
@@ -108,15 +108,15 @@
 - (void) testDouble
 {
 	COMutableItem *item = [COMutableItem item];
-    [item setValue: [NSNumber numberWithDouble: 3.14] forAttribute: @"3.14" type: kCOTypeDouble];
-	[item setValue: [NSNumber numberWithDouble: 123.456789012] forAttribute: @"123.456789012" type: kCOTypeDouble];
+    [item setValue: @3.14 forAttribute: @"3.14" type: kCOTypeDouble];
+	[item setValue: @123.456789012 forAttribute: @"123.456789012" type: kCOTypeDouble];
     [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeDouble];
     
-    [item setValue: A([NSNumber numberWithDouble: 3.14], [NSNumber numberWithDouble: 123.456789012])
+    [item setValue: A(@3.14, @123.456789012)
       forAttribute: @"[3.14, 123.456789012]"
               type: kCOTypeArray | kCOTypeDouble];
     
-    [item setValue: S([NSNumber numberWithDouble: 3.14], [NSNumber numberWithDouble: 123.456789012])
+    [item setValue: S(@3.14, @123.456789012)
       forAttribute: @"(3.14, 123.456789012)"
               type: kCOTypeSet | kCOTypeDouble];
     
@@ -238,7 +238,7 @@
 
 - (COItem *) roundTrip: (COItem *)anItem
 {
-    return [[COMutableItem alloc] initWithData: [anItem dataValue]];
+    return [[COMutableItem alloc] initWithData: anItem.dataValue];
 }
 
 - (void) testMutability
@@ -271,12 +271,14 @@
 
 - (void) testEquality
 {
-	COItem *immutable = [COItem itemWithTypesForAttributes: D([NSNumber numberWithInt: kCOTypeString | kCOTypeSet], @"key1",
-															  [NSNumber numberWithInt: kCOTypeString | kCOTypeArray], @"key2",
-															  [NSNumber numberWithInt: kCOTypeString], @"name")
-									   valuesForAttributes: D([NSMutableSet setWithObject: @"a"], @"key1",	
-															  [NSMutableArray arrayWithObject: @"A"], @"key2",
-															  @"my name", @"name")];
+	COItem *immutable = [COItem itemWithTypesForAttributes:
+		@{ @"key1" : @(kCOTypeString | kCOTypeSet),
+		   @"key2" : @(kCOTypeString | kCOTypeArray),
+		   @"name" : @(kCOTypeString) }
+	                                   valuesForAttributes:
+		@{ @"key1" : [NSMutableSet setWithObject: @"a"],
+		   @"key2" : [NSMutableArray arrayWithObject: @"A"],
+		   @"name" : @"my name" }];
 	COMutableItem *mutable = [immutable mutableCopy];
 	
 	UKObjectsEqual(immutable, mutable);

@@ -31,12 +31,12 @@
 	self = [super init];
 	
 	persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-	parent = [persistentRoot rootObject];
+	parent = persistentRoot.rootObject;
 	parent.label = @"Parent";
 	UKObjectsEqual(@[], parent.contents);
 	
-	child1 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"OutlineItem"];
-	child2 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"OutlineItem"];
+	child1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
+	child2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	child1.label = @"Child1";
 	child2.label = @"Child2";
 	parent.contents = @[child1, child2];
@@ -67,7 +67,7 @@
 
 - (void)testAddAndRemoveChildren
 {
-	OutlineItem *child3 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *child3 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	child3.label = @"Child3";
 
 	UKNil(child3.parentContainer);
@@ -102,7 +102,7 @@
 
 - (void)testMoveChildren
 {
-	OutlineItem *parent2 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *parent2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	parent2.label = @"Parent2";
 	
 	UKObjectsEqual(@[], parent2.contents);
@@ -203,8 +203,8 @@
 - (id)init
 {
 	SUPERINIT;
-	parent = [[ctx insertNewPersistentRootWithEntityName: @"TransientOutlineItem"] rootObject];
-	child = [[TransientOutlineItem alloc] initWithObjectGraphContext: [parent objectGraphContext]];
+	parent = [ctx insertNewPersistentRootWithEntityName: @"TransientOutlineItem"].rootObject;
+	child = [[TransientOutlineItem alloc] initWithObjectGraphContext: parent.objectGraphContext];
 	return self;
 }
 

@@ -24,10 +24,10 @@
 																						type: (id)@"Anonymous.UnorderedGroupWithOpposite"];
     [parentGroupsProperty setMultivalued: YES];
     [parentGroupsProperty setOrdered: NO];
-	[parentGroupsProperty setOpposite: (id)@"Anonymous.UnorderedGroupWithOpposite.contents"];
+	parentGroupsProperty.opposite = (id)@"Anonymous.UnorderedGroupWithOpposite.contents";
 	[parentGroupsProperty setDerived: YES];
 	
-	[entity setPropertyDescriptions: @[labelProperty, parentGroupsProperty]];
+	entity.propertyDescriptions = @[labelProperty, parentGroupsProperty];
 	
     return entity;
 }

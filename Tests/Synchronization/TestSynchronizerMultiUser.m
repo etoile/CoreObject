@@ -44,7 +44,7 @@
 	[[[COSQLiteStore alloc] initWithURL: CLIENT2_STORE_URL] clearStore];
 	
 	serverPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	serverBranch = [serverPersistentRoot currentBranch];
+	serverBranch = serverPersistentRoot.currentBranch;
 	[ctx commit];
 	
 	server = [[COSynchronizerServer alloc] initWithBranch: serverBranch];
@@ -86,24 +86,24 @@
 
 - (OutlineItem *) addAndCommitServerChild
 {
-	OutlineItem *serverChild = [[serverBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	[[serverBranch rootObject] addObject: serverChild];
+	OutlineItem *serverChild = [serverBranch.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[serverBranch.rootObject addObject: serverChild];
 	[ctx commit];
 	return serverChild;
 }
 
 - (OutlineItem *) addAndCommitClient1Child
 {
-	OutlineItem *clientChild = [[client1Branch objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	[[client1Branch rootObject] addObject: clientChild];
+	OutlineItem *clientChild = [client1Branch.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[client1Branch.rootObject addObject: clientChild];
 	[client1Ctx commit];
 	return clientChild;
 }
 
 - (OutlineItem *) addAndCommitClient2Child
 {
-	OutlineItem *clientChild = [[client2Branch objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	[[client2Branch rootObject] addObject: clientChild];
+	OutlineItem *clientChild = [client2Branch.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	[client2Branch.rootObject addObject: clientChild];
 	[client2Ctx commit];
 	return clientChild;
 }

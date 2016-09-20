@@ -34,7 +34,7 @@
     
     ETPropertyDescription *parentTagProperty =
     [ETPropertyDescription descriptionWithName: @"parentTag" type: (id)@"Anonymous.Tag"];
-    [parentTagProperty setOpposite: childTagsProperty];
+    parentTagProperty.opposite = childTagsProperty;
 	[parentTagProperty setDerived: YES];
 	
 	ETAssert(childTagsProperty.isComposite);

@@ -32,25 +32,25 @@
 	[track clear];
 	
     persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	[[persistentRoot rootObject] setLabel: @"0"];
+	[persistentRoot.rootObject setLabel: @"0"];
 	[ctx commit]; // not on undo track
-	r0 = [persistentRoot currentRevision];
+	r0 = persistentRoot.currentRevision;
 	
-	[[persistentRoot rootObject] setLabel: @"1"];
+	[persistentRoot.rootObject setLabel: @"1"];
 	[ctx commitWithUndoTrack: track];
-	r1 = [persistentRoot currentRevision];
+	r1 = persistentRoot.currentRevision;
 	
-	[[persistentRoot rootObject] setLabel: @"2"];
+	[persistentRoot.rootObject setLabel: @"2"];
 	[ctx commitWithUndoTrack: track];
-	r2 = [persistentRoot currentRevision];
+	r2 = persistentRoot.currentRevision;
 	
-	[[persistentRoot rootObject] setLabel: @"3"];
+	[persistentRoot.rootObject setLabel: @"3"];
 	[ctx commitWithUndoTrack: track];
-	r3 = [persistentRoot currentRevision];
+	r3 = persistentRoot.currentRevision;
 	
-	[[persistentRoot rootObject] setLabel: @"4"];
+	[persistentRoot.rootObject setLabel: @"4"];
 	[ctx commitWithUndoTrack: track];
-	r4 = [persistentRoot currentRevision];
+	r4 = persistentRoot.currentRevision;
 	
     return self;
 }
@@ -59,7 +59,7 @@
 	 isSetVersionFrom: (CORevision *)a
 				   to: (CORevision *)b
 {
-	COCommandSetCurrentVersionForBranch *command = [[(COCommandGroup *)aCommand contents] firstObject];
+	COCommandSetCurrentVersionForBranch *command = [((COCommandGroup *)aCommand).contents firstObject];
 	UKObjectKindOf(command, COCommandSetCurrentVersionForBranch);
 	UKObjectsEqual(a, command.oldRevision);
 	UKObjectsEqual(b, command.revision);
@@ -69,7 +69,7 @@
 {
 	id <COTrackNode> current = [track currentNode];
 	
-	double timeIntervalSinceLastNodeCommitted = [[NSDate date] timeIntervalSinceDate: [current date]];
+	double timeIntervalSinceLastNodeCommitted = [[NSDate date] timeIntervalSinceDate: current.date];
 	
 	// i.e., the last undo node must have been created between 0 and 250ms ago.
 	UKTrue(timeIntervalSinceLastNodeCommitted < 0.250);
@@ -189,7 +189,7 @@
 
 - (void) testNodes
 {
-	NSArray *nodes = [track nodes];
+	NSArray *nodes = track.nodes;
 	[self checkNodes: nodes];
 }
 
@@ -200,14 +200,14 @@
 - (void) testNodesUnaffectedBy1Undo
 {
 	[track undo];
-	[self checkNodes: [track nodes]];
+	[self checkNodes: track.nodes];
 }
 
 - (void) testNodesUnaffectedBy2Undos
 {
 	[track undo];
 	[track undo];
-	[self checkNodes: [track nodes]];
+	[self checkNodes: track.nodes];
 }
 
 - (void) testNodesUnaffectedBy3Undos
@@ -215,7 +215,7 @@
 	[track undo];
 	[track undo];
 	[track undo];
-	[self checkNodes: [track nodes]];
+	[self checkNodes: track.nodes];
 }
 
 - (void) testNodesUnaffectedBy4Undos
@@ -224,7 +224,7 @@
 	[track undo];
 	[track undo];
 	[track undo];
-	[self checkNodes: [track nodes]];
+	[self checkNodes: track.nodes];
 }
 
 - (void) testSetCurrentNode

@@ -25,9 +25,9 @@
     [contentsProperty setPersistent: YES];
     [contentsProperty setMultivalued: YES];
     [contentsProperty setOrdered: NO];
-	[contentsProperty setOpposite: (id)@"Anonymous.UnorderedGroupContent.parentGroups"];
+	contentsProperty.opposite = (id)@"Anonymous.UnorderedGroupContent.parentGroups";
 	
-	[entity setPropertyDescriptions: @[labelProperty, contentsProperty]];
+	entity.propertyDescriptions = @[labelProperty, contentsProperty];
 	
     return entity;
 }

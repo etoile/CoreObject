@@ -23,7 +23,7 @@ NSString * const kCOParent = @"parentContainer";
 - (void) checkObjectGraphBeforeAndAfterSerializationRoundtrip: (COObjectGraphContext *)anObjectGraph
 													  inBlock: (void (^)(COObjectGraphContext *testGraph, COObject *testRootObject, BOOL isObjectGraphCopy))block
 {
-	block(anObjectGraph, [anObjectGraph rootObject], NO);
+	block(anObjectGraph, anObjectGraph.rootObject, NO);
 	
 	NSData *data = COItemGraphToJSONData(anObjectGraph);
 	COItemGraph *deseriazlied = COItemGraphFromJSONData(data);
@@ -32,7 +32,7 @@ NSString * const kCOParent = @"parentContainer";
 	[deserializedContext setItemGraph: deseriazlied];
 	[deserializedContext removeUnreachableObjects];
 	
-	block(deserializedContext, [deserializedContext rootObject], YES);
+	block(deserializedContext, deserializedContext.rootObject, YES);
 }
 
 - (void)	checkBlock: (void (^)(void))block
@@ -94,7 +94,7 @@ doesNotPostNotification: (NSString *)notif
 {
 	BOOL isDir = NO;
 
-	if ([[NSFileManager defaultManager] fileExistsAtPath: [[self storeURL] path]
+	if ([[NSFileManager defaultManager] fileExistsAtPath: [self storeURL].path
 	                                         isDirectory: &isDir])
 	{
 		ETAssert(isDir);
@@ -104,7 +104,7 @@ doesNotPostNotification: (NSString *)notif
 		ETAssert(error == nil);
 	}
 	
-	if ([[NSFileManager defaultManager] fileExistsAtPath: [[self undoTrackStoreURL] path]
+	if ([[NSFileManager defaultManager] fileExistsAtPath: [self undoTrackStoreURL].path
 	                                         isDirectory: &isDir])
 	{
 		ETAssert(isDir);
@@ -289,14 +289,14 @@ doesNotPostNotification: (NSString *)notif
 - (void) checkBranchWithExistingAndNewContext: (COBranch *)aBranch
 									 inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block
 {
-	block([aBranch editingContext], [aBranch persistentRoot], aBranch, NO);
+	block(aBranch.editingContext, aBranch.persistentRoot, aBranch, NO);
 	
 	// Create a second, isolated context that opens a new store object
 	// at the current one's URL
 	
-	COEditingContext *ctx2 = [COEditingContext contextWithURL: [[[aBranch persistentRoot] store] URL]];
-	COPersistentRoot *ctx2PersistentRoot = [ctx2 persistentRootForUUID: [[aBranch persistentRoot] UUID]];
-	COBranch *ctx2Branch = [ctx2PersistentRoot branchForUUID: [aBranch UUID]];
+	COEditingContext *ctx2 = [COEditingContext contextWithURL: aBranch.persistentRoot.store.URL];
+	COPersistentRoot *ctx2PersistentRoot = [ctx2 persistentRootForUUID: aBranch.persistentRoot.UUID];
+	COBranch *ctx2Branch = [ctx2PersistentRoot branchForUUID: aBranch.UUID];
 	
 	// Run the tests again
 	
@@ -310,14 +310,14 @@ doesNotPostNotification: (NSString *)notif
 	// because for the second execution of the block I want to pass in the current branch that
 	// was persistent.
 	
-	block([aPersistentRoot editingContext], aPersistentRoot, [aPersistentRoot currentBranch], NO);
+	block(aPersistentRoot.editingContext, aPersistentRoot, aPersistentRoot.currentBranch, NO);
 
 	// Create a second, isolated context that opens a new store object
 	// at the current one's URL
 	
-	COEditingContext *ctx2 = [COEditingContext contextWithURL: [[aPersistentRoot store] URL]];
-	COPersistentRoot *ctx2PersistentRoot = [ctx2 persistentRootForUUID: [aPersistentRoot UUID]];
-	COBranch *ctx2Branch = [ctx2PersistentRoot currentBranch];
+	COEditingContext *ctx2 = [COEditingContext contextWithURL: aPersistentRoot.store.URL];
+	COPersistentRoot *ctx2PersistentRoot = [ctx2 persistentRootForUUID: aPersistentRoot.UUID];
+	COBranch *ctx2Branch = ctx2PersistentRoot.currentBranch;
 	
 	// Run the tests again
 	
@@ -344,12 +344,12 @@ doesNotPostNotification: (NSString *)notif
 
 - (id)insertObjectWithEntityName: (NSString *)aFullName
 {
-    ETEntityDescription *desc = [[self modelDescriptionRepository] descriptionForName: aFullName];
+    ETEntityDescription *desc = [self.modelDescriptionRepository descriptionForName: aFullName];
     if (desc == nil)
 	{
 		[NSException raise: NSInvalidArgumentException format: @"Entity name %@ invalid", aFullName];
 	}
-	Class objClass = [[self modelDescriptionRepository] classForEntityDescription: desc];
+	Class objClass = [self.modelDescriptionRepository classForEntityDescription: desc];
     
     /* Nil root object means the new object will be a root */
 	COObject *obj = [[objClass alloc] initWithEntityDescription: desc
@@ -367,9 +367,9 @@ doesNotPostNotification: (NSString *)notif
 	NSIndexSet *indexes =
 		(index != ETUndeterminedIndex ? [NSIndexSet indexSetWithIndex: index] : [NSIndexSet indexSet]);
 	
-	[self insertObjects: (object != nil ? A(object) : [NSArray array])
+	[self insertObjects: (object != nil ? A(object) : @[])
 	          atIndexes: indexes
-	              hints: (hint != nil ? A(hint) : [NSArray array])
+	              hints: (hint != nil ? A(hint) : @[])
 	        forProperty: key];
 }
 
@@ -378,9 +378,9 @@ doesNotPostNotification: (NSString *)notif
 	NSIndexSet *indexes =
 		(index != ETUndeterminedIndex ? [NSIndexSet indexSetWithIndex: index] : [NSIndexSet indexSet]);
 	
-	[self removeObjects: (object != nil ? A(object) : [NSArray array])
+	[self removeObjects: (object != nil ? A(object) : @[])
 	          atIndexes: indexes
-	              hints: (hint != nil ? A(hint) : [NSArray array])
+	              hints: (hint != nil ? A(hint) : @[])
 	        forProperty: key];
 }
 

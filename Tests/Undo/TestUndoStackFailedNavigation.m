@@ -32,19 +32,19 @@
 	
 	// set root to "0" ---- not on undo track
     persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	[[persistentRoot rootObject] setLabel: @"0"];
+	[persistentRoot.rootObject setLabel: @"0"];
 	[ctx commit];
 	node1 = [track currentNode];
 	
 	// set root to "1"
-	[[persistentRoot rootObject] setLabel: @"1"];
+	[persistentRoot.rootObject setLabel: @"1"];
 	[ctx commitWithUndoTrack: track];
 	node2 = [track currentNode];
 	
 	// set child to "a"
-	OutlineItem *child1 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	child1.label = @"a";
-	[[persistentRoot rootObject] addObject: child1];
+	[persistentRoot.rootObject addObject: child1];
 	[ctx commitWithUndoTrack: track];
 	node3 = [track currentNode];
 	
@@ -54,7 +54,7 @@
 	node4 = [track currentNode];
 	
 	// set root to "2" ---- not on undo track
-	[[persistentRoot rootObject] setLabel: @"2"];
+	[persistentRoot.rootObject setLabel: @"2"];
 	[ctx commit];
 	
 	// Since this last change is not recorded on the undo track,

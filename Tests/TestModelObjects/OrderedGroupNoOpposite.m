@@ -38,7 +38,7 @@ static NSUInteger DeallocCalls;
     [contentsProperty setMultivalued: YES];
     [contentsProperty setOrdered: YES];
 	
-	[entity setPropertyDescriptions: @[labelProperty, contentsProperty]];
+	entity.propertyDescriptions = @[labelProperty, contentsProperty];
 	
     return entity;
 }

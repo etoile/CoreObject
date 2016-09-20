@@ -33,11 +33,11 @@
 {
 	NSMutableSet *properties = [NSMutableSet set];
 
-	for (ETPropertyDescription *propertyDesc in [[self entityDescription] allPropertyDescriptions])
+	for (ETPropertyDescription *propertyDesc in self.entityDescription.allPropertyDescriptions)
 	{
 		if (propertyDesc.multivalued)
 		{
-			[properties addObject: [propertyDesc name]];
+			[properties addObject: propertyDesc.name];
 		}
 	}
 	return properties;
@@ -58,8 +58,8 @@
 
 - (void)testDefensiveCopyForContentArray
 {
-	COGroup *group = [[ctx insertNewPersistentRootWithEntityName: @"COGroup"] rootObject];
-	COGroup *container = [[ctx insertNewPersistentRootWithEntityName: @"COContainer"] rootObject];
+	COGroup *group = [ctx insertNewPersistentRootWithEntityName: @"COGroup"].rootObject;
+	COGroup *container = [ctx insertNewPersistentRootWithEntityName: @"COContainer"].rootObject;
 
 	UKFalse([[group contentArray] isMutable]);
 	UKFalse([[container contentArray] isMutable]);
@@ -77,15 +77,15 @@
 
 - (void)testLibraryForContentType
 {
-	ETEntityDescription *bookmarkType = [[ctx modelDescriptionRepository] descriptionForName: @"COBookmark"];
+	ETEntityDescription *bookmarkType = [ctx.modelDescriptionRepository descriptionForName: @"COBookmark"];
 
 	UKObjectsEqual([ctx bookmarkLibrary], [ctx libraryForContentType: bookmarkType]);
 }
 
 - (void)testBookmarkLibrary
 {
-	COLibrary *library = [ctx bookmarkLibrary];
-	ETEntityDescription *entity = [library entityDescription];
+	COLibrary *library = ctx.bookmarkLibrary;
+	ETEntityDescription *entity = library.entityDescription;
 
 	UKObjectsEqual([COLibrary class], [library class]);
 	UKStringsEqual(@"COBookmarkLibrary", [entity name]);
@@ -100,8 +100,8 @@
 
 - (void)testNoteLibrary
 {
-	COLibrary *library = [ctx noteLibrary];
-	ETEntityDescription *entity = [library entityDescription];
+	COLibrary *library = ctx.noteLibrary;
+	ETEntityDescription *entity = library.entityDescription;
 
 	UKObjectsEqual([COLibrary class], [library class]);
 	UKStringsEqual(@"CONoteLibrary", [entity name]);
@@ -116,7 +116,7 @@
 
 - (void)testTagLibrary
 {
-	COTagLibrary *library = [[ctx insertNewPersistentRootWithEntityName: @"COTagLibrary"] rootObject];
+	COTagLibrary *library = [ctx insertNewPersistentRootWithEntityName: @"COTagLibrary"].rootObject;
 
 	/* objects: the tags collected in the library
 	 tagGroups: the tag groups used to organize the tags in the library (see objects)
@@ -129,8 +129,8 @@
 
 - (void)testTagGroup
 {
-	COTagGroup *tagGroup = [[ctx insertNewPersistentRootWithEntityName: @"COTagGroup"] rootObject];
-	COTag *tag = [[ctx insertNewPersistentRootWithEntityName: @"COTag"] rootObject];
+	COTagGroup *tagGroup = [ctx insertNewPersistentRootWithEntityName: @"COTagGroup"].rootObject;
+	COTag *tag = [ctx insertNewPersistentRootWithEntityName: @"COTag"].rootObject;
 
 	/* objects: the tags put in the tag group
 	      tags: the tags applied to the tag group (inverse relationship) */
@@ -152,8 +152,8 @@
 
 - (void)testTag
 {
-	COTag *tag = [[ctx insertNewPersistentRootWithEntityName: @"COTag"] rootObject];
-	COObject *object = [[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
+	COTag *tag = [ctx insertNewPersistentRootWithEntityName: @"COTag"].rootObject;
+	COObject *object = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
 
 	UKObjectsEqual(S(@"tags"), [object multivaluedPropertyNames]);
 	UKObjectsEqual(S(@"objects", @"tagGroups", @"tags"), [tag multivaluedPropertyNames]);
@@ -163,7 +163,7 @@
 	UKTrue([[object tags] isKindOfClass: [NSSet class]]);
 
 	[tag addObject: object];
-	[tag setName: @"bird"];
+	tag.name = @"bird";
 
 	UKObjectsEqual(A(object), [tag content]);
 	UKObjectsEqual(S(tag), [object tags]);
@@ -172,13 +172,13 @@
 
 - (void)testCollectionContainingCheapCopyAndOriginal
 {
-	COTag *tag = [[ctx insertNewPersistentRootWithEntityName: @"COTag"] rootObject];
-	COObject *original = [[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
+	COTag *tag = [ctx insertNewPersistentRootWithEntityName: @"COTag"].rootObject;
+	COObject *original = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
 	
 	[ctx commit];
 
-	COObject *copy = [[[[original objectGraphContext] branch]
-		makePersistentRootCopyFromRevision: [original revision]] rootObject];
+	COObject *copy = [original.objectGraphContext.branch
+		makePersistentRootCopyFromRevision: original.revision].rootObject;
 
 	[tag addObject: original];
 	[tag addObject: copy];
@@ -190,8 +190,8 @@
 
 - (void)testSimpleCrossReference
 {
-	COTag *tag = [[ctx insertNewPersistentRootWithEntityName: @"COTag"] rootObject];
-	COObject *original = [[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
+	COTag *tag = [ctx insertNewPersistentRootWithEntityName: @"COTag"].rootObject;
+	COObject *original = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
 	
 	[ctx commit];
 	

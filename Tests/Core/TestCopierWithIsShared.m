@@ -157,7 +157,7 @@ static NSArray *initialUUIDs;
 	OutlineItem *b = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[[a mutableSetValueForKey: @"contents"] addObject: b];
 	
-	ETUUID *aCopyUUID = [copier copyItemWithUUID: [a UUID] fromGraph: ctx toGraph: ctx];
+	ETUUID *aCopyUUID = [copier copyItemWithUUID: a.UUID fromGraph: ctx toGraph: ctx];
 	id aCopy = [ctx loadedObjectForUUID: aCopyUUID];
 	
 	UKIntsEqual(3, [[ctx itemUUIDs] count]);
@@ -175,7 +175,7 @@ static NSArray *initialUUIDs;
 	
 	b.isShared = YES;
 	
-	ETUUID *aCopyUUID = [copier copyItemWithUUID: [a UUID] fromGraph: ctx toGraph: ctx];
+	ETUUID *aCopyUUID = [copier copyItemWithUUID: a.UUID fromGraph: ctx toGraph: ctx];
 	id aCopy = [ctx loadedObjectForUUID: aCopyUUID];
 	
 	UKIntsEqual(3, [[ctx itemUUIDs] count]);
@@ -193,7 +193,7 @@ static NSArray *initialUUIDs;
 	
 	b.isShared = NO;
 	
-	ETUUID *aCopyUUID = [copier copyItemWithUUID: [a UUID] fromGraph: ctx toGraph: ctx];
+	ETUUID *aCopyUUID = [copier copyItemWithUUID: a.UUID fromGraph: ctx toGraph: ctx];
 	id aCopy = [ctx loadedObjectForUUID: aCopyUUID];
 	
 	UKIntsEqual(4, [[ctx itemUUIDs] count]);

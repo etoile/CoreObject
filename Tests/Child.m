@@ -24,10 +24,10 @@
     [ETPropertyDescription descriptionWithName: @"parent" type: (id)@"Anonymous.Parent"];
     
     [parentProperty setMultivalued: NO];
-    [parentProperty setOpposite: (id)@"Anonymous.Parent.child"];
+    parentProperty.opposite = (id)@"Anonymous.Parent.child";
 	[parentProperty setDerived: YES];
     
-    [entity setPropertyDescriptions: @[labelProperty, parentProperty]];
+    entity.propertyDescriptions = @[labelProperty, parentProperty];
 	
     return entity;
 }

@@ -55,7 +55,7 @@
 {
     ETEntityDescription *rootEntity = [ETEntityDescription descriptionWithName: @"RootEntity"];
 	ETEntityDescription *emptyEntity = [ETEntityDescription descriptionWithName: @"EmptyEntity"];
-	[emptyEntity setParent: (id)@"Anonymous.COObject"];
+	emptyEntity.parent = (id)@"Anonymous.COObject";
 
 	[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: rootEntity];
 	[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: emptyEntity];
@@ -78,8 +78,8 @@
 
 - (void) testEquality
 {
-	COObject *object = [[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
-	COObject *otherObject = [[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
+	COObject *object = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
+	COObject *otherObject = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
 	
 	// FIXME: bookmark stuff is commented out because it fails serialization to an item graph
 	
@@ -106,7 +106,7 @@
 {
 	COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
 	COObject *object = [[COObject alloc] initWithObjectGraphContext: objectGraphContext];
-	NSUInteger hash = [object hash];
+	NSUInteger hash = object.hash;
 
 	/* For testing the hash stability with -[NSSet containsObject:], we must 
 	   insert the objects in the set before object becomes persistent */
@@ -130,12 +130,12 @@
 - (void) testHashStabilityAcrossSetCurrentBranch
 {
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-	COObject *object = [proot rootObject];
-	const NSUInteger hash = [object hash];
+	COObject *object = proot.rootObject;
+	const NSUInteger hash = object.hash;
 	[ctx commit];
 	
-	COBranch *secondaryBranch = [[proot currentBranch] makeBranchWithLabel: @"secondaryBranch"];
-	[proot setCurrentBranch: secondaryBranch];
+	COBranch *secondaryBranch = [proot.currentBranch makeBranchWithLabel: @"secondaryBranch"];
+	proot.currentBranch = secondaryBranch;
 	[ctx commit];
 	
 	UKIntsEqual(hash, [object hash]);
@@ -146,7 +146,7 @@
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	[ctx commit];
 	
-	COObject *object = [proot rootObject];
+	COObject *object = proot.rootObject;
 	
 	[self checkPersistentRootWithExistingAndNewContext: proot
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
@@ -167,7 +167,7 @@
 - (void) testDetailedDescription
 {
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
-	COObject *object = [proot rootObject];
+	COObject *object = proot.rootObject;
 
 	UKStringsEqual([object description], [object stringValue]);
 }
@@ -175,23 +175,23 @@
 - (void) testCreationAndModificationDates
 {
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
-	COObject *object = [proot rootObject];
+	COObject *object = proot.rootObject;
 
 	UKNil([proot creationDate]);
 	UKNil([proot modificationDate]);
 
-	[object setName: @"Bing"];
+	object.name = @"Bing";
 	[ctx commit];
 
-	CORevision *firstRev = [object revision];
+	CORevision *firstRev = object.revision;
 
 	UKObjectsEqual([firstRev date], [proot creationDate]);
 	UKObjectsEqual([firstRev date], [proot modificationDate]);
 
-	[object setName: @"Bong"];
+	object.name = @"Bong";
 	[ctx commit];
 
-	CORevision *lastRev = [object revision];
+	CORevision *lastRev = object.revision;
 	UKObjectsNotEqual(lastRev, firstRev);
 	
 	[self checkPersistentRootWithExistingAndNewContext: proot
@@ -205,7 +205,7 @@
 - (void) testKVCForSynthesizedSetterName
 {
 	COOverridenSetterBookmark *bookmark =
-		[[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"] rootObject];
+		[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"].rootObject;
 	NSDate *date = [NSDate date];
 
 	[bookmark setValue: date forProperty: @"lastVisitedDate"];
@@ -217,7 +217,7 @@
 - (void) testValidationForSynthesizedSetterName
 {
 	COOverridenSetterBookmark *bookmark =
-		[[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"] rootObject];
+		[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"].rootObject;
 	NSDate *date = [NSDate date];
 	NSArray *results = [bookmark validateValue: date forProperty: @"lastVisitedDate"];
 
@@ -228,10 +228,10 @@
 - (void) testSerializationForSynthesizedSetterName
 {
 	COOverridenSetterBookmark *bookmark =
-		[[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"] rootObject];
-	[bookmark setLastVisitedDate: [NSDate date]];
+		[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"].rootObject;
+	bookmark.lastVisitedDate = [NSDate date];
 	ETPropertyDescription *propertyDesc =
-		[[bookmark entityDescription] propertyDescriptionForName: @"lastVisitedDate"];
+		[bookmark.entityDescription propertyDescriptionForName: @"lastVisitedDate"];
 
 	NSString *dateString = [bookmark serializedValueForPropertyDescription: propertyDesc];
 
@@ -242,10 +242,10 @@
 - (void) testDeserializationForSynthesizedSetterName
 {
 	COOverridenSetterBookmark *bookmark =
-		[[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"] rootObject];
+		[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"].rootObject;
 	NSDate *date = [NSDate date];
 	ETPropertyDescription *propertyDesc =
-		[[bookmark entityDescription] propertyDescriptionForName: @"lastVisitedDate"];
+		[bookmark.entityDescription propertyDescriptionForName: @"lastVisitedDate"];
 
 	[bookmark setSerializedValue: date forPropertyDescription: propertyDesc];
 	
@@ -308,7 +308,7 @@
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	
 	OutlineItem *obj2 = [[OutlineItem alloc] initWithObjectGraphContext: proot.objectGraphContext];
-	[obj2 setLabel: @"test"];
+	obj2.label = @"test";
 	
 	/* obj2 is removed since it's unreachable */
 	[proot.objectGraphContext removeUnreachableObjects];
@@ -330,7 +330,7 @@
 	UKNil([object editingContext]);
 	
 	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithRootObject: object];
-	COBranch *branch = [persistentRoot currentBranch];
+	COBranch *branch = persistentRoot.currentBranch;
 	UKNotNil(persistentRoot);
 	UKNotNil(branch);
 	
@@ -345,7 +345,7 @@
 	COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
 	OutlineItem *object = [[OutlineItem alloc] initWithObjectGraphContext: objectGraphContext];
 	
-	ETEntityDescription *entityDesc = [object entityDescription];
+	ETEntityDescription *entityDesc = object.entityDescription;
 	ETPropertyDescription *contentsDesc = [entityDesc propertyDescriptionForName: @"contents"];
 	
 	UKTrue(contentsDesc.ordered);
@@ -386,7 +386,7 @@
 - (void) setLastVisitedDate: (NSDate *)lastVisitedDate
 {
 	setterInvoked = YES;
-	[super setLastVisitedDate: lastVisitedDate];
+	super.lastVisitedDate = lastVisitedDate;
 }
 
 - (id) validateLastVisitedDate: (id)aValue
@@ -398,13 +398,13 @@
 - (id) serializedLastVisitedDate
 {
 	serialized = YES;
-	return [[self lastVisitedDate] stringValue];
+	return [self.lastVisitedDate stringValue];
 }
 
 - (void) setSerializedLastVisitedDate: (id)aValue
 {
 	deserialized = YES;
-	[self setLastVisitedDate: aValue];
+	self.lastVisitedDate = aValue;
 }
 
 @end

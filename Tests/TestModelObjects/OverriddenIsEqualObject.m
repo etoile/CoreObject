@@ -20,7 +20,7 @@
                                                                                  type: (id)@"Anonymous.NSString"];
     [labelProperty setPersistent: YES];
 	
-	[entity setPropertyDescriptions: @[labelProperty]];
+	entity.propertyDescriptions = @[labelProperty];
 	
     return entity;
 }
@@ -29,7 +29,7 @@
 
 - (NSUInteger) hash
 {
-	return [self.label hash];
+	return (self.label).hash;
 }
 
 - (BOOL) isEqual:(id)anObject

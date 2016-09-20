@@ -31,9 +31,9 @@
 	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
 	[ctx2 setItemGraph: ctx];
 	
-	UnivaluedGroupNoOpposite *group1ctx2 = [ctx2 loadedObjectForUUID: [group1 UUID]];
-	UnivaluedGroupNoOpposite *group2ctx2 = [ctx2 loadedObjectForUUID: [group2 UUID]];
-	OutlineItem *item1ctx2 = [ctx2 loadedObjectForUUID: [item1 UUID]];
+	UnivaluedGroupNoOpposite *group1ctx2 = [ctx2 loadedObjectForUUID: group1.UUID];
+	UnivaluedGroupNoOpposite *group2ctx2 = [ctx2 loadedObjectForUUID: group2.UUID];
+	OutlineItem *item1ctx2 = [ctx2 loadedObjectForUUID: item1.UUID];
 	
 	UKObjectsEqual(item1ctx2, [group1ctx2 content]);
 	UKObjectsEqual(item1ctx2, [group2ctx2 content]);
@@ -580,7 +580,7 @@
 	UKNotNil(otherItem1.branch.UUID);
 	UKObjectsEqual(otherItemPath, [group1ctx2 serializableValueForStorageKey: @"content"]);
 	
-	NSArray *referrers = [[[ctx2 deadRelationshipCache] referringObjectsForPath: otherItemPath] allObjects];
+	NSArray *referrers = [ctx2.deadRelationshipCache referringObjectsForPath: otherItemPath].allObjects;
 	UKObjectsEqual(A(group1ctx2), referrers);
 	
 	// Ensure item1 persistent root is still unloaded

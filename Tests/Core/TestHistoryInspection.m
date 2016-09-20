@@ -89,61 +89,61 @@
     p1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commit];
     
-    branch1A = [p1 currentBranch];
-    r0 = [branch1A currentRevision];
-    [[p1 rootObject] setLabel: @"1"];
+    branch1A = p1.currentBranch;
+    r0 = branch1A.currentRevision;
+    [p1.rootObject setLabel: @"1"];
     [ctx commit];
-    r1 = [branch1A currentRevision];
+    r1 = branch1A.currentRevision;
     
-    [[branch1A rootObject] setLabel: @"2"];
+    [branch1A.rootObject setLabel: @"2"];
     [ctx commit];
-    r2 = [branch1A currentRevision];
+    r2 = branch1A.currentRevision;
     
     branch1B = [branch1A makeBranchWithLabel: @"1B" atRevision: r1];
 
-    [[branch1B rootObject] setLabel: @"3"];
+    [branch1B.rootObject setLabel: @"3"];
     [ctx commit];
-    r3 = [branch1B currentRevision];
+    r3 = branch1B.currentRevision;
     
-    p2 = [branch1A makePersistentRootCopy];
+    p2 = branch1A.makePersistentRootCopy;
     [ctx commit]; // FIXME: This commit is a hack, should be removed. add test and fix.
 
-    branch2A = [p2 currentBranch];
-    [[p2 rootObject] setLabel: @"4"];
+    branch2A = p2.currentBranch;
+    [p2.rootObject setLabel: @"4"];
     [ctx commit];
-    r4 = [branch2A currentRevision];
+    r4 = branch2A.currentRevision;
 
-	[[branch1B rootObject] setLabel: @"5"];
+	[branch1B.rootObject setLabel: @"5"];
     [ctx commit];
-    r5 = [branch1B currentRevision];
+    r5 = branch1B.currentRevision;
 	
     branch1B.currentRevision = r3;
     [ctx commit];
 	
-	[[branch1B rootObject] setLabel: @"6"];
+	[branch1B.rootObject setLabel: @"6"];
     [ctx commit];
-    r6 = [branch1B currentRevision];
+    r6 = branch1B.currentRevision;
 
 	branch1C = [branch1B makeBranchWithLabel: @"1C" atRevision: r6];
 
-    [[branch1C rootObject] setLabel: @"7"];
+    [branch1C.rootObject setLabel: @"7"];
     [ctx commit];
-    r7 = [branch1C currentRevision];
+    r7 = branch1C.currentRevision;
 
-	[[branch1B rootObject] setLabel: @"8"];
+	[branch1B.rootObject setLabel: @"8"];
     [ctx commit];
-    r8 = [branch1B currentRevision];
+    r8 = branch1B.currentRevision;
 
-	[[branch1C rootObject] setLabel: @"9"];
+	[branch1C.rootObject setLabel: @"9"];
     [ctx commit];
-    r9 = [branch1C currentRevision];
+    r9 = branch1C.currentRevision;
 
 	branch1C.currentRevision = r6;
     [ctx commit];
     
-	[[branch1C rootObject] setLabel: @"10"];
+	[branch1C.rootObject setLabel: @"10"];
     [ctx commit];
-    r10 = [branch1C currentRevision];
+    r10 = branch1C.currentRevision;
 
 	branch1B.currentRevision = r6;
     [ctx commit];
@@ -199,14 +199,14 @@
     UKObjectsEqual(branch1A, [branch1B parentBranch]);
     UKNil([branch1A parentBranch]);
 	{
-		COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: [ctx store]];
+		COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: ctx.store];
 		UKObjectsEqual([branch1A UUID], [[[[ctx2 persistentRootForUUID: [p1 UUID]]
 										   branchForUUID: [branch1B UUID]] parentBranch] UUID]);
 	}
 	
 	UKObjectsEqual(branch1A, [branch2A parentBranch]);
 	{
-		COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: [ctx store]];
+		COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: ctx.store];
 		UKObjectsEqual([branch1A UUID], [[[[ctx2 persistentRootForUUID: [p2 UUID]] currentBranch] parentBranch] UUID]);
 	}
 }
@@ -214,7 +214,7 @@
 - (NSArray *)revisionsForBranch: (COBranch *)aBranch
                         options: (COBranchRevisionReadingOptions)options
 {
-	NSArray *revInfos = [[ctx store] revisionInfosForBranchUUID: [aBranch UUID]
+	NSArray *revInfos = [ctx.store revisionInfosForBranchUUID: aBranch.UUID
 	                                                    options: options];
 	NSMutableArray *revs = [NSMutableArray array];
 	
@@ -266,11 +266,11 @@
 	   and we adjust the current revision to ensure: 
 	   
 	   'current revision' <= 'head revision' */
-	[branch1C setCurrentRevision: r3];
+	branch1C.currentRevision = r3;
 	[branch1C setHeadRevision: r5];
 	[ctx commit];
 
-	COPersistentRootInfo *p1Info = [[ctx store] persistentRootInfoForUUID: [p1 UUID]];
+	COPersistentRootInfo *p1Info = [ctx.store persistentRootInfoForUUID: p1.UUID];
 
 	UKObjectsEqual([r5 UUID], [[p1Info branchInfoForUUID: [branch1C UUID]] headRevisionUUID]);
 	UKObjectsEqual([r3 UUID], [[p1Info branchInfoForUUID: [branch1C UUID]] currentRevisionUUID]);
@@ -299,9 +299,9 @@
 	   reaction to a commit) */
 	[branch2A nodes];
 
-    [[branch2A rootObject] setLabel: @"11"];
+    [branch2A.rootObject setLabel: @"11"];
     [ctx commit];
-    CORevision *r11 = [branch2A currentRevision];
+    CORevision *r11 = branch2A.currentRevision;
 
 	UKObjectsEqual(A(r0, r1, r2, r4, r11), [branch2A nodes]);
 }
@@ -315,7 +315,7 @@
 - (void) testRevisionCacheReturnsNilForUnknownRevision
 {
 	CORevision *rev = [ctx revisionForRevisionUUID: [ETUUID UUID]
-								persistentRootUUID: [p1 UUID]];
+								persistentRootUUID: p1.UUID];
 	UKNil(rev);
 }
 
@@ -345,10 +345,10 @@
 
 - (void) testNewCommitUpdatesHeadRevision
 {
-	[[branch1B rootObject] setLabel: @"new commit"];
+	[branch1B.rootObject setLabel: @"new commit"];
 	[p1 commit];
 	
-	CORevision *r11 = [branch1B currentRevision];
+	CORevision *r11 = branch1B.currentRevision;
 	UKObjectsEqual(r6, [r11 parentRevision]);
 	
 	UKObjectsEqual(r11, branch1B.headRevision);

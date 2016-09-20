@@ -65,30 +65,30 @@ static ETUUID *rootUUID;
 	ETUUID *prootBBranchUUID = [ETUUID UUID];
 	
 	prootB = [txn createPersistentRootCopyWithUUID: [ETUUID UUID]
-						  parentPersistentRootUUID: [prootA UUID]
+						  parentPersistentRootUUID: prootA.UUID
 										branchUUID: [ETUUID UUID]
 								  parentBranchUUID: nil
-							   initialRevisionUUID: [prootA currentRevisionUUID]];
+							   initialRevisionUUID: prootA.currentRevisionUUID];
     
     ETUUID *prootBRev = [ETUUID UUID];
 	
 	[txn writeRevisionWithModifiedItems: [self prooBitemTree]
 						   revisionUUID: prootBRev
 							   metadata: nil
-					   parentRevisionID: [prootA currentRevisionUUID]
+					   parentRevisionID: prootA.currentRevisionUUID
 				  mergeParentRevisionID: nil
-					 persistentRootUUID: [prootB UUID]
+					 persistentRootUUID: prootB.UUID
 							 branchUUID: prootBBranchUUID];
 
     [txn setCurrentRevision: prootBRev
 				 headRevision: prootBRev
-	                forBranch: [prootB currentBranchUUID]
-	         ofPersistentRoot: [prootB UUID]];
+	                forBranch: prootB.currentBranchUUID
+	         ofPersistentRoot: prootB.UUID];
 
     prootB.currentBranchInfo.currentRevisionUUID = prootBRev;
     
-	prootAChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: [prootA UUID]];
-	prootBChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: [prootB UUID]];
+	prootAChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: prootA.UUID];
+	prootBChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: prootB.UUID];
 	
     UKTrue([store commitStoreTransaction: txn]);
 	
@@ -101,8 +101,8 @@ static ETUUID *rootUUID;
     UKNotNil(prootA);
     UKNotNil(prootB);
     
-    CORevisionInfo *prootARevInfo = [store revisionInfoForRevisionUUID: [prootA currentRevisionUUID] persistentRootUUID: [prootA UUID]];
-    CORevisionInfo *prootBRevInfo = [store revisionInfoForRevisionUUID: [prootB currentRevisionUUID] persistentRootUUID: [prootB UUID]];
+    CORevisionInfo *prootARevInfo = [store revisionInfoForRevisionUUID: prootA.currentRevisionUUID persistentRootUUID: prootA.UUID];
+    CORevisionInfo *prootBRevInfo = [store revisionInfoForRevisionUUID: prootB.currentRevisionUUID persistentRootUUID: prootB.UUID];
     
     UKNotNil(prootARevInfo);
     UKNotNil(prootBRevInfo);
@@ -113,8 +113,8 @@ static ETUUID *rootUUID;
     UKObjectsEqual([self prootAitemTree], [self currentItemGraphForPersistentRoot: [prootA UUID]]);
     UKObjectsEqual([self prooBitemTree], [self currentItemGraphForPersistentRoot: [prootB UUID]]);
 	
-	NSDictionary *prootAAttrs = [store attributesForPersistentRootWithUUID: [prootA UUID]];
-	NSDictionary *prootBAttrs = [store attributesForPersistentRootWithUUID: [prootB UUID]];
+	NSDictionary *prootAAttrs = [store attributesForPersistentRootWithUUID: prootA.UUID];
+	NSDictionary *prootBAttrs = [store attributesForPersistentRootWithUUID: prootB.UUID];
 	
 	// For the original (non cheap copy)
 	
@@ -133,8 +133,8 @@ static ETUUID *rootUUID;
 {
 	{
 		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-		[txn deletePersistentRoot: [prootA UUID]];
-		prootAChangeCount = [txn setOldTransactionID: prootAChangeCount forPersistentRoot: [prootA UUID]];
+		[txn deletePersistentRoot: prootA.UUID];
+		prootAChangeCount = [txn setOldTransactionID: prootAChangeCount forPersistentRoot: prootA.UUID];
 		UKTrue([store commitStoreTransaction: txn]);
 	}
 
@@ -154,8 +154,8 @@ static ETUUID *rootUUID;
 {
 	{
 		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-		[txn deletePersistentRoot: [prootB UUID]];
-		prootBChangeCount = [txn setOldTransactionID: prootBChangeCount forPersistentRoot: [prootB UUID]];
+		[txn deletePersistentRoot: prootB.UUID];
+		prootBChangeCount = [txn setOldTransactionID: prootBChangeCount forPersistentRoot: prootB.UUID];
 		UKTrue([store commitStoreTransaction: txn]);
 	}
 

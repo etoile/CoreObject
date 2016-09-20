@@ -32,9 +32,9 @@
     
     [parentProperty setMultivalued: NO];
 	[parentProperty setDerived: YES];
-    [parentProperty setOpposite: (id)@"Anonymous.Folder.contents"];
+    parentProperty.opposite = (id)@"Anonymous.Folder.contents";
     
-    [entity setPropertyDescriptions: @[labelProperty, contentsProperty, parentProperty]];
+    entity.propertyDescriptions = @[labelProperty, contentsProperty, parentProperty];
 	
     return entity;
 }

@@ -20,7 +20,7 @@
                                                                                  type: (id)@"Anonymous.NSString"];
     [labelProperty setPersistent: YES];
 	
-	[entity setPropertyDescriptions: @[labelProperty]];
+	entity.propertyDescriptions = @[labelProperty];
 	
     return entity;
 }

@@ -34,7 +34,7 @@
 	colorProperty.persistentType = (id)@"NSString";
     colorProperty.persistent = YES;
 	
-	[entity setPropertyDescriptions: @[colorProperty]];
+	entity.propertyDescriptions = @[colorProperty];
 	
     return entity;
 }
@@ -57,13 +57,13 @@
 	SUPERINIT;
 	ctx = [COObjectGraphContext new];
 	item1 = [ctx insertObjectWithEntityName: @"ValueTransformerModel"];
-	[ctx setRootObject: item1];
+	ctx.rootObject = item1;
 	return self;
 }
 
 - (void) testMetamodel
 {
-	ETPropertyDescription *colorPropDesc = [[item1 entityDescription] propertyDescriptionForName: @"color"];
+	ETPropertyDescription *colorPropDesc = [item1.entityDescription propertyDescriptionForName: @"color"];
 	NSValueTransformer *transformer = [NSValueTransformer valueTransformerForName: colorPropDesc.valueTransformerName];
 	ETEntityDescription *persistentType = colorPropDesc.persistentType;
 	

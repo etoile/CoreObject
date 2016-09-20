@@ -25,7 +25,7 @@
 	UKNil([graph rootItemUUID]);
 	UKObjectsEqual(@[[item UUID]], [graph itemUUIDs]);
 
-	graph.rootItemUUID = [item UUID];
+	graph.rootItemUUID = item.UUID;
 	
 	UKObjectsEqual([item UUID], [graph rootItemUUID]);
 }

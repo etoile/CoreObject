@@ -19,12 +19,12 @@
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     UKNotNil([persistentRoot UUID]);
     
-	COObject *obj = [persistentRoot rootObject];
+	COObject *obj = persistentRoot.rootObject;
 	UKNil([obj revision]);
 	
 	[ctx commit];
 	
-	CORevision *firstCommitRev = [obj revision];
+	CORevision *firstCommitRev = obj.revision;
 	UKNotNil(firstCommitRev);
     
 	[obj setValue: @"The hello world label!" forProperty: @"label"];
@@ -35,7 +35,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 CORevision *secondCommitRev = [[testProot rootObject] revision];
+		 CORevision *secondCommitRev = [testProot.rootObject revision];
 		 
 		 UKNotNil(secondCommitRev);
 		 UKObjectsNotEqual(firstCommitRev, secondCommitRev);
@@ -60,23 +60,23 @@
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     
 	// 1
-	COObject *obj = [persistentRoot rootObject];
-	objectUUID = [obj UUID];
+	COObject *obj = persistentRoot.rootObject;
+	objectUUID = obj.UUID;
 	UKNil([obj revision]);
 	[ctx commit];
-	CORevision *firstCommitRev = [obj revision];
+	CORevision *firstCommitRev = obj.revision;
 	UKNotNil(firstCommitRev);
 	
 	// 2
 	[obj setValue: @"Second Revision" forProperty: @"label"];
 	UKObjectsEqual(firstCommitRev, [obj revision]);
 	[ctx commit];
-	CORevision *secondCommitRev = [obj revision];
+	CORevision *secondCommitRev = obj.revision;
 
 	// 3
 	[obj setValue: @"Third Revision" forProperty: @"label"];
 	[ctx commit];
-	CORevision *thirdCommitRev = [obj revision];
+	CORevision *thirdCommitRev = obj.revision;
 	UKObjectsEqual(secondCommitRev, [thirdCommitRev parentRevision]);
 
     // Check that we can read the state 3 in another context
@@ -85,7 +85,7 @@
 	 {
         UKNotNil(testProot);
         
-        COObject *testObj2 = [testProot loadedObjectForUUID: [obj UUID]];
+        COObject *testObj2 = [testProot loadedObjectForUUID: obj.UUID];
         UKNotNil(testObj2);
         UKObjectsEqual(@"Third Revision", [testObj2 valueForKey: @"label"]);
 	 }];
@@ -93,11 +93,11 @@
 	// Load up 2 in another context
     
     {
-        COEditingContext *ctx2 = [COEditingContext contextWithURL: [store URL]];
-        COPersistentRoot *persistentRootInCtx2 = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        [persistentRootInCtx2 setCurrentRevision: secondCommitRev];
+        COEditingContext *ctx2 = [COEditingContext contextWithURL: store.URL];
+        COPersistentRoot *persistentRootInCtx2 = [ctx2 persistentRootForUUID: persistentRoot.UUID];
+        persistentRootInCtx2.currentRevision = secondCommitRev;
         
-        COObject *obj2 = [persistentRootInCtx2 loadedObjectForUUID: [obj UUID]];
+        COObject *obj2 = [persistentRootInCtx2 loadedObjectForUUID: obj.UUID];
         UKNotNil(obj2);
         UKObjectsEqual(@"Second Revision", [obj2 valueForProperty: @"label"]);
         
@@ -116,7 +116,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 COObject *testObj2 = [testProot loadedObjectForUUID: [obj UUID]];
+		 COObject *testObj2 = [testProot loadedObjectForUUID: obj.UUID];
 		 UKNotNil(testObj2);
 		 UKObjectsEqual(@"Fourth Revision", [testObj2 valueForKey: @"label"]);
 	 }];

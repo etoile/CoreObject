@@ -28,7 +28,7 @@
 	SUPERINIT;
 	ctx = [COObjectGraphContext new];
 	group1 = [ctx insertObjectWithEntityName: @"UnorderedAttributeModel"];
-	[ctx setRootObject: group1];
+	ctx.rootObject = group1;
 	return self;
 }
 

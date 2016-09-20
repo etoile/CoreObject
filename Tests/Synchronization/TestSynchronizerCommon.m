@@ -18,7 +18,7 @@
 	
 	serverPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupNoOpposite"];
 	serverPersistentRoot.metadata = [self persistentRootMetadataForTest];
-	serverBranch = [serverPersistentRoot currentBranch];
+	serverBranch = serverPersistentRoot.currentBranch;
 	serverBranch.metadata = [self branchMetadataForTest];
 	[ctx commit];
 	
@@ -75,16 +75,16 @@
 
 - (UnorderedGroupNoOpposite *) addAndCommitServerChild
 {
-	UnorderedGroupNoOpposite *serverChild1 = [[serverBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];
-	[[[serverBranch rootObject] mutableSetValueForKey: @"contents"] addObject: serverChild1];
+	UnorderedGroupNoOpposite *serverChild1 = [serverBranch.objectGraphContext insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];
+	[[serverBranch.rootObject mutableSetValueForKey: @"contents"] addObject: serverChild1];
 	[serverPersistentRoot commitWithMetadata: [self serverRevisionMetadataForTest]];
 	return serverChild1;
 }
 
 - (UnorderedGroupNoOpposite *) addAndCommitClientChild
 {
-	UnorderedGroupNoOpposite *clientChild1 = [[clientBranch objectGraphContext] insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];
-	[[[clientBranch rootObject] mutableSetValueForKey: @"contents"] addObject: clientChild1];
+	UnorderedGroupNoOpposite *clientChild1 = [clientBranch.objectGraphContext insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];
+	[[clientBranch.rootObject mutableSetValueForKey: @"contents"] addObject: clientChild1];
 	[clientPersistentRoot commitWithMetadata: [self clientRevisionMetadataForTest]];
 	return clientChild1;
 }

@@ -124,14 +124,14 @@
 
 - (void)checkUndoRedo
 {
-	__unused NSUInteger counter = [track nodes].count;
+	__unused NSUInteger counter = track.nodes.count;
 
-	while ([track canUndo])
+	while (track.canUndo)
 	{
 		UKDoesNotRaiseException([track undo]);
 		counter--;
 	}
-	while ([track canRedo])
+	while (track.canRedo)
 	{
 		counter++;
 		UKDoesNotRaiseException([track redo]);

@@ -87,8 +87,8 @@ static ETUUID *drawing2;
     
     UKIntsEqual(6, [[initialGraph itemUUIDs] count]);
     
-    ETUUID *shape1Copy = [[[initialGraph itemForUUID: group1Copy] valueForAttribute: @"contents"] objectAtIndex: 0];
-    ETUUID *shape1CopyStyle = [[[initialGraph itemForUUID: shape1Copy] valueForAttribute: @"styles"] objectAtIndex: 0];
+    ETUUID *shape1Copy = [[initialGraph itemForUUID: group1Copy] valueForAttribute: @"contents"][0];
+    ETUUID *shape1CopyStyle = [[initialGraph itemForUUID: shape1Copy] valueForAttribute: @"styles"][0];
     
     UKObjectsEqual(style1, shape1CopyStyle);
 }
@@ -132,8 +132,8 @@ static ETUUID *drawing2;
     
     UKIntsEqual(4, [[drawing2Graph itemUUIDs] count]);
     
-    ETUUID *shape1Copy = [[[drawing2Graph itemForUUID: group1Copy] valueForAttribute: @"contents"] objectAtIndex: 0];
-    ETUUID *shape1CopyStyle1 = [[[drawing2Graph itemForUUID: shape1Copy] valueForAttribute: @"styles"] objectAtIndex: 0];
+    ETUUID *shape1Copy = [[drawing2Graph itemForUUID: group1Copy] valueForAttribute: @"contents"][0];
+    ETUUID *shape1CopyStyle1 = [[drawing2Graph itemForUUID: shape1Copy] valueForAttribute: @"styles"][0];
     
     UKNotNil(shape1Copy);
     UKNotNil(shape1CopyStyle1);

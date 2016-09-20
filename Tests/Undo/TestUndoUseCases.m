@@ -52,26 +52,26 @@
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commit];
-	CORevision *r0 = [persistentRoot currentRevision];
+	CORevision *r0 = persistentRoot.currentRevision;
 	
-	[[persistentRoot rootObject] setLabel: @"r1"];
+	[persistentRoot.rootObject setLabel: @"r1"];
 	[ctx commitWithUndoTrack: _testTrack];
-	CORevision *r1 = [persistentRoot currentRevision];
+	CORevision *r1 = persistentRoot.currentRevision;
 	
-	[[persistentRoot rootObject] setLabel: @"r2"];
+	[persistentRoot.rootObject setLabel: @"r2"];
 	[ctx commitWithUndoTrack: _testTrack];
-	CORevision *r2 = [persistentRoot currentRevision];
+	CORevision *r2 = persistentRoot.currentRevision;
 	
-	[[persistentRoot rootObject] setLabel: @"r3"];
+	[persistentRoot.rootObject setLabel: @"r3"];
 	[ctx commitWithUndoTrack: _testTrack];
-	CORevision *r3 = [persistentRoot currentRevision];
+	CORevision *r3 = persistentRoot.currentRevision;
 
 	persistentRoot.currentRevision = r1;
 	[ctx commitWithUndoTrack: _testTrack];
 	
-	[[persistentRoot rootObject] setLabel: @"r2b"];
+	[persistentRoot.rootObject setLabel: @"r2b"];
 	[ctx commitWithUndoTrack: _testTrack];
-	CORevision *r2b = [persistentRoot currentRevision];
+	CORevision *r2b = persistentRoot.currentRevision;
 	
 	[_testTrack undo];
 	UKObjectsEqual(r1, [persistentRoot currentRevision]);
@@ -121,40 +121,40 @@
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commit];
 	
-	[[persistentRoot rootObject] setLabel: @"r1"];
+	[persistentRoot.rootObject setLabel: @"r1"];
 	[ctx commitWithUndoTrack: _testTrack];
-	CORevision *r1 = [persistentRoot currentRevision];
+	CORevision *r1 = persistentRoot.currentRevision;
 	
-	[[persistentRoot rootObject] setLabel: @"r2"];
+	[persistentRoot.rootObject setLabel: @"r2"];
 	[ctx commitWithUndoTrack: _testTrack];
-	CORevision *r2 = [persistentRoot currentRevision];
+	CORevision *r2 = persistentRoot.currentRevision;
 	
-	[[persistentRoot rootObject] setLabel: @"r3"];
+	[persistentRoot.rootObject setLabel: @"r3"];
 	[ctx commitWithUndoTrack: _testTrack];
-	CORevision *r3 = [persistentRoot currentRevision];
+	CORevision *r3 = persistentRoot.currentRevision;
 	
-	[[persistentRoot currentBranch] undo];
+	[persistentRoot.currentBranch undo];
 	[ctx commitWithUndoTrack: _testTrack];
 	
 	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r2 head: r3];
 	
-	[[persistentRoot currentBranch] undo];
+	[persistentRoot.currentBranch undo];
 	[ctx commitWithUndoTrack: _testTrack];
 
 	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r1 head: r3];
 
-	[[persistentRoot rootObject] setLabel: @"r2b"];
+	[persistentRoot.rootObject setLabel: @"r2b"];
 	[ctx commitWithUndoTrack: _testTrack];
-	CORevision *r2b = [persistentRoot currentRevision];
+	CORevision *r2b = persistentRoot.currentRevision;
 
 	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r2b head: r2b];
 	
-	[[persistentRoot currentBranch] undo];
+	[persistentRoot.currentBranch undo];
 	[ctx commitWithUndoTrack: _testTrack];
 	
 	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r1 head: r2b];
 
-	[[persistentRoot currentBranch] redo];
+	[persistentRoot.currentBranch redo];
 	[ctx commitWithUndoTrack: _testTrack];
 
 	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r2b head: r2b];
@@ -177,12 +177,12 @@
 	
 	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r1 head: r3];
 	
-	[[persistentRoot currentBranch] redo];
+	[persistentRoot.currentBranch redo];
 	[ctx commitWithUndoTrack: _testTrack];
 	
 	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r2 head: r3];
 	
-	[[persistentRoot currentBranch] redo];
+	[persistentRoot.currentBranch redo];
 	[ctx commitWithUndoTrack: _testTrack];
 	
 	[self checkPersistentRoot: persistentRoot hasCurrentRevision: r3 head: r3];

@@ -13,7 +13,7 @@
 {
 	ETEntityDescription *entity = [self newBasicEntityDescription];
 
-	if (![[entity name] isEqual: [ObjectWithTransientState className]])
+	if (![entity.name isEqual: [ObjectWithTransientState className]])
 		return entity;
 	
     ETPropertyDescription *labelProperty =

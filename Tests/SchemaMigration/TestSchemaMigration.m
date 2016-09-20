@@ -109,7 +109,7 @@
 		return item.packageVersion;
 	}
 
-	for (ETPackageDescription *package in [anObject.entityDescription allPackageDescriptions])
+	for (ETPackageDescription *package in (anObject.entityDescription).allPackageDescriptions)
 	{
 		if ([package.name isEqual: aPackage])
 		{
@@ -125,7 +125,7 @@
 	[self checkObjectGraphBeforeAndAfterSerializationRoundtrip: parent.objectGraphContext
 	                                                   inBlock: ^(COObjectGraphContext *testGraph, id testRootObject, BOOL isObjectGraphCopy)
 	{
-		OutlineItem *newParent = [(Tag *)testRootObject contents].anyObject;
+		OutlineItem *newParent = ((Tag *)testRootObject).contents.anyObject;
 		OutlineItem *newChild = [newParent.content firstObject];
 
 		UKIntsEqual(0, newParent.storeItem.packageVersion);

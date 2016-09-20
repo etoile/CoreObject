@@ -62,21 +62,21 @@
 - (ETEntityDescription *)nonCompositeOneToManyWithOppositeEntityDescription
 {
     ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"NonCompositeOneToManyWithOpposite"];
-    [entity setParent: (id)@"Anonymous.COObject"];
+    entity.parent = (id)@"Anonymous.COObject";
 	
 	ETPropertyDescription *contentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
 																					type: (id)@"Anonymous.NonCompositeOneToManyWithOpposite"];
     [contentsProperty setPersistent: YES];
     [contentsProperty setMultivalued: YES];
-	[contentsProperty setOpposite: (id)@"Anonymous.NonCompositeOneToManyWithOpposite.parent"];
+	contentsProperty.opposite = (id)@"Anonymous.NonCompositeOneToManyWithOpposite.parent";
 	
 	ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
 																				  type: (id)@"Anonymous.NonCompositeOneToManyWithOpposite"];
     [parentProperty setMultivalued: NO];
-	[parentProperty setOpposite: (id)@"Anonymous.NonCompositeOneToManyWithOpposite.contents"];
+	parentProperty.opposite = (id)@"Anonymous.NonCompositeOneToManyWithOpposite.contents";
 	[parentProperty setDerived: YES];
 	
-	[entity setPropertyDescriptions: @[contentsProperty, parentProperty]];
+	entity.propertyDescriptions = @[contentsProperty, parentProperty];
 	
     return entity;
 }

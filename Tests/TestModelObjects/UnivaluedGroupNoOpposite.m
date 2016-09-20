@@ -36,7 +36,7 @@ static NSUInteger DeallocCalls;
 																				   type: (id)@"Anonymous.COObject"];
     [contentProperty setPersistent: YES];
 	
-	[entity setPropertyDescriptions: @[labelProperty, contentProperty]];
+	entity.propertyDescriptions = @[labelProperty, contentProperty];
 	
     return entity;
 }

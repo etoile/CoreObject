@@ -24,7 +24,7 @@
 	SUPERINIT;
 	ctx = [COObjectGraphContext new];
 	group1 = [ctx insertObjectWithEntityName: @"OrderedAttributeModel"];
-	[ctx setRootObject: group1];
+	ctx.rootObject = group1;
 	return self;
 }
 
@@ -45,7 +45,7 @@
 													   inBlock: ^(COObjectGraphContext *testGraph, COObject *testRootObject, BOOL isObjectGraphCopy)
 	 {
 		 OrderedAttributeModel *testGroup1 = (OrderedAttributeModel *)testRootObject;
-		 UKObjectsEqual([NSArray array], testGroup1.contents);
+		 UKObjectsEqual(@[], testGroup1.contents);
 		 UKRaisesException([(NSMutableArray *)testGroup1.contents addObject: @"illegal"]);
 	 }];
 	

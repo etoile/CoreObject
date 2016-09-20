@@ -9,8 +9,8 @@
 #import "COItem.h"
 #import "COSQLiteStore+Attachments.h"
 
-#define READONLY_SEARCHABLE_DIRECTORY_ATTRIBUTES D([NSNumber numberWithShort: 0555], NSFilePosixPermissions)
-#define REABLE_WRITABLE_SEARCHABLE_DIRECTORY_ATTRIBUTES D([NSNumber numberWithShort: 0777], NSFilePosixPermissions)
+#define READONLY_SEARCHABLE_DIRECTORY_ATTRIBUTES @{ NSFilePosixPermissions: @0555 }
+#define REABLE_WRITABLE_SEARCHABLE_DIRECTORY_ATTRIBUTES @{ NSFilePosixPermissions: @0777 }
 
 @interface TestSQLiteStoreErrorHandling : NSObject <UKTest>
 {
@@ -136,7 +136,7 @@ static ETUUID *rootUUID;
 														UUID: [ETUUID UUID]
 												  branchUUID: [ETUUID UUID]
 										    revisionMetadata: nil];
-		changeCount = [txn setOldTransactionID: -1 forPersistentRoot: [info UUID]];
+		changeCount = [txn setOldTransactionID: -1 forPersistentRoot: info.UUID];
         UKTrue([store commitStoreTransaction: txn]);
         
         UKNotNil(info);
@@ -167,10 +167,10 @@ static ETUUID *rootUUID;
             [txn writeRevisionWithModifiedItems: [self makeChangedItemGraph]
 								   revisionUUID: [ETUUID UUID]
 									   metadata: nil
-							   parentRevisionID: [info currentRevisionUUID]
+							   parentRevisionID: info.currentRevisionUUID
 						  mergeParentRevisionID: nil
-							 persistentRootUUID: [info UUID]
-									 branchUUID: [info currentBranchUUID]];
+							 persistentRootUUID: info.UUID
+									 branchUUID: info.currentBranchUUID];
             UKFalse([store commitStoreTransaction: txn]);
         }
         

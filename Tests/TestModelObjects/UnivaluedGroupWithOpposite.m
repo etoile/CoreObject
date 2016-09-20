@@ -23,9 +23,9 @@
 	ETPropertyDescription *contentProperty = [ETPropertyDescription descriptionWithName: @"content"
 																				   type: (id)@"Anonymous.UnivaluedGroupContent"];
     [contentProperty setPersistent: YES];
-	[contentProperty setOpposite: (id)@"Anonymous.UnivaluedGroupContent.parents"];
+	contentProperty.opposite = (id)@"Anonymous.UnivaluedGroupContent.parents";
 	
-	[entity setPropertyDescriptions: @[labelProperty, contentProperty]];
+	entity.propertyDescriptions = @[labelProperty, contentProperty];
 	
     return entity;
 }

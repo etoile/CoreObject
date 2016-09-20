@@ -64,12 +64,12 @@ static ETUUID *tagUUID;
 												  branchUUID: [ETUUID UUID]
 											revisionMetadata: nil];
     
-    tagProot = [txn createPersistentRootWithInitialItemGraph: [self tagItemTreeWithDocProoUUID: [docProot UUID]]
+    tagProot = [txn createPersistentRootWithInitialItemGraph: [self tagItemTreeWithDocProoUUID: docProot.UUID]
 														UUID: [ETUUID UUID]
 												  branchUUID: [ETUUID UUID]
 											revisionMetadata: nil];
-	docProotChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: [docProot UUID]];
-	tagProotChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: [tagProot UUID]];
+	docProotChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: docProot.UUID];
+	tagProotChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: tagProot.UUID];
 
     UKTrue([store commitStoreTransaction: txn]);
     
@@ -79,9 +79,9 @@ static ETUUID *tagUUID;
 
 - (void) testSearch
 {
-    NSArray *results = [store referencesToPersistentRoot: [docProot UUID]];
+    NSArray *results = [store referencesToPersistentRoot: docProot.UUID];
     
-    COSearchResult *result = [results objectAtIndex: 0];
+    COSearchResult *result = results[0];
     UKObjectsEqual([[tagProot currentBranchInfo] currentRevisionUUID], [result revision]);
     UKObjectsEqual(tagUUID, [result innerObjectUUID]);
 }
@@ -89,8 +89,8 @@ static ETUUID *tagUUID;
 - (void) testDeletion
 {
 	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-	[txn deletePersistentRoot: [docProot UUID]];
-	docProotChangeCount = [txn setOldTransactionID: docProotChangeCount forPersistentRoot: [docProot UUID]];
+	[txn deletePersistentRoot: docProot.UUID];
+	docProotChangeCount = [txn setOldTransactionID: docProotChangeCount forPersistentRoot: docProot.UUID];
 	UKTrue([store commitStoreTransaction: txn]);
     
     UKTrue([store finalizeDeletionsForPersistentRoot: [docProot UUID]

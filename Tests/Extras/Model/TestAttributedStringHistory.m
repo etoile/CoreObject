@@ -27,12 +27,12 @@
 		[track clear];
 		
 		COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COAttributedString"];
-		COAttributedStringWrapper *as = [[COAttributedStringWrapper alloc] initWithBacking: [proot rootObject]];
-		[[as mutableString] appendString: @"x"];
+		COAttributedStringWrapper *as = [[COAttributedStringWrapper alloc] initWithBacking: proot.rootObject];
+		[as.mutableString appendString: @"x"];
 		
 		{
-			COObjectGraphContext *graph = [proot objectGraphContext];
-			COAttributedString *root = [proot rootObject];
+			COObjectGraphContext *graph = proot.objectGraphContext;
+			COAttributedString *root = proot.rootObject;
 			COAttributedStringChunk *chunk0 = root.chunks[0];
 			
 			// Check that the object graph is correctly constructed
@@ -54,8 +54,8 @@
 		
 		
 		{
-			COObjectGraphContext *graph = [proot objectGraphContext];
-			COAttributedString *root = [proot rootObject];
+			COObjectGraphContext *graph = proot.objectGraphContext;
+			COAttributedString *root = proot.rootObject;
 			COAttributedStringChunk *chunk0 = root.chunks[0];
 			COAttributedStringChunk *chunk1 = root.chunks[1];
 

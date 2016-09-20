@@ -211,7 +211,7 @@
 	
 	// Before the merged changes arrives at the client, make another commit on the client
 	
-	[[clientBranch rootObject] setLabel: @"more changes"];
+	[clientBranch.rootObject setLabel: @"more changes"];
 	[clientPersistentRoot commitWithMetadata: [self clientRevisionMetadataForTest]];
 	UKObjectsEqual([self clientRevisionMetadataForTest], [[clientPersistentRoot currentRevision] metadata]);
 	
@@ -252,7 +252,7 @@
 // I think it's something to do with the exception thrown during -commit.
 - (void) testBasicServerRevert
 {
-	[[serverBranch rootObject] setLabel: @"revertThis"];
+	[serverBranch.rootObject setLabel: @"revertThis"];
 	[serverPersistentRoot commit];
 	
 	[transport deliverMessagesToClient];
@@ -271,7 +271,7 @@
 // FIXME: This test case causes a COSQLiteStore to be leaked (see previous test too).
 - (void) testBasicClientRevert
 {
-	[[serverBranch rootObject] setLabel: @"revertThis"];
+	[serverBranch.rootObject setLabel: @"revertThis"];
 	[serverPersistentRoot commit];
 	
 	[transport deliverMessagesToClient];
@@ -298,8 +298,8 @@
 	 
 	 */
 		
-	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: [serverBranch objectGraphContext]];
-	[(UnorderedGroupNoOpposite *)[serverBranch rootObject] setContents: S(serverStr)];
+	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: serverBranch.objectGraphContext];
+	[(UnorderedGroupNoOpposite *)serverBranch.rootObject setContents: S(serverStr)];
 	[self appendString: @"Hello" htmlCode: nil toAttributedString: serverStr];
 	[serverPersistentRoot commit];
 	
@@ -314,7 +314,7 @@
 	 
 	 */
 	
-	COAttributedString *clientStr = [[(UnorderedGroupNoOpposite *)[clientBranch rootObject] contents] anyObject];
+	COAttributedString *clientStr = [((UnorderedGroupNoOpposite *)clientBranch.rootObject).contents anyObject];
 	COAttributedStringWrapper *clientWrapper = [[COAttributedStringWrapper alloc] initWithBacking: clientStr];
 	[self setFontTraits: NSFontBoldTrait inRange: NSMakeRange(0,4) inTextStorage: clientWrapper];
 	[clientPersistentRoot commit];
@@ -355,14 +355,14 @@
 
 - (void) testClientAttributedStringEdits
 {
-	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: [serverBranch objectGraphContext]];
+	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: serverBranch.objectGraphContext];
 	COAttributedStringWrapper *serverWrapper = [[COAttributedStringWrapper alloc] initWithBacking: serverStr];
-	[(UnorderedGroupNoOpposite *)[serverBranch rootObject] setContents: S(serverStr)];
+	[(UnorderedGroupNoOpposite *)serverBranch.rootObject setContents: S(serverStr)];
 	[serverPersistentRoot commit];
 	
 	[transport deliverMessagesToClient];
 	
-	COAttributedString *clientStr = [[(UnorderedGroupNoOpposite *)[clientBranch rootObject] contents] anyObject];
+	COAttributedString *clientStr = [((UnorderedGroupNoOpposite *)clientBranch.rootObject).contents anyObject];
 	COAttributedStringWrapper *clientWrapper = [[COAttributedStringWrapper alloc] initWithBacking: clientStr];
 	[clientWrapper replaceCharactersInRange: NSMakeRange(0,0) withString: @"a"];
 	[clientPersistentRoot commit];
@@ -380,7 +380,7 @@
 	
 	// confirmation that 'a' was received -> client
 	// Make sure that the client doesn't do any unnecessary rebasing
-	ETUUID *clientABCRevision = [[clientBranch currentRevision] UUID];
+	ETUUID *clientABCRevision = clientBranch.currentRevision.UUID;
 	[transport deliverMessagesToClient];
 	UKObjectsEqual(clientABCRevision, [[clientBranch currentRevision] UUID]);
 	UKObjectsEqual(@"abc", [clientWrapper string]);
@@ -400,8 +400,8 @@
 - (NSString *)stringForRevision: (CORevision *)aRevision persistentRoot: (COPersistentRoot *)proot
 {
 	COObjectGraphContext *graph = [proot objectGraphContextForPreviewingRevision: aRevision];
-	COAttributedStringWrapper *wrapper = [[COAttributedStringWrapper alloc] initWithBacking: [[(UnorderedGroupNoOpposite *)[graph rootObject] contents] anyObject]];
-	return [wrapper string];
+	COAttributedStringWrapper *wrapper = [[COAttributedStringWrapper alloc] initWithBacking: [((UnorderedGroupNoOpposite *)graph.rootObject).contents anyObject]];
+	return wrapper.string;
 }
 
 /**
@@ -415,16 +415,16 @@
  */
 - (void) testConflictingAttributedStringInserts
 {
-	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: [serverBranch objectGraphContext]];
+	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: serverBranch.objectGraphContext];
 	COAttributedStringWrapper *serverWrapper = [[COAttributedStringWrapper alloc] initWithBacking: serverStr];
-	[(UnorderedGroupNoOpposite *)[serverBranch rootObject] setContents: S(serverStr)];
+	[(UnorderedGroupNoOpposite *)serverBranch.rootObject setContents: S(serverStr)];
 	[serverPersistentRoot commit];
 	
 	[transport deliverMessagesToClient];
 	
 	// 3 commits on client
 	
-	COAttributedString *clientStr = [[(UnorderedGroupNoOpposite *)[clientBranch rootObject] contents] anyObject];
+	COAttributedString *clientStr = [((UnorderedGroupNoOpposite *)clientBranch.rootObject).contents anyObject];
 	COAttributedStringWrapper *clientWrapper = [[COAttributedStringWrapper alloc] initWithBacking: clientStr];
 	[clientWrapper replaceCharactersInRange: NSMakeRange(0,0) withString: @"a"];
 	[clientPersistentRoot commit];

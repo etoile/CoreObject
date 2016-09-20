@@ -36,14 +36,14 @@
     
     [parentContainerProperty setMultivalued: NO];
 	[parentContainerProperty setDerived: YES];
-    [parentContainerProperty setOpposite: (id)@"Anonymous.OutlineItem.contents"];
+    parentContainerProperty.opposite = (id)@"Anonymous.OutlineItem.contents";
     
     ETPropertyDescription *parentCollectionsProperty =
     [ETPropertyDescription descriptionWithName: @"parentCollections" type: (id)@"Anonymous.Tag"];
     
     [parentCollectionsProperty setMultivalued: YES];
 	[parentCollectionsProperty setDerived: YES];
-    [parentCollectionsProperty setOpposite: (id)@"Anonymous.Tag.contents"];
+    parentCollectionsProperty.opposite = (id)@"Anonymous.Tag.contents";
 	
 	ETPropertyDescription *attachmentProperty =
     [ETPropertyDescription descriptionWithName: @"attachmentID" type: (id)@"Anonymous.COAttachmentID"];
@@ -103,7 +103,7 @@
     
 	// NOTE: For a non-persistent relationship, 'container' doesn't necessarily imply 'derived'
     [parentContainerProperty setMultivalued: NO];
-    [parentContainerProperty setOpposite: (id)@"TransientOutlineItem.contents"];
+    parentContainerProperty.opposite = (id)@"TransientOutlineItem.contents";
        
     [entity setPropertyDescriptions: A(contentsProperty, parentContainerProperty)];
 

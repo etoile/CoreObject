@@ -23,10 +23,10 @@
 - (id)init
 {
 	SUPERINIT;
-	model = [[ctx insertNewPersistentRootWithEntityName: @"KeyedRelationshipModel"] rootObject];
-	pear = [[model objectGraphContext] insertObjectWithEntityName: @"OutlineItem"];
+	model = [ctx insertNewPersistentRootWithEntityName: @"KeyedRelationshipModel"].rootObject;
+	pear = [model.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	pear.label = @"Pear";
-	banana = [[model objectGraphContext] insertObjectWithEntityName: @"OutlineItem"];
+	banana = [model.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	banana.label = @"Banana";
 	return self;
 }
@@ -35,13 +35,13 @@
 {
 	[ctx commit];
 
-	[self checkPersistentRootWithExistingAndNewContext: [model persistentRoot]
+	[self checkPersistentRootWithExistingAndNewContext: model.persistentRoot
 	                                           inBlock:
 	^ (COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
 	{
-		KeyedRelationshipModel *testModel = [testPersistentRoot rootObject];
+		KeyedRelationshipModel *testModel = testPersistentRoot.rootObject;
 
-		UKObjectsEqual([NSDictionary dictionary], [testModel valueForProperty: @"entries"]);
+		UKObjectsEqual(@{}, [testModel valueForProperty: @"entries"]);
 	}];
 }
 
@@ -53,11 +53,11 @@
 
 	[ctx commit];
 
-	[self checkPersistentRootWithExistingAndNewContext: [model persistentRoot]
+	[self checkPersistentRootWithExistingAndNewContext: model.persistentRoot
 	                                           inBlock:
 	^ (COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
 	{
-		KeyedRelationshipModel *testModel = [testPersistentRoot rootObject];
+		KeyedRelationshipModel *testModel = testPersistentRoot.rootObject;
 		OutlineItem *testPear = testModel.entries[@"pear"];
 		UKNotNil(testPear);
 		UKObjectsEqual(@"Pear", testPear.label);
@@ -72,11 +72,11 @@
 
 - (void)testIllegalDirectModificationOfCollection
 {
-	UKRaisesException([(NSMutableDictionary *)[model entries] setObject: pear forKey: @"fruit"]);
+	UKRaisesException(((NSMutableDictionary *)[model entries])[@"fruit"] = pear);
 	
 	model.entries = @{@"fruit" : banana};
 	
-	UKRaisesException([(NSMutableDictionary *)[model entries] setObject: pear forKey: @"fruit"]);
+	UKRaisesException(((NSMutableDictionary *)[model entries])[@"fruit"] = pear);
 }
 
 - (void)testMutation
@@ -106,7 +106,7 @@
 	UKObjectsEqual([model entries], [model roundTripValueForProperty: @"entries"]);
 	
 	[ctx commit];
-	[self checkPersistentRootWithExistingAndNewContext: [model persistentRoot]
+	[self checkPersistentRootWithExistingAndNewContext: model.persistentRoot
 	                                           inBlock:
 	^ (COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	{

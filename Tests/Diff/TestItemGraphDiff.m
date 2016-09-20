@@ -20,7 +20,7 @@
 	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
 	
 	COObject *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-    [ctx1 setRootObject: parent];
+    ctx1.rootObject = parent;
 	COObject *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COObject *subchild1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COObject *subchild2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -38,13 +38,13 @@
 	
     // Copy the items to ctx2
     [ctx2 setItemGraph: ctx1];
-    [ctx2 setRootObject: [ctx2 loadedObjectForUUID: [parent UUID]]];
+    ctx2.rootObject = [ctx2 loadedObjectForUUID: parent.UUID];
     
-	COObject *parentCtx2 = [ctx2 rootObject];
-	COObject *childCtx2 = [ctx2 loadedObjectForUUID: [child UUID]];
-	COObject *subchild1Ctx2 = [ctx2 loadedObjectForUUID: [subchild1 UUID]];
-	COObject *subchild2Ctx2 = [ctx2 loadedObjectForUUID: [subchild2 UUID]];
-	COObject *subchild3Ctx2 = [ctx2 loadedObjectForUUID: [subchild3 UUID]];
+	COObject *parentCtx2 = ctx2.rootObject;
+	COObject *childCtx2 = [ctx2 loadedObjectForUUID: child.UUID];
+	COObject *subchild1Ctx2 = [ctx2 loadedObjectForUUID: subchild1.UUID];
+	COObject *subchild2Ctx2 = [ctx2 loadedObjectForUUID: subchild2.UUID];
+	COObject *subchild3Ctx2 = [ctx2 loadedObjectForUUID: subchild3.UUID];
 
 	UKObjectsEqual([parent UUID], [parentCtx2 UUID]);
 	UKObjectsEqual([child UUID], [childCtx2 UUID]);
@@ -56,7 +56,7 @@
 	
 	[childCtx2 removeObject: subchild2Ctx2 atIndex: ETUndeterminedIndex hint: nil forProperty:@"contents"]; // Remove "Salad"
 	COObject *subchild4Ctx2 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	ETUUID *subchild4UUID = [subchild4Ctx2 UUID];
+	ETUUID *subchild4UUID = subchild4Ctx2.UUID;
 	[subchild4Ctx2 setValue: @"Salsa" forProperty: @"label"];
 	[childCtx2 insertObject: subchild4Ctx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"]; // Add "Salsa"
 	[childCtx2 setValue: @"Snacks" forProperty: @"label"];
@@ -72,11 +72,11 @@
 	// Now check that all of the changes were properly made.
 	
 	UKStringsEqual(@"Snacks", [child valueForProperty: @"label"]);
-    COObject *subchild4 = [[child valueForProperty: @"contents"] objectAtIndex: 2];
+    COObject *subchild4 = [child valueForProperty: @"contents"][2];
     
-	UKObjectsSame(subchild1, [[child valueForProperty: @"contents"] objectAtIndex: 0]);
-    UKObjectsSame(subchild3, [[child valueForProperty: @"contents"] objectAtIndex: 1]);
-    UKObjectsSame(subchild4, [[child valueForProperty: @"contents"] objectAtIndex: 2]);
+	UKObjectsSame(subchild1, [child valueForProperty: @"contents"][0]);
+    UKObjectsSame(subchild3, [child valueForProperty: @"contents"][1]);
+    UKObjectsSame(subchild4, [child valueForProperty: @"contents"][2]);
     
 	UKObjectsEqual(A(@"Pizza", @"Chips", @"Salsa"), [child valueForKeyPath: @"contents.label"]);
 	UKObjectsEqual(subchild4UUID, [subchild4 UUID]);
@@ -88,7 +88,7 @@
 	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
 	
 	COObject *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-    [ctx1 setRootObject: parent];
+    ctx1.rootObject = parent;
 	COObject *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COObject *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	COObject *subchild1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
@@ -103,13 +103,13 @@
 	
     // Copy the items to ctx2
     [ctx2 setItemGraph: ctx1];
-    [ctx2 setRootObject: [ctx2 loadedObjectForUUID: [parent UUID]]];
+    ctx2.rootObject = [ctx2 loadedObjectForUUID: parent.UUID];
     
-    COObject *parentCtx2 = [ctx2 rootObject];
+    COObject *parentCtx2 = ctx2.rootObject;
     UKNotNil(parentCtx2);
-	COObject *child1Ctx2 = [ctx2 loadedObjectForUUID: [child1 UUID]];
-	COObject *child2Ctx2 = [ctx2 loadedObjectForUUID: [child2 UUID]];
-	COObject *subchild1Ctx2 = [ctx2 loadedObjectForUUID: [subchild1 UUID]];
+	COObject *child1Ctx2 = [ctx2 loadedObjectForUUID: child1.UUID];
+	COObject *child2Ctx2 = [ctx2 loadedObjectForUUID: child2.UUID];
+	COObject *subchild1Ctx2 = [ctx2 loadedObjectForUUID: subchild1.UUID];
 	
 	// Now make some modifications to ctx2: (move "Salad" from "Groceries" to "Todo")
 	
@@ -128,7 +128,7 @@
 	
 	UKIntsEqual(0, [[child1 valueForProperty: @"contents"] count]);
 	UKIntsEqual(1, [[child2 valueForProperty: @"contents"] count]);
-	UKObjectsSame(subchild1, [[child2 valueForProperty: @"contents"] objectAtIndex: 0]);
+	UKObjectsSame(subchild1, [child2 valueForProperty: @"contents"][0]);
 	
 }
 
@@ -160,7 +160,7 @@
 	UKIntsEqual(2, [[diff conflicts].anyObject allEdits].count);
 	UKIntsEqual(2, [diff allEdits].count);
 	
-	COItemGraphEdit *edit = [[diff conflicts].anyObject allEdits].anyObject;
+	COItemGraphEdit *edit = [diff.conflicts.anyObject allEdits].anyObject;
 	
 	[diff removeEdit: edit];
 	

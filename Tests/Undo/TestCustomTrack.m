@@ -38,22 +38,22 @@ selective undo is involved. */
 {
 	/* First commit */
 
-	COContainer *object = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
+	COContainer *object = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"].rootObject;
 	[object setValue: @"Groceries" forProperty: @"label"];
     [ctx commitWithUndoTrack: _setupTrack];
-    CORevision *firstRevision = [[[object persistentRoot] currentBranch] currentRevision];
+    CORevision *firstRevision = object.persistentRoot.currentBranch.currentRevision;
     
 	/* Second commit */
 
 	[object setValue: @"Shopping List" forProperty: @"label"];
     [ctx commitWithUndoTrack: _testTrack];
-    CORevision *secondRevision = [[[object persistentRoot] currentBranch] currentRevision];
+    CORevision *secondRevision = object.persistentRoot.currentBranch.currentRevision;
     
 	/* Third commit */
 
 	[object setValue: @"Todo" forProperty: @"label"];
     [ctx commitWithUndoTrack: _testTrack];
-    CORevision *thirdRevision = [[[object persistentRoot] currentBranch] currentRevision];
+    CORevision *thirdRevision = object.persistentRoot.currentBranch.currentRevision;
     
 	/* First undo  (Todo -> Shopping List) */
 
@@ -105,7 +105,7 @@ selective undo is involved. */
 	/* First commit */
 
 	COPersistentRoot *objectPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *object = [objectPersistentRoot rootObject];
+	COContainer *object = objectPersistentRoot.rootObject;
 	[object setValue: @"Groceries" forProperty: @"label"];
 
     [ctx commitWithUndoTrack: _testTrack];
@@ -113,14 +113,14 @@ selective undo is involved. */
 	/* Second commit */
 
     COPersistentRoot *docPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *doc = [docPersistentRoot rootObject];
+	COContainer *doc = docPersistentRoot.rootObject;
 	[doc setValue: @"Document" forProperty: @"label"];
 
 	[ctx commitWithUndoTrack: _testTrack];
 
 	/* Third commit call (creates commits in objectPersistentRoot and docPersistentRoot) */
 
-	COContainer *para1 = [[doc objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para1 = [doc.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para1 setValue: @"paragraph 1" forProperty: @"label"];
     [doc addObject: para1];
 	[object setValue: @"Shopping List" forProperty: @"label"];
@@ -135,7 +135,7 @@ selective undo is involved. */
 
 	/* Fifth commit */
 
-	COContainer *para2 = [[doc objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para2 = [doc.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para2 setValue: @"paragraph 2" forProperty: @"label"];
 	[doc addObject: para2];
 
@@ -154,15 +154,15 @@ selective undo is involved. */
 {
 	NSArray *objects = [self makeCommitsWithMultiplePersistentRoots];
 
-	OutlineItem *object = [objects objectAtIndex: 0];
-	OutlineItem *doc = [objects objectAtIndex: 1];
-	OutlineItem *para1 = [objects objectAtIndex: 2];
-	OutlineItem *para2 = [objects objectAtIndex: 3];
+	OutlineItem *object = objects[0];
+	OutlineItem *doc = objects[1];
+	OutlineItem *para1 = objects[2];
+	OutlineItem *para2 = objects[3];
 
-    COPersistentRoot *objectPersistentRoot = [object persistentRoot];
+    COPersistentRoot *objectPersistentRoot = object.persistentRoot;
     UKNotNil(objectPersistentRoot);
     
-    COPersistentRoot *docPersistentRoot = [doc persistentRoot];
+    COPersistentRoot *docPersistentRoot = doc.persistentRoot;
     UKNotNil(docPersistentRoot);
     
     UKObjectsNotEqual(docPersistentRoot, objectPersistentRoot);
@@ -237,7 +237,7 @@ selective undo is involved. */
 	UKObjectsNotSame(para1, [docPersistentRoot loadedObjectForUUID: [para1 UUID]]);
 
 	// Get the new restored object instance
-	para1 = (OutlineItem *)[docPersistentRoot loadedObjectForUUID: [para1 UUID]];
+	para1 = (OutlineItem *)[docPersistentRoot loadedObjectForUUID: para1.UUID];
     UKObjectsEqual(@[para1], [doc contents]);
 	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
 
@@ -253,7 +253,7 @@ selective undo is involved. */
 	UKObjectsNotSame(para2, [docPersistentRoot loadedObjectForUUID: [para2 UUID]]);
 
 	// Get the new restored object instance
-	para2 = (OutlineItem *)[docPersistentRoot loadedObjectForUUID: [para2 UUID]];
+	para2 = (OutlineItem *)[docPersistentRoot loadedObjectForUUID: para2.UUID];
     UKObjectsEqual((@[para1, para2]), [doc contents]);
 	UKStringsEqual(@"paragraph 2", [para2 valueForProperty: @"label"]);
 }

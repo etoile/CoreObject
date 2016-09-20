@@ -24,7 +24,7 @@
     [ETPropertyDescription descriptionWithName: @"child" type: (id)@"Anonymous.Child"];
     [childProperty setPersistent: YES];
     
-    [entity setPropertyDescriptions: @[labelProperty, childProperty]];
+    entity.propertyDescriptions = @[labelProperty, childProperty];
 	
     return entity;
 }

@@ -43,10 +43,10 @@
 	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
 	[ctx2 setItemGraph: ctx];
 	
-	OrderedGroupWithOpposite *group1ctx2 = [ctx2 loadedObjectForUUID: [group1 UUID]];
-	OrderedGroupWithOpposite *group2ctx2 = [ctx2 loadedObjectForUUID: [group2 UUID]];
-	OrderedGroupContent *item1ctx2 = [ctx2 loadedObjectForUUID: [item1 UUID]];
-	OrderedGroupContent *item2ctx2 = [ctx2 loadedObjectForUUID: [item2 UUID]];
+	OrderedGroupWithOpposite *group1ctx2 = [ctx2 loadedObjectForUUID: group1.UUID];
+	OrderedGroupWithOpposite *group2ctx2 = [ctx2 loadedObjectForUUID: group2.UUID];
+	OrderedGroupContent *item1ctx2 = [ctx2 loadedObjectForUUID: item1.UUID];
+	OrderedGroupContent *item2ctx2 = [ctx2 loadedObjectForUUID: item2.UUID];
 	
 	UKObjectsEqual((@[item2ctx2]), [group1ctx2 contents]);
 	UKObjectsEqual((@[item1ctx2, item2ctx2]), [group2ctx2 contents]);

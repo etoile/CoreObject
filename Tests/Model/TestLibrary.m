@@ -20,7 +20,7 @@
  */
 - (void)testIdentifierPersisted
 {
-	COLibrary *library = [[ctx insertNewPersistentRootWithEntityName: @"COLibrary"] rootObject];
+	COLibrary *library = [ctx insertNewPersistentRootWithEntityName: @"COLibrary"].rootObject;
 	[ctx commit];
 	
 	[self checkPersistentRootWithExistingAndNewContext: library.persistentRoot

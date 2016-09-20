@@ -26,7 +26,7 @@
        we add OutlineItem and other metamodels to the main repository. */
     ctx1 = [[COObjectGraphContext alloc] init];
     root1 = [self addObjectWithLabel: @"root1" toContext: ctx1];
-    [ctx1 setRootObject: root1];
+    ctx1.rootObject = root1;
     
     return self;
 }
@@ -68,7 +68,7 @@
 
 - (OutlineItem *) addObjectWithLabel: (NSString *)label toObject: (OutlineItem *)dest
 {
-    OutlineItem *obj = [self addObjectWithLabel: label toContext: [dest objectGraphContext]];
+    OutlineItem *obj = [self addObjectWithLabel: label toContext: dest.objectGraphContext];
     [dest insertObject: obj atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     return obj;
 }
@@ -78,7 +78,7 @@
 	COObjectGraphContext *ctx2 = [COObjectGraphContext objectGraphContext];
    
     OutlineItem *root2 = [self addObjectWithLabel: @"root2" toContext: ctx2];
-    [ctx2 setRootObject: root2];
+    ctx2.rootObject = root2;
         
 	OutlineItem *parent = [self addObjectWithLabel: @"Shopping" toObject: root1];
 	OutlineItem *child = [self addObjectWithLabel: @"Groceries" toObject: parent];
@@ -92,7 +92,7 @@
     
     // Do the copy
     
-    ETUUID *parentCopyUUID = [copier copyItemWithUUID: [parent UUID]
+    ETUUID *parentCopyUUID = [copier copyItemWithUUID: parent.UUID
                                             fromGraph: ctx1
                                               toGraph: ctx2];
 
@@ -110,17 +110,17 @@
 	COObjectGraphContext *ctx2 = [COObjectGraphContext objectGraphContext];
    
     OutlineItem *root2 = [self addObjectWithLabel: @"root2" toContext: ctx2];
-    [ctx2 setRootObject: root2];
+    ctx2.rootObject = root2;
     
     OutlineItem *o1 = [self addObjectWithLabel: @"Shopping" toObject: root1];
 	OutlineItem *o2 = [self addObjectWithLabel: @"Gift" toObject: o1];
     UKNotNil(o1);
     
-    ETUUID *o1copyUUID = [copier copyItemWithUUID: [o1 UUID]
+    ETUUID *o1copyUUID = [copier copyItemWithUUID: o1.UUID
                                             fromGraph: ctx1
                                               toGraph: ctx2];
 
-    ETUUID *o1copy2UUID = [copier copyItemWithUUID: [o1 UUID]
+    ETUUID *o1copy2UUID = [copier copyItemWithUUID: o1.UUID
                                             fromGraph: ctx1
                                               toGraph: ctx2]; // copy o1 into ctx2 a second time
 
@@ -140,7 +140,7 @@
 
 - (void)testItemForUUID
 {
-    COItem *root1Item = [ctx1 itemForUUID: [root1 UUID]];
+    COItem *root1Item = [ctx1 itemForUUID: root1.UUID];
     
     // Check that changes in the COObject don't propagate to the item
     
@@ -203,7 +203,7 @@
 	UKObjectsEqual(S(mutableItem.UUID), ctx1.insertedObjectUUIDs);
 	UKObjectsEqual(S(), ctx1.updatedObjectUUIDs);
 	
-    OutlineItem *object = [ctx1 loadedObjectForUUID: [mutableItem UUID]];
+    OutlineItem *object = [ctx1 loadedObjectForUUID: mutableItem.UUID];
     
     [mutableItem setValue: @"hello" forAttribute: kCOLabel type: kCOTypeString];
     
@@ -234,8 +234,8 @@
 - (void)testChangeTrackingBasic
 {
 	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
-    [ctx2 setRootObject: [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"]];
-	OutlineItem *root = [ctx2 rootObject];
+    ctx2.rootObject = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *root = ctx2.rootObject;
 
     UKObjectsEqual(S(root.UUID), [ctx2 insertedObjectUUIDs]);
     UKObjectsEqual([NSSet set], [ctx2 updatedObjectUUIDs]);
@@ -289,7 +289,7 @@
 
 	UKObjectsEqual(A(document1, document2), [workspace valueForKey: kCOContents]);
 	UKObjectsEqual(A(group1, group2), [document1 valueForKey: kCOContents]);
-	UKObjectsEqual([NSArray array], [document2 valueForKey: kCOContents]);
+	UKObjectsEqual(@[], [document2 valueForKey: kCOContents]);
 	UKObjectsEqual(A(leaf1, leaf2), [group1 valueForKey: kCOContents]);
 	UKObjectsEqual(A(leaf3), [group2 valueForKey: kCOContents]);
     
@@ -347,10 +347,10 @@
     
     // Move child from group1 to group2 at the COItem level
     
-    COMutableItem *group1item = [[ctx1 itemForUUID: [group1 UUID]] mutableCopy];
-    COMutableItem *group2item = [[ctx1 itemForUUID: [group2 UUID]] mutableCopy];
+    COMutableItem *group1item = [[ctx1 itemForUUID: group1.UUID] mutableCopy];
+    COMutableItem *group2item = [[ctx1 itemForUUID: group2.UUID] mutableCopy];
     [group1item setValue: @[] forAttribute: @"contents" type: kCOTypeArray | kCOTypeCompositeReference];
-    [group2item setValue: @[[child UUID]] forAttribute: @"contents" type: kCOTypeArray | kCOTypeCompositeReference];
+    [group2item setValue: @[child.UUID] forAttribute: @"contents" type: kCOTypeArray | kCOTypeCompositeReference];
     
     [ctx1 insertOrUpdateItems: @[group1item, group2item]];
     
@@ -512,8 +512,8 @@
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	[proot commit];
 	
-	COObjectGraphContext *persistentCtx = [proot objectGraphContext];
-	OutlineItem *persistentCtxRoot = [persistentCtx rootObject];
+	COObjectGraphContext *persistentCtx = proot.objectGraphContext;
+	OutlineItem *persistentCtxRoot = persistentCtx.rootObject;
 	UKFalse([persistentCtx hasChanges]);
 	
 	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: persistentCtx];
@@ -546,7 +546,7 @@
 	[ctx2 setItemGraph: ctx1];
 	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
 	child1.label = @"child1";
-	[(OutlineItem *)[ctx2 rootObject] setContents: @[child1]];
+	((OutlineItem *)ctx2.rootObject).contents = @[child1];
 	
 	[self checkBlock: ^{
 		// Load those changes into ctx1. Should post a notifcation.
@@ -567,7 +567,7 @@
 	[ctx2 setItemGraph: ctx1];
 	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
 	child1.label = @"child1";
-	[(OutlineItem *)[ctx2 rootObject] setContents: @[child1]];
+	((OutlineItem *)ctx2.rootObject).contents = @[child1];
 	
 	NSArray *exportedItems = @[[ctx2 itemForUUID: ctx2.rootItemUUID],
 							   [ctx2 itemForUUID: child1.UUID]];
@@ -607,7 +607,7 @@
 			COObjectGraphContext *testCtx = [COObjectGraphContext new];
 			OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: testCtx];
 			child1.label = @"child1";
-			[testCtx setRootObject: child1];
+			testCtx.rootObject = child1;
 		}
 	} postsNotification: COObjectGraphContextWillRelinquishObjectsNotification
 			  withCount: 1
@@ -623,7 +623,7 @@
 	[altCtx setItemGraph: ctx1];
 	OutlineItem *obj1 = [[OutlineItem alloc] initWithObjectGraphContext: altCtx];
 	OutlineItem *obj2 = [[OutlineItem alloc] initWithObjectGraphContext: altCtx];
-	[(OutlineItem *)[altCtx rootObject] setContents: @[obj1]];
+	((OutlineItem *)altCtx.rootObject).contents = @[obj1];
 	obj1.contents = @[obj2];
 		
 	// FIXME: These are not very good tests
@@ -648,7 +648,7 @@
 	[ctx1 acceptAllChanges];
 	UKFalse([ctx1 hasChanges]);
 	
-	COItem *rootItem = [ctx1 itemForUUID: [ctx1 rootItemUUID]];
+	COItem *rootItem = [ctx1 itemForUUID: ctx1.rootItemUUID];
 	
 	// Should be a no-op
 	[ctx1 insertOrUpdateItems: @[rootItem]];
@@ -669,7 +669,7 @@
     [root1 addObject: ctx2root];
     
     // TODO: Perhaps attempting to serialize this should throw an exception?
-    COItem *item = [root1 storeItem];
+    COItem *item = root1.storeItem;
     NSArray *itemContentsArray = [item valueForAttribute: @"contents"];
     UKIntsEqual(1, itemContentsArray.count);
     UKObjectsEqual([NSNull null], itemContentsArray[0]);
@@ -682,7 +682,7 @@
 		
 		OutlineItem *ctx2root = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
 		ctx2root.label = @"ctx2root";
-		[ctx2 setRootObject: ctx2root];
+		ctx2.rootObject = ctx2root;
 
 		// create a link from ctx1 to ctx2
 		[root1 addObject: ctx2root];
@@ -697,7 +697,7 @@
 	
 	UKTrue([root1.contents isEmpty]);
 	
-	NSLog(@"%@", [ctx1 detailedDescription]);
+	NSLog(@"%@", ctx1.detailedDescription);
 }
 
 - (void) testCrossContextReferencedObjectDeallocatedWithTwoReferences
@@ -747,7 +747,7 @@
 	// create a link from ctx1 to ctx2
 	[root1 addObject: ctx2obj];
 	
-	NSArray *ctx1ig = [ctx1 items];
+	NSArray *ctx1ig = ctx1.items;
 	UKFalse([root1.contents isEmpty]);
 	
 	// GC ctx2obj (it's not set as the root object)
@@ -759,7 +759,7 @@
 	UKTrue([root1.contents isEmpty]);
 	
 	// It should serialize to COBrokenPath
-	COItem *item = [root1 storeItem];
+	COItem *item = root1.storeItem;
 	NSArray *itemContentsArray = [item valueForAttribute: @"contents"];
 	UKIntsEqual(1, itemContentsArray.count);
 	UKTrue([itemContentsArray[0] isBroken]);

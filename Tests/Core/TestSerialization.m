@@ -40,12 +40,12 @@
 {
 	COAttachmentID *attachmentID = [self createAttachment];
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *item = [proot rootObject];
+	OutlineItem *item = proot.rootObject;
 	item.attachmentID = attachmentID;
 	
 	// Test writing to COItem
 	
-	COItem *itemValue = [item storeItem];
+	COItem *itemValue = item.storeItem;
 	UKIntsEqual(kCOTypeAttachment, [itemValue typeForAttribute: @"attachmentID"]);
 	UKObjectsEqual(attachmentID, [itemValue valueForAttribute: @"attachmentID"]);
 	
@@ -53,7 +53,7 @@
 	
 	COObjectGraphContext *tempGraph = [COObjectGraphContext new];
 	[tempGraph insertOrUpdateItems: @[itemValue]];
-	COObject *deserializedObject = [tempGraph loadedObjectForUUID: [itemValue UUID]];
+	COObject *deserializedObject = [tempGraph loadedObjectForUUID: itemValue.UUID];
 	
 	UKObjectsEqual(attachmentID, [deserializedObject valueForKey: @"attachmentID"]);
 	UKObjectsEqual(@"COAttachmentID", [[[[deserializedObject entityDescription] propertyDescriptionForName: @"attachmentID"] type] name]);
@@ -62,8 +62,8 @@
 - (void) testUnknowItemAttributes
 {
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	COObject *rootObject = [proot rootObject];
-	COMutableItem *item = [[rootObject storeItem] mutableCopy];
+	COObject *rootObject = proot.rootObject;
+	COMutableItem *item = [rootObject.storeItem mutableCopy];
 	
 	[item setValue: @"foo" forAttribute: @"bar" type: kCOTypeString];
 	

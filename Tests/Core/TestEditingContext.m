@@ -52,7 +52,7 @@
 {
 	ETModelDescriptionRepository *newRepo = [ETModelDescriptionRepository new];
 	ETEntityDescription *rootEntity =
-		[[ctx modelDescriptionRepository] entityDescriptionForClass: [COObject class]];
+		[ctx.modelDescriptionRepository entityDescriptionForClass: [COObject class]];
 
 	[newRepo addDescription: rootEntity];
 	[newRepo setEntityDescription: rootEntity forClass: [COObject class]];
@@ -79,7 +79,7 @@
 - (void)testDeleteUncommittedPersistentRoot
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-    ETUUID *uuid = [persistentRoot UUID];
+    ETUUID *uuid = persistentRoot.UUID;
     
 	[self validateNewPersistentRoot: persistentRoot UUID: uuid];
     
@@ -97,7 +97,7 @@
 - (void)testUndeleteUncommittedPersistentRoot
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-    ETUUID *uuid = [persistentRoot UUID];
+    ETUUID *uuid = persistentRoot.UUID;
     
 	[self validateNewPersistentRoot: persistentRoot UUID: uuid];
 	
@@ -118,7 +118,7 @@
 - (void)testDeleteCommittedPersistentRoot
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    ETUUID *uuid = [persistentRoot UUID];
+    ETUUID *uuid = persistentRoot.UUID;
     
     [ctx commit];
     
@@ -172,7 +172,7 @@
 - (void)testUndeleteCommittedPersistentRoot
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    ETUUID *uuid = [persistentRoot UUID];
+    ETUUID *uuid = persistentRoot.UUID;
     [ctx commit];
     
     persistentRoot.deleted = YES;
@@ -313,10 +313,10 @@
 	[self checkPersistentRootWithExistingAndNewContext: regular
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testRegular, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 COPersistentRoot *testDeletedOnDisk = [testCtx persistentRootForUUID: [deletedOnDisk UUID]];
-		 COPersistentRoot *testPendingInsertion = [testCtx persistentRootForUUID: [pendingInsertion UUID]];
-		 COPersistentRoot *testPendingDeletion = [testCtx persistentRootForUUID: [pendingDeletion UUID]];
-		 COPersistentRoot *testPendingUndeletion = [testCtx persistentRootForUUID: [pendingUndeletion UUID]];
+		 COPersistentRoot *testDeletedOnDisk = [testCtx persistentRootForUUID: deletedOnDisk.UUID];
+		 COPersistentRoot *testPendingInsertion = [testCtx persistentRootForUUID: pendingInsertion.UUID];
+		 COPersistentRoot *testPendingDeletion = [testCtx persistentRootForUUID: pendingDeletion.UUID];
+		 COPersistentRoot *testPendingUndeletion = [testCtx persistentRootForUUID: pendingUndeletion.UUID];
 		 
 		 UKObjectsEqual(S(testRegular, testPendingInsertion, testPendingUndeletion), [testCtx persistentRoots]);
 		 UKObjectsEqual(S(testDeletedOnDisk, testPendingDeletion), [testCtx deletedPersistentRoots]);
@@ -378,7 +378,7 @@
 	[ctx commit];
 	CORevision *r1 = persistentRoot.currentRevision;
 	
-	[[persistentRoot rootObject] setLabel: @"test"];
+	[persistentRoot.rootObject setLabel: @"test"];
 	[ctx commit];
 	CORevision *r2 = persistentRoot.currentRevision;
 		
@@ -389,7 +389,7 @@
 		COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore:
 			[[COSQLiteStore alloc] initWithURL: [[self class] storeURL]]];
 		
-		r2cxt2 = [[ctx2 persistentRootForUUID: persistentRoot.UUID] currentRevision];
+		r2cxt2 = [ctx2 persistentRootForUUID: persistentRoot.UUID].currentRevision;
 	}
 	
 	// At this point, r2ctx2's editing context is deallocated, so calling

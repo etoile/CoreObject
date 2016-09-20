@@ -38,14 +38,14 @@
     // 1. Set it up in memory
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo1 rootObject] setLabel: @"photo1"];
+    [photo1.rootObject setLabel: @"photo1"];
     
     COPersistentRoot *photo2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo2 rootObject] setLabel: @"photo2"];
+    [photo2.rootObject setLabel: @"photo2"];
     
     COPersistentRoot *library = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-    [[library rootObject] addObject: [photo1 rootObject]];
-    [[library rootObject] addObject: [photo2 rootObject]];
+    [library.rootObject addObject: photo1.rootObject];
+    [library.rootObject addObject: photo2.rootObject];
     
     UKObjectsEqual(S([photo1 rootObject], [photo2 rootObject]), [[library rootObject] contents]);
     
@@ -54,14 +54,14 @@
     UKObjectsEqual(S([library rootObject]), [[photo2 rootObject] parentCollections]);
     
     // Check that nothing is committed yet
-    UKObjectsEqual([NSArray array], [store persistentRootUUIDs]);
+    UKObjectsEqual(@[], [store persistentRootUUIDs]);
     
     [ctx commit];
 
 	[self checkPersistentRootWithExistingAndNewContext: library
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testLibrary, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 NSArray *library2contents = [[testLibrary rootObject] valueForKey: @"contents"];
+		 NSArray *library2contents = [testLibrary.rootObject valueForKey: @"contents"];
 		 UKIntsEqual(2, [library2contents count]);
 		 
 		 COPersistentRoot *photo1ctx2 = nil;
@@ -71,11 +71,11 @@
 		 {
 			 if ([[obj valueForKey: @"label"] isEqual: @"photo1"])
 			 {
-				 photo1ctx2 = [obj persistentRoot];
+				 photo1ctx2 = obj.persistentRoot;
 			 }
 			 else if ([[obj valueForKey: @"label"] isEqual: @"photo2"])
 			 {
-				 photo2ctx2 = [obj persistentRoot];
+				 photo2ctx2 = obj.persistentRoot;
 			 }
 		 }
 		 
@@ -91,10 +91,10 @@
 - (void) testSpecificAndCurrentBranchReferenceInSet
 {
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	COBranch *branchA = [photo1 currentBranch];
+	COBranch *branchA = photo1.currentBranch;
     
-	OutlineItem *photo1root = [photo1 rootObject];
-	OutlineItem *branchAroot = [branchA rootObject];
+	OutlineItem *photo1root = photo1.rootObject;
+	OutlineItem *branchAroot = branchA.rootObject;
 	
 	UKObjectsNotEqual(photo1root, branchAroot);
 	UKFalse([photo1root hash] == [branchAroot hash]);
@@ -130,18 +130,18 @@
 	//  \--childB
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	COBranch *branchA = [photo1 currentBranch];
-    OutlineItem *photo1root = [photo1 rootObject];
+	COBranch *branchA = photo1.currentBranch;
+    OutlineItem *photo1root = photo1.rootObject;
     photo1root.label = @"photo1, branch A";
     
-    OutlineItem *childA = [[photo1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    OutlineItem *childA = [photo1.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     childA.label = @"childA";
     
     [photo1root addObject: childA];
     [photo1 commit];
     
-    COBranch *branchB = [[photo1 currentBranch] makeBranchWithLabel: @"branchB"];
-    OutlineItem *photo1branchBroot = [[branchB objectGraphContext] rootObject];
+    COBranch *branchB = [photo1.currentBranch makeBranchWithLabel: @"branchB"];
+    OutlineItem *photo1branchBroot = branchB.objectGraphContext.rootObject;
     photo1branchBroot.label = @"photo1, branch B";
     
     OutlineItem *childB = [photo1branchBroot.contents firstObject];
@@ -152,7 +152,7 @@
     // Set up library
     
     COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-    [(Tag *)[library1 rootObject] setContents: S([photo1 rootObject], [branchA rootObject])];
+    [(Tag *)library1.rootObject setContents: S([photo1 rootObject], [branchA rootObject])];
 	UKIntsEqual(2, [[[library1 rootObject] contents] count]);
 	
     [ctx commit];
@@ -162,7 +162,7 @@
     
     // Now switch the current branch of photo1. This should automatically update the cross-persistent reference
     
-    [photo1 setCurrentBranch: branchB];
+    photo1.currentBranch = branchB;
     
     UKObjectsEqual(S(@"photo1, branch A", @"photo1, branch B"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
     UKObjectsEqual(S(A(@"childA"), A(@"childB")), [[library1 rootObject] valueForKeyPath: @"contents.contents.label"]);
@@ -174,7 +174,7 @@
 	 {
         // Test that the cross-persistent reference uses branchB when we reopen the store
         
-        COPersistentRoot *photo1ctx2 = [ctx2 persistentRootForUUID: [photo1 UUID]];
+        COPersistentRoot *photo1ctx2 = [ctx2 persistentRootForUUID: photo1.UUID];
         
         // Sanity check
         
@@ -210,18 +210,18 @@
 	// We're interested in how the inverse (parent) pointers in John and Lucy are calculated here.
 	   
 	COPersistentRoot *john = [ctx insertNewPersistentRootWithEntityName: @"OrderedGroupContent"];
-	OrderedGroupContent *johnRoot = [john rootObject];
+	OrderedGroupContent *johnRoot = john.rootObject;
 	johnRoot.label = @"John";
 	
 	COPersistentRoot *lucy = [ctx insertNewPersistentRootWithEntityName: @"OrderedGroupContent"];
-	OrderedGroupContent *lucyRoot = [lucy rootObject];
+	OrderedGroupContent *lucyRoot = lucy.rootObject;
 	lucyRoot.label = @"Lucy";
 	
 	COPersistentRoot *group = [ctx insertNewPersistentRootWithEntityName: @"OrderedGroupWithOpposite"];
 	[ctx commit]; /* FIXME: HACK */
 	
-	COBranch *groupA = [group currentBranch];
-	OrderedGroupWithOpposite *groupARoot = [groupA rootObject];
+	COBranch *groupA = group.currentBranch;
+	OrderedGroupWithOpposite *groupARoot = groupA.rootObject;
 	groupARoot.label = @"GroupA";
 	groupARoot.contents = @[johnRoot, lucyRoot];
 	
@@ -230,7 +230,7 @@
 	// Setup Group branch B
 	
 	COBranch *groupB = [groupA makeBranchWithLabel: @"GroupB"];
-	OrderedGroupWithOpposite *groupBRoot = [groupB rootObject];
+	OrderedGroupWithOpposite *groupBRoot = groupB.rootObject;
 	groupBRoot.label = @"GroupB";
 	/* No change to groupBRoot.content */
 	
@@ -241,7 +241,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: group
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 OrderedGroupWithOpposite *testGroupRoot = [testProot rootObject];
+		 OrderedGroupWithOpposite *testGroupRoot = testProot.rootObject;
 		 OrderedGroupContent *testJohnRoot = testGroupRoot.contents[0];
 		 OrderedGroupContent *testLucyRoot = testGroupRoot.contents[1];
 		 
@@ -265,7 +265,7 @@
 	[self checkBranchWithExistingAndNewContext: groupA
 									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 OrderedGroupWithOpposite *testBranchARoot = [testBranch rootObject];
+		 OrderedGroupWithOpposite *testBranchARoot = testBranch.rootObject;
 		 OrderedGroupContent *testJohnRoot = testBranchARoot.contents[0];
 		 OrderedGroupContent *testLucyRoot = testBranchARoot.contents[1];
 		 
@@ -290,7 +290,7 @@
 	[self checkBranchWithExistingAndNewContext: groupB
 									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 OrderedGroupWithOpposite *testBranchBRoot = [testBranch rootObject];
+		 OrderedGroupWithOpposite *testBranchBRoot = testBranch.rootObject;
 		 OrderedGroupContent *testJohnRoot = testBranchBRoot.contents[0];
 		 OrderedGroupContent *testLucyRoot = testBranchBRoot.contents[1];
 		 
@@ -314,10 +314,10 @@
 	
 	// Make a branch B of Lucy and make it current
 	
-	COBranch *lucyA = [lucy currentBranch];
+	COBranch *lucyA = lucy.currentBranch;
 	COBranch *lucyB = [lucyA makeBranchWithLabel: @"LucyB"];
-	[lucy setCurrentBranch: lucyB];
-	OrderedGroupContent *lucyBRoot = [lucyB rootObject];
+	lucy.currentBranch = lucyB;
+	OrderedGroupContent *lucyBRoot = lucyB.rootObject;
 	lucyBRoot.label = @"LucyB";
 	[ctx commit];
 	
@@ -326,7 +326,7 @@
 	[self checkBranchWithExistingAndNewContext: groupA
 									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 OrderedGroupWithOpposite *testBranchARoot = [testBranch rootObject];
+		 OrderedGroupWithOpposite *testBranchARoot = testBranch.rootObject;
 		 OrderedGroupContent *testJohnRoot = testBranchARoot.contents[0];
 		 OrderedGroupContent *testLucyRoot = testBranchARoot.contents[1];
 
@@ -339,7 +339,7 @@
 	[self checkBranchWithExistingAndNewContext: groupB
 									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 OrderedGroupWithOpposite *testBranchBRoot = [testBranch rootObject];
+		 OrderedGroupWithOpposite *testBranchBRoot = testBranch.rootObject;
 		 OrderedGroupContent *testJohnRoot = testBranchBRoot.contents[0];
 		 OrderedGroupContent *testLucyRoot = testBranchBRoot.contents[1];
 		 
@@ -354,7 +354,7 @@
 	[self checkBranchWithExistingAndNewContext: lucyA
 									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 OrderedGroupContent *testLucyARoot = [testBranch rootObject];
+		 OrderedGroupContent *testLucyARoot = testBranch.rootObject;
 		 UKObjectsEqual(@"Lucy", testLucyARoot.label);
 	
 		 // HACK: Have to unfault the group proot to populate testLucyARoot.parentGroups
@@ -371,7 +371,7 @@
 	[self checkBranchWithExistingAndNewContext: lucyB
 									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 OrderedGroupContent *testLucyBRoot = [testBranch rootObject];
+		 OrderedGroupContent *testLucyBRoot = testBranch.rootObject;
 		 UKObjectsEqual(@"LucyB", testLucyBRoot.label);
 		 
 		 // HACK: Have to unfault the group proot to populate testLucyARoot.parentGroups
@@ -401,7 +401,7 @@
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [photo1 commit];
 
-    COBranch *branchA = [photo1 currentBranch];
+    COBranch *branchA = photo1.currentBranch;
     COBranch *branchB = [branchA makeBranchWithLabel: @"branchB"];
     [branchB.rootObject setLabel: @"photo1, branch B"];
     
@@ -410,7 +410,7 @@
     COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
     
     /* This creates a reference to branch B of photo1. */
-	[[library1 rootObject] addObject: branchB.rootObject];
+	[library1.rootObject addObject: branchB.rootObject];
     [ctx commit];
     
     // Valid reference should be visible in existing and new context
@@ -442,7 +442,7 @@
      }];
     
 	UKTrue(branchB.deleted);
-	[store finalizeDeletionsForPersistentRoot: [photo1 UUID]
+	[store finalizeDeletionsForPersistentRoot: photo1.UUID
 									 error: NULL];
 	UKTrue(branchB.deleted);
 
@@ -472,9 +472,9 @@
 	COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     COPersistentRoot *photo2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
 
-	NSMutableSet *tag1ContentsProxy = [[tag1 rootObject] mutableSetValueForKey: @"contents"];
-	[tag1ContentsProxy addObject: [photo1 rootObject]];
-	[tag1ContentsProxy addObject: [photo2 rootObject]];
+	NSMutableSet *tag1ContentsProxy = [tag1.rootObject mutableSetValueForKey: @"contents"];
+	[tag1ContentsProxy addObject: photo1.rootObject];
+	[tag1ContentsProxy addObject: photo2.rootObject];
 	
 	[ctx commit];
 	
@@ -505,14 +505,14 @@
     // Test that deleting photo1 hides the child relationship in library1 to phtoto1
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo1 rootObject] setValue: @"photo1" forProperty: @"label"];
+    [photo1.rootObject setValue: @"photo1" forProperty: @"label"];
     [photo1 commit];
     
     // Set up library
     
     COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
     /* This creates a reference to photo1. */
-    [[library1 rootObject] insertObject: [photo1 rootObject] atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
+    [library1.rootObject insertObject: photo1.rootObject atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
     [ctx commit];
     
     UKObjectsEqual(S(@"photo1"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
@@ -537,14 +537,14 @@
     // Test that deleting library1 hides the parent relationship in photo1 to library1
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo1 rootObject] setLabel: @"photo1"];
+    [photo1.rootObject setLabel: @"photo1"];
     [photo1 commit];
     
     // Set up library
     
     COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-    [[library1 rootObject] setLabel: @"library1"];
-    [[library1 rootObject] addObject: [photo1 rootObject]];
+    [library1.rootObject setLabel: @"library1"];
+    [library1.rootObject addObject: photo1.rootObject];
     [ctx commit];
     
     UKObjectsEqual(S(@"photo1"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
@@ -572,14 +572,14 @@
     // Test that undeleting photo1 restores the child relationship in library1
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo1 rootObject] setLabel: @"photo1"];
+    [photo1.rootObject setLabel: @"photo1"];
     [photo1 commit];
         
     // Set up library
     
     COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
     /* This creates a reference to photo1. */
-    [[library1 rootObject] addObject: [photo1 rootObject]];
+    [library1.rootObject addObject: photo1.rootObject];
     
     [ctx commit];
     
@@ -593,9 +593,9 @@
     // Add photo2 inner item. Note that the photo1 cross-persistent-root reference is
     // still present in library1.contents, it's just hidden.
 	
-    COObject *photo2 = [[library1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    COObject *photo2 = [library1.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     [photo2 setValue: @"photo2" forProperty: @"label"];
-    [[library1 rootObject] addObject: photo2];
+    [library1.rootObject addObject: photo2];
     
     UKObjectsEqual(S(@"photo2"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
     
@@ -609,7 +609,7 @@
         
         // Undelete photo1, which should restore the cross-root relationship
         
-        COPersistentRoot *photo1ctx2 = [[ctx2 deletedPersistentRoots] anyObject];
+        COPersistentRoot *photo1ctx2 = [ctx2.deletedPersistentRoots anyObject];
         [photo1ctx2 setDeleted: NO];
         
         UKFalse([[library1ctx2 objectGraphContext] hasChanges]);
@@ -628,14 +628,14 @@
     // Test that undeleting library1 restores the parent relationship in photo1
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[photo1 rootObject] setLabel: @"photo1"];
+    [photo1.rootObject setLabel: @"photo1"];
     [photo1 commit];
     
     // Set up library
     
     COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-    [[library1 rootObject] setLabel: @"library1"];
-    [[library1 rootObject] addObject: [photo1 rootObject]];
+    [library1.rootObject setLabel: @"library1"];
+    [library1.rootObject addObject: photo1.rootObject];
     [ctx commit];
     
     library1.deleted = YES;
@@ -681,7 +681,7 @@
 	COObjectGraphContext *transientCtx1 = [COObjectGraphContext new];
 	
     OutlineItem *parent = [[OutlineItem alloc] initWithObjectGraphContext: transientCtx1];
-    OutlineItem *child = [[ctx insertNewPersistentRootWithEntityName: @"OutlineItem"] rootObject];
+    OutlineItem *child = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
 	
 	UKDoesNotRaiseException([parent addObject: child]);
 	
@@ -692,7 +692,7 @@
 {
 	COObjectGraphContext *transientCtx1 = [COObjectGraphContext new];
 	
-    OutlineItem *parent = [[ctx insertNewPersistentRootWithEntityName: @"OutlineItem"] rootObject];
+    OutlineItem *parent = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
     OutlineItem *child = [[OutlineItem alloc] initWithObjectGraphContext: transientCtx1];
 	
 	UKRaisesException([parent addObject: child]);
@@ -733,20 +733,20 @@
 		[[UnivaluedGroupWithOpposite alloc] initWithObjectGraphContext: graph];
 	UnivaluedGroupContent *content =
 		[[UnivaluedGroupContent alloc] initWithObjectGraphContext: graph];
-	[group setContent: content];
+	group.content = content;
 	
 	UKObjectsSame(content, [group content]);
 	UKObjectsSame(group, [[content parents] anyObject]);
 	UKObjectsEqual(S(group), [content parents]);
 
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithRootObject: group];
-	COBranch *nonTrackingBranch = [proot branchForUUID: [graph branchUUID]];
+	COBranch *nonTrackingBranch = [proot branchForUUID: graph.branchUUID];
 	
 	/* The group and content in the non-tracking branch */
 	UnivaluedGroupWithOpposite *shadowGroup =
-		[[nonTrackingBranch objectGraphContext] loadedObjectForUUID: [group UUID]];
+		[nonTrackingBranch.objectGraphContext loadedObjectForUUID: group.UUID];
 	UnivaluedGroupContent *shadowContent =
-		[[nonTrackingBranch objectGraphContext] loadedObjectForUUID: [content UUID]];
+		[nonTrackingBranch.objectGraphContext loadedObjectForUUID: content.UUID];
 
 	UKObjectsSame(shadowContent, [shadowGroup content]);
 	UKObjectsSame(shadowGroup, [[shadowContent parents] anyObject]);

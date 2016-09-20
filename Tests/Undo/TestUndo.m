@@ -49,7 +49,7 @@
 
     UKNil([[persistentRoot rootObject] valueForProperty: kCOLabel]);
     
-    [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
+    [persistentRoot.rootObject setValue: @"hello" forProperty: kCOLabel];
     [ctx commitWithUndoTrack: _testTrack];
 	
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
@@ -73,19 +73,19 @@
     COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commitWithUndoTrack: _testTrack];
     
-    [[persistentRoot1 rootObject] setLabel: @"hello1"];
-    [[persistentRoot2 rootObject] setLabel: @"hello2"];
+    [persistentRoot1.rootObject setLabel: @"hello1"];
+    [persistentRoot2.rootObject setLabel: @"hello2"];
     [ctx commitWithUndoTrack: _testTrack];
     
-    CORevision *persistentRoot1Revision = [persistentRoot1 currentRevision];
-    CORevision *persistentRoot2Revision = [persistentRoot2 currentRevision];
+    CORevision *persistentRoot1Revision = persistentRoot1.currentRevision;
+    CORevision *persistentRoot2Revision = persistentRoot2.currentRevision;
     
     [_testTrack undo];
     
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot1
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot1, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 COPersistentRoot *testProot2 = [testCtx persistentRootForUUID: [persistentRoot2 UUID]];
+		 COPersistentRoot *testProot2 = [testCtx persistentRootForUUID: persistentRoot2.UUID];
 		 
 		 UKObjectsNotEqual([testProot1 currentRevision], persistentRoot1Revision);
 		 UKObjectsNotEqual([testProot2 currentRevision], persistentRoot2Revision);
@@ -98,8 +98,8 @@
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     {
-        COObject *root = [persistentRoot rootObject];
-        COObject *child = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+        COObject *root = persistentRoot.rootObject;
+        COObject *child = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
         [root insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: kCOContents];
         [ctx commitWithIdentifier: @"insert-item" undoTrack: _setupTrack error: NULL];
         
@@ -113,12 +113,12 @@
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
 
 		COUndoTrack *rootEditTrack = [_rootEditTrack trackWithEditingContext: ctx2];
 		COUndoTrack *childEditTrack = [_childEditTrack trackWithEditingContext: ctx2];
 
-        COObject *root = [ctx2persistentRoot rootObject];
+        COObject *root = ctx2persistentRoot.rootObject;
         COObject *child = [[root valueForProperty: kCOContents] firstObject];
         
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
@@ -208,14 +208,14 @@
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commit];
     
-    COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
+    COBranch *secondBranch = [persistentRoot.currentBranch makeBranchWithLabel: @"secondBranch"];
     [ctx commitWithUndoTrack: _testTrack];
         
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
+        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: secondBranch.UUID];
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
@@ -232,15 +232,15 @@
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commit];
     
-    COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
+    COBranch *secondBranch = [persistentRoot.currentBranch makeBranchWithLabel: @"secondBranch"];
 	secondBranch.metadata = @{ @"some" : @"metadata" };
     [ctx commitWithUndoTrack: _testTrack];
 	
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
+        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: secondBranch.UUID];
 		
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
@@ -257,15 +257,15 @@
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commit];
     
-    COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
-    [persistentRoot setCurrentBranch: secondBranch];
+    COBranch *secondBranch = [persistentRoot.currentBranch makeBranchWithLabel: @"secondBranch"];
+    persistentRoot.currentBranch = secondBranch;
     [ctx commitWithUndoTrack: _testTrack];
     
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
+        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: secondBranch.UUID];
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
@@ -283,7 +283,7 @@
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commit];
     
-    COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
+    COBranch *secondBranch = [persistentRoot.currentBranch makeBranchWithLabel: @"secondBranch"];
     [ctx commit];
     
     [secondBranch setDeleted: YES];
@@ -292,8 +292,8 @@
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
+        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: secondBranch.UUID];
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
@@ -308,16 +308,16 @@
 - (void) testUndoSetBranchMetadata
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[persistentRoot currentBranch] setMetadata: D(@"world", @"hello")];
+    [persistentRoot.currentBranch setMetadata: D(@"world", @"hello")];
     [ctx commit];
     
-    [[persistentRoot currentBranch] setMetadata: D(@"world2", @"hello")];
+    [persistentRoot.currentBranch setMetadata: D(@"world2", @"hello")];
     [ctx commitWithUndoTrack: _testTrack];
     
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
@@ -341,7 +341,7 @@
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
 		
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
@@ -356,23 +356,23 @@
 - (void) testUndoSetCurrentBranch
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    COBranch *originalBranch = [persistentRoot currentBranch];
-    [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
+    COBranch *originalBranch = persistentRoot.currentBranch;
+    [persistentRoot.rootObject setValue: @"hello" forProperty: kCOLabel];
     [ctx commit];
     
-    COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];    
-    [[[secondBranch objectGraphContext] rootObject] setValue: @"hello2" forProperty: kCOLabel];
+    COBranch *secondBranch = [persistentRoot.currentBranch makeBranchWithLabel: @"secondBranch"];    
+    [secondBranch.objectGraphContext.rootObject setValue: @"hello2" forProperty: kCOLabel];
     [ctx commit];
     
-    [persistentRoot setCurrentBranch: secondBranch];
+    persistentRoot.currentBranch = secondBranch;
     [ctx commitWithUndoTrack: _testTrack];
     
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        COBranch *ctx2originalBranch = [ctx2persistentRoot branchForUUID: [originalBranch UUID]];
-        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
+        COBranch *ctx2originalBranch = [ctx2persistentRoot branchForUUID: originalBranch.UUID];
+        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: secondBranch.UUID];
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
@@ -399,7 +399,7 @@
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
 		
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
@@ -420,7 +420,7 @@
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
 		
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
@@ -443,7 +443,7 @@
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
@@ -464,7 +464,7 @@
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commitWithUndoTrack: _testTrack];
     
-    [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
+    [persistentRoot.rootObject setValue: @"hello" forProperty: kCOLabel];
     [ctx commitWithUndoTrack: _testTrack];
     
     UKIntsEqual(3, [[_testTrack nodes] count]);
@@ -495,16 +495,16 @@
 
     // doc1 commits
     
-    [[doc1 rootObject] setLabel: @"doc1"];
+    [doc1.rootObject setLabel: @"doc1"];
     [ctx commitWithUndoTrack: workspaceDoc1Track];
-    [[doc1 rootObject] setLabel: @"sketch"];
+    [doc1.rootObject setLabel: @"sketch"];
     [ctx commitWithUndoTrack: workspaceDoc1Track];
 
     // doc2 commits
     
-    [[doc2 rootObject] setLabel: @"doc2"];
+    [doc2.rootObject setLabel: @"doc2"];
     [ctx commitWithUndoTrack: workspaceDoc2Track];
-    [[doc2 rootObject] setLabel: @"photo"];
+    [doc2.rootObject setLabel: @"photo"];
     [ctx commitWithUndoTrack: workspaceDoc2Track];
 
     // experiment...
@@ -547,35 +547,35 @@
 - (void) testSelectiveUndoOfCommands
 {
     COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *root = [doc1 rootObject];
-	OutlineItem *child1 = [[doc1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *root = doc1.rootObject;
+	OutlineItem *child1 = [doc1.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[root addObject: child1];
 	
     [ctx commitWithUndoTrack: _setupTrack];
 		
     // make some commits...
     
-    [root setLabel: @"doc1"];
+    root.label = @"doc1";
     [ctx commitWithUndoTrack: _testTrack];
-	id<COTrackNode> node0 = [[_testTrack nodes] lastObject];
+	id<COTrackNode> node0 = _testTrack.nodes.lastObject;
 
-    [child1 setLabel: @"child1"];
+    child1.label = @"child1";
     [ctx commitWithUndoTrack: _testTrack];
-    id<COTrackNode> node1 = [[_testTrack nodes] lastObject];
+    id<COTrackNode> node1 = _testTrack.nodes.lastObject;
 	
-	[root setLabel: @"doc1a"];
+	root.label = @"doc1a";
     [ctx commitWithUndoTrack: _testTrack];
-    id<COTrackNode> node2 = [[_testTrack nodes] lastObject];
+    id<COTrackNode> node2 = _testTrack.nodes.lastObject;
 	
-	[child1 setLabel: @"child1a"];
+	child1.label = @"child1a";
     [ctx commitWithUndoTrack: _testTrack];
-	id<COTrackNode> node3 = [[_testTrack nodes] lastObject];
+	id<COTrackNode> node3 = _testTrack.nodes.lastObject;
 	
 	UKObjectsEqual(@"doc1a", [root label]);
 	UKObjectsEqual(@"child1a", [child1 label]);
 	
     [_testTrack undoNode: node2]; // selective undo doc1 -> doc1a
-	id<COTrackNode> node4 = [[_testTrack nodes] lastObject];
+	id<COTrackNode> node4 = _testTrack.nodes.lastObject;
 	
 	UKObjectsEqual(@"doc1", [root label]);
 	UKObjectsEqual(@"child1a", [child1 label]);
@@ -608,7 +608,7 @@
 	 isSetVersionFrom: (CORevision *)a
 				   to: (CORevision *)b
 {
-	NSArray *subCommands = [(COCommandGroup *)aCommand contents];
+	NSArray *subCommands = ((COCommandGroup *)aCommand).contents;
 	UKIntsEqual(1, [subCommands count]);
 	
 	COCommandSetCurrentVersionForBranch *command = [subCommands firstObject];
@@ -631,19 +631,19 @@
 	 */
 	
     COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *root = [doc1 rootObject];
+	OutlineItem *root = doc1.rootObject;
 	[ctx commit];
-	CORevision *r0 = [doc1 currentRevision];
+	CORevision *r0 = doc1.currentRevision;
 	
-	OutlineItem *child1 = [[doc1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child1 = [doc1.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[root addObject: child1];
 	[ctx commitWithIdentifier: @"insert-item" undoTrack: _testTrack error: nil];
-	CORevision *r1 = [doc1 currentRevision];
+	CORevision *r1 = doc1.currentRevision;
 	
-	OutlineItem *child2 = [[doc1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child2 = [doc1.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[root addObject: child2];
 	[ctx commitWithIdentifier: @"insert-item" undoTrack: _testTrack error: nil];
-	CORevision *r2 = [doc1 currentRevision];
+	CORevision *r2 = doc1.currentRevision;
 	
 	UKObjectsEqual((@[child1, child2]), [root contents]);
 	
@@ -658,7 +658,7 @@
 	
 	// selective undo child1 insertion
 	[_testTrack undoNode: _testTrack.nodes[1]];
-	CORevision *r3 = [doc1 currentRevision];
+	CORevision *r3 = doc1.currentRevision;
 	
 	UKObjectsEqual(@[child2], [root contents]);
 	
@@ -688,7 +688,7 @@
 	
 	// Efficiency test: the r3 commit should only have written one item to the store
 	// (root) since that was the only change.
-	COItemGraph *r3PartialItemGraph = [[ctx store] partialItemGraphFromRevisionUUID: [r2 UUID] toRevisionUUID: [r3 UUID] persistentRoot: [doc1 UUID]];
+	COItemGraph *r3PartialItemGraph = [ctx.store partialItemGraphFromRevisionUUID: r2.UUID toRevisionUUID: r3.UUID persistentRoot: doc1.UUID];
 	UKObjectsEqual(@[root.UUID], [r3PartialItemGraph itemUUIDs]);
 	
 	// selective redo child1 insertion
@@ -710,9 +710,9 @@
 - (void)testUndoCoalescing
 {
 	CORevision *r0, *r1, *r2, *r3, *r4, *r5, *r6;
-    OutlineItem *item = [[ctx insertNewPersistentRootWithEntityName: @"OutlineItem"] rootObject];
+    OutlineItem *item = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
     [ctx commit];
-	r0 = [item revision];
+	r0 = item.revision;
 	
 	// First coalesced block
 	
@@ -720,11 +720,11 @@
 	{
 		item.label = @"a";
 		[ctx commitWithUndoTrack: _testTrack];
-		r1 = [item revision];
+		r1 = item.revision;
 		
 		item.label = @"ab";
 		[ctx commitWithUndoTrack: _testTrack];
-		r2 = [item revision];
+		r2 = item.revision;
 	}
 	[_testTrack endCoalescing];
 
@@ -738,11 +738,11 @@
 	{
 		item.label = @"abc";
 		[ctx commitWithUndoTrack: _testTrack];
-		r3 = [item revision];
+		r3 = item.revision;
 		
 		item.label = @"abcd";
 		[ctx commitWithUndoTrack: _testTrack];
-		r4 = [item revision];
+		r4 = item.revision;
 	}
 	[_testTrack endCoalescing];
 
@@ -750,11 +750,11 @@
 	
 	item.label = @"foo";
 	[ctx commitWithUndoTrack: _testTrack];
-	r5 = [item revision];
+	r5 = item.revision;
 	
 	item.label = @"bar";
 	[ctx commitWithUndoTrack: _testTrack];
-	r6 = [item revision];
+	r6 = item.revision;
 
 	// Check track contents
 	UKIntsEqual(4, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
@@ -768,7 +768,7 @@
 
 - (void)testUndoDisablesCoalescing
 {
-    OutlineItem *item = [[ctx insertNewPersistentRootWithEntityName: @"OutlineItem"] rootObject];
+    OutlineItem *item = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
     [ctx commit];
 	
 	[_testTrack beginCoalescing];
@@ -802,7 +802,7 @@
 
 - (COUndoTrack *)trackWithEditingContext: (COEditingContext *)aContext
 {
-	return [[self class] trackForName: [self name] withEditingContext: aContext];
+	return [[self class] trackForName: self.name withEditingContext: aContext];
 }
 
 @end
