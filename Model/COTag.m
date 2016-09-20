@@ -16,7 +16,7 @@
 
 	// For subclasses that don't override -newEntityDescription, we must not add the 
 	// property descriptions that we will inherit through the parent
-	if ([collection.name isEqual: [COTag className]] == NO) 
+	if (![collection.name isEqual: [COTag className]]) 
 		return collection;
 
 	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COTag"
@@ -72,7 +72,7 @@
 
 	// For subclasses that don't override -newEntityDescription, we must not add the 
 	// property descriptions that we will inherit through the parent
-	if ([collection.name isEqual: [COTagGroup className]] == NO) 
+	if (![collection.name isEqual: [COTagGroup className]]) 
 		return collection;
 
 	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COTagGroup"
@@ -106,7 +106,7 @@
 	
 	// For subclasses that don't override -newEntityDescription, we must not add the
 	// property descriptions that we will inherit through the parent
-	if ([collection.name isEqual: [COTagLibrary className]] == NO)
+	if (![collection.name isEqual: [COTagLibrary className]])
 		return collection;
 
 	 ETPropertyDescription *tagGroups =

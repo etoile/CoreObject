@@ -48,7 +48,7 @@
 
 - (COCommandGroup *) recordEndUndoGroupWithUndoTrack: (COUndoTrack *)track
 {
-    if (_recordingUndo == NO)
+    if (!_recordingUndo)
 		return nil;
 
 	if ([_currentEditGroup.contents isEmpty])

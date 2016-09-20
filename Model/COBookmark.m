@@ -17,7 +17,7 @@
 	
 	// For subclasses that don't override -newEntityDescription, we must not add the
 	// property descriptions that we will inherit through the parent
-	if ([bookmark.name isEqual: [COBookmark className]] == NO)
+	if (![bookmark.name isEqual: [COBookmark className]])
 		return bookmark;
 	
 	ETPropertyDescription *URL =

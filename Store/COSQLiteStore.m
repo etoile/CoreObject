@@ -380,7 +380,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         if ([rs next])
         {
             revUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-            ETAssert([rs next] == NO);
+            ETAssert(![rs next]);
         }
 
         [rs close];
@@ -879,7 +879,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         if ([rs next])
         {
             prootUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-            ETAssert([rs next] == NO);
+            ETAssert(![rs next]);
         }
 
         [rs close];

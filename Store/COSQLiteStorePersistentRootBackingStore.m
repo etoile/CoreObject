@@ -852,12 +852,12 @@ static NSData *Sha1Data(NSData *data)
 		BOOL isValidBranch = ([branchUUIDData isEqualToData: visitedBranchUUIDData]);
 		int64_t revid = [rs longLongIntForColumnIndex: 0];
 		BOOL isParentRev = (revid == parentRevid);
-		BOOL skippingUnrelatedBranchRevisions = (isValidBranch == NO && isParentRev == NO);
+		BOOL skippingUnrelatedBranchRevisions = (!isValidBranch && !isParentRev);
 		
 		if (skippingUnrelatedBranchRevisions)
 			continue;
 	
-		if (isValidBranch == NO && (options & COBranchRevisionReadingParentBranches) == NO)
+		if (!isValidBranch && !(options & COBranchRevisionReadingParentBranches))
 			break;
 
 		if (isFirstResult || isParentRev || (options & COBranchRevisionReadingDivergentRevisions))

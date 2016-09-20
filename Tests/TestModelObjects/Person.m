@@ -15,7 +15,7 @@
 {
 	ETEntityDescription *entity = [self newBasicEntityDescription];
 	
-	if ([entity.name isEqual: [Person className]] == NO)
+	if (![entity.name isEqual: [Person className]])
 		return entity;
 
 	ETPropertyDescription *role =

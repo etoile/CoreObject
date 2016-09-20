@@ -143,7 +143,7 @@
 
 	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
 	{
-		if (persistentRoot.hasChanges == NO)
+		if (!persistentRoot.hasChanges)
 			continue;
 		
 		changeSummary[persistentRoot.UUID] = persistentRoot.description;
@@ -229,7 +229,7 @@
     COPersistentRootInfo *info = [_store persistentRootInfoForUUID: persistentRootUUID];
 	BOOL persistentRootFound = (info != nil);
 
-	if (persistentRootFound == NO)
+	if (!persistentRootFound)
 		return nil;
 
 	persistentRoot = [self makePersistentRootWithInfo: info objectGraphContext: nil];
@@ -638,7 +638,7 @@
 	[_persistentRootsPendingDeletion removeAllObjects];
 	[_persistentRootsPendingUndeletion removeAllObjects];
 
-	ETAssert([self hasChanges] == NO);
+	ETAssert(![self hasChanges]);
 }
 
 #pragma mark Validation -
@@ -652,7 +652,7 @@
 	{
 		[validationErrors addObjectsFromArray: [object validate]];
 	}
-	ETAssert([validationErrors containsObject: [NSNull null]] == NO);
+	ETAssert(![validationErrors containsObject: [NSNull null]]);
 
 	if (error != NULL)
 	{
@@ -679,7 +679,7 @@
                        error: (COError **)anError
 {
 	NILARG_EXCEPTION_TEST(aCommitDescriptorId);
-	INVALIDARG_EXCEPTION_TEST(additionalMetadata, [additionalMetadata containsKey: aCommitDescriptorId] == NO);
+	INVALIDARG_EXCEPTION_TEST(additionalMetadata, ![additionalMetadata containsKey: aCommitDescriptorId]);
 
 	NSMutableDictionary *metadata =
 		[D(aCommitDescriptorId, kCOCommitMetadataIdentifier) mutableCopy];
@@ -773,7 +773,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 		// suberror per inner object, then each suberror could in turn contain
 		// a suberror per validation result. For now, we just aggregate errors per
 		// inner object.
-		if ([self validateChangedObjectsForContext: self error: anError] == NO)
+		if (![self validateChangedObjectsForContext: self error: anError])
 			return NO;
 
 		/* Commit persistent root changes (deleted persistent roots included) */

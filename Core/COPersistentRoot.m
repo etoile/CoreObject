@@ -496,7 +496,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	
 	[_currentBranchObjectGraph discardAllChanges];
 	
-	ETAssert([self hasChanges] == NO);
+	ETAssert(![self hasChanges]);
 }
 
 - (BOOL) isZombie
@@ -587,7 +587,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 {
 	NILARG_EXCEPTION_TEST(aCommitDescriptorId);
 	INVALIDARG_EXCEPTION_TEST(additionalMetadata,
-		[additionalMetadata containsKey: aCommitDescriptorId] == NO);
+		![additionalMetadata containsKey: aCommitDescriptorId]);
 
 	NSMutableDictionary *metadata =
 		[D(aCommitDescriptorId, kCOCommitMetadataIdentifier) mutableCopy];

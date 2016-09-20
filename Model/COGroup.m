@@ -15,7 +15,7 @@
 
 	// For subclasses that don't override -newEntityDescription, we must not add the 
 	// property descriptions that we will inherit through the parent
-	if ([collection.name isEqual: [COGroup className]] == NO) 
+	if (![collection.name isEqual: [COGroup className]]) 
 		return collection;
 
 	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COGroup"

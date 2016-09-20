@@ -195,12 +195,12 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 - (BOOL) isBranchUncommitted
 {
-    return _isCreated == NO;
+    return !_isCreated;
 }
 
 - (BOOL) isBranchPersistentRootUncommitted
 {
-    return _currentRevisionUUID == nil && _isCreated == NO;
+    return _currentRevisionUUID == nil && !_isCreated;
 }
 
 - (NSString *)displayName
@@ -208,7 +208,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	NSString *label = self.label;
 	NSString *displayName = [self.persistentRoot.rootObject displayName];
 	
-	if (label != nil && [label isEqual: @""] == NO)
+	if (label != nil && ![label isEqual: @""])
 	{
 		displayName = [displayName stringByAppendingFormat: @" (%@)", label];
 	}
@@ -779,7 +779,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
         _metadataChanged = NO;
     }
     
-    ETAssert(_isCreated == NO);
+    ETAssert(!_isCreated);
     
     _currentRevisionUUID =  aRevisionUUID;
 	_headRevisionUUID = aRevisionUUID;

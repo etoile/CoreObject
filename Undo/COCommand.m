@@ -204,7 +204,7 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
 
 - (BOOL)isEqual: (id)object
 {
-	if ([object isKindOfClass: [self class]] == NO)
+	if (![object isKindOfClass: [self class]])
 		return NO;
 	
 	return [((COCommand *)object)->_storeUUID isEqual: _storeUUID]

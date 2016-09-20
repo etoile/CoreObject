@@ -33,7 +33,7 @@
 
 - (BOOL)isEqual: (id)rhs
 {
-	if ([rhs isKindOfClass: [CORevision class]] == NO)
+	if (![rhs isKindOfClass: [CORevision class]])
 		return NO;
 
 	return [revisionInfo.revisionUUID isEqual: ((CORevision *)rhs)->revisionInfo.revisionUUID];

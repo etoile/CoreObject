@@ -99,7 +99,7 @@ static void genericSetter(id self, SEL theCmd, id value)
         BOOL isDynamic = (strchr(attributes, 'D') != NULL);
         
         // FIXME: Check other property attributes are correct e.g. readwrite and not readonly
-        if (isDynamic == NO)
+        if (!isDynamic)
             return NO;
         
         if (!isSetter)

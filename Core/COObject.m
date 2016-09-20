@@ -96,7 +96,7 @@ See +[NSObject typePrefix]. */
 
 	// For subclasses that don't override -newEntityDescription, we must not add the 
 	// property descriptions that we will inherit through the parent
-	if ([object.name isEqual: [COObject className]] == NO) 
+	if (![object.name isEqual: [COObject className]]) 
 		return object;
 
 	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COObject"
@@ -192,7 +192,7 @@ See +[NSObject typePrefix]. */
 	{
 		// NOTE: Could be better to return nil in the assertion case, and move
 		// the assertion in methods calling -collectionClassForPropertyDescription:.
-		NSAssert1([propDesc isOrdered] == NO || [propDesc isPersistent] == NO,
+		NSAssert1(![propDesc isOrdered] || ![propDesc isPersistent],
 			@"Persistent keyed collection %@ cannot be ordered.", propDesc);
 		return [COMutableDictionary class];
 	}
@@ -217,7 +217,7 @@ See +[NSObject typePrefix]. */
 	{
 		// NOTE: Could be better to return nil in the assertion case, and move
 		// the assertion in methods calling -collectionClassForPropertyDescription:.
-		NSAssert1([propDesc isOrdered] == NO || [propDesc isPersistent] == NO,
+		NSAssert1(![propDesc isOrdered] || ![propDesc isPersistent],
 				  @"Persistent keyed collection %@ cannot be ordered.", propDesc);
 		return [NSDictionary class];
 	}
@@ -248,7 +248,7 @@ See +[NSObject typePrefix]. */
 
 	for (ETPropertyDescription *propDesc in self.entityDescription.allPropertyDescriptions)
 	{
-		if (propDesc.multivalued == NO || propDesc.derived)
+		if (!propDesc.multivalued || propDesc.derived)
 			continue;
 
 		id value = nil;
@@ -270,8 +270,8 @@ See +[NSObject typePrefix]. */
 {
 	Class entityClass = [repo classForEntityDescription: anEntityDescription];
 
-	if ([entityClass isSubclassOfClass: [self class]] == NO
-	 && [[self class] isSubclassOfClass: entityClass] == NO)
+	if (![entityClass isSubclassOfClass: [self class]]
+	 && ![[self class] isSubclassOfClass: entityClass])
 	{
 		[NSException raise: NSInvalidArgumentException
 					format: @"There is mismatch between the entity description "
@@ -346,7 +346,7 @@ See +[NSObject typePrefix]. */
 	_variableStorage = [self newVariableStorage];
 	_incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
 	_propertyChangeStack = [NSMutableArray new];
-	_additionalStoreItemUUIDs = [self newAdditionalStoreItemUUIDs: (inserted == NO)];
+	_additionalStoreItemUUIDs = [self newAdditionalStoreItemUUIDs: !inserted];
 
 	[_objectGraphContext registerObject: self isNew: inserted];
 
@@ -641,7 +641,7 @@ See +[NSObject typePrefix]. */
 		   references accross object graph contexts (or persistent roots), 
 		   unless the parent object graph context is transient. */
 		return isSameObjectGraphContext
-			|| (involvesTransientParent && involvesTransientChild == NO)
+			|| (involvesTransientParent && !involvesTransientChild)
 			|| (involvesTransientParent && involvesTransientChild);
 	}
 	else
@@ -662,7 +662,7 @@ See +[NSObject typePrefix]. */
 - (void)validateEditingContextForNewCollectionValue: (id)value
 								propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if (propertyDesc.isPersistentRelationship == NO)
+	if (!propertyDesc.isPersistentRelationship)
 		return;
 	
 	ETAssert([propertyDesc isMultivalued]);
@@ -672,7 +672,7 @@ See +[NSObject typePrefix]. */
 - (void)validateEditingContextForNewValue: (id)value
                       propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if (propertyDesc.isPersistentRelationship == NO)
+	if (!propertyDesc.isPersistentRelationship)
 		return;
 
 	if ([value isPrimitiveCollection])
@@ -699,7 +699,7 @@ See +[NSObject typePrefix]. */
 - (void)validateObjectGraphContextForNewCollectionValue: (id)value
 									propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if (propertyDesc.isPersistentRelationship == NO)
+	if (!propertyDesc.isPersistentRelationship)
 		return;
 	
 	ETAssert([propertyDesc isMultivalued]);
@@ -711,7 +711,7 @@ See +[NSObject typePrefix]. */
 - (void)validateObjectGraphContextForNewValue: (id)value
 						  propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if (propertyDesc.isPersistentRelationship == NO)
+	if (!propertyDesc.isPersistentRelationship)
 		return;
 
 	if ([value isPrimitiveCollection])
@@ -828,7 +828,7 @@ See +[NSObject typePrefix]. */
 
 	SEL keySelector = sel_getUid(validator);
 
-	if ([self respondsToSelector: keySelector] == NO)
+	if (![self respondsToSelector: keySelector])
 		return [ETValidationResult validResult: value];
 
 	return [self performSelector: keySelector withObject: value];
@@ -844,11 +844,11 @@ See +[NSObject typePrefix]. */
 
 	NSMutableArray *results = [NSMutableArray arrayWithCapacity: 2];
 
-	if (metamodelResult.isValid == NO)
+	if (!metamodelResult.isValid)
 	{
 		[results addObject: metamodelResult];
 	}
-	if (modelResult.isValid == NO)
+	if (!modelResult.isValid)
 	{
 		[results addObject: modelResult];
 	}
@@ -1070,7 +1070,7 @@ See +[NSObject typePrefix]. */
 	{
 		storageValue = [[COWeakRef alloc] initWithObject: aValue];
 	}
-	else if (propertyDesc.multivalued && [self isCoreObjectCollection: aValue] == NO)
+	else if (propertyDesc.multivalued && ![self isCoreObjectCollection: aValue])
 	{
 		storageValue = _variableStorage[key];
 		storageValue = [self replaceContentOfCollection: storageValue
@@ -1147,7 +1147,7 @@ See +[NSObject typePrefix]. */
 
 - (void)setValue: (id)value forStorageKey: (NSString *)key
 {
-	if (ETSetInstanceVariableValueForKey(self, value, key) == NO)
+	if (!ETSetInstanceVariableValueForKey(self, value, key))
 	{
 		[self setValue: value forVariableStorageKey: key];
 	}
@@ -1315,7 +1315,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 - (void)validateTypeForNewCollectionValue: (id)value
 					  propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if (propertyDesc.persistent == NO)
+	if (!propertyDesc.persistent)
 		return;
 	
 	if ([self serializationGetterForProperty: propertyDesc.name] != NULL)
@@ -1454,7 +1454,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 {
 	ETAssert([propertyDesc isMultivalued]);
 
-	if (propertyDesc.isComposite == NO)
+	if (!propertyDesc.isComposite)
 		return;
 	
 	NSString *key = propertyDesc.name;
@@ -1502,7 +1502,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
  */
 - (void)updateCompositeRelationshipForPropertyDescription: (ETPropertyDescription *)propertyDesc
 {
-    if (propertyDesc.isComposite == NO)
+    if (!propertyDesc.isComposite)
 		return;
 
 	NSString *key = propertyDesc.name;
@@ -1560,7 +1560,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 {
 	NSString *top = _propertyChangeStack.lastObject;
 
-	if ([top isEqual: key] == NO)
+	if (![top isEqual: key])
 	{
 		[NSException raise: NSInternalInconsistencyException
 		            format: @"-willChangeValueForProperty: and -didChangeValueForProperty: "
@@ -1775,7 +1775,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 	for (ETPropertyDescription *propDesc in self.entityDescription.allPropertyDescriptions)
 	{
 		/* At validation time, derived properties should return a valid collection */
-		if (propDesc.multivalued == NO)
+		if (!propDesc.multivalued)
 			continue;
 
 		Class class = [self collectionClassForPropertyDescription: propDesc];
@@ -1789,7 +1789,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 			collection = [self valueForKey: propDesc.name];
 		}
 
-		if ([collection isKindOfClass: class] == NO)
+		if (![collection isKindOfClass: class])
 		{
 			[NSException raise: NSInternalInconsistencyException
 			            format: @"Property %@ of %@ is declared as a collection "
@@ -1804,7 +1804,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 
 - (void)awakeFromDeserialization
 {
-	ETAssert([[_additionalStoreItemUUIDs allValues] containsObject: cachedNSNull] == NO);
+	ETAssert(![[_additionalStoreItemUUIDs allValues] containsObject: cachedNSNull]);
 }
 
 - (void)willLoadObjectGraph

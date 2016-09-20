@@ -17,7 +17,7 @@
 	
 	// For subclasses that don't override -newEntityDescription, we must not add
 	// the property descriptions that we will inherit through the parent
-	if ([[object name] isEqual: [KeyedAttributeModel className]] == NO)
+	if (![[object name] isEqual: [KeyedAttributeModel className]])
 		return object;
 	
 	ETPropertyDescription *entries =

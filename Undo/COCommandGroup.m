@@ -117,7 +117,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (BOOL)isEqual: (id)object
 {
-	if ([object isKindOfClass: [COCommandGroup class]] == NO)
+	if (![object isKindOfClass: [COCommandGroup class]])
 		return NO;
 
 	return ([((COCommandGroup *)object)->_UUID isEqual: _UUID]);

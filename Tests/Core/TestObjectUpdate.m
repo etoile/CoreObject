@@ -59,7 +59,7 @@
 {
 	ETEntityDescription *entity = [self newBasicEntityDescription];
 	
-	if ([[entity name] isEqual: [TestObjectUpdateEntity className]] == NO)
+	if (![[entity name] isEqual: [TestObjectUpdateEntity className]])
 		return entity;
 	
 	ETPropertyDescription *label =

@@ -60,7 +60,7 @@ void CORegisterCoreObjectMetamodel(ETModelDescriptionRepository *repo)
 
 	[repo checkConstraints: warnings];
 		
-	if ([warnings isEmpty] == NO)
+	if (![warnings isEmpty])
 	{
 		[NSException raise: NSInternalInconsistencyException
 		            format: @"Failure on constraint check in repository %@:\n %@",

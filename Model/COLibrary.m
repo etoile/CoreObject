@@ -19,7 +19,7 @@
 
 	// For subclasses that don't override -newEntityDescription, we must not add the 
 	// property descriptions that we will inherit through the parent
-	if ([collection.name isEqual: [COLibrary className]] == NO) 
+	if (![collection.name isEqual: [COLibrary className]]) 
 		return collection;
 
 	[collection setLocalizedDescription: _(@"Library")];

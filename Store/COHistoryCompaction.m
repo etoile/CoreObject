@@ -84,7 +84,7 @@
 				[collectablePersistentRootUUIDs addObject: UUID];
 				[compactedPersistentRootUUIDs addObject: UUID];
 	
-				ETAssert([rs next] == NO);
+				ETAssert(![rs next]);
 			}
 			[rs close];
 

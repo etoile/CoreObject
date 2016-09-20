@@ -64,7 +64,7 @@ static const NSRect CONullRect = {{FLT_MIN, FLT_MIN}, {FLT_MIN, FLT_MIN}};
 serialization. */
 BOOL isSerializableScalarValue(id value)
 {
-	if ([value isKindOfClass: [NSValue class]] == NO)
+	if (![value isKindOfClass: [NSValue class]])
 		return NO;
 
 	const char *type = [value objCType];
@@ -697,7 +697,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
 	if (COTypeMultivaluedPart(type) == kCOTypeArray)
 	{
-		NSAssert([aPropertyDesc isKeyed] == NO && [aPropertyDesc isOrdered] && [aPropertyDesc isMultivalued],
+		NSAssert(![aPropertyDesc isKeyed] && [aPropertyDesc isOrdered] && [aPropertyDesc isMultivalued],
 				 @"Serialization type doesn't match metamodel");
 		
 		COMutableArray *resultCollection =
@@ -717,7 +717,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	}
 	else if (COTypeMultivaluedPart(type) == kCOTypeSet)
 	{
-		NSAssert([aPropertyDesc isKeyed] == NO && [aPropertyDesc isOrdered] == NO && [aPropertyDesc isMultivalued],
+		NSAssert(![aPropertyDesc isKeyed] && ![aPropertyDesc isOrdered] && [aPropertyDesc isMultivalued],
 				 @"Serialization type doesn't match metamodel");
 		
 		COMutableSet *resultCollection =
@@ -738,7 +738,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	else if (type == kCOTypeCompositeReference)
 	{
 		NSParameterAssert([value isKindOfClass: [ETUUID class]]);
-		NSAssert([aPropertyDesc isKeyed] && [aPropertyDesc isOrdered] == NO && [aPropertyDesc isMultivalued],
+		NSAssert([aPropertyDesc isKeyed] && ![aPropertyDesc isOrdered] && [aPropertyDesc isMultivalued],
 			@"Serialization type doesn't match metamodel");
 		
 		ETUUID *itemUUID = _additionalStoreItemUUIDs[aPropertyDesc.name];

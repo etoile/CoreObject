@@ -20,7 +20,7 @@
 		return nil;
 	}
 
-	BOOL isAggregate = ([suberrors isEmpty] == NO);
+	BOOL isAggregate = ![suberrors isEmpty];
 	self = [super initWithDomain: kCOCoreObjectErrorDomain 
 	                        code: (isAggregate ? kCOValidationMultipleErrorsError : kCOValidationError)
 	                    userInfo: nil];
