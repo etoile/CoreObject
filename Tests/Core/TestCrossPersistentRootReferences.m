@@ -79,8 +79,8 @@
 			 }
 		 }
 		 
-		 UKObjectsEqual([photo1 UUID], [photo1ctx2 UUID]);
-		 UKObjectsEqual([photo2 UUID], [photo2ctx2 UUID]);
+		 UKObjectsEqual(photo1.UUID, photo1ctx2.UUID);
+		 UKObjectsEqual(photo2.UUID, photo2ctx2.UUID);
 		 UKObjectsEqual([photo1.rootObject UUID], [photo1ctx2.rootObject UUID]);
 		 UKObjectsEqual([photo2.rootObject UUID], [photo2ctx2.rootObject UUID]);
 		 UKObjectsEqual(@"photo1", [photo1ctx2.rootObject label]);
@@ -178,7 +178,7 @@
         
         // Sanity check
         
-        UKObjectsEqual([branchB UUID], [[photo1ctx2 currentBranch] UUID]);
+        UKObjectsEqual(branchB.UUID, [[photo1ctx2 currentBranch] UUID]);
         UKObjectsEqual(A(@"childB"), [photo1ctx2.rootObject valueForKeyPath: @"contents.label"]);
         
         // Actual test of cross-persistent-root references
@@ -657,7 +657,7 @@
 		NSSet *deletedProots = [ctx2 deletedPersistentRoots];
 		UKIntsEqual(1, [deletedProots count]);
         COPersistentRoot *library1ctx2 = [deletedProots anyObject];
-		UKObjectsEqual([library1 UUID], [library1ctx2 UUID]);
+		UKObjectsEqual(library1.UUID, library1ctx2.UUID);
         //[library1ctx2 setDeleted: NO];
 
         //UKFalse([[photo1ctx2 objectGraphContext] hasChanges]);

@@ -105,7 +105,7 @@
 
 	NSDate *start = [NSDate date];
 	COEditingContext *ctx2 = [COEditingContext contextWithURL: [[persistentRoot store] URL]];
-	COPersistentRoot *ctx2PersistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+	COPersistentRoot *ctx2PersistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
 	NSArray *contents = [ctx2PersistentRoot.rootObject contents];
 	const NSTimeInterval time = [[NSDate date] timeIntervalSinceDate: start];
 

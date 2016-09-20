@@ -46,11 +46,11 @@
 	COObject *subchild2Ctx2 = [ctx2 loadedObjectForUUID: subchild2.UUID];
 	COObject *subchild3Ctx2 = [ctx2 loadedObjectForUUID: subchild3.UUID];
 
-	UKObjectsEqual([parent UUID], [parentCtx2 UUID]);
-	UKObjectsEqual([child UUID], [childCtx2 UUID]);
-	UKObjectsEqual([subchild1 UUID], [subchild1Ctx2 UUID]);
-	UKObjectsEqual([subchild2 UUID], [subchild2Ctx2 UUID]);
-	UKObjectsEqual([subchild3 UUID], [subchild3Ctx2 UUID]);
+	UKObjectsEqual(parent.UUID, parentCtx2.UUID);
+	UKObjectsEqual(child.UUID, childCtx2.UUID);
+	UKObjectsEqual(subchild1.UUID, subchild1Ctx2.UUID);
+	UKObjectsEqual(subchild2.UUID, subchild2Ctx2.UUID);
+	UKObjectsEqual(subchild3.UUID, subchild3Ctx2.UUID);
 	
 	// Now make some modifications to ctx2: 
 	
@@ -79,7 +79,7 @@
     UKObjectsSame(subchild4, [child valueForProperty: @"contents"][2]);
     
 	UKObjectsEqual(A(@"Pizza", @"Chips", @"Salsa"), [child valueForKeyPath: @"contents.label"]);
-	UKObjectsEqual(subchild4UUID, [subchild4 UUID]);
+	UKObjectsEqual(subchild4UUID, subchild4.UUID);
 }
 
 - (void)testMove

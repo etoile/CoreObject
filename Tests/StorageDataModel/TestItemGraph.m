@@ -23,11 +23,11 @@
 	[graph insertOrUpdateItems: @[item]];
 
 	UKNil([graph rootItemUUID]);
-	UKObjectsEqual(@[[item UUID]], [graph itemUUIDs]);
+	UKObjectsEqual(@[item.UUID], [graph itemUUIDs]);
 
 	graph.rootItemUUID = item.UUID;
 	
-	UKObjectsEqual([item UUID], [graph rootItemUUID]);
+	UKObjectsEqual(item.UUID, [graph rootItemUUID]);
 }
 
 @end

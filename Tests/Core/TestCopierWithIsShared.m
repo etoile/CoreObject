@@ -115,25 +115,25 @@ static NSArray *initialUUIDs;
 	
 	
 	UKNotNil(drawingCopyItem);
-	UKFalse([initialUUIDs containsObject: [drawingCopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: drawingCopyItem.UUID]);
 			 
 	UKNotNil(group1CopyItem);
-	UKFalse([initialUUIDs containsObject: [group1CopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: group1CopyItem.UUID]);
 
 	UKNotNil(group2CopyItem);
-	UKFalse([initialUUIDs containsObject: [group2CopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: group2CopyItem.UUID]);
 
 	UKNotNil(shape1CopyItem);
-	UKFalse([initialUUIDs containsObject: [shape1CopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: shape1CopyItem.UUID]);
 	
 	UKNotNil(shape2CopyItem);
-	UKFalse([initialUUIDs containsObject: [shape2CopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: shape2CopyItem.UUID]);
 	
 	UKNotNil(shape3CopyItem);
-	UKFalse([initialUUIDs containsObject: [shape3CopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: shape3CopyItem.UUID]);
 
 	UKNotNil(shape4CopyItem);
-	UKFalse([initialUUIDs containsObject: [shape4CopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: shape4CopyItem.UUID]);
 	
 	// Check that the copies of shape1 and shape2 have aliases to the original style1 and style2
 	UKObjectsEqual(style1, [shape1CopyItem valueForAttribute: @"refs"][0]);
@@ -142,11 +142,11 @@ static NSArray *initialUUIDs;
 	// The copy of shape3 has a reference to a copy of style2
 	
 	UKNotNil(style2CopyItem);
-	UKFalse([initialUUIDs containsObject: [style2CopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: style2CopyItem.UUID]);
 	UKObjectsEqual(@"style2", [style2CopyItem valueForAttribute: @"name"]);
 	
 	// The copy of shape4 should refer to the copy of shape3, not the original
-	UKObjectsEqual([shape3CopyItem UUID], [shape4CopyItem valueForAttribute: @"refs"][0]);
+	UKObjectsEqual(shape3CopyItem.UUID, [shape4CopyItem valueForAttribute: @"refs"][0]);
 }
 
 - (void) testCOObjectCopyWithIsSharedUnset

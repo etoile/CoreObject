@@ -245,7 +245,7 @@
 - (COPersistentRoot *)makePersistentRootWithInfo: (COPersistentRootInfo *)info
                               objectGraphContext: (COObjectGraphContext *)anObjectGrapContext
 {
-	NSParameterAssert(info == nil || nil == _loadedPersistentRoots[[info UUID]]);
+	NSParameterAssert(info == nil || nil == _loadedPersistentRoots[info.UUID]);
     
     COPersistentRoot *persistentRoot = [[COPersistentRoot alloc] initWithInfo: info
                                                         cheapCopyRevisionUUID: nil

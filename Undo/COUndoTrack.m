@@ -864,7 +864,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
                                                       userInfo: userInfo];
     // FIXME: Implement distributed notification support
     //    [[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
-    //                                                                   object: [[self UUID] stringValue]
+    //                                                                   object: [self.UUID stringValue]
     //                                                                 userInfo: userInfo
     //                                                       deliverImmediately: NO];
 }

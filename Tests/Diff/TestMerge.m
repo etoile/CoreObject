@@ -57,7 +57,7 @@
 	[(id)[ctx3 loadedObjectForUUID: child3.UUID] insertObject: [ctx3 loadedObjectForUUID: subchild1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	OutlineItem *child4Ctx3 = [ctx3 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[(id)[ctx3 loadedObjectForUUID: parent.UUID] insertObject: child4Ctx3 atIndex: 0];
-	assert([[(id)[ctx1 loadedObjectForUUID: [parent UUID]] contentArray] count] == 3);
+	assert([[(id)[ctx1 loadedObjectForUUID: parent.UUID] contentArray] count] == 3);
 	
 	// Now do the merge
     COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
@@ -241,9 +241,9 @@
 	// ctx2: insert subchild1 in child1
 	OutlineItem *subchild1Ctx2 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[(id)[ctx2 loadedObjectForUUID: child1.UUID] insertObject: subchild1Ctx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	UKObjectsSame([ctx2 loadedObjectForUUID: [child1 UUID]], [subchild1Ctx2 valueForProperty: @"parentContainer"]);
-	UKIntsEqual(1, [[(id)[ctx2 loadedObjectForUUID: [child1 UUID]] contentArray] count]);
-	UKIntsEqual(0, [[(id)[ctx2 loadedObjectForUUID: [child2 UUID]] contentArray] count]);
+	UKObjectsSame([ctx2 loadedObjectForUUID: child1.UUID], [subchild1Ctx2 valueForProperty: @"parentContainer"]);
+	UKIntsEqual(1, [[(id)[ctx2 loadedObjectForUUID: child1.UUID] contentArray] count]);
+	UKIntsEqual(0, [[(id)[ctx2 loadedObjectForUUID: child2.UUID] contentArray] count]);
 	
 	// ctx2:
 	//
@@ -259,9 +259,9 @@
 	// ctx3: insert subchild1 in child2
     [ctx3 setItemGraph: ctx2];
 	[(id)[ctx3 loadedObjectForUUID: child2.UUID] insertObject: [ctx3 loadedObjectForUUID: subchild1Ctx2.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	UKObjectsSame([ctx3 loadedObjectForUUID: [child2 UUID]], [[ctx3 loadedObjectForUUID: [subchild1Ctx2 UUID]] valueForProperty: @"parentContainer"]);
-	UKIntsEqual(0, [[(id)[ctx3 loadedObjectForUUID: [child1 UUID]] contentArray] count]);
-	UKIntsEqual(1, [[(id)[ctx3 loadedObjectForUUID: [child2 UUID]] contentArray] count]);
+	UKObjectsSame([ctx3 loadedObjectForUUID: child2.UUID], [[ctx3 loadedObjectForUUID: subchild1Ctx2.UUID] valueForProperty: @"parentContainer"]);
+	UKIntsEqual(0, [[(id)[ctx3 loadedObjectForUUID: child1.UUID] contentArray] count]);
+	UKIntsEqual(1, [[(id)[ctx3 loadedObjectForUUID: child2.UUID] contentArray] count]);
 	
 	// ctx3:
 	//
@@ -309,8 +309,8 @@
 	// ctx2: insert subchild1 in child1
 	OutlineItem *subchild1Ctx2 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[(id)[ctx2 loadedObjectForUUID: child1.UUID] insertObject: subchild1Ctx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	UKObjectsSame([ctx2 loadedObjectForUUID: [child1 UUID]], [subchild1Ctx2 valueForProperty: @"parentContainer"]);
-	UKIntsEqual(1, [[(id)[ctx2 loadedObjectForUUID: [child1 UUID]] contentArray] count]);
+	UKObjectsSame([ctx2 loadedObjectForUUID: child1.UUID], [subchild1Ctx2 valueForProperty: @"parentContainer"]);
+	UKIntsEqual(1, [[(id)[ctx2 loadedObjectForUUID: child1.UUID] contentArray] count]);
 	
 	// ctx2:
 	//
@@ -323,8 +323,8 @@
 	
 	// ctx3: insert subchild1 in child1
     [ctx3 setItemGraph: ctx2];
-	UKObjectsSame([ctx3 loadedObjectForUUID: [child1 UUID]], [[ctx3 loadedObjectForUUID: [subchild1Ctx2 UUID]] valueForProperty: @"parentContainer"]);
-    UKIntsEqual(1, [[(id)[ctx3 loadedObjectForUUID: [child1 UUID]] contents] count]);
+	UKObjectsSame([ctx3 loadedObjectForUUID: child1.UUID], [[ctx3 loadedObjectForUUID: subchild1Ctx2.UUID] valueForProperty: @"parentContainer"]);
+    UKIntsEqual(1, [[(id)[ctx3 loadedObjectForUUID: child1.UUID] contents] count]);
 	
 	// ctx3:
 	//
@@ -386,12 +386,12 @@
 	[ctx2.rootObject insertObject: child1a atIndex: 2 hint: nil forProperty: @"contents"];
     [ctx2.rootObject insertObject: child4 atIndex: 5 hint: nil forProperty: @"contents"];
     
-    UKObjectsEqual((@[[child0 UUID],
-                    [child1 UUID],
-                    [child1a UUID],
-                    [child2 UUID],
-                    [child3 UUID],
-                    [child4 UUID]]), [[[(OutlineItem *)ctx2.rootObject contents] mappedCollection] UUID]);
+    UKObjectsEqual((@[child0.UUID,
+                    child1.UUID,
+                    child1a.UUID,
+                    child2.UUID,
+                    child3.UUID,
+                    child4.UUID]), [[[(OutlineItem *)ctx2.rootObject contents] mappedCollection] UUID]);
     
 	// ctx2:
 	//
@@ -417,12 +417,12 @@
     [[ctx3.rootObject mutableArrayValueForKey: @"contents"] removeObjectAtIndex: 2];
     [[ctx3.rootObject mutableArrayValueForKey: @"contents"] insertObject: child2a atIndex: 3];
 
-    UKObjectsEqual((@[[child0 UUID],
-                    [child1 UUID],
-                    [child2 UUID],
-                    [child2a UUID],
-                    [child3 UUID],
-                    [child4 UUID]]), [[[(OutlineItem *)ctx3.rootObject contents] mappedCollection] UUID]);
+    UKObjectsEqual((@[child0.UUID,
+                    child1.UUID,
+                    child2.UUID,
+                    child2a.UUID,
+                    child3.UUID,
+                    child4.UUID]), [[[(OutlineItem *)ctx3.rootObject contents] mappedCollection] UUID]);
     
 	// ctx3:
 	//
@@ -466,13 +466,13 @@
 	//  |
 	//   \-child4    ** new (from ctx2 and ctx3)
     
-	UKObjectsEqual((@[[child0 UUID],
-                      [child1 UUID],
-                      [child1a UUID],
-                      [child2 UUID],
-                      [child2a UUID],
-                      [child3 UUID],
-                      [child4 UUID]]), [[[parent contents] mappedCollection] UUID]);
+	UKObjectsEqual((@[child0.UUID,
+                      child1.UUID,
+                      child1a.UUID,
+                      child2.UUID,
+                      child2a.UUID,
+                      child3.UUID,
+                      child4.UUID]), [[[parent contents] mappedCollection] UUID]);
 }
 
 /**
@@ -754,11 +754,11 @@
     
 	Tag *tag1Ctx2 = (Tag *)[ctx2 loadedObjectForUUID: tag1.UUID];
 	Tag *tag2Ctx2 = (Tag *)[ctx2 loadedObjectForUUID: tag2.UUID];
-	//Tag *tag3Ctx2 = (Tag *)[ctx2 loadedObjectForUUID: [tag3 UUID]];
+	//Tag *tag3Ctx2 = (Tag *)[ctx2 loadedObjectForUUID: tag3.UUID];
 	OutlineItem *childCtx2 = (OutlineItem *)[ctx2 loadedObjectForUUID: child.UUID];
 	
 	Tag *tag1Ctx3 = (Tag *)[ctx3 loadedObjectForUUID: tag1.UUID];
-	//Tag *tag2Ctx3 = (Tag *)[ctx3 loadedObjectForUUID: [tag2 UUID]];
+	//Tag *tag2Ctx3 = (Tag *)[ctx3 loadedObjectForUUID: tag2.UUID];
 	Tag *tag3Ctx3 = (Tag *)[ctx3 loadedObjectForUUID: tag3.UUID];
 	OutlineItem *childCtx3 = (OutlineItem *)[ctx3 loadedObjectForUUID: child.UUID];
 	
@@ -856,17 +856,17 @@
     UKFalse([merged hasConflicts]);
 	[merged applyTo: ctx3];
 	
-	UKIntsEqual(5, [[(OutlineItem *)[ctx3 loadedObjectForUUID: [doc UUID]] contentArray] count]);
+	UKIntsEqual(5, [[(OutlineItem *)[ctx3 loadedObjectForUUID: doc.UUID] contentArray] count]);
 
-    UKStringsEqual(@"triangle1", [[(OutlineItem *)[ctx3 loadedObjectForUUID: [doc UUID]] contentArray][0] valueForProperty: @"label"]);
-    UKStringsEqual(@"line1", [[(OutlineItem *)[ctx3 loadedObjectForUUID: [doc UUID]] contentArray][1] valueForProperty: @"label"]);
-    UKStringsEqual(@"circle1", [[(OutlineItem *)[ctx3 loadedObjectForUUID: [doc UUID]] contentArray][2] valueForProperty: @"label"]);
-    UKStringsEqual(@"square1", [[(OutlineItem *)[ctx3 loadedObjectForUUID: [doc UUID]] contentArray][3] valueForProperty: @"label"]);
-    UKStringsEqual(@"image1", [[(OutlineItem *)[ctx3 loadedObjectForUUID: [doc UUID]] contentArray][4] valueForProperty: @"label"]);
+    UKStringsEqual(@"triangle1", [[(OutlineItem *)[ctx3 loadedObjectForUUID: doc.UUID] contentArray][0] valueForProperty: @"label"]);
+    UKStringsEqual(@"line1", [[(OutlineItem *)[ctx3 loadedObjectForUUID: doc.UUID] contentArray][1] valueForProperty: @"label"]);
+    UKStringsEqual(@"circle1", [[(OutlineItem *)[ctx3 loadedObjectForUUID: doc.UUID] contentArray][2] valueForProperty: @"label"]);
+    UKStringsEqual(@"square1", [[(OutlineItem *)[ctx3 loadedObjectForUUID: doc.UUID] contentArray][3] valueForProperty: @"label"]);
+    UKStringsEqual(@"image1", [[(OutlineItem *)[ctx3 loadedObjectForUUID: doc.UUID] contentArray][4] valueForProperty: @"label"]);
 	
 	for (OutlineItem *object in [(OutlineItem *)[ctx3 loadedObjectForUUID: doc.UUID] contentArray])
 	{
-		UKObjectsSame([ctx3 loadedObjectForUUID: [doc UUID]], [object valueForProperty: @"parentContainer"]);
+		UKObjectsSame([ctx3 loadedObjectForUUID: doc.UUID], [object valueForProperty: @"parentContainer"]);
 	}
 }
 

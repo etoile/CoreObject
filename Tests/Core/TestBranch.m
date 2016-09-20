@@ -117,8 +117,8 @@
 	UKObjectsEqual(thirdRevision, originalBranch.headRevision);
 	
     // Verify that the revert to firstRevision is not committed
-    UKObjectsEqual([thirdRevision UUID],
-                   [[store persistentRootInfoForUUID: [persistentRoot UUID]] currentRevisionUUID]);
+    UKObjectsEqual(thirdRevision.UUID,
+                   [[store persistentRootInfoForUUID: persistentRoot.UUID] currentRevisionUUID]);
     
 	// First redo (Groceries -> Shopping List)
 	[originalBranch redo]; //[originalBranch setCurrentRevision: secondRevision];
@@ -266,16 +266,16 @@
 	
     [persistentRoot commit];
     
-	UKObjectsEqual([rev2 UUID], [[[store persistentRootInfoForUUID: [persistentRoot UUID]]
-                                            branchInfoForUUID: [originalBranch UUID]] currentRevisionUUID]);
-	UKObjectsEqual([rev6 UUID], [[[store persistentRootInfoForUUID: [persistentRoot UUID]]
-                                         branchInfoForUUID: [branch1 UUID]] currentRevisionUUID]);
-	UKObjectsEqual([rev5 UUID], [[[store persistentRootInfoForUUID: [persistentRoot UUID]]
-                                         branchInfoForUUID: [branch2 UUID]] currentRevisionUUID]);
+	UKObjectsEqual(rev2.UUID, [[[store persistentRootInfoForUUID: persistentRoot.UUID]
+                                            branchInfoForUUID: originalBranch.UUID] currentRevisionUUID]);
+	UKObjectsEqual(rev6.UUID, [[[store persistentRootInfoForUUID: persistentRoot.UUID]
+                                         branchInfoForUUID: branch1.UUID] currentRevisionUUID]);
+	UKObjectsEqual(rev5.UUID, [[[store persistentRootInfoForUUID: persistentRoot.UUID]
+                                         branchInfoForUUID: branch2.UUID] currentRevisionUUID]);
 	
-//	NSArray *parentTrackUUIDs = A([initialTrack UUID], [branch1 UUID]);
+//	NSArray *parentTrackUUIDs = A(initialTrack.UUID, branch1.UUID);
 //	
-//	UKObjectsEqual(parentTrackUUIDs, [store parentTrackUUIDsForCommitTrackUUID: [branch2 UUID]]);
+//	UKObjectsEqual(parentTrackUUIDs, [store parentTrackUUIDsForCommitTrackUUID: branch2.UUID]);
 //	UKObjectsEqual(A(rev1, rev2, rev5), [[[branch2 loadedNodes] mappedCollection] revision]);
 //	
 //	[object setValue: @"Boum" forProperty: @"label"];
@@ -308,23 +308,23 @@
     
     UKFalse([[branchA objectGraphContext] hasChanges]);
     UKTrue([[branchB objectGraphContext] hasChanges]);
-    UKObjectsEqual(S([branchBroot UUID]), SA([[branchA objectGraphContext] itemUUIDs]));
-    UKObjectsEqual(S([branchBroot UUID]), SA([[branchB objectGraphContext] itemUUIDs]));
+    UKObjectsEqual(S(branchBroot.UUID), SA([[branchA objectGraphContext] itemUUIDs]));
+    UKObjectsEqual(S(branchBroot.UUID), SA([[branchB objectGraphContext] itemUUIDs]));
     
     COObject *childB = [branchB.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     [childB setValue: @"childB" forProperty: @"label"];
     
     UKFalse([[branchA objectGraphContext] hasChanges]);
     UKTrue([[branchB objectGraphContext] hasChanges]);
-    UKObjectsEqual(S([branchBroot UUID]),                SA([[branchA objectGraphContext] itemUUIDs]));
-    UKObjectsEqual(S([branchBroot UUID], [childB UUID]), SA([[branchB objectGraphContext] itemUUIDs]));
+    UKObjectsEqual(S(branchBroot.UUID),                SA([[branchA objectGraphContext] itemUUIDs]));
+    UKObjectsEqual(S(branchBroot.UUID, childB.UUID), SA([[branchB objectGraphContext] itemUUIDs]));
     
     [branchBroot insertObject: childB atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 
     UKFalse([[branchA objectGraphContext] hasChanges]);
     UKTrue([[branchB objectGraphContext] hasChanges]);
-    UKObjectsEqual(S([branchBroot UUID]),                SA([[branchA objectGraphContext] itemUUIDs]));
-    UKObjectsEqual(S([branchBroot UUID], [childB UUID]), SA([[branchB objectGraphContext] itemUUIDs]));
+    UKObjectsEqual(S(branchBroot.UUID),                SA([[branchA objectGraphContext] itemUUIDs]));
+    UKObjectsEqual(S(branchBroot.UUID, childB.UUID), SA([[branchB objectGraphContext] itemUUIDs]));
     
     [ctx commit];
     
@@ -357,7 +357,7 @@
         
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: store.URL];
-        UKNil([[[ctx2 persistentRootForUUID: [persistentRoot UUID]] currentBranch] label]);
+        UKNil([[[ctx2 persistentRootForUUID: persistentRoot.UUID] currentBranch] label]);
     }
     
     [ctx commit];
@@ -410,7 +410,7 @@
     
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: store.URL];
-        UKObjectsEqual(@{}, [[[ctx2 persistentRootForUUID: [persistentRoot UUID]] currentBranch] metadata]);
+        UKObjectsEqual(@{}, [[[ctx2 persistentRootForUUID: persistentRoot.UUID] currentBranch] metadata]);
     }
     
     [ctx commit];
@@ -517,13 +517,13 @@
 		 // Check for the proper contents
 		 
 		 UKObjectsEqual(@"1", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: initialBranchRev] rootObject] label]);
-		 UKObjectsEqual(@"0", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: initialBranchRev] loadedObjectForUUID: [childObj UUID]] label]);
+		 UKObjectsEqual(@"0", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: initialBranchRev] loadedObjectForUUID: childObj.UUID] label]);
 		 
 		 UKObjectsEqual(@"0", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: secondBranchRev] rootObject] label]);
-		 UKObjectsEqual(@"2", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: secondBranchRev] loadedObjectForUUID: [childObj UUID]] label]);
+		 UKObjectsEqual(@"2", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: secondBranchRev] loadedObjectForUUID: childObj.UUID] label]);
 		 
 		 UKObjectsEqual(@"0", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: initialRev] rootObject] label]);
-		 UKObjectsEqual(@"0", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: initialRev] loadedObjectForUUID: [childObj UUID]] label]);
+		 UKObjectsEqual(@"0", [(OutlineItem *)[[testProot objectGraphContextForPreviewingRevision: initialRev] loadedObjectForUUID: childObj.UUID] label]);
 	 }];
     
     initialBranch.mergingBranch = secondBranch;

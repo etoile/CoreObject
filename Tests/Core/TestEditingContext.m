@@ -282,11 +282,11 @@
         pendingUndeletion.deleted = NO;
         
         // Check that the constraints we wanted to set up hold
-        UKTrue([[store persistentRootUUIDs] containsObject: [regular UUID]]);
-        UKTrue([[store deletedPersistentRootUUIDs] containsObject: [deletedOnDisk UUID]]);
-        UKNil([store persistentRootInfoForUUID: [pendingInsertion UUID]]);
-        UKTrue([[store persistentRootUUIDs] containsObject: [pendingDeletion UUID]]);
-        UKTrue([[store deletedPersistentRootUUIDs] containsObject: [pendingUndeletion UUID]]);
+        UKTrue([[store persistentRootUUIDs] containsObject: regular.UUID]);
+        UKTrue([[store deletedPersistentRootUUIDs] containsObject: deletedOnDisk.UUID]);
+        UKNil([store persistentRootInfoForUUID: pendingInsertion.UUID]);
+        UKTrue([[store persistentRootUUIDs] containsObject: pendingDeletion.UUID]);
+        UKTrue([[store deletedPersistentRootUUIDs] containsObject: pendingUndeletion.UUID]);
 		UKTrue(deletedOnDisk.deleted);
 		UKTrue(pendingDeletion.deleted);
 		UKFalse(pendingUndeletion.deleted);
@@ -300,11 +300,11 @@
     UKObjectsEqual(S(pendingDeletion), [ctx persistentRootsPendingDeletion]);
     UKObjectsEqual(S(pendingUndeletion), [ctx persistentRootsPendingUndeletion]);
 
-	UKObjectsEqual(regular, [ctx persistentRootForUUID: [regular UUID]]);
-	UKObjectsEqual(deletedOnDisk, [ctx persistentRootForUUID: [deletedOnDisk UUID]]);
-   	UKObjectsEqual(pendingInsertion, [ctx persistentRootForUUID: [pendingInsertion UUID]]);
-	UKObjectsEqual(pendingDeletion, [ctx persistentRootForUUID: [pendingDeletion UUID]]);
-   	UKObjectsEqual(pendingUndeletion, [ctx persistentRootForUUID: [pendingUndeletion UUID]]);
+	UKObjectsEqual(regular, [ctx persistentRootForUUID: regular.UUID]);
+	UKObjectsEqual(deletedOnDisk, [ctx persistentRootForUUID: deletedOnDisk.UUID]);
+   	UKObjectsEqual(pendingInsertion, [ctx persistentRootForUUID: pendingInsertion.UUID]);
+	UKObjectsEqual(pendingDeletion, [ctx persistentRootForUUID: pendingDeletion.UUID]);
+   	UKObjectsEqual(pendingUndeletion, [ctx persistentRootForUUID: pendingUndeletion.UUID]);
 
     // 3. Test what happens when we commit (all pending changes are made and no longer pending)
     

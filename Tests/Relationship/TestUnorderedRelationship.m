@@ -503,8 +503,14 @@
 	
 	// Access collection to trigger loading
 	UKIntsEqual(2, group1ctx2.contents.count);
-	OutlineItem *item1ctx2 = [[group1ctx2.contents objectsPassingTest:^(id obj, BOOL*stop){ return [[obj UUID] isEqual: item1.UUID]; }] anyObject];
-	OutlineItem *item2ctx2 = [[group1ctx2.contents objectsPassingTest:^(id obj, BOOL*stop){ return [[obj UUID] isEqual: item2.UUID]; }] anyObject];
+	OutlineItem *item1ctx2 = [[group1ctx2.contents objectsPassingTest: ^(COObject *obj, BOOL *stop)
+	{
+		return [obj.UUID isEqual: item1.UUID];
+	}] anyObject];
+	OutlineItem *item2ctx2 = [[group1ctx2.contents objectsPassingTest: ^(COObject *obj, BOOL *stop)
+	{
+		return [obj.UUID isEqual: item2.UUID];
+	}] anyObject];
 	UKObjectsEqual(item1.UUID, item1ctx2.UUID);
 	UKObjectsEqual(item2.UUID, item2ctx2.UUID);
 	UKNotNil([ctx2 loadedPersistentRootForUUID: item1uuid]);

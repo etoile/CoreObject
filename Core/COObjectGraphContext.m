@@ -615,7 +615,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 {
     NSParameterAssert([anObject objectGraphContext] == self);
 	// i.e., the root object can be set once and never changed.
-	NSParameterAssert(_rootObjectUUID == nil || [_rootObjectUUID isEqual: [anObject UUID]]);
+	NSParameterAssert(_rootObjectUUID == nil || [_rootObjectUUID isEqual: anObject.UUID]);
 	
     _rootObjectUUID =  anObject.UUID;
 }

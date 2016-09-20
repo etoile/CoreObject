@@ -802,7 +802,7 @@ static ETUUID *childUUID2;
 		UKTrue([store commitStoreTransaction: txn]);
 	}
     
-    UKObjectsEqual(S(prootUUID, [copy UUID]), [NSSet setWithArray:[store persistentRootUUIDs]]);
+    UKObjectsEqual(S(prootUUID, copy.UUID), [NSSet setWithArray:[store persistentRootUUIDs]]);
 
     // 1. check setup
     
@@ -810,7 +810,7 @@ static ETUUID *childUUID2;
     UKNil([[copy currentBranchInfo] metadata]);
     
     // Verify that new UUIDs were generated
-    UKObjectsNotEqual(prootUUID, [copy UUID]);
+    UKObjectsNotEqual(prootUUID, copy.UUID);
     UKObjectsNotEqual([proot branchUUIDs], [copy branchUUIDs]);
     UKIntsEqual(1,  [[copy branchUUIDs] count]);
     
@@ -830,8 +830,8 @@ static ETUUID *childUUID2;
     // Make sure the persistent root state returned from createPersistentRoot matches what the store
     // gives us when we read it back.
 
-    UKObjectsEqual(copy.branchUUIDs, [store persistentRootInfoForUUID: [copy UUID]].branchUUIDs);
-    UKObjectsEqual([[copy currentBranchInfo] currentRevisionUUID], [[store persistentRootInfoForUUID: [copy UUID]] currentBranchInfo].currentRevisionUUID);
+    UKObjectsEqual(copy.branchUUIDs, [store persistentRootInfoForUUID: copy.UUID].branchUUIDs);
+    UKObjectsEqual([[copy currentBranchInfo] currentRevisionUUID], [[store persistentRootInfoForUUID: copy.UUID] currentBranchInfo].currentRevisionUUID);
     
     // 2. try changing. Verify that proot and copy are totally independent
 
@@ -883,7 +883,7 @@ static ETUUID *childUUID2;
     UKNotNil(uuid);
     
     COSQLiteStore *store2 = [[COSQLiteStore alloc] initWithURL: store.URL];
-    UKObjectsEqual(uuid, [store2 UUID]);
+    UKObjectsEqual(uuid, store2.UUID);
     
 }
 
@@ -902,8 +902,8 @@ static ETUUID *childUUID2;
 														initialRevisionUUID: branchARevisionUUIDs.lastObject];
     UKTrue([store commitStoreTransaction: txn]);
 
-    UKObjectsEqual(rootUUID, [store rootObjectUUIDForPersistentRoot: [proot UUID]]);
-    UKObjectsEqual(rootUUID, [store rootObjectUUIDForPersistentRoot: [cheapCopy UUID]]);
+    UKObjectsEqual(rootUUID, [store rootObjectUUIDForPersistentRoot: proot.UUID]);
+    UKObjectsEqual(rootUUID, [store rootObjectUUIDForPersistentRoot: cheapCopy.UUID]);
     UKObjectsEqual(initialBranchUUID, [[store persistentRootInfoForUUID: prootUUID] currentBranchUUID]);
     UKObjectsEqual(cheapCopyBranchUUID, [[store persistentRootInfoForUUID: cheapCopyUUID] currentBranchUUID]);
 }

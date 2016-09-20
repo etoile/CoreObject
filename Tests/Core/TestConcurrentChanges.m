@@ -135,8 +135,8 @@
     testBranch.deleted = YES;
     [ctx commit];
 
-    UKTrue([[[store persistentRootInfoForUUID: [persistentRoot UUID]]
-             branchInfoForUUID: [testBranch UUID]]
+    UKTrue([[[store persistentRootInfoForUUID: persistentRoot.UUID]
+             branchInfoForUUID: testBranch.UUID]
             isDeleted]);
     
     COStoreTransaction *txn = [[COStoreTransaction alloc] init];
@@ -262,7 +262,7 @@
         }
     }
     UKTrue(found);
-    UKNotNil([ctx persistentRootForUUID: [info UUID]]);
+    UKNotNil([ctx persistentRootForUUID: info.UUID]);
     UKFalse([ctx hasChanges]);
 }
 

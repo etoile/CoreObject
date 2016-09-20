@@ -176,7 +176,7 @@ static ETUUID *rootUUID;
         
         // Check we can still read the initial revision
         
-        UKObjectsEqual([self makeInitialItemGraph], [store itemGraphForRevisionUUID: [info currentRevisionUUID] persistentRoot: [info UUID]]);
+        UKObjectsEqual([self makeInitialItemGraph], [store itemGraphForRevisionUUID: [info currentRevisionUUID] persistentRoot: info.UUID]);
     }
     
     assert([[NSFileManager defaultManager] removeItemAtPath: dir error: NULL]);

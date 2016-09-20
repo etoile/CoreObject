@@ -17,7 +17,7 @@
 - (void)testBaseRevision
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    UKNotNil([persistentRoot UUID]);
+    UKNotNil(persistentRoot.UUID);
     
 	COObject *obj = persistentRoot.rootObject;
 	UKNil([obj revision]);

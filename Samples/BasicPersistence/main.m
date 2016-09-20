@@ -138,7 +138,7 @@ void ShowStoreContentsForContext(COEditingContext *ctx)
 
 	for (COPersistentRoot *persistentRoot in ctx.persistentRoots)
 	{
-		NSLog(@"\tPersistent root %@ (root object class: %@)", [persistentRoot UUID], [persistentRoot.rootObject class]);
+		NSLog(@"\tPersistent root %@ (root object class: %@)", persistentRoot.UUID, [persistentRoot.rootObject class]);
 		
 		if (![persistentRoot.rootObject isKindOfClass: [Calendar class]])
 			continue;
@@ -149,7 +149,7 @@ void ShowStoreContentsForContext(COEditingContext *ctx)
 		{
 			assert(appointment.calendar == calendar);
 
-			NSLog(@"\t\tAppointment %@: %@ - %@", [appointment UUID], [appointment startDate], [appointment endDate]);
+			NSLog(@"\t\tAppointment %@: %@ - %@", appointment.UUID, [appointment startDate], [appointment endDate]);
 		}
 	}
 }

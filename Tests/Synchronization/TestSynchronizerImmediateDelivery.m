@@ -33,8 +33,8 @@
 	UKNotNil(clientBranch);
 	UKNotNil(clientPersistentRoot.currentBranch);
 	UKObjectsSame(clientBranch, clientPersistentRoot.currentBranch);
-	UKObjectsEqual([serverPersistentRoot UUID], [clientPersistentRoot UUID]);
-	UKObjectsEqual([serverBranch UUID], [clientBranch UUID]);
+	UKObjectsEqual(serverPersistentRoot.UUID, clientPersistentRoot.UUID);
+	UKObjectsEqual(serverBranch.UUID, clientBranch.UUID);
 	UKObjectsEqual([serverBranch.rootObject UUID], [clientBranch.rootObject UUID]);
 }
 

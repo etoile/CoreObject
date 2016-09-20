@@ -110,8 +110,8 @@ static ETUUID *rootUUID;
     UKObjectsNotEqual([prootARevInfo revisionUUID], [prootBRevInfo revisionUUID]);
     UKObjectsEqual([prootARevInfo revisionUUID], [prootBRevInfo parentRevisionUUID]);
     
-    UKObjectsEqual([self prootAitemTree], [self currentItemGraphForPersistentRoot: [prootA UUID]]);
-    UKObjectsEqual([self prooBitemTree], [self currentItemGraphForPersistentRoot: [prootB UUID]]);
+    UKObjectsEqual([self prootAitemTree], [self currentItemGraphForPersistentRoot: prootA.UUID]);
+    UKObjectsEqual([self prooBitemTree], [self currentItemGraphForPersistentRoot: prootB.UUID]);
 	
 	NSDictionary *prootAAttrs = [store attributesForPersistentRootWithUUID: prootA.UUID];
 	NSDictionary *prootBAttrs = [store attributesForPersistentRootWithUUID: prootB.UUID];
@@ -138,16 +138,16 @@ static ETUUID *rootUUID;
 		UKTrue([store commitStoreTransaction: txn]);
 	}
 
-    UKTrue([store finalizeDeletionsForPersistentRoot: [prootA UUID] error: NULL]);
+    UKTrue([store finalizeDeletionsForPersistentRoot: prootA.UUID error: NULL]);
 
-    UKNil([store persistentRootInfoForUUID: [prootA UUID]]);
+    UKNil([store persistentRootInfoForUUID: prootA.UUID]);
     
     // prootB should be unaffected. Both commits should be accessible.
     
-    UKNotNil([store persistentRootInfoForUUID: [prootB UUID]]);
+    UKNotNil([store persistentRootInfoForUUID: prootB.UUID]);
 
-    UKObjectsEqual([self prootAitemTree], [store itemGraphForRevisionUUID: [prootA currentRevisionUUID] persistentRoot: [prootA UUID]]);
-    UKObjectsEqual([self prooBitemTree], [store itemGraphForRevisionUUID: [prootB currentRevisionUUID] persistentRoot: [prootB UUID]]);
+    UKObjectsEqual([self prootAitemTree], [store itemGraphForRevisionUUID: [prootA currentRevisionUUID] persistentRoot: prootA.UUID]);
+    UKObjectsEqual([self prooBitemTree], [store itemGraphForRevisionUUID: [prootB currentRevisionUUID] persistentRoot: prootB.UUID]);
 }
 
 - (void) testDeleteCopiedPersistentRoot
@@ -159,16 +159,16 @@ static ETUUID *rootUUID;
 		UKTrue([store commitStoreTransaction: txn]);
 	}
 
-    UKTrue([store finalizeDeletionsForPersistentRoot: [prootB UUID] error: NULL]);
+    UKTrue([store finalizeDeletionsForPersistentRoot: prootB.UUID error: NULL]);
     
-    UKNil([store persistentRootInfoForUUID: [prootB UUID]]);
+    UKNil([store persistentRootInfoForUUID: prootB.UUID]);
     
     // prootA should be unaffected. Only the first commit should be accessible.
     
-    UKNotNil([store persistentRootInfoForUUID: [prootA UUID]]);
+    UKNotNil([store persistentRootInfoForUUID: prootA.UUID]);
     
-    UKObjectsEqual([self prootAitemTree], [store itemGraphForRevisionUUID: [prootA currentRevisionUUID] persistentRoot: [prootA UUID]]);
-    UKNil([store itemGraphForRevisionUUID: [prootB currentRevisionUUID] persistentRoot: [prootB UUID]]);
+    UKObjectsEqual([self prootAitemTree], [store itemGraphForRevisionUUID: [prootA currentRevisionUUID] persistentRoot: prootA.UUID]);
+    UKNil([store itemGraphForRevisionUUID: [prootB currentRevisionUUID] persistentRoot: prootB.UUID]);
 }
 
 @end

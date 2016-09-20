@@ -127,13 +127,13 @@ static ETUUID *branchBUUID;
                                                                          forKey: @"replcatedBranch"] firstObject];
 
     // Check out the 3 branches
-    UKObjectsEqual(branchAUUID, [currentBranch UUID]);
+    UKObjectsEqual(branchAUUID, currentBranch.UUID);
     
     UKNotNil(replicatedBranchB);
-    UKObjectsNotEqual(branchBUUID, [replicatedBranchB UUID]);
+    UKObjectsNotEqual(branchBUUID, replicatedBranchB.UUID);
 
     UKNotNil(replicatedBranchA);
-    UKObjectsNotEqual(branchAUUID, [replicatedBranchA UUID]);
+    UKObjectsNotEqual(branchAUUID, replicatedBranchA.UUID);
     
     // Check out the revisions of the branches
 
@@ -141,9 +141,9 @@ static ETUUID *branchBUUID;
     UKObjectsEqual([serverInfo currentRevisionUUID], [replicatedBranchA currentRevisionUUID]);
     UKObjectsEqual([serverInfo currentRevisionUUID], [replicatedBranchB currentRevisionUUID]);
     
-	UKObjectsEqual([self itemGraphWithLabel: @"1"], [self currentItemGraphForBranch: [currentBranch UUID]]);
-    UKObjectsEqual([self itemGraphWithLabel: @"1"], [self currentItemGraphForBranch: [replicatedBranchA UUID]]);
-    UKObjectsEqual([self itemGraphWithLabel: @"1"], [self currentItemGraphForBranch: [replicatedBranchB UUID]]);
+	UKObjectsEqual([self itemGraphWithLabel: @"1"], [self currentItemGraphForBranch: currentBranch.UUID]);
+    UKObjectsEqual([self itemGraphWithLabel: @"1"], [self currentItemGraphForBranch: replicatedBranchA.UUID]);
+    UKObjectsEqual([self itemGraphWithLabel: @"1"], [self currentItemGraphForBranch: replicatedBranchB.UUID]);
     
     UKNil([currentBranch metadata][@"source"]);
     UKObjectsEqual(@"server", [replicatedBranchA metadata][@"source"]);
@@ -220,8 +220,8 @@ static ETUUID *branchBUUID;
     
     // The replicated branch should have been update, but the other branch should not have
     
-    UKObjectsEqual([self itemGraphWithLabel: @"1"], [self currentItemGraphForBranch: [currentBranch UUID]]);
-    UKObjectsEqual([self itemGraphWithLabel: @"2"], [self currentItemGraphForBranch: [replicatedBranchA UUID]]);
+    UKObjectsEqual([self itemGraphWithLabel: @"1"], [self currentItemGraphForBranch: currentBranch.UUID]);
+    UKObjectsEqual([self itemGraphWithLabel: @"2"], [self currentItemGraphForBranch: replicatedBranchA.UUID]);
 }
 
 // This test broke when I added the constraint that writing a revision fails if
@@ -298,11 +298,11 @@ static ETUUID *branchBUUID;
     COBranchInfo *replicatedCheapCopyBranch = [[clientCheapCopyInfo branchInfosWithMetadataValue: [cheapCopyBranchUUID stringValue]
                                                                                           forKey: @"replcatedBranch"] firstObject];
 
-    UKObjectsEqual(cheapCopyBranchUUID, [currentBranch UUID]);
-    UKObjectsNotEqual(cheapCopyBranchUUID, [replicatedCheapCopyBranch UUID]);
+    UKObjectsEqual(cheapCopyBranchUUID, currentBranch.UUID);
+    UKObjectsNotEqual(cheapCopyBranchUUID, replicatedCheapCopyBranch.UUID);
     
-    UKObjectsEqual([self itemGraphWithLabel: @"2"], [self currentItemGraphForBranch: [currentBranch UUID]]);
-    UKObjectsEqual([self itemGraphWithLabel: @"2"], [self currentItemGraphForBranch: [replicatedCheapCopyBranch UUID]]);
+    UKObjectsEqual([self itemGraphWithLabel: @"2"], [self currentItemGraphForBranch: currentBranch.UUID]);
+    UKObjectsEqual([self itemGraphWithLabel: @"2"], [self currentItemGraphForBranch: replicatedCheapCopyBranch.UUID]);
     
     // Ideally it shares the same backing store as the original persistent root. But that's not going to be easy to do.
 }
@@ -380,8 +380,8 @@ static ETUUID *branchBUUID;
     
     // The replicated branch should have been update, but the other branch should not have
     
-    UKObjectsEqual([self itemGraphWithLabel: @"1"], [self currentItemGraphForBranch: [currentBranch UUID] store: serverStore]);
-    UKObjectsEqual([self itemGraphWithLabel: @"2"], [self currentItemGraphForBranch: [replicatedBranchA UUID] store: serverStore]);
+    UKObjectsEqual([self itemGraphWithLabel: @"1"], [self currentItemGraphForBranch: currentBranch.UUID store: serverStore]);
+    UKObjectsEqual([self itemGraphWithLabel: @"2"], [self currentItemGraphForBranch: replicatedBranchA.UUID store: serverStore]);
 }
 
 - (void)testPullFromServerToClientThenClientToServerAndClientToServer

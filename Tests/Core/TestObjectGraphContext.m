@@ -84,7 +84,7 @@
 	OutlineItem *child = [self addObjectWithLabel: @"Groceries" toObject: parent];
 	OutlineItem *subchild = [self addObjectWithLabel: @"Pizza" toObject: child];
     
-    UKObjectsEqual(S([ctx1.rootObject UUID], [parent UUID], [child UUID], [subchild UUID]),
+    UKObjectsEqual(S([ctx1.rootObject UUID], parent.UUID, child.UUID, subchild.UUID),
                    [NSSet setWithArray: [ctx1 itemUUIDs]]);
     
     UKObjectsEqual(S([ctx2.rootObject UUID]),
@@ -96,13 +96,13 @@
                                             fromGraph: ctx1
                                               toGraph: ctx2];
 
-    UKObjectsNotEqual(parentCopyUUID, [parent UUID]);
+    UKObjectsNotEqual(parentCopyUUID, parent.UUID);
     UKIntsEqual(4, [[ctx2 itemUUIDs] count]);
     
     // Remember, we aggressively rename everything when copying across
     // contexts now.
     UKFalse([[NSSet setWithArray: [ctx2 itemUUIDs]] intersectsSet:
-             S([parent UUID], [child UUID], [subchild UUID])]);
+             S(parent.UUID, child.UUID, subchild.UUID)]);
 }
 
 - (void)testCopyingBetweenContextsCornerCases
@@ -132,10 +132,10 @@
     OutlineItem *o2copy = [[o1copy valueForKey: @"contents"] firstObject];
 	OutlineItem *o2copy2 = [[o1copy2 valueForKey: @"contents"] firstObject];
     
-    UKObjectsNotEqual([o1 UUID], [o1copy UUID]);
-    UKObjectsNotEqual([o2 UUID], [o2copy UUID]);
-    UKObjectsNotEqual([o1 UUID], [o1copy2 UUID]);
-    UKObjectsNotEqual([o2 UUID], [o2copy2 UUID]);
+    UKObjectsNotEqual(o1.UUID, o1copy.UUID);
+    UKObjectsNotEqual(o2.UUID, o2copy.UUID);
+    UKObjectsNotEqual(o1.UUID, o1copy2.UUID);
+    UKObjectsNotEqual(o2.UUID, o2copy2.UUID);
 }
 
 - (void)testItemForUUID
@@ -156,12 +156,12 @@
 
 - (void) testItemUUIDsWithInsertedObject
 {
-	UKObjectsEqual(S([root1 UUID]), SA([ctx1 itemUUIDs]));
+	UKObjectsEqual(S(root1.UUID), SA([ctx1 itemUUIDs]));
 	
     OutlineItem *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
 	
-	UKObjectsEqual(S([root1 UUID], [tag1 UUID]), SA([ctx1 itemUUIDs]));
-	UKNotNil([ctx1 itemForUUID: [tag1 UUID]]);
+	UKObjectsEqual(S(root1.UUID, tag1.UUID), SA([ctx1 itemUUIDs]));
+	UKNotNil([ctx1 itemForUUID: tag1.UUID]);
 }
 
 #pragma mark - -insertOrUpdateItems: and -setItemGraph:
@@ -226,7 +226,7 @@
 	UKObjectsEqual(S(), ctx1.insertedObjectUUIDs);
 	UKObjectsEqual(S(root1.UUID), ctx1.updatedObjectUUIDs);
 	
-    UKObjectsSame(root1, [ctx1 loadedObjectForUUID: [mutableItem UUID]]);
+    UKObjectsSame(root1, [ctx1 loadedObjectForUUID: mutableItem.UUID]);
 }
 
 #pragma mark -
@@ -317,8 +317,8 @@
     COItemGraph *graph = COItemGraphFromJSONData(data);
     
     UKTrue(COItemGraphEqualToItemGraph(ctx1, graph));
-    UKObjectsEqual([root1 UUID], [graph rootItemUUID]);
-    UKObjectsEqual([root1 storeItem], [graph itemForUUID: [root1 UUID]]);
+    UKObjectsEqual(root1.UUID, [graph rootItemUUID]);
+    UKObjectsEqual([root1 storeItem], [graph itemForUUID: root1.UUID]);
     
     // Test binary roundtrip
 
@@ -326,8 +326,8 @@
     COItemGraph *bingraph = COItemGraphFromBinaryData(bindata);
     
     UKTrue(COItemGraphEqualToItemGraph(ctx1, bingraph));
-    UKObjectsEqual([root1 UUID], [bingraph rootItemUUID]);
-    UKObjectsEqual([root1 storeItem], [bingraph itemForUUID: [root1 UUID]]);
+    UKObjectsEqual(root1.UUID, [bingraph rootItemUUID]);
+    UKObjectsEqual([root1 storeItem], [bingraph itemForUUID: root1.UUID]);
     
     // TODO: We should have tests for COItemGraphEqualToItemGraph since we
     // rely on it in checking the correctness of COItemGraphToJSONData

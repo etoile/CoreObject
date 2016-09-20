@@ -177,13 +177,13 @@ selective undo is involved. */
     
 	/* Sixth and fifth commit undone ('doc' revision) */
     
-    UKNotNil([docPersistentRoot loadedObjectForUUID: [para2 UUID]]);
+    UKNotNil([docPersistentRoot loadedObjectForUUID: para2.UUID]);
     UKObjectsEqual((@[para1, para2]), [doc contents]);
 	[_testTrack undo];
 	[_testTrack undo];
 	UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
 	// i.e., check for garbage collection
-	UKNil([docPersistentRoot loadedObjectForUUID: [para2 UUID]]);
+	UKNil([docPersistentRoot loadedObjectForUUID: para2.UUID]);
 	UKObjectsEqual(@[para1], [doc contents]);
 
 	/* Fourth commit undone ('object' revision) */
@@ -193,9 +193,9 @@ selective undo is involved. */
 
 	/* Third commit call undone (two underlying commits, one on 'doc' and one on 'object') */
 
-    UKNotNil([docPersistentRoot loadedObjectForUUID: [para1 UUID]]);
+    UKNotNil([docPersistentRoot loadedObjectForUUID: para1.UUID]);
 	[_testTrack undo];
-	UKNil([docPersistentRoot loadedObjectForUUID: [para1 UUID]]);
+	UKNil([docPersistentRoot loadedObjectForUUID: para1.UUID]);
     UKObjectsEqual(@[], [doc contents]);
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
 
@@ -209,15 +209,15 @@ selective undo is involved. */
     /***********************************************/
     
 	// Just check the object creation hasn't been undone
-	UKNotNil([objectPersistentRoot loadedObjectForUUID: [object UUID]]);
+	UKNotNil([objectPersistentRoot loadedObjectForUUID: object.UUID]);
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
 
 	/* Second commit redone */
 
 	[_testTrack redo];
     UKFalse(docPersistentRoot.deleted);
-	UKNotNil([docPersistentRoot loadedObjectForUUID: [doc UUID]]);
-	UKObjectsSame(doc, [docPersistentRoot loadedObjectForUUID: [doc UUID]]);
+	UKNotNil([docPersistentRoot loadedObjectForUUID: doc.UUID]);
+	UKObjectsSame(doc, [docPersistentRoot loadedObjectForUUID: doc.UUID]);
 	UKStringsEqual(@"Document", [doc valueForProperty: @"label"]);
 
 	/* Third commit redone (involve two underlying commits) */
@@ -233,8 +233,8 @@ selective undo is involved. */
 	/* Third commit redone (involve two underlying commits) */
 
 	[_testTrack redo];
-	UKNotNil([docPersistentRoot loadedObjectForUUID: [para1 UUID]]);
-	UKObjectsNotSame(para1, [docPersistentRoot loadedObjectForUUID: [para1 UUID]]);
+	UKNotNil([docPersistentRoot loadedObjectForUUID: para1.UUID]);
+	UKObjectsNotSame(para1, [docPersistentRoot loadedObjectForUUID: para1.UUID]);
 
 	// Get the new restored object instance
 	para1 = (OutlineItem *)[docPersistentRoot loadedObjectForUUID: para1.UUID];
@@ -249,8 +249,8 @@ selective undo is involved. */
     UKFalse([_testTrack canRedo]);
 	UKStringsEqual(@"Todo", [object valueForProperty: @"label"]);
 	UKStringsEqual(@"paragraph with different contents", [para1 valueForProperty: @"label"]);
-	UKNotNil([docPersistentRoot loadedObjectForUUID: [para2 UUID]]);
-	UKObjectsNotSame(para2, [docPersistentRoot loadedObjectForUUID: [para2 UUID]]);
+	UKNotNil([docPersistentRoot loadedObjectForUUID: para2.UUID]);
+	UKObjectsNotSame(para2, [docPersistentRoot loadedObjectForUUID: para2.UUID]);
 
 	// Get the new restored object instance
 	para2 = (OutlineItem *)[docPersistentRoot loadedObjectForUUID: para2.UUID];

@@ -155,10 +155,10 @@ static ETUUID *drawing2;
     
 	// Copy the tag collection to ctx2.
 	
-    ETUUID *tag1copyUUID = [copier copyItemWithUUID: [tag1 UUID]
+    ETUUID *tag1copyUUID = [copier copyItemWithUUID: tag1.UUID
                                           fromGraph: ctx1
                                             toGraph: ctx2];
-    UKObjectsNotEqual(tag1copyUUID, [tag1 UUID]);
+    UKObjectsNotEqual(tag1copyUUID, tag1.UUID);
     
     COObject *tag1copy = [ctx2 loadedObjectForUUID: tag1copyUUID];
     
@@ -168,7 +168,7 @@ static ETUUID *drawing2;
     UKIntsEqual(1, [refs count]);
     
     COObject *childcopy = [refs anyObject];
-    UKObjectsNotEqual([childcopy UUID], [child UUID]);
+    UKObjectsNotEqual(childcopy.UUID, child.UUID);
     UKObjectsEqual(@"OutlineItem", [childcopy valueForKey: kCOLabel]);
     
     // FIXME: At first glance this looks like ugly behaviour.

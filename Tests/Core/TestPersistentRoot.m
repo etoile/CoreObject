@@ -77,10 +77,10 @@
 	
 	COBranch *branch = [originalBranch makeBranchWithLabel: @"Sandbox"];
 	UKNotNil(branch);
-	UKObjectsNotEqual([branch UUID], [originalBranch UUID]);
+	UKObjectsNotEqual(branch.UUID, originalBranch.UUID);
     
     /* Verify that the branch creation is not committed yet. */
-    UKIntsEqual(1, [[[[store persistentRootInfoForUUID: [persistentRoot UUID]] branchForUUID] allKeys] count]);
+    UKIntsEqual(1, [[[[store persistentRootInfoForUUID: persistentRoot.UUID] branchForUUID] allKeys] count]);
     
     [persistentRoot commit];
 	
@@ -89,7 +89,7 @@
 	 {
 		 UKIntsEqual(2, [[testProot branches] count]);
 		 UKStringsEqual(@"Sandbox", [testBranch label]);
-		 UKObjectsEqual([originalBranch UUID], [[testBranch parentBranch] UUID]);
+		 UKObjectsEqual(originalBranch.UUID, [[testBranch parentBranch] UUID]);
 		 
 		 UKObjectsEqual(testProot, [testBranch persistentRoot]);
 		 
@@ -117,8 +117,8 @@
 	
 	persistentRoot.currentBranch = branch;
 	
-    UKObjectsEqual([originalBranch UUID],
-                   [[store persistentRootInfoForUUID: [persistentRoot UUID]] currentBranchUUID]);
+    UKObjectsEqual(originalBranch.UUID,
+                   [[store persistentRootInfoForUUID: persistentRoot.UUID] currentBranchUUID]);
     
 	/* Commit some changes in the Sandbox branch */
 	
@@ -130,8 +130,8 @@
 
 	UKObjectsEqual(@"Todo", [persistentRoot.rootObject valueForProperty: @"label"]);
 	
-    UKObjectsEqual([branch UUID],
-                   [[store persistentRootInfoForUUID: [persistentRoot UUID]] currentBranchUUID]);
+    UKObjectsEqual(branch.UUID,
+                   [[store persistentRootInfoForUUID: persistentRoot.UUID] currentBranchUUID]);
     
 	[sandboxRootObj setValue: @"Tidi" forProperty: @"label"];
 	
@@ -187,7 +187,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: photo1
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPhoto1, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual([branchB UUID], [[testPhoto1 currentBranch] UUID]);
+		 UKObjectsEqual(branchB.UUID, [[testPhoto1 currentBranch] UUID]);
 		 UKObjectsEqual(A(@"childB"), [testPhoto1.rootObject valueForKeyPath: @"contents.label"]);
 	 }];
 }
@@ -209,7 +209,7 @@
 	 {
 		 UKObjectsEqual(testSecondBranch, [testProot currentBranch]);
 		 UKObjectsEqual(@"hello2", [testProot.rootObject label]);
-		 UKObjectsEqual(@"hello", [[[testProot branchForUUID: [originalBranch UUID]] rootObject] label]);
+		 UKObjectsEqual(@"hello", [[[testProot branchForUUID: originalBranch.UUID] rootObject] label]);
 	 }];
 }
 
@@ -238,7 +238,7 @@
     
 	CORevision *rev1 = originalBranch.currentRevision;
     COPersistentRoot *copyRoot = [originalBranch makePersistentRootCopyFromRevision: rev1];
-    UKNil([store persistentRootInfoForUUID: [copyRoot UUID]]);
+    UKNil([store persistentRootInfoForUUID: copyRoot.UUID]);
 	UKTrue([[ctx persistentRootsPendingInsertion] containsObject: copyRoot]);
     
 	COBranch *copyRootBranch = copyRoot.currentBranch;
@@ -247,7 +247,7 @@
 	UKFalse([persistentRoot isCopy]);
 	UKTrue([copyRoot isCopy]);
 
-	UKObjectsEqual([rootObj UUID], [copyRoot.rootObject UUID]);
+	UKObjectsEqual(rootObj.UUID, [copyRoot.rootObject UUID]);
 	UKObjectsNotEqual(rootObj, copyRoot.rootObject);
 
     [ctx commit];
@@ -260,11 +260,11 @@
 		 // FIXME: It might be cleaner if we could get rid of these -UUID calls
 		 // and have -[COBranch isEqual:]/-[COPersistentRoot isEqual:] work
 		 
-		 UKObjectsNotEqual([originalBranch UUID], [testBranch UUID]);
-		 UKObjectsNotEqual([persistentRoot UUID], [testProot UUID]);
+		 UKObjectsNotEqual(originalBranch.UUID, testBranch.UUID);
+		 UKObjectsNotEqual(persistentRoot.UUID, testProot.UUID);
 		 
-		 UKObjectsEqual([originalBranch UUID], [[testBranch parentBranch] UUID]);
-		 UKObjectsEqual([persistentRoot UUID], [[testProot parentPersistentRoot] UUID]);
+		 UKObjectsEqual(originalBranch.UUID, [[testBranch parentBranch] UUID]);
+		 UKObjectsEqual(persistentRoot.UUID, [[testProot parentPersistentRoot] UUID]);
 		 
 		 UKObjectsEqual(rev1, [testBranch initialRevision]);
 		 UKObjectsEqual(rev1, [testBranch currentRevision]);
@@ -291,7 +291,7 @@
 		 /* Cheap copy creation doesn't touch the current persistent root revision */
 		 UKObjectsEqual(rev1, [testProot currentRevision]);
 		 /* Cheap copy creation doesn't switch the branch */
-		 UKObjectsEqual([originalBranch UUID], [testBranch UUID]);
+		 UKObjectsEqual(originalBranch.UUID, testBranch.UUID);
 	 }];
 }
 
@@ -369,8 +369,8 @@
     
     [ctx commit];
     
-    UKObjectsEqual(S([originalBranch UUID]),
-	               SA([[[store persistentRootInfoForUUID: [persistentRoot UUID]] branchForUUID] allKeys]));
+    UKObjectsEqual(S(originalBranch.UUID),
+	               SA([[[store persistentRootInfoForUUID: persistentRoot.UUID] branchForUUID] allKeys]));
 }
 
 - (void) testDeleteCommittedBranch
@@ -381,8 +381,8 @@
 	
     [ctx commit];
     
-    UKObjectsEqual(S([originalBranch UUID], [branch UUID]),
-                   SA([[[store persistentRootInfoForUUID: [persistentRoot UUID]] branchForUUID] allKeys]));
+    UKObjectsEqual(S(originalBranch.UUID, branch.UUID),
+                   SA([[[store persistentRootInfoForUUID: persistentRoot.UUID] branchForUUID] allKeys]));
     
     branch.deleted = YES;
     
@@ -417,8 +417,8 @@
     
     [ctx commit];
     
-    UKObjectsEqual(S([branch UUID], [originalBranch UUID]),
-	               SA([[[store persistentRootInfoForUUID: [persistentRoot UUID]] branchForUUID] allKeys]));
+    UKObjectsEqual(S(branch.UUID, originalBranch.UUID),
+	               SA([[[store persistentRootInfoForUUID: persistentRoot.UUID] branchForUUID] allKeys]));
 }
 
 - (void) testUndeleteCommittedBranch
@@ -433,8 +433,8 @@
 	
     [ctx commit];
     
-    UKObjectsEqual(S([originalBranch UUID], [branch UUID]),
-                   SA([[[store persistentRootInfoForUUID: [persistentRoot UUID]] branchForUUID] allKeys]));
+    UKObjectsEqual(S(originalBranch.UUID, branch.UUID),
+                   SA([[[store persistentRootInfoForUUID: persistentRoot.UUID] branchForUUID] allKeys]));
     
     branch.deleted = NO;
     
@@ -577,7 +577,7 @@
     
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: store.URL];
-        UKObjectsEqual(@{}, [[ctx2 persistentRootForUUID: [persistentRoot UUID]] metadata]);
+        UKObjectsEqual(@{}, [[ctx2 persistentRootForUUID: persistentRoot.UUID] metadata]);
     }
     
     [ctx commit];
@@ -671,11 +671,11 @@
 
         // Check that the constraints we wanted to set up hold
 		
-        UKTrue([[persistentRootInfo branchUUIDs] containsObject: [regular UUID]]);
-        UKTrue([[persistentRootInfo branchUUIDs] containsObject: [deletedOnDisk UUID]]);
-		UKNil([persistentRootInfo branchInfoForUUID: [pendingInsertion UUID]]);
-		UKTrue([[persistentRootInfo branchUUIDs] containsObject: [pendingDeletion UUID]]);
-        UKTrue([[persistentRootInfo branchUUIDs] containsObject: [pendingUndeletion UUID]]);
+        UKTrue([[persistentRootInfo branchUUIDs] containsObject: regular.UUID]);
+        UKTrue([[persistentRootInfo branchUUIDs] containsObject: deletedOnDisk.UUID]);
+		UKNil([persistentRootInfo branchInfoForUUID: pendingInsertion.UUID]);
+		UKTrue([[persistentRootInfo branchUUIDs] containsObject: pendingDeletion.UUID]);
+        UKTrue([[persistentRootInfo branchUUIDs] containsObject: pendingUndeletion.UUID]);
 		UKTrue(deletedOnDisk.deleted);
 		UKTrue(pendingDeletion.deleted);
 		UKFalse(pendingUndeletion.deleted);
@@ -689,11 +689,11 @@
     UKObjectsEqual(S(pendingDeletion), [persistentRoot branchesPendingDeletion]);
     UKObjectsEqual(S(pendingUndeletion), [persistentRoot branchesPendingUndeletion]);
 
-	UKObjectsEqual(regular, [persistentRoot branchForUUID: [regular UUID]]);
-	UKObjectsEqual(deletedOnDisk, [persistentRoot branchForUUID: [deletedOnDisk UUID]]);
-   	UKObjectsEqual(pendingInsertion, [persistentRoot branchForUUID: [pendingInsertion UUID]]);
-	UKObjectsEqual(pendingDeletion, [persistentRoot branchForUUID: [pendingDeletion UUID]]);
-   	UKObjectsEqual(pendingUndeletion, [persistentRoot branchForUUID: [pendingUndeletion UUID]]);
+	UKObjectsEqual(regular, [persistentRoot branchForUUID: regular.UUID]);
+	UKObjectsEqual(deletedOnDisk, [persistentRoot branchForUUID: deletedOnDisk.UUID]);
+   	UKObjectsEqual(pendingInsertion, [persistentRoot branchForUUID: pendingInsertion.UUID]);
+	UKObjectsEqual(pendingDeletion, [persistentRoot branchForUUID: pendingDeletion.UUID]);
+   	UKObjectsEqual(pendingUndeletion, [persistentRoot branchForUUID: pendingUndeletion.UUID]);
 
     // 3. Test what happens when we commit (all pending changes are made and no longer pending)
     

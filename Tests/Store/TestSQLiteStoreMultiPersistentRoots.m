@@ -93,10 +93,10 @@ static ETUUID *tagUUID;
 	docProotChangeCount = [txn setOldTransactionID: docProotChangeCount forPersistentRoot: docProot.UUID];
 	UKTrue([store commitStoreTransaction: txn]);
     
-    UKTrue([store finalizeDeletionsForPersistentRoot: [docProot UUID]
+    UKTrue([store finalizeDeletionsForPersistentRoot: docProot.UUID
                                                error: NULL]);
     
-    UKNil([store itemGraphForRevisionUUID: [[docProot currentBranchInfo] currentRevisionUUID] persistentRoot: [docProot UUID]]);
+    UKNil([store itemGraphForRevisionUUID: [[docProot currentBranchInfo] currentRevisionUUID] persistentRoot: docProot.UUID]);
 }
 
 @end
