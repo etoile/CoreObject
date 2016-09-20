@@ -348,7 +348,7 @@
 	ETEntityDescription *entityDesc = [object entityDescription];
 	ETPropertyDescription *contentsDesc = [entityDesc propertyDescriptionForName: @"contents"];
 	
-	UKTrue([contentsDesc isOrdered]);
+	UKTrue(contentsDesc.ordered);
 	UKRaisesException([contentsDesc setOrdered: NO]);
 }
 

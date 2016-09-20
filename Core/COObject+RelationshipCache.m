@@ -23,7 +23,7 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
 	// NOTE: For now, we don't support keyed relationships, and we don't want to
 	// interpret a CODictionary as a relationship, when we use it as a
 	// multivalued collection.
-    return prop.isPersistentRelationship && !prop.isKeyed;
+    return prop.isPersistentRelationship && !prop.keyed;
 }
 
 - (void) removeCachedOutgoingRelationshipsForCollectionValue: (id)obj
@@ -71,7 +71,7 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
         {
             if (aProperty.multivalued)
             {
-                for (id obj in ((id <COPrimitiveCollection>)aValue).enumerableReferences)
+                for (id obj in [aValue enumerableReferences])
                 {
 					[self removeCachedOutgoingRelationshipsForCollectionValue: obj
 													ofPropertyWithDescription: aProperty];
@@ -99,11 +99,11 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
 		ETPropertyDescription *propertyInTarget = aProperty.opposite; // May be nil
 		
 		// Metamodel sanity check
-		ETAssert(![aProperty isDerived]);
+		ETAssert(!aProperty.derived);
 		if (propertyInTarget != nil)
 		{
-			NSAssert2([propertyInTarget isDerived], @"Your metamodel is invalid - the property %@ (opposite of %@) should be marked as derived.", [propertyInTarget fullName], [aProperty fullName]);
-			ETAssert(![propertyInTarget isPersistent]);
+			NSAssert2(propertyInTarget.derived, @"Your metamodel is invalid - the property %@ (opposite of %@) should be marked as derived.", propertyInTarget.fullName, aProperty.fullName);
+			ETAssert(!propertyInTarget.persistent);
 		}
 		
 		BOOL isDeadReference = [obj isKindOfClass: [COPath class]];
@@ -134,16 +134,16 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
             ETPropertyDescription *propertyInTarget = aProperty.opposite; // May be nil
 
 			// Metamodel sanity check
-			ETAssert(![aProperty isDerived]);
+			ETAssert(!aProperty.derived);
 			if (propertyInTarget != nil)
 			{
-				NSAssert2([propertyInTarget isDerived], @"Your metamodel is invalid - the property %@ (opposite of %@) should be marked as derived.", [propertyInTarget fullName], [aProperty fullName]);
-				ETAssert(![propertyInTarget isPersistent]);
+				NSAssert2(propertyInTarget.derived, @"Your metamodel is invalid - the property %@ (opposite of %@) should be marked as derived.", propertyInTarget.fullName, aProperty.fullName);
+				ETAssert(!propertyInTarget.persistent);
 			}
 			
 			if (aProperty.multivalued)
 			{
-				for (id obj in ((id <COPrimitiveCollection>)aValue).enumerableReferences)
+				for (id obj in [aValue enumerableReferences])
 				{
 					[self addCachedOutgoingRelationshipsForCollectionValue: obj
 												 ofPropertyWithDescription: aProperty];

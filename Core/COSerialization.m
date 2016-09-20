@@ -670,7 +670,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 
 	if (object != nil)
 	{
-		ETAssert([[object entityDescription] isKindOfEntity: [aPropertyDesc persistentType]]);
+		ETAssert([object.entityDescription isKindOfEntity: [aPropertyDesc persistentType]]);
 	}
 	
 	return object;
@@ -697,7 +697,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
 	if (COTypeMultivaluedPart(type) == kCOTypeArray)
 	{
-		NSAssert(![aPropertyDesc isKeyed] && [aPropertyDesc isOrdered] && [aPropertyDesc isMultivalued],
+		NSAssert(!aPropertyDesc.keyed && aPropertyDesc.ordered && aPropertyDesc.multivalued,
 				 @"Serialization type doesn't match metamodel");
 		
 		COMutableArray *resultCollection =
@@ -717,7 +717,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	}
 	else if (COTypeMultivaluedPart(type) == kCOTypeSet)
 	{
-		NSAssert(![aPropertyDesc isKeyed] && ![aPropertyDesc isOrdered] && [aPropertyDesc isMultivalued],
+		NSAssert(!aPropertyDesc.keyed && !aPropertyDesc.ordered && aPropertyDesc.multivalued,
 				 @"Serialization type doesn't match metamodel");
 		
 		COMutableSet *resultCollection =
@@ -738,7 +738,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	else if (type == kCOTypeCompositeReference)
 	{
 		NSParameterAssert([value isKindOfClass: [ETUUID class]]);
-		NSAssert([aPropertyDesc isKeyed] && ![aPropertyDesc isOrdered] && [aPropertyDesc isMultivalued],
+		NSAssert(aPropertyDesc.keyed && !aPropertyDesc.ordered && aPropertyDesc.multivalued,
 			@"Serialization type doesn't match metamodel");
 		
 		ETUUID *itemUUID = _additionalStoreItemUUIDs[aPropertyDesc.name];
@@ -832,7 +832,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyD
 
 		BOOL isCrossPersistentRootRef = [value isKindOfClass: [COPath class]];
 		BOOL isDeletedCrossPersistentRootRef = isCrossPersistentRootRef
-			&& (((COObject *)result).persistentRoot.isDeleted || ((COObject *)result).branch.isDeleted);
+			&& ([result persistentRoot].deleted || [result branch].deleted);
 		BOOL isDeadCrossPersistentRootRef = (result == nil && isCrossPersistentRootRef);
 
 		result = (isDeadCrossPersistentRootRef || isDeletedCrossPersistentRootRef ? value : result);
@@ -1036,7 +1036,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyD
 - (id)roundTripValueForProperty: (NSString *)key
 {
 	ETPropertyDescription *propertyDesc = [self.entityDescription propertyDescriptionForName: key];
-	ETAssert([propertyDesc isPersistent]);
+	ETAssert(propertyDesc.persistent);
 	id value = [self serializedValueForPropertyDescription: propertyDesc];
 	id serializedValue = [self serializedValueForValue: value propertyDescription: propertyDesc];
 	NSNumber *serializedType = [self serializedTypeForPropertyDescription: propertyDesc

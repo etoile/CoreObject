@@ -360,17 +360,17 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSSet *)branches
 {
-    return [NSSet setWithArray: [_branchForUUID.allValues filteredCollectionWithBlock: ^(id obj)
+    return [NSSet setWithArray: [_branchForUUID.allValues filteredCollectionWithBlock: ^(COBranch *obj)
 	{
-		return (BOOL)![obj isDeleted];
+		return (BOOL)!obj.deleted;
 	}]];
 }
 
 - (NSSet *)deletedBranches
 {
-    return [NSSet setWithArray: [_branchForUUID.allValues filteredCollectionWithBlock: ^(id obj)
+    return [NSSet setWithArray: [_branchForUUID.allValues filteredCollectionWithBlock: ^(COBranch *obj)
 	{
-		return (BOOL)[obj isDeleted];
+		return (BOOL)obj.deleted;
 	}]];
 }
 
@@ -383,7 +383,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 {
 	if ([_branchesPendingUndeletion containsObject: aBranch])
 	{
-		ETAssert(!aBranch.isBranchUncommitted);
+		ETAssert(!aBranch.branchUncommitted);
 		[_branchesPendingUndeletion removeObject: aBranch];
 	}
 	else
@@ -394,7 +394,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	                                                                  branch: aBranch
 	                                                                 isFault: YES];
 	
-    if (aBranch.isBranchUncommitted)
+    if (aBranch.branchUncommitted)
     {
 		[_branchesPendingDeletion removeObject: aBranch];
         [_branchForUUID removeObjectForKey: aBranch.UUID];
@@ -405,7 +405,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 {
     if ([_branchesPendingDeletion containsObject: aBranch])
     {
-		ETAssert(!aBranch.isBranchUncommitted);
+		ETAssert(!aBranch.branchUncommitted);
         [_branchesPendingDeletion removeObject: aBranch];
     }
     else
@@ -416,7 +416,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	                                                                  branch: aBranch
 	                                                                 isFault: aBranch.persistentRoot.deleted];
 
-    if (aBranch.isBranchUncommitted)
+    if (aBranch.branchUncommitted)
     {
 		[_branchesPendingUndeletion removeObject: aBranch];
 	}
@@ -426,17 +426,17 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSSet *)branchesPendingInsertion
 {
-    return [self.branches filteredCollectionWithBlock: ^(id obj)
+    return [self.branches filteredCollectionWithBlock: ^(COBranch *obj)
 	{
-		return [obj isBranchUncommitted];
+		return obj.branchUncommitted;
 	}];
 }
 
 - (NSSet *)branchesPendingUpdate
 {
-    return [self.branches filteredCollectionWithBlock: ^(id obj)
+    return [self.branches filteredCollectionWithBlock: ^(COBranch *obj)
 	{
-		return [obj hasChanges];
+		return obj.hasChanges;
 	}];
 }
 
@@ -482,7 +482,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	NSArray *branchesPendingInsertion = self.branchesPendingInsertion.allObjects;
 	
 	[_branchForUUID removeObjectsForKeys: (id)[[branchesPendingInsertion mappedCollection] UUID]];
-	ETAssert([[self branchesPendingInsertion] isEmpty]);
+	ETAssert([self.branchesPendingInsertion isEmpty]);
 
 	/* Clear other pending changes */
 
@@ -496,7 +496,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 	
 	[_currentBranchObjectGraph discardAllChanges];
 	
-	ETAssert(![self hasChanges]);
+	ETAssert(!self.hasChanges);
 }
 
 - (BOOL) isZombie
@@ -623,18 +623,18 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 - (void) saveCommitWithMetadata: (NSDictionary *)metadata transaction: (COStoreTransaction *)txn
 {
 	if (self.hasChanges
-		&& self.isDeleted
+		&& self.deleted
 		&& self.persistentRootInfo.deleted)
 	{
 		[NSException raise: NSGenericException
 					format: @"Attempted to commit changes to deleted persistent root %@", self];
 	}
 	
-	ETAssert([self currentBranch] != nil);
-	ETAssert([self rootObject] != nil);
-	ETAssert([[self rootObject] isRoot]);
-	ETAssert([[self objectGraphContext] rootObject] != nil
-			 || [[[self currentBranch] objectGraphContextWithoutUnfaulting] rootObject] != nil);
+	ETAssert(self.currentBranch != nil);
+	ETAssert(self.rootObject != nil);
+	ETAssert([self.rootObject isRoot]);
+	ETAssert(self.objectGraphContext.rootObject != nil
+			 || self.currentBranch.objectGraphContextWithoutUnfaulting.rootObject != nil);
     
 	if (self.persistentRootUncommitted)
 	{
@@ -642,16 +642,16 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		
         if (_cheapCopyRevisionUUID == nil)
         {
-			ETAssert(!([[[self currentBranch] objectGraphContextWithoutUnfaulting] hasChanges]
-					   && [_currentBranchObjectGraph hasChanges]));
+			ETAssert(!(self.currentBranch.objectGraphContextWithoutUnfaulting.hasChanges
+					   && _currentBranchObjectGraph.hasChanges));
 			// FIXME: Move this into -createPersistentRootWithInitialItemGraph:
 			// and make that take a id<COItemGraph>
 
 			COObjectGraphContext *graphCtx = _currentBranchObjectGraph;
-			if ((self.currentBranch).objectGraphContextWithoutUnfaulting.hasChanges)
+			if (self.currentBranch.objectGraphContextWithoutUnfaulting.hasChanges)
 			{
 				usingCurrentBranchObjectGraph = NO;
-				graphCtx = (self.currentBranch).objectGraphContextWithoutUnfaulting;
+				graphCtx = self.currentBranch.objectGraphContextWithoutUnfaulting;
 			}
 			
 			[graphCtx doPreCommitChecks];
@@ -673,7 +673,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 			ETAssert(_cheapCopyPersistentRootUUID != nil);
 			
 			const BOOL currentBranchObjectGraphHasChanges = _currentBranchObjectGraph.hasChanges;
-			const BOOL specificBranchObjectGraphHasChanges = (self.currentBranch).objectGraphContextWithoutUnfaulting.hasChanges;
+			const BOOL specificBranchObjectGraphHasChanges = self.currentBranch.objectGraphContextWithoutUnfaulting.hasChanges;
 			
 			ETAssert(!(currentBranchObjectGraphHasChanges && specificBranchObjectGraphHasChanges));
 			
@@ -694,7 +694,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 				}
 				else
 				{
-					modifiedItems = (self.currentBranch).objectGraphContextWithoutUnfaulting.modifiedItemsSnapshot;
+					modifiedItems = self.currentBranch.objectGraphContextWithoutUnfaulting.modifiedItemsSnapshot;
 					usingCurrentBranchObjectGraph = NO;
 				}
 				
@@ -731,16 +731,16 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		if (usingCurrentBranchObjectGraph)
 		{
 			[_currentBranchObjectGraph acceptAllChanges];
-			[(self.currentBranch).objectGraphContextWithoutUnfaulting setItemGraph: _currentBranchObjectGraph];
+			[self.currentBranch.objectGraphContextWithoutUnfaulting setItemGraph: _currentBranchObjectGraph];
 		}
 		else
 		{
-			[(self.currentBranch).objectGraphContextWithoutUnfaulting acceptAllChanges];
+			[self.currentBranch.objectGraphContextWithoutUnfaulting acceptAllChanges];
 			[_currentBranchObjectGraph setItemGraph: self.currentBranch.objectGraphContext];
 		}
 
 		[self validateNewObjectGraphContext: _currentBranchObjectGraph
-		                        createdFrom: (self.currentBranch).objectGraphContextWithoutUnfaulting];
+		                        createdFrom: self.currentBranch.objectGraphContextWithoutUnfaulting];
 	}
     else
     {
@@ -781,7 +781,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		_metadataChanged = NO;
 	}
 	
-	ETAssert([[self branchesPendingInsertion] isEmpty]);
+	ETAssert([self.branchesPendingInsertion isEmpty]);
 }
 
 - (void)clearBranchesPendingDeletionAndUndeletion

@@ -202,7 +202,7 @@ selective undo is involved. */
 	/* Second commit undone ('doc' revision) */
 
 	[_testTrack undo];
-    UKTrue(docPersistentRoot.isDeleted);
+    UKTrue(docPersistentRoot.deleted);
     
 	/***********************************************/
 	/* First commit reached (root object 'object') */
@@ -215,7 +215,7 @@ selective undo is involved. */
 	/* Second commit redone */
 
 	[_testTrack redo];
-    UKFalse(docPersistentRoot.isDeleted);
+    UKFalse(docPersistentRoot.deleted);
 	UKNotNil([docPersistentRoot loadedObjectForUUID: [doc UUID]]);
 	UKObjectsSame(doc, [docPersistentRoot loadedObjectForUUID: [doc UUID]]);
 	UKStringsEqual(@"Document", [doc valueForProperty: @"label"]);

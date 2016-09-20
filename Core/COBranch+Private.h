@@ -16,6 +16,7 @@
             persistentRoot: (COPersistentRoot *)aPersistentRoot
           parentBranchUUID: (ETUUID *)aParentBranchUUID
 parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
+@property (nonatomic, readonly) COSQLiteStore *store;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
@@ -55,6 +56,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
  * This method is only exposed to be used internally by CoreObject.
  */
 @property (nonatomic, readonly, getter=isBranchUncommitted) BOOL branchUncommitted;
+@property (nonatomic, readonly, getter=isBranchPersistentRootUncommitted) BOOL branchPersistentRootUncommitted;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

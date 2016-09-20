@@ -6,6 +6,7 @@
  */
 
 #import "COObjectGraphContext.h"
+#import "COObjectGraphContext+Private.h"
 #import "COCrossPersistentRootDeadRelationshipCache.h"
 #import "COEditingContext+Private.h"
 #import "COItemGraph.h"
@@ -865,7 +866,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 		_persistentRoot.parentContext.deadRelationshipCache;
 	COPath *pathToUndeletedObject = nil;
 	
-	if ([undeletedObjectGraphContext isTrackingSpecificBranch])
+	if (undeletedObjectGraphContext.trackingSpecificBranch)
 	{
 		pathToUndeletedObject = [COPath pathWithPersistentRoot: undeletedObjectGraphContext.persistentRoot.UUID
 		                                                branch: undeletedObjectGraphContext.branch.UUID];

@@ -186,13 +186,13 @@ See +[NSObject typePrefix]. */
 
 - (Class)coreObjectCollectionClassForPropertyDescription: (ETPropertyDescription *)propDesc
 {
-	NSParameterAssert([propDesc isMultivalued]);
+	NSParameterAssert(propDesc.multivalued);
 
 	if (propDesc.keyed)
 	{
 		// NOTE: Could be better to return nil in the assertion case, and move
 		// the assertion in methods calling -collectionClassForPropertyDescription:.
-		NSAssert1(![propDesc isOrdered] || ![propDesc isPersistent],
+		NSAssert1(!propDesc.ordered || !propDesc.persistent,
 			@"Persistent keyed collection %@ cannot be ordered.", propDesc);
 		return [COMutableDictionary class];
 	}
@@ -211,13 +211,13 @@ See +[NSObject typePrefix]. */
 
 - (Class)collectionClassForPropertyDescription: (ETPropertyDescription *)propDesc
 {
-	NSParameterAssert([propDesc isMultivalued]);
+	NSParameterAssert(propDesc.multivalued);
 	
 	if (propDesc.keyed)
 	{
 		// NOTE: Could be better to return nil in the assertion case, and move
 		// the assertion in methods calling -collectionClassForPropertyDescription:.
-		NSAssert1(![propDesc isOrdered] || ![propDesc isPersistent],
+		NSAssert1(!propDesc.ordered || !propDesc.persistent,
 				  @"Persistent keyed collection %@ cannot be ordered.", propDesc);
 		return [NSDictionary class];
 	}
@@ -297,7 +297,7 @@ See +[NSObject typePrefix]. */
 
 	for (ETPropertyDescription *propertyDesc in propertyDescs)
 	{
-		if (propertyDesc.isKeyed)
+		if (propertyDesc.keyed)
 		{
 			[keyedPropertyDescs addObject: propertyDesc];
 		}
@@ -665,7 +665,7 @@ See +[NSObject typePrefix]. */
 	if (!propertyDesc.isPersistentRelationship)
 		return;
 	
-	ETAssert([propertyDesc isMultivalued]);
+	ETAssert(propertyDesc.multivalued);
 	ETAssert([self isEditingContextValidForObject: value]);
 }
 
@@ -677,7 +677,7 @@ See +[NSObject typePrefix]. */
 
 	if ([value isPrimitiveCollection])
 	{
-		ETAssert([propertyDesc isMultivalued]);
+		ETAssert(propertyDesc.multivalued);
 
 		for (COObject *object in [value objectEnumerator])
 		{
@@ -702,7 +702,7 @@ See +[NSObject typePrefix]. */
 	if (!propertyDesc.isPersistentRelationship)
 		return;
 	
-	ETAssert([propertyDesc isMultivalued]);
+	ETAssert(propertyDesc.multivalued);
 	
 	ETAssert([self isObjectGraphContextValidForObject: value
 								  propertyDescription: propertyDesc]);
@@ -716,7 +716,7 @@ See +[NSObject typePrefix]. */
 
 	if ([value isPrimitiveCollection])
 	{
-		ETAssert([propertyDesc isMultivalued]);
+		ETAssert(propertyDesc.multivalued);
 		
 		for (COObject *object in [value objectEnumerator])
 		{
@@ -936,7 +936,7 @@ See +[NSObject typePrefix]. */
 	id value = _variableStorage[key];
 	
 	// If the value is a collection, try to load all of the cross persistent root references
-	if ([self isLoadingEnabled] && shouldLoad && [self isCoreObjectCollection: value])
+	if (self.loadingEnabled && shouldLoad && [self isCoreObjectCollection: value])
 	{
 		[self replaceReferencesWithLoadedObjectsForKey: key collection: value];
 	}
@@ -956,7 +956,7 @@ See +[NSObject typePrefix]. */
 	}
 	else if ([value isKindOfClass: [COPath class]])
 	{
-		if ([self isLoadingEnabled] && shouldLoad)
+		if (self.loadingEnabled && shouldLoad)
 		{
 			return [self.editingContext crossPersistentRootReferenceWithPath: value shouldLoad: YES];
 		}
@@ -1082,7 +1082,7 @@ See +[NSObject typePrefix]. */
 		// TODO: In debugging mode, we could check the class of the value
 		// is permitted
 		// TODO: Once EtoileUI is migrated to serialization transformers,
-		// replace [self isCoreObjectValue: aValue] by [propertyDesc isPersistent]
+		// replace [self isCoreObjectValue: aValue] by propertyDesc.persistent
 		// (Also, remember it will affect COSerialization's value transformer support,
 		// since if a value transformer is in use you can have random NSObjects in the
 		// variable storage --Eric)
@@ -1321,7 +1321,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 	if ([self serializationGetterForProperty: propertyDesc.name] != NULL)
 		return;
 	
-	ETAssert([propertyDesc isMultivalued]);
+	ETAssert(propertyDesc.multivalued);
 	
 	ETModelDescriptionRepository *repo = _objectGraphContext.modelDescriptionRepository;
 
@@ -1452,7 +1452,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 - (void)updateCompositeRelationshipForNewCollectionValue: (COObject *)child
 									 propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	ETAssert([propertyDesc isMultivalued]);
+	ETAssert(propertyDesc.multivalued);
 
 	if (!propertyDesc.isComposite)
 		return;
@@ -1959,7 +1959,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 	
 	if (isDeletion)
 	{
-		if (anObject.objectGraphContext.isTrackingSpecificBranch)
+		if (anObject.objectGraphContext.trackingSpecificBranch)
 		{
 			replacement = [COPath pathWithPersistentRoot: anObject.persistentRoot.UUID
 			                                      branch: anObject.branch.UUID];
@@ -1971,7 +1971,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 	}
 	else if (isUndeletion)
 	{
-		if (aReplacement.objectGraphContext.isTrackingSpecificBranch)
+		if (aReplacement.objectGraphContext.trackingSpecificBranch)
 		{
 			object = [COPath pathWithPersistentRoot: aReplacement.persistentRoot.UUID
 			                                 branch: aReplacement.branch.UUID];

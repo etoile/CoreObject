@@ -491,7 +491,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		[ancestorUUIDsOfA addObject: temp.UUID];
 	}
 
-	ETAssert([ancestorUUIDsOfA containsObject: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+	ETAssert([ancestorUUIDsOfA containsObject: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
 
 	for (id<COTrackNode> temp = commitB; temp != nil; temp = temp.parentNode)
 	{
@@ -752,7 +752,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 - (COCommandGroup *) commandForUUID:(ETUUID *)aUUID
 {
 	NILARG_EXCEPTION_TEST(aUUID);
-	ETAssert(![aUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+	ETAssert(![aUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
 	
 	COCommandGroup *command = _commandsByUUID[aUUID];
 	if (command == nil)

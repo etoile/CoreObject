@@ -1032,7 +1032,7 @@
 
 	// NOTE: For CoreObject, we don't support property extensions (extending
 	// entities with categories).
-	ETAssert([[testPackage propertyDescriptions] isEmpty]);
+	ETAssert([testPackage.propertyDescriptions isEmpty]);
 
 	for (ETEntityDescription *entity in testPackage.entityDescriptions)
 	{

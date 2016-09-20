@@ -263,7 +263,7 @@ static ETUUID *childUUID2;
     
     {
         COBranchInfo *branchObj = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
-        UKTrue([branchObj isDeleted]);
+        UKTrue(branchObj.deleted);
     }
     
     // Ensure we can't switch to it, since it is deleted
@@ -280,7 +280,7 @@ static ETUUID *childUUID2;
 	
     {
         COBranchInfo *branchObj = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
-        UKFalse([branchObj isDeleted]);
+        UKFalse(branchObj.deleted);
         UKObjectsEqual(initialState.currentRevisionUUID, branchObj.currentRevisionUUID);
     }
 

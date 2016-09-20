@@ -481,11 +481,11 @@
 
 - (void)testTemporaryMutation
 {
-	UKTrue(array.isMutable); // We called -beginMutation in -init
+	UKTrue(array.mutable); // We called -beginMutation in -init
 	UKDoesNotRaiseException([array addObject: @"a"]);
 	[array endMutation];
 	
-	UKFalse(array.isMutable);
+	UKFalse(array.mutable);
 	UKRaisesException([array addObject: @"a"]);
 	
 	// Now test two -beginMutation calls
@@ -494,17 +494,17 @@
 	
 	// Making a copy should preserve the "level" of -beginMutation calls
 	COMutableArray *arrayCopy = [array copy];
-	UKTrue(arrayCopy.isMutable);
+	UKTrue(arrayCopy.mutable);
 	UKDoesNotRaiseException([arrayCopy addObject: @"a"]);
 	
 	[arrayCopy endMutation];
 	
-	UKTrue(arrayCopy.isMutable);
+	UKTrue(arrayCopy.mutable);
 	UKDoesNotRaiseException([arrayCopy addObject: @"a"]);
 	
 	[arrayCopy endMutation];
 	
-	UKFalse(arrayCopy.isMutable);
+	UKFalse(arrayCopy.mutable);
 	UKRaisesException([arrayCopy addObject: @"a"]);
 }
 
@@ -718,11 +718,11 @@
 
 - (void)testTemporaryMutation
 {
-	UKTrue(set.isMutable); // We called -beginMutation in -init
+	UKTrue(set.mutable); // We called -beginMutation in -init
 	UKDoesNotRaiseException([set addObject: @"a"]);
 	[set endMutation];
 	
-	UKFalse(set.isMutable);
+	UKFalse(set.mutable);
 	UKRaisesException([set addObject: @"a"]);
 	
 	// Now test two -beginMutation calls
@@ -731,17 +731,17 @@
 	
 	// Making a copy should preserve the "level" of -beginMutation calls
 	COMutableArray *setCopy = [set copy];
-	UKTrue(setCopy.isMutable);
+	UKTrue(setCopy.mutable);
 	UKDoesNotRaiseException([setCopy addObject: @"a"]);
 	
 	[setCopy endMutation];
 	
-	UKTrue(setCopy.isMutable);
+	UKTrue(setCopy.mutable);
 	UKDoesNotRaiseException([setCopy addObject: @"a"]);
 	
 	[setCopy endMutation];
 	
-	UKFalse(setCopy.isMutable);
+	UKFalse(setCopy.mutable);
 	UKRaisesException([setCopy addObject: @"a"]);
 }
 

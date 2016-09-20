@@ -22,7 +22,7 @@
 	SUPERINIT;
 	cache = aCache;
 	revisionInfo =  aRevInfo;
-    assert([revisionInfo revisionUUID] != nil);
+    assert(revisionInfo.revisionUUID != nil);
 	return self;
 }
 

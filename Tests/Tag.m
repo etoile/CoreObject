@@ -37,8 +37,8 @@
     [parentTagProperty setOpposite: childTagsProperty];
 	[parentTagProperty setDerived: YES];
 	
-	ETAssert([childTagsProperty isComposite]);
-	ETAssert([parentTagProperty isContainer]);
+	ETAssert(childTagsProperty.isComposite);
+	ETAssert(parentTagProperty.isContainer);
     
     [entity setPropertyDescriptions: A(tagLabelProperty, contentsProperty, childTagsProperty, parentTagProperty)];
     return entity;

@@ -74,18 +74,18 @@
 			 persistentRootUUID: self.persistentRoot.UUID
 					 branchUUID: self.branch.UUID];
 	}
-	ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
+	ETAssert([self.persistentRoot.store commitStoreTransaction: txn]);
 	
-	if (![branch.editingContext isRevision: ((self.branch).currentRevision).UUID
-				 equalToOrParentOfRevision: ((COSynchronizerRevision *)revs.lastObject).revisionUUID
+	if (![branch.editingContext isRevision: self.branch.currentRevision.UUID
+				 equalToOrParentOfRevision: [revs.lastObject revisionUUID]
 							persistentRoot: self.persistentRoot.UUID])
 	{
 		// Rebase revs onto the current revisions
 		
 		txn = [[COStoreTransaction alloc] init];
 		
-		ETUUID *source = ((COSynchronizerRevision *)revs.lastObject).revisionUUID;
-		ETUUID *dest = ((self.branch).currentRevision).UUID;
+		ETUUID *source = [revs.lastObject revisionUUID];
+		ETUUID *dest = self.branch.currentRevision.UUID;
 		
 		ETUUID *lca = [self.persistentRoot.editingContext commonAncestorForCommit: source
 																		andCommit: dest
@@ -96,11 +96,11 @@
 													commonAncestor: lca
 												persistentRootUUID: self.persistentRoot.UUID
 														branchUUID: self.branch.UUID
-															 store: (self.persistentRoot).store
+															 store: self.persistentRoot.store
 													   transaction: txn
 													editingContext: self.persistentRoot.editingContext
 										modelDescriptionRepository: self.persistentRoot.editingContext.modelDescriptionRepository];
-		ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
+		ETAssert([self.persistentRoot.store commitStoreTransaction: txn]);
 		
 		[branch setCurrentRevisionSkipSupportsRevertCheck: [self.persistentRoot.editingContext revisionForRevisionUUID: rebasedRevs.lastObject
 																									persistentRootUUID: self.persistentRoot.UUID]];
@@ -109,7 +109,7 @@
 	{
 		// Fast-forward
 		
-		[branch setCurrentRevisionSkipSupportsRevertCheck: [self.persistentRoot.editingContext revisionForRevisionUUID: ((COSynchronizerRevision *)revs.lastObject).revisionUUID
+		[branch setCurrentRevisionSkipSupportsRevertCheck: [self.persistentRoot.editingContext revisionForRevisionUUID: [revs.lastObject revisionUUID]
 																									persistentRootUUID: self.persistentRoot.UUID]];
 	}
 
@@ -117,7 +117,7 @@
 	// instead of a regular push message.
 
 	ETAssert(clientID != nil);
-	currentlyHandlingLastSentRevision = ((COSynchronizerRevision *)revs.lastObject).revisionUUID;
+	currentlyHandlingLastSentRevision = [revs.lastObject revisionUUID];
 	currentlyRespondingToClient = clientID;
 	
 	// Will cause a call to -[self persistentRootDidChange:]
@@ -172,7 +172,7 @@
 	
 	ETAssert(branch.editingContext != nil);
 	NSArray *revUUIDs = [branch.editingContext revisionUUIDsFromRevisionUUIDExclusive: lastConfirmedForClient
-															  toRevisionUUIDInclusive: ((self.branch).currentRevision).UUID
+															  toRevisionUUIDInclusive: self.branch.currentRevision.UUID
 																	   persistentRoot: self.persistentRoot.UUID];
 	
 	if (revUUIDs == nil)

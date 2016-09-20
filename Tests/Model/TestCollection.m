@@ -35,7 +35,7 @@
 
 	for (ETPropertyDescription *propertyDesc in [[self entityDescription] allPropertyDescriptions])
 	{
-		if ([propertyDesc isMultivalued])
+		if (propertyDesc.multivalued)
 		{
 			[properties addObject: [propertyDesc name]];
 		}
@@ -95,7 +95,7 @@
 	UKStringsEqual(@"COBookmark", [[[entity propertyDescriptionForName: @"objects"] type] name]);
 	UKObjectsEqual([ETUTI typeWithClass: [COBookmark class]], [library objectType]);
 
-	UKTrue([library isOrdered]);
+	UKTrue(library.ordered);
 }
 
 - (void)testNoteLibrary
@@ -111,7 +111,7 @@
 	UKStringsEqual(@"COContainer", [[[entity propertyDescriptionForName: @"objects"] type] name]);
 	UKObjectsEqual([ETUTI typeWithClass: [COContainer class]], [library objectType]);
 
-	UKTrue([library isOrdered]);
+	UKTrue(library.ordered);
 }
 
 - (void)testTagLibrary

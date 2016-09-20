@@ -36,10 +36,6 @@
 
 NSString * const kCOBranchLabel = @"COBranchLabel";
 
-@interface COBranch ()
-@property (nonatomic, readonly) COSQLiteStore *store;
-@end
-
 
 @implementation COBranch
 
@@ -159,7 +155,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 		_objectGraph = [[COObjectGraphContext alloc] initWithBranch: self];
 		
 		if (_currentRevisionUUID != nil
-			&& !(self.persistentRoot).persistentRootUncommitted)
+			&& !self.persistentRoot.persistentRootUncommitted)
 		{
 			id <COItemGraph> aGraph = [_persistentRoot.store itemGraphForRevisionUUID: _currentRevisionUUID
 																		 persistentRoot: self.persistentRoot.UUID];
@@ -171,7 +167,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 		{
 			[_objectGraph setItemGraph: self.persistentRoot.objectGraphContext];
 		}
-		ETAssert(![_objectGraph hasChanges]);
+		ETAssert(!_objectGraph.hasChanges);
 		
 		// Lazy loading support
 		[self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: self.persistentRoot
@@ -273,7 +269,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	{
 		return YES;
 	}
-	return info.isDeleted;
+	return info.deleted;
 }
 
 - (BOOL)isDeleted
@@ -338,7 +334,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
         return [self.editingContext revisionForRevisionUUID: _headRevisionUUID
 										   persistentRootUUID: self.persistentRoot.UUID];
     }
-	ETAssert([self isBranchUncommitted]);
+	ETAssert(self.branchUncommitted);
     return nil;
 }
 
@@ -355,7 +351,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
         return [self.editingContext revisionForRevisionUUID: _currentRevisionUUID
 										   persistentRootUUID: self.persistentRoot.UUID];
     }
-	ETAssert([self isBranchUncommitted]);
+	ETAssert(self.branchUncommitted);
     return nil;
 }
 
@@ -609,13 +605,13 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 {
 	if ([self hasChangesOtherThanDeletionOrUndeletion]
 		&& self.deletedInStore
-		&& self.isDeleted)
+		&& self.deleted)
 	{
 		[NSException raise: NSGenericException
 					format: @"Attempted to commit changes to deleted branch %@", self];
 	}
 	
-    ETAssert(![self isBranchPersistentRootUncommitted]);
+    ETAssert(!self.branchPersistentRootUncommitted);
     ETAssert(_currentRevisionUUID != nil);
     ETAssert(_headRevisionUUID != nil);
     
@@ -725,12 +721,12 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 				[_objectGraph acceptAllChanges];
 				if (self == self.persistentRoot.currentBranch)
 				{
-					[(self.persistentRoot).objectGraphContext setItemGraph: _objectGraph];
+					[self.persistentRoot.objectGraphContext setItemGraph: _objectGraph];
 				}
 			}
 			else if (modifiedItemsSource != nil)
 			{
-				ETAssert(modifiedItemsSource == [_persistentRoot objectGraphContext]);
+				ETAssert(modifiedItemsSource == _persistentRoot.objectGraphContext);
 				[_persistentRoot.objectGraphContext acceptAllChanges];
 				
 				if (_objectGraph != nil)
@@ -788,7 +784,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	if (_objectGraph != nil)
 	{
 		[_objectGraph acceptAllChanges];
-		ETAssert(![_objectGraph hasChanges]);
+		ETAssert(!_objectGraph.hasChanges);
 	}
 }
 

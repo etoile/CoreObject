@@ -72,7 +72,7 @@
     UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNil([store persistentRootInfoForUUID: uuid]);
-    UKFalse([persistentRoot isDeleted]);
+    UKFalse(persistentRoot.deleted);
 	UKFalse(persistentRoot.isZombie);
 }
 
@@ -131,7 +131,7 @@
 		 UKObjectsEqual([NSSet set], [testCtx deletedPersistentRoots]);
 		 UKNotNil([testCtx persistentRootForUUID: uuid]);
 		 UKNotNil([[testCtx store] persistentRootInfoForUUID: uuid]);
-		 UKFalse([testProot isDeleted]);
+		 UKFalse(testProot.deleted);
 	 }];
     
     persistentRoot.deleted = YES;
@@ -142,7 +142,7 @@
     UKObjectsEqual(S(persistentRoot), [ctx deletedPersistentRoots]);
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNotNil([store persistentRootInfoForUUID: uuid]);
-    UKTrue([persistentRoot isDeleted]);
+    UKTrue(persistentRoot.deleted);
     
     [ctx commit];
 	
@@ -165,7 +165,7 @@
 		 /* You can still retrieve a deleted persistent root, until the deletion is finalized */
 		 UKNotNil([testCtx persistentRootForUUID: uuid]);
 		 UKNotNil([[testCtx store] persistentRootInfoForUUID: uuid]);
-		 UKTrue([testProot isDeleted]);
+		 UKTrue(testProot.deleted);
 	 }];
 }
 
@@ -191,7 +191,7 @@
     UKObjectsEqual([NSSet set], [ctx persistentRootsPendingDeletion]);
     UKObjectsEqual(S(persistentRoot), [ctx persistentRootsPendingUndeletion]);
     UKObjectsEqual([NSSet set], [ctx deletedPersistentRoots]);
-    UKFalse([persistentRoot isDeleted]);
+    UKFalse(persistentRoot.deleted);
     
     [ctx commit];
     
@@ -204,7 +204,7 @@
 		UKObjectsEqual([NSSet set], [testCtx persistentRootsPendingDeletion]);
 		UKObjectsEqual([NSSet set], [testCtx persistentRootsPendingUndeletion]);
 		UKObjectsEqual([NSSet set], [testCtx deletedPersistentRoots]);
-		UKFalse([testProot isDeleted]);
+		UKFalse(testProot.deleted);
 	 }];
 }
 

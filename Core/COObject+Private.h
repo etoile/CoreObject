@@ -65,6 +65,9 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
  * This method is only exposed to be used internally by CoreObject.
  */
 - (void) markAsRemovedFromContext;
+
+@property (nonatomic, readonly, getter=isLoadingEnabled) BOOL loadingEnabled;
+
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
@@ -81,6 +84,10 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
  * This method is only exposed to be used internally by CoreObject.
  */
 - (void)setValue: (id)value forStorageKey: (NSString *)key;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
+- (id) valueForProperty: (NSString *)key shouldLoad: (BOOL)shouldLoad;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -132,8 +139,4 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
  * This method is only exposed to be used internally by CoreObject.
  */
 - (void) replaceReferencesToObjectIdenticalTo: (COObject *)anObject withObject: (COObject *)aReplacement;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-- (id) valueForProperty: (NSString *)key shouldLoad: (BOOL)shouldLoad;
 @end

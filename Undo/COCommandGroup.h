@@ -92,7 +92,7 @@
  * The first command in a track is always a non-persistent
  * COEndOfUndoTrackPlaceholderNode instance; its parent UUID is nil. The first 
  * persistent divergent commands in a track have a parent UUID equal to
- * [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID].
+ * [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID.
  *
  * Before compaction, the parent UUID of the first recorded command is the 
  * placeholder node UUID. After compaction, the parent UUID of the oldest kept 

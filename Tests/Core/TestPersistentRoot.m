@@ -297,7 +297,7 @@
 
 - (void)testCheapCopyCreationWithEdit
 {
-	ETAssert(![persistentRoot hasChanges]);
+	ETAssert(!persistentRoot.hasChanges);
 	
     COPersistentRoot *copyRoot = [originalBranch makePersistentRootCopyFromRevision: r1];
 	UKObjectsEqual(r1, [copyRoot currentRevision]);
@@ -315,7 +315,7 @@
 
 - (void)testCheapCopyCreationWithEditInBranchObjectGraphContext
 {
-	ETAssert(![persistentRoot hasChanges]);
+	ETAssert(!persistentRoot.hasChanges);
 	
     COPersistentRoot *copyRoot = [originalBranch makePersistentRootCopyFromRevision: r1];
 	UKObjectsEqual(r1, [copyRoot currentRevision]);
@@ -334,7 +334,7 @@
 
 - (void)testCheapCopyOfCheapCopy
 {
-	ETAssert(![persistentRoot hasChanges]);
+	ETAssert(!persistentRoot.hasChanges);
 	
     COPersistentRoot *copy1 = [originalBranch makePersistentRootCopyFromRevision: r1];
     [ctx commit];
@@ -351,7 +351,7 @@
 
 - (void) testCreateBranchInUncommittedCheapCopyDisallowed
 {
-	ETAssert(![persistentRoot hasChanges]);
+	ETAssert(!persistentRoot.hasChanges);
 	
     COPersistentRoot *copy1 = [originalBranch makePersistentRootCopyFromRevision: r1];
 	UKRaisesException([[copy1 currentBranch] makeBranchWithLabel: @"hello"]);
@@ -389,7 +389,7 @@
     UKObjectsEqual(S(originalBranch), [persistentRoot branches]);
     UKObjectsEqual(S(branch), [persistentRoot branchesPendingDeletion]);
     UKObjectsEqual(S(branch), [persistentRoot deletedBranches]);
-    UKTrue([branch isDeleted]);
+    UKTrue(branch.deleted);
     
     [ctx commit];
     
@@ -401,7 +401,7 @@
 		 UKObjectsEqual(S(testOriginalBranch), [testProot branches]);
 		 UKTrue([[testProot branchesPendingDeletion] isEmpty]);
 		 UKObjectsEqual(S(testBranch), [testProot deletedBranches]);
-		 UKTrue([testBranch isDeleted]);
+		 UKTrue(testBranch.deleted);
 	 }];
 }
 
@@ -441,7 +441,7 @@
     UKObjectsEqual(S(branch, originalBranch), [persistentRoot branches]);
     UKObjectsEqual(S(branch), [persistentRoot branchesPendingUndeletion]);
     UKTrue([[persistentRoot deletedBranches] isEmpty]);
-    UKFalse([branch isDeleted]);
+    UKFalse(branch.deleted);
     
     [ctx commit];
     
@@ -453,7 +453,7 @@
 		 UKObjectsEqual(S(testBranch, testOriginalBranch), [testProot branches]);
 		 UKTrue([[testProot branchesPendingUndeletion] isEmpty]);
 		 UKTrue([[testProot deletedBranches] isEmpty]);
-		 UKFalse([testBranch isDeleted]);
+		 UKFalse(testBranch.deleted);
 	}];
 }
 
@@ -566,12 +566,12 @@
 	UKRaisesException([[persistentRoot metadata] setValue: @"foo" forKey: @"bar"]);
 	
     UKTrue([ctx hasChanges]);
-    UKTrue([persistentRoot hasChanges]);
+    UKTrue(persistentRoot.hasChanges);
     
     [persistentRoot discardAllChanges];
     
     UKObjectsEqual(@{}, [persistentRoot metadata]);
-    UKFalse([persistentRoot hasChanges]);
+    UKFalse(persistentRoot.hasChanges);
     
     [persistentRoot setMetadata: @{@"key" : @"value"}];
     

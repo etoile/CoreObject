@@ -284,8 +284,8 @@
 	COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil
 	                                                 objectGraphContext: graph];
 
-	ETAssert([rootObject objectGraphContext] == persistentRoot.objectGraphContext);
-    ETAssert([[persistentRoot rootObject] isRoot]);
+	ETAssert(rootObject.objectGraphContext == persistentRoot.objectGraphContext);
+    ETAssert([persistentRoot.rootObject isRoot]);
 	
     return persistentRoot;
 }
@@ -355,7 +355,7 @@
 {
     if ([_persistentRootsPendingUndeletion containsObject: aPersistentRoot])
     {
-		ETAssert(!aPersistentRoot.isPersistentRootUncommitted);
+		ETAssert(!aPersistentRoot.persistentRootUncommitted);
         [_persistentRootsPendingUndeletion removeObject: aPersistentRoot];
     }
     else
@@ -368,7 +368,7 @@
 	                                                   branch: nil
 	                                                  isFault: YES];
 	
-	if (aPersistentRoot.isPersistentRootUncommitted)
+	if (aPersistentRoot.persistentRootUncommitted)
     {
 		[_persistentRootsPendingDeletion removeObject: aPersistentRoot];
         [self unloadPersistentRoot: aPersistentRoot
@@ -381,7 +381,7 @@
 {
     if ([_persistentRootsPendingDeletion containsObject: aPersistentRoot])
     {
-		ETAssert(!aPersistentRoot.isPersistentRootUncommitted);
+		ETAssert(!aPersistentRoot.persistentRootUncommitted);
         [_persistentRootsPendingDeletion removeObject: aPersistentRoot];
     }
     else
@@ -393,7 +393,7 @@
 	                                                   branch: nil
 	                                                  isFault: NO];
 	
-	if (aPersistentRoot.isPersistentRootUncommitted)
+	if (aPersistentRoot.persistentRootUncommitted)
     {
 		[_persistentRootsPendingUndeletion removeObject: aPersistentRoot];
     }
@@ -631,14 +631,14 @@
 
 	[_loadedPersistentRoots removeObjectsForKeys:
 		(id)[[persistentRootsPendingInsertion mappedCollection] UUID]];
-	ETAssert([[self persistentRootsPendingInsertion] isEmpty]);
+	ETAssert([self.persistentRootsPendingInsertion isEmpty]);
 	
 	/* Clear other pending changes */
 
 	[_persistentRootsPendingDeletion removeAllObjects];
 	[_persistentRootsPendingUndeletion removeAllObjects];
 
-	ETAssert(![self hasChanges]);
+	ETAssert(!self.hasChanges);
 }
 
 #pragma mark Validation -
@@ -953,7 +953,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 				   a correct deletion status (critical to update the cross
 				   persistent root references). Between 
 				   -clearBranchesPendingDeletionAndUndeletion and this point, 
-				   COBranch.isDeleted is always NO. */
+				   COBranch.deleted is always NO. */
 				[loaded storePersistentRootDidChange: notif isDistributed: isDistributed];
 				/* When -[COUndoTrack setCurrentNode:] is used or we receive 
 				   another application commit notification, we must update other
@@ -964,7 +964,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 				   notifTransaction > loaded.lastTransactionID is NO). */
 				[self updateCrossPersistentRootReferencesToPersistentRoot: loaded
 			                                                       branch: nil
-			                                                      isFault: loaded.isDeleted];
+			                                                      isFault: loaded.deleted];
 				// TODO: Unload the persistent root when deleted (this represents
 				// an external deletion)
 			}

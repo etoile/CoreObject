@@ -809,7 +809,7 @@ static NSData *Sha1Data(NSData *data)
 		revInfo.parentRevisionUUID = revIDs[revInfo.parentRevisionUUID];
 		revInfo.mergeParentRevisionUUID = revIDs[revInfo.mergeParentRevisionUUID];
 
-		ETAssert([revInfo parentRevisionUUID] != nil || [revInfo isEqual: [revInfos firstObject]]);
+		ETAssert(revInfo.parentRevisionUUID != nil || [revInfo isEqual: revInfos.firstObject]);
 	}
 }
 

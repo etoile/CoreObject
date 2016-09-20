@@ -441,10 +441,10 @@
          UKObjectsEqual(S(), [[[[testProot rootObject] contents] mappedCollection] label]);
      }];
     
-	UKTrue(branchB.isDeleted);
+	UKTrue(branchB.deleted);
 	[store finalizeDeletionsForPersistentRoot: [photo1 UUID]
 									 error: NULL];
-	UKTrue(branchB.isDeleted);
+	UKTrue(branchB.deleted);
 
     // Finalized deletion, reference should be hidden
     [self checkPersistentRootWithExistingAndNewContext: library1

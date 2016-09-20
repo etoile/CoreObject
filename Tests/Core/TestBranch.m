@@ -690,7 +690,7 @@
 	[self checkBranchWithExistingAndNewContext: altBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKTrue(testBranch.isDeleted);
+		 UKTrue(testBranch.deleted);
 		 
 		 [[testBranch rootObject] setLabel: @"hi"];
 		 UKTrue([testBranch hasChanges]);

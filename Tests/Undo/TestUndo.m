@@ -219,11 +219,11 @@
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
-        UKFalse([ctx2secondBranch isDeleted]);
+        UKFalse(ctx2secondBranch.deleted);
         [testTrack undo];
-        UKTrue([ctx2secondBranch isDeleted]);
+        UKTrue(ctx2secondBranch.deleted);
         [testTrack redo];
-        UKFalse([ctx2secondBranch isDeleted]);
+        UKFalse(ctx2secondBranch.deleted);
     }
 }
 
@@ -244,11 +244,11 @@
 		
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
-        UKFalse([ctx2secondBranch isDeleted]);
+        UKFalse(ctx2secondBranch.deleted);
         [testTrack undo];
-        UKTrue([ctx2secondBranch isDeleted]);
+        UKTrue(ctx2secondBranch.deleted);
         [testTrack redo];
-        UKFalse([ctx2secondBranch isDeleted]);
+        UKFalse(ctx2secondBranch.deleted);
     }
 }
 
@@ -270,11 +270,11 @@
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
         UKNotNil(ctx2secondBranch);
-        UKFalse([ctx2secondBranch isDeleted]);
+        UKFalse(ctx2secondBranch.deleted);
         [testTrack undo];
-        UKTrue([ctx2secondBranch isDeleted]);
+        UKTrue(ctx2secondBranch.deleted);
         [testTrack redo];
-        UKFalse([ctx2secondBranch isDeleted]);
+        UKFalse(ctx2secondBranch.deleted);
     }
 }
 
@@ -297,11 +297,11 @@
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
-        UKTrue([ctx2secondBranch isDeleted]);
+        UKTrue(ctx2secondBranch.deleted);
         [testTrack undo];
-        UKFalse([ctx2secondBranch isDeleted]);
+        UKFalse(ctx2secondBranch.deleted);
         [testTrack redo];
-        UKTrue([ctx2secondBranch isDeleted]);
+        UKTrue(ctx2secondBranch.deleted);
     }
 }
 
@@ -403,11 +403,11 @@
 		
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
-        UKFalse([ctx2persistentRoot isDeleted]);
+        UKFalse(ctx2persistentRoot.deleted);
         [testTrack undo];
-        UKTrue([ctx2persistentRoot isDeleted]);
+        UKTrue(ctx2persistentRoot.deleted);
         [testTrack redo];
-        UKFalse([ctx2persistentRoot isDeleted]);
+        UKFalse(ctx2persistentRoot.deleted);
     }
 }
 
@@ -424,11 +424,11 @@
 		
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
-        UKFalse([ctx2persistentRoot isDeleted]);
+        UKFalse(ctx2persistentRoot.deleted);
         [testTrack undo];
-        UKTrue([ctx2persistentRoot isDeleted]);
+        UKTrue(ctx2persistentRoot.deleted);
         [testTrack redo];
-        UKFalse([ctx2persistentRoot isDeleted]);
+        UKFalse(ctx2persistentRoot.deleted);
     }
 }
 
@@ -447,11 +447,11 @@
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
-		UKTrue([ctx2persistentRoot isDeleted]);
+		UKTrue(ctx2persistentRoot.deleted);
         [testTrack undo];
-        UKFalse([ctx2persistentRoot isDeleted]);
+        UKFalse(ctx2persistentRoot.deleted);
         [testTrack redo];
-        UKTrue([ctx2persistentRoot isDeleted]);
+        UKTrue(ctx2persistentRoot.deleted);
     }
 }
 
@@ -773,16 +773,16 @@
 	
 	[_testTrack beginCoalescing];
 
-	UKTrue([_testTrack isCoalescing]);
+	UKTrue(_testTrack.coalescing);
 		
 	item.label = @"a";
 	[ctx commitWithUndoTrack: _testTrack];
 
-	UKTrue([_testTrack isCoalescing]);
+	UKTrue(_testTrack.coalescing);
 	
 	[_testTrack undo];
 	
-	UKFalse([_testTrack isCoalescing]);
+	UKFalse(_testTrack.coalescing);
 }
 
 - (void) testSelectiveUndoCommitDescriptor
