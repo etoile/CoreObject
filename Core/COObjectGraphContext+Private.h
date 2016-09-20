@@ -123,7 +123,7 @@
 /**
  * Should be called by COBranch at every commit.
  */
-@property (nonatomic, readonly) BOOL incrementCommitCounterAndCheckIfGCNeeded;
+- (BOOL)incrementCommitCounterAndCheckIfGCNeeded;
 
 /**
  * Perform tasks needed before each commit. (GC, check for cycles in composites)
