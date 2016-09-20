@@ -865,10 +865,10 @@ See +[NSObject typePrefix]. */
 	NSParameterAssert(aValue != NULL);
 	NSArray *results = [self validateValue: *aValue forProperty: key];
 
-	if (results.count == 1 && [[results firstObject] isValid])
+	if (results.count == 1 && [results.firstObject isValid])
 		return YES;
 
-	*aValue = ((ETValidationResult *)results.lastObject).value;
+	*aValue = [results.lastObject value];
 	if (anError != NULL)
 	{
 		*anError = [COError errorWithValidationResults: results];

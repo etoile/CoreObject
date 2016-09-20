@@ -33,11 +33,11 @@ static BOOL coalesceOpPair(id<COAttributedStringDiffOperation> op, id<COAttribut
 	if (isOpAttributeOp && isOpSameClassAsNextOp && isAdjacent)
 	{
 		COObjectGraphContext *opAttributeGraph = [COObjectGraphContext new];
-		[opAttributeGraph setItemGraph: ((COAttributedStringDiffOperationAddAttribute *)op).attributeItemGraph];
+		[opAttributeGraph setItemGraph: [(id)op attributeItemGraph]];
 		COAttributedStringAttribute *opAttribute = opAttributeGraph.rootObject;
 		
 		COObjectGraphContext *nextOpAttributeGraph = [COObjectGraphContext new];
-		[nextOpAttributeGraph setItemGraph: ((COAttributedStringDiffOperationAddAttribute *)nextOp).attributeItemGraph];
+		[nextOpAttributeGraph setItemGraph: [(id)nextOp attributeItemGraph]];
 		COAttributedStringAttribute *nextOpAttribute = nextOpAttributeGraph.rootObject;
 		
 		const BOOL sameAttributes = [opAttribute isDeeplyEqualToAttribute: nextOpAttribute];

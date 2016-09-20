@@ -185,8 +185,8 @@
 {
 	[self loadAllPersistentRootsIfNeeded];
 	
-	return [NSSet setWithArray: [_loadedPersistentRoots.allValues filteredCollectionWithBlock: ^(id obj) {
-		return (BOOL) !((COPersistentRoot *)obj).deleted;
+	return [NSSet setWithArray: [_loadedPersistentRoots.allValues filteredCollectionWithBlock: ^(COPersistentRoot *obj) {
+		return (BOOL)!obj.deleted;
 	}]];
 }
 
@@ -200,8 +200,8 @@
 		 [self persistentRootForUUID: persistentRootUUID];
 	}
 
-	return [NSSet setWithArray: [_loadedPersistentRoots.allValues filteredCollectionWithBlock: ^(id obj) {
-		return ((COPersistentRoot *)obj).deleted;
+	return [NSSet setWithArray: [_loadedPersistentRoots.allValues filteredCollectionWithBlock: ^(COPersistentRoot *obj) {
+		return obj.deleted;
 	}]];
 }
 

@@ -143,7 +143,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 					insertedObjects: (id)anArray
 						   userInfo: (id)info
 {
-	NSRange characterRange = {((COAttributedStringChunk *)anArray[0]).characterIndex, 0};
+	NSRange characterRange = {[anArray[0] characterIndex], 0};
 	NSUInteger lengthDelta = 0;
 	BOOL hasAttributes = NO;
 	for (COAttributedStringChunk *insertedChunk in anArray)
