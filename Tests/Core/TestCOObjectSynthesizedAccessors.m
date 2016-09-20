@@ -43,7 +43,7 @@
     child2.label = @"child2";
 
     [item setContents: A(child1, child2)];
-    UKObjectsEqual(A(child1, child2), [item contents]);
+    UKObjectsEqual(A(child1, child2), item.contents);
 }
 
 - (void)testSynthesizedAccessorsRestrictedToDynamicProperties
@@ -70,10 +70,10 @@
     
     // FIXME: Change to mutableOrderedSetValueForKey
     [[item mutableArrayValueForKey: @"contents"] addObject: child1];
-    UKObjectsEqual(@[child1], [item contents]);
+    UKObjectsEqual(@[child1], item.contents);
 
     [[item mutableArrayValueForKey: @"contents"] removeObject: child1];
-    UKObjectsEqual(@[], [item contents]);
+    UKObjectsEqual(@[], item.contents);
 }
 
 - (void) testSetterToProperty

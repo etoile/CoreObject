@@ -71,9 +71,9 @@ static NSArray *initialUUIDs;
 
 - (void) testCopyWithinContext
 {
-    UKIntsEqual(4, [[initialGraph itemUUIDs] count]);
+    UKIntsEqual(4, initialGraph.itemUUIDs.count);
 	ETUUID *drawing2 = [copier copyItemWithUUID: drawing fromGraph: initialGraph toGraph: initialGraph];
-    UKIntsEqual(8, [[initialGraph itemUUIDs] count]);
+    UKIntsEqual(8, initialGraph.itemUUIDs.count);
     
 	// Check structure ("copy semantics.pdf" page 10)
 	

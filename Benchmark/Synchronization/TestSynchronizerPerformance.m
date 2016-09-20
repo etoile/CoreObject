@@ -34,7 +34,7 @@
 	COAttributedString *clientStr = [[(UnorderedGroupNoOpposite *)clientBranch.rootObject contents] anyObject];
 	COAttributedStringWrapper *clientWrapper = [[COAttributedStringWrapper alloc] initWithBacking: clientStr];
 	
-	UKObjectsEqual(baseString, [clientWrapper string]);
+	UKObjectsEqual(baseString, clientWrapper.string);
 	
 	for (NSUInteger i = 0; i < [charactersToInsert length]; i++)
 	{
@@ -43,7 +43,7 @@
 		[clientPersistentRoot commit];
 	}
 	
-	UKObjectsEqual([charactersToInsert stringByAppendingString: baseString], [clientWrapper string]);
+	UKObjectsEqual([charactersToInsert stringByAppendingString: baseString], clientWrapper.string);
 	
 	// 1 commit on server
 	
@@ -53,8 +53,8 @@
 	// deliver first client commit to server. This will be the first character of 'charactersToInsert'
 	[transport deliverMessagesToServer];
 	
-	UKTrue(([[NSString stringWithFormat: @"%@%@%@", stringToInsert, [charactersToInsert substringToIndex: 1], baseString] isEqualToString: [serverWrapper string]]
-		   || [[NSString stringWithFormat: @"%@%@%@", [charactersToInsert substringToIndex: 1], stringToInsert, baseString] isEqualToString: [serverWrapper string]]));
+	UKTrue(([[NSString stringWithFormat: @"%@%@%@", stringToInsert, [charactersToInsert substringToIndex: 1], baseString] isEqualToString: serverWrapper.string]
+		   || [[NSString stringWithFormat: @"%@%@%@", [charactersToInsert substringToIndex: 1], stringToInsert, baseString] isEqualToString: serverWrapper.string]));
 	
 	[transport deliverMessagesToClient];
 	
@@ -64,14 +64,14 @@
 	// Send confirmation back to client
 	[transport deliverMessagesToClient];
 	
-	UKTrue(([[NSString stringWithFormat: @"%@%@%@", stringToInsert, charactersToInsert, baseString] isEqualToString: [serverWrapper string]]
-		   || [[NSString stringWithFormat: @"%@%@%@", charactersToInsert, stringToInsert, baseString] isEqualToString: [serverWrapper string]]));
+	UKTrue(([[NSString stringWithFormat: @"%@%@%@", stringToInsert, charactersToInsert, baseString] isEqualToString: serverWrapper.string]
+		   || [[NSString stringWithFormat: @"%@%@%@", charactersToInsert, stringToInsert, baseString] isEqualToString: serverWrapper.string]));
 
-	UKTrue(([[NSString stringWithFormat: @"%@%@%@", stringToInsert, charactersToInsert, baseString] isEqualToString: [clientWrapper string]]
-		   || [[NSString stringWithFormat: @"%@%@%@", charactersToInsert, stringToInsert, baseString] isEqualToString: [clientWrapper string]]));
+	UKTrue(([[NSString stringWithFormat: @"%@%@%@", stringToInsert, charactersToInsert, baseString] isEqualToString: clientWrapper.string]
+		   || [[NSString stringWithFormat: @"%@%@%@", charactersToInsert, stringToInsert, baseString] isEqualToString: clientWrapper.string]));
 	
-	UKIntsEqual(0, [[self clientMessages] count]);
-	UKIntsEqual(0, [[self serverMessages] count]);
+	UKIntsEqual(0, self.clientMessages.count);
+	UKIntsEqual(0, self.serverMessages.count);
 }
 
 - (void) testRegularRebasePerformance
@@ -94,7 +94,7 @@
 		[[clientGroup mutableArrayValueForKey: @"contents"] addObject: child];
 		[clientPersistentRoot commit];
 	}
-	UKIntsEqual(objectsToInsert, [[clientGroup contents] count]);
+	UKIntsEqual(objectsToInsert, [clientGroup.contents count]);
 	
 	// 1 commit on server
 	
@@ -117,11 +117,11 @@
 	// Send confirmation back to client
 	[transport deliverMessagesToClient];
 	
-	UKIntsEqual(objectsToInsert + 1, [[clientGroup contents] count]);
-	UKIntsEqual(objectsToInsert + 1, [[serverGroup contents] count]);
+	UKIntsEqual(objectsToInsert + 1, [clientGroup.contents count]);
+	UKIntsEqual(objectsToInsert + 1, [serverGroup.contents count]);
 	
-	UKIntsEqual(0, [[self clientMessages] count]);
-	UKIntsEqual(0, [[self serverMessages] count]);
+	UKIntsEqual(0, self.clientMessages.count);
+	UKIntsEqual(0, self.serverMessages.count);
 }
 
 @end

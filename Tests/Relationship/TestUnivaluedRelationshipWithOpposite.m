@@ -440,7 +440,7 @@
 
 	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
 
-	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
+	UKNil([ctx2.deadRelationshipCache referringObjectsForPath: item1Path]);
 }
 
 - (void)testTargetBranchLazyLoading
@@ -486,7 +486,7 @@
 	UKObjectsEqual(otherItem1ctx2, [group1ctx2 serializableValueForStorageKey: @"content"]);
 	UKFalse([ctx2 hasChanges]);
 
-	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: otherItemPath]);
+	UKNil([ctx2.deadRelationshipCache referringObjectsForPath: otherItemPath]);
 }
 
 - (void) testSourcePersistentRootLazyLoading
@@ -518,7 +518,7 @@
 
 	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
 
-	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
+	UKNil([ctx2.deadRelationshipCache referringObjectsForPath: item1Path]);
 }
 
 - (void) testSourcePersistentRootLazyLoadingReverseOrder
@@ -548,7 +548,7 @@
 
 	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
 
-	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
+	UKNil([ctx2.deadRelationshipCache referringObjectsForPath: item1Path]);
 }
 
 - (void)testSourcePersistentRootUnloadingOnDeletion

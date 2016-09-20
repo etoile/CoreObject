@@ -91,7 +91,7 @@
 
 - (NSArray *)serverMessages
 {
-	return [transport serverMessages];
+	return transport.serverMessages;
 }
 
 - (NSArray *)clientMessages

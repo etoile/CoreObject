@@ -281,7 +281,7 @@ ETUUID *AttributedString2UUID()
 {
 	// Easy test: are the string contents equal?
 	
-	UKObjectsEqual([expected string], [actual string]);
+	UKObjectsEqual(expected.string, actual.string);
 	
 	// HACK: use COAttributedStringWrapper to compare the attributes
 	

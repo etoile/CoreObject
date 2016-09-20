@@ -82,7 +82,7 @@ static ETUUID *tagUUID;
     NSArray *results = [store referencesToPersistentRoot: docProot.UUID];
     
     COSearchResult *result = results[0];
-    UKObjectsEqual([[tagProot currentBranchInfo] currentRevisionUUID], [result revision]);
+    UKObjectsEqual([[tagProot currentBranchInfo] currentRevisionUUID], result.revision);
     UKObjectsEqual(tagUUID, [result innerObjectUUID]);
 }
 

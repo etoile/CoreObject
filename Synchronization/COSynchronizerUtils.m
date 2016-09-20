@@ -73,7 +73,7 @@
 											  toRevisionUUIDInclusive: source
 													   persistentRoot: persistentRoot];
 	ETAssert(sourceRevs != nil);
-	ETAssert([sourceRevs count] > 0);
+	ETAssert(sourceRevs.count > 0);
 	
 	NSMutableArray *newRevids = [[NSMutableArray alloc] init];
 	

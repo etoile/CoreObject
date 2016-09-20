@@ -726,7 +726,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 		for (NSString *modifiedAttribute in [diffDict modifiedAttributesForUUID: modifiedUUID])
 		{
 			NSSet *edits = [diffDict editsForUUID: modifiedUUID attribute: modifiedAttribute];
-			assert([edits count] > 0);
+			assert(edits.count > 0);
             
 			COApplyEditsToMutableItem(edits, item);
 		}

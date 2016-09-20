@@ -102,17 +102,17 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 - (NSDictionary *)metadata
 {
-	return [self revision].metadata;
+	return self.revision.metadata;
 }
 
 - (NSDate *)date
 {
-	return [self revision].date;
+	return self.revision.date;
 }
 
 - (NSString *)localizedShortDescription
 {
-	return [self revision].localizedShortDescription;
+	return self.revision.localizedShortDescription;
 }
 
 - (id) copyWithZone:(NSZone *)zone

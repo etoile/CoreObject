@@ -58,9 +58,9 @@
 - (void) makeIncrementalCommitToPersistentRoot: (COPersistentRoot *)persistentRoot
 {
 	COObjectGraphContext *graph = [persistentRoot objectGraphContext];
-	NSArray *itemUUIDS = [graph itemUUIDs];
+	NSArray *itemUUIDS = graph.itemUUIDs;
 	int randNumber = rand();
-	OutlineItem *randomItem = [graph loadedObjectForUUID: itemUUIDS[randNumber % [itemUUIDS count]]];
+	OutlineItem *randomItem = [graph loadedObjectForUUID: itemUUIDS[randNumber % itemUUIDS.count]];
 	randomItem.label = [NSString stringWithFormat: @"random number: %d", randNumber];
 	[ctx commit];
 }

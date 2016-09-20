@@ -85,10 +85,10 @@
 	OutlineItem *subchild = [self addObjectWithLabel: @"Pizza" toObject: child];
     
     UKObjectsEqual(S([ctx1.rootObject UUID], parent.UUID, child.UUID, subchild.UUID),
-                   [NSSet setWithArray: [ctx1 itemUUIDs]]);
+                   [NSSet setWithArray: ctx1.itemUUIDs]);
     
     UKObjectsEqual(S([ctx2.rootObject UUID]),
-                   [NSSet setWithArray: [ctx2 itemUUIDs]]);
+                   [NSSet setWithArray: ctx2.itemUUIDs]);
     
     // Do the copy
     
@@ -97,11 +97,11 @@
                                               toGraph: ctx2];
 
     UKObjectsNotEqual(parentCopyUUID, parent.UUID);
-    UKIntsEqual(4, [[ctx2 itemUUIDs] count]);
+    UKIntsEqual(4, ctx2.itemUUIDs.count);
     
     // Remember, we aggressively rename everything when copying across
     // contexts now.
-    UKFalse([[NSSet setWithArray: [ctx2 itemUUIDs]] intersectsSet:
+    UKFalse([[NSSet setWithArray: ctx2.itemUUIDs] intersectsSet:
              S(parent.UUID, child.UUID, subchild.UUID)]);
 }
 
@@ -156,11 +156,11 @@
 
 - (void) testItemUUIDsWithInsertedObject
 {
-	UKObjectsEqual(S(root1.UUID), SA([ctx1 itemUUIDs]));
+	UKObjectsEqual(S(root1.UUID), SA(ctx1.itemUUIDs));
 	
     OutlineItem *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
 	
-	UKObjectsEqual(S(root1.UUID, tag1.UUID), SA([ctx1 itemUUIDs]));
+	UKObjectsEqual(S(root1.UUID, tag1.UUID), SA(ctx1.itemUUIDs));
 	UKNotNil([ctx1 itemForUUID: tag1.UUID]);
 }
 
@@ -175,7 +175,7 @@
 	UKFalse([ctx2 hasChanges]);
 	
 	[ctx2 setItemGraph: ctx1];
-	UKObjectsEqual(S(root1.UUID, child.UUID), SA([ctx2 itemUUIDs]));
+	UKObjectsEqual(S(root1.UUID, child.UUID), SA(ctx2.itemUUIDs));
 	UKObjectsEqual(@"root1", [[ctx2 loadedObjectForUUID: root1.UUID] label]);
 	UKObjectsEqual(@"child", [[ctx2 loadedObjectForUUID: child.UUID] label]);
 	UKNil([ctx2 loadedObjectForUUID: garbage.UUID]);

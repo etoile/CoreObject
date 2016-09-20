@@ -87,7 +87,7 @@
     [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
-    UKObjectsEqual(firstRevid, [[persistentRoot currentRevision] UUID]);
+    UKObjectsEqual(firstRevid, [persistentRoot.currentRevision UUID]);
     UKFalse([ctx hasChanges]);
 }
 
@@ -110,7 +110,7 @@
     // Check that a notification was sent to the editing context, and it automatically updated.
     COBranch *secondBranch = [persistentRoot branchForUUID: secondbranchUUID];
     UKNotNil(secondBranch);
-    UKObjectsEqual([persistentRoot currentRevision], [secondBranch currentRevision]);
+    UKObjectsEqual(persistentRoot.currentRevision, secondBranch.currentRevision);
     UKFalse([ctx hasChanges]);
 }
 

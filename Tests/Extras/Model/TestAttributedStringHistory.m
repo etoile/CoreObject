@@ -49,7 +49,7 @@
 		[ctx commit];
 		
 		[as appendAttributedString: [self html: @"<u>y</u>"]];
-		UKObjectsEqual(@"xy", [as string]);
+		UKObjectsEqual(@"xy", as.string);
 		[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(1,1) inAttributedString: as];
 		
 		
@@ -69,7 +69,7 @@
 			
 			UKObjectsEqual(@"x", chunk0.text);
 			UKObjectsEqual(@"y", chunk1.text);
-			UKIntsEqual(2, [root.chunks count]);
+			UKIntsEqual(2, root.chunks.count);
 	
 			// Check that chunk0 has no underline attribute, and chunk1 does
 			UKTrue([[chunk0.attributes filteredCollectionWithBlock: underlineAttributesFilter] isEmpty]);
@@ -82,11 +82,11 @@
 		
 		[track undo];
 		
-		UKObjectsEqual(@"x", [as string]);
+		UKObjectsEqual(@"x", as.string);
 		
 		[track redo];
 		
-		UKObjectsEqual(@"xy", [as string]);
+		UKObjectsEqual(@"xy", as.string);
 		[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(1,1) inAttributedString: as];
 	}
 }

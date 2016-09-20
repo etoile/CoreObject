@@ -62,7 +62,7 @@
 
 + (COItemGraph *)itemGraphWithItemsRootFirst: (NSArray*)items
 {
-    NSParameterAssert([items count] >= 1);
+    NSParameterAssert(items.count >= 1);
 
     COItemGraph *result = [[self alloc] init];
     result->rootItemUUID_ = [[items[0] UUID] copy];

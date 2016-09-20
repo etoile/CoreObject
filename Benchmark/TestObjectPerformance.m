@@ -316,12 +316,12 @@ static const int LARGE_RELATIONSHIP_SIZE = 1000;
 	NSArray *parentContentsArray = coreobjectParent.contents;
 	__block NSUInteger count = 0;
 	[self timeBlock: ^(void) {
-		count += [parentContentsArray count];
+		count += parentContentsArray.count;
 	} message: [NSString stringWithFormat: @"-count on CoreObject array with %d elements", LARGE_RELATIONSHIP_SIZE]];
 	
 	NSArray *parentContentsArrayCopy = [NSArray arrayWithArray: coreobjectParent.contents];
 	[self timeBlock: ^(void) {
-		count += [parentContentsArrayCopy count];
+		count += parentContentsArrayCopy.count;
 	} message: [NSString stringWithFormat: @"-count on NSArray with %d elements", LARGE_RELATIONSHIP_SIZE]];
 	
 	// test for/in loop

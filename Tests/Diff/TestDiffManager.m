@@ -145,7 +145,7 @@
 		// Check the attributed string contents
 
 		COAttributedStringWrapper *w1 = [[COAttributedStringWrapper alloc] initWithBacking: attributedString];
-		UKObjectsEqual(@"this isn't a big test", [w1 string]);
+		UKObjectsEqual(@"this isn't a big test", w1.string);
 		
 		[self checkFontHasTraits: NSFontItalicTrait withLongestEffectiveRange: NSMakeRange(0, 5) inAttributedString: w1];
 		// This may not be exactly what we want. the bold "n't" did not pick up the italics
@@ -154,7 +154,7 @@
 		[self checkFontHasTraits: NSFontItalicTrait withLongestEffectiveRange: NSMakeRange(10, 11) inAttributedString: w1];
 		
 		COAttributedStringWrapper *w2 = [[COAttributedStringWrapper alloc] initWithBacking: attributedString2];
-		UKObjectsEqual(@"hello world", [w2 string]);
+		UKObjectsEqual(@"hello world", w2.string);
 	}
 }
 

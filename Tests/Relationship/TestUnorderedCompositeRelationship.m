@@ -54,7 +54,7 @@
 		 Folder *testChild1 = sortedChildren[0];
 		 Folder *testChild2 = sortedChildren[1];
 		 
-		 UKIntsEqual(2, [sortedChildren count]);
+		 UKIntsEqual(2, sortedChildren.count);
 		 
 		 UKObjectsEqual(@"Parent", testParent.label);
 		 UKObjectsSame(testParent, testChild1.parent);
@@ -94,7 +94,7 @@
 		 Folder *testChild2 = sortedChildren[0];
 		 Folder *testChild3 = sortedChildren[1];
 		 
-		 UKIntsEqual(2, [sortedChildren count]);
+		 UKIntsEqual(2, sortedChildren.count);
 		 
 		 UKObjectsEqual(@"Parent", testParent.label);
 		 UKObjectsSame(testParent, testChild2.parent);

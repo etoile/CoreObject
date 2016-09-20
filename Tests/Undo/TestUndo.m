@@ -87,10 +87,10 @@
 	 {
 		 COPersistentRoot *testProot2 = [testCtx persistentRootForUUID: persistentRoot2.UUID];
 		 
-		 UKObjectsNotEqual([testProot1 currentRevision], persistentRoot1Revision);
-		 UKObjectsNotEqual([testProot2 currentRevision], persistentRoot2Revision);
-		 UKObjectsEqual([testProot1 currentRevision], [persistentRoot1Revision parentRevision]);
-		 UKObjectsEqual([testProot2 currentRevision], [persistentRoot2Revision parentRevision]);
+		 UKObjectsNotEqual(testProot1.currentRevision, persistentRoot1Revision);
+		 UKObjectsNotEqual(testProot2.currentRevision, persistentRoot2Revision);
+		 UKObjectsEqual(testProot1.currentRevision, persistentRoot1Revision.parentRevision);
+		 UKObjectsEqual(testProot2.currentRevision, persistentRoot2Revision.parentRevision);
 	 }];
 }
 
@@ -141,7 +141,7 @@
 		// Check that a new revision was created
 		CORevision *r4 = ctx2persistentRoot.currentRevision;
 		UKObjectsNotEqual(r3, r4);
-		UKObjectsEqual(r3, [r4 parentRevision]);
+		UKObjectsEqual(r3, r4.parentRevision);
 		UKObjectsEqual(r2.metadata[kCOCommitMetadataIdentifier], r4.metadata[kCOCommitMetadataIdentifier]);
 
 		UKObjectsEqual(@"org.etoile.CoreObject.undo", r4.metadata[kCOCommitMetadataUndoType]);
@@ -157,7 +157,7 @@
         
 		// Check that a new revision was created
 		CORevision *r5 = ctx2persistentRoot.currentRevision;
-		UKObjectsEqual(r4, [r5 parentRevision]);
+		UKObjectsEqual(r4, r5.parentRevision);
 		UKObjectsEqual(r3.metadata[kCOCommitMetadataIdentifier], r5.metadata[kCOCommitMetadataIdentifier]);
 
 		UKObjectsEqual(@"org.etoile.CoreObject.undo", r5.metadata[kCOCommitMetadataUndoType]);
@@ -174,7 +174,7 @@
         
 		// Check that a new revision was created
 		CORevision *r6 = ctx2persistentRoot.currentRevision;
-		UKObjectsEqual(r5, [r6 parentRevision]);
+		UKObjectsEqual(r5, r6.parentRevision);
 		UKObjectsEqual(r4.metadata[kCOCommitMetadataIdentifier], r6.metadata[kCOCommitMetadataIdentifier]);
 
 		UKObjectsEqual(@"org.etoile.CoreObject.redo", r6.metadata[kCOCommitMetadataUndoType]);
@@ -191,7 +191,7 @@
 		
 		// Check that a new revision was created
 		CORevision *r7 = ctx2persistentRoot.currentRevision;
-		UKObjectsEqual(r6, [r7 parentRevision]);
+		UKObjectsEqual(r6, r7.parentRevision);
 		UKObjectsEqual(r5.metadata[kCOCommitMetadataIdentifier], r7.metadata[kCOCommitMetadataIdentifier]);
 
 		UKObjectsEqual(@"org.etoile.CoreObject.redo", r7.metadata[kCOCommitMetadataUndoType]);
@@ -609,7 +609,7 @@
 				   to: (CORevision *)b
 {
 	NSArray *subCommands = ((COCommandGroup *)aCommand).contents;
-	UKIntsEqual(1, [subCommands count]);
+	UKIntsEqual(1, subCommands.count);
 	
 	COCommandSetCurrentVersionForBranch *command = [subCommands firstObject];
 	UKObjectKindOf(command, COCommandSetCurrentVersionForBranch);
@@ -645,11 +645,11 @@
 	[ctx commitWithIdentifier: @"insert-item" undoTrack: _testTrack error: nil];
 	CORevision *r2 = doc1.currentRevision;
 	
-	UKObjectsEqual((@[child1, child2]), [root contents]);
+	UKObjectsEqual((@[child1, child2]), root.contents);
 	
 	// Check track contents
 	UKIntsEqual(2, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
-	UKIntsEqual(3, [_testTrack.nodes count]);
+	UKIntsEqual(3, _testTrack.nodes.count);
 	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
 	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r0 to: r1];
 	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r1 to: r2];
@@ -660,11 +660,11 @@
 	[_testTrack undoNode: _testTrack.nodes[1]];
 	CORevision *r3 = doc1.currentRevision;
 	
-	UKObjectsEqual(@[child2], [root contents]);
+	UKObjectsEqual(@[child2], root.contents);
 	
 	// Check track contents
 	UKIntsEqual(3, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
-	UKIntsEqual(4, [_testTrack.nodes count]);
+	UKIntsEqual(4, _testTrack.nodes.count);
 	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
 	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r0 to: r1];
 	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r1 to: r2];
@@ -689,7 +689,7 @@
 	// Efficiency test: the r3 commit should only have written one item to the store
 	// (root) since that was the only change.
 	COItemGraph *r3PartialItemGraph = [ctx.store partialItemGraphFromRevisionUUID: r2.UUID toRevisionUUID: r3.UUID persistentRoot: doc1.UUID];
-	UKObjectsEqual(@[root.UUID], [r3PartialItemGraph itemUUIDs]);
+	UKObjectsEqual(@[root.UUID], r3PartialItemGraph.itemUUIDs);
 	
 	// selective redo child1 insertion
 	[_testTrack redoNode: _testTrack.nodes[1]];
@@ -758,7 +758,7 @@
 
 	// Check track contents
 	UKIntsEqual(4, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
-	UKIntsEqual(5, [_testTrack.nodes count]);
+	UKIntsEqual(5, _testTrack.nodes.count);
 	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
 	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r0 to: r2];
 	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r2 to: r4];

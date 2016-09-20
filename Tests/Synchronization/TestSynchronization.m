@@ -116,7 +116,7 @@ static ETUUID *branchBUUID;
     COPersistentRootInfo *clientInfo = [store persistentRootInfoForUUID: persistentRootUUID];
     UKNotNil(clientInfo);
     
-    UKIntsEqual(3, [[clientInfo branches] count]);
+    UKIntsEqual(3, clientInfo.branches.count);
     
     COBranchInfo *currentBranch = clientInfo.currentBranchInfo;
     COBranchInfo *replicatedBranchA = [[clientInfo branchInfosWithMetadataValue: [branchAUUID stringValue]
@@ -209,7 +209,7 @@ static ETUUID *branchBUUID;
     clientInfo = [store persistentRootInfoForUUID: persistentRootUUID];
     UKNotNil(clientInfo);
     
-    UKIntsEqual(2, [[clientInfo branches] count]);
+    UKIntsEqual(2, clientInfo.branches.count);
 
     COBranchInfo *currentBranch = clientInfo.currentBranchInfo;
     
@@ -292,7 +292,7 @@ static ETUUID *branchBUUID;
     // "cheapCopyUUID" persistent root has been replicated to the client.
     
     COPersistentRootInfo *clientCheapCopyInfo = [store persistentRootInfoForUUID: cheapCopyUUID];
-    UKIntsEqual(2, [[clientCheapCopyInfo branches] count]);
+    UKIntsEqual(2, clientCheapCopyInfo.branches.count);
     
     COBranchInfo *currentBranch = [clientCheapCopyInfo currentBranchInfo];
     COBranchInfo *replicatedCheapCopyBranch = [[clientCheapCopyInfo branchInfosWithMetadataValue: [cheapCopyBranchUUID stringValue]
@@ -334,7 +334,7 @@ static ETUUID *branchBUUID;
     
 	COPersistentRootInfo *clientInfo = [store persistentRootInfoForUUID: persistentRootUUID];
     UKNotNil(clientInfo);
-	UKIntsEqual(2, [[clientInfo branches] count]);
+	UKIntsEqual(2, clientInfo.branches.count);
 	
     txn = [[COStoreTransaction alloc] init];
     ETUUID *clientCommit2 = [ETUUID UUID];
@@ -369,7 +369,7 @@ static ETUUID *branchBUUID;
     serverInfo = [serverStore persistentRootInfoForUUID: persistentRootUUID];
     UKNotNil(serverInfo);
     
-    UKIntsEqual(2, [[serverInfo branches] count]);
+    UKIntsEqual(2, serverInfo.branches.count);
 	
     COBranchInfo *currentBranch = serverInfo.currentBranchInfo;
     
@@ -434,9 +434,9 @@ static ETUUID *branchBUUID;
 	
 	// These next two lines are no longer needed if -commitStoreTransaction:
 	// blocks while sending in-process editing context notifications.
-    //UKIntsEqual(1, [[serverPersistentRoot branches] count]);
+    //UKIntsEqual(1, serverPersistentRoot.branches.count);
 	//[self wait];
-    UKIntsEqual(2, [[serverPersistentRoot branches] count]);
+    UKIntsEqual(2, serverPersistentRoot.branches.count);
 	
 	// Server merges remote branch into local branch
 	{
@@ -445,7 +445,7 @@ static ETUUID *branchBUUID;
 		{
 			return (BOOL)(obj.metadata[@"replcatedBranch"] != nil);
 		}];
-		UKIntsEqual(1, [serverRemoteBranches count]);
+		UKIntsEqual(1, serverRemoteBranches.count);
 		COBranch *serverRemoteBranch = [serverRemoteBranches anyObject];
 		UKObjectsNotSame(serverLocalBranch, serverRemoteBranch);
 		
@@ -486,7 +486,7 @@ static ETUUID *branchBUUID;
 		{
 			return (BOOL)(obj.metadata[@"replcatedBranch"] != nil);
 		}];
-		UKIntsEqual(1, [serverRemoteBranches count]);
+		UKIntsEqual(1, serverRemoteBranches.count);
 		COBranch *serverRemoteBranch = [serverRemoteBranches anyObject];
 		UKObjectsNotSame(serverLocalBranch, serverRemoteBranch);
 		

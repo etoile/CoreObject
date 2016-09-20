@@ -898,7 +898,7 @@
 		NSObject *content = [NSObject new];
 		weakReference = content;
 		[set addObject: content];
-		UKIntsEqual(1, [set count]);
+		UKIntsEqual(1, set.count);
 		UKNotNil(weakReference);
 	}
 	

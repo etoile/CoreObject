@@ -248,7 +248,7 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 	/* Trim property suffix if present (e.g. /shortDescription) */
 
 	NSArray *components = [self.identifier componentsSeparatedByString: @"/"];
-	ETAssert([components count] == 1 || [components count] == 2);
+	ETAssert(components.count == 1 || components.count == 2);
 	NSString *idMinusProperty = [components firstObject];
 
 	/* Trim operation suffix (e.g. .rename) */

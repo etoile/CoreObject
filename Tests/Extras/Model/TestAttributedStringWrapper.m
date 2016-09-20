@@ -145,7 +145,7 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 		UKTrue(NSEqualRanges(aRange, _lastEditedRange));
 		UKIntsEqual(aMask, _lastEditedMask);
 		UKIntsEqual(delta, _lastChangeInLength);
-		UKObjectsEqual(newString, [as string]);
+		UKObjectsEqual(newString, as.string);
 		UKIntsEqual([newString length], [as length]);
 	}
 }
@@ -455,8 +455,8 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	
 	[as replaceCharactersInRange: NSMakeRange(1, 1) withString: @""];
 	
-	UKObjectsEqual(@"ac", [as string]);
-	UKIntsEqual(2, [attributedString.chunks count]);
+	UKObjectsEqual(@"ac", as.string);
+	UKIntsEqual(2, attributedString.chunks.count);
 	UKObjectsEqual(@"a", [attributedString.chunks[0] text]);
 	UKObjectsEqual(@"c", [attributedString.chunks[1] text]);
 }
@@ -468,8 +468,8 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	// Delete chunks 'b' and 'c', and the first character of 'dd'
 	[as replaceCharactersInRange: NSMakeRange(1, 3) withString: @""];
 	
-	UKObjectsEqual(@"ad", [as string]);
-	UKIntsEqual(2, [attributedString.chunks count]);
+	UKObjectsEqual(@"ad", as.string);
+	UKIntsEqual(2, attributedString.chunks.count);
 	UKObjectsEqual(@"a", [attributedString.chunks[0] text]);
 	UKObjectsEqual(@"d", [attributedString.chunks[1] text]);
 }
@@ -477,11 +477,11 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 - (void) testRemovingAttributeMergesAdjacentChunks
 {
 	[self appendHTMLString: @"a<B>b</B>c" toAttributedString: attributedString];
-	UKIntsEqual(3, [attributedString.chunks count]);
+	UKIntsEqual(3, attributedString.chunks.count);
 	
 	[self setFontTraits: 0 inRange: NSMakeRange(1,1) inTextStorage:as];
-	UKObjectsEqual(@"abc", [as string]);
-	UKIntsEqual(1, [attributedString.chunks count]);
+	UKObjectsEqual(@"abc", as.string);
+	UKIntsEqual(1, attributedString.chunks.count);
 	UKObjectsEqual(@"abc", [attributedString.chunks[0] text]);
 }
 
@@ -490,8 +490,8 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	[self appendHTMLString: @"a<B>b</B>c" toAttributedString: attributedString];
 	
 	[as replaceCharactersInRange: NSMakeRange(1, 1) withString: @""];
-	UKObjectsEqual(@"ac", [as string]);
-	UKIntsEqual(1, [attributedString.chunks count]);
+	UKObjectsEqual(@"ac", as.string);
+	UKIntsEqual(1, attributedString.chunks.count);
 	UKObjectsEqual(@"ac", [attributedString.chunks[0] text]);
 }
 

@@ -398,8 +398,8 @@
 	
 	UKObjectsEqual(r2.UUID, r2cxt2.UUID);
 
-	UKObjectsEqual(r1, [r2 parentRevision]);
-	UKRaisesException([r2cxt2 parentRevision]);
+	UKObjectsEqual(r1, r2.parentRevision);
+	UKRaisesException(r2cxt2.parentRevision);
 }
 
 - (void) testCommitWithinCommitNotificationIllegal

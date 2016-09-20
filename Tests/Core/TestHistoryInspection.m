@@ -162,18 +162,18 @@
 
 - (void) testRevisionParentRevision
 {
-	UKNil([r0 parentRevision]);
+	UKNil(r0.parentRevision);
 	UKNil([r0 mergeParentRevision]);
-	UKObjectsEqual(r0, [r1 parentRevision]);
-	UKObjectsEqual(r1, [r2 parentRevision]);
-	UKObjectsEqual(r1, [r3 parentRevision]);
-	UKObjectsEqual(r2, [r4 parentRevision]);
-	UKObjectsEqual(r3, [r5 parentRevision]);
-	UKObjectsEqual(r3, [r6 parentRevision]);
-	UKObjectsEqual(r6, [r7 parentRevision]);
-	UKObjectsEqual(r6, [r8 parentRevision]);
-	UKObjectsEqual(r7, [r9 parentRevision]);
-	UKObjectsEqual(r6, [r10 parentRevision]);
+	UKObjectsEqual(r0, r1.parentRevision);
+	UKObjectsEqual(r1, r2.parentRevision);
+	UKObjectsEqual(r1, r3.parentRevision);
+	UKObjectsEqual(r2, r4.parentRevision);
+	UKObjectsEqual(r3, r5.parentRevision);
+	UKObjectsEqual(r3, r6.parentRevision);
+	UKObjectsEqual(r6, r7.parentRevision);
+	UKObjectsEqual(r6, r8.parentRevision);
+	UKObjectsEqual(r7, r9.parentRevision);
+	UKObjectsEqual(r6, r10.parentRevision);
 }
 
 - (void) testRevisionPersistentRootUUID
@@ -196,15 +196,15 @@
 
 - (void) testParentBranch
 {
-    UKObjectsEqual(branch1A, [branch1B parentBranch]);
-    UKNil([branch1A parentBranch]);
+    UKObjectsEqual(branch1A, branch1B.parentBranch);
+    UKNil(branch1A.parentBranch);
 	{
 		COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: ctx.store];
 		UKObjectsEqual(branch1A.UUID, [[[[ctx2 persistentRootForUUID: p1.UUID]
 										   branchForUUID: branch1B.UUID] parentBranch] UUID]);
 	}
 	
-	UKObjectsEqual(branch1A, [branch2A parentBranch]);
+	UKObjectsEqual(branch1A, branch2A.parentBranch);
 	{
 		COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: ctx.store];
 		UKObjectsEqual(branch1A.UUID, [[[[ctx2 persistentRootForUUID: p2.UUID] currentBranch] parentBranch] UUID]);
@@ -349,7 +349,7 @@
 	[p1 commit];
 	
 	CORevision *r11 = branch1B.currentRevision;
-	UKObjectsEqual(r6, [r11 parentRevision]);
+	UKObjectsEqual(r6, r11.parentRevision);
 	
 	UKObjectsEqual(r11, branch1B.headRevision);
 }

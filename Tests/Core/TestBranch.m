@@ -69,8 +69,8 @@
 	[self checkBranchWithExistingAndNewContext: originalBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKNotNil([testBranch currentRevision]);
-		 UKObjectsEqual([testBranch currentRevision], [testProot.rootObject revision]);
+		 UKNotNil(testBranch.currentRevision);
+		 UKObjectsEqual(testBranch.currentRevision, [testProot.rootObject revision]);
 	 }];
 }
 
@@ -79,7 +79,7 @@
 	CORevision *zerothRevision = originalBranch.currentRevision;
 	UKNotNil(originalBranch);
 	UKNotNil(zerothRevision);
-	UKNil([zerothRevision parentRevision]);
+	UKNil(zerothRevision.parentRevision);
 	
 	[rootObj setValue: @"Groceries" forProperty: @"label"];
 	[ctx commit];
@@ -87,7 +87,7 @@
 	CORevision *firstRevision = originalBranch.currentRevision;
 	UKNotNil(originalBranch);
 	UKNotNil(firstRevision);
-	UKNotNil([firstRevision parentRevision]);
+	UKNotNil(firstRevision.parentRevision);
 
 	[rootObj setValue: @"Shopping List" forProperty: @"label"];
 	[ctx commit];
@@ -107,13 +107,13 @@
 	// First undo (Todo -> Shopping List)
 	[originalBranch undo]; //[originalBranch setCurrentRevision: secondRevision];
 	UKStringsEqual(@"Shopping List", [rootObj valueForProperty: @"label"]);
-	UKObjectsEqual(secondRevision, [originalBranch currentRevision]);
+	UKObjectsEqual(secondRevision, originalBranch.currentRevision);
 	UKObjectsEqual(thirdRevision, originalBranch.headRevision);
 	
 	// Second undo (Shopping List -> Groceries)
 	[originalBranch undo]; //[originalBranch setCurrentRevision: firstRevision];
 	UKStringsEqual(@"Groceries", [rootObj valueForProperty: @"label"]);
-	UKObjectsEqual(firstRevision, [originalBranch currentRevision]);
+	UKObjectsEqual(firstRevision, originalBranch.currentRevision);
 	UKObjectsEqual(thirdRevision, originalBranch.headRevision);
 	
     // Verify that the revert to firstRevision is not committed
@@ -123,13 +123,13 @@
 	// First redo (Groceries -> Shopping List)
 	[originalBranch redo]; //[originalBranch setCurrentRevision: secondRevision];
 	UKStringsEqual(@"Shopping List", [rootObj valueForProperty: @"label"]);
-	UKObjectsEqual(secondRevision, [originalBranch currentRevision]);
+	UKObjectsEqual(secondRevision, originalBranch.currentRevision);
 	UKObjectsEqual(thirdRevision, originalBranch.headRevision);
 	
     // Second redo (Shopping List -> Todo)
 	[originalBranch redo]; //[originalBranch setCurrentRevision: thirdRevision];
 	UKStringsEqual(@"Todo", [rootObj valueForProperty: @"label"]);
-	UKObjectsEqual(thirdRevision, [originalBranch currentRevision]);
+	UKObjectsEqual(thirdRevision, originalBranch.currentRevision);
 	UKObjectsEqual(thirdRevision, originalBranch.headRevision);
 }
 
@@ -180,7 +180,7 @@
 	[para2 setValue: @"paragraph 2" forProperty: @"label"];
 	[rootObj addObject: para1];
 	[rootObj addObject: para2];
-	UKIntsEqual(2, [rootObj count]);
+	UKIntsEqual(2, rootObj.count);
 	[ctx commit]; // Revision 2 (base 1)
 
     CORevision *secondRevision = originalBranch.currentRevision;    
@@ -188,7 +188,7 @@
     
     // Undo
     [originalBranch undo]; //[originalBranch setCurrentRevision: firstRevision];
-	UKIntsEqual(0, [rootObj count]);
+	UKIntsEqual(0, rootObj.count);
 
 	COContainer *para3 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	[para3 setValue: @"paragraph 3" forProperty: @"label"];
@@ -197,16 +197,16 @@
     CORevision *divergentRevision = originalBranch.currentRevision;
     UKNotNil(divergentRevision);
     
-	UKIntsEqual(1, [rootObj count]); // Revision 3 (base 1)
+	UKIntsEqual(1, rootObj.count); // Revision 3 (base 1)
 
     // Undo
     [originalBranch undo]; //[originalBranch setCurrentRevision: firstRevision];
-	UKIntsEqual(0, [rootObj count]);
+	UKIntsEqual(0, rootObj.count);
 
     
     // Redo
     [originalBranch redo]; //[originalBranch setCurrentRevision: divergentRevision];
-	UKIntsEqual(1, [rootObj count]);
+	UKIntsEqual(1, rootObj.count);
 	UKStringsEqual(@"paragraph 3", [[rootObj contentArray][0] valueForProperty: @"label"]);
 }
 
@@ -508,7 +508,7 @@
 		 
 		 // Check for the proper relationship
 		 
-		 UKObjectsEqual(initialRev, [secondBranchRev parentRevision]);
+		 UKObjectsEqual(initialRev, secondBranchRev.parentRevision);
 		 
 		 UKObjectsNotEqual(initialBranchRev, secondBranchRev);
 		 UKObjectsNotEqual(initialBranchRev, initialRev);
@@ -538,7 +538,7 @@
     [persistentRoot commit];
 	
 	CORevision *mergedRevision = persistentRoot.currentRevision;
-	UKObjectsEqual(headRevBeforeMerge, [mergedRevision parentRevision]);
+	UKObjectsEqual(headRevBeforeMerge, mergedRevision.parentRevision);
 	UKObjectsEqual(mergingBranchRevision, [mergedRevision mergeParentRevision]);
 }
 
@@ -607,7 +607,7 @@
 
 		 [testBranch discardAllChanges];
 		 UKFalse([testBranch hasChanges]);
-		 UKObjectsEqual(secondRevision, [testBranch currentRevision]);
+		 UKObjectsEqual(secondRevision, testBranch.currentRevision);
 		 UKObjectsEqual(@"test", [testBranch.rootObject label]);
 	 }];
 }
@@ -841,7 +841,7 @@
 															toRevisionUUID: persistentRoot.currentRevision.UUID
 															persistentRoot: persistentRoot.UUID];
 	/* The last commit changed exactly 2 objects: rootObj (modified) and notGarbage (inserted */
-	UKObjectsEqual(S(rootObj.UUID, notGarbage.UUID), SA([lastCommitDelta itemUUIDs]));
+	UKObjectsEqual(S(rootObj.UUID, notGarbage.UUID), SA(lastCommitDelta.itemUUIDs));
 }
 #endif
 

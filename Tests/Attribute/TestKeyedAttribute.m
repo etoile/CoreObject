@@ -34,7 +34,7 @@
 {
 	NSArray *keyedProperties = model.additionalStoreItemUUIDs.allKeys;
 
-	UKIntsEqual(1, [keyedProperties count]);
+	UKIntsEqual(1, keyedProperties.count);
 	UKStringsEqual(@"entries", [keyedProperties firstObject]);
 }
 

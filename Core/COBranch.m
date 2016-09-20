@@ -544,7 +544,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 	// in a cheap copy to before the copy was made. I'm disabling this
 	// block to get that behaviour.
 #if 0
-    if ([[self initialRevision] isEqual: [self currentRevision]])
+    if ([[self initialRevision] isEqual: self.currentRevision])
     {
         return nil;
     }

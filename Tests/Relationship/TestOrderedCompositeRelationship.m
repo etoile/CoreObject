@@ -55,7 +55,7 @@
 		 OutlineItem *testChild1 = testParent.contents[0];
 		 OutlineItem *testChild2 = testParent.contents[1];
 		 
-		 UKIntsEqual(2, [testParent.contents count]);
+		 UKIntsEqual(2, testParent.contents.count);
 		 
 		 UKObjectsEqual(@"Parent", testParent.label);
 		 UKObjectsSame(testParent, testChild1.parentContainer);
@@ -90,7 +90,7 @@
 		 OutlineItem *testChild2 = testParent.contents[0];
 		 OutlineItem *testChild3 = testParent.contents[1];
 		 
-		 UKIntsEqual(2, [testParent.contents count]);
+		 UKIntsEqual(2, testParent.contents.count);
 		 
 		 UKObjectsEqual(@"Parent", testParent.label);
 		 UKObjectsSame(testParent, testChild2.parentContainer);

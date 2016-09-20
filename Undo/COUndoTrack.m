@@ -348,7 +348,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 {
 	ETAssert([aCommand isKindOfClass: [COCommandGroup class]]);
 
-	ETAssert([_trackStateForName count] <= 1);
+	ETAssert(_trackStateForName.count <= 1);
 	COUndoTrackState *state = _trackStateForName[_name];
 	
 	// Set ownership pointers (not parent UUID!)
@@ -510,8 +510,8 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
  */
 - (void) undo: (NSArray *)undo1 redo: (NSArray *)redo1 undo: (NSArray *)undo2 redo: (NSArray *)redo2
 {
-	ETAssert([undo1 count] == 0 || [redo1 count] == 0);
-	ETAssert([undo2 count] == 0 || [redo2 count] == 0);
+	ETAssert(undo1.count == 0 || redo1.count == 0);
+	ETAssert(undo2.count == 0 || redo2.count == 0);
 	
 	COStoreTransaction *txn = [COStoreTransaction new];
 	

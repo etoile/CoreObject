@@ -98,9 +98,9 @@ static NSArray *initialUUIDs;
 
 - (void) testCopyWithinContext
 {
-    UKIntsEqual(9, [[initialGraph itemUUIDs] count]);
+    UKIntsEqual(9, initialGraph.itemUUIDs.count);
 	ETUUID *drawing2 = [copier copyItemWithUUID: drawing fromGraph: initialGraph toGraph: initialGraph];
-    UKIntsEqual(17, [[initialGraph itemUUIDs] count]);
+    UKIntsEqual(17, initialGraph.itemUUIDs.count);
     
 	// Check structure ("copy semantics.pdf" page 9)
 	
@@ -160,9 +160,9 @@ static NSArray *initialUUIDs;
 	ETUUID *aCopyUUID = [copier copyItemWithUUID: a.UUID fromGraph: ctx toGraph: ctx];
 	id aCopy = [ctx loadedObjectForUUID: aCopyUUID];
 	
-	UKIntsEqual(3, [[ctx itemUUIDs] count]);
+	UKIntsEqual(3, ctx.itemUUIDs.count);
 	UKObjectsNotEqual(a, aCopy);
-	UKObjectsEqual([a contents], [aCopy contents]);
+	UKObjectsEqual(a.contents, [aCopy contents]);
 }
 
 - (void) testCOObjectCopyWithIsSharedYES
@@ -178,9 +178,9 @@ static NSArray *initialUUIDs;
 	ETUUID *aCopyUUID = [copier copyItemWithUUID: a.UUID fromGraph: ctx toGraph: ctx];
 	id aCopy = [ctx loadedObjectForUUID: aCopyUUID];
 	
-	UKIntsEqual(3, [[ctx itemUUIDs] count]);
+	UKIntsEqual(3, ctx.itemUUIDs.count);
 	UKObjectsNotEqual(a, aCopy);
-	UKObjectsEqual([a contents], [aCopy contents]);
+	UKObjectsEqual(a.contents, [aCopy contents]);
 }
 
 - (void) testCOObjectCopyWithIsSharedNO
@@ -196,9 +196,9 @@ static NSArray *initialUUIDs;
 	ETUUID *aCopyUUID = [copier copyItemWithUUID: a.UUID fromGraph: ctx toGraph: ctx];
 	id aCopy = [ctx loadedObjectForUUID: aCopyUUID];
 	
-	UKIntsEqual(4, [[ctx itemUUIDs] count]);
+	UKIntsEqual(4, ctx.itemUUIDs.count);
 	UKObjectsNotEqual(a, aCopy);
-	UKObjectsNotEqual([a contents], [aCopy contents]);
+	UKObjectsNotEqual(a.contents, [aCopy contents]);
 }
 
 @end

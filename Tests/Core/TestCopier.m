@@ -79,13 +79,13 @@ static ETUUID *drawing2;
  */
 - (void) testCopyWithinContext
 {
-    UKIntsEqual(4, [[initialGraph itemUUIDs] count]);
+    UKIntsEqual(4, initialGraph.itemUUIDs.count);
     
     ETUUID *group1Copy = [copier copyItemWithUUID: group1
                                         fromGraph: initialGraph
                                           toGraph: initialGraph];
     
-    UKIntsEqual(6, [[initialGraph itemUUIDs] count]);
+    UKIntsEqual(6, initialGraph.itemUUIDs.count);
     
     ETUUID *shape1Copy = [[initialGraph itemForUUID: group1Copy] valueForAttribute: @"contents"][0];
     ETUUID *shape1CopyStyle = [[initialGraph itemForUUID: shape1Copy] valueForAttribute: @"styles"][0];
@@ -124,13 +124,13 @@ static ETUUID *drawing2;
     COItemGraph *drawing2Graph = [[COItemGraph alloc] initWithItems: A(drawing2Item, style1Item)
                                                      rootItemUUID: drawing2];
     
-    UKIntsEqual(2, [[drawing2Graph itemUUIDs] count]);
+    UKIntsEqual(2, drawing2Graph.itemUUIDs.count);
     
     ETUUID *group1Copy = [copier copyItemWithUUID: group1
                                         fromGraph: initialGraph
                                           toGraph: drawing2Graph];
     
-    UKIntsEqual(4, [[drawing2Graph itemUUIDs] count]);
+    UKIntsEqual(4, drawing2Graph.itemUUIDs.count);
     
     ETUUID *shape1Copy = [[drawing2Graph itemForUUID: group1Copy] valueForAttribute: @"contents"][0];
     ETUUID *shape1CopyStyle1 = [[drawing2Graph itemForUUID: shape1Copy] valueForAttribute: @"styles"][0];
@@ -162,10 +162,10 @@ static ETUUID *drawing2;
     
     COObject *tag1copy = [ctx2 loadedObjectForUUID: tag1copyUUID];
     
-    UKIntsEqual(2, [[ctx2 itemUUIDs] count]);
+    UKIntsEqual(2, ctx2.itemUUIDs.count);
     
     NSSet *refs = [tag1copy valueForKey: kCOReferences];
-    UKIntsEqual(1, [refs count]);
+    UKIntsEqual(1, refs.count);
     
     COObject *childcopy = [refs anyObject];
     UKObjectsNotEqual(childcopy.UUID, child.UUID);

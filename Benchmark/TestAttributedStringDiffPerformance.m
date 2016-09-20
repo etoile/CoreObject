@@ -81,9 +81,9 @@
 	UKTrue(diffTimesFaster >= 5);
 		
 	NSLog(@"COAttributedStringDiff diff with a trivial insertion and %d chunks took %d ms. Copying %d objects took %d ms. Expected diff to be at least 5x faster than copy, was %f x faster.",
-		  (int)[[as1 chunks] count],
+		  (int)as1.chunks.count,
 		  (int)(diffTime * 1000),
-		  (int)[[ctx1 itemUUIDs] count],
+		  (int)ctx1.itemUUIDs.count,
 		  (int)(copyTime * 1000),
 		  diffTimesFaster);
 }

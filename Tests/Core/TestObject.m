@@ -462,7 +462,7 @@
 {
 	UKNil(parent.insertObjectArgumentsForCalls);
 	[parent addObject: other];
-	UKIntsEqual(1, [parent.insertObjectArgumentsForCalls count]);
+	UKIntsEqual(1, parent.insertObjectArgumentsForCalls.count);
 	
 	// Check the arguments that were passed to -insertObject:atIndex:hint:
 	NSDictionary *args = parent.insertObjectArgumentsForCalls[0];

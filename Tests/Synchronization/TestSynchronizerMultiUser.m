@@ -110,7 +110,7 @@
 
 - (NSArray *)serverMessages
 {
-	return [transport serverMessages];
+	return transport.serverMessages;
 }
 
 - (NSArray *)client1Messages
@@ -128,9 +128,9 @@
 	OutlineItem *client1Child = [self addAndCommitClient1Child];
 	OutlineItem *client2Child = [self addAndCommitClient2Child];
 	
-	UKIntsEqual(2, [[self serverMessages] count]);
-	UKObjectKindOf([self serverMessages][0], COSynchronizerPushedRevisionsFromClientMessage);
-	UKObjectKindOf([self serverMessages][0], COSynchronizerPushedRevisionsFromClientMessage);
+	UKIntsEqual(2, self.serverMessages.count);
+	UKObjectKindOf(self.serverMessages[0], COSynchronizerPushedRevisionsFromClientMessage);
+	UKObjectKindOf(self.serverMessages[0], COSynchronizerPushedRevisionsFromClientMessage);
 	UKIntsEqual(0, [[self client1Messages] count]);
 	UKIntsEqual(0, [[self client2Messages] count]);
 	
@@ -138,7 +138,7 @@
 	// and send a push response back to each of the clients
 	[transport deliverMessagesToServer];
 	
-	UKIntsEqual(0, [[self serverMessages] count]);
+	UKIntsEqual(0, self.serverMessages.count);
 	UKIntsEqual(2, [[self client1Messages] count]);
 	UKObjectKindOf([self client1Messages][0], COSynchronizerResponseToClientForSentRevisionsMessage);
 	UKObjectKindOf([self client1Messages][1], COSynchronizerPushedRevisionsToClientMessage);
@@ -152,7 +152,7 @@
 	
 	[transport deliverMessagesToClient: @"client1"];
 	
-	UKIntsEqual(0, [[self serverMessages] count]);
+	UKIntsEqual(0, self.serverMessages.count);
 	UKIntsEqual(0, [[self client1Messages] count]);
 	UKIntsEqual(2, [[self client2Messages] count]);
 	
@@ -161,7 +161,7 @@
 
 	[transport deliverMessagesToClient: @"client2"];
 	
-	UKIntsEqual(0, [[self serverMessages] count]);
+	UKIntsEqual(0, self.serverMessages.count);
 	UKIntsEqual(0, [[self client1Messages] count]);
 	UKIntsEqual(0, [[self client2Messages] count]);
 	

@@ -74,28 +74,28 @@
 	CORevision *r2b = persistentRoot.currentRevision;
 	
 	[_testTrack undo];
-	UKObjectsEqual(r1, [persistentRoot currentRevision]);
+	UKObjectsEqual(r1, persistentRoot.currentRevision);
 	[_testTrack undo];
-	UKObjectsEqual(r3, [persistentRoot currentRevision]);
+	UKObjectsEqual(r3, persistentRoot.currentRevision);
 	[_testTrack undo];
-	UKObjectsEqual(r2, [persistentRoot currentRevision]);
+	UKObjectsEqual(r2, persistentRoot.currentRevision);
 	[_testTrack undo];
-	UKObjectsEqual(r1, [persistentRoot currentRevision]);
+	UKObjectsEqual(r1, persistentRoot.currentRevision);
 	[_testTrack undo];
-	UKObjectsEqual(r0, [persistentRoot currentRevision]);
+	UKObjectsEqual(r0, persistentRoot.currentRevision);
 	
 	UKFalse([_testTrack canUndo]);
 	
 	[_testTrack redo];
-	UKObjectsEqual(r1, [persistentRoot currentRevision]);
+	UKObjectsEqual(r1, persistentRoot.currentRevision);
 	[_testTrack redo];
-	UKObjectsEqual(r2, [persistentRoot currentRevision]);
+	UKObjectsEqual(r2, persistentRoot.currentRevision);
 	[_testTrack redo];
-	UKObjectsEqual(r3, [persistentRoot currentRevision]);
+	UKObjectsEqual(r3, persistentRoot.currentRevision);
 	[_testTrack redo];
-	UKObjectsEqual(r1, [persistentRoot currentRevision]);
+	UKObjectsEqual(r1, persistentRoot.currentRevision);
 	[_testTrack redo];
-	UKObjectsEqual(r2b, [persistentRoot currentRevision]);
+	UKObjectsEqual(r2b, persistentRoot.currentRevision);
 	
 	UKFalse([_testTrack canRedo]);
 }
@@ -105,7 +105,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: proot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(currentExpected, [testProot currentRevision]);
+		 UKObjectsEqual(currentExpected, testProot.currentRevision);
 		 UKObjectsEqual(headExpected, [testProot headRevision]);
 	 }];
 }

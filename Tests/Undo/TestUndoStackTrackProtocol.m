@@ -179,7 +179,7 @@
 
 - (void) checkNodes: (NSArray *)nodes
 {
-	UKIntsEqual(5, [nodes count]);
+	UKIntsEqual(5, nodes.count);
 	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], nodes[0]);
 	[self checkCommand: nodes[1] isSetVersionFrom: r0 to: r1];
 	[self checkCommand: nodes[2] isSetVersionFrom: r1 to: r2];
@@ -241,14 +241,14 @@
 	[track setCurrentNode: target];
 	
 	[self checkCommand: [track currentNode] isSetVersionFrom: r1 to: r2];
-	UKObjectsEqual(r2, [persistentRoot currentRevision]);
+	UKObjectsEqual(r2, persistentRoot.currentRevision);
 	
 	// Redo back to the start
 	
 	[track setCurrentNode: startNode];
 
 	[self checkCommand: [track currentNode] isSetVersionFrom: r3 to: r4];
-	UKObjectsEqual(r4, [persistentRoot currentRevision]);
+	UKObjectsEqual(r4, persistentRoot.currentRevision);
 }
 
 - (void) testSetCurrentNodeToPlaceholder
@@ -268,7 +268,7 @@
 	UKFalse([track canUndo]);
 	UKTrue([track canRedo]);
 	UKObjectsEqual(@"0", [persistentRoot.rootObject label]);
-	UKObjectsEqual(r0, [persistentRoot currentRevision]);
+	UKObjectsEqual(r0, persistentRoot.currentRevision);
 	
 	// Redo 1 node
 	
@@ -279,7 +279,7 @@
 	UKTrue([track canUndo]);
 	UKTrue([track canRedo]);
 	UKObjectsEqual(@"1", [persistentRoot.rootObject label]);
-	UKObjectsEqual(r1, [persistentRoot currentRevision]);
+	UKObjectsEqual(r1, persistentRoot.currentRevision);
 }
 
 @end

@@ -69,7 +69,7 @@
     [merged applyTo: ctx1];
     
 	UKStringsEqual(@"Groceries", [subchild1 valueForProperty: @"label"]);
-    UKObjectsEqual(@[subchild1], [child3 contents]);
+    UKObjectsEqual(@[subchild1], child3.contents);
 	UKObjectsSame(child3, [subchild1 valueForProperty: @"parentContainer"]);
 	UKIntsEqual(3, [[parent contentArray] count]);
 	OutlineItem *child4 = (id)[ctx1 loadedObjectForUUID: child4Ctx3.UUID];
@@ -170,7 +170,7 @@
 	OutlineItem *childCtx3 = (OutlineItem *)[ctx3 loadedObjectForUUID: child.UUID];
 	
 	// ctx2: move child to tag2
-	UKTrue([[tag1Ctx2 contents] containsObject: childCtx2]);
+	UKTrue([tag1Ctx2.contents containsObject: childCtx2]);
 	[tag1Ctx2 removeObject: childCtx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	[tag2Ctx2 insertObject: childCtx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	
@@ -181,7 +181,7 @@
 	//                \--child
 	
 	// ctx3: delete child from tag1
-	UKTrue([[tag1Ctx3 contents] containsObject: childCtx3]);
+	UKTrue([tag1Ctx3.contents containsObject: childCtx3]);
 	[tag1Ctx3 removeObject: childCtx3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	
 	// ctx3:
@@ -208,8 +208,8 @@
 	//               |
 	//                \--child
 	
-	UKIntsEqual(0, [[tag1 contents] count]);
-	UKIntsEqual(1, [[tag2 contents] count]);
+	UKIntsEqual(0, [tag1.contents count]);
+	UKIntsEqual(1, [tag2.contents count]);
 	UKObjectsEqual(S(tag2), [child valueForProperty: @"parentCollections"]);
 }
 
@@ -344,8 +344,8 @@
 	OutlineItem *subchild1 = (id)[ctx1 loadedObjectForUUID: subchild1Ctx2.UUID];
     UKNotNil(subchild1);
 	UKObjectsSame(child1, [subchild1 valueForProperty: @"parentContainer"]);
-    UKIntsEqual(1, [[child1 contents] count]);
-	UKObjectsEqual(A(subchild1), [child1 contents]);
+    UKIntsEqual(1, [child1.contents count]);
+	UKObjectsEqual(A(subchild1), child1.contents);
 }
 
 /**
@@ -472,7 +472,7 @@
                       child2.UUID,
                       child2a.UUID,
                       child3.UUID,
-                      child4.UUID]), [[[parent contents] mappedCollection] UUID]);
+                      child4.UUID]), [[parent.contents mappedCollection] UUID]);
 }
 
 /**
@@ -576,8 +576,8 @@
 	
 	
 	OutlineItem *child = (id)[ctx1 loadedObjectForUUID: childCtx2.UUID];
-	UKIntsEqual(1, [[tag1 contents] count]);
-	UKIntsEqual(1, [[tag2 contents] count]);
+	UKIntsEqual(1, [tag1.contents count]);
+	UKIntsEqual(1, [tag2.contents count]);
 	
     UKObjectsEqual(S(tag1, tag2), [child valueForProperty: @"parentCollections"]);
 	UKObjectsEqual(A(child), [tag1 contentArray]);
@@ -836,7 +836,7 @@
 	[doc insertObject: group1 atIndex: 1 hint: nil forProperty: @"contents"];
 	[group1 insertObject: circle1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	[group1 insertObject: square1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	UKObjectsEqual((@[line1, group1, image1]), [doc contents]);
+	UKObjectsEqual((@[line1, group1, image1]), doc.contents);
     
 	// snapshot the state:  (line1, group1=(circle1, square1), image1) into ctx3
 	[ctx3 setItemGraph: ctx1];
@@ -886,13 +886,13 @@
 	[ctx3 setItemGraph: ctx1];
 
 	group2.contents = @[item1];
-	UKObjectsEqual(A(group1, group2, item2), [doc contents]);
+	UKObjectsEqual(A(group1, group2, item2), doc.contents);
 	
 	// snapshot the state [group1, group2=[item1], item2] into ctx2
 	[ctx2 setItemGraph: ctx1];
 	
 	group1.contents = @[item2];
-	UKObjectsEqual(A(group1, group2), [doc contents]);
+	UKObjectsEqual(A(group1, group2), doc.contents);
 	
 	// the state [group1=[item2], group2=[item1]] is in ctx1
 	

@@ -297,8 +297,8 @@ static int itemChangedAtCommit(int i)
     
     NSLog(@"FTS took %lf ms", 1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
     
-    UKTrue([results count] == 1);
-    if ([results count] == 1)
+    UKTrue(results.count == 1);
+    if (results.count == 1)
     {
         COSearchResult *result = [results objectAtIndex: 0];
         UKObjectsEqual(proot.UUID, result.persistentRoot);
@@ -385,7 +385,7 @@ static int itemChangedAtCommit(int i)
     
     COItemGraph *readBack = [self currentItemGraphForPersistentRoot: proot.UUID];
     
-    NSLog(@"reading %d item itemtree took %lf ms", (int)[[readBack itemUUIDs] count],
+    NSLog(@"reading %d item itemtree took %lf ms", (int)readBack.itemUUIDs.count,
           1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
 }
 

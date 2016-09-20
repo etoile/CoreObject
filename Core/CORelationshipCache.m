@@ -145,8 +145,8 @@
         }
     }
     
-    assert([results count] == 0
-           || [results count] == 1);
+    assert(results.count == 0
+           || results.count == 1);
     
     if (results.count == 0)
     {

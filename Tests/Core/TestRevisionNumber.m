@@ -20,7 +20,7 @@
     UKNotNil(persistentRoot.UUID);
     
 	COObject *obj = persistentRoot.rootObject;
-	UKNil([obj revision]);
+	UKNil(obj.revision);
 	
 	[ctx commit];
 	
@@ -28,7 +28,7 @@
 	UKNotNil(firstCommitRev);
     
 	[obj setValue: @"The hello world label!" forProperty: @"label"];
-	UKObjectsEqual(firstCommitRev, [obj revision]);
+	UKObjectsEqual(firstCommitRev, obj.revision);
 
 	[ctx commit];
 
@@ -41,11 +41,11 @@
 		 UKObjectsNotEqual(firstCommitRev, secondCommitRev);
 		 
 		 // The base revision should be equals to the first revision
-		 UKNotNil([secondCommitRev parentRevision]);
-		 UKObjectsEqual(firstCommitRev, [secondCommitRev parentRevision]);
+		 UKNotNil(secondCommitRev.parentRevision);
+		 UKObjectsEqual(firstCommitRev, secondCommitRev.parentRevision);
 		 
 		 // The first commit revision's base revision should be nil
-		 UKNil([firstCommitRev parentRevision]);
+		 UKNil(firstCommitRev.parentRevision);
 	 }];
 }
 
@@ -62,14 +62,14 @@
 	// 1
 	COObject *obj = persistentRoot.rootObject;
 	objectUUID = obj.UUID;
-	UKNil([obj revision]);
+	UKNil(obj.revision);
 	[ctx commit];
 	CORevision *firstCommitRev = obj.revision;
 	UKNotNil(firstCommitRev);
 	
 	// 2
 	[obj setValue: @"Second Revision" forProperty: @"label"];
-	UKObjectsEqual(firstCommitRev, [obj revision]);
+	UKObjectsEqual(firstCommitRev, obj.revision);
 	[ctx commit];
 	CORevision *secondCommitRev = obj.revision;
 
@@ -77,7 +77,7 @@
 	[obj setValue: @"Third Revision" forProperty: @"label"];
 	[ctx commit];
 	CORevision *thirdCommitRev = obj.revision;
-	UKObjectsEqual(secondCommitRev, [thirdCommitRev parentRevision]);
+	UKObjectsEqual(secondCommitRev, thirdCommitRev.parentRevision);
 
     // Check that we can read the state 3 in another context
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
@@ -104,9 +104,9 @@
         // 4
         [obj2 setValue: @"Fourth Revision" forProperty: @"label"];
         [ctx2 commit];
-        UKObjectsNotEqual(secondCommitRev, [obj2 revision]);
-        UKObjectsNotEqual(thirdCommitRev, [obj2 revision]);
-        UKObjectsEqual(secondCommitRev, [[obj2 revision] parentRevision]);
+        UKObjectsNotEqual(secondCommitRev, obj2.revision);
+        UKObjectsNotEqual(thirdCommitRev, obj2.revision);
+        UKObjectsEqual(secondCommitRev, obj2.revision.parentRevision);
     }
     
 	[self wait];

@@ -74,7 +74,7 @@
 		[self unregisterAsObserverOf: object];
 	}
 
-	ETAssert([_observedObjectsSet count] == 0);
+	ETAssert(_observedObjectsSet.count == 0);
 }
 
 - (COAttributedString *)backing
@@ -404,7 +404,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 
 - (NSDictionary *)attributesAtIndex: (NSUInteger)anIndex effectiveRange: (NSRangePointer)aRangeOut
 {
-	//NSLog(@"%p (%@) attributesAtIndex %d", self, [self string], (int)anIndex);
+	//NSLog(@"%p (%@) attributesAtIndex %d", self, self.string, (int)anIndex);
 	
 	_inPrimitiveMethod = YES;
 	
@@ -470,7 +470,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 
 - (void)replaceCharactersInRange: (NSRange)aRange withString: (NSString *)aString
 {
-	//NSLog(@"%p (%@) replaceCharactersInRange %@ with '%@'", self, [self string], NSStringFromRange(aRange), aString);
+	//NSLog(@"%p (%@) replaceCharactersInRange %@ with '%@'", self, self.string, NSStringFromRange(aRange), aString);
 	
 	_inPrimitiveMethod = YES;
 		
@@ -630,7 +630,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 
 - (void)setAttributes: (NSDictionary *)aDict range: (NSRange)aRange
 {
-	//NSLog(@"%p (%@) Set attributes %@ range %@", self, [self string], aDict, NSStringFromRange(aRange));
+	//NSLog(@"%p (%@) Set attributes %@ range %@", self, self.string, aDict, NSStringFromRange(aRange));
 	
 	if (aRange.length == 0)
 	{

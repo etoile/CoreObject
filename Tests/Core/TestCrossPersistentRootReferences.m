@@ -62,7 +62,7 @@
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testLibrary, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 NSArray *library2contents = [testLibrary.rootObject valueForKey: @"contents"];
-		 UKIntsEqual(2, [library2contents count]);
+		 UKIntsEqual(2, library2contents.count);
 		 
 		 COPersistentRoot *photo1ctx2 = nil;
 		 COPersistentRoot *photo2ctx2 = nil;
@@ -100,7 +100,7 @@
 	UKFalse([photo1root hash] == [branchAroot hash]);
 	
     NSSet *set = S(photo1root, branchAroot);
-	UKIntsEqual(2, [set count]);
+	UKIntsEqual(2, set.count);
 }
 
 /*
@@ -361,7 +361,7 @@
 		 OrderedGroupWithOpposite *testGroup = [testCtx persistentRootForUUID: group.UUID].rootObject;
 		 
 		 // The parent ref points to the current branch of Group
-		 UKIntsEqual(1, [testLucyARoot.parentGroups count]);
+		 UKIntsEqual(1, testLucyARoot.parentGroups.count);
 		 UKObjectsSame(testGroup, [testLucyARoot.parentGroups anyObject]);
 		 
 		 UKFalse([[testGroup objectGraphContext] isTrackingSpecificBranch]);
@@ -378,7 +378,7 @@
 		 OrderedGroupWithOpposite *testGroup = [testCtx persistentRootForUUID: group.UUID].rootObject;
 		 
 		 // The parent ref points to the current branch of Group
-		 UKIntsEqual(1, [testLucyBRoot.parentGroups count]);
+		 UKIntsEqual(1, testLucyBRoot.parentGroups.count);
 		 UKObjectsSame(testGroup, [testLucyBRoot.parentGroups anyObject]);
 		 
 		 UKFalse([[testGroup objectGraphContext] isTrackingSpecificBranch]);
@@ -655,7 +655,7 @@
 		
 		// Check the -deletedPersistentRoots property
 		NSSet *deletedProots = [ctx2 deletedPersistentRoots];
-		UKIntsEqual(1, [deletedProots count]);
+		UKIntsEqual(1, deletedProots.count);
         COPersistentRoot *library1ctx2 = [deletedProots anyObject];
 		UKObjectsEqual(library1.UUID, library1ctx2.UUID);
         //[library1ctx2 setDeleted: NO];
