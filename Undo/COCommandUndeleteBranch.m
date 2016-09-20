@@ -28,7 +28,7 @@ static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
 
 - (id) propertyList
 {
-    NSMutableDictionary *result = [super propertyList];
+    NSMutableDictionary *result = super.propertyList;
     result[kCOCommandBranchUUID] = [_branchUUID stringValue];
     return result;
 }

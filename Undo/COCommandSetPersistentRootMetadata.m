@@ -30,7 +30,7 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
 
 - (id) propertyList
 {
-    NSMutableDictionary *result = [super propertyList];
+    NSMutableDictionary *result = super.propertyList;
     if (_oldMetadata != nil)
     {
         result[kCOCommandOldMetadata] = _oldMetadata;

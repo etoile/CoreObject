@@ -89,7 +89,7 @@ static inline void writePrimitiveValue(co_buffer_t *dest, id aValue, COType aTyp
         case kCOTypeReference:
             if ([aValue isKindOfClass: [COPath class]])
             {
-                co_buffer_store_string(dest, [(COPath *)aValue stringValue]);
+                co_buffer_store_string(dest, ((COPath *)aValue).stringValue);
             }
             else
             {
@@ -223,13 +223,13 @@ static inline void writeValue(co_buffer_t *dest, id aValue, COType aType, co_buf
 	
     co_buffer_t buf;
     co_buffer_init(&buf);
-    co_buffer_store_uuid(&buf, [self UUID]);
+    co_buffer_store_uuid(&buf, self.UUID);
     co_buffer_begin_object(&buf);
     
 	// TODO: For safety we should probaly serialize the attribute names to UTF-8 and compare
 	// them there. Although, I believe compare: should be the same as comparing Unicode character numbers
 	// which is the same as comparing UTF-8 byte sequences (mentiomed in the RFC.)
-	NSArray *propsSorted = [[self attributeNames] sortedArrayUsingSelector: @selector(compare:)];
+	NSArray *propsSorted = [self.attributeNames sortedArrayUsingSelector: @selector(compare:)];
 	
     for (NSString *prop in propsSorted)
     {

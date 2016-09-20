@@ -74,14 +74,14 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 - (id) propertyList
 {
-    NSMutableDictionary *result = [super propertyList];
+    NSMutableDictionary *result = super.propertyList;
     result[kCOCommandInitialRevisionID] = [_initialRevisionID stringValue];
     return result;
 }
 
 - (COCommand *) inverse
 {
-    COCommandDeletePersistentRoot *inverse = (id)[super inverse];
+    COCommandDeletePersistentRoot *inverse = (id)super.inverse;
 	inverse.initialRevisionID = _initialRevisionID;
     return inverse;
 }
@@ -102,17 +102,17 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 - (NSDictionary *)metadata
 {
-	return [[self revision] metadata];
+	return [self revision].metadata;
 }
 
 - (NSDate *)date
 {
-	return [[self revision] date];
+	return [self revision].date;
 }
 
 - (NSString *)localizedShortDescription
 {
-	return [[self revision] localizedShortDescription];
+	return [self revision].localizedShortDescription;
 }
 
 - (id) copyWithZone:(NSZone *)zone

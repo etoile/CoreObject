@@ -44,7 +44,7 @@
 		if (diffClass == Nil)
 		{
 			NSLog(@"WARNING: Item %@ (entity name %@) specified a diff algorithm (%@) for which there is no corresponding class",
-				  [anItem UUID], entity.name, entity.diffAlgorithm);
+				  anItem.UUID, entity.name, entity.diffAlgorithm);
 		}
 	}
 	
@@ -62,7 +62,7 @@
 {
 	NSMutableDictionary *itemUUIDsByDiffAlgorithmName = [NSMutableDictionary new];
 	
-	for (ETUUID *aUUID in [b itemUUIDs])
+	for (ETUUID *aUUID in b.itemUUIDs)
 	{
 		COItem *commonItemA = [a itemForUUID: aUUID]; // may be nil if the item was inserted in b
 		COItem *commonItemB = [b itemForUUID: aUUID];
@@ -177,7 +177,7 @@
 {
 	for (id<CODiffAlgorithm> diff in subDiffsByAlgorithmName.allValues)
 	{
-		if (![diff isEmpty])
+		if (!diff.empty)
 			return NO;
 	}
 	return YES;
@@ -187,7 +187,7 @@
 {
 	for (id<CODiffAlgorithm> diff in subDiffsByAlgorithmName.allValues)
 	{
-		if ([diff hasConflicts])
+		if (diff.hasConflicts)
 			return YES;
 	}
 	return NO;

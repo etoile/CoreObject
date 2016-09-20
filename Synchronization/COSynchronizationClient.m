@@ -25,7 +25,7 @@
     COPersistentRootInfo *info = [aStore persistentRootInfoForUUID: aRoot];
     
     NSMutableDictionary *clientNewestRevisionIDForBranchUUID = [NSMutableDictionary dictionary];
-    for (COBranchInfo *branch in [info branches])
+    for (COBranchInfo *branch in info.branches)
     {
         // N.B. Only send the server the revision UUID - backing store UUIDs are implementation details of the store
         // and two stores may not use the same backing UUID for a persistent root.
@@ -149,7 +149,7 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COStoreTransaction *tx
         
         COBranchInfo *branchToUpdate = nil;
         
-        for (COBranchInfo *branch in [info branches])
+        for (COBranchInfo *branch in info.branches)
         {
             if ([branch.metadata[@"source"] isEqual: serverID]
                 && [branch.metadata[@"replcatedBranch"] isEqual: branchUUIDString])

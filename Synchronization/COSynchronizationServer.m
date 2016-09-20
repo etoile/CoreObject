@@ -78,7 +78,7 @@ For now we do.
     
     // 2. Calculate the set of CORevisionID that the client lacks
     NSMutableSet *revisionsClientLacks = [NSMutableSet set];
-    for (COBranchInfo *branch in [serverInfo branches])
+    for (COBranchInfo *branch in serverInfo.branches)
     {
 		if ([self shouldSendBranch: branch])
 		{
@@ -89,7 +89,7 @@ For now we do.
     // Now prepare the property list output
     
     NSMutableDictionary *branches = [NSMutableDictionary dictionary];
-    for (COBranchInfo *branch in [serverInfo branches])
+    for (COBranchInfo *branch in serverInfo.branches)
     {
         if (branch.metadata[@"source"] != nil)
         {

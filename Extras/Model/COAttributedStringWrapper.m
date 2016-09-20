@@ -85,7 +85,7 @@
 - (void)setBacking:(COAttributedString *)backing
 {
 	_lastNotifiedLength = backing.length;
-	_cachedString = [backing string];
+	_cachedString = backing.string;
 	
 	[self unregisterToObserveBacking];
 	_backing = backing;
@@ -143,7 +143,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 					insertedObjects: (id)anArray
 						   userInfo: (id)info
 {
-	NSRange characterRange = {[(COAttributedStringChunk *)anArray[0] characterIndex], 0};
+	NSRange characterRange = {((COAttributedStringChunk *)anArray[0]).characterIndex, 0};
 	NSUInteger lengthDelta = 0;
 	BOOL hasAttributes = NO;
 	for (COAttributedStringChunk *insertedChunk in anArray)
@@ -189,7 +189,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	{
 		COAttributedStringChunk *chunkBeforeDeletedChunk = oldArray[aRange.location - 1];
 		ETAssert(chunkBeforeDeletedChunk.parentString == _backing);
-		characterRange.location = NSMaxRange([chunkBeforeDeletedChunk characterRange]);
+		characterRange.location = NSMaxRange(chunkBeforeDeletedChunk.characterRange);
 	}
 	
 	[self edited: NSTextStorageEditedCharacters | NSTextStorageEditedAttributes range: characterRange changeInLength: -deletedChunksLength];
@@ -220,7 +220,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	{
 		COAttributedStringChunk *chunkBeforeDeletedChunk = oldArray[aRange.location - 1];
 		ETAssert(chunkBeforeDeletedChunk.parentString == _backing);
-		characterRange.location = NSMaxRange([chunkBeforeDeletedChunk characterRange]);
+		characterRange.location = NSMaxRange(chunkBeforeDeletedChunk.characterRange);
 	}
 	
 	NSInteger delta = insertedChunksLength - deletedChunksLength;
@@ -280,14 +280,14 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		// N.B. This used to be above the -beginEditingCall, but that would violate
 		// the principle that you can't modify an NSAttributedStringWrapper from
 		// outside a -beginEditing/-endEditing block
-		_cachedString = [_backing string];
+		_cachedString = _backing.string;
 		
 		CODiffArrays(oldArray, newArray, self, oldArray);
 		[self endEditing];
 	}
 	else if ([keyPath isEqualToString: @"text"])
 	{
-		_cachedString = [_backing string];
+		_cachedString = _backing.string;
 		
 		
 		NSLog(@"%@: Text changed from %@ to %@", object, change[NSKeyValueChangeOldKey], change[NSKeyValueChangeNewKey]);
@@ -329,7 +329,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	}
 	else if ([keyPath isEqualToString: @"attributes"])
 	{
-		_cachedString = [_backing string];
+		_cachedString = _backing.string;
 		
 		
 		COAttributedStringChunk *chunk = object;
@@ -340,7 +340,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 			return;
 		}
 		
-		[self edited: NSTextStorageEditedAttributes range: [chunk characterRange] changeInLength: 0];
+		[self edited: NSTextStorageEditedAttributes range: chunk.characterRange changeInLength: 0];
 	}
 }
 
@@ -533,7 +533,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	
 	// TODO: Add tests that check for this
 	const NSInteger delta = aString.length - aRange.length;
-	_cachedString = [_backing string];
+	_cachedString = _backing.string;
 	[self edited: NSTextStorageEditedCharacters range: aRange changeInLength: delta];
 	_lastNotifiedLength += delta;
 	

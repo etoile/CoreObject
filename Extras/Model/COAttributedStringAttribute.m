@@ -82,7 +82,7 @@
 	COAttributedStringAttribute *attr = [[COAttributedStringAttribute alloc] initWithObjectGraphContext: tempCtx];
 	attr.styleKey = aKey;
 	attr.styleValue = aValue;
-	return [attr attributeItemGraph];
+	return attr.attributeItemGraph;
 }
 
 + (BOOL) isAttributeItemGraph: (COItemGraph *)aGraph equalToItemGraph: (COItemGraph *)anotherGraph

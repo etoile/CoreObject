@@ -54,7 +54,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 
 - (id) propertyList
 {
-    NSMutableDictionary *result = [super propertyList];
+    NSMutableDictionary *result = super.propertyList;
     result[kCOCommandBranchUUID] = [_branchUUID stringValue];
     result[kCOCommandOldRevisionID] = [_oldRevisionUUID stringValue];
     result[kCOCommandNewRevisionID] = [_newRevisionUUID stringValue];
@@ -97,7 +97,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
     
     CODiffManager *merged = [diff1 diffByMergingWithDiff: diff2];
 	
-	if([merged hasConflicts])
+	if(merged.hasConflicts)
 	{
 		NSLog(@"Attempting to auto-resolve conflicts favouring the diff1...");
 		[merged resolveConflictsFavoringSourceIdentifier: @"diff1"];
@@ -136,7 +136,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
     COBranch *branch = [proot branchForUUID: _branchUUID];
 	ETAssert(branch != nil);
 
-    if ([[branch.currentRevision UUID] isEqual: _oldRevisionUUID]
+    if ([(branch.currentRevision).UUID isEqual: _oldRevisionUUID]
 		&& branch.supportsRevert)
     {
         branch.currentRevision = [aContext revisionForRevisionUUID: _newRevisionUUID persistentRootUUID: _persistentRootUUID];
@@ -150,7 +150,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
     }
     else
     {
-		_currentRevisionBeforeSelectiveApply = [branch.currentRevision UUID];
+		_currentRevisionBeforeSelectiveApply = (branch.currentRevision).UUID;
 		
         CODiffManager *merged = [self diffToSelectivelyApplyToBranchCurrentRevision: _currentRevisionBeforeSelectiveApply
 															 assumingEditingContext: aContext];
@@ -161,7 +161,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
         
         // FIXME: Works, but an ugly API mismatch when setting object graph context contents
         NSMutableArray *items = [NSMutableArray array];
-        for (ETUUID *uuid in [result itemUUIDs])
+        for (ETUUID *uuid in result.itemUUIDs)
         {
 			COItem *replacementItem = [result itemForUUID: uuid];
 			COItem *existingItem = [branch.objectGraphContext itemForUUID: uuid];
@@ -244,7 +244,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 		COItemGraph *branchCurrentGraph = [aContext.store itemGraphForRevisionUUID: branchCurrentRevisionUUID
 																	  persistentRoot: _persistentRootUUID];		
         NSMutableArray *necessaryItems = [NSMutableArray array];
-        for (ETUUID *uuid in [result itemUUIDs])
+        for (ETUUID *uuid in result.itemUUIDs)
         {
 			COItem *replacementItem = [result itemForUUID: uuid];
 			COItem *existingItem = [branchCurrentGraph itemForUUID: uuid];
@@ -301,7 +301,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 
 - (ETUUID *)UUID
 {
-	return [self.revision UUID];
+	return (self.revision).UUID;
 }
 
 - (ETUUID *)branchUUID
@@ -311,17 +311,17 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 
 - (NSDictionary *)metadata
 {
-	return [self.revision metadata];
+	return (self.revision).metadata;
 }
 
 - (NSDate *)date
 {
-	return [self.revision date];
+	return (self.revision).date;
 }
 
 - (NSString *)localizedShortDescription
 {
-	return [self.revision localizedShortDescription];
+	return (self.revision).localizedShortDescription;
 }
 
 - (id) copyWithZone:(NSZone *)zone

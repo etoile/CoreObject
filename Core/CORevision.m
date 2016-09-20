@@ -117,7 +117,7 @@
 - (COCommitDescriptor *)commitDescriptor
 {
 	NSString *commitDescriptorId =
-		[self metadata][kCOCommitMetadataIdentifier];
+		self.metadata[kCOCommitMetadataIdentifier];
 
 	if (commitDescriptorId == nil)
 		return nil;
@@ -127,10 +127,10 @@
 
 - (NSString *)localizedTypeDescription
 {
-	COCommitDescriptor *descriptor = [self commitDescriptor];
+	COCommitDescriptor *descriptor = self.commitDescriptor;
 
 	if (descriptor == nil)
-		return [self metadata][kCOCommitMetadataTypeDescription];
+		return self.metadata[kCOCommitMetadataTypeDescription];
 
 	return descriptor.localizedTypeDescription;
 }
@@ -144,8 +144,8 @@
 {
 	return [NSString stringWithFormat: @"%@ (%@ <= %@)", 
 		NSStringFromClass([self class]),
-		[self UUID],
-		([self parentRevision] != nil ? [[self parentRevision] UUID] : @"none")];
+		self.UUID,
+		(self.parentRevision != nil ? self.parentRevision.UUID : @"none")];
 }
 
 - (BOOL) isEqualToOrAncestorOfRevision: (CORevision *)aRevision
@@ -157,7 +157,7 @@
         {
             return YES;
         }
-        rev = [rev parentRevision];
+        rev = rev.parentRevision;
     }
     return NO;
 }
@@ -166,12 +166,12 @@
 
 - (id<COTrackNode>)parentNode
 {
-	return [self parentRevision];
+	return self.parentRevision;
 }
 
 - (id<COTrackNode>)mergeParentNode
 {
-	return [self mergeParentRevision];
+	return self.mergeParentRevision;
 }
 
 @end

@@ -36,7 +36,7 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 - (id) propertyList
 {
-    NSMutableDictionary *result = [super propertyList];
+    NSMutableDictionary *result = super.propertyList;
 
 	if (_initialRevisionID != nil)
 	{

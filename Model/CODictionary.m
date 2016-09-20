@@ -71,7 +71,7 @@
 
 	NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 
-	for (NSString *property in [aStoreItem attributeNames])
+	for (NSString *property in aStoreItem.attributeNames)
 	{
         if ([property isEqualToString: kCOObjectEntityNameProperty]
 		 || [property isEqualToString: kCOObjectPackageVersionProperty]

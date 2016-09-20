@@ -105,7 +105,7 @@
 	for (COLibrary *lib in self.libraryGroup)
 	{
 		ETEntityDescription *contentType =
-			[lib.entityDescription propertyDescriptionForName: [lib contentKey]].type;
+			[lib.entityDescription propertyDescriptionForName: lib.contentKey].type;
 											
 		if ([aType isKindOfEntity: contentType])
 			return lib;

@@ -210,7 +210,7 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 
 - (NSArray *)attributesForPackage: (ETPackageDescription *)package inItem: (COItem *)item
 {
-	if ([item isAdditionalItem])
+	if (item.isAdditionalItem)
 	{
 		return [item.attributeNames arrayByRemovingObjectsInArray:
 			@[kCOObjectEntityNameProperty, kCOObjectPackageNameProperty, kCOObjectPackageVersionProperty]];

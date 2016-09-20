@@ -32,7 +32,7 @@ static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
 
 - (id) propertyList
 {
-    NSMutableDictionary *result = [super propertyList];
+    NSMutableDictionary *result = super.propertyList;
     result[kCOCommandOldBranchUUID] = [_oldBranchUUID stringValue];
     result[kCOCommandNewBranchUUID] = [_newBranchUUID stringValue];
     return result;

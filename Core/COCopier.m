@@ -17,7 +17,7 @@
 	NSMutableSet *result = [NSMutableSet set];
 	
 	COItem *item = [source itemForUUID: aUUID];
-	for (NSString *key in [item attributeNames])
+	for (NSString *key in item.attributeNames)
 	{
 		COType type = [item typeForAttribute: key];
 		if (COTypePrimitivePart(type) == kCOTypeCompositeReference)
@@ -86,7 +86,7 @@
 	
 		// FIXME: This isn't intuitive... we just copy one layer deep of non-composite references 		
 		// FIXME: referencedItemUUIDs ignores composite references, which sounds wrong! Test!
-        for (ETUUID *referenced in [item referencedItemUUIDs])
+        for (ETUUID *referenced in item.referencedItemUUIDs)
         {
             if (![compositeObjectCopySet containsObject: referenced])
             {

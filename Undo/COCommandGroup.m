@@ -64,7 +64,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 	_UUID = aCommand.UUID;
 	if (aCommand.parentUUID == nil)
 	{
-		_parentUUID = [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID];
+		_parentUUID = [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID;
 	}
 	else
 	{
@@ -82,7 +82,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 	cmd.JSONData = [self commandsPropertyList];
 	cmd.metadata = _metadata;
 	cmd.UUID = _UUID;
-	if ([_parentUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
+	if ([_parentUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID])
 	{
 		cmd.parentUUID = nil;
 	}
@@ -136,7 +136,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     {
 		// Insert the inverses back to front, so the inverse of the most recent
 		// action will be first.
-        [inversedCommands insertObject: [command inverse] atIndex: 0];
+        [inversedCommands insertObject: command.inverse atIndex: 0];
     }
 
 	return inversedCommands;
@@ -274,7 +274,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 {
 	ETAssert(self.parentUUID != nil);
 	
-	if ([self.parentUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
+	if ([self.parentUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID])
 		return [COEndOfUndoTrackPlaceholderNode sharedInstance];
 	
 	return [_parentUndoTrack commandForUUID: self.parentUUID];

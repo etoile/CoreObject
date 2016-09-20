@@ -556,7 +556,7 @@ See +[NSObject typePrefix]. */
 
 - (id) valueForProperty: (NSString *)key shouldLoad: (BOOL)shouldLoad
 {
-	if (![[self propertyNames] containsObject: key])
+	if (![self.propertyNames containsObject: key])
 	{
 		[NSException raise: NSInvalidArgumentException
 					format: @"Tried to get value for invalid property %@", key];
@@ -735,7 +735,7 @@ See +[NSObject typePrefix]. */
 
 - (BOOL) setValue: (id)value forProperty: (NSString *)key
 {
-	if (![[self propertyNames] containsObject: key])
+	if (![self.propertyNames containsObject: key])
 	{
 		[NSException raise: NSInvalidArgumentException
 		            format: @"Tried to set value for invalid property %@", key];
@@ -781,7 +781,7 @@ See +[NSObject typePrefix]. */
 	NSMutableArray *results = [NSMutableArray array];
 	
 	// TODO: We might want to coalesce bidirectional relationships validation results
-	for (NSString *key in [self persistentPropertyNames])
+	for (NSString *key in self.persistentPropertyNames)
 	{
 		[results addObjectsFromArray: [self validateValue: [self valueForProperty: key shouldLoad: NO]
 		                                      forProperty: key]];
@@ -1461,7 +1461,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 	ETPropertyDescription *parentDesc = propertyDesc.opposite;
 
 	/* From the child viewpoint (the child as target), the parent is a referring object */
-	COObject *oldParent = [[child incomingRelationshipCache]
+	COObject *oldParent = [child.incomingRelationshipCache
 						   referringObjectForPropertyInTarget: parentDesc.name];
 
 	if (oldParent == nil || oldParent == self)
@@ -1519,7 +1519,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 	for (COObject *child in children)
 	{
 		/* From the child viewpoint (the child as target), the parent is a referring object */
-		COObject *oldParent = [[child incomingRelationshipCache]
+		COObject *oldParent = [child.incomingRelationshipCache
 				referringObjectForPropertyInTarget: parentDesc.name];
 		
 		// FIXME: Minor flaw, you can insert a composite twice if the collection is ordered.
@@ -1913,7 +1913,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 
 - (NSString *)revisionDescription
 {
-	return [[self.revision UUID] stringValue];
+	return [(self.revision).UUID stringValue];
 }
 
 - (NSString *)tagDescription
@@ -1982,7 +1982,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 		}
 	}
 
-	for (NSString *key in [self persistentPropertyNames])
+	for (NSString *key in self.persistentPropertyNames)
 	{
 		id value = [self serializableValueForStorageKey: key];
 		BOOL updated = NO;
@@ -2137,7 +2137,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 
 - (NSSet *) referringObjects
 {
-	return [_incomingRelationshipCache referringObjects];
+	return _incomingRelationshipCache.referringObjects;
 }
 
 @end

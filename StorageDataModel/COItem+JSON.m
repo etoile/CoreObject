@@ -291,7 +291,7 @@ static COType importTypeFromPlist(id typeValuePair)
 
 - (NSData *) JSONData
 {
-    id plist = [self JSONPlist];
+    id plist = self.JSONPlist;
     return CODataWithJSONObject(plist, NULL);
 }
 

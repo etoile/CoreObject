@@ -679,7 +679,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 // TODO: Could replace -loadingItemGraph as a semi-private COObjectGraphContext API.
 - (COItem *) itemForUUIDDuringLoading: (ETUUID *)aUUID
 {
-	COItem *item = [[self.objectGraphContext loadingItemGraph] itemForUUID: aUUID];
+	COItem *item = [(self.objectGraphContext).loadingItemGraph itemForUUID: aUUID];
 
 	if (item == nil)
 	{
@@ -949,10 +949,10 @@ static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyD
 /* Validates that the receiver is compatible with the provided store item. */
 - (void)validateStoreItem: (COItem *)aStoreItem
 {
-    if (![[aStoreItem UUID] isEqual: self.UUID])
+    if (![aStoreItem.UUID isEqual: self.UUID])
     {
         [NSException raise: NSInvalidArgumentException
-                    format: @"-setStoreItem: called with UUID %@ on COObject with UUID %@", [aStoreItem UUID], self.UUID];
+                    format: @"-setStoreItem: called with UUID %@ on COObject with UUID %@", aStoreItem.UUID, self.UUID];
     }
 
 	NSString *entityName = [aStoreItem valueForAttribute: kCOObjectEntityNameProperty];
@@ -997,7 +997,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyD
 
 	[self validateStoreItem: aStoreItem];
 	
-	for (NSString *property in [aStoreItem attributeNames])
+	for (NSString *property in aStoreItem.attributeNames)
 	{
         if ([property isEqualToString: kCOObjectEntityNameProperty]
 		 || [property isEqualToString: kCOObjectPackageVersionProperty]

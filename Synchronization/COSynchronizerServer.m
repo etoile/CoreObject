@@ -76,7 +76,7 @@
 	}
 	ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
 	
-	if (![branch.editingContext isRevision: [(self.branch).currentRevision UUID]
+	if (![branch.editingContext isRevision: ((self.branch).currentRevision).UUID
 				 equalToOrParentOfRevision: ((COSynchronizerRevision *)revs.lastObject).revisionUUID
 							persistentRoot: self.persistentRoot.UUID])
 	{
@@ -85,7 +85,7 @@
 		txn = [[COStoreTransaction alloc] init];
 		
 		ETUUID *source = ((COSynchronizerRevision *)revs.lastObject).revisionUUID;
-		ETUUID *dest = [(self.branch).currentRevision UUID];
+		ETUUID *dest = ((self.branch).currentRevision).UUID;
 		
 		ETUUID *lca = [self.persistentRoot.editingContext commonAncestorForCommit: source
 																		andCommit: dest
@@ -147,7 +147,7 @@
 
 - (void) handlePushedRevisionsFromClient: (COSynchronizerPushedRevisionsFromClientMessage *)aMessage
 {
-	if ([branch hasChanges])
+	if (branch.hasChanges)
 	{
 		[NSException raise: NSGenericException
 		 format: @"-[%@ %@] called but the branch has uncommitted changes. You should ensure all changes are committed before feeding the synchronizer a message.",
@@ -162,17 +162,17 @@
 - (void) sendPushToClient: (NSString *)clientID
 {
 	ETUUID *lastConfirmedForClient = lastSentRevisionForClientID[clientID];
-	if ([lastConfirmedForClient isEqual: [branch.currentRevision UUID]])
+	if ([lastConfirmedForClient isEqual: (branch.currentRevision).UUID])
 	{
 		return;
 	}
-	lastSentRevisionForClientID[clientID] = [branch.currentRevision UUID];
+	lastSentRevisionForClientID[clientID] = (branch.currentRevision).UUID;
 	
 	NSMutableArray *revs = [[NSMutableArray alloc] init];
 	
 	ETAssert(branch.editingContext != nil);
 	NSArray *revUUIDs = [branch.editingContext revisionUUIDsFromRevisionUUIDExclusive: lastConfirmedForClient
-															  toRevisionUUIDInclusive: [(self.branch).currentRevision UUID]
+															  toRevisionUUIDInclusive: ((self.branch).currentRevision).UUID
 																	   persistentRoot: self.persistentRoot.UUID];
 	
 	if (revUUIDs == nil)

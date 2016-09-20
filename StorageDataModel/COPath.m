@@ -117,7 +117,7 @@
 
 - (NSString *) description
 {
-	return [self stringValue];
+	return self.stringValue;
 }
 
 @end
@@ -152,7 +152,7 @@
 
 - (NSString *) description
 {
-	return [self stringValue];
+	return self.stringValue;
 }
 
 @end

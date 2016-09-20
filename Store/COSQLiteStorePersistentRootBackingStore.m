@@ -88,7 +88,7 @@
     }
     else
     {
-        NSString *path = [[store URL].path stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.sqlite", _uuid]];
+        NSString *path = [store.URL.path stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.sqlite", _uuid]];
         NILARG_EXCEPTION_TEST(path);
         
         db_ = [[FMDatabase alloc] initWithPath: path];
@@ -369,7 +369,7 @@
         return nil;
     }
     
-    ETUUID *root = [self rootUUID];
+    ETUUID *root = self.rootUUID;
     
     // Convert dataForUUID to a UUID -> COItem mapping.
     // TODO: Eliminate this by giving COItem to be created with a serialized NSData of itself,
@@ -416,7 +416,7 @@ NSData *contentsBLOBWithItemTree(id<COItemGraph> itemGraph)
 {
     NSMutableData *result = [NSMutableData dataWithCapacity: 64536];
     
-	NSArray *sortedUUIDs = [[itemGraph itemUUIDs] sortedArrayUsingComparator: ^(id obj1, id obj2){
+	NSArray *sortedUUIDs = [itemGraph.itemUUIDs sortedArrayUsingComparator: ^(id obj1, id obj2){
 		ETUUID *uuid1 = (ETUUID *)obj1;
 		ETUUID *uuid2 = (ETUUID *)obj2;
 		int result = memcmp([uuid1 UUIDValue], [uuid2 UUIDValue], 16);
@@ -430,7 +430,7 @@ NSData *contentsBLOBWithItemTree(id<COItemGraph> itemGraph)
     for (ETUUID *uuid in sortedUUIDs)
     {
         COItem *item = [itemGraph itemForUUID: uuid];
-        NSData *itemData = [item dataValue];
+        NSData *itemData = item.dataValue;
         
         AddCommitUUIDAndDataToCombinedCommitData(result, uuid, itemData);
     }
@@ -597,7 +597,7 @@ static NSData *Sha1Data(NSData *data)
 	
 	
 	// Update the root object UUID
-	ETUUID *currentRoot = [self rootUUID];
+	ETUUID *currentRoot = self.rootUUID;
 	
 	if (currentRoot == nil)
 	{

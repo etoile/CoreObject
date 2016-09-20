@@ -216,7 +216,7 @@ static void COGraphvizWriteDotNodeForItem(COItem *anItem, NSMutableString *dest)
 	NSMutableString *extraNodes = [NSMutableString string];
 	
 	[dest appendFormat: @"%@ [shape=plaintext, label=<<table border=\"0\" cellborder=\"1\" cellspacing=\"0\"><tr><td colspan=\"3\">%@</td></tr>", nodeName, nodeTitle];
-	for (NSString *attr in [anItem attributeNames])
+	for (NSString *attr in anItem.attributeNames)
 	{
 		COGraphvizWriteHTMLTableRowForAttributeOfItem(attr, anItem, dest, extraNodes);
 	}
@@ -229,7 +229,7 @@ NSString *COGraphvizDotFileForItemGraph(id<COItemGraph> graph)
 	NSMutableString *result = [NSMutableString string];
 	[result appendString: @"digraph G {\n"];
 	[result appendString: @"rankdir=LR;\n"];
-	for (ETUUID *uuid in [graph itemUUIDs])
+	for (ETUUID *uuid in graph.itemUUIDs)
 	{
 		COItem *item = [graph itemForUUID: uuid];
 		COGraphvizWriteDotNodeForItem(item, result);

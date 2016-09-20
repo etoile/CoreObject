@@ -221,7 +221,7 @@ static void coalesceOps(NSMutableArray *ops)
 
 - (void) recordAddAttribute: (COAttributedStringAttribute *)attr toRangeA: (NSRange)rangeInA first: (COAttributedString *)first second: (COAttributedString *)second source: (id)source
 {
-	COItemGraph *graph = [attr attributeItemGraph];
+	COItemGraph *graph = attr.attributeItemGraph;
 	
 	COAttributedStringDiffOperationAddAttribute *op = [COAttributedStringDiffOperationAddAttribute new];
 	op.range = rangeInA;
@@ -234,7 +234,7 @@ static void coalesceOps(NSMutableArray *ops)
 
 - (void) recordRemoveAttribute: (COAttributedStringAttribute *)attr toRangeA: (NSRange)rangeInA first: (COAttributedString *)first second: (COAttributedString *)second source: (id)source
 {
-	COItemGraph *graph = [attr attributeItemGraph];
+	COItemGraph *graph = attr.attributeItemGraph;
 	
 	COAttributedStringDiffOperationRemoveAttribute *op = [COAttributedStringDiffOperationRemoveAttribute new];
 	op.range = rangeInA;
@@ -469,7 +469,7 @@ static void coalesceOps(NSMutableArray *ops)
 static NSString *
 COHTMLCodesForAttributesItemGraph(COItemGraph *graph)
 {
-	NSString *htmlCodes = [[[graph items] mappedCollectionWithBlock:
+	NSString *htmlCodes = [[graph.items mappedCollectionWithBlock:
 							^(id obj) { return [obj valueForAttribute: @"htmlCode"]; }] componentsJoinedByString: @","];
 	return htmlCodes;
 }
@@ -525,7 +525,7 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 	COObjectGraphContext *targetCtx = target.objectGraphContext;
 	const NSInteger insertionPos = range.location + offset;
 		
-	[targetCtx insertOrUpdateItems: [attributedStringItemGraph items]];
+	[targetCtx insertOrUpdateItems: attributedStringItemGraph.items];
 	
 	COAttributedString *sourceString = [targetCtx loadedObjectForUUID: attributedStringItemGraph.rootItemUUID];
 	const NSUInteger sourceStringLength = sourceString.length;
@@ -586,7 +586,7 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 {
 	COObjectGraphContext *targetCtx = target.objectGraphContext;
 	
-	[targetCtx insertOrUpdateItems: [attributedStringItemGraph items]];
+	[targetCtx insertOrUpdateItems: attributedStringItemGraph.items];
 	COAttributedString *sourceString = [targetCtx loadedObjectForUUID: attributedStringItemGraph.rootItemUUID];
 	const NSUInteger sourceStringLength = sourceString.length;
 	
@@ -623,7 +623,7 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
-	[target.objectGraphContext insertOrUpdateItems: [attributeItemGraph items]];
+	[target.objectGraphContext insertOrUpdateItems: attributeItemGraph.items];
 	COAttributedStringAttribute *attributeToAdd = [target.objectGraphContext loadedObjectForUUID: attributeItemGraph.rootItemUUID];
 	
 	const NSInteger editStartChunkIndex = [target splitChunkAtIndex: range.location + offset];
@@ -663,7 +663,7 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
-	[target.objectGraphContext insertOrUpdateItems: [attributeItemGraph items]];
+	[target.objectGraphContext insertOrUpdateItems: attributeItemGraph.items];
 	COAttributedStringAttribute *attributeToRemove = [target.objectGraphContext loadedObjectForUUID: attributeItemGraph.rootItemUUID];
 	
 	const NSInteger editStartChunkIndex = [target splitChunkAtIndex: range.location + offset];

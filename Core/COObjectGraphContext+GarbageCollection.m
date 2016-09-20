@@ -127,7 +127,7 @@ static void FindCyclesInContainersOfObject(COObject *currentObject, COObject *ob
 
 - (void) checkForCyclesInCompositeRelationshipsInChangedObjects
 {
-	[self checkForCyclesInCompositeRelationshipsInObjects: [self changedObjects]];
+	[self checkForCyclesInCompositeRelationshipsInObjects: self.changedObjects];
 }
 
 @end

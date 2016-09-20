@@ -136,7 +136,7 @@
 			NSData *backingUUIDData = [backingUUID dataValue];
 			COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForUUID: backingUUID
 			                                                                       error: NULL];
-			NSIndexSet *revisions = [backing revidsUsedRange];
+			NSIndexSet *revisions = backing.revidsUsedRange;
 			NSMutableIndexSet *reachableRevisions = [NSMutableIndexSet new];
 			NSMutableIndexSet *contiguousLiveRevisions = [NSMutableIndexSet new];
 			

@@ -41,7 +41,7 @@
 	NILARG_EXCEPTION_TEST(aURL);
 	SUPERINIT;
 	_URL =  aURL;
-	_favIconData =  [aURL favIconData];
+	_favIconData =  aURL.favIconData;
 	return self;
 }
 

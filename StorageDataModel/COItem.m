@@ -186,7 +186,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
 	NSMutableSet *result = [NSMutableSet set];
 	
-	for (NSString *key in [self attributeNames])
+	for (NSString *key in self.attributeNames)
 	{
 		COType type = [self typeForAttribute: key];
 		if (COTypePrimitivePart(type) == kCOTypeCompositeReference)
@@ -204,7 +204,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
 	NSMutableSet *result = [NSMutableSet set];
 	
-	for (NSString *key in [self attributeNames])
+	for (NSString *key in self.attributeNames)
 	{
 		COType type = [self typeForAttribute: key];
 		if (COTypePrimitivePart(type) == kCOTypeReference)
@@ -223,7 +223,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
 	NSMutableSet *result = [NSMutableSet set];
 	
-	for (NSString *key in [self attributeNames])
+	for (NSString *key in self.attributeNames)
 	{
 		COType type = [self typeForAttribute: key];
 		if (COTypePrimitivePart(type) == kCOTypeCompositeReference
@@ -252,7 +252,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
 	NSMutableArray *result = [NSMutableArray array];
 	
-	for (NSString *key in [self attributeNames])
+	for (NSString *key in self.attributeNames)
 	{
 		COType type = [self typeForAttribute: key];
 		if (COTypePrimitivePart(type) == kCOTypeAttachment)
@@ -270,7 +270,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
 	NSMutableArray *result = [NSMutableArray array];
 	
-	for (NSString *key in [self attributeNames])
+	for (NSString *key in self.attributeNames)
 	{
 		COType type = [self typeForAttribute: key];
 		if (COTypePrimitivePart(type) == kCOTypeReference)
@@ -290,7 +290,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 - (NSString *) fullTextSearchContent
 {
     NSMutableArray *result = [NSMutableArray array];
-    for (NSString *key in [self attributeNames])
+    for (NSString *key in self.attributeNames)
 	{
 		COType type = [self typeForAttribute: key];
 		if (COTypePrimitivePart(type) == kCOTypeString)
@@ -307,7 +307,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 		
 	[result appendFormat: @"{ COItem %@\n", uuid];
 	
-	for (NSString *attrib in [self attributeNames])
+	for (NSString *attrib in self.attributeNames)
 	{
 		[result appendFormat: @"\t%@ <%@> = '%@'\n",
 			attrib,
@@ -338,13 +338,13 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
 	COMutableItem *aCopy = [self mutableCopy];
 	
-	ETUUID *newUUIDForSelf = aMapping[[self UUID]];
+	ETUUID *newUUIDForSelf = aMapping[self.UUID];
 	if (newUUIDForSelf != nil)
 	{
 		[aCopy setUUID: newUUIDForSelf];
 	}
 	
-	for (NSString *attr in [aCopy attributeNames])
+	for (NSString *attr in aCopy.attributeNames)
 	{
 		id value = [aCopy valueForAttribute: attr];
 		COType type = [aCopy typeForAttribute: attr];

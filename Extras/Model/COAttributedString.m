@@ -119,7 +119,7 @@
 	[rootItem setValue: copiedUUIDs forAttribute: @"chunks" type: COTypeMakeArrayOf(kCOTypeCompositeReference)];
 
 	[result insertOrUpdateItems: @[rootItem]];
-	result.rootItemUUID = [rootItem UUID];
+	result.rootItemUUID = rootItem.UUID;
 	
 	return result;
 }

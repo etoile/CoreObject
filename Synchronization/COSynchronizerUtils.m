@@ -93,7 +93,7 @@
 		
 		CODiffManager *mergedDiff = [destBranchDiff diffByMergingWithDiff: sourceBranchDiff];
 		
-		if([mergedDiff hasConflicts])
+		if(mergedDiff.hasConflicts)
 		{
 			NSLog(@"Attempting to auto-resolve conflicts favouring the other user...");
 			[mergedDiff resolveConflictsFavoringSourceIdentifier: @"source"]; // FIXME: Hardcoded

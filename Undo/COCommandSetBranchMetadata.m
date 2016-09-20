@@ -33,7 +33,7 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
 
 - (id) propertyList
 {
-    NSMutableDictionary *result = [super propertyList];
+    NSMutableDictionary *result = super.propertyList;
     result[kCOCommandBranchUUID] = [_branchUUID stringValue];
     if (_oldMetadata != nil)
     {

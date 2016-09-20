@@ -86,7 +86,7 @@
 		
 		// Add revisions
 		
-		NSIndexSet *revidsUsed = [backing revidsUsedRange];
+		NSIndexSet *revidsUsed = backing.revidsUsedRange;
 		for (NSUInteger i = revidsUsed.firstIndex; i != NSNotFound; i = [revidsUsed indexGreaterThanIndex: i])
 		{
 			ETUUID *revUUID = [backing revisionUUIDForRevid: i];

@@ -41,7 +41,7 @@
                       useStoreDB: (BOOL)share
                            error: (NSError **)error NS_DESIGNATED_INITIALIZER;
 
-- (BOOL)close;
+@property (nonatomic, readonly) BOOL close;
 
 - (CORevisionInfo *) revisionInfoForRevisionUUID: (ETUUID *)aToken;
 

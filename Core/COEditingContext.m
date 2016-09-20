@@ -121,7 +121,7 @@
 - (NSString *)description
 {
 	return [NSString stringWithFormat: @"<%@ %p - store: %@ (%@)>",
-		NSStringFromClass([self class]), self, _store.UUID, [_store URL]];
+		NSStringFromClass([self class]), self, _store.UUID, _store.URL];
 }
 
 - (NSString *)detailedDescription
@@ -143,10 +143,10 @@
 
 	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
 	{
-		if ([persistentRoot hasChanges] == NO)
+		if (persistentRoot.hasChanges == NO)
 			continue;
 		
-		changeSummary[persistentRoot.UUID] = [persistentRoot description];
+		changeSummary[persistentRoot.UUID] = persistentRoot.description;
 	}
 
 	/* For Mac OS X, see http://www.cocoabuilder.com/archive/cocoa/197297-who-broke-nslog-on-leopard.html */
@@ -172,7 +172,7 @@
 {
 	if (!_hasLoadedPersistentRootUUIDs)
 	{
-		for (ETUUID *uuid in [_store persistentRootUUIDs])
+		for (ETUUID *uuid in _store.persistentRootUUIDs)
 		{
 			[self persistentRootForUUID: uuid];
 		}
@@ -195,7 +195,7 @@
 	[self loadAllPersistentRootsIfNeeded];
 	
 	/* Force deleted persistent roots to be reloaded (see -unloadPersistentRoot:) */
-	for (ETUUID *persistentRootUUID in [self.store deletedPersistentRootUUIDs])
+	for (ETUUID *persistentRootUUID in (self.store).deletedPersistentRootUUIDs)
 	{
 		 [self persistentRootForUUID: persistentRootUUID];
 	}
@@ -311,7 +311,7 @@
 
 	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
 	{
-		if ([persistentRoot isPersistentRootUncommitted])
+		if (persistentRoot.persistentRootUncommitted)
 		{
 			[insertedPersistentRoots addObject: persistentRoot];
 		}
@@ -325,7 +325,7 @@
 
 	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
 	{
-		if ([persistentRoot hasChanges])
+		if (persistentRoot.hasChanges)
 		{
 			[updatedPersistentRoots addObject: persistentRoot];
 		}
@@ -528,7 +528,7 @@
 	// -[COObjectGraphContext dealloc], COObject.deadRelationshipCache will be nil.
 	[[aPersistentRoot.allObjectGraphContexts mappedCollection] discardAllObjects];
 		
-	if ([aPersistentRoot isPersistentRootUncommitted])
+	if (aPersistentRoot.persistentRootUncommitted)
 	{
 		[aPersistentRoot makeZombie];
 	}
@@ -601,10 +601,10 @@
     
 	for (COPersistentRoot *context in [_loadedPersistentRoots objectEnumerator])
 	{
-        if ([context isPersistentRootUncommitted])
+        if (context.persistentRootUncommitted)
             return YES;
         
-		if ([context hasChanges])
+		if (context.hasChanges)
 			return YES;
 	}
 	return NO;
@@ -806,7 +806,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 
 		/* Update transaction IDs (can't add to the transaction after this) */
 		
-		for (ETUUID *uuid in [transaction persistentRootUUIDs])
+		for (ETUUID *uuid in transaction.persistentRootUUIDs)
 		{
 			COPersistentRoot *persistentRoot = [self persistentRootForUUID: uuid];
 
@@ -883,7 +883,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
     NSString *storeUUID = userInfo[kCOStoreUUID];
     
     if ([[_store.UUID stringValue] isEqual: storeUUID]
-        && [[_store URL].absoluteString isEqual: storeURL])
+        && [_store.URL.absoluteString isEqual: storeURL])
     {
         [self storePersistentRootsDidChange: notif isDistributed: YES];
     }

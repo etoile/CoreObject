@@ -31,7 +31,7 @@
 
 - (BOOL) execute: (COSQLiteStore *)store inTransaction: (COStoreTransaction *)aTransaction
 {
-    return [[store database] executeUpdate: @"UPDATE persistentroots SET metadata = ? WHERE uuid = ?",
+    return [store.database executeUpdate: @"UPDATE persistentroots SET metadata = ? WHERE uuid = ?",
             [self writeMetadata: metadata],
             [persistentRoot dataValue]];
 }

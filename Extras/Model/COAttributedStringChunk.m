@@ -100,7 +100,7 @@
 
 - (NSRange) characterRange
 {
-	return NSMakeRange([self characterIndex], self.length);
+	return NSMakeRange(self.characterIndex, self.length);
 }
 
 - (NSString *) description

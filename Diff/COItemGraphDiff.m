@@ -221,7 +221,7 @@
  */
 - (BOOL) isNonconflicting
 {
-	NSSet *allEdits = [self allEdits];
+	NSSet *allEdits = self.allEdits;
 	if (allEdits.count > 0)
 	{
 		COItemGraphEdit *referenceEdit = [allEdits anyObject];
@@ -238,7 +238,7 @@
 {
 	NSMutableString *desc = [NSMutableString stringWithString: super.description];
 	[desc appendFormat: @" {\n"];
-	for (COItemGraphEdit *edit in [self allEdits])
+	for (COItemGraphEdit *edit in self.allEdits)
 	{
 		[desc appendFormat: @"\t%@\n", edit.description];
 	}
@@ -454,21 +454,21 @@
 	NILARG_EXCEPTION_TEST(itemB);
 	
 	if (itemA != nil 
-		&& ![[itemA UUID] isEqual: [itemB UUID]])
+		&& ![itemA.UUID isEqual: itemB.UUID])
 	{
 		[NSException raise: NSInvalidArgumentException format: @"expected same UUID"];
 	}
 	
-	ETUUID *uuid = [itemB UUID];
+	ETUUID *uuid = itemB.UUID;
 	
-	NSMutableSet *removedAttrs = [NSMutableSet setWithArray: [itemA attributeNames]]; // itemA may be nil => may be empty set
-	[removedAttrs minusSet: [NSSet setWithArray: [itemB attributeNames]]];
+	NSMutableSet *removedAttrs = [NSMutableSet setWithArray: itemA.attributeNames]; // itemA may be nil => may be empty set
+	[removedAttrs minusSet: [NSSet setWithArray: itemB.attributeNames]];
 	
-	NSMutableSet *addedAttrs = [NSMutableSet setWithArray: [itemB attributeNames]];
-	[addedAttrs minusSet: [NSSet setWithArray: [itemA attributeNames]]];
+	NSMutableSet *addedAttrs = [NSMutableSet setWithArray: itemB.attributeNames];
+	[addedAttrs minusSet: [NSSet setWithArray: itemA.attributeNames]];
 	
-	NSMutableSet *commonAttrs = [NSMutableSet setWithArray: [itemB attributeNames]];
-	[commonAttrs intersectSet: [NSSet setWithArray: [itemA attributeNames]]];
+	NSMutableSet *commonAttrs = [NSMutableSet setWithArray: itemB.attributeNames];
+	[commonAttrs intersectSet: [NSSet setWithArray: itemA.attributeNames]];
 	
 	
 	// process 'insert attribute's
@@ -527,7 +527,7 @@
 					withItemTree: (COItemGraph *)b
                 sourceIdentifier: (id)aSource
 {
-	return [self diffItemUUIDs: [b itemUUIDs]
+	return [self diffItemUUIDs: b.itemUUIDs
 					 fromGraph: a
 					   toGraph: b
 			  sourceIdentifier: aSource];
@@ -559,7 +559,7 @@
 {
 	NSMutableString *desc = [NSMutableString stringWithString: super.description];
 	[desc appendFormat: @" {\n"];
-	for (COItemGraphEdit *edit in [self allEdits])
+	for (COItemGraphEdit *edit in self.allEdits)
 	{
 		[desc appendFormat: @"\t%@\n", edit.description];
 	}
@@ -704,7 +704,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 					format: @"diff was created from a subtree with UUID %@ and being applied to a subtree with UUID %@", oldRoot, dest.rootItemUUID];
 	}
 	
-	if ([self hasConflicts])
+	if (self.hasConflicts)
 	{
 		[NSException raise: NSInvalidArgumentException
 					format: @"resolve conflicts before applying diff"];
@@ -746,7 +746,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 - (BOOL) isEmpty
 {
-	return [[self allEdits] isEmpty];
+	return [self.allEdits isEmpty];
 }
 
 - (COItemGraph *) itemTreeWithDiffAppliedToItemGraph: (id<COItemGraph>)aGraph
@@ -765,7 +765,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 					format: @"for now, merging subtree diffs with conflicting changes to the root UUID of the tree is unsupported."];
 	}	
 	
-	for (COItemGraphEdit *edit in [other allEdits])
+	for (COItemGraphEdit *edit in other.allEdits)
 	{
 		[self addEdit: edit];
 	}
@@ -780,9 +780,9 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 - (BOOL) hasConflicts
 {	
-	for (COItemGraphConflict *conflict in [self conflicts])
+	for (COItemGraphConflict *conflict in self.conflicts)
 	{
-		if (![conflict isNonconflicting])
+		if (!conflict.nonconflicting)
 			return YES;
 	}
 	return NO;
@@ -843,7 +843,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
  */
 - (void) removeConflict: (COItemGraphConflict *)aConflict
 {
-	for (COItemGraphEdit *edit in [aConflict allEdits])
+	for (COItemGraphEdit *edit in aConflict.allEdits)
 	{
 		[self removeEdit: edit isRemovingConflict: YES];
 	}
@@ -860,7 +860,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	
 	for (COItemGraphConflict *aConflict in aSet)
 	{
-		if ([[aConflict allEdits] containsObject: existingEdit])
+		if ([aConflict.allEdits containsObject: existingEdit])
 		{
 			conflict = aConflict;
 			break;
@@ -1027,12 +1027,12 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 	// check for same inner item inserted in more than one place
 	
-	NSSet *anEditInnerItemInsertions = [anEdit insertedInnerItemUUIDs];
-	for (COItemGraphEdit *edit in [self allEdits])
+	NSSet *anEditInnerItemInsertions = anEdit.insertedInnerItemUUIDs;
+	for (COItemGraphEdit *edit in self.allEdits)
 	{
 		if (![edit isEqual: anEdit])
 		{
-			NSSet *editInnerItemInsertions = [edit insertedInnerItemUUIDs];
+			NSSet *editInnerItemInsertions = edit.insertedInnerItemUUIDs;
 			if ([anEditInnerItemInsertions intersectsSet: editInnerItemInsertions])
 			{
 				// edit and anEdit conflict! create a new conflict or update an existing one.
@@ -1051,9 +1051,9 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 - (void) _updateConflictsForRemovingEdit: (COItemGraphEdit *)anEdit isRemovingConflict: (BOOL)isRemovingConflict
 {
-	for (COItemGraphConflict *conflict in [self conflicts])
+	for (COItemGraphConflict *conflict in self.conflicts)
 	{
-		for (COItemGraphEdit *edit in [conflict allEdits])
+		for (COItemGraphEdit *edit in conflict.allEdits)
 		{
 			if (edit == anEdit)
 			{
@@ -1067,11 +1067,11 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	if (isRemovingConflict)
 		return;
 
-	for (COItemGraphConflict *conflict in [self conflicts])
+	for (COItemGraphConflict *conflict in self.conflicts)
 	{
-		if ([conflict allEdits].count <= 1)
+		if (conflict.allEdits.count <= 1)
 		{
-			id edit = [conflict allEdits].anyObject;
+			id edit = conflict.allEdits.anyObject;
 			// Will call -removeEdit: and -_updateConflictsForRemovingEdit:,
 			// we don't want to add the edits back when we reenter the current
 			// method, but wait until -removeConflict: returns, that's why we
@@ -1101,7 +1101,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 - (void) resolveConflictsFavoringSourceIdentifier: (NSString*)anIdentifier
 {
-    for (COItemGraphConflict *conflict in [self conflicts])
+    for (COItemGraphConflict *conflict in self.conflicts)
     {
         NSSet *edits = [NSSet setWithSet: [conflict editsForSourceIdentifier: anIdentifier]];
         [self removeConflict: conflict];

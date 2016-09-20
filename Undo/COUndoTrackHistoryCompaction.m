@@ -417,7 +417,7 @@
 
 - (void)beginCompaction
 {
-	NSArray *allCommands = [_undoTrack allCommands];
+	NSArray *allCommands = _undoTrack.allCommands;
 	NSInteger newestDiscardedCommandIndex =
 		_newestCommandToDiscard == nil ? -1 : [allCommands indexOfObject: _newestCommandToDiscard];
 	ETAssert(newestDiscardedCommandIndex != NSNotFound);

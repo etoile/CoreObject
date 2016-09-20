@@ -234,7 +234,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 
 		// setup
 		
-        for (ETUUID *modifiedUUID in [aTransaction persistentRootUUIDs])
+        for (ETUUID *modifiedUUID in aTransaction.persistentRootUUIDs)
         {
 			const BOOL isPresent = [db_ boolForQuery: @"SELECT COUNT(*) > 0 FROM persistentroots WHERE uuid = ?", [modifiedUUID dataValue]];
 			const BOOL modifiesMutableState = [aTransaction touchesMutableStateForPersistentRootUUID: modifiedUUID];
@@ -290,7 +290,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 		/* Since we don't allow committing to a deleted persistent root, this 
 		   means these deleted UUIDs won't include persistent roots deleted in 
 		   a previous commit. */
-		for (ETUUID *modifiedUUID in [aTransaction persistentRootUUIDs])
+		for (ETUUID *modifiedUUID in aTransaction.persistentRootUUIDs)
         {
 			const BOOL isPresent = [db_ boolForQuery: @"SELECT COUNT(*) > 0 FROM persistentroots WHERE uuid = ? AND deleted = 1", [modifiedUUID dataValue]];
 			
@@ -429,7 +429,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         COSQLiteStorePersistentRootBackingStore *backingStore =
 		[self backingStoreForPersistentRootUUID: aPersistentRoot createIfNotPresent: YES];
 		
-        result = [backingStore revisionInfos];
+        result = backingStore.revisionInfos;
     });
     
     return result;
@@ -500,7 +500,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 
 - (NSString *)backingStorePathForUUID: (ETUUID *)aUUID
 {
-	return [[self URL].path stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.sqlite", aUUID]];
+	return [self.URL.path stringByAppendingPathComponent: [NSString stringWithFormat: @"%@.sqlite", aUUID]];
 }
 
 - (void) deleteBackingStoreWithUUID: (ETUUID *)aUUID
@@ -596,7 +596,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     
     dispatch_sync(queue_, ^(){
         COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aPersistentRoot createIfNotPresent: YES];
-        result = [backing rootUUID];
+        result = backing.rootUUID;
     });
     
     return result;
@@ -624,14 +624,14 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     NSData *backingUUIDData = [backingStoreUUID dataValue];
     
     NSMutableArray *ftsContent = [NSMutableArray array];
-    for (ETUUID *uuid in [anItemTree itemUUIDs])
+    for (ETUUID *uuid in anItemTree.itemUUIDs)
     {
         COItem *itemToIndex = [anItemTree itemForUUID: uuid];
-        NSString *itemFtsContent = [itemToIndex fullTextSearchContent];
+        NSString *itemFtsContent = itemToIndex.fullTextSearchContent;
         [ftsContent addObject: itemFtsContent];
 
         // Look for references to other persistent roots.
-        for (ETUUID *referenced in [itemToIndex allReferencedPersistentRootUUIDs])
+        for (ETUUID *referenced in itemToIndex.allReferencedPersistentRootUUIDs)
         {
             [db_ executeUpdate: @"INSERT INTO proot_refs(root_id, revid, inner_object_uuid, dest_root_id) VALUES(?,?,?,?)",
                 backingUUIDData,
@@ -641,14 +641,14 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
         }
         
         // Look for attachments
-        for (COAttachmentID *attachment in [itemToIndex attachments])
+        for (COAttachmentID *attachment in itemToIndex.attachments)
         {
 			if ((id)attachment != [NSNull null])
 			{
 				[db_ executeUpdate: @"INSERT INTO attachment_refs(root_id, revid, attachment_hash) VALUES(?,?,?)",
 				 backingUUIDData ,
 				 [aRevision dataValue],
-				 [attachment dataValue]];
+				 attachment.dataValue];
 			}
         }
     }
@@ -1058,7 +1058,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 							   kCOStoreCompactedPersistentRoots : compactedUUIDStrings,
 							   kCOStoreFinalizedPersistentRoots : finalizedUUIDStrings,
 							   kCOStoreUUID : [self.UUID stringValue],
-							   kCOStoreURL : [self URL].absoluteString};
+							   kCOStoreURL : self.URL.absoluteString};
 
 	[self postCommitNotificationsWithUserInfo: userInfo];
 }
@@ -1083,7 +1083,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
     {
         [result appendFormat: @"\t backing UUID %@ (containing ", backingUUID];
         
-        for (ETUUID *persistentRoot in  [[NSSet setWithArray: [self persistentRootUUIDs]]
+        for (ETUUID *persistentRoot in  [[NSSet setWithArray: self.persistentRootUUIDs]
                                          objectsPassingTest: ^(id obj, BOOL *stop) {
                                              return [[self backingUUIDForPersistentRootUUID: obj
 																		 createIfNotPresent: YES] isEqual: backingUUID];
@@ -1161,8 +1161,8 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 		if (bs == nil)
 			return;
 		
-		uint64_t exportsize = [bs fileSize];
-		uint64_t usedsize = [[bs UUID] isEqual: aUUID] ? exportsize : 0;
+		uint64_t exportsize = bs.fileSize;
+		uint64_t usedsize = [bs.UUID isEqual: aUUID] ? exportsize : 0;
 		
 		result = @{ COPersistentRootAttributeExportSize : @(exportsize),
 				  COPersistentRootAttributeUsedSize : @(usedsize) };

@@ -153,7 +153,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	NSMutableString *result = [NSMutableString string];
     
 	[result appendFormat: @"[COObjectGraphContext root: %@\n", self.rootItemUUID];
-	for (ETUUID *uuid in [self itemUUIDs])
+	for (ETUUID *uuid in self.itemUUIDs)
 	{
         COItem *item = [self itemForUUID: uuid];
 		[result appendFormat: @"%@", item];
@@ -301,7 +301,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 {
 	NILARG_EXCEPTION_TEST(anItem);
     
-	COObject *obj = [self objectWithUUID: [anItem UUID]
+	COObject *obj = [self objectWithUUID: anItem.UUID
 	                   entityDescription: [self descriptionForItem: anItem]];
 
     obj.storeItem = anItem;
@@ -445,7 +445,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (void)updateMappingFromAdditionalItemsToObject: (COObject *)currentObject
 {
-	for (ETUUID *itemUUID in [[currentObject additionalStoreItemUUIDs] objectEnumerator])
+	for (ETUUID *itemUUID in [currentObject.additionalStoreItemUUIDs objectEnumerator])
 	{
 		_objectsByAdditionalItemUUIDs[itemUUID] = currentObject;
 	}
@@ -461,7 +461,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	NSParameterAssert(!item.isAdditionalItem);
 	ETAssert(_loadingItemGraph != nil);
 
-    ETUUID *uuid = [item UUID];
+    ETUUID *uuid = item.UUID;
     COObject *currentObject = _loadedObjects[uuid];
     
     if (currentObject == nil)
@@ -561,7 +561,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
                               rootItemUUID: [[items firstObject] UUID]];
 	
 	[self addItemsFromItemGraph: itemGraph
-	              loadableUUIDs: [NSSet setWithArray: [itemGraph itemUUIDs]]];
+	              loadableUUIDs: [NSSet setWithArray: itemGraph.itemUUIDs]];
 	
 	// NOTE: -acceptAllChanges *not* called
 	
@@ -585,7 +585,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 		// Special case. Both the givem graph, and the receiver have no root UUID.
 		// In that case, just take all of the objects from the aTree
 		
-		aTreeReachableUUIDs = [NSSet setWithArray: [aTree itemUUIDs]];
+		aTreeReachableUUIDs = [NSSet setWithArray: aTree.itemUUIDs];
 	}
 
 	[self addItemsFromItemGraph: aTree
@@ -637,7 +637,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	{
 		[_insertedObjectUUIDs addObject: uuid];
 		
-		for (ETUUID *itemUUID in [[object additionalStoreItemUUIDs] objectEnumerator])
+		for (ETUUID *itemUUID in [object.additionalStoreItemUUIDs objectEnumerator])
 		{
 			_objectsByAdditionalItemUUIDs[itemUUID] = object;
 		}
@@ -747,7 +747,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 	// Remove it from the additional item to object lookup table
 
-	[_objectsByAdditionalItemUUIDs removeObjectsForKeys: [anObject additionalStoreItemUUIDs].allValues];
+	[_objectsByAdditionalItemUUIDs removeObjectsForKeys: anObject.additionalStoreItemUUIDs.allValues];
     
     // Release it from the objects dictionary (may release it)
     
@@ -835,7 +835,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
     }
     
     NSMutableSet *deadUUIDs = [NSMutableSet setWithArray: _loadedObjects.allKeys];
-	NSSet *liveUUIDs = [self allReachableObjectUUIDs];
+	NSSet *liveUUIDs = self.allReachableObjectUUIDs;
     [deadUUIDs minusSet: liveUUIDs];
 	
 	[self discardObjectsWithUUIDs: deadUUIDs];
@@ -924,7 +924,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	}
 	else
 	{
-		referringObjects = [[anObject incomingRelationshipCache] referringObjects];
+		referringObjects = anObject.incomingRelationshipCache.referringObjects;
 	}
 
 	self.ignoresChangeTrackingNotifications = YES;
@@ -995,7 +995,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	// in the same transaction, they still get committed. This isn't a big deal
 	// becuase this should be rare (only a strange app would do this), and the
 	// detached objects will be ignored at reloading time.
-	if ([self hasChanges])
+	if (self.hasChanges)
 	{
 		if ([self incrementCommitCounterAndCheckIfGCNeeded])
 		{

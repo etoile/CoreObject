@@ -125,7 +125,7 @@ static NSData *dataFromHexString(NSString *hexString)
 
 - (NSURL *) URLForAttachmentID: (COAttachmentID *)aHash
 {
-	NSData *data = [aHash dataValue];
+	NSData *data = aHash.dataValue;
 	
     NSParameterAssert([data length] == SHA_DIGEST_LENGTH);
     return [[[self attachmentsURL] URLByAppendingPathComponent: hexString(data)]

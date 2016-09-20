@@ -14,7 +14,7 @@
 
 - (BOOL) execute: (COSQLiteStore *)store inTransaction: (COStoreTransaction *)aTransaction
 {
-    return [[store database] executeUpdate: @"UPDATE persistentroots SET deleted = 0 WHERE uuid = ?",
+    return [store.database executeUpdate: @"UPDATE persistentroots SET deleted = 0 WHERE uuid = ?",
             [persistentRoot dataValue]];
 }
 

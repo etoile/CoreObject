@@ -28,7 +28,7 @@
 	NSMutableArray *array = [NSMutableArray array];
 	for (COSynchronizerRevision *revision in revs)
 	{
-		id revisionPropertyList = [revision propertyList];
+		id revisionPropertyList = revision.propertyList;
 		[array addObject: revisionPropertyList];
 	}
 	return array;
@@ -47,10 +47,10 @@
 
 + (COAttachmentID *) searchForFirstMissingAttachmentIDInGraph: (id<COItemGraph>)aGraph store: (COSQLiteStore *)aStore
 {
-	for (ETUUID *uuid in [aGraph itemUUIDs])
+	for (ETUUID *uuid in aGraph.itemUUIDs)
 	{
 		COItem *item = [aGraph itemForUUID: uuid];
-		for (COAttachmentID *attachmentID in [item attachments])
+		for (COAttachmentID *attachmentID in item.attachments)
 		{
 			NSURL *url = [aStore URLForAttachmentID: attachmentID];
 			

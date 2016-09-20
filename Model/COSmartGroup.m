@@ -140,7 +140,7 @@
 
 - (id)objectForIdentifier: (NSString *)anId
 {
-	for (id object in [self content])
+	for (id object in self.content)
 	{
 		if ([[object identifier] isEqualToString: anId])
 		{
@@ -154,7 +154,7 @@
 {
 	NSMutableArray *result = [NSMutableArray array];
 
-	for (COObject *object in [self content])
+	for (COObject *object in self.content)
 	{
 		if ([aQuery.predicate evaluateWithObject: object])
 		{
