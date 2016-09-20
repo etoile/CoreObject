@@ -41,7 +41,7 @@
 {
 	COObjectGraphContext *emptyContext = [COObjectGraphContext objectGraphContext];
 	UKNotNil(emptyContext);
-    //UKNil([emptyContext rootObject]);
+    //UKNil(emptyContext.rootObject);
 }
 
 - (void)testCustomModelDescriptionRepository
@@ -84,10 +84,10 @@
 	OutlineItem *child = [self addObjectWithLabel: @"Groceries" toObject: parent];
 	OutlineItem *subchild = [self addObjectWithLabel: @"Pizza" toObject: child];
     
-    UKObjectsEqual(S([[ctx1 rootObject] UUID], [parent UUID], [child UUID], [subchild UUID]),
+    UKObjectsEqual(S([ctx1.rootObject UUID], [parent UUID], [child UUID], [subchild UUID]),
                    [NSSet setWithArray: [ctx1 itemUUIDs]]);
     
-    UKObjectsEqual(S([[ctx2 rootObject] UUID]),
+    UKObjectsEqual(S([ctx2.rootObject UUID]),
                    [NSSet setWithArray: [ctx2 itemUUIDs]]);
     
     // Do the copy
@@ -361,7 +361,7 @@
 
 - (void) testRootObjectIsSetOnceOnly
 {
-	UKObjectsEqual(root1, [ctx1 rootObject]);
+	UKObjectsEqual(root1, ctx1.rootObject);
 	
 	OutlineItem *root2 = [self addObjectWithLabel: @"root1" toContext: ctx1];
     UKRaisesException([ctx1 setRootObject: root2]);

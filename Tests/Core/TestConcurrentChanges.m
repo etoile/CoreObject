@@ -56,7 +56,7 @@
 	CORevision *newRev = [ctx revisionForRevisionUUID: newRevID persistentRootUUID: persistentRoot.UUID];
 
 	UKObjectsEqual([revs arrayByAddingObject: newRev], [[persistentRoot currentBranch] nodes]);
-    UKObjectsEqual(@"hello", [[persistentRoot rootObject] valueForProperty: @"label"]);
+    UKObjectsEqual(@"hello", [persistentRoot.rootObject valueForProperty: @"label"]);
     UKFalse([ctx hasChanges]);
 }
 

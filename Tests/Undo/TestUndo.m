@@ -47,7 +47,7 @@
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commitWithUndoTrack: _testTrack];
 
-    UKNil([[persistentRoot rootObject] valueForProperty: kCOLabel]);
+    UKNil([persistentRoot.rootObject valueForProperty: kCOLabel]);
     
     [persistentRoot.rootObject setValue: @"hello" forProperty: kCOLabel];
     [ctx commitWithUndoTrack: _testTrack];
@@ -55,7 +55,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(@"hello", [[testProot rootObject] valueForProperty: kCOLabel]);
+		 UKObjectsEqual(@"hello", [testProot.rootObject valueForProperty: kCOLabel]);
 	 }];
     
     [_testTrack undo];
@@ -63,7 +63,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKNil([[testProot rootObject] valueForProperty: kCOLabel]);
+		 UKNil([testProot.rootObject valueForProperty: kCOLabel]);
 	 }];
 }
 
@@ -377,17 +377,17 @@
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
         UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
-        UKObjectsEqual(@"hello2", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
+        UKObjectsEqual(@"hello2", [ctx2persistentRoot.rootObject valueForProperty: kCOLabel]);
         
         [testTrack undo];
         
         UKObjectsEqual(ctx2originalBranch, [ctx2persistentRoot currentBranch]);
-        UKObjectsEqual(@"hello", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
+        UKObjectsEqual(@"hello", [ctx2persistentRoot.rootObject valueForProperty: kCOLabel]);
         
         [testTrack redo];
         
         UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
-        UKObjectsEqual(@"hello2", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
+        UKObjectsEqual(@"hello2", [ctx2persistentRoot.rootObject valueForProperty: kCOLabel]);
     }
 }
 
@@ -472,11 +472,11 @@
     UKFalse([_testTrack canRedo]);
     UKTrue([_testTrack canUndo]);
     
-    UKObjectsEqual(@"hello", [[persistentRoot rootObject] valueForProperty: kCOLabel]);
+    UKObjectsEqual(@"hello", [persistentRoot.rootObject valueForProperty: kCOLabel]);
     
     [_testTrack undo];
     
-    UKNil([[persistentRoot rootObject] valueForProperty: kCOLabel]);
+    UKNil([persistentRoot.rootObject valueForProperty: kCOLabel]);
 }
 
 - (void) testPatternTrack
@@ -509,39 +509,39 @@
 
     // experiment...
 
-    UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
+    UKObjectsEqual(@"photo", [doc2.rootObject label]);
     [workspaceTrack undo];
-    UKObjectsEqual(@"doc2", [[doc2 rootObject] label]);
+    UKObjectsEqual(@"doc2", [doc2.rootObject label]);
     
     [workspaceTrack undo];
-    UKNil([[doc2 rootObject] label]);
+    UKNil([doc2.rootObject label]);
 
-    UKObjectsEqual(@"sketch", [[doc1 rootObject] label]);
+    UKObjectsEqual(@"sketch", [doc1.rootObject label]);
     [workspaceTrack undo];
-    UKObjectsEqual(@"doc1", [[doc1 rootObject] label]);
+    UKObjectsEqual(@"doc1", [doc1.rootObject label]);
     
     [workspaceTrack undo];
-    UKNil([[doc1 rootObject] label]);
+    UKNil([doc1.rootObject label]);
     
     // redo on doc2
     
     [workspaceDoc2Track redo];
-    UKNil([[doc1 rootObject] label]);
-    UKObjectsEqual(@"doc2", [[doc2 rootObject] label]);
+    UKNil([doc1.rootObject label]);
+    UKObjectsEqual(@"doc2", [doc2.rootObject label]);
 
     [workspaceDoc2Track redo];
-    UKNil([[doc1 rootObject] label]);
-    UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
+    UKNil([doc1.rootObject label]);
+    UKObjectsEqual(@"photo", [doc2.rootObject label]);
 
     // redo on doc1
     
     [workspaceDoc1Track redo];
-    UKObjectsEqual(@"doc1", [[doc1 rootObject] label]);
-    UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
+    UKObjectsEqual(@"doc1", [doc1.rootObject label]);
+    UKObjectsEqual(@"photo", [doc2.rootObject label]);
 
     [workspaceDoc1Track redo];
-    UKObjectsEqual(@"sketch", [[doc1 rootObject] label]);
-    UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
+    UKObjectsEqual(@"sketch", [doc1.rootObject label]);
+    UKObjectsEqual(@"photo", [doc2.rootObject label]);
 }
 
 - (void) testSelectiveUndoOfCommands

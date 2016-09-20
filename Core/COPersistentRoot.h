@@ -288,7 +288,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * Changing this value stages it for commit; upon the next persistent root 
  * commit, the change is saved to disk and replicated to other applications.
  *
- * TODO: Document the deletion behavior for [[self currentBranch] setDeleted: YES]. 
+ * TODO: Document the deletion behavior for [self.currentBranch setDeleted: YES]. 
  */
 @property (nonatomic, strong) COBranch *currentBranch;
 /**
@@ -404,7 +404,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
 
 
 /**
- * Shorthand for <code>[[self objectGraphContext] rootObject]</code>.
+ * Shorthand for <code>self.objectGraphContext.rootObject</code>.
  *
  * You can use this root object to create a cross persistent reference that 
  * dynamically tracks the current branch. If the receiver's current branch is
@@ -413,48 +413,48 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * roots to this root object, the branch switch is immediately visible through those
  * references.
  *
- * If you use <code>[[self currentBranch] rootObject]</code> or 
- * <code>[otherBranch rootObject]</code>, the cross persistent root reference 
+ * If you use <code>self.currentBranch.rootObject</code> or
+ * <code>otherBranch.rootObject</code>, the cross persistent root reference
  * in another persistent root will track a specific branch. For example, even 
  * if the current branch changes in the receiver, the other persistent root 
  * will continue to refer to the root object of the previous current branch.
  */
 @property (nonatomic, strong) id rootObject;
 /**
- * Shorthand for <code>[[self objectGraphContext] loadedObjectForUUID:]</code>.
+ * Shorthand for <code>[self.objectGraphContext loadedObjectForUUID:]</code>.
  */
 - (COObject *)loadedObjectForUUID: (ETUUID *)uuid;
 /**
- * Shortcut for <code>[[self currentBranch] currentRevision]</code>.
+ * Shortcut for <code>self.currentBranch.currentRevision</code>.
  *
  * For a new persistent root, the revision is nil, unless it is a cheap copy. 
  * See -[COBranch makeCopyFromRevision:].
  */
 @property (nonatomic, strong) CORevision *currentRevision;
 /**
- * Shortcut for <code>[[self currentBranch] headRevision]</code>.
+ * Shortcut for <code>self.currentBranch.headRevision</code>.
  */
 @property (nonatomic, strong) CORevision *headRevision;
 /**
- * Shorthand for <code>[[self editingContext] store]</code>.
+ * Shorthand for <code>self.editingContext.store</code>.
  */
 @property (nonatomic, readonly) COSQLiteStore *store;
 /**
  * Returns the object graph that dynamically tracks the -currentBranch.
  *
  * This object graph context is not the same than 
- * <code>[[self currentBranch] objectGraphContext]</code>, although its content 
+ * <code>self.currentBranch.objectGraphContext</code>, although its content
  * is the same (their item graphs are equal). For the same inner object UUID, 
  * both use distinct inner object instances.
  *
  * When -setCurrentBranch: is called, this object graph content changes. It is 
  * updated with -[COObjectGraphContext setItemGraph:], to present the same 
- * content than [[self currentBranch] objectGraphContext].
+ * content than [self.currentBranch objectGraphContext].
  *
- * This object graph context and <code>[[self currentBranch] objectGraphContext]</code>
+ * This object graph context and <code>self.currentBranch.objectGraphContext</code>
  * are kept in sync at commit time. There is a one-way update, so both are not 
  * allowed to contain changes, otherwise an assertion occurs at commit time.
- * If -objectGraphContext or <code>[[self currentBranch] objectGraphContext]</code>  
+ * If -objectGraphContext or <code>self.currentBranch.objectGraphContext</code>
  * contains some changes, a commit must be done, to start making changes to its 
  * counterpart.
  *

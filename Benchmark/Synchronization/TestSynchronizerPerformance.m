@@ -24,14 +24,14 @@
 	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: [serverBranch objectGraphContext]];
 	COAttributedStringWrapper *serverWrapper = [[COAttributedStringWrapper alloc] initWithBacking: serverStr];
 	[serverWrapper replaceCharactersInRange: NSMakeRange(0, 0) withString: baseString];
-	[(UnorderedGroupNoOpposite *)[serverBranch rootObject] setContents: S(serverStr)];
+	[(UnorderedGroupNoOpposite *)serverBranch.rootObject setContents: S(serverStr)];
 	[serverPersistentRoot commit];
 	
 	[transport deliverMessagesToClient];
 	
 	// several commits on client
 	
-	COAttributedString *clientStr = [[(UnorderedGroupNoOpposite *)[clientBranch rootObject] contents] anyObject];
+	COAttributedString *clientStr = [[(UnorderedGroupNoOpposite *)clientBranch.rootObject contents] anyObject];
 	COAttributedStringWrapper *clientWrapper = [[COAttributedStringWrapper alloc] initWithBacking: clientStr];
 	
 	UKObjectsEqual(baseString, [clientWrapper string]);
@@ -79,14 +79,14 @@
 	const NSUInteger objectsToInsert = 80;
 	
 	OrderedGroupNoOpposite *serverGroup = [[OrderedGroupNoOpposite alloc] initWithObjectGraphContext: [serverBranch objectGraphContext]];
-	[(UnorderedGroupNoOpposite *)[serverBranch rootObject] setContents: S(serverGroup)];
+	[(UnorderedGroupNoOpposite *)serverBranch.rootObject setContents: S(serverGroup)];
 	[serverPersistentRoot commit];
 	
 	[transport deliverMessagesToClient];
 	
 	// several commits on client
 	
-	OrderedGroupNoOpposite *clientGroup = [[(UnorderedGroupNoOpposite *)[clientBranch rootObject] contents] anyObject];
+	OrderedGroupNoOpposite *clientGroup = [[(UnorderedGroupNoOpposite *)clientBranch.rootObject contents] anyObject];
 	for (NSUInteger i = 0; i < objectsToInsert; i++)
 	{
 		OrderedGroupNoOpposite *child = [[OrderedGroupNoOpposite alloc] initWithObjectGraphContext: [clientBranch objectGraphContext]];

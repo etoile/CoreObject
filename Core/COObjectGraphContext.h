@@ -386,7 +386,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * be raised if the caller attempts to set it to something else.
  *
  * The root object doesn't represent the core object. As such, use the persistent
- * root UUID to refer to core objects and never <code>[[self rootObject] UUID]</code>.
+ * root UUID to refer to core objects and never <code>[self.rootObject UUID]</code>.
  *
  * See also -rootItemUUID.
  */

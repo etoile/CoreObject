@@ -30,7 +30,7 @@
 	UKObjectsSame(clientBranch, clientPersistentRoot.currentBranch);
 	UKObjectsEqual([serverPersistentRoot UUID], [clientPersistentRoot UUID]);
 	UKObjectsEqual([serverBranch UUID], [clientBranch UUID]);
-	UKObjectsEqual([[serverBranch rootObject] UUID], [[clientBranch rootObject] UUID]);
+	UKObjectsEqual([serverBranch.rootObject UUID], [clientBranch.rootObject UUID]);
 }
 
 - (void) testClientEdit
@@ -49,8 +49,8 @@
 	UKIntsEqual(1, [[self clientMessages] count]);
 	UKObjectKindOf([self clientMessages][0], COSynchronizerResponseToClientForSentRevisionsMessage);
 	
-	UKIntsEqual(1, [[[serverBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1.UUID), [[serverBranch rootObject] valueForKeyPath: @"contents.UUID"]);
+	UKIntsEqual(1, [[serverBranch.rootObject contents] count]);
+	UKObjectsEqual(S(clientChild1.UUID), [serverBranch.rootObject valueForKeyPath: @"contents.UUID"]);
 	
 	// Deliver the response to the client
 	[transport deliverMessagesToClient];
@@ -71,8 +71,8 @@
 	// Deliver push to client
 	[transport deliverMessagesToClient];
 	
-	UKIntsEqual(1, [[[clientBranch rootObject] contents] count]);
-	UKObjectsEqual(S(serverChild1.UUID), [[clientBranch rootObject] valueForKeyPath: @"contents.UUID"]);
+	UKIntsEqual(1, [[clientBranch.rootObject contents] count]);
+	UKObjectsEqual(S(serverChild1.UUID), [clientBranch.rootObject valueForKeyPath: @"contents.UUID"]);
 	
 	// No more messages
 	UKIntsEqual(0, [[self clientMessages] count]);
@@ -95,8 +95,8 @@
 	
 	UKIntsEqual(0, [[self clientMessages] count]);
 	
-	UKIntsEqual(1, [[[clientBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1), [[clientBranch rootObject] contents]);
+	UKIntsEqual(1, [[clientBranch.rootObject contents] count]);
+	UKObjectsEqual(S(clientChild1), [clientBranch.rootObject contents]);
 	
 	// Server should merge in client's changes, and send a push response back to the client
 	[transport deliverMessagesToServer];
@@ -106,8 +106,8 @@
 	UKIntsEqual(1, [[self clientMessages] count]);
 	UKObjectKindOf([self clientMessages][0], COSynchronizerResponseToClientForSentRevisionsMessage);
 	
-	UKIntsEqual(2, [[[serverBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [[serverBranch rootObject] valueForKeyPath: @"contents.UUID"]);
+	UKIntsEqual(2, [[serverBranch.rootObject contents] count]);
+	UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [serverBranch.rootObject valueForKeyPath: @"contents.UUID"]);
 	
 	// Deliver the response to the client
 	[transport deliverMessagesToClient];
@@ -116,8 +116,8 @@
 	UKIntsEqual(0, [[self serverMessages] count]);
 	UKIntsEqual(0, [[self clientMessages] count]);
 		
-	UKIntsEqual(2, [[[clientBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [[clientBranch rootObject] valueForKeyPath: @"contents.UUID"]);
+	UKIntsEqual(2, [[clientBranch.rootObject contents] count]);
+	UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [clientBranch.rootObject valueForKeyPath: @"contents.UUID"]);
 }
 
 - (void) testServerAndClientEdit
@@ -152,8 +152,8 @@
 	// Server should merge in client's changes, and send a push response back to the client
 	[transport deliverMessagesToServer];
 	
-	UKIntsEqual(2, [[[serverBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [[serverBranch rootObject] valueForKeyPath: @"contents.UUID"]);
+	UKIntsEqual(2, [[serverBranch.rootObject contents] count]);
+	UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [serverBranch.rootObject valueForKeyPath: @"contents.UUID"]);
 	
 	UKIntsEqual(0, [[self serverMessages] count]);
 	
@@ -182,8 +182,8 @@
 	UKIntsEqual(0, [[self serverMessages] count]);
 	UKIntsEqual(0, [[self clientMessages] count]);
 	
-	UKIntsEqual(2, [[[clientBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [[clientBranch rootObject] valueForKeyPath: @"contents.UUID"]);
+	UKIntsEqual(2, [[clientBranch.rootObject contents] count]);
+	UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [clientBranch.rootObject valueForKeyPath: @"contents.UUID"]);
 }
 
 - (void) testLocalClientCommitsAfterPushingToServer
@@ -206,8 +206,8 @@
 	UKObjectKindOf([self clientMessages][0], COSynchronizerPushedRevisionsToClientMessage); /* Will be ignored by client */
 	UKObjectKindOf([self clientMessages][1], COSynchronizerResponseToClientForSentRevisionsMessage);
 	
-	UKIntsEqual(2, [[[serverBranch rootObject] contents] count]);
-	UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [[serverBranch rootObject] valueForKeyPath: @"contents.UUID"]);
+	UKIntsEqual(2, [[serverBranch.rootObject contents] count]);
+	UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [serverBranch.rootObject valueForKeyPath: @"contents.UUID"]);
 	
 	// Before the merged changes arrives at the client, make another commit on the client
 	
@@ -223,7 +223,7 @@
 	// Deliver the merge response to the client
 	[transport deliverMessagesToClient];
 
-	UKObjectsEqual(@"more changes", [[clientBranch rootObject] label]);
+	UKObjectsEqual(@"more changes", [clientBranch.rootObject label]);
 	UKObjectsEqual([self clientRevisionMetadataForTest], [[clientPersistentRoot currentRevision] metadata]);
 	
 	// The client should push back the @"more changes" change to the server
@@ -239,7 +239,7 @@
 	UKIntsEqual(1, [[self clientMessages] count]);
 	UKObjectKindOf([self clientMessages][0], COSynchronizerResponseToClientForSentRevisionsMessage);
 	
-	UKObjectsEqual(@"more changes", [[serverBranch rootObject] label]);
+	UKObjectsEqual(@"more changes", [serverBranch.rootObject label]);
 	
 	[transport deliverMessagesToClient];
 	
@@ -259,7 +259,7 @@
 	
 	UKIntsEqual(0, [[self serverMessages] count]);
 	UKIntsEqual(0, [[self clientMessages] count]);
-	UKObjectsEqual(@"revertThis", [[clientBranch rootObject] label]);
+	UKObjectsEqual(@"revertThis", [clientBranch.rootObject label]);
 	
 	UKRaisesException([serverBranch setCurrentRevision: [[serverBranch currentRevision] parentRevision]]);
 	[serverPersistentRoot commit];
@@ -278,7 +278,7 @@
 	
 	UKIntsEqual(0, [[self serverMessages] count]);
 	UKIntsEqual(0, [[self clientMessages] count]);
-	UKObjectsEqual(@"revertThis", [[clientBranch rootObject] label]);
+	UKObjectsEqual(@"revertThis", [clientBranch.rootObject label]);
 	
 	UKRaisesException([clientBranch setCurrentRevision: [[clientBranch currentRevision] parentRevision]]);
 	[clientPersistentRoot commit];

@@ -47,11 +47,11 @@
     [library.rootObject addObject: photo1.rootObject];
     [library.rootObject addObject: photo2.rootObject];
     
-    UKObjectsEqual(S([photo1 rootObject], [photo2 rootObject]), [[library rootObject] contents]);
+    UKObjectsEqual(S(photo1.rootObject, photo2.rootObject), [library.rootObject contents]);
     
     // Do the computed parentCollections properties work across persistent root boundaries?
-    UKObjectsEqual(S([library rootObject]), [[photo1 rootObject] parentCollections]);
-    UKObjectsEqual(S([library rootObject]), [[photo2 rootObject] parentCollections]);
+    UKObjectsEqual(S(library.rootObject), [photo1.rootObject parentCollections]);
+    UKObjectsEqual(S(library.rootObject), [photo2.rootObject parentCollections]);
     
     // Check that nothing is committed yet
     UKObjectsEqual(@[], [store persistentRootUUIDs]);
@@ -81,10 +81,10 @@
 		 
 		 UKObjectsEqual([photo1 UUID], [photo1ctx2 UUID]);
 		 UKObjectsEqual([photo2 UUID], [photo2ctx2 UUID]);
-		 UKObjectsEqual([[photo1 rootObject] UUID], [[photo1ctx2 rootObject] UUID]);
-		 UKObjectsEqual([[photo2 rootObject] UUID], [[photo2ctx2 rootObject] UUID]);
-		 UKObjectsEqual(@"photo1", [[photo1ctx2 rootObject] label]);
-		 UKObjectsEqual(@"photo2", [[photo2ctx2 rootObject] label]);
+		 UKObjectsEqual([photo1.rootObject UUID], [photo1ctx2.rootObject UUID]);
+		 UKObjectsEqual([photo2.rootObject UUID], [photo2ctx2.rootObject UUID]);
+		 UKObjectsEqual(@"photo1", [photo1ctx2.rootObject label]);
+		 UKObjectsEqual(@"photo2", [photo2ctx2.rootObject label]);
 	 }];
 }
 
@@ -152,20 +152,20 @@
     // Set up library
     
     COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-    [(Tag *)library1.rootObject setContents: S([photo1 rootObject], [branchA rootObject])];
-	UKIntsEqual(2, [[[library1 rootObject] contents] count]);
+    [(Tag *)library1.rootObject setContents: S(photo1.rootObject, branchA.rootObject)];
+	UKIntsEqual(2, [[library1.rootObject contents] count]);
 	
     [ctx commit];
     
-    UKObjectsEqual(S(@"photo1, branch A"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
-    UKObjectsEqual(S(A(@"childA")), [[library1 rootObject] valueForKeyPath: @"contents.contents.label"]);
+    UKObjectsEqual(S(@"photo1, branch A"), [library1.rootObject valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(S(A(@"childA")), [library1.rootObject valueForKeyPath: @"contents.contents.label"]);
     
     // Now switch the current branch of photo1. This should automatically update the cross-persistent reference
     
     photo1.currentBranch = branchB;
     
-    UKObjectsEqual(S(@"photo1, branch A", @"photo1, branch B"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
-    UKObjectsEqual(S(A(@"childA"), A(@"childB")), [[library1 rootObject] valueForKeyPath: @"contents.contents.label"]);
+    UKObjectsEqual(S(@"photo1, branch A", @"photo1, branch B"), [library1.rootObject valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(S(A(@"childA"), A(@"childB")), [library1.rootObject valueForKeyPath: @"contents.contents.label"]);
     
     [ctx commit];
     
@@ -179,12 +179,12 @@
         // Sanity check
         
         UKObjectsEqual([branchB UUID], [[photo1ctx2 currentBranch] UUID]);
-        UKObjectsEqual(A(@"childB"), [[photo1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
+        UKObjectsEqual(A(@"childB"), [photo1ctx2.rootObject valueForKeyPath: @"contents.label"]);
         
         // Actual test of cross-persistent-root references
         
-        UKObjectsEqual(S(@"photo1, branch A", @"photo1, branch B"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
-        UKObjectsEqual(S(A(@"childA"), A(@"childB")), [[library1ctx2 rootObject] valueForKeyPath: @"contents.contents.label"]);
+        UKObjectsEqual(S(@"photo1, branch A", @"photo1, branch B"), [library1ctx2.rootObject valueForKeyPath: @"contents.label"]);
+        UKObjectsEqual(S(A(@"childA"), A(@"childB")), [library1ctx2.rootObject valueForKeyPath: @"contents.contents.label"]);
 	 }];
 }
 
@@ -280,8 +280,8 @@
 		 // Ensure that the computed parents of Lucy and John are the "current branch object context" of Group,
 		 // not a specific branch one.
 		 
-		 UKObjectsEqual(S([testProot rootObject]), testJohnRoot.parentGroups);
-		 UKObjectsEqual(S([testProot rootObject]), testLucyRoot.parentGroups);
+		 UKObjectsEqual(S(testProot.rootObject), testJohnRoot.parentGroups);
+		 UKObjectsEqual(S(testProot.rootObject), testLucyRoot.parentGroups);
 		 
 		 UKObjectsNotEqual(S(testBranchARoot), testJohnRoot.parentGroups);
 		 UKObjectsNotEqual(S(testBranchARoot), testLucyRoot.parentGroups);
@@ -305,8 +305,8 @@
 		 // Ensure that the computed parents of Lucy and John are the "current branch object context" of Group
 		 // not a specific branch one.
 		 
-		 UKObjectsEqual(S([testProot rootObject]), testJohnRoot.parentGroups);
-		 UKObjectsEqual(S([testProot rootObject]), testLucyRoot.parentGroups);
+		 UKObjectsEqual(S(testProot.rootObject), testJohnRoot.parentGroups);
+		 UKObjectsEqual(S(testProot.rootObject), testLucyRoot.parentGroups);
 		 
 		 UKObjectsNotEqual(S(testBranchBRoot), testJohnRoot.parentGroups);
 		 UKObjectsNotEqual(S(testBranchBRoot), testLucyRoot.parentGroups);
@@ -332,8 +332,8 @@
 
 		 UKObjectsEqual(@"LucyB", testLucyRoot.label);
 		 
-		 UKObjectsEqual(S([testProot rootObject]), testJohnRoot.parentGroups);
-		 UKObjectsEqual(S([testProot rootObject]), testLucyRoot.parentGroups);
+		 UKObjectsEqual(S(testProot.rootObject), testJohnRoot.parentGroups);
+		 UKObjectsEqual(S(testProot.rootObject), testLucyRoot.parentGroups);
 	 }];
 	
 	[self checkBranchWithExistingAndNewContext: groupB
@@ -345,8 +345,8 @@
 		 
 		 UKObjectsEqual(@"LucyB", testLucyRoot.label);
 		 
-		 UKObjectsEqual(S([testProot rootObject]), testJohnRoot.parentGroups);
-		 UKObjectsEqual(S([testProot rootObject]), testLucyRoot.parentGroups);
+		 UKObjectsEqual(S(testProot.rootObject), testJohnRoot.parentGroups);
+		 UKObjectsEqual(S(testProot.rootObject), testLucyRoot.parentGroups);
 	 }];
 	
 	// Check out both specifc branches of Lucy
@@ -417,7 +417,7 @@
     [self checkPersistentRootWithExistingAndNewContext: library1
                                                inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
      {
-         UKObjectsEqual(S(@"photo1, branch B"), [[[[testProot rootObject] contents] mappedCollection] label]);
+         UKObjectsEqual(S(@"photo1, branch B"), [[[testProot.rootObject contents] mappedCollection] label]);
      }];
 
 	branchB.deleted = YES;
@@ -427,9 +427,9 @@
                                                inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
      {
          if (isNewContext)
-             UKObjectsEqual(S(@"photo1, branch B"), [[[[testProot rootObject] contents] mappedCollection] label]);
+             UKObjectsEqual(S(@"photo1, branch B"), [[[testProot.rootObject contents] mappedCollection] label]);
          else
-             UKObjectsEqual(S(), [[[[testProot rootObject] contents] mappedCollection] label]);
+             UKObjectsEqual(S(), [[[testProot.rootObject contents] mappedCollection] label]);
      }];
     
     [ctx commit];
@@ -438,7 +438,7 @@
     [self checkPersistentRootWithExistingAndNewContext: library1
                                                inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
      {
-         UKObjectsEqual(S(), [[[[testProot rootObject] contents] mappedCollection] label]);
+         UKObjectsEqual(S(), [[[testProot.rootObject contents] mappedCollection] label]);
      }];
     
 	UKTrue(branchB.deleted);
@@ -450,7 +450,7 @@
     [self checkPersistentRootWithExistingAndNewContext: library1
                                                inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
      {
-         UKObjectsEqual(S(), [[[[testProot rootObject] contents] mappedCollection] label]);
+         UKObjectsEqual(S(), [[[testProot.rootObject contents] mappedCollection] label]);
      }];
 }
 
@@ -481,7 +481,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: tag1
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(S([[photo1 rootObject] UUID], [[photo2 rootObject] UUID]), [[[[testProot rootObject] contents] mappedCollection] UUID]);
+		 UKObjectsEqual(S([photo1.rootObject UUID], [photo2.rootObject UUID]), [[[testProot.rootObject contents] mappedCollection] UUID]);
 	 }];
 	
 	photo1.deleted = YES;
@@ -490,7 +490,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: tag1
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(S([[photo2 rootObject] UUID]), [[[[testProot rootObject] contents] mappedCollection] UUID]);
+		 UKObjectsEqual(S([photo2.rootObject UUID]), [[[testProot.rootObject contents] mappedCollection] UUID]);
 	 }];
 }
 
@@ -515,13 +515,13 @@
     [library1.rootObject insertObject: photo1.rootObject atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
     [ctx commit];
     
-    UKObjectsEqual(S(@"photo1"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(S(@"photo1"), [library1.rootObject valueForKeyPath: @"contents.label"]);
 
     // Now delete photo1. This should automatically update the cross-persistent reference
     
     photo1.deleted = YES;
     
-    UKObjectsEqual([NSSet set], [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual([NSSet set], [library1.rootObject valueForKeyPath: @"contents.label"]);
     
     [ctx commit];
 }
@@ -547,14 +547,14 @@
     [library1.rootObject addObject: photo1.rootObject];
     [ctx commit];
     
-    UKObjectsEqual(S(@"photo1"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
-    UKObjectsEqual(S(@"library1"), [[photo1 rootObject] valueForKeyPath: @"parentCollections.label"]);
+    UKObjectsEqual(S(@"photo1"), [library1.rootObject valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(S(@"library1"), [photo1.rootObject valueForKeyPath: @"parentCollections.label"]);
     
     // Now delete library1. This should automatically update the derived cross-persistent reference in photo1
     
     library1.deleted = YES;
     
-	UKObjectsEqual([NSSet set], [[photo1 rootObject] valueForKeyPath: @"parentCollections.label"]);
+	UKObjectsEqual([NSSet set], [photo1.rootObject valueForKeyPath: @"parentCollections.label"]);
     
     [ctx commit];
 }
@@ -588,7 +588,7 @@
     photo1.deleted = YES;
     [ctx commit];
     
-    UKObjectsEqual(S(), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(S(), [library1.rootObject valueForKeyPath: @"contents.label"]);
     
     // Add photo2 inner item. Note that the photo1 cross-persistent-root reference is
     // still present in library1.contents, it's just hidden.
@@ -597,7 +597,7 @@
     [photo2 setValue: @"photo2" forProperty: @"label"];
     [library1.rootObject addObject: photo2];
     
-    UKObjectsEqual(S(@"photo2"), [[library1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(S(@"photo2"), [library1.rootObject valueForKeyPath: @"contents.label"]);
     
     [ctx commit];
     
@@ -605,7 +605,7 @@
 											  inBlock: ^(COEditingContext *ctx2, COPersistentRoot *library1ctx2, COBranch *testBranch, BOOL isNewContext)
 	 {
         UKFalse([[library1ctx2 objectGraphContext] hasChanges]);
-        UKObjectsEqual(S(@"photo2"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
+        UKObjectsEqual(S(@"photo2"), [library1ctx2.rootObject valueForKeyPath: @"contents.label"]);
         
         // Undelete photo1, which should restore the cross-root relationship
         
@@ -613,7 +613,7 @@
         [photo1ctx2 setDeleted: NO];
         
         UKFalse([[library1ctx2 objectGraphContext] hasChanges]);
-        UKObjectsEqual(S(@"photo1", @"photo2"), [[library1ctx2 rootObject] valueForKeyPath: @"contents.label"]);
+        UKObjectsEqual(S(@"photo1", @"photo2"), [library1ctx2.rootObject valueForKeyPath: @"contents.label"]);
 	 }];
 }
 
@@ -649,7 +649,7 @@
 											   inBlock: ^(COEditingContext *ctx2, COPersistentRoot *photo1ctx2, COBranch *testBranch, BOOL isNewContext)
 	 {
         UKFalse([[photo1ctx2 objectGraphContext] hasChanges]);
-        UKObjectsEqual([NSSet set], [[photo1ctx2 rootObject] valueForKeyPath: @"parentCollections.label"]);
+        UKObjectsEqual([NSSet set], [photo1ctx2.rootObject valueForKeyPath: @"parentCollections.label"]);
         
         // Undelete library1, which should restore the cross-root inverse relationship
 		
@@ -661,7 +661,7 @@
         //[library1ctx2 setDeleted: NO];
 
         //UKFalse([[photo1ctx2 objectGraphContext] hasChanges]);
-        //UKObjectsEqual(S(@"library1"), [[photo1ctx2 rootObject] valueForKeyPath: @"parentCollections.label"]);
+        //UKObjectsEqual(S(@"library1"), [photo1ctx2.rootObject valueForKeyPath: @"parentCollections.label"]);
 	 }];
 #endif
 }
@@ -670,7 +670,7 @@
 {
     COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     COPersistentRoot *child1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    UKRaisesException([[doc1 rootObject] addObject: [child1 rootObject]]);
+    UKRaisesException([doc1.rootObject addObject: child1.rootObject]);
 	
 	// TODO: In fact, the illegal reference was actually inserted, so the object graph is in an
 	// illegal state now.

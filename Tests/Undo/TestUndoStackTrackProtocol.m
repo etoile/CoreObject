@@ -267,7 +267,7 @@
 	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [track currentNode]);
 	UKFalse([track canUndo]);
 	UKTrue([track canRedo]);
-	UKObjectsEqual(@"0", [[persistentRoot rootObject] label]);
+	UKObjectsEqual(@"0", [persistentRoot.rootObject label]);
 	UKObjectsEqual(r0, [persistentRoot currentRevision]);
 	
 	// Redo 1 node
@@ -278,7 +278,7 @@
 	[self checkCommand: [track currentNode] isSetVersionFrom: r0 to: r1];
 	UKTrue([track canUndo]);
 	UKTrue([track canRedo]);
-	UKObjectsEqual(@"1", [[persistentRoot rootObject] label]);
+	UKObjectsEqual(@"1", [persistentRoot.rootObject label]);
 	UKObjectsEqual(r1, [persistentRoot currentRevision]);
 }
 

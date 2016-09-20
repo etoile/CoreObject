@@ -69,8 +69,8 @@
 	COObjectGraphContext *ctx1 = [self make1KChunkAttributedString];
 	COObjectGraphContext *ctx2 = [self make1KChunkAttributedString];
 	
-	COAttributedString *as1 = [ctx1 rootObject];
-	COAttributedString *as2 = [ctx2 rootObject];
+	COAttributedString *as1 = ctx1.rootObject;
+	COAttributedString *as2 = ctx2.rootObject;
 	
 	[self appendHTMLString: @"<I>test</I>" toAttributedString: as2];
 	

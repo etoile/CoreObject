@@ -26,7 +26,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: library.persistentRoot
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKNil([[testProot rootObject] identifier]);
+		 UKNil([testProot.rootObject identifier]);
 	 }];
 	
 	UKFalse(library.persistentRoot.hasChanges);
@@ -37,7 +37,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: library.persistentRoot
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(@"hello", [[testProot rootObject] identifier]);
+		 UKObjectsEqual(@"hello", [testProot.rootObject identifier]);
 	 }];
 }
 

@@ -128,7 +128,7 @@
     
 	[persistentRoot commit];
 
-	UKObjectsEqual(@"Todo", [[persistentRoot rootObject] valueForProperty: @"label"]);
+	UKObjectsEqual(@"Todo", [persistentRoot.rootObject valueForProperty: @"label"]);
 	
     UKObjectsEqual([branch UUID],
                    [[store persistentRootInfoForUUID: [persistentRoot UUID]] currentBranchUUID]);
@@ -139,13 +139,13 @@
     
 	//CORevision *rev3 = [branch currentRevision];
     
-    UKObjectsEqual(@"Tidi", [[persistentRoot rootObject] valueForProperty: @"label"]);
+    UKObjectsEqual(@"Tidi", [persistentRoot.rootObject valueForProperty: @"label"]);
 	
 	/* Switch back to the main branch */
 	
 	persistentRoot.currentBranch = originalBranch;
     
-    UKObjectsEqual(@"Untitled", [[persistentRoot rootObject] valueForProperty: @"label"]);
+    UKObjectsEqual(@"Untitled", [persistentRoot.rootObject valueForProperty: @"label"]);
 }
 
 - (void) testBranchSwitchCommitted
@@ -176,10 +176,10 @@
     
     [ctx commit];
     
-    UKObjectsEqual(A(@"childA"), [[photo1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(A(@"childA"), [photo1.rootObject valueForKeyPath: @"contents.label"]);
     photo1.currentBranch = branchB;
     
-    UKObjectsEqual(A(@"childB"), [[photo1 rootObject] valueForKeyPath: @"contents.label"]);
+    UKObjectsEqual(A(@"childB"), [photo1.rootObject valueForKeyPath: @"contents.label"]);
     [ctx commit];
     
     // Test that the cross-persistent reference uses branchB when we reopen the store
@@ -188,7 +188,7 @@
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPhoto1, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKObjectsEqual([branchB UUID], [[testPhoto1 currentBranch] UUID]);
-		 UKObjectsEqual(A(@"childB"), [[testPhoto1 rootObject] valueForKeyPath: @"contents.label"]);
+		 UKObjectsEqual(A(@"childB"), [testPhoto1.rootObject valueForKeyPath: @"contents.label"]);
 	 }];
 }
 
@@ -208,7 +208,7 @@
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testSecondBranch, BOOL isNewContext)
 	 {
 		 UKObjectsEqual(testSecondBranch, [testProot currentBranch]);
-		 UKObjectsEqual(@"hello2", [[testProot rootObject] label]);
+		 UKObjectsEqual(@"hello2", [testProot.rootObject label]);
 		 UKObjectsEqual(@"hello", [[[testProot branchForUUID: [originalBranch UUID]] rootObject] label]);
 	 }];
 }
@@ -247,8 +247,8 @@
 	UKFalse([persistentRoot isCopy]);
 	UKTrue([copyRoot isCopy]);
 
-	UKObjectsEqual([rootObj UUID], [[copyRoot rootObject] UUID]);
-	UKObjectsNotEqual(rootObj, [copyRoot rootObject]);
+	UKObjectsEqual([rootObj UUID], [copyRoot.rootObject UUID]);
+	UKObjectsNotEqual(rootObj, copyRoot.rootObject);
 
     [ctx commit];
 	
@@ -282,7 +282,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: copyRoot
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(@"Todo", [[testProot rootObject] label]);
+		 UKObjectsEqual(@"Todo", [testProot.rootObject label]);
 	 }];
 	
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
@@ -309,7 +309,7 @@
 	 {
 		 UKObjectsNotEqual(r1, [testBranch initialRevision]);
 		 UKObjectsNotEqual(r1, [testProot currentRevision]);
-		 UKObjectsEqual(@"a change", [[testProot rootObject] label]);
+		 UKObjectsEqual(@"a change", [testProot.rootObject label]);
 	 }];
 }
 
@@ -327,7 +327,7 @@
 	 {
 		 UKObjectsNotEqual(r1, [testBranch initialRevision]);
 		 UKObjectsNotEqual(r1, [testProot currentRevision]);
-		 UKObjectsEqual(@"a change", [[testProot rootObject] label]);
+		 UKObjectsEqual(@"a change", [testProot.rootObject label]);
 	 }];
 }
 
@@ -630,7 +630,7 @@
 	OutlineItem *child = [altBranch.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	[altBranch.rootObject insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	
-	UKRaisesException([[originalBranch rootObject] insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"]);
+	UKRaisesException([originalBranch.rootObject insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"]);
 }
 
 /**

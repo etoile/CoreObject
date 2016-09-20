@@ -137,7 +137,7 @@
 		COAttributedString *attributedString = [applied loadedObjectForUUID: attributedStringUUID];
 		COAttributedString *attributedString2 = [applied loadedObjectForUUID: attributedString2UUID];
 		
-		UKObjectsSame(parent, [applied rootObject]);
+		UKObjectsSame(parent, applied.rootObject);
 		UKObjectsEqual(S(child1, child2), parent.contents);
 		UKObjectsEqual(S(attributedString2), child1.contents);
 		UKObjectsEqual(S(attributedString), child2.contents);

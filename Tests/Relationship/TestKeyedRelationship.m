@@ -110,7 +110,7 @@
 	                                           inBlock:
 	^ (COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	{
-		UKObjectsEqual([model entries], [[testProot rootObject] entries]);
+		UKObjectsEqual([model entries], [testProot.rootObject entries]);
 	}];
 }
 

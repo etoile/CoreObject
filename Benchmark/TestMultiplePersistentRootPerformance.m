@@ -29,7 +29,7 @@
 	{
 		OutlineItem *item = [[OutlineItem alloc] initWithObjectGraphContext: [proot objectGraphContext]];
 		item.label = [NSString stringWithFormat: @"Commit %d", commit];
-		[[[proot rootObject] mutableArrayValueForKey: @"contents"] addObject: item];
+		[[proot.rootObject mutableArrayValueForKey: @"contents"] addObject: item];
 		[proot commit];
 	}
 }

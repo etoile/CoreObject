@@ -414,7 +414,7 @@ static ETUUID *branchBUUID;
 	{
 		COPersistentRoot *clientPersistentRoot = [ctx persistentRootForUUID: uuid];
 		UKNotNil(clientPersistentRoot);
-		UKObjectsEqual(@"v1", [[clientPersistentRoot rootObject] label]);
+		UKObjectsEqual(@"v1", [clientPersistentRoot.rootObject label]);
 		[clientPersistentRoot.rootObject setLabel: @"v2"];
 		UKTrue([ctx commit]);
 	}
@@ -449,10 +449,10 @@ static ETUUID *branchBUUID;
 		COBranch *serverRemoteBranch = [serverRemoteBranches anyObject];
 		UKObjectsNotSame(serverLocalBranch, serverRemoteBranch);
 		
-		UKObjectsEqual(@"v1", [[serverLocalBranch rootObject] label]);
+		UKObjectsEqual(@"v1", [serverLocalBranch.rootObject label]);
 		// Fast-forward merge
 		serverLocalBranch.currentRevision = serverRemoteBranch.currentRevision;
-		UKObjectsEqual(@"v2", [[serverLocalBranch rootObject] label]);
+		UKObjectsEqual(@"v2", [serverLocalBranch.rootObject label]);
 		[serverPersistentRoot commit];
 	}
 	
@@ -461,7 +461,7 @@ static ETUUID *branchBUUID;
 	{
 		COPersistentRoot *clientPersistentRoot = [ctx persistentRootForUUID: uuid];
 		UKNotNil(clientPersistentRoot);
-		UKObjectsEqual(@"v2", [[clientPersistentRoot rootObject] label]);
+		UKObjectsEqual(@"v2", [clientPersistentRoot.rootObject label]);
 		[clientPersistentRoot.rootObject setLabel: @"v3"];
 		UKTrue([ctx commit]);
 	}
@@ -490,10 +490,10 @@ static ETUUID *branchBUUID;
 		COBranch *serverRemoteBranch = [serverRemoteBranches anyObject];
 		UKObjectsNotSame(serverLocalBranch, serverRemoteBranch);
 		
-		UKObjectsEqual(@"v2", [[serverLocalBranch rootObject] label]);
+		UKObjectsEqual(@"v2", [serverLocalBranch.rootObject label]);
 		// Fast-forward merge
 		serverLocalBranch.currentRevision = serverRemoteBranch.currentRevision;
-		UKObjectsEqual(@"v3", [[serverLocalBranch rootObject] label]);
+		UKObjectsEqual(@"v3", [serverLocalBranch.rootObject label]);
 		[serverPersistentRoot commit];
 	}
 }

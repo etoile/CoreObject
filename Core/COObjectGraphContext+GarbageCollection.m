@@ -85,7 +85,7 @@ static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *col
 
 - (NSSet *) allReachableObjectUUIDs
 {
-	NSParameterAssert([self rootObject] != nil);
+	NSParameterAssert(self.rootObject != nil);
 	
 	NSMutableSet *result = [[NSMutableSet alloc] initWithCapacity: _loadedObjects.count];
 	FindReachableObjectsFromObject(self.rootObject, result, self);

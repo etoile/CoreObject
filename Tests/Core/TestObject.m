@@ -153,13 +153,13 @@
 	 {
 		 if (isNewContext)
 		 {
-			 UKObjectsNotEqual(object, [testProot rootObject]);
-			 UKObjectsNotSame(object, [testProot rootObject]);
+			 UKObjectsNotEqual(object, testProot.rootObject);
+			 UKObjectsNotSame(object, testProot.rootObject);
 		 }
 		 else
 		 {
-			 UKObjectsEqual(object, [testProot rootObject]);
-			 UKObjectsSame(object, [testProot rootObject]);
+			 UKObjectsEqual(object, testProot.rootObject);
+			 UKObjectsSame(object, testProot.rootObject);
 		 }
 	 }];
 }

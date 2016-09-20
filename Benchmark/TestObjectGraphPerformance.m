@@ -47,7 +47,7 @@
 - (NSTimeInterval) timeToMakeInitialCommitToPersistentRoot: (COPersistentRoot *)persistentRoot
 {
 	COObjectGraphContext *graph = [persistentRoot objectGraphContext];
-	[self make3LevelNestedTreeInContainer: [graph rootObject]];
+	[self make3LevelNestedTreeInContainer: graph.rootObject];
 	
 	NSDate *start = [NSDate date];
 	[ctx commit];
@@ -106,7 +106,7 @@
 	NSDate *start = [NSDate date];
 	COEditingContext *ctx2 = [COEditingContext contextWithURL: [[persistentRoot store] URL]];
 	COPersistentRoot *ctx2PersistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-	NSArray *contents = [[ctx2PersistentRoot rootObject] contents];
+	NSArray *contents = [ctx2PersistentRoot.rootObject contents];
 	const NSTimeInterval time = [[NSDate date] timeIntervalSinceDate: start];
 
 	NSLog(@"Took %f ms to commit %d objects",

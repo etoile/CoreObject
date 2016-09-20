@@ -209,7 +209,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 	                                           inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
 	{
-		UKNotNil([[testPersistentRoot rootObject] content]);
+		UKNotNil([testPersistentRoot.rootObject content]);
 	}];
 }
 

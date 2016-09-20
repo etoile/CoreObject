@@ -339,7 +339,7 @@
 
 	INVALIDARG_EXCEPTION_TEST(objectGraphContext, [objectGraphContext persistentRoot] == nil);
 	INVALIDARG_EXCEPTION_TEST(objectGraphContext,
-		[objectGraphContext rootObject] == nil || [objectGraphContext rootObject] == aRootObject);
+		objectGraphContext.rootObject == nil || objectGraphContext.rootObject == aRootObject);
 	INVALIDARG_EXCEPTION_TEST(objectGraphContext,
 		[objectGraphContext modelDescriptionRepository] == _modelDescriptionRepository)
 

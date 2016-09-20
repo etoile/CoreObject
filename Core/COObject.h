@@ -447,7 +447,7 @@
  * COObjectGraphContext *graphContext = [COObjectGraphContext new];
  * COObject *object = [[COObject alloc] initWithObjectGraphContext: graphContext];
  *
- * [editingContext insertPersistentRootWithRootObject: [graphContext rootObject]];
+ * [editingContext insertPersistentRootWithRootObject: graphContext.rootObject];
  * </example>
  *
  * You cannot use -init to create a COObject instance.

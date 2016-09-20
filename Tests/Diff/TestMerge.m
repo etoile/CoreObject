@@ -391,7 +391,7 @@
                     [child1a UUID],
                     [child2 UUID],
                     [child3 UUID],
-                    [child4 UUID]]), [[[(OutlineItem *)[ctx2 rootObject] contents] mappedCollection] UUID]);
+                    [child4 UUID]]), [[[(OutlineItem *)ctx2.rootObject contents] mappedCollection] UUID]);
     
 	// ctx2:
 	//
@@ -422,7 +422,7 @@
                     [child2 UUID],
                     [child2a UUID],
                     [child3 UUID],
-                    [child4 UUID]]), [[[(OutlineItem *)[ctx3 rootObject] contents] mappedCollection] UUID]);
+                    [child4 UUID]]), [[[(OutlineItem *)ctx3.rootObject contents] mappedCollection] UUID]);
     
 	// ctx3:
 	//

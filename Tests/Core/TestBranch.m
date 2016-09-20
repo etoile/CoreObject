@@ -70,7 +70,7 @@
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKNotNil([testBranch currentRevision]);
-		 UKObjectsEqual([testBranch currentRevision], [[testProot rootObject] revision]);
+		 UKObjectsEqual([testBranch currentRevision], [testProot.rootObject revision]);
 	 }];
 }
 
@@ -589,7 +589,7 @@
     [persistentRoot commit];
     CORevision *firstRevision = originalBranch.currentRevision;
     
-	UKTrue([originalBranch rootObject] != nil);
+	UKTrue(originalBranch.rootObject != nil);
     [originalBranch.rootObject setLabel: @"test"];
     [persistentRoot commit];
     CORevision *secondRevision = originalBranch.currentRevision;
@@ -598,17 +598,17 @@
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKFalse([testBranch hasChanges]);
-		 UKObjectsEqual(@"test", [[testBranch rootObject] label]);
+		 UKObjectsEqual(@"test", [testBranch.rootObject label]);
 		
 		 testBranch.currentRevision = firstRevision;
 		 UKTrue([testBranch hasChanges]);
 		 UKFalse([[testBranch objectGraphContext] hasChanges]);
-		 UKNil([[testBranch rootObject] label]);
+		 UKNil([testBranch.rootObject label]);
 
 		 [testBranch discardAllChanges];
 		 UKFalse([testBranch hasChanges]);
 		 UKObjectsEqual(secondRevision, [testBranch currentRevision]);
-		 UKObjectsEqual(@"test", [[testBranch rootObject] label]);
+		 UKObjectsEqual(@"test", [testBranch.rootObject label]);
 	 }];
 }
 
@@ -798,7 +798,7 @@
 	// Might be worth investigation why the next line fails though, not sure why
 	// it would.
 #if 0
-	UKObjectsEqual(A(obj1, obj2), [[proot2 rootObject] contents]);
+	UKObjectsEqual(A(obj1, obj2), [proot2.rootObject contents]);
 	
 	[ctx commit];
 	
@@ -811,7 +811,7 @@
 		 UKNotNil(testObj1);
 		 UKNotNil(testObj2);
 		 UKObjectsNotSame(testObj1, testObj2);
-		 UKObjectsEqual(A(testObj1, testObj2), [[testProot rootObject] contents]);
+		 UKObjectsEqual(A(testObj1, testObj2), [testProot.rootObject contents]);
 	 }];
 #endif
 }
@@ -892,13 +892,13 @@
 	[self checkBranchWithExistingAndNewContext: altBranch
 									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(@"change1", [[testBranch rootObject] label]);
+		 UKObjectsEqual(@"change1", [testBranch.rootObject label]);
 	 }];
 
 	[self checkBranchWithExistingAndNewContext: originalBranch
 									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(@"change2", [[testBranch rootObject] label]);
+		 UKObjectsEqual(@"change2", [testBranch.rootObject label]);
 	 }];
 }
 
