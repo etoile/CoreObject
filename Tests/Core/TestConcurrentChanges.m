@@ -55,7 +55,7 @@
 
 	CORevision *newRev = [ctx revisionForRevisionUUID: newRevID persistentRootUUID: persistentRoot.UUID];
 
-	UKObjectsEqual([revs arrayByAddingObject: newRev], [[persistentRoot currentBranch] nodes]);
+	UKObjectsEqual([revs arrayByAddingObject: newRev], [persistentRoot.currentBranch nodes]);
     UKObjectsEqual(@"hello", [persistentRoot.rootObject valueForProperty: @"label"]);
     UKFalse([ctx hasChanges]);
 }
@@ -167,7 +167,7 @@
     [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
-    UKObjectsEqual(metadata, [testBranch metadata]);
+    UKObjectsEqual(metadata, testBranch.metadata);
     UKFalse([ctx hasChanges]);
 }
 
@@ -182,7 +182,7 @@
     [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
-    UKObjectsEqual(testBranch, [persistentRoot currentBranch]);
+    UKObjectsEqual(testBranch, persistentRoot.currentBranch);
     UKFalse([ctx hasChanges]);
 }
 
@@ -197,7 +197,7 @@
     [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
-    UKObjectsEqual(testBranch, [persistentRoot currentBranch]);
+    UKObjectsEqual(testBranch, persistentRoot.currentBranch);
     UKFalse([ctx hasChanges]);
 }
 

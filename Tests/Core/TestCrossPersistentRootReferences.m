@@ -178,7 +178,7 @@
         
         // Sanity check
         
-        UKObjectsEqual(branchB.UUID, [[photo1ctx2 currentBranch] UUID]);
+        UKObjectsEqual(branchB.UUID, [photo1ctx2.currentBranch UUID]);
         UKObjectsEqual(A(@"childB"), [photo1ctx2.rootObject valueForKeyPath: @"contents.label"]);
         
         // Actual test of cross-persistent-root references

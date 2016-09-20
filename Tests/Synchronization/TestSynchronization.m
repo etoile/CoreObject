@@ -145,9 +145,9 @@ static ETUUID *branchBUUID;
     UKObjectsEqual([self itemGraphWithLabel: @"1"], [self currentItemGraphForBranch: replicatedBranchA.UUID]);
     UKObjectsEqual([self itemGraphWithLabel: @"1"], [self currentItemGraphForBranch: replicatedBranchB.UUID]);
     
-    UKNil([currentBranch metadata][@"source"]);
-    UKObjectsEqual(@"server", [replicatedBranchA metadata][@"source"]);
-    UKObjectsEqual(@"server", [replicatedBranchB metadata][@"source"]);
+    UKNil(currentBranch.metadata[@"source"]);
+    UKObjectsEqual(@"server", replicatedBranchA.metadata[@"source"]);
+    UKObjectsEqual(@"server", replicatedBranchB.metadata[@"source"]);
 }
 
 - (void)testPullUpdates
@@ -216,7 +216,7 @@ static ETUUID *branchBUUID;
     COBranchInfo *replicatedBranchA = [[clientInfo branchInfosWithMetadataValue: [branchAUUID stringValue]
                                                                          forKey: @"replcatedBranch"] firstObject];
     
-    UKTrue([[replicatedBranchA metadata][@"source"] isEqual: @"server"]);
+    UKTrue([replicatedBranchA.metadata[@"source"] isEqual: @"server"]);
     
     // The replicated branch should have been update, but the other branch should not have
     
@@ -376,7 +376,7 @@ static ETUUID *branchBUUID;
     COBranchInfo *replicatedBranchA = [[serverInfo branchInfosWithMetadataValue: [branchAUUID stringValue]
                                                                          forKey: @"replcatedBranch"] firstObject];
     
-    UKTrue([[replicatedBranchA metadata][@"source"] isEqual: @"client"]);
+    UKTrue([replicatedBranchA.metadata[@"source"] isEqual: @"client"]);
     
     // The replicated branch should have been update, but the other branch should not have
     
@@ -441,10 +441,10 @@ static ETUUID *branchBUUID;
 	// Server merges remote branch into local branch
 	{
 		COBranch *serverLocalBranch = serverPersistentRoot.currentBranch;
-		NSSet *serverRemoteBranches = [serverPersistentRoot.branches filteredCollectionWithBlock: ^(id obj)
-										{
-											return (BOOL) ([obj metadata][@"replcatedBranch"] != nil);
-										}];
+		NSSet *serverRemoteBranches = [serverPersistentRoot.branches filteredCollectionWithBlock: ^(COBranch *obj)
+		{
+			return (BOOL)(obj.metadata[@"replcatedBranch"] != nil);
+		}];
 		UKIntsEqual(1, [serverRemoteBranches count]);
 		COBranch *serverRemoteBranch = [serverRemoteBranches anyObject];
 		UKObjectsNotSame(serverLocalBranch, serverRemoteBranch);
@@ -482,10 +482,10 @@ static ETUUID *branchBUUID;
 	// Server merges remote branch into local branch
 	{
 		COBranch *serverLocalBranch = serverPersistentRoot.currentBranch;
-		NSSet *serverRemoteBranches = [serverPersistentRoot.branches filteredCollectionWithBlock: ^(id obj)
-									   {
-										   return (BOOL) ([obj metadata][@"replcatedBranch"] != nil);
-									   }];
+		NSSet *serverRemoteBranches = [serverPersistentRoot.branches filteredCollectionWithBlock: ^(COBranch *obj)
+		{
+			return (BOOL)(obj.metadata[@"replcatedBranch"] != nil);
+		}];
 		UKIntsEqual(1, [serverRemoteBranches count]);
 		COBranch *serverRemoteBranch = [serverRemoteBranches anyObject];
 		UKObjectsNotSame(serverLocalBranch, serverRemoteBranch);

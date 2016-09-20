@@ -171,7 +171,7 @@
 	
 	// The main point of the test is that the following -undo restores the
 	// branch head_revid (-newestRevision) to point to r3, which means
-	// [[persistentRoot currentBranch] redo] moves towards r3 instead of r2b.
+	// [persistentRoot.currentBranch redo] moves towards r3 instead of r2b.
 	
 	[_testTrack undo];
 	

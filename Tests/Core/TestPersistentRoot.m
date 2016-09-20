@@ -91,13 +91,13 @@
 		 UKStringsEqual(@"Sandbox", [testBranch label]);
 		 UKObjectsEqual(originalBranch.UUID, [[testBranch parentBranch] UUID]);
 		 
-		 UKObjectsEqual(testProot, [testBranch persistentRoot]);
+		 UKObjectsEqual(testProot, testBranch.persistentRoot);
 		 
 		 UKObjectsEqual(rev1, [testBranch currentRevision]);
 	 }];
 
 	/* Branch creation doesn't switch the branch */
-	UKObjectsEqual(originalBranch, [persistentRoot currentBranch]);
+	UKObjectsEqual(originalBranch, persistentRoot.currentBranch);
 	
 	/* Branch creation doesn't touch the current persistent root revision */
 	UKObjectsEqual(rev1, [rootObj revision]);
@@ -109,7 +109,7 @@
 	[rootObj setValue: @"Untitled" forProperty: @"label"];
 	[persistentRoot commit];
     
-	//CORevision *rev1 = [[persistentRoot currentBranch] currentRevision];
+	//CORevision *rev1 = [persistentRoot.currentBranch currentRevision];
 	
 	COBranch *branch = [originalBranch makeBranchWithLabel: @"Sandbox"];
     
@@ -187,7 +187,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: photo1
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPhoto1, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(branchB.UUID, [[testPhoto1 currentBranch] UUID]);
+		 UKObjectsEqual(branchB.UUID, [testPhoto1.currentBranch UUID]);
 		 UKObjectsEqual(A(@"childB"), [testPhoto1.rootObject valueForKeyPath: @"contents.label"]);
 	 }];
 }
@@ -207,7 +207,7 @@
 	[self checkBranchWithExistingAndNewContext: secondBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testSecondBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(testSecondBranch, [testProot currentBranch]);
+		 UKObjectsEqual(testSecondBranch, testProot.currentBranch);
 		 UKObjectsEqual(@"hello2", [testProot.rootObject label]);
 		 UKObjectsEqual(@"hello", [[[testProot branchForUUID: originalBranch.UUID] rootObject] label]);
 	 }];
@@ -215,7 +215,7 @@
 
 - (void) testSetCurrentBranchAndDeleteBranch
 {
-    UKObjectsEqual(originalBranch, [persistentRoot currentBranch]);
+    UKObjectsEqual(originalBranch, persistentRoot.currentBranch);
     [ctx commit];
     
     COBranch *branch = [originalBranch makeBranchWithLabel: @"branch"];
@@ -354,7 +354,7 @@
 	ETAssert(!persistentRoot.hasChanges);
 	
     COPersistentRoot *copy1 = [originalBranch makePersistentRootCopyFromRevision: r1];
-	UKRaisesException([[copy1 currentBranch] makeBranchWithLabel: @"hello"]);
+	UKRaisesException([copy1.currentBranch makeBranchWithLabel: @"hello"]);
 }
 
 - (void) testDeleteUncommittedBranch
@@ -556,21 +556,21 @@
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(@{}, [testProot metadata]);
+		 UKObjectsEqual(@{}, testProot.metadata);
 	 }];
     
     persistentRoot.metadata = @{@"key" : @"value"};
     
-    UKObjectsEqual((@{@"key" : @"value"}), [persistentRoot metadata]);
+    UKObjectsEqual((@{@"key" : @"value"}), persistentRoot.metadata);
 
-	UKRaisesException([[persistentRoot metadata] setValue: @"foo" forKey: @"bar"]);
+	UKRaisesException([persistentRoot.metadata setValue: @"foo" forKey: @"bar"]);
 	
     UKTrue([ctx hasChanges]);
     UKTrue(persistentRoot.hasChanges);
     
     [persistentRoot discardAllChanges];
     
-    UKObjectsEqual(@{}, [persistentRoot metadata]);
+    UKObjectsEqual(@{}, persistentRoot.metadata);
     UKFalse(persistentRoot.hasChanges);
     
     persistentRoot.metadata = @{@"key" : @"value"};
@@ -585,16 +585,16 @@
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual((@{@"key" : @"value"}), [testProot metadata]);
+		 UKObjectsEqual((@{@"key" : @"value"}), testProot.metadata);
 		 UKFalse([testCtx hasChanges]);
 	 }];
     
     persistentRoot.metadata = @{@"key" : @"value2"};
-    UKObjectsEqual((@{@"key" : @"value2"}), [persistentRoot metadata]);
+    UKObjectsEqual((@{@"key" : @"value2"}), persistentRoot.metadata);
     
     [persistentRoot discardAllChanges];
     
-    UKObjectsEqual((@{@"key" : @"value"}), [persistentRoot metadata]);
+    UKObjectsEqual((@{@"key" : @"value"}), persistentRoot.metadata);
 }
 
 - (void) testPersistentRootMetadataOnPersistentRootFirstCommit
@@ -606,7 +606,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot2
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual((@{@"hello" : @"world"}), [testProot metadata]);
+		 UKObjectsEqual((@{@"hello" : @"world"}), testProot.metadata);
 	 }];
 }
 

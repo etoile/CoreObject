@@ -105,7 +105,7 @@ int main(int argc, char **argv)
 
 		COEditingContext *ctx = [COEditingContext contextWithURL: url];
 		Calendar *calendar = [[ctx insertNewPersistentRootWithEntityName: @"Calendar"] rootObject];
-		ETUUID *persistentRootUUID = [[calendar persistentRoot] UUID];
+		ETUUID *persistentRootUUID = [calendar.persistentRoot UUID];
 		NSDate *futureDate = [NSDate dateWithTimeIntervalSinceNow: 3600];
 		Appointment *appointment = [[Appointment alloc] initWithStartDate: [NSDate date]
 		                                                          endDate: futureDate

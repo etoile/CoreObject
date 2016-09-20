@@ -371,7 +371,7 @@ extern NSString * const kCOBranchLabel;
  * the current branch. For example:
  *
  * <example>
- * [persistentRoot setCurrentBranch: [[persistentRoot currentBranch] makeBranchWithLabel: @"Sandbox"]];
+ * [persistentRoot setCurrentBranch: [persistentRoot.currentBranch makeBranchWithLabel: @"Sandbox"]];
  * </example>
  *
  * The receiver must be committed - not a newly created branch, or the default

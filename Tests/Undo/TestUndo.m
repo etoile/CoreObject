@@ -142,11 +142,11 @@
 		CORevision *r4 = ctx2persistentRoot.currentRevision;
 		UKObjectsNotEqual(r3, r4);
 		UKObjectsEqual(r3, [r4 parentRevision]);
-		UKObjectsEqual([r2 metadata][kCOCommitMetadataIdentifier], [r4 metadata][kCOCommitMetadataIdentifier]);
+		UKObjectsEqual(r2.metadata[kCOCommitMetadataIdentifier], r4.metadata[kCOCommitMetadataIdentifier]);
 
-		UKObjectsEqual(@"org.etoile.CoreObject.undo", [r4 metadata][kCOCommitMetadataUndoType]);
-		UKObjectsEqual([[_rootEditTrack.nodes[1] UUID] stringValue], [r4 metadata][kCOCommitMetadataUndoBaseUUID]);
-		UKTrue([[r4 metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
+		UKObjectsEqual(@"org.etoile.CoreObject.undo", r4.metadata[kCOCommitMetadataUndoType]);
+		UKObjectsEqual([[_rootEditTrack.nodes[1] UUID] stringValue], r4.metadata[kCOCommitMetadataUndoBaseUUID]);
+		UKTrue([r4.metadata[kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
 
 		UKObjectsEqual(@"extraValue", r4.metadata[@"extraKey"]);
 		
@@ -158,11 +158,11 @@
 		// Check that a new revision was created
 		CORevision *r5 = ctx2persistentRoot.currentRevision;
 		UKObjectsEqual(r4, [r5 parentRevision]);
-		UKObjectsEqual([r3 metadata][kCOCommitMetadataIdentifier], [r5 metadata][kCOCommitMetadataIdentifier]);
+		UKObjectsEqual(r3.metadata[kCOCommitMetadataIdentifier], r5.metadata[kCOCommitMetadataIdentifier]);
 
-		UKObjectsEqual(@"org.etoile.CoreObject.undo", [r5 metadata][kCOCommitMetadataUndoType]);
-		UKObjectsEqual([[_childEditTrack.nodes[1] UUID] stringValue], [r5 metadata][kCOCommitMetadataUndoBaseUUID]);
-		UKTrue([[r5 metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
+		UKObjectsEqual(@"org.etoile.CoreObject.undo", r5.metadata[kCOCommitMetadataUndoType]);
+		UKObjectsEqual([[_childEditTrack.nodes[1] UUID] stringValue], r5.metadata[kCOCommitMetadataUndoBaseUUID]);
+		UKTrue([r5.metadata[kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
 		
         UKNil([root valueForProperty: kCOLabel]);
         UKNil([child valueForProperty: kCOLabel]);
@@ -175,11 +175,11 @@
 		// Check that a new revision was created
 		CORevision *r6 = ctx2persistentRoot.currentRevision;
 		UKObjectsEqual(r5, [r6 parentRevision]);
-		UKObjectsEqual([r4 metadata][kCOCommitMetadataIdentifier], [r6 metadata][kCOCommitMetadataIdentifier]);
+		UKObjectsEqual(r4.metadata[kCOCommitMetadataIdentifier], r6.metadata[kCOCommitMetadataIdentifier]);
 
-		UKObjectsEqual(@"org.etoile.CoreObject.redo", [r6 metadata][kCOCommitMetadataUndoType]);
-		UKObjectsEqual([[_rootEditTrack.nodes[1] UUID] stringValue], [r6 metadata][kCOCommitMetadataUndoBaseUUID]);
-		UKFalse([[r6 metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
+		UKObjectsEqual(@"org.etoile.CoreObject.redo", r6.metadata[kCOCommitMetadataUndoType]);
+		UKObjectsEqual([[_rootEditTrack.nodes[1] UUID] stringValue], r6.metadata[kCOCommitMetadataUndoBaseUUID]);
+		UKFalse([r6.metadata[kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
 
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
         UKNil([child valueForProperty: kCOLabel]);
@@ -192,11 +192,11 @@
 		// Check that a new revision was created
 		CORevision *r7 = ctx2persistentRoot.currentRevision;
 		UKObjectsEqual(r6, [r7 parentRevision]);
-		UKObjectsEqual([r5 metadata][kCOCommitMetadataIdentifier], [r7 metadata][kCOCommitMetadataIdentifier]);
+		UKObjectsEqual(r5.metadata[kCOCommitMetadataIdentifier], r7.metadata[kCOCommitMetadataIdentifier]);
 
-		UKObjectsEqual(@"org.etoile.CoreObject.redo", [r7 metadata][kCOCommitMetadataUndoType]);
-		UKObjectsEqual([[_childEditTrack.nodes[1] UUID] stringValue], [r7 metadata][kCOCommitMetadataUndoBaseUUID]);
-		UKFalse([[r7 metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
+		UKObjectsEqual(@"org.etoile.CoreObject.redo", r7.metadata[kCOCommitMetadataUndoType]);
+		UKObjectsEqual([[_childEditTrack.nodes[1] UUID] stringValue], r7.metadata[kCOCommitMetadataUndoBaseUUID]);
+		UKFalse([r7.metadata[kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
         
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
         UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
@@ -321,11 +321,11 @@
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
-        UKObjectsEqual(D(@"world2", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
+        UKObjectsEqual(D(@"world2", @"hello"), [ctx2persistentRoot.currentBranch metadata]);
         [testTrack undo];
-        UKObjectsEqual(D(@"world", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
+        UKObjectsEqual(D(@"world", @"hello"), [ctx2persistentRoot.currentBranch metadata]);
         [testTrack redo];
-        UKObjectsEqual(D(@"world2", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
+        UKObjectsEqual(D(@"world2", @"hello"), [ctx2persistentRoot.currentBranch metadata]);
     }
 }
 
@@ -345,11 +345,11 @@
 		
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
-        UKObjectsEqual(D(@"world2", @"hello"), [ctx2persistentRoot metadata]);
+        UKObjectsEqual(D(@"world2", @"hello"), ctx2persistentRoot.metadata);
         [testTrack undo];
-        UKObjectsEqual(D(@"world", @"hello"), [ctx2persistentRoot metadata]);
+        UKObjectsEqual(D(@"world", @"hello"), ctx2persistentRoot.metadata);
         [testTrack redo];
-        UKObjectsEqual(D(@"world2", @"hello"), [ctx2persistentRoot metadata]);
+        UKObjectsEqual(D(@"world2", @"hello"), ctx2persistentRoot.metadata);
     }
 }
 
@@ -376,17 +376,17 @@
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
-        UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
+        UKObjectsEqual(ctx2secondBranch, ctx2persistentRoot.currentBranch);
         UKObjectsEqual(@"hello2", [ctx2persistentRoot.rootObject valueForProperty: kCOLabel]);
         
         [testTrack undo];
         
-        UKObjectsEqual(ctx2originalBranch, [ctx2persistentRoot currentBranch]);
+        UKObjectsEqual(ctx2originalBranch, ctx2persistentRoot.currentBranch);
         UKObjectsEqual(@"hello", [ctx2persistentRoot.rootObject valueForProperty: kCOLabel]);
         
         [testTrack redo];
         
-        UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
+        UKObjectsEqual(ctx2secondBranch, ctx2persistentRoot.currentBranch);
         UKObjectsEqual(@"hello2", [ctx2persistentRoot.rootObject valueForProperty: kCOLabel]);
     }
 }

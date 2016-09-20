@@ -326,7 +326,7 @@
 	
 	UKObjectsSame(objectGraphContext, [object objectGraphContext]);
 	UKNil([object branch]);
-	UKNil([object persistentRoot]);
+	UKNil(object.persistentRoot);
 	UKNil([object editingContext]);
 	
 	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithRootObject: object];
@@ -336,7 +336,7 @@
 	
 	UKObjectsSame(objectGraphContext, [object objectGraphContext]);
 	UKObjectsSame(branch, [object branch]);
-	UKObjectsSame(persistentRoot, [object persistentRoot]);
+	UKObjectsSame(persistentRoot, object.persistentRoot);
 	UKObjectsSame(ctx, [object editingContext]);
 }
 
