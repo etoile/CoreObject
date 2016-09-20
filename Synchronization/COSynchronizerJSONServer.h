@@ -26,6 +26,6 @@
 
 - (void) receiveText: (NSString *)text fromClient: (NSString *)aClient;
 
-@property (nonatomic, readwrite, assign) BOOL paused;
+@property (nonatomic, readwrite, assign, getter=isPaused) BOOL paused;
 
 @end

@@ -182,7 +182,7 @@ extern NSString * const kCOUndoTrackName;
 /**
  * Returns whether coalescing is active.
  */
-@property (nonatomic, getter=isCoalescing, readonly) BOOL coalescing;
+@property (nonatomic, readonly, getter=isCoalescing) BOOL coalescing;
 
 
 /** @taskunit Convenience */

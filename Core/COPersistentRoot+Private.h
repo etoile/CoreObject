@@ -83,7 +83,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (COBranch *)makeBranchWithUUID: (ETUUID *)aUUID metadata: (NSDictionary *)metadata atRevision: (CORevision *)aRev parentBranch: (COBranch *)aParent;
 
-@property (nonatomic, getter=isPersistentRootUncommitted, readonly) BOOL persistentRootUncommitted;
+@property (nonatomic, readonly, getter=isPersistentRootUncommitted) BOOL persistentRootUncommitted;
 
 - (void)storePersistentRootDidChange: (NSNotification *)notif isDistributed: (BOOL)isDistributed;
 

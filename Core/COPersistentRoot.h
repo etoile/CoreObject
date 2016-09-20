@@ -494,7 +494,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * See -commitWithIdentifier:metadata:undoTrack:error:.
  */
-@property (nonatomic, readonly) BOOL commit;
+- (BOOL)commit;
 
 
 /** @taskunit Previewing Old Revision */

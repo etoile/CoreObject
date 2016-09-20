@@ -29,7 +29,7 @@
 @property (readwrite, nonatomic, copy) NSString *targetProperty;
 
 - (BOOL) isSourceObjectTrackingSpecificBranchForTargetObject: (COObject *)aTargetObject;
-@property (nonatomic, getter=isSourceObjectBranchDeleted, readonly) BOOL sourceObjectBranchDeleted;
+@property (nonatomic, readonly, getter=isSourceObjectBranchDeleted) BOOL sourceObjectBranchDeleted;
 
 @end
 

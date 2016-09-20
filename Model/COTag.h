@@ -35,7 +35,7 @@
 /**
  * Returns YES.
  */
-@property (nonatomic, getter=isTag, readonly) BOOL tag;
+@property (nonatomic, readonly, getter=isTag) BOOL tag;
 
 
 /** @taskunit Tagging */

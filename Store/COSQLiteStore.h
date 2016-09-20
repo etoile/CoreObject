@@ -477,7 +477,7 @@ extern NSString * const COPersistentRootAttributeUsedSize;
  * <item>https://wiki.mozilla.org/Firefox/Projects/Places_Vacuum</item>
  * </list>
  */
-@property (nonatomic, readonly) BOOL vacuum;
+- (BOOL)vacuum;
 /**
  * Returns statistics about the database pages.
  *

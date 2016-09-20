@@ -28,6 +28,6 @@
 /**
  * Returns YES.
  */
-@property (nonatomic, getter=isContainer, readonly) BOOL container;
+@property (nonatomic, readonly) BOOL isContainer;
 
 @end

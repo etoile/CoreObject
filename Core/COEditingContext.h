@@ -166,7 +166,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
 	COCrossPersistentRootDeadRelationshipCache *_deadRelationshipCache;
     /** Undo */
 	COUndoTrackStore *_undoTrackStore;
-    BOOL _isRecordingUndo;
+    BOOL _recordingUndo;
     COCommandGroup *_currentEditGroup;
 	CORevisionCache *_revisionCache;
 	/** Detect illegal recursive calls to commit */
@@ -473,7 +473,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  *
  * See also -commitWithMetadata:undoTrack:error:.
  */
-@property (nonatomic, readonly) BOOL commit;
+- (BOOL)commit;
 /**
  * Commits the current changes to the store, records them on the undo track and 
  * returns whether it succeeds.

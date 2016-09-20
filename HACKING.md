@@ -150,7 +150,7 @@ retain attributes
 
 - readwrite must be used for properties not declared as readonly
 
-- the ordering must be: atomicity, writability, memory-management
+- the ordering must be: atomicity, writability, memory-management, getter, setter
 
 ### Examples
 
@@ -177,7 +177,7 @@ retain attributes
 	@property (nonatomic, readwrite, copy) NSDictionary *elementsByName;
 	@property (nonatomic, readwrite, strong) id relatedObject;
 
-	@property (nonatomic, readwrite, assign) BOOL success;
+	@property (nonatomic, readwrite, assign, getter=isEmpty) BOOL empty;
 
 - Invalid: @property (nonatomic, readonly, weak) id derivedOwner
 

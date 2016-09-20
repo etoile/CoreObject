@@ -63,7 +63,7 @@
 /**
  * Returns whether this is a [COPath brokenPath]
  */
-@property (nonatomic, readonly, assign) BOOL isBroken;
+@property (nonatomic, readonly, getter=isBroken) BOOL broken;
 
 
 /** @taskunit Persistent String Representation */

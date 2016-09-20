@@ -89,7 +89,7 @@
  *
  * See also -[COObjectMatching matchesPredicate:].
  */
-@property (nonatomic, assign) BOOL matchesAgainstObjectsInMemory;
+@property (nonatomic, readwrite, assign) BOOL matchesAgainstObjectsInMemory;
 
 
 @end

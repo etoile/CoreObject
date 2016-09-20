@@ -24,7 +24,7 @@
 /**
  * Returns whether the diff contains any edits.
  */
-@property (nonatomic, getter=isEmpty, readonly) BOOL empty;
+@property (nonatomic, readonly, getter=isEmpty) BOOL empty;
 
 @property (nonatomic, readonly) BOOL hasConflicts;
 - (void) resolveConflictsFavoringSourceIdentifier: (id)aSource;
@@ -85,7 +85,7 @@
 /**
  * Returns whether the diff contains any edits.
  */
-@property (nonatomic, getter=isEmpty, readonly) BOOL empty;
+@property (nonatomic, readonly, getter=isEmpty) BOOL empty;
 
 @property (nonatomic, readonly) BOOL hasConflicts;
 - (void) resolveConflictsFavoringSourceIdentifier: (id)aSource;

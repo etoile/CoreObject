@@ -89,7 +89,7 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-@property (nonatomic, getter=isTrackingSpecificBranch, readonly) BOOL trackingSpecificBranch;
+@property (nonatomic, readonly, getter=isTrackingSpecificBranch) BOOL trackingSpecificBranch;
 
 
 /** @taskunit Metamodel Access */
@@ -123,12 +123,12 @@
 /**
  * Should be called by COBranch at every commit.
  */
-@property (nonatomic, readonly) BOOL incrementCommitCounterAndCheckIfGCNeeded;
+- (BOOL)incrementCommitCounterAndCheckIfGCNeeded;
 
 /**
  * Perform tasks needed before each commit. (GC, check for cycles in composites)
  */
-- (void) doPreCommitChecks;
+- (void)doPreCommitChecks;
 
 @property (nonatomic, readwrite) BOOL ignoresChangeTrackingNotifications;
 

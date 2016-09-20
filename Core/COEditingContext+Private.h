@@ -15,7 +15,7 @@
 /**
  * This property is only exposed to be used internally by CoreObject.
  */
-@property (nonatomic, assign) BOOL isRecordingUndo;
+@property (nonatomic, assign, getter=isRecordingUndo) BOOL recordingUndo;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

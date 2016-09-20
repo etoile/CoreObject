@@ -84,7 +84,7 @@
  * The returned value is controlled by -[ETPropertyDescription isOrdered] for 
  * the content property description (looked up using -contentKey).
  */
-@property (nonatomic, getter=isOrdered, readonly) BOOL ordered;
+@property (nonatomic, readonly, getter=isOrdered) BOOL ordered;
 
 
 /** @taskunit Content Access */
@@ -154,21 +154,21 @@
 /**
  * Returns whether the receiver is a group or not.
  */
-@property (nonatomic, getter=isGroup, readonly) BOOL group;
+@property (nonatomic, readonly) BOOL isGroup;
 /**
  * Returns whether the receiver is a tag or not.
  *
  * A tag is group that belongs to -[COEditingContext tagGroup].
  */
-@property (nonatomic, getter=isTag, readonly) BOOL tag;
+@property (nonatomic, readonly) BOOL isTag;
 /**
  * Returns whether the receiver is a container or not.
  */
-@property (nonatomic, getter=isContainer, readonly) BOOL container;
+@property (nonatomic, readonly) BOOL isContainer;
 /**
  * Returns whether the receiver is a library or not.
  *
  * A library is a container.
  */
-@property (nonatomic, getter=isLibrary, readonly) BOOL library;
+@property (nonatomic, readonly) BOOL isLibrary;
 @end

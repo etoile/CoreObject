@@ -364,7 +364,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
 /** @taskunit Loading Status */
 
 
-@property (nonatomic, readonly) BOOL isLoading;
+@property (nonatomic, readonly, getter=isLoading) BOOL loading;
 
 
 /** @taskunit Accessing the Root Object */

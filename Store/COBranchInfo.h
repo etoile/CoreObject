@@ -60,7 +60,7 @@
  *  we can easily re-add it)
  */
 @property (nonatomic, readwrite, strong) NSDictionary *metadata;
-@property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
+@property (nonatomic, readwrite, getter=isDeleted) BOOL deleted;
 
 @property (nonatomic, readwrite, strong) ETUUID *parentBranchUUID;
 

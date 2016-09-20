@@ -38,8 +38,8 @@
 @property (nonatomic, readwrite, strong) ETUUID *UUID;
 @property (nonatomic, readwrite, strong) ETUUID *currentBranchUUID;
 @property (nonatomic, readwrite, strong) NSDictionary *branchForUUID;
-@property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
-@property (readwrite, nonatomic, assign) int64_t transactionID;
+@property (nonatomic, readwrite, getter=isDeleted) BOOL deleted;
+@property (nonatomic, readwrite, assign) int64_t transactionID;
 @property (nonatomic, readwrite, strong) NSDictionary *metadata;
 
 - (NSArray *)branchInfosWithMetadataValue: (id)aValue forKey: (NSString *)aKey;

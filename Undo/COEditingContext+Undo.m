@@ -35,7 +35,7 @@
 - (void) recordBeginUndoGroupWithMetadata: (NSDictionary *)metadata
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
-    if (_isRecordingUndo)
+    if (_recordingUndo)
     {
         _currentEditGroup = [[COCommandGroup alloc] init];
 		_currentEditGroup.metadata = metadata;
@@ -48,7 +48,7 @@
 
 - (COCommandGroup *) recordEndUndoGroupWithUndoTrack: (COUndoTrack *)track
 {
-    if (_isRecordingUndo == NO)
+    if (_recordingUndo == NO)
 		return nil;
 
 	if ([_currentEditGroup.contents isEmpty])

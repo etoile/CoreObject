@@ -50,7 +50,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
  * For state objects returned by -[COUndoTrackStore stateForTrackName:], this 
  * property is currently always NO.
  */
-@property (nonatomic, readwrite, assign) BOOL compacted;
+@property (nonatomic, readwrite, assign, getter=isCompacted) BOOL compacted;
 @end
 
 
@@ -85,7 +85,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
  *
  * This method must be run in the main thread.
  */
-@property (nonatomic, readonly) BOOL beginTransaction;
+- (BOOL)beginTransaction;
 /**
  * Ends a COUndoTrackStore transaction previously initiated with 
  * -beginTransaction.
@@ -94,7 +94,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
  *
  * This method must be run in the main thread.
  */
-@property (nonatomic, readonly) BOOL commitTransaction;
+- (BOOL)commitTransaction;
 
 
 /** @taskunit Managing Undo Tracks */
@@ -209,7 +209,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
  * 
  * See also -[COSQLiteStore vacuum].
  */
-@property (nonatomic, readonly) BOOL vacuum;
+- (BOOL)vacuum;
 /**
  * See -[COSQLiteStore pageStatistics].
  */

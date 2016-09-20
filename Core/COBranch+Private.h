@@ -28,7 +28,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-@property (nonatomic, getter=isDeletedInStore, readonly) BOOL deletedInStore;
+@property (nonatomic, readonly, getter=isDeletedInStore) BOOL deletedInStore;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -54,7 +54,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-@property (nonatomic, getter=isBranchUncommitted, readonly) BOOL branchUncommitted;
+@property (nonatomic, readonly, getter=isBranchUncommitted) BOOL branchUncommitted;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

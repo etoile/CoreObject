@@ -41,7 +41,7 @@
 
 @property (nonatomic, readonly) NSSet *allEdits;
 
-@property (nonatomic, getter=isNonconflicting, readonly) BOOL nonconflicting;
+@property (nonatomic, readonly, getter=isNonconflicting) BOOL nonconflicting;
 
 // private
 
@@ -93,7 +93,7 @@
 /**
  * Returns whether the diff contains any edits.
  */
-@property (nonatomic, getter=isEmpty, readonly) BOOL empty;
+@property (nonatomic, readonly, getter=isEmpty) BOOL empty;
 
 - (COItemGraph *) itemTreeWithDiffAppliedToItemGraph: (id<COItemGraph>)aSubtree;
 

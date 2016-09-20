@@ -37,7 +37,7 @@
 @synthesize persistentRootsPendingDeletion = _persistentRootsPendingDeletion;
 @synthesize persistentRootsPendingUndeletion = _persistentRootsPendingUndeletion;
 @synthesize deadRelationshipCache = _deadRelationshipCache;
-@synthesize undoTrackStore = _undoTrackStore, isRecordingUndo = _isRecordingUndo;
+@synthesize undoTrackStore = _undoTrackStore, recordingUndo = _recordingUndo;
 
 #pragma mark Creating a New Context -
 
@@ -70,7 +70,7 @@
     _persistentRootsPendingUndeletion = [NSMutableSet new];
 	_deadRelationshipCache = [COCrossPersistentRootDeadRelationshipCache new];
 	_undoTrackStore = anUndoTrackStore;
-    _isRecordingUndo = YES;
+    _recordingUndo = YES;
 	_revisionCache = [[CORevisionCache alloc] initWithParentEditingContext: self];
 	_internalTransientObjectGraphContext = [[COObjectGraphContext alloc]
 		initWithModelDescriptionRepository: aRepo

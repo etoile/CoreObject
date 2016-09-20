@@ -52,7 +52,7 @@
 /**
  * Returns YES.
  */
-@property (nonatomic, getter=isLibrary, readonly) BOOL library;
+@property (nonatomic, readonly) BOOL isLibrary;
 
 
 /** @taskunit Private */
