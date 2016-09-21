@@ -161,7 +161,7 @@
 		 UKFalse(testCtx.hasChanges);
 		 UKObjectsEqual([NSSet set], testCtx.persistentRoots);
 		 UKObjectsEqual([NSSet set], testCtx.persistentRootsPendingDeletion);
-		 UKIntsEqual(1, [testCtx.deletedPersistentRoots count]);
+		 UKIntsEqual(1, testCtx.deletedPersistentRoots.count);
 		 /* You can still retrieve a deleted persistent root, until the deletion is finalized */
 		 UKNotNil([testCtx persistentRootForUUID: uuid]);
 		 UKNotNil([testCtx.store persistentRootInfoForUUID: uuid]);

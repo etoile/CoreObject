@@ -457,7 +457,7 @@
 
 - (void) testTrackAPI
 {
-    UKIntsEqual(1, [_testTrack.nodes count]); // Placeholder node
+    UKIntsEqual(1, _testTrack.nodes.count); // Placeholder node
     UKFalse(_testTrack.canRedo);
     UKFalse(_testTrack.canUndo);
     
@@ -467,7 +467,7 @@
     [persistentRoot.rootObject setValue: @"hello" forProperty: kCOLabel];
     [ctx commitWithUndoTrack: _testTrack];
     
-    UKIntsEqual(3, [_testTrack.nodes count]);
+    UKIntsEqual(3, _testTrack.nodes.count);
     UKIntsEqual(2, [_testTrack.nodes indexOfObject: [_testTrack currentNode]]);
     UKFalse(_testTrack.canRedo);
     UKTrue(_testTrack.canUndo);
@@ -730,7 +730,7 @@
 
 	// N.B. Intentionally calling -nodes, which has the side effect of causing
 	// COUndoTrack to cache the nodes in memory, to try to break things
-	UKIntsEqual(2, [_testTrack.nodes count]);
+	UKIntsEqual(2, _testTrack.nodes.count);
 	
 	// Second coalesced block
 	

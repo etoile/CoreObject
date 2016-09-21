@@ -94,7 +94,7 @@
 		[[clientGroup mutableArrayValueForKey: @"contents"] addObject: child];
 		[clientPersistentRoot commit];
 	}
-	UKIntsEqual(objectsToInsert, [clientGroup.contents count]);
+	UKIntsEqual(objectsToInsert, clientGroup.contents.count);
 	
 	// 1 commit on server
 	
@@ -117,8 +117,8 @@
 	// Send confirmation back to client
 	[transport deliverMessagesToClient];
 	
-	UKIntsEqual(objectsToInsert + 1, [clientGroup.contents count]);
-	UKIntsEqual(objectsToInsert + 1, [serverGroup.contents count]);
+	UKIntsEqual(objectsToInsert + 1, clientGroup.contents.count);
+	UKIntsEqual(objectsToInsert + 1, serverGroup.contents.count);
 	
 	UKIntsEqual(0, self.clientMessages.count);
 	UKIntsEqual(0, self.serverMessages.count);

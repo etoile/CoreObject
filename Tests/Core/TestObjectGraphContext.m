@@ -395,17 +395,17 @@
 - (void) doTestGarbageCollection
 {
 	@autoreleasepool {
-		UKIntsEqual(1, [[ctx1 loadedObjects] count]);
+		UKIntsEqual(1, [ctx1 loadedObjects].count);
 		
 		[self addGarbageToObjectGraphContext];
 		
-		UKTrue([[ctx1 loadedObjects] count] > 1);
+		UKTrue([ctx1 loadedObjects].count > 1);
 	}
 	
 	[ctx1 removeUnreachableObjects];
 
 	@autoreleasepool {
-		UKIntsEqual(1, [[ctx1 loadedObjects] count]);
+		UKIntsEqual(1, [ctx1 loadedObjects].count);
 	}
 }
 

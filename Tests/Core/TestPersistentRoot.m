@@ -80,7 +80,7 @@
 	UKObjectsNotEqual(branch.UUID, originalBranch.UUID);
     
     /* Verify that the branch creation is not committed yet. */
-    UKIntsEqual(1, [[store persistentRootInfoForUUID: persistentRoot.UUID].branchForUUID.allKeys count]);
+    UKIntsEqual(1, [store persistentRootInfoForUUID: persistentRoot.UUID].branchForUUID.allKeys.count);
     
     [persistentRoot commit];
 	

@@ -131,18 +131,18 @@
 	UKIntsEqual(2, self.serverMessages.count);
 	UKObjectKindOf(self.serverMessages[0], COSynchronizerPushedRevisionsFromClientMessage);
 	UKObjectKindOf(self.serverMessages[0], COSynchronizerPushedRevisionsFromClientMessage);
-	UKIntsEqual(0, [[self client1Messages] count]);
-	UKIntsEqual(0, [[self client2Messages] count]);
+	UKIntsEqual(0, [self client1Messages].count);
+	UKIntsEqual(0, [self client2Messages].count);
 	
 	// Server should merge in client's changes in the order they were made [client1, client2],
 	// and send a push response back to each of the clients
 	[transport deliverMessagesToServer];
 	
 	UKIntsEqual(0, self.serverMessages.count);
-	UKIntsEqual(2, [[self client1Messages] count]);
+	UKIntsEqual(2, [self client1Messages].count);
 	UKObjectKindOf([self client1Messages][0], COSynchronizerResponseToClientForSentRevisionsMessage);
 	UKObjectKindOf([self client1Messages][1], COSynchronizerPushedRevisionsToClientMessage);
-	UKIntsEqual(2, [[self client2Messages] count]);
+	UKIntsEqual(2, [self client2Messages].count);
 	/* This message is sent to client2 when client1's push message is handled, before the
 	   server sees client2's push message. Client2 will ignore it. */
 	UKObjectKindOf([self client2Messages][0], COSynchronizerPushedRevisionsToClientMessage);
@@ -153,8 +153,8 @@
 	[transport deliverMessagesToClient: @"client1"];
 	
 	UKIntsEqual(0, self.serverMessages.count);
-	UKIntsEqual(0, [[self client1Messages] count]);
-	UKIntsEqual(2, [[self client2Messages] count]);
+	UKIntsEqual(0, [self client1Messages].count);
+	UKIntsEqual(2, [self client2Messages].count);
 	
 	UKIntsEqual(2, [[client1Branch.rootObject contents] count]);
 	UKObjectsEqual(S(client1Child.UUID, client2Child.UUID), SA([client1Branch.rootObject valueForKeyPath: @"contents.UUID"]));
@@ -162,8 +162,8 @@
 	[transport deliverMessagesToClient: @"client2"];
 	
 	UKIntsEqual(0, self.serverMessages.count);
-	UKIntsEqual(0, [[self client1Messages] count]);
-	UKIntsEqual(0, [[self client2Messages] count]);
+	UKIntsEqual(0, [self client1Messages].count);
+	UKIntsEqual(0, [self client2Messages].count);
 	
 	UKIntsEqual(2, [[client2Branch.rootObject contents] count]);
 	UKObjectsEqual(S(client1Child.UUID, client2Child.UUID), SA([client2Branch.rootObject valueForKeyPath: @"contents.UUID"]));

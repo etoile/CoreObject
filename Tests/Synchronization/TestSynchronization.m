@@ -426,7 +426,7 @@ static ETUUID *branchBUUID;
 													serverID: @"client"
 													   store: serverStore];
 		id response = [server handleUpdateRequest: request store: store];
-		UKIntsEqual(1, [[response[@"revisions"] allKeys] count]);
+		UKIntsEqual(1, [response[@"revisions"] allKeys].count);
 		[client handleUpdateResponse: response store: serverStore];
     }
 	
@@ -473,7 +473,7 @@ static ETUUID *branchBUUID;
 													serverID: @"client"
 													   store: serverStore];
 		id response = [server handleUpdateRequest: request store: store];
-		UKIntsEqual(1, [[response[@"revisions"] allKeys] count]);
+		UKIntsEqual(1, [response[@"revisions"] allKeys].count);
 		[client handleUpdateResponse: response store: serverStore];
 	}
 	

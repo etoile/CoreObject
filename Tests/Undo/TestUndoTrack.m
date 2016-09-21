@@ -263,7 +263,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	
 	UKObjectsEqual(A(placeholderNode, group1, group1b), _track.nodes);
 	UKObjectsEqual(S(group1, group1a, group1b), SA([_track allCommands]));
-	UKIntsEqual(3, [S(group1, group1a, group1b) count]);
+	UKIntsEqual(3, S(group1, group1a, group1b).count);
 }
 
 - (void) testSetCurrentNodeToDivergentNode
