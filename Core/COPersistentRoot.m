@@ -137,7 +137,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		// TODO: Decide whether we should attempt to always allocate the object
 		// graph context in the editing context methods rather than creating it
 		// in COBranch initializer in some cases. Would make possible to write:
-		//ETUUID *branchUUID = [anObjectGraphContext branchUUID];
+		//ETUUID *branchUUID = anObjectGraphContext.branchUUID;
         ETUUID *branchUUID =
 			(anObjectGraphContext != nil ? anObjectGraphContext.branchUUID : [ETUUID UUID]);
         COBranch *branch = [[COBranch alloc] initWithUUID: branchUUID

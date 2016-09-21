@@ -294,7 +294,7 @@ static ETUUID *branchBUUID;
     COPersistentRootInfo *clientCheapCopyInfo = [store persistentRootInfoForUUID: cheapCopyUUID];
     UKIntsEqual(2, clientCheapCopyInfo.branches.count);
     
-    COBranchInfo *currentBranch = [clientCheapCopyInfo currentBranchInfo];
+    COBranchInfo *currentBranch = clientCheapCopyInfo.currentBranchInfo;
     COBranchInfo *replicatedCheapCopyBranch = [[clientCheapCopyInfo branchInfosWithMetadataValue: [cheapCopyBranchUUID stringValue]
                                                                                           forKey: @"replcatedBranch"] firstObject];
 

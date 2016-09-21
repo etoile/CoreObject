@@ -45,7 +45,7 @@
         
         [rootObj setValue: @"hello" forProperty: @"label"];
         
-        //NSLog(@"Committing change to %@", [persistentRoot persistentRootUUID]);
+        //NSLog(@"Committing change to %@", persistentRoot.persistentRootUUID);
         [ctx2 commit];
 		newRevID = rootObj.revision.UUID;
     }

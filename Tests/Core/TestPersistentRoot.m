@@ -266,7 +266,7 @@
 		 UKObjectsEqual(originalBranch.UUID, [testBranch.parentBranch UUID]);
 		 UKObjectsEqual(persistentRoot.UUID, [[testProot parentPersistentRoot] UUID]);
 		 
-		 UKObjectsEqual(rev1, [testBranch initialRevision]);
+		 UKObjectsEqual(rev1, testBranch.initialRevision);
 		 UKObjectsEqual(rev1, testBranch.currentRevision);
 		 UKObjectsEqual(rev1, [testBranch headRevision]);
 		 
@@ -307,7 +307,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: copyRoot
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsNotEqual(r1, [testBranch initialRevision]);
+		 UKObjectsNotEqual(r1, testBranch.initialRevision);
 		 UKObjectsNotEqual(r1, testProot.currentRevision);
 		 UKObjectsEqual(@"a change", [testProot.rootObject label]);
 	 }];
@@ -325,7 +325,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: copyRoot
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsNotEqual(r1, [testBranch initialRevision]);
+		 UKObjectsNotEqual(r1, testBranch.initialRevision);
 		 UKObjectsNotEqual(r1, testProot.currentRevision);
 		 UKObjectsEqual(@"a change", [testProot.rootObject label]);
 	 }];
@@ -387,7 +387,7 @@
     branch.deleted = YES;
     
     UKObjectsEqual(S(originalBranch), persistentRoot.branches);
-    UKObjectsEqual(S(branch), [persistentRoot branchesPendingDeletion]);
+    UKObjectsEqual(S(branch), persistentRoot.branchesPendingDeletion);
     UKObjectsEqual(S(branch), persistentRoot.deletedBranches);
     UKTrue(branch.deleted);
     
@@ -399,7 +399,7 @@
 		 COBranch *testOriginalBranch = [testProot branchForUUID: originalBranch.UUID];
 		 
 		 UKObjectsEqual(S(testOriginalBranch), testProot.branches);
-		 UKTrue([[testProot branchesPendingDeletion] isEmpty]);
+		 UKTrue([testProot.branchesPendingDeletion isEmpty]);
 		 UKObjectsEqual(S(testBranch), testProot.deletedBranches);
 		 UKTrue(testBranch.deleted);
 	 }];
@@ -439,7 +439,7 @@
     branch.deleted = NO;
     
     UKObjectsEqual(S(branch, originalBranch), persistentRoot.branches);
-    UKObjectsEqual(S(branch), [persistentRoot branchesPendingUndeletion]);
+    UKObjectsEqual(S(branch), persistentRoot.branchesPendingUndeletion);
     UKTrue([persistentRoot.deletedBranches isEmpty]);
     UKFalse(branch.deleted);
     
@@ -451,7 +451,7 @@
 		 COBranch *testOriginalBranch = [testProot branchForUUID: originalBranch.UUID];
 		 
 		 UKObjectsEqual(S(testBranch, testOriginalBranch), testProot.branches);
-		 UKTrue([[testProot branchesPendingUndeletion] isEmpty]);
+		 UKTrue([testProot.branchesPendingUndeletion isEmpty]);
 		 UKTrue([testProot.deletedBranches isEmpty]);
 		 UKFalse(testBranch.deleted);
 	}];
@@ -577,7 +577,7 @@
     
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: store.URL];
-        UKObjectsEqual(@{}, [[ctx2 persistentRootForUUID: persistentRoot.UUID] metadata]);
+        UKObjectsEqual(@{}, [ctx2 persistentRootForUUID: persistentRoot.UUID].metadata);
     }
     
     [ctx commit];
@@ -685,9 +685,9 @@
     
     UKObjectsEqual(S(current, regular, pendingInsertion, pendingUndeletion), persistentRoot.branches);
     UKObjectsEqual(S(deletedOnDisk, pendingDeletion), persistentRoot.deletedBranches);
-    UKObjectsEqual(S(pendingInsertion), [persistentRoot branchesPendingInsertion]);
-    UKObjectsEqual(S(pendingDeletion), [persistentRoot branchesPendingDeletion]);
-    UKObjectsEqual(S(pendingUndeletion), [persistentRoot branchesPendingUndeletion]);
+    UKObjectsEqual(S(pendingInsertion), persistentRoot.branchesPendingInsertion);
+    UKObjectsEqual(S(pendingDeletion), persistentRoot.branchesPendingDeletion);
+    UKObjectsEqual(S(pendingUndeletion), persistentRoot.branchesPendingUndeletion);
 
 	UKObjectsEqual(regular, [persistentRoot branchForUUID: regular.UUID]);
 	UKObjectsEqual(deletedOnDisk, [persistentRoot branchForUUID: deletedOnDisk.UUID]);
@@ -711,9 +711,9 @@
 		 
 		 UKObjectsEqual(S(testCurrent, testRegular, testPendingInsertion, testPendingUndeletion), testPersistentRoot.branches);
 		 UKObjectsEqual(S(testDeletedOnDisk, testPendingDeletion), testPersistentRoot.deletedBranches);
-		 UKObjectsEqual([NSSet set], [testPersistentRoot branchesPendingInsertion]);
-		 UKObjectsEqual([NSSet set], [testPersistentRoot branchesPendingDeletion]);
-		 UKObjectsEqual([NSSet set], [testPersistentRoot branchesPendingUndeletion]);
+		 UKObjectsEqual([NSSet set], testPersistentRoot.branchesPendingInsertion);
+		 UKObjectsEqual([NSSet set], testPersistentRoot.branchesPendingDeletion);
+		 UKObjectsEqual([NSSet set], testPersistentRoot.branchesPendingUndeletion);
 	 }];
 }
 

@@ -213,7 +213,7 @@
 	
 	[clientBranch.rootObject setLabel: @"more changes"];
 	[clientPersistentRoot commitWithMetadata: self.clientRevisionMetadataForTest];
-	UKObjectsEqual([self clientRevisionMetadataForTest], [clientPersistentRoot.currentRevision metadata]);
+	UKObjectsEqual(self.clientRevisionMetadataForTest, clientPersistentRoot.currentRevision.metadata);
 	
 	// This should not produce any more messages
 	
@@ -224,7 +224,7 @@
 	[transport deliverMessagesToClient];
 
 	UKObjectsEqual(@"more changes", [clientBranch.rootObject label]);
-	UKObjectsEqual([self clientRevisionMetadataForTest], [clientPersistentRoot.currentRevision metadata]);
+	UKObjectsEqual(self.clientRevisionMetadataForTest, clientPersistentRoot.currentRevision.metadata);
 	
 	// The client should push back the @"more changes" change to the server
 	

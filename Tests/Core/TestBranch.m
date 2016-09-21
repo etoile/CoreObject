@@ -357,7 +357,7 @@
         
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: store.URL];
-        UKNil([[[ctx2 persistentRootForUUID: persistentRoot.UUID] currentBranch] label]);
+        UKNil([ctx2 persistentRootForUUID: persistentRoot.UUID].currentBranch.label);
     }
     
     [ctx commit];
@@ -410,7 +410,7 @@
     
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: store.URL];
-        UKObjectsEqual(@{}, [[[ctx2 persistentRootForUUID: persistentRoot.UUID] currentBranch] metadata]);
+        UKObjectsEqual(@{}, [ctx2 persistentRootForUUID: persistentRoot.UUID].currentBranch.metadata);
     }
     
     [ctx commit];

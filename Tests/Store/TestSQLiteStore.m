@@ -327,7 +327,7 @@ static ETUUID *childUUID2;
     //
     // If you want to give the branch initial metadata you can call -setMetadata:forBranch:...
     // in a transaction with the -createPersistentRootWithInitialItemGraph: call.
-    UKNil([[[store persistentRootInfoForUUID: prootUUID] currentBranchInfo] metadata]);
+    UKNil([store persistentRootInfoForUUID: prootUUID].currentBranchInfo.metadata);
     
 	{
 		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
@@ -337,7 +337,7 @@ static ETUUID *childUUID2;
 		[self updateChangeCountAndCommitTransaction: txn];
 	}
     
-    UKObjectsEqual(D(@"hello world", @"msg"), [[[store persistentRootInfoForUUID: prootUUID] currentBranchInfo] metadata]);
+    UKObjectsEqual(D(@"hello world", @"msg"), [store persistentRootInfoForUUID: prootUUID].currentBranchInfo.metadata);
     
 	{
 		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
@@ -346,14 +346,14 @@ static ETUUID *childUUID2;
 		ofPersistentRoot: prootUUID];
 		[self updateChangeCountAndCommitTransaction: txn];
 	}
-    UKNil([[[store persistentRootInfoForUUID: prootUUID] currentBranchInfo] metadata]);
+    UKNil([store persistentRootInfoForUUID: prootUUID].currentBranchInfo.metadata);
 }
 
 - (void) testPersistentRootMetadata
 {
     // A plain call to -createPersistentRootWithInitialItemGraph: creates a persistent root
     // with nil metadata; this is intentional.
-    UKNil([[store persistentRootInfoForUUID: prootUUID] metadata]);
+    UKNil([store persistentRootInfoForUUID: prootUUID].metadata);
     
 	{
 		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
@@ -362,7 +362,7 @@ static ETUUID *childUUID2;
 		[self updateChangeCountAndCommitTransaction: txn];
 	}
     
-    UKObjectsEqual(D(@"hello world", @"msg"), [[store persistentRootInfoForUUID: prootUUID] metadata]);
+    UKObjectsEqual(D(@"hello world", @"msg"), [store persistentRootInfoForUUID: prootUUID].metadata);
     
 	{
 		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
@@ -370,7 +370,7 @@ static ETUUID *childUUID2;
 	   forPersistentRoot: prootUUID];
 		[self updateChangeCountAndCommitTransaction: txn];
 	}
-    UKNil([[store persistentRootInfoForUUID: prootUUID] metadata]);
+    UKNil([store persistentRootInfoForUUID: prootUUID].metadata);
 }
 
 
@@ -669,9 +669,9 @@ static ETUUID *childUUID2;
 - (void) testRevisionInfo
 {
     CORevisionInfo *info = [store revisionInfoForRevisionUUID: initialRevisionUUID persistentRootUUID: prootUUID];
-    UKNil([info parentRevisionUUID]);
-    UKObjectsEqual(initialRevisionUUID, [info revisionUUID]);
-	UKObjectsEqual([proot currentBranchUUID], [info branchUUID]);
+    UKNil(info.parentRevisionUUID);
+    UKObjectsEqual(initialRevisionUUID, info.revisionUUID);
+	UKObjectsEqual([proot currentBranchUUID], info.branchUUID);
 }
 
 - (void) checkHasTables: (BOOL)flag forUUID: (ETUUID *)aUUID
@@ -699,7 +699,7 @@ static ETUUID *childUUID2;
 {
     UKObjectsEqual(@[], store.deletedPersistentRootUUIDs);
     UKObjectsEqual(A(prootUUID), store.persistentRootUUIDs);
-    UKFalse([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
+    UKFalse([store persistentRootInfoForUUID: prootUUID].deleted);
 
 	[self checkHasTables: YES forUUID: prootUUID];
 	
@@ -710,11 +710,11 @@ static ETUUID *childUUID2;
 		[self updateChangeCountAndCommitTransaction: txn];
 	}
 
-    UKTrue([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
+    UKTrue([store persistentRootInfoForUUID: prootUUID].deleted);
     UKObjectsEqual(A(prootUUID), store.deletedPersistentRootUUIDs);
     UKObjectsEqual(@[], store.persistentRootUUIDs);
     UKNotNil([store persistentRootInfoForUUID: prootUUID]);
-    UKFalse([[[store persistentRootInfoForUUID: prootUUID] currentBranchInfo] isDeleted]); // Deleting proot does not mark branch as deleted.
+    UKFalse([store persistentRootInfoForUUID: prootUUID].currentBranchInfo.deleted); // Deleting proot does not mark branch as deleted.
     
     // Undelete it
 	{
@@ -723,7 +723,7 @@ static ETUUID *childUUID2;
 		[self updateChangeCountAndCommitTransaction: txn];
 	}
     
-    UKFalse([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
+    UKFalse([store persistentRootInfoForUUID: prootUUID].deleted);
     UKObjectsEqual(@[], store.deletedPersistentRootUUIDs);
     UKObjectsEqual(A(prootUUID), store.persistentRootUUIDs);
     
@@ -779,7 +779,7 @@ static ETUUID *childUUID2;
 						 head: initialRevisionUUID];
 	
     UKObjectsEqual([self makeInitialItemTree], [self currentItemGraphForPersistentRoot: prootUUID]);
-    UKFalse([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
+    UKFalse([store persistentRootInfoForUUID: prootUUID].deleted);
 }
 
 /**
@@ -807,7 +807,7 @@ static ETUUID *childUUID2;
     // 1. check setup
     
     // Verify that the new branch metadata is nil
-    UKNil([[copy currentBranchInfo] metadata]);
+    UKNil(copy.currentBranchInfo.metadata);
     
     // Verify that new UUIDs were generated
     UKObjectsNotEqual(prootUUID, copy.UUID);
@@ -831,7 +831,7 @@ static ETUUID *childUUID2;
     // gives us when we read it back.
 
     UKObjectsEqual(copy.branchUUIDs, [store persistentRootInfoForUUID: copy.UUID].branchUUIDs);
-    UKObjectsEqual([[copy currentBranchInfo] currentRevisionUUID], [[store persistentRootInfoForUUID: copy.UUID] currentBranchInfo].currentRevisionUUID);
+    UKObjectsEqual(copy.currentBranchInfo.currentRevisionUUID, [store persistentRootInfoForUUID: copy.UUID].currentBranchInfo.currentRevisionUUID);
     
     // 2. try changing. Verify that proot and copy are totally independent
 

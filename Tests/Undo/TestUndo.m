@@ -321,11 +321,11 @@
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
-        UKObjectsEqual(D(@"world2", @"hello"), [ctx2persistentRoot.currentBranch metadata]);
+        UKObjectsEqual(D(@"world2", @"hello"), ctx2persistentRoot.currentBranch.metadata);
         [testTrack undo];
-        UKObjectsEqual(D(@"world", @"hello"), [ctx2persistentRoot.currentBranch metadata]);
+        UKObjectsEqual(D(@"world", @"hello"), ctx2persistentRoot.currentBranch.metadata);
         [testTrack redo];
-        UKObjectsEqual(D(@"world2", @"hello"), [ctx2persistentRoot.currentBranch metadata]);
+        UKObjectsEqual(D(@"world2", @"hello"), ctx2persistentRoot.currentBranch.metadata);
     }
 }
 

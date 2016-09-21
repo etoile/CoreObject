@@ -82,7 +82,7 @@ static ETUUID *tagUUID;
     NSArray *results = [store referencesToPersistentRoot: docProot.UUID];
     
     COSearchResult *result = results[0];
-    UKObjectsEqual([[tagProot currentBranchInfo] currentRevisionUUID], result.revision);
+    UKObjectsEqual(tagProot.currentBranchInfo.currentRevisionUUID, result.revision);
     UKObjectsEqual(tagUUID, [result innerObjectUUID]);
 }
 
@@ -96,7 +96,7 @@ static ETUUID *tagUUID;
     UKTrue([store finalizeDeletionsForPersistentRoot: docProot.UUID
                                                error: NULL]);
     
-    UKNil([store itemGraphForRevisionUUID: [[docProot currentBranchInfo] currentRevisionUUID] persistentRoot: docProot.UUID]);
+    UKNil([store itemGraphForRevisionUUID: docProot.currentBranchInfo.currentRevisionUUID persistentRoot: docProot.UUID]);
 }
 
 @end

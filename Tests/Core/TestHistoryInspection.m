@@ -178,20 +178,20 @@
 
 - (void) testRevisionPersistentRootUUID
 {
-    UKObjectsEqual(p1.UUID, [r0 persistentRootUUID]);
-    UKObjectsEqual(p1.UUID, [r1 persistentRootUUID]);
-    UKObjectsEqual(p1.UUID, [r2 persistentRootUUID]);
-    UKObjectsEqual(p1.UUID, [r3 persistentRootUUID]);
-    UKObjectsEqual(p2.UUID, [r4 persistentRootUUID]);
+    UKObjectsEqual(p1.UUID, r0.persistentRootUUID);
+    UKObjectsEqual(p1.UUID, r1.persistentRootUUID);
+    UKObjectsEqual(p1.UUID, r2.persistentRootUUID);
+    UKObjectsEqual(p1.UUID, r3.persistentRootUUID);
+    UKObjectsEqual(p2.UUID, r4.persistentRootUUID);
 }
 
 - (void) testRevisionBranchUUID
 {
-    UKObjectsEqual(branch1A.UUID, [r0 branchUUID]);
-    UKObjectsEqual(branch1A.UUID, [r1 branchUUID]);
-    UKObjectsEqual(branch1A.UUID, [r2 branchUUID]);
-    UKObjectsEqual(branch1B.UUID, [r3 branchUUID]);
-    UKObjectsEqual(branch2A.UUID, [r4 branchUUID]);
+    UKObjectsEqual(branch1A.UUID, r0.branchUUID);
+    UKObjectsEqual(branch1A.UUID, r1.branchUUID);
+    UKObjectsEqual(branch1A.UUID, r2.branchUUID);
+    UKObjectsEqual(branch1B.UUID, r3.branchUUID);
+    UKObjectsEqual(branch2A.UUID, r4.branchUUID);
 }
 
 - (void) testParentBranch
@@ -200,14 +200,14 @@
     UKNil(branch1A.parentBranch);
 	{
 		COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: ctx.store];
-		UKObjectsEqual(branch1A.UUID, [[[[ctx2 persistentRootForUUID: p1.UUID]
-										   branchForUUID: branch1B.UUID] parentBranch] UUID]);
+		UKObjectsEqual(branch1A.UUID, [[ctx2 persistentRootForUUID: p1.UUID]
+										   branchForUUID: branch1B.UUID].parentBranch.UUID);
 	}
 	
 	UKObjectsEqual(branch1A, branch2A.parentBranch);
 	{
 		COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: ctx.store];
-		UKObjectsEqual(branch1A.UUID, [[[[ctx2 persistentRootForUUID: p2.UUID] currentBranch] parentBranch] UUID]);
+		UKObjectsEqual(branch1A.UUID, [ctx2 persistentRootForUUID: p2.UUID].currentBranch.parentBranch.UUID);
 	}
 }
 

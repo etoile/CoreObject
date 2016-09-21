@@ -146,7 +146,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 - (NSString *)description
 {
 	return [NSString stringWithFormat: @"<%@: %p - %@ - rootObject: %@>",
-		NSStringFromClass([self class]), self, [self branchUUID], self.rootItemUUID];
+		NSStringFromClass([self class]), self, self.branchUUID, self.rootItemUUID];
 }
 
 - (NSString *)detailedDescription

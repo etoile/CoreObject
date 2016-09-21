@@ -185,11 +185,11 @@
     
     [persistentRoot setDeleted: NO];
 
-    UKTrue([[store persistentRootInfoForUUID: uuid] isDeleted]);
+    UKTrue([store persistentRootInfoForUUID: uuid].deleted);
     UKTrue(ctx.hasChanges);
     UKObjectsEqual(S(persistentRoot), ctx.persistentRoots);
     UKObjectsEqual([NSSet set], ctx.persistentRootsPendingDeletion);
-    UKObjectsEqual(S(persistentRoot), [ctx persistentRootsPendingUndeletion]);
+    UKObjectsEqual(S(persistentRoot), ctx.persistentRootsPendingUndeletion);
     UKObjectsEqual([NSSet set], ctx.deletedPersistentRoots);
     UKFalse(persistentRoot.deleted);
     
@@ -202,7 +202,7 @@
 		UKFalse(testCtx.hasChanges);
 		UKObjectsEqual(S(testProot), testCtx.persistentRoots);
 		UKObjectsEqual([NSSet set], testCtx.persistentRootsPendingDeletion);
-		UKObjectsEqual([NSSet set], [testCtx persistentRootsPendingUndeletion]);
+		UKObjectsEqual([NSSet set], testCtx.persistentRootsPendingUndeletion);
 		UKObjectsEqual([NSSet set], testCtx.deletedPersistentRoots);
 		UKFalse(testProot.deleted);
 	 }];
@@ -298,7 +298,7 @@
     UKObjectsEqual(S(deletedOnDisk, pendingDeletion), ctx.deletedPersistentRoots);
     UKObjectsEqual(S(pendingInsertion), ctx.persistentRootsPendingInsertion);
     UKObjectsEqual(S(pendingDeletion), ctx.persistentRootsPendingDeletion);
-    UKObjectsEqual(S(pendingUndeletion), [ctx persistentRootsPendingUndeletion]);
+    UKObjectsEqual(S(pendingUndeletion), ctx.persistentRootsPendingUndeletion);
 
 	UKObjectsEqual(regular, [ctx persistentRootForUUID: regular.UUID]);
 	UKObjectsEqual(deletedOnDisk, [ctx persistentRootForUUID: deletedOnDisk.UUID]);
@@ -322,7 +322,7 @@
 		 UKObjectsEqual(S(testDeletedOnDisk, testPendingDeletion), testCtx.deletedPersistentRoots);
 		 UKObjectsEqual([NSSet set], testCtx.persistentRootsPendingInsertion);
 		 UKObjectsEqual([NSSet set], testCtx.persistentRootsPendingDeletion);
-		 UKObjectsEqual([NSSet set], [testCtx persistentRootsPendingUndeletion]);
+		 UKObjectsEqual([NSSet set], testCtx.persistentRootsPendingUndeletion);
 	 }];
 }
 
