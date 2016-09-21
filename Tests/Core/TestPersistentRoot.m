@@ -80,7 +80,7 @@
 	UKObjectsNotEqual(branch.UUID, originalBranch.UUID);
     
     /* Verify that the branch creation is not committed yet. */
-    UKIntsEqual(1, [[[[store persistentRootInfoForUUID: persistentRoot.UUID] branchForUUID] allKeys] count]);
+    UKIntsEqual(1, [[store persistentRootInfoForUUID: persistentRoot.UUID].branchForUUID.allKeys count]);
     
     [persistentRoot commit];
 	
@@ -89,7 +89,7 @@
 	 {
 		 UKIntsEqual(2, testProot.branches.count);
 		 UKStringsEqual(@"Sandbox", [testBranch label]);
-		 UKObjectsEqual(originalBranch.UUID, [testBranch.parentBranch UUID]);
+		 UKObjectsEqual(originalBranch.UUID, testBranch.parentBranch.UUID);
 		 
 		 UKObjectsEqual(testProot, testBranch.persistentRoot);
 		 
@@ -118,7 +118,7 @@
 	persistentRoot.currentBranch = branch;
 	
     UKObjectsEqual(originalBranch.UUID,
-                   [[store persistentRootInfoForUUID: persistentRoot.UUID] currentBranchUUID]);
+                   [store persistentRootInfoForUUID: persistentRoot.UUID].currentBranchUUID);
     
 	/* Commit some changes in the Sandbox branch */
 	
@@ -131,7 +131,7 @@
 	UKObjectsEqual(@"Todo", [persistentRoot.rootObject valueForProperty: @"label"]);
 	
     UKObjectsEqual(branch.UUID,
-                   [[store persistentRootInfoForUUID: persistentRoot.UUID] currentBranchUUID]);
+                   [store persistentRootInfoForUUID: persistentRoot.UUID].currentBranchUUID);
     
 	[sandboxRootObj setValue: @"Tidi" forProperty: @"label"];
 	
@@ -172,7 +172,7 @@
     
     COObject *childB = [[photo1branchBroot valueForKey: @"contents"] firstObject];
     [childB setValue: @"childB" forProperty: @"label"];
-    UKTrue([branchB.objectGraphContext hasChanges]);
+    UKTrue(branchB.objectGraphContext.hasChanges);
     
     [ctx commit];
     
@@ -187,7 +187,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: photo1
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPhoto1, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(branchB.UUID, [testPhoto1.currentBranch UUID]);
+		 UKObjectsEqual(branchB.UUID, testPhoto1.currentBranch.UUID);
 		 UKObjectsEqual(A(@"childB"), [testPhoto1.rootObject valueForKeyPath: @"contents.label"]);
 	 }];
 }
@@ -243,9 +243,9 @@
     
 	COBranch *copyRootBranch = copyRoot.currentBranch;
 	UKObjectsEqual(originalBranch, copyRootBranch.parentBranch);
-	UKObjectsEqual(persistentRoot, [copyRoot parentPersistentRoot]);
-	UKFalse([persistentRoot isCopy]);
-	UKTrue([copyRoot isCopy]);
+	UKObjectsEqual(persistentRoot, copyRoot.parentPersistentRoot);
+	UKFalse(persistentRoot.isCopy);
+	UKTrue(copyRoot.isCopy);
 
 	UKObjectsEqual(rootObj.UUID, [copyRoot.rootObject UUID]);
 	UKObjectsNotEqual(rootObj, copyRoot.rootObject);
@@ -263,14 +263,14 @@
 		 UKObjectsNotEqual(originalBranch.UUID, testBranch.UUID);
 		 UKObjectsNotEqual(persistentRoot.UUID, testProot.UUID);
 		 
-		 UKObjectsEqual(originalBranch.UUID, [testBranch.parentBranch UUID]);
-		 UKObjectsEqual(persistentRoot.UUID, [[testProot parentPersistentRoot] UUID]);
+		 UKObjectsEqual(originalBranch.UUID, testBranch.parentBranch.UUID);
+		 UKObjectsEqual(persistentRoot.UUID, testProot.parentPersistentRoot.UUID);
 		 
 		 UKObjectsEqual(rev1, testBranch.initialRevision);
 		 UKObjectsEqual(rev1, testBranch.currentRevision);
-		 UKObjectsEqual(rev1, [testBranch headRevision]);
+		 UKObjectsEqual(rev1, testBranch.headRevision);
 		 
-		 UKTrue([testProot isCopy]);
+		 UKTrue(testProot.isCopy);
 	 }];
 
     /* Make a commit in the cheap copy */
@@ -370,7 +370,7 @@
     [ctx commit];
     
     UKObjectsEqual(S(originalBranch.UUID),
-	               SA([[[store persistentRootInfoForUUID: persistentRoot.UUID] branchForUUID] allKeys]));
+	               SA([store persistentRootInfoForUUID: persistentRoot.UUID].branchForUUID.allKeys));
 }
 
 - (void) testDeleteCommittedBranch
@@ -382,7 +382,7 @@
     [ctx commit];
     
     UKObjectsEqual(S(originalBranch.UUID, branch.UUID),
-                   SA([[[store persistentRootInfoForUUID: persistentRoot.UUID] branchForUUID] allKeys]));
+                   SA([store persistentRootInfoForUUID: persistentRoot.UUID].branchForUUID.allKeys));
     
     branch.deleted = YES;
     
@@ -418,7 +418,7 @@
     [ctx commit];
     
     UKObjectsEqual(S(branch.UUID, originalBranch.UUID),
-	               SA([[[store persistentRootInfoForUUID: persistentRoot.UUID] branchForUUID] allKeys]));
+	               SA([store persistentRootInfoForUUID: persistentRoot.UUID].branchForUUID.allKeys));
 }
 
 - (void) testUndeleteCommittedBranch
@@ -434,7 +434,7 @@
     [ctx commit];
     
     UKObjectsEqual(S(originalBranch.UUID, branch.UUID),
-                   SA([[[store persistentRootInfoForUUID: persistentRoot.UUID] branchForUUID] allKeys]));
+                   SA([store persistentRootInfoForUUID: persistentRoot.UUID].branchForUUID.allKeys));
     
     branch.deleted = NO;
     
@@ -671,11 +671,11 @@
 
         // Check that the constraints we wanted to set up hold
 		
-        UKTrue([[persistentRootInfo branchUUIDs] containsObject: regular.UUID]);
-        UKTrue([[persistentRootInfo branchUUIDs] containsObject: deletedOnDisk.UUID]);
+        UKTrue([persistentRootInfo.branchUUIDs containsObject: regular.UUID]);
+        UKTrue([persistentRootInfo.branchUUIDs containsObject: deletedOnDisk.UUID]);
 		UKNil([persistentRootInfo branchInfoForUUID: pendingInsertion.UUID]);
-		UKTrue([[persistentRootInfo branchUUIDs] containsObject: pendingDeletion.UUID]);
-        UKTrue([[persistentRootInfo branchUUIDs] containsObject: pendingUndeletion.UUID]);
+		UKTrue([persistentRootInfo.branchUUIDs containsObject: pendingDeletion.UUID]);
+        UKTrue([persistentRootInfo.branchUUIDs containsObject: pendingUndeletion.UUID]);
 		UKTrue(deletedOnDisk.deleted);
 		UKTrue(pendingDeletion.deleted);
 		UKFalse(pendingUndeletion.deleted);

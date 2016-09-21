@@ -80,7 +80,7 @@ static ETUUID *branchBUUID;
 				 parentBranch: nil
 			  initialRevision: serverInfo.currentRevisionUUID
 			forPersistentRoot: persistentRootUUID];
-    UKObjectsEqual(branchAUUID, [serverInfo currentBranchUUID]);
+    UKObjectsEqual(branchAUUID, serverInfo.currentBranchUUID);
 	serverChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: persistentRootUUID];
     UKTrue([serverStore commitStoreTransaction: txn]);
     

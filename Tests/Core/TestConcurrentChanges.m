@@ -87,7 +87,7 @@
     [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
-    UKObjectsEqual(firstRevid, [persistentRoot.currentRevision UUID]);
+    UKObjectsEqual(firstRevid, persistentRoot.currentRevision.UUID);
     UKFalse(ctx.hasChanges);
 }
 

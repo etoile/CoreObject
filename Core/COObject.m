@@ -1913,7 +1913,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 
 - (NSString *)revisionDescription
 {
-	return [(self.revision).UUID stringValue];
+	return [self.revision.UUID stringValue];
 }
 
 - (NSString *)tagDescription

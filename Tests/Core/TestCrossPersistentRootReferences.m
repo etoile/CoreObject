@@ -178,7 +178,7 @@
         
         // Sanity check
         
-        UKObjectsEqual(branchB.UUID, [photo1ctx2.currentBranch UUID]);
+        UKObjectsEqual(branchB.UUID, photo1ctx2.currentBranch.UUID);
         UKObjectsEqual(A(@"childB"), [photo1ctx2.rootObject valueForKeyPath: @"contents.label"]);
         
         // Actual test of cross-persistent-root references
@@ -604,7 +604,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: library1
 											  inBlock: ^(COEditingContext *ctx2, COPersistentRoot *library1ctx2, COBranch *testBranch, BOOL isNewContext)
 	 {
-        UKFalse([library1ctx2.objectGraphContext hasChanges]);
+        UKFalse(library1ctx2.objectGraphContext.hasChanges);
         UKObjectsEqual(S(@"photo2"), [library1ctx2.rootObject valueForKeyPath: @"contents.label"]);
         
         // Undelete photo1, which should restore the cross-root relationship
@@ -612,7 +612,7 @@
         COPersistentRoot *photo1ctx2 = [ctx2.deletedPersistentRoots anyObject];
         [photo1ctx2 setDeleted: NO];
         
-        UKFalse([library1ctx2.objectGraphContext hasChanges]);
+        UKFalse(library1ctx2.objectGraphContext.hasChanges);
         UKObjectsEqual(S(@"photo1", @"photo2"), [library1ctx2.rootObject valueForKeyPath: @"contents.label"]);
 	 }];
 }
@@ -648,7 +648,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: photo1
 											   inBlock: ^(COEditingContext *ctx2, COPersistentRoot *photo1ctx2, COBranch *testBranch, BOOL isNewContext)
 	 {
-        UKFalse([photo1ctx2.objectGraphContext hasChanges]);
+        UKFalse(photo1ctx2.objectGraphContext.hasChanges);
         UKObjectsEqual([NSSet set], [photo1ctx2.rootObject valueForKeyPath: @"parentCollections.label"]);
         
         // Undelete library1, which should restore the cross-root inverse relationship
@@ -660,7 +660,7 @@
 		UKObjectsEqual(library1.UUID, library1ctx2.UUID);
         //[library1ctx2 setDeleted: NO];
 
-        //UKFalse([photo1ctx2.objectGraphContext hasChanges]);
+        //UKFalse(photo1ctx2.objectGraphContext.hasChanges);
         //UKObjectsEqual(S(@"library1"), [photo1ctx2.rootObject valueForKeyPath: @"parentCollections.label"]);
 	 }];
 #endif

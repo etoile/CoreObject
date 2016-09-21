@@ -40,7 +40,7 @@ static NSData *hashItemAtURL(NSURL *aURL)
     }
 
 #ifdef GNUSTEP
-	NSFileHandle *fh = [NSFileHandle fileHandleForReadingAtPath: [aURL path]];
+	NSFileHandle *fh = [NSFileHandle fileHandleForReadingAtPath: aURL.path];
 #else
 	NSFileHandle *fh = [NSFileHandle fileHandleForReadingFromURL: aURL
 	                                                       error: NULL];

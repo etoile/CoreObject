@@ -29,7 +29,7 @@
 
 - (NSUInteger) hash
 {
-	return (self.label).hash;
+	return self.label.hash;
 }
 
 - (BOOL) isEqual:(id)anObject

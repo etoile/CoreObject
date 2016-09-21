@@ -89,7 +89,7 @@
 	
 	NSLog(@"Took %f ms to commit %d objects",
 		  timeToMakeInitialCommitToPersistentRoot * MS_PER_SECOND,
-		  (int)[[persistentRoot.objectGraphContext itemUUIDs] count]);
+		  (int)persistentRoot.objectGraphContext.itemUUIDs.count);
 	
 	NSLog(@"Took %f ms to commit a change to 1 object in that graph. SQLite takes %f ms to commit 1K bytes. CO is %f times worse.",
 		  timeToMakeIncrementalCommitToPersistentRoot * MS_PER_SECOND,
@@ -104,14 +104,14 @@
 	NSTimeInterval timeToMakeInitialCommitToPersistentRoot = [self timeToMakeInitialCommitToPersistentRoot: persistentRoot];
 
 	NSDate *start = [NSDate date];
-	COEditingContext *ctx2 = [COEditingContext contextWithURL: [[persistentRoot store] URL]];
+	COEditingContext *ctx2 = [COEditingContext contextWithURL: persistentRoot.istore.URL];
 	COPersistentRoot *ctx2PersistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
 	NSArray *contents = [ctx2PersistentRoot.rootObject contents];
 	const NSTimeInterval time = [[NSDate date] timeIntervalSinceDate: start];
 
 	NSLog(@"Took %f ms to commit %d objects",
 		  timeToMakeInitialCommitToPersistentRoot * MS_PER_SECOND,
-		  (int)[[persistentRoot.objectGraphContext itemUUIDs] count]);
+		  (int)persistentRoot.objectGraphContext.itemUUIDs.count);
 	
 	NSLog(@"Took %f ms to load back objects. Top level objects: %@", time, contents);
 }

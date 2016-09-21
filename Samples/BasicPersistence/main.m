@@ -134,7 +134,7 @@ int main(int argc, char **argv)
  */
 void ShowStoreContentsForContext(COEditingContext *ctx)
 {
-	NSLog(@"Store %@ contents:", [[[ctx store] URL] path]);
+	NSLog(@"Store %@ contents:", ctx.istore.URL.path);
 
 	for (COPersistentRoot *persistentRoot in ctx.persistentRoots)
 	{

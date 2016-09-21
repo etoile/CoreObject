@@ -450,7 +450,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	{
 		_objectsByAdditionalItemUUIDs[itemUUID] = currentObject;
 	}
-	ETAssert([[_objectsByAdditionalItemUUIDs allKeys] containsCollection: [[currentObject additionalStoreItemUUIDs] allValues]]);
+	ETAssert([_objectsByAdditionalItemUUIDs.allKeys containsCollection: [[currentObject additionalStoreItemUUIDs] allValues]]);
 }
 
 /**

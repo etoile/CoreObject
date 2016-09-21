@@ -156,17 +156,17 @@
 	COItemGraphDiff *diff = [diffB itemTreeDiffByMergingWithDiff: diffC];
 	
 	UKTrue(diff.hasConflicts);
-	UKIntsEqual(1, [diff conflicts].count);
-	UKIntsEqual(2, [[diff conflicts].anyObject allEdits].count);
-	UKIntsEqual(2, [diff allEdits].count);
+	UKIntsEqual(1, diff.conflicts.count);
+	UKIntsEqual(2, [diff.conflicts.anyObject allEdits].count);
+	UKIntsEqual(2, diff.allEdits.count);
 	
 	COItemGraphEdit *edit = [diff.conflicts.anyObject allEdits].anyObject;
 	
 	[diff removeEdit: edit];
 	
 	UKFalse(diff.hasConflicts);
-	UKIntsEqual(0, [diff conflicts].count);
-	UKIntsEqual(1, [diff allEdits].count);
+	UKIntsEqual(0, diff.conflicts.count);
+	UKIntsEqual(1, diff.allEdits.count);
 }
 
 // FIXME: When run with testcoreobject-macosx.sh, this doesn't find the resource

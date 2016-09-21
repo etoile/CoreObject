@@ -109,7 +109,7 @@
 		return item.packageVersion;
 	}
 
-	for (ETPackageDescription *package in (anObject.entityDescription).allPackageDescriptions)
+	for (ETPackageDescription *package in anObject.entityDescription.allPackageDescriptions)
 	{
 		if ([package.name isEqual: aPackage])
 		{

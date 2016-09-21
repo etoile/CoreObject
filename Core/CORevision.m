@@ -41,7 +41,7 @@
 
 - (NSUInteger)hash
 {
-	return (revisionInfo.revisionUUID).hash;
+	return revisionInfo.revisionUUID.hash;
 }
 
 - (NSArray *)propertyNames

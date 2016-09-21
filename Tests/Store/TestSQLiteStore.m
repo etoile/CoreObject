@@ -252,7 +252,7 @@ static ETUUID *childUUID2;
 {
     COBranchInfo *initialState = [[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID];
     
-    UKObjectsEqual(S(branchAUUID, branchBUUID, initialBranchUUID), [[store persistentRootInfoForUUID: prootUUID] branchUUIDs]);
+    UKObjectsEqual(S(branchAUUID, branchBUUID, initialBranchUUID), [store persistentRootInfoForUUID: prootUUID].branchUUIDs);
     
     // Delete it
 	{
@@ -302,7 +302,7 @@ static ETUUID *childUUID2;
     
     UKTrue([store finalizeDeletionsForPersistentRoot: prootUUID error: NULL]);
     UKNil([[store persistentRootInfoForUUID: prootUUID] branchInfoForUUID: branchAUUID]);
-    UKObjectsEqual(S(branchBUUID, initialBranchUUID), [[store persistentRootInfoForUUID: prootUUID] branchUUIDs]);
+    UKObjectsEqual(S(branchBUUID, initialBranchUUID), [store persistentRootInfoForUUID: prootUUID].branchUUIDs);
 }
 
 /**
@@ -376,7 +376,7 @@ static ETUUID *childUUID2;
 
 - (void) testSetCurrentBranch
 {
-    UKObjectsEqual(initialBranchUUID, [[store persistentRootInfoForUUID: prootUUID] currentBranchUUID]);
+    UKObjectsEqual(initialBranchUUID, [store persistentRootInfoForUUID: prootUUID].currentBranchUUID);
     
 	{
 		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
@@ -385,7 +385,7 @@ static ETUUID *childUUID2;
 		[self updateChangeCountAndCommitTransaction: txn];
     }
 	
-    UKObjectsEqual(branchAUUID, [[store persistentRootInfoForUUID: prootUUID] currentBranchUUID]);
+    UKObjectsEqual(branchAUUID, [store persistentRootInfoForUUID: prootUUID].currentBranchUUID);
 
 	{
 		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
@@ -394,7 +394,7 @@ static ETUUID *childUUID2;
 		[self updateChangeCountAndCommitTransaction: txn];
 	}
     
-    UKObjectsEqual(branchBUUID, [[store persistentRootInfoForUUID: prootUUID] currentBranchUUID]);
+    UKObjectsEqual(branchBUUID, [store persistentRootInfoForUUID: prootUUID].currentBranchUUID);
 }
 
 - (void) testSetCurrentVersion
@@ -515,8 +515,8 @@ static ETUUID *childUUID2;
                                                              encoding: NSUTF8StringEncoding
 																error: NULL ]);
     
-    UKTrue([[NSFileManager defaultManager] fileExistsAtPath: [[store URLForAttachmentID: hash1] path]]);
-    UKTrue([[NSFileManager defaultManager] fileExistsAtPath: [[store URLForAttachmentID: hash2] path]]);
+    UKTrue([[NSFileManager defaultManager] fileExistsAtPath: [store URLForAttachmentID: hash1].path]);
+    UKTrue([[NSFileManager defaultManager] fileExistsAtPath: [store URLForAttachmentID: hash2].path]);
 }
 
 - (void) testAttachmentFromData
@@ -527,7 +527,7 @@ static ETUUID *childUUID2;
     UKObjectsEqual(fakeAttachment, [NSString stringWithContentsOfURL: [store URLForAttachmentID: hash]
                                                             encoding: NSUTF8StringEncoding
 	                                                           error: NULL]);
-    UKTrue([[NSFileManager defaultManager] fileExistsAtPath: [[store URLForAttachmentID: hash] path]]);
+    UKTrue([[NSFileManager defaultManager] fileExistsAtPath: [store URLForAttachmentID: hash].path]);
 }
 
 - (void) testAttachmentsGCDoesNotCollectReferenced
@@ -601,9 +601,9 @@ static ETUUID *childUUID2;
                                                             encoding: NSUTF8StringEncoding
                                                               error: NULL]);
 
-    UKTrue([[NSFileManager defaultManager] fileExistsAtPath: [[store URLForAttachmentID: hash] path]]);
+    UKTrue([[NSFileManager defaultManager] fileExistsAtPath: [store URLForAttachmentID: hash].path]);
     UKTrue([store finalizeDeletionsForPersistentRoot: prootUUID error: NULL]);
-    UKFalse([[NSFileManager defaultManager] fileExistsAtPath: [[store URLForAttachmentID: hash] path]]);
+    UKFalse([[NSFileManager defaultManager] fileExistsAtPath: [store URLForAttachmentID: hash].path]);
 }
 
 /**
@@ -671,7 +671,7 @@ static ETUUID *childUUID2;
     CORevisionInfo *info = [store revisionInfoForRevisionUUID: initialRevisionUUID persistentRootUUID: prootUUID];
     UKNil(info.parentRevisionUUID);
     UKObjectsEqual(initialRevisionUUID, info.revisionUUID);
-	UKObjectsEqual([proot currentBranchUUID], info.branchUUID);
+	UKObjectsEqual(proot.currentBranchUUID, info.branchUUID);
 }
 
 - (void) checkHasTables: (BOOL)flag forUUID: (ETUUID *)aUUID
@@ -811,11 +811,11 @@ static ETUUID *childUUID2;
     
     // Verify that new UUIDs were generated
     UKObjectsNotEqual(prootUUID, copy.UUID);
-    UKObjectsNotEqual([proot branchUUIDs], [copy branchUUIDs]);
-    UKIntsEqual(1,  [[copy branchUUIDs] count]);
+    UKObjectsNotEqual(proot.branchUUIDs, copy.branchUUIDs);
+    UKIntsEqual(1,  copy.branchUUIDs.count);
     
     // Check that the current branch is set correctly
-    UKObjectsEqual([[copy branchUUIDs] anyObject], [copy currentBranchUUID]);
+    UKObjectsEqual([copy.branchUUIDs anyObject], copy.currentBranchUUID);
     
     // Check that the branch data is the same
 
@@ -904,8 +904,8 @@ static ETUUID *childUUID2;
 
     UKObjectsEqual(rootUUID, [store rootObjectUUIDForPersistentRoot: proot.UUID]);
     UKObjectsEqual(rootUUID, [store rootObjectUUIDForPersistentRoot: cheapCopy.UUID]);
-    UKObjectsEqual(initialBranchUUID, [[store persistentRootInfoForUUID: prootUUID] currentBranchUUID]);
-    UKObjectsEqual(cheapCopyBranchUUID, [[store persistentRootInfoForUUID: cheapCopyUUID] currentBranchUUID]);
+    UKObjectsEqual(initialBranchUUID, [store persistentRootInfoForUUID: prootUUID].currentBranchUUID);
+    UKObjectsEqual(cheapCopyBranchUUID, [store persistentRootInfoForUUID: cheapCopyUUID].currentBranchUUID);
 }
 
 - (void)testReopenStore

@@ -162,11 +162,11 @@
 - (void) sendPushToClient: (NSString *)clientID
 {
 	ETUUID *lastConfirmedForClient = lastSentRevisionForClientID[clientID];
-	if ([lastConfirmedForClient isEqual: (branch.currentRevision).UUID])
+	if ([lastConfirmedForClient isEqual: branch.currentRevision.UUID])
 	{
 		return;
 	}
-	lastSentRevisionForClientID[clientID] = (branch.currentRevision).UUID;
+	lastSentRevisionForClientID[clientID] = branch.currentRevision.UUID;
 	
 	NSMutableArray *revs = [[NSMutableArray alloc] init];
 	

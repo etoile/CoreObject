@@ -77,7 +77,7 @@
 {
 	item1.color = [NSColor redColor];
 	
-	UKObjectsEqual(@"#ffff0000", [[item1 storeItem] valueForAttribute: @"color"]);
+	UKObjectsEqual(@"#ffff0000", [item1.storeItem valueForAttribute: @"color"]);
 }
 
 - (void) testRoundTrip

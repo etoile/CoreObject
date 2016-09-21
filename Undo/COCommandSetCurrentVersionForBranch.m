@@ -116,7 +116,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 //    COBranch *branch = [proot branchForUUID: _branchUUID];
 //	ETAssert(branch != nil);
 //
-//    if ([[branch.currentRevision UUID] isEqual: _oldRevisionUUID])
+//    if (branch.currentRevision.UUID isEqual: _oldRevisionUUID])
 //    {
 //        return YES;
 //    }
@@ -124,7 +124,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 //    {
 //        COItemGraphDiff *merged = [self diffToSelectivelyApplyToContext: aContext];
 //        
-//        return ![merged hasConflicts];
+//        return !merged.hasConflicts;
 //    }
 }
 
@@ -136,7 +136,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
     COBranch *branch = [proot branchForUUID: _branchUUID];
 	ETAssert(branch != nil);
 
-    if ([(branch.currentRevision).UUID isEqual: _oldRevisionUUID]
+    if ([branch.currentRevision.UUID isEqual: _oldRevisionUUID]
 		&& branch.supportsRevert)
     {
         branch.currentRevision = [aContext revisionForRevisionUUID: _newRevisionUUID persistentRootUUID: _persistentRootUUID];
@@ -150,7 +150,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
     }
     else
     {
-		_currentRevisionBeforeSelectiveApply = (branch.currentRevision).UUID;
+		_currentRevisionBeforeSelectiveApply = branch.currentRevision.UUID;
 		
         CODiffManager *merged = [self diffToSelectivelyApplyToBranchCurrentRevision: _currentRevisionBeforeSelectiveApply
 															 assumingEditingContext: aContext];
@@ -301,7 +301,7 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 
 - (ETUUID *)UUID
 {
-	return (self.revision).UUID;
+	return self.revision.UUID;
 }
 
 - (ETUUID *)branchUUID
@@ -311,17 +311,17 @@ static NSString * const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevision
 
 - (NSDictionary *)metadata
 {
-	return (self.revision).metadata;
+	return self.revision.metadata;
 }
 
 - (NSDate *)date
 {
-	return (self.revision).date;
+	return self.revision.date;
 }
 
 - (NSString *)localizedShortDescription
 {
-	return (self.revision).localizedShortDescription;
+	return self.revision.localizedShortDescription;
 }
 
 - (id) copyWithZone:(NSZone *)zone

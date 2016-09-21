@@ -36,8 +36,8 @@
     
 	[ctx commit];
 	
-	UKFalse([persistentRoot.objectGraphContext hasChanges]);
-	UKFalse([originalBranch.objectGraphContext hasChanges]);
+	UKFalse(persistentRoot.objectGraphContext.hasChanges);
+	UKFalse(originalBranch.objectGraphContext.hasChanges);
 	
 	UKNotNil(originalBranch.currentRevision);
 	UKNotNil(originalBranch.headRevision);
@@ -45,7 +45,7 @@
 	altBranch = [originalBranch makeBranchWithLabel: @"altBranch"];
 	[ctx commit];
 
-	UKFalse([altBranch.objectGraphContext hasChanges]);
+	UKFalse(altBranch.objectGraphContext.hasChanges);
 	
     _testTrack = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
     [_testTrack clear];
@@ -300,36 +300,36 @@
     
     UKObjectsNotSame(branchA.objectGraphContext, branchB.objectGraphContext);
     UKObjectsNotSame([branchA.objectGraphContext rootObject], [branchB.objectGraphContext rootObject]);
-    UKFalse([branchA.objectGraphContext hasChanges]);
-    UKFalse([branchB.objectGraphContext hasChanges]);
+    UKFalse(branchA.objectGraphContext.hasChanges);
+    UKFalse(branchB.objectGraphContext.hasChanges);
     
     COObject *branchBroot = branchB.objectGraphContext.rootObject;
     [branchBroot setValue: @"photo1, branch B" forProperty: @"label"];
     
-    UKFalse([branchA.objectGraphContext hasChanges]);
-    UKTrue([branchB.objectGraphContext hasChanges]);
-    UKObjectsEqual(S(branchBroot.UUID), SA([branchA.objectGraphContext itemUUIDs]));
-    UKObjectsEqual(S(branchBroot.UUID), SA([branchB.objectGraphContext itemUUIDs]));
+    UKFalse(branchA.objectGraphContext.hasChanges);
+    UKTrue(branchB.objectGraphContext.hasChanges);
+    UKObjectsEqual(S(branchBroot.UUID), SA(branchA.objectGraphContext.itemUUIDs));
+    UKObjectsEqual(S(branchBroot.UUID), SA(branchB.objectGraphContext.itemUUIDs));
     
     COObject *childB = [branchB.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     [childB setValue: @"childB" forProperty: @"label"];
     
-    UKFalse([branchA.objectGraphContext hasChanges]);
-    UKTrue([branchB.objectGraphContext hasChanges]);
-    UKObjectsEqual(S(branchBroot.UUID),                SA([branchA.objectGraphContext itemUUIDs]));
-    UKObjectsEqual(S(branchBroot.UUID, childB.UUID), SA([branchB.objectGraphContext itemUUIDs]));
+    UKFalse(branchA.objectGraphContext.hasChanges);
+    UKTrue(branchB.objectGraphContext.hasChanges);
+    UKObjectsEqual(S(branchBroot.UUID),                SA(branchA.objectGraphContext.itemUUIDs));
+    UKObjectsEqual(S(branchBroot.UUID, childB.UUID), SA(branchB.objectGraphContext.itemUUIDs));
     
     [branchBroot insertObject: childB atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 
-    UKFalse([branchA.objectGraphContext hasChanges]);
-    UKTrue([branchB.objectGraphContext hasChanges]);
-    UKObjectsEqual(S(branchBroot.UUID),                SA([branchA.objectGraphContext itemUUIDs]));
-    UKObjectsEqual(S(branchBroot.UUID, childB.UUID), SA([branchB.objectGraphContext itemUUIDs]));
+    UKFalse(branchA.objectGraphContext.hasChanges);
+    UKTrue(branchB.objectGraphContext.hasChanges);
+    UKObjectsEqual(S(branchBroot.UUID),                SA(branchA.objectGraphContext.itemUUIDs));
+    UKObjectsEqual(S(branchBroot.UUID, childB.UUID), SA(branchB.objectGraphContext.itemUUIDs));
     
     [ctx commit];
     
-    UKFalse([branchA.objectGraphContext hasChanges]);
-    UKFalse([branchB.objectGraphContext hasChanges]);
+    UKFalse(branchA.objectGraphContext.hasChanges);
+    UKFalse(branchB.objectGraphContext.hasChanges);
 }
 
 - (void) testBranchLabel
@@ -602,7 +602,7 @@
 		
 		 testBranch.currentRevision = firstRevision;
 		 UKTrue(testBranch.hasChanges);
-		 UKFalse([testBranch.objectGraphContext hasChanges]);
+		 UKFalse(testBranch.objectGraphContext.hasChanges);
 		 UKNil([testBranch.rootObject label]);
 
 		 [testBranch discardAllChanges];

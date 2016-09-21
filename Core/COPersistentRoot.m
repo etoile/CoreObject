@@ -283,7 +283,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 	for (COBranch *branch in self.branches)
 	{
-		NSDate *date = (branch.headRevision).date;
+		NSDate *date = branch.headRevision.date;
 
 		if (maxDate != nil && [[date earlierDate: maxDate] isEqualToDate: date])
 			continue;
@@ -295,7 +295,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSDate *)creationDate
 {
-	return (self.currentBranch.firstRevision).date;
+	return self.currentBranch.firstRevision.date;
 }
 
 - (COPersistentRoot *)parentPersistentRoot

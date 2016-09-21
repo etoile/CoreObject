@@ -170,7 +170,7 @@
 	ETAssert(characterIndex <= [self length]);
 	
 	if (characterIndex == self.length)
-		return (self.chunks).count;
+		return self.chunks.count;
 	
 	NSUInteger chunkIndex = 0, chunkStart = 0;
 	COAttributedStringChunk *chunk = [self chunkContainingIndex: characterIndex chunkStart: &chunkStart chunkIndex: &chunkIndex];
@@ -241,7 +241,7 @@
 		
 		// Look right
 		
-		for (NSInteger j=chunkIndex+1; j<(self.chunks).count; j++)
+		for (NSInteger j=chunkIndex+1; j<self.chunks.count; j++)
 		{
 			COAttributedStringChunk *rightChunk = self.chunks[j];
 			if ([COAttributedStringAttribute isAttributeSet: rightChunk.attributes equalToSet: attribs])

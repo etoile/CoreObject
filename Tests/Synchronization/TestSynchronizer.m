@@ -131,11 +131,11 @@
 		UKObjectKindOf(serverMessage0, COSynchronizerPushedRevisionsFromClientMessage);
 		UKObjectsEqual(client.clientID, serverMessage0.clientID);
 		UKIntsEqual(1, serverMessage0.revisions.count);
-		UKObjectsEqual([clientChild1.revision.parentRevision UUID], serverMessage0.lastRevisionUUIDSentByServer);
+		UKObjectsEqual(clientChild1.revision.parentRevision.UUID, serverMessage0.lastRevisionUUIDSentByServer);
 		
 		COSynchronizerRevision *serverMessage0Rev0 = serverMessage0.revisions[0];
-		UKObjectsEqual([clientChild1.revision UUID], serverMessage0Rev0.revisionUUID);
-		UKObjectsEqual([clientChild1.revision.parentRevision UUID], serverMessage0Rev0.parentRevisionUUID);
+		UKObjectsEqual(clientChild1.revision.UUID, serverMessage0Rev0.revisionUUID);
+		UKObjectsEqual(clientChild1.revision.parentRevision.UUID, serverMessage0Rev0.parentRevisionUUID);
 	}
 	
 	UKIntsEqual(1, self.clientMessages.count);
@@ -145,8 +145,8 @@
 		UKIntsEqual(1, clientMessage0.revisions.count);
 		
 		COSynchronizerRevision *clientMessage0Rev0 = clientMessage0.revisions[0];
-		UKObjectsEqual([serverChild1.revision UUID], clientMessage0Rev0.revisionUUID);
-		UKObjectsEqual([serverChild1.revision.parentRevision UUID], clientMessage0Rev0.parentRevisionUUID);
+		UKObjectsEqual(serverChild1.revision.UUID, clientMessage0Rev0.revisionUUID);
+		UKObjectsEqual(serverChild1.revision.parentRevision.UUID, clientMessage0Rev0.parentRevisionUUID);
 	}
 	
 	// Server should merge in client's changes, and send a push response back to the client
@@ -162,17 +162,17 @@
 	{
 		COSynchronizerResponseToClientForSentRevisionsMessage *clientMessage1 = self.clientMessages[1];
 		UKObjectKindOf(clientMessage1, COSynchronizerResponseToClientForSentRevisionsMessage);
-		UKObjectsEqual([clientChild1.revision UUID], clientMessage1.lastRevisionUUIDSentByClient);
+		UKObjectsEqual(clientChild1.revision.UUID, clientMessage1.lastRevisionUUIDSentByClient);
 		// Server should be sending serverChild1.revision.parentRevision, as well as the clients changes rebased on to that (serverChild1.revision)
 		UKIntsEqual(2, clientMessage1.revisions.count);
 		
 		COSynchronizerRevision *clientMessage1Rev0 = clientMessage1.revisions[0];
-		UKObjectsEqual([[serverChild1.revision.parentRevision parentRevision] UUID], clientMessage1Rev0.parentRevisionUUID);
-		UKObjectsEqual([serverChild1.revision.parentRevision UUID], clientMessage1Rev0.revisionUUID);
+		UKObjectsEqual([serverChild1.revision.parentRevision parentRevision].UUID, clientMessage1Rev0.parentRevisionUUID);
+		UKObjectsEqual(serverChild1.revision.parentRevision.UUID, clientMessage1Rev0.revisionUUID);
 		
 		COSynchronizerRevision *clientMessage1Rev1 = clientMessage1.revisions[1];
-		UKObjectsEqual([serverChild1.revision.parentRevision UUID], clientMessage1Rev1.parentRevisionUUID);
-		UKObjectsEqual([serverChild1.revision UUID], clientMessage1Rev1.revisionUUID);
+		UKObjectsEqual(serverChild1.revision.parentRevision.UUID, clientMessage1Rev1.parentRevisionUUID);
+		UKObjectsEqual(serverChild1.revision.UUID, clientMessage1Rev1.revisionUUID);
 	}
 
 	// Deliver the response to the client
@@ -382,7 +382,7 @@
 	// Make sure that the client doesn't do any unnecessary rebasing
 	ETUUID *clientABCRevision = clientBranch.currentRevision.UUID;
 	[transport deliverMessagesToClient];
-	UKObjectsEqual(clientABCRevision, [clientBranch.currentRevision UUID]);
+	UKObjectsEqual(clientABCRevision, clientBranch.currentRevision.UUID);
 	UKObjectsEqual(@"abc", clientWrapper.string);
 
 	// 'ab' and 'abc' commits -> server

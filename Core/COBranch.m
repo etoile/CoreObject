@@ -550,7 +550,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
     }
 #endif
     
-    CORevision *revision = (self.currentRevision).parentRevision;
+    CORevision *revision = self.currentRevision.parentRevision;
     return revision;
 }
 
@@ -927,7 +927,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 - (id)rootObject
 {
-    return (self.objectGraphContext).rootObject;
+    return self.objectGraphContext.rootObject;
 }
 
 /**
@@ -936,7 +936,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 - (COObjectGraphContext *)modifiedItemsSource
 {
 	if (self == _persistentRoot.currentBranch
-		&& (_persistentRoot.objectGraphContext).hasChanges)
+		&& _persistentRoot.objectGraphContext.hasChanges)
 	{
 		COObjectGraphContext *graph = _persistentRoot.objectGraphContext;
 		

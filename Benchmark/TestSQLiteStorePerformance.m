@@ -147,7 +147,7 @@ static int itemChangedAtCommit(int i)
 						   parentRevisionID: revisionUUIDs.lastObject
 					  mergeParentRevisionID: nil
 						 persistentRootUUID: proot.UUID
-								 branchUUID: [proot currentBranchUUID]];
+								 branchUUID: proot.currentBranchUUID];
 		
         [revisionUUIDs addObject: revisionUUID];
     }
@@ -156,7 +156,7 @@ static int itemChangedAtCommit(int i)
     
     [txn setCurrentRevision: revisionUUIDs.lastObject
 			   headRevision: revisionUUIDs.lastObject
-				  forBranch: [proot currentBranchUUID]
+				  forBranch: proot.currentBranchUUID
              ofPersistentRoot: proot.UUID];
     
 	UKTrue([store commitStoreTransaction: txn]);
@@ -192,7 +192,7 @@ static int itemChangedAtCommit(int i)
     }
     
     COMutableItem *rootItem = [COMutableItem item];
-    [rootItem setValue: [dict allKeys]
+    [rootItem setValue: dict.allKeys
           forAttribute: @"children" type: kCOTypeArray | kCOTypeCompositeReference];
     [dict setObject: rootItem forKey: rootItem.UUID];
     

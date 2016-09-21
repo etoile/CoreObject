@@ -39,7 +39,7 @@
 	{
 		return NO;
 	}
-	return (_sourceObject.objectGraphContext).trackingSpecificBranch;
+	return _sourceObject.objectGraphContext.trackingSpecificBranch;
 }
 
 - (BOOL)isSourceObjectBranchDeleted
@@ -103,7 +103,7 @@
 	   On slide 2 of 'cross persistent root reference semantics.key',
 	   this corresponds to the non-current branch Lucy (A) viewing the dotted incoming references from
 	   Group (A). */
-	if ((_owner.objectGraphContext).trackingSpecificBranch)
+	if (_owner.objectGraphContext.trackingSpecificBranch)
 	{
 		COObject *currentBranchRootObject = _owner.persistentRoot.rootObject;
 		NSSet *referringObjectsToCurrentBranch = [currentBranchRootObject.incomingRelationshipCache referringObjectsForPropertyInTarget: aProperty];		

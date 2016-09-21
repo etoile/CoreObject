@@ -792,7 +792,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 - (NSSet *)allEdits
 {
-	return [diffDict allEdits];
+	return diffDict.allEdits;
 }
 - (NSSet *)conflicts
 {

@@ -195,7 +195,7 @@
 	[self loadAllPersistentRootsIfNeeded];
 	
 	/* Force deleted persistent roots to be reloaded (see -unloadPersistentRoot:) */
-	for (ETUUID *persistentRootUUID in (self.store).deletedPersistentRootUUIDs)
+	for (ETUUID *persistentRootUUID in self.store.deletedPersistentRootUUIDs)
 	{
 		 [self persistentRootForUUID: persistentRootUUID];
 	}

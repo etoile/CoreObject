@@ -130,7 +130,7 @@
 		 UKObjectsEqual([NSSet set], testCtx.persistentRootsPendingDeletion);
 		 UKObjectsEqual([NSSet set], testCtx.deletedPersistentRoots);
 		 UKNotNil([testCtx persistentRootForUUID: uuid]);
-		 UKNotNil([[testCtx store] persistentRootInfoForUUID: uuid]);
+		 UKNotNil([testCtx.store persistentRootInfoForUUID: uuid]);
 		 UKFalse(testProot.deleted);
 	 }];
     
@@ -164,7 +164,7 @@
 		 UKIntsEqual(1, [testCtx.deletedPersistentRoots count]);
 		 /* You can still retrieve a deleted persistent root, until the deletion is finalized */
 		 UKNotNil([testCtx persistentRootForUUID: uuid]);
-		 UKNotNil([[testCtx store] persistentRootInfoForUUID: uuid]);
+		 UKNotNil([testCtx.store persistentRootInfoForUUID: uuid]);
 		 UKTrue(testProot.deleted);
 	 }];
 }
@@ -198,7 +198,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		UKFalse([[[testCtx store] persistentRootInfoForUUID: uuid] isDeleted]);
+		UKFalse([[testCtx.store persistentRootInfoForUUID: uuid] isDeleted]);
 		UKFalse(testCtx.hasChanges);
 		UKObjectsEqual(S(testProot), testCtx.persistentRoots);
 		UKObjectsEqual([NSSet set], testCtx.persistentRootsPendingDeletion);

@@ -190,8 +190,8 @@ static COPath *Path(unsigned char num)
 
 - (void) testItemsPreparedCorrectly
 {
-	UKObjectsEqual(SA([asc attributeNames]), SA([dsc attributeNames]));
-	UKObjectsNotEqual([asc attributeNames], [dsc attributeNames]);
+	UKObjectsEqual(SA(asc.attributeNames), SA(dsc.attributeNames));
+	UKObjectsNotEqual(asc.attributeNames, dsc.attributeNames);
 
 	for (NSString *key in asc.attributeNames)
 	{

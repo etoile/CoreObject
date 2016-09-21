@@ -38,7 +38,7 @@
 {
 	for (int i = 0; i < NUM_PERSISTENT_ROOTS; i++)
 	{
-		[[proots[i] store] itemGraphForRevisionUUID: [[proots[i] currentRevision] UUID]
+		[[proots[i] store] itemGraphForRevisionUUID: [proots[i] currentRevision].UUID
 									 persistentRoot: [proots[i] UUID]];
 	}
 }
@@ -47,7 +47,7 @@
 {
 	for (int i = 0; i < NUM_PERSISTENT_ROOTS; i++)
 	{
-		[[proots[i] store] itemGraphForRevisionUUID: [[proots[i] currentRevision] UUID]
+		[[proots[i] store] itemGraphForRevisionUUID: [proots[i] currentRevision].UUID
 									 persistentRoot: [proots[i] UUID]];
 	}
 }

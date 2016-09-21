@@ -160,8 +160,8 @@
 
 		NSDictionary *diffOutput = [ourSubDiff addedOrUpdatedItemsForApplyingTo: dest];
 		
-		assert(![[NSSet setWithArray: [itemsByUUID allKeys]]
-				 intersectsSet: [NSSet setWithArray: [diffOutput allKeys]]]);
+		assert(![[NSSet setWithArray: itemsByUUID.allKeys]
+				 intersectsSet: [NSSet setWithArray: diffOutput.allKeys]]);
 		
 		[itemsByUUID addEntriesFromDictionary: diffOutput];
 	}

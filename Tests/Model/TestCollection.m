@@ -70,16 +70,16 @@
 	UKTrue([ctx.libraryGroup.content isEmpty]);
 
 	/* Accessing libraries will create them */
-	NSSet *someLibs = S([ctx bookmarkLibrary], [ctx noteLibrary]);
+	NSSet *someLibs = S(ctx.bookmarkLibrary, ctx.noteLibrary);
 
-	UKObjectsEqual(someLibs, SA([[ctx libraryGroup] content]));
+	UKObjectsEqual(someLibs, SA(ctx.libraryGroup.content));
 }
 
 - (void)testLibraryForContentType
 {
 	ETEntityDescription *bookmarkType = [ctx.modelDescriptionRepository descriptionForName: @"COBookmark"];
 
-	UKObjectsEqual([ctx bookmarkLibrary], [ctx libraryForContentType: bookmarkType]);
+	UKObjectsEqual(ctx.bookmarkLibrary, [ctx libraryForContentType: bookmarkType]);
 }
 
 - (void)testBookmarkLibrary
@@ -124,7 +124,7 @@
 	UKObjectsEqual(S(@"objects", @"tagGroups", @"tags"), [library multivaluedPropertyNames]);
 	UKObjectsEqual([ETUTI typeWithClass: [COTag class]], library.objectType);
 	UKTrue([library.content isKindOfClass: [NSMutableArray class]]);
-	UKTrue([[library tagGroups] isKindOfClass: [NSMutableArray class]]);
+	UKTrue([library.tagGroups isKindOfClass: [NSMutableArray class]]);
 }
 
 - (void)testTagGroup
@@ -142,12 +142,12 @@
 
 	UKObjectsEqual([ETUTI typeWithClass: [COTag class]], tagGroup.objectType);
 	UKTrue([tagGroup.content isKindOfClass: [NSMutableArray class]]);
-	UKTrue([[tag tagGroups] isKindOfClass: [NSSet class]]);
+	UKTrue([tag.tagGroups isKindOfClass: [NSSet class]]);
 
 	[tagGroup addObject: tag];
 
 	UKObjectsEqual(A(tag), tagGroup.content);
-	UKObjectsEqual(S(tagGroup), [tag tagGroups]);
+	UKObjectsEqual(S(tagGroup), tag.tagGroups);
 }
 
 - (void)testTag
@@ -160,14 +160,14 @@
 
 	UKObjectsEqual([ETUTI typeWithClass: [COObject class]], tag.objectType);
 	UKTrue([tag.content isKindOfClass: [NSMutableArray class]]);
-	UKTrue([[object tags] isKindOfClass: [NSSet class]]);
+	UKTrue([object.tags isKindOfClass: [NSSet class]]);
 
 	[tag addObject: object];
 	tag.name = @"bird";
 
 	UKObjectsEqual(A(object), tag.content);
-	UKObjectsEqual(S(tag), [object tags]);
-	UKStringsEqual(@"bird", [object tagDescription]);
+	UKObjectsEqual(S(tag), object.tags);
+	UKStringsEqual(@"bird", object.tagDescription);
 }
 
 - (void)testCollectionContainingCheapCopyAndOriginal
@@ -184,8 +184,8 @@
 	[tag addObject: copy];
 
 	UKObjectsEqual(A(original, copy), tag.content);
-	UKObjectsEqual(S(tag), [original tags]);
-	UKObjectsEqual(S(tag), [copy tags]);
+	UKObjectsEqual(S(tag), original.tags);
+	UKObjectsEqual(S(tag), copy.tags);
 }
 
 - (void)testSimpleCrossReference
@@ -198,7 +198,7 @@
 	[tag addObject: original];
 	
 	UKObjectsEqual(A(original), tag.content);
-	UKObjectsEqual(S(tag), [original tags]);
+	UKObjectsEqual(S(tag), original.tags);
 }
 - (void)testSmartGroup
 {

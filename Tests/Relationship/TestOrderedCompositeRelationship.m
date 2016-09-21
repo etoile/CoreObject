@@ -132,7 +132,7 @@
 	UKObjectsEqual(A(child1, child2), parent.contents);
 	
 	// Verify at the store item level too
-	UKObjectsEqual(A(child1.UUID, child2.UUID), [[parent storeItem] valueForAttribute: @"contents"]);
+	UKObjectsEqual(A(child1.UUID, child2.UUID), [parent.storeItem valueForAttribute: @"contents"]);
 }
 
 - (void) testIllegalDirectModificationOfCollection

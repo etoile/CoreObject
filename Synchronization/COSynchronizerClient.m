@@ -100,7 +100,7 @@
 										 branchUUID: message.branchUUID];
 	}
 	
-	ETAssert([[_ctx store] commitStoreTransaction: txn]);
+	ETAssert([_ctx.store commitStoreTransaction: txn]);
 
 	persistentRoot = [_ctx persistentRootForUUID: message.persistentRootUUID];
 	ETAssert(persistentRoot != nil);

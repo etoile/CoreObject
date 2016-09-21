@@ -75,7 +75,7 @@
 	{
 		plist[@"branchMetadata"] = message.branchMetadata;
 	}
-	plist[@"currentRevision"] = (message.currentRevision).propertyList;
+	plist[@"currentRevision"] = message.currentRevision.propertyList;
 	plist[@"class"] = @"COSynchronizerPersistentRootInfoToClientMessage";
 	[self sendPropertyList: plist toClient: aClient];
 }

@@ -523,7 +523,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		chunk.text = [chunk.text stringByReplacingCharactersInRange: NSMakeRange(0, lengthInChunkToReplace) withString: @""];
 		remainingLengthToDelete -= lengthInChunkToReplace;
 		
-		if ((chunk.text).length == 0)
+		if (chunk.text.length == 0)
 		{
 			[[_backing mutableArrayValueForKey: @"chunks"] removeObjectAtIndex: chunkIndex--];
 		}

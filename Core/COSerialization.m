@@ -679,7 +679,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 // TODO: Could replace -loadingItemGraph as a semi-private COObjectGraphContext API.
 - (COItem *) itemForUUIDDuringLoading: (ETUUID *)aUUID
 {
-	COItem *item = [(self.objectGraphContext).loadingItemGraph itemForUUID: aUUID];
+	COItem *item = [self.objectGraphContext.loadingItemGraph itemForUUID: aUUID];
 
 	if (item == nil)
 	{
