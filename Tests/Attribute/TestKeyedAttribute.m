@@ -35,12 +35,12 @@
 	NSArray *keyedProperties = model.additionalStoreItemUUIDs.allKeys;
 
 	UKIntsEqual(1, keyedProperties.count);
-	UKStringsEqual(@"entries", [keyedProperties firstObject]);
+	UKStringsEqual(@"entries", keyedProperties.firstObject);
 }
 
 - (ETUUID *)dictionaryItemUUID
 {
-	return [model.additionalStoreItemUUIDs.allValues firstObject];
+	return model.additionalStoreItemUUIDs.allValues.firstObject;
 }
 
 - (COItem *)dictionaryItem
@@ -157,14 +157,14 @@
 	               hint: [ETKeyValuePair pairWithKey: @"vegetable" value: @"leak"]
 	        forProperty: @"entries"];
 
-	UKObjectsEqual(D(@"pear", @"fruit", @"leak", @"vegetable"), [[model entries] content]);
+	UKObjectsEqual(D(@"pear", @"fruit", @"leak", @"vegetable"), model.entries.content);
 
 	[model removeObject: nil
 	            atIndex: ETUndeterminedIndex
 	               hint: [ETKeyValuePair pairWithKey: @"fruit" value: nil]
 	        forProperty: @"entries"];
 			
-	UKObjectsEqual(D(@"leak", @"vegetable"), [[model entries] content]);
+	UKObjectsEqual(D(@"leak", @"vegetable"), model.entries.content);
 }
 
 - (void)testSerializationRoundTrip

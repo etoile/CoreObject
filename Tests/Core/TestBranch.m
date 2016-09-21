@@ -36,8 +36,8 @@
     
 	[ctx commit];
 	
-	UKFalse([[persistentRoot objectGraphContext] hasChanges]);
-	UKFalse([[originalBranch objectGraphContext] hasChanges]);
+	UKFalse([persistentRoot.objectGraphContext hasChanges]);
+	UKFalse([originalBranch.objectGraphContext hasChanges]);
 	
 	UKNotNil(originalBranch.currentRevision);
 	UKNotNil(originalBranch.headRevision);
@@ -45,7 +45,7 @@
 	altBranch = [originalBranch makeBranchWithLabel: @"altBranch"];
 	[ctx commit];
 
-	UKFalse([[altBranch objectGraphContext] hasChanges]);
+	UKFalse([altBranch.objectGraphContext hasChanges]);
 	
     _testTrack = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
     [_testTrack clear];
@@ -298,38 +298,38 @@
     COBranch *branchA = photo1.currentBranch;
     COBranch *branchB = [branchA makeBranchWithLabel: @"branchB"];
     
-    UKObjectsNotSame([branchA objectGraphContext], [branchB objectGraphContext]);
-    UKObjectsNotSame([[branchA objectGraphContext] rootObject], [[branchB objectGraphContext] rootObject]);
-    UKFalse([[branchA objectGraphContext] hasChanges]);
-    UKFalse([[branchB objectGraphContext] hasChanges]);
+    UKObjectsNotSame(branchA.objectGraphContext, branchB.objectGraphContext);
+    UKObjectsNotSame([branchA.objectGraphContext rootObject], [branchB.objectGraphContext rootObject]);
+    UKFalse([branchA.objectGraphContext hasChanges]);
+    UKFalse([branchB.objectGraphContext hasChanges]);
     
     COObject *branchBroot = branchB.objectGraphContext.rootObject;
     [branchBroot setValue: @"photo1, branch B" forProperty: @"label"];
     
-    UKFalse([[branchA objectGraphContext] hasChanges]);
-    UKTrue([[branchB objectGraphContext] hasChanges]);
-    UKObjectsEqual(S(branchBroot.UUID), SA([[branchA objectGraphContext] itemUUIDs]));
-    UKObjectsEqual(S(branchBroot.UUID), SA([[branchB objectGraphContext] itemUUIDs]));
+    UKFalse([branchA.objectGraphContext hasChanges]);
+    UKTrue([branchB.objectGraphContext hasChanges]);
+    UKObjectsEqual(S(branchBroot.UUID), SA([branchA.objectGraphContext itemUUIDs]));
+    UKObjectsEqual(S(branchBroot.UUID), SA([branchB.objectGraphContext itemUUIDs]));
     
     COObject *childB = [branchB.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     [childB setValue: @"childB" forProperty: @"label"];
     
-    UKFalse([[branchA objectGraphContext] hasChanges]);
-    UKTrue([[branchB objectGraphContext] hasChanges]);
-    UKObjectsEqual(S(branchBroot.UUID),                SA([[branchA objectGraphContext] itemUUIDs]));
-    UKObjectsEqual(S(branchBroot.UUID, childB.UUID), SA([[branchB objectGraphContext] itemUUIDs]));
+    UKFalse([branchA.objectGraphContext hasChanges]);
+    UKTrue([branchB.objectGraphContext hasChanges]);
+    UKObjectsEqual(S(branchBroot.UUID),                SA([branchA.objectGraphContext itemUUIDs]));
+    UKObjectsEqual(S(branchBroot.UUID, childB.UUID), SA([branchB.objectGraphContext itemUUIDs]));
     
     [branchBroot insertObject: childB atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 
-    UKFalse([[branchA objectGraphContext] hasChanges]);
-    UKTrue([[branchB objectGraphContext] hasChanges]);
-    UKObjectsEqual(S(branchBroot.UUID),                SA([[branchA objectGraphContext] itemUUIDs]));
-    UKObjectsEqual(S(branchBroot.UUID, childB.UUID), SA([[branchB objectGraphContext] itemUUIDs]));
+    UKFalse([branchA.objectGraphContext hasChanges]);
+    UKTrue([branchB.objectGraphContext hasChanges]);
+    UKObjectsEqual(S(branchBroot.UUID),                SA([branchA.objectGraphContext itemUUIDs]));
+    UKObjectsEqual(S(branchBroot.UUID, childB.UUID), SA([branchB.objectGraphContext itemUUIDs]));
     
     [ctx commit];
     
-    UKFalse([[branchA objectGraphContext] hasChanges]);
-    UKFalse([[branchB objectGraphContext] hasChanges]);
+    UKFalse([branchA.objectGraphContext hasChanges]);
+    UKFalse([branchB.objectGraphContext hasChanges]);
 }
 
 - (void) testBranchLabel
@@ -602,7 +602,7 @@
 		
 		 testBranch.currentRevision = firstRevision;
 		 UKTrue(testBranch.hasChanges);
-		 UKFalse([[testBranch objectGraphContext] hasChanges]);
+		 UKFalse([testBranch.objectGraphContext hasChanges]);
 		 UKNil([testBranch.rootObject label]);
 
 		 [testBranch discardAllChanges];
@@ -805,8 +805,8 @@
 	[self checkPersistentRootWithExistingAndNewContext: proot2
 										inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 OverriddenIsEqualObject *testObj1 = [[testProot objectGraphContext] loadedObjectForUUID: obj1.UUID];
-		 OverriddenIsEqualObject *testObj2 = [[testProot objectGraphContext] loadedObjectForUUID: obj2.UUID];
+		 OverriddenIsEqualObject *testObj1 = [testProot.objectGraphContext loadedObjectForUUID: obj1.UUID];
+		 OverriddenIsEqualObject *testObj2 = [testProot.objectGraphContext loadedObjectForUUID: obj2.UUID];
 
 		 UKNotNil(testObj1);
 		 UKNotNil(testObj2);
@@ -820,8 +820,8 @@
 #if 0
 - (void) testGarbageObjectsNotCommitted
 {
-	OutlineItem *garbage = [[OutlineItem alloc] initWithObjectGraphContext: [persistentRoot objectGraphContext]];
-	OutlineItem *notGarbage = [[OutlineItem alloc] initWithObjectGraphContext: [persistentRoot objectGraphContext]];
+	OutlineItem *garbage = [[OutlineItem alloc] initWithObjectGraphContext: persistentRoot.objectGraphContext];
+	OutlineItem *notGarbage = [[OutlineItem alloc] initWithObjectGraphContext: persistentRoot.objectGraphContext];
 
 	rootObj.contents = @[notGarbage];
 		
@@ -832,7 +832,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKNil([[testProot objectGraphContext] loadedObjectForUUID: garbage.UUID]);
+		 UKNil([testProot.objectGraphContext loadedObjectForUUID: garbage.UUID]);
 	 }];
 	
 	// Implementation test: pull out the actual store revision and make sure it doesn't contain garbage
@@ -857,7 +857,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKNotNil([[testProot objectGraphContext] loadedObjectForUUID: garbage.UUID]);
+		 UKNotNil([testProot.objectGraphContext loadedObjectForUUID: garbage.UUID]);
 	 }];
 	
 	/* Now delete 'garbage' from its parent, making it actually garbage */
@@ -878,7 +878,7 @@
 	 {
 		 if (isNewContext)
 		 {
-			 UKNil([[testProot objectGraphContext] loadedObjectForUUID: garbage.UUID]);
+			 UKNil([testProot.objectGraphContext loadedObjectForUUID: garbage.UUID]);
 		 }
 	 }];
 }

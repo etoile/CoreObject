@@ -27,7 +27,7 @@
 {
 	for (int commit=0; commit < NUM_COMMITS_PER_EDITING_SESSION; commit++)
 	{
-		OutlineItem *item = [[OutlineItem alloc] initWithObjectGraphContext: [proot objectGraphContext]];
+		OutlineItem *item = [[OutlineItem alloc] initWithObjectGraphContext: proot.objectGraphContext];
 		item.label = [NSString stringWithFormat: @"Commit %d", commit];
 		[[proot.rootObject mutableArrayValueForKey: @"contents"] addObject: item];
 		[proot commit];

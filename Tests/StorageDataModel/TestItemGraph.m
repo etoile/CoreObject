@@ -16,18 +16,18 @@
 {
 	COItemGraph *graph = [[COItemGraph alloc] init];
 	
-	UKNil([graph rootItemUUID]);
+	UKNil(graph.rootItemUUID);
 	UKObjectsEqual(@[], graph.itemUUIDs);
 	
 	COItem *item = [[COMutableItem alloc] init];
 	[graph insertOrUpdateItems: @[item]];
 
-	UKNil([graph rootItemUUID]);
+	UKNil(graph.rootItemUUID);
 	UKObjectsEqual(@[item.UUID], graph.itemUUIDs);
 
 	graph.rootItemUUID = item.UUID;
 	
-	UKObjectsEqual(item.UUID, [graph rootItemUUID]);
+	UKObjectsEqual(item.UUID, graph.rootItemUUID);
 }
 
 @end

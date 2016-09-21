@@ -582,8 +582,8 @@
     UKObjectsEqual(S(tag1, tag2), [child valueForProperty: @"parentCollections"]);
 	UKObjectsEqual(A(child), [tag1 contentArray]);
 	UKObjectsEqual(A(child), [tag2 contentArray]);
-	UKObjectsEqual(S(child), [tag1 content]);
-	UKObjectsEqual(S(child), [tag2 content]);
+	UKObjectsEqual(S(child), tag1.content);
+	UKObjectsEqual(S(child), tag2.content);
 }
 
 

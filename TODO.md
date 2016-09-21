@@ -24,7 +24,7 @@ Major Missing Features
 
         - (ETEntityDescription *)persistentEntityDescription
         {
-            return  [[[self objectGraphContext] modelDescriptionRepository] descriptionForName: @"COObject"];
+            return  [self.objectGraphContext.modelDescriptionRepository descriptionForName: @"COObject"];
         }
 
 - Better query support (in-memory and in-store as sketched in COQuery)
@@ -229,7 +229,7 @@ Future Work (Minor features, refactoring, cleanup)
   - Add relationship update check to detect persistent objects inserted into a transient relationship. The object put in the relationship could belong to:
   
     - a transient object graph context --> allowed (see transient property _dropIndicator in -[ETLayout awakeFromDeserialization)
-    - the same object graph context --> disallowed (otherwise we can accidentally easily look up shared instance using the wrong object graph context e.g. `_dropIndicator = [ETDropIndicator sharedInstanceForObjectGraphContext: [layout objectGraphContext]])`
+    - the same object graph context --> disallowed (otherwise we can accidentally easily look up shared instance using the wrong object graph context e.g. `_dropIndicator = [ETDropIndicator sharedInstanceForObjectGraphContext: layout.objectGraphContext])`
     - some other persistent object graph context --> allowed or disallowed (not sure yet)
 
   - Make primitives with potentially mutable subclasses (NSString and NSData)

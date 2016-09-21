@@ -46,7 +46,7 @@
 
 - (NSTimeInterval) timeToMakeInitialCommitToPersistentRoot: (COPersistentRoot *)persistentRoot
 {
-	COObjectGraphContext *graph = [persistentRoot objectGraphContext];
+	COObjectGraphContext *graph = persistentRoot.objectGraphContext;
 	[self make3LevelNestedTreeInContainer: graph.rootObject];
 	
 	NSDate *start = [NSDate date];
@@ -57,7 +57,7 @@
 
 - (void) makeIncrementalCommitToPersistentRoot: (COPersistentRoot *)persistentRoot
 {
-	COObjectGraphContext *graph = [persistentRoot objectGraphContext];
+	COObjectGraphContext *graph = persistentRoot.objectGraphContext;
 	NSArray *itemUUIDS = graph.itemUUIDs;
 	int randNumber = rand();
 	OutlineItem *randomItem = [graph loadedObjectForUUID: itemUUIDS[randNumber % itemUUIDS.count]];

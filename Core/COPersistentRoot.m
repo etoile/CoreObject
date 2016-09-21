@@ -656,7 +656,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 			
 			[graphCtx doPreCommitChecks];
 			
-			// FIXME: check both _currentBranchObjectGraph and [branch objectGraphContext]
+			// FIXME: check both _currentBranchObjectGraph and branch.objectGraphContext
 			// FIXME: After, update the other graph with the contents of the one we committed
 			COItemGraph *graphCopy = [[COItemGraph alloc] initWithItemGraph: graphCtx];
 						

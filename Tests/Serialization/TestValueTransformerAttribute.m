@@ -70,7 +70,7 @@
 	UKObjectKindOf(transformer, NSValueTransformer);
 	UKObjectKindOf(persistentType, ETEntityDescription);
 	
-	UKObjectsEqual(@"NSString", [persistentType name]);
+	UKObjectsEqual(@"NSString", persistentType.name);
 }
 
 - (void) testSerialization

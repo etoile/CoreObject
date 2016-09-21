@@ -502,7 +502,7 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
 
 	if (getter != NULL)
 	{
-		NSAssert1([self serializationSetterForProperty: [aPropertyDesc name]] != NULL,
+		NSAssert1([self serializationSetterForProperty: aPropertyDesc.name] != NULL,
 			@"Serialization getter %@ must have a matching serialization setter",
 				 NSStringFromSelector(getter));
 
@@ -801,7 +801,7 @@ static id reverseTransformedValueOfPropertyDescription(COObject *self, id value,
 
 	ETEntityDescription *resultEntityDesc = entityDescriptionForObjectInRepository(result, repo);
 
-	assert(result == nil || [resultEntityDesc isKindOfEntity: [aPropertyDesc type]]);
+	assert(result == nil || [resultEntityDesc isKindOfEntity: aPropertyDesc.type]);
 	
 	return result;
 }
@@ -930,7 +930,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyD
 
 	if ([self respondsToSelector: setter])
 	{
-		NSAssert1([self serializationGetterForProperty: [aPropertyDesc name]] != NULL,
+		NSAssert1([self serializationGetterForProperty: aPropertyDesc.name] != NULL,
 			@"Serialization setter %@ must have a matching serialization getter",
 				 NSStringFromSelector(setter));
 		

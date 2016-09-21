@@ -144,7 +144,7 @@
     OutlineItem *photo1branchBroot = branchB.objectGraphContext.rootObject;
     photo1branchBroot.label = @"photo1, branch B";
     
-    OutlineItem *childB = [photo1branchBroot.contents firstObject];
+    OutlineItem *childB = photo1branchBroot.contents.firstObject;
     childB.label = @"childB";
     
     [ctx commit];
@@ -249,9 +249,9 @@
 		 UKObjectsEqual(@"John", testJohnRoot.label);
 		 UKObjectsEqual(@"Lucy", testLucyRoot.label);
 		 
-		 UKFalse([[testGroupRoot objectGraphContext] isTrackingSpecificBranch]);
-		 UKFalse([[testJohnRoot objectGraphContext] isTrackingSpecificBranch]);
-		 UKFalse([[testLucyRoot objectGraphContext] isTrackingSpecificBranch]);
+		 UKFalse([testGroupRoot.objectGraphContext isTrackingSpecificBranch]);
+		 UKFalse([testJohnRoot.objectGraphContext isTrackingSpecificBranch]);
+		 UKFalse([testLucyRoot.objectGraphContext isTrackingSpecificBranch]);
 		 
 		 // Ensure that the computed parents of Lucy and John are the "current branch object context" of Group,
 		 // not a specific branch one.
@@ -273,9 +273,9 @@
 		 UKObjectsEqual(@"John", testJohnRoot.label);
 		 UKObjectsEqual(@"Lucy", testLucyRoot.label);
 
-		 UKTrue([[testBranchARoot objectGraphContext] isTrackingSpecificBranch]);
-		 UKFalse([[testJohnRoot objectGraphContext] isTrackingSpecificBranch]);
-		 UKFalse([[testLucyRoot objectGraphContext] isTrackingSpecificBranch]);
+		 UKTrue([testBranchARoot.objectGraphContext isTrackingSpecificBranch]);
+		 UKFalse([testJohnRoot.objectGraphContext isTrackingSpecificBranch]);
+		 UKFalse([testLucyRoot.objectGraphContext isTrackingSpecificBranch]);
 		 
 		 // Ensure that the computed parents of Lucy and John are the "current branch object context" of Group,
 		 // not a specific branch one.
@@ -298,9 +298,9 @@
 		 UKObjectsEqual(@"John", testJohnRoot.label);
 		 UKObjectsEqual(@"Lucy", testLucyRoot.label);
 		 
-		 UKTrue([[testBranchBRoot objectGraphContext] isTrackingSpecificBranch]);
-		 UKFalse([[testJohnRoot objectGraphContext] isTrackingSpecificBranch]);
-		 UKFalse([[testLucyRoot objectGraphContext] isTrackingSpecificBranch]);
+		 UKTrue([testBranchBRoot.objectGraphContext isTrackingSpecificBranch]);
+		 UKFalse([testJohnRoot.objectGraphContext isTrackingSpecificBranch]);
+		 UKFalse([testLucyRoot.objectGraphContext isTrackingSpecificBranch]);
 
 		 // Ensure that the computed parents of Lucy and John are the "current branch object context" of Group
 		 // not a specific branch one.
@@ -364,7 +364,7 @@
 		 UKIntsEqual(1, testLucyARoot.parentGroups.count);
 		 UKObjectsSame(testGroup, [testLucyARoot.parentGroups anyObject]);
 		 
-		 UKFalse([[testGroup objectGraphContext] isTrackingSpecificBranch]);
+		 UKFalse([testGroup.objectGraphContext isTrackingSpecificBranch]);
 		 UKObjectsEqual(@"GroupA", testGroup.label);
 	 }];
 	
@@ -381,7 +381,7 @@
 		 UKIntsEqual(1, testLucyBRoot.parentGroups.count);
 		 UKObjectsSame(testGroup, [testLucyBRoot.parentGroups anyObject]);
 		 
-		 UKFalse([[testGroup objectGraphContext] isTrackingSpecificBranch]);
+		 UKFalse([testGroup.objectGraphContext isTrackingSpecificBranch]);
 		 UKObjectsEqual(@"GroupA", testGroup.label);
 	 }];
 }
@@ -604,7 +604,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: library1
 											  inBlock: ^(COEditingContext *ctx2, COPersistentRoot *library1ctx2, COBranch *testBranch, BOOL isNewContext)
 	 {
-        UKFalse([[library1ctx2 objectGraphContext] hasChanges]);
+        UKFalse([library1ctx2.objectGraphContext hasChanges]);
         UKObjectsEqual(S(@"photo2"), [library1ctx2.rootObject valueForKeyPath: @"contents.label"]);
         
         // Undelete photo1, which should restore the cross-root relationship
@@ -612,7 +612,7 @@
         COPersistentRoot *photo1ctx2 = [ctx2.deletedPersistentRoots anyObject];
         [photo1ctx2 setDeleted: NO];
         
-        UKFalse([[library1ctx2 objectGraphContext] hasChanges]);
+        UKFalse([library1ctx2.objectGraphContext hasChanges]);
         UKObjectsEqual(S(@"photo1", @"photo2"), [library1ctx2.rootObject valueForKeyPath: @"contents.label"]);
 	 }];
 }
@@ -648,7 +648,7 @@
 	[self checkPersistentRootWithExistingAndNewContext: photo1
 											   inBlock: ^(COEditingContext *ctx2, COPersistentRoot *photo1ctx2, COBranch *testBranch, BOOL isNewContext)
 	 {
-        UKFalse([[photo1ctx2 objectGraphContext] hasChanges]);
+        UKFalse([photo1ctx2.objectGraphContext hasChanges]);
         UKObjectsEqual([NSSet set], [photo1ctx2.rootObject valueForKeyPath: @"parentCollections.label"]);
         
         // Undelete library1, which should restore the cross-root inverse relationship
@@ -660,7 +660,7 @@
 		UKObjectsEqual(library1.UUID, library1ctx2.UUID);
         //[library1ctx2 setDeleted: NO];
 
-        //UKFalse([[photo1ctx2 objectGraphContext] hasChanges]);
+        //UKFalse([photo1ctx2.objectGraphContext hasChanges]);
         //UKObjectsEqual(S(@"library1"), [photo1ctx2.rootObject valueForKeyPath: @"parentCollections.label"]);
 	 }];
 #endif
@@ -735,9 +735,9 @@
 		[[UnivaluedGroupContent alloc] initWithObjectGraphContext: graph];
 	group.content = content;
 	
-	UKObjectsSame(content, [group content]);
-	UKObjectsSame(group, [[content parents] anyObject]);
-	UKObjectsEqual(S(group), [content parents]);
+	UKObjectsSame(content, group.content);
+	UKObjectsSame(group, [content.parents anyObject]);
+	UKObjectsEqual(S(group), content.parents);
 
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithRootObject: group];
 	COBranch *nonTrackingBranch = [proot branchForUUID: graph.branchUUID];
@@ -748,9 +748,9 @@
 	UnivaluedGroupContent *shadowContent =
 		[nonTrackingBranch.objectGraphContext loadedObjectForUUID: content.UUID];
 
-	UKObjectsSame(shadowContent, [shadowGroup content]);
-	UKObjectsSame(shadowGroup, [[shadowContent parents] anyObject]);
-	UKObjectsEqual(S(shadowGroup), [shadowContent parents]);
+	UKObjectsSame(shadowContent, shadowGroup.content);
+	UKObjectsSame(shadowGroup, [shadowContent.parents anyObject]);
+	UKObjectsEqual(S(shadowGroup), shadowContent.parents);
 	
 	UKObjectsNotSame(group, shadowGroup);
 	UKObjectsNotSame(content, shadowContent);

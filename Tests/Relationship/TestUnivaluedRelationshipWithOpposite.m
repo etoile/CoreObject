@@ -26,17 +26,17 @@
 	group2.content = item1;
 	UKNil(group3.content);
 	
-	UKObjectsEqual(S(group1, group2), [item1 parents]);
+	UKObjectsEqual(S(group1, group2), item1.parents);
 	
 	// Make some changes
 	
 	group2.content = nil;
 	
-	UKObjectsEqual(S(group1), [item1 parents]);
+	UKObjectsEqual(S(group1), item1.parents);
 	
 	group3.content = item1;
 	
-	UKObjectsEqual(S(group1, group3), [item1 parents]);
+	UKObjectsEqual(S(group1, group3), item1.parents);
 	
 	// Reload in another graph
 	
@@ -48,10 +48,10 @@
 	UnivaluedGroupWithOpposite *group3ctx2 = [ctx2 loadedObjectForUUID: group3.UUID];
 	UnivaluedGroupContent *item1ctx2 = [ctx2 loadedObjectForUUID: item1.UUID];
 	
-	UKObjectsEqual(item1ctx2, [group1ctx2 content]);
-	UKNil([group2ctx2 content]);
-	UKObjectsEqual(item1ctx2, [group3ctx2 content]);
-	UKObjectsEqual(S(group1ctx2, group3ctx2), [item1ctx2 parents]);
+	UKObjectsEqual(item1ctx2, group1ctx2.content);
+	UKNil(group2ctx2.content);
+	UKObjectsEqual(item1ctx2, group3ctx2.content);
+	UKObjectsEqual(S(group1ctx2, group3ctx2), item1ctx2.parents);
 	
 	// Check the relationship cache
 	UKObjectsEqual(S(group1, group3), item1.referringObjects);

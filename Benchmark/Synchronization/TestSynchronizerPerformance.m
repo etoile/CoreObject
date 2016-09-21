@@ -21,7 +21,7 @@
 	NSString *stringToInsert = @"Another insertion. ";
 	NSString *baseString = @"Test.";
 	
-	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: [serverBranch objectGraphContext]];
+	COAttributedString *serverStr = [[COAttributedString alloc] initWithObjectGraphContext: serverBranch.objectGraphContext];
 	COAttributedStringWrapper *serverWrapper = [[COAttributedStringWrapper alloc] initWithBacking: serverStr];
 	[serverWrapper replaceCharactersInRange: NSMakeRange(0, 0) withString: baseString];
 	[(UnorderedGroupNoOpposite *)serverBranch.rootObject setContents: S(serverStr)];
@@ -78,7 +78,7 @@
 {
 	const NSUInteger objectsToInsert = 80;
 	
-	OrderedGroupNoOpposite *serverGroup = [[OrderedGroupNoOpposite alloc] initWithObjectGraphContext: [serverBranch objectGraphContext]];
+	OrderedGroupNoOpposite *serverGroup = [[OrderedGroupNoOpposite alloc] initWithObjectGraphContext: serverBranch.objectGraphContext];
 	[(UnorderedGroupNoOpposite *)serverBranch.rootObject setContents: S(serverGroup)];
 	[serverPersistentRoot commit];
 	
@@ -89,7 +89,7 @@
 	OrderedGroupNoOpposite *clientGroup = [[(UnorderedGroupNoOpposite *)clientBranch.rootObject contents] anyObject];
 	for (NSUInteger i = 0; i < objectsToInsert; i++)
 	{
-		OrderedGroupNoOpposite *child = [[OrderedGroupNoOpposite alloc] initWithObjectGraphContext: [clientBranch objectGraphContext]];
+		OrderedGroupNoOpposite *child = [[OrderedGroupNoOpposite alloc] initWithObjectGraphContext: clientBranch.objectGraphContext];
 		child.label = [@(i) stringValue];
 		[[clientGroup mutableArrayValueForKey: @"contents"] addObject: child];
 		[clientPersistentRoot commit];
@@ -99,7 +99,7 @@
 	// 1 commit on server
 	
 	{
-		OrderedGroupNoOpposite *child = [[OrderedGroupNoOpposite alloc] initWithObjectGraphContext: [serverBranch objectGraphContext]];
+		OrderedGroupNoOpposite *child = [[OrderedGroupNoOpposite alloc] initWithObjectGraphContext: serverBranch.objectGraphContext];
 		child.label = @"serverChild";
 		[[serverGroup mutableArrayValueForKey: @"contents"] insertObject: child atIndex: 0];
 		[serverPersistentRoot commit];

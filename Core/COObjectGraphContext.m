@@ -559,7 +559,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
     // -objectReferenceWithUUID:. The rootItemUUID is ignored.
     COItemGraph *itemGraph =
 		[[COItemGraph alloc] initWithItems: items
-                              rootItemUUID: [[items firstObject] UUID]];
+                              rootItemUUID: [items.firstObject UUID]];
 	
 	[self addItemsFromItemGraph: itemGraph
 	              loadableUUIDs: [NSSet setWithArray: itemGraph.itemUUIDs]];
@@ -613,7 +613,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (void)setRootObject: (COObject *)anObject
 {
-    NSParameterAssert([anObject objectGraphContext] == self);
+    NSParameterAssert(anObject.objectGraphContext == self);
 	// i.e., the root object can be set once and never changed.
 	NSParameterAssert(_rootObjectUUID == nil || [_rootObjectUUID isEqual: anObject.UUID]);
 	

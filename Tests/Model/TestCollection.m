@@ -67,7 +67,7 @@
 
 - (void)testLibraryGroup
 {
-	UKTrue([[[ctx libraryGroup] content] isEmpty]);
+	UKTrue([ctx.libraryGroup.content isEmpty]);
 
 	/* Accessing libraries will create them */
 	NSSet *someLibs = S([ctx bookmarkLibrary], [ctx noteLibrary]);
@@ -88,12 +88,12 @@
 	ETEntityDescription *entity = library.entityDescription;
 
 	UKObjectsEqual([COLibrary class], [library class]);
-	UKStringsEqual(@"COBookmarkLibrary", [entity name]);
-	UKStringsEqual(@"COLibrary", [[entity parent] name]);
+	UKStringsEqual(@"COBookmarkLibrary", entity.name);
+	UKStringsEqual(@"COLibrary", entity.parent.name);
 
 	UKObjectsEqual(S(@"objects", @"tags"), [library multivaluedPropertyNames]);
-	UKStringsEqual(@"COBookmark", [[[entity propertyDescriptionForName: @"objects"] type] name]);
-	UKObjectsEqual([ETUTI typeWithClass: [COBookmark class]], [library objectType]);
+	UKStringsEqual(@"COBookmark", [[entity propertyDescriptionForName: @"objects"].type name]);
+	UKObjectsEqual([ETUTI typeWithClass: [COBookmark class]], library.objectType);
 
 	UKTrue(library.ordered);
 }
@@ -104,12 +104,12 @@
 	ETEntityDescription *entity = library.entityDescription;
 
 	UKObjectsEqual([COLibrary class], [library class]);
-	UKStringsEqual(@"CONoteLibrary", [entity name]);
-	UKStringsEqual(@"COLibrary", [[entity parent] name]);
+	UKStringsEqual(@"CONoteLibrary", entity.name);
+	UKStringsEqual(@"COLibrary", entity.parent.name);
 
 	UKObjectsEqual(S(@"objects", @"tags"), [library multivaluedPropertyNames]);
-	UKStringsEqual(@"COContainer", [[[entity propertyDescriptionForName: @"objects"] type] name]);
-	UKObjectsEqual([ETUTI typeWithClass: [COContainer class]], [library objectType]);
+	UKStringsEqual(@"COContainer", [entity propertyDescriptionForName: @"objects"].type.name);
+	UKObjectsEqual([ETUTI typeWithClass: [COContainer class]], library.objectType);
 
 	UKTrue(library.ordered);
 }
@@ -122,8 +122,8 @@
 	 tagGroups: the tag groups used to organize the tags in the library (see objects)
 	      tags: the tags applied to the library (inverse relationship) */
 	UKObjectsEqual(S(@"objects", @"tagGroups", @"tags"), [library multivaluedPropertyNames]);
-	UKObjectsEqual([ETUTI typeWithClass: [COTag class]], [library objectType]);
-	UKTrue([[library content] isKindOfClass: [NSMutableArray class]]);
+	UKObjectsEqual([ETUTI typeWithClass: [COTag class]], library.objectType);
+	UKTrue([library.content isKindOfClass: [NSMutableArray class]]);
 	UKTrue([[library tagGroups] isKindOfClass: [NSMutableArray class]]);
 }
 
@@ -140,13 +140,13 @@
 	      tags: the tags applied to the tag (inverse relationship) */
 	UKObjectsEqual(S(@"objects", @"tagGroups", @"tags"), [tag multivaluedPropertyNames]);
 
-	UKObjectsEqual([ETUTI typeWithClass: [COTag class]], [tagGroup objectType]);
-	UKTrue([[tagGroup content] isKindOfClass: [NSMutableArray class]]);
+	UKObjectsEqual([ETUTI typeWithClass: [COTag class]], tagGroup.objectType);
+	UKTrue([tagGroup.content isKindOfClass: [NSMutableArray class]]);
 	UKTrue([[tag tagGroups] isKindOfClass: [NSSet class]]);
 
 	[tagGroup addObject: tag];
 
-	UKObjectsEqual(A(tag), [tagGroup content]);
+	UKObjectsEqual(A(tag), tagGroup.content);
 	UKObjectsEqual(S(tagGroup), [tag tagGroups]);
 }
 
@@ -158,14 +158,14 @@
 	UKObjectsEqual(S(@"tags"), [object multivaluedPropertyNames]);
 	UKObjectsEqual(S(@"objects", @"tagGroups", @"tags"), [tag multivaluedPropertyNames]);
 
-	UKObjectsEqual([ETUTI typeWithClass: [COObject class]], [tag objectType]);
-	UKTrue([[tag content] isKindOfClass: [NSMutableArray class]]);
+	UKObjectsEqual([ETUTI typeWithClass: [COObject class]], tag.objectType);
+	UKTrue([tag.content isKindOfClass: [NSMutableArray class]]);
 	UKTrue([[object tags] isKindOfClass: [NSSet class]]);
 
 	[tag addObject: object];
 	tag.name = @"bird";
 
-	UKObjectsEqual(A(object), [tag content]);
+	UKObjectsEqual(A(object), tag.content);
 	UKObjectsEqual(S(tag), [object tags]);
 	UKStringsEqual(@"bird", [object tagDescription]);
 }
@@ -183,7 +183,7 @@
 	[tag addObject: original];
 	[tag addObject: copy];
 
-	UKObjectsEqual(A(original, copy), [tag content]);
+	UKObjectsEqual(A(original, copy), tag.content);
 	UKObjectsEqual(S(tag), [original tags]);
 	UKObjectsEqual(S(tag), [copy tags]);
 }
@@ -197,7 +197,7 @@
 	
 	[tag addObject: original];
 	
-	UKObjectsEqual(A(original), [tag content]);
+	UKObjectsEqual(A(original), tag.content);
 	UKObjectsEqual(S(tag), [original tags]);
 }
 - (void)testSmartGroup

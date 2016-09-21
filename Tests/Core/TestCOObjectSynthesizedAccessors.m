@@ -50,7 +50,7 @@
 {
 	UKRaisesException([item unkownMethod]);
 
-	NSAssert([[[item entityDescription] propertyDescriptionForName: @"isPersistent"] isReadOnly],
+	NSAssert([[item.entityDescription propertyDescriptionForName: @"isPersistent"] isReadOnly],
 		@"We expect isPersistent to be read-only for COObject and its subclasses");
 	UKRaisesException([(id)item setIsPersistent: YES]);
 }

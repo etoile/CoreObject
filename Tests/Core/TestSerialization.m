@@ -56,7 +56,7 @@
 	COObject *deserializedObject = [tempGraph loadedObjectForUUID: itemValue.UUID];
 	
 	UKObjectsEqual(attachmentID, [deserializedObject valueForKey: @"attachmentID"]);
-	UKObjectsEqual(@"COAttachmentID", [[[[deserializedObject entityDescription] propertyDescriptionForName: @"attachmentID"] type] name]);
+	UKObjectsEqual(@"COAttachmentID", [deserializedObject.entityDescription propertyDescriptionForName: @"attachmentID"].type.name);
 }
 
 - (void) testUnknowItemAttributes

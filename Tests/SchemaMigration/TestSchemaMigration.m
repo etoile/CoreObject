@@ -129,9 +129,9 @@
 		OutlineItem *newChild = [newParent.content firstObject];
 
 		UKIntsEqual(0, newParent.storeItem.packageVersion);
-		UKIntsEqual(0, [[[[newParent entityDescription] parent] owner] version]);
+		UKIntsEqual(0, newParent.entityDescription.parent.owner.version);
 		UKIntsEqual(0, newChild.storeItem.packageVersion);
-		UKIntsEqual(0, [[[[newChild entityDescription] parent] owner] version]);
+		UKIntsEqual(0, newChild.entityDescription.parent.owner.version);
 		
 		UKObjectsEqual(@"Test", newParent.storeItem.packageName);
 		UKObjectsEqual(@"Test", newParent.entityDescription.owner.name);

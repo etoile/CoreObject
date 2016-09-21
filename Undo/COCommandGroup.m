@@ -300,7 +300,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (NSArray *)contentArray
 {
-	return [NSArray arrayWithArray: [self content]];
+	return [NSArray arrayWithArray: self.content];
 }
 
 #pragma mark -

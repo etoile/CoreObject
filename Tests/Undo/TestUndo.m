@@ -611,7 +611,7 @@
 	NSArray *subCommands = ((COCommandGroup *)aCommand).contents;
 	UKIntsEqual(1, subCommands.count);
 	
-	COCommandSetCurrentVersionForBranch *command = [subCommands firstObject];
+	COCommandSetCurrentVersionForBranch *command = subCommands.firstObject;
 	UKObjectKindOf(command, COCommandSetCurrentVersionForBranch);
 	UKObjectsEqual(a, command.oldRevision);
 	UKObjectsEqual(b, command.revision);

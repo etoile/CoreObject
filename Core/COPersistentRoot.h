@@ -449,7 +449,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * When -setCurrentBranch: is called, this object graph content changes. It is 
  * updated with -[COObjectGraphContext setItemGraph:], to present the same 
- * content than [self.currentBranch objectGraphContext].
+ * content than self.currentBranch.objectGraphContext.
  *
  * This object graph context and <code>self.currentBranch.objectGraphContext</code>
  * are kept in sync at commit time. There is a one-way update, so both are not 

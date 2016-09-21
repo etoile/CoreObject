@@ -45,7 +45,7 @@
 	NSDate *start = [NSDate date];
 	
 	COObjectGraphContext *tempCtx = [COObjectGraphContext new];
-	(void) [[COCopier new] copyItemWithUUID: [ctx rootItemUUID] fromGraph: ctx toGraph: tempCtx];
+	(void) [[COCopier new] copyItemWithUUID: ctx.rootItemUUID fromGraph: ctx toGraph: tempCtx];
 	
 	NSTimeInterval time = [[NSDate date] timeIntervalSinceDate: start];
 	return time;

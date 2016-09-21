@@ -35,8 +35,8 @@
 	UnivaluedGroupNoOpposite *group2ctx2 = [ctx2 loadedObjectForUUID: group2.UUID];
 	OutlineItem *item1ctx2 = [ctx2 loadedObjectForUUID: item1.UUID];
 	
-	UKObjectsEqual(item1ctx2, [group1ctx2 content]);
-	UKObjectsEqual(item1ctx2, [group2ctx2 content]);
+	UKObjectsEqual(item1ctx2, group1ctx2.content);
+	UKObjectsEqual(item1ctx2, group2ctx2.content);
 }
 
 - (void) testUnivaluedGroupNoOppositeOuterReference

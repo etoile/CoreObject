@@ -219,7 +219,7 @@
 		// N.B. The reason _lastRevisionUUIDInTransitToServer is the common ancestor for the rebasing is a bit subtle.
 		//
 		// It is the revision we sent to the server earlier, and we are currently
-		// processing the response to sending that revision, so we know that [revsToUse lastObject]
+		// processing the response to sending that revision, so we know that revsToUse.lastObject
 		// has the changes in _lastRevisionUUIDInTransitToServer merged in to it (although there is
 		// no link showing that in our history graph, since the merge was done on the server).
 		//

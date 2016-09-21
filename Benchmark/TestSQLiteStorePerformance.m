@@ -137,14 +137,14 @@ static int itemChangedAtCommit(int i)
           forAttribute: @"name"];
         
 		COItemGraph *deltaGraph = [[COItemGraph alloc] initWithItems: @[item]
-														rootItemUUID: [initialTree rootItemUUID]];
+														rootItemUUID: initialTree.rootItemUUID];
 		
 		ETUUID *revisionUUID = [ETUUID UUID];
 		
 		[txn writeRevisionWithModifiedItems: deltaGraph
 							   revisionUUID: revisionUUID
 								   metadata: nil
-						   parentRevisionID: [revisionUUIDs lastObject]
+						   parentRevisionID: revisionUUIDs.lastObject
 					  mergeParentRevisionID: nil
 						 persistentRootUUID: proot.UUID
 								 branchUUID: [proot currentBranchUUID]];
@@ -154,8 +154,8 @@ static int itemChangedAtCommit(int i)
     
     // Set the persistent root's state to the last commit
     
-    [txn setCurrentRevision: [revisionUUIDs lastObject]
-			   headRevision: [revisionUUIDs lastObject]
+    [txn setCurrentRevision: revisionUUIDs.lastObject
+			   headRevision: revisionUUIDs.lastObject
 				  forBranch: [proot currentBranchUUID]
              ofPersistentRoot: proot.UUID];
     
@@ -258,7 +258,7 @@ static int itemChangedAtCommit(int i)
         COItemGraph *tree = [store itemGraphForRevisionUUID: lastCommitId persistentRoot: prootUUID];
         
         // Check the state
-        UKObjectsEqual(rootUUID, [tree rootItemUUID]);
+        UKObjectsEqual(rootUUID, tree.rootItemUUID);
 		      
         for (int i=0; i<NUM_CHILDREN; i++)
         {

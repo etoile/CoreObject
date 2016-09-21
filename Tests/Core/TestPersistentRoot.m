@@ -172,7 +172,7 @@
     
     COObject *childB = [[photo1branchBroot valueForKey: @"contents"] firstObject];
     [childB setValue: @"childB" forProperty: @"label"];
-    UKTrue([[branchB objectGraphContext] hasChanges]);
+    UKTrue([branchB.objectGraphContext hasChanges]);
     
     [ctx commit];
     

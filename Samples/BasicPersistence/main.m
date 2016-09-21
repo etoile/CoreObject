@@ -29,7 +29,7 @@
 {
 	ETEntityDescription *desc = [self newBasicEntityDescription];
 
-	if (![[desc name] isEqual: [Calendar className]])
+	if (![desc.name isEqual: [Calendar className]])
 		return desc;
 
 	ETPropertyDescription *appointments = [ETPropertyDescription descriptionWithName: @"appointments"
@@ -53,7 +53,7 @@
 {
 	ETEntityDescription *desc = [self newBasicEntityDescription];
 
-	if (![[desc name] isEqual: [Appointment className]])
+	if (![desc.name isEqual: [Appointment className]])
 		return desc;
 
 	ETPropertyDescription *calendar = [ETPropertyDescription descriptionWithName: @"calendar"
@@ -109,7 +109,7 @@ int main(int argc, char **argv)
 		NSDate *futureDate = [NSDate dateWithTimeIntervalSinceNow: 3600];
 		Appointment *appointment = [[Appointment alloc] initWithStartDate: [NSDate date]
 		                                                          endDate: futureDate
-		                                               objectGraphContext: [calendar objectGraphContext]];
+		                                               objectGraphContext: calendar.objectGraphContext];
 
 		calendar.appointments = [NSSet setWithObject: appointment];
 

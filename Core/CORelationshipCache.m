@@ -152,7 +152,7 @@
     {
         return nil;
     }
-    return [results firstObject];
+    return results.firstObject;
 }
 
 - (void) removeAllEntries

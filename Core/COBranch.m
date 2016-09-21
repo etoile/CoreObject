@@ -931,7 +931,7 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 }
 
 /**
- * Returns either nil, _objectGraph, or [_persistentRoot objectGraphContext]
+ * Returns either nil, _objectGraph, or _persistentRoot.objectGraphContext
  */
 - (COObjectGraphContext *)modifiedItemsSource
 {
@@ -943,8 +943,8 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 		if (_objectGraph.hasChanges)
 		{
 			[NSException raise: NSGenericException
-						format: @"You appear to have modified both [persistentRoot objectGraphContext] and "
-								"[[persistentRoot currentBranch] objectGraphContext]"];
+						format: @"You appear to have modified both persistentRoot.objectGraphContext and "
+								"persistentRoot.currentBranch.objectGraphContext"];
 		}
 		return graph;
 	}
