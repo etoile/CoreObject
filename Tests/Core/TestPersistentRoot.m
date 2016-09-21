@@ -88,7 +88,7 @@
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKIntsEqual(2, testProot.branches.count);
-		 UKStringsEqual(@"Sandbox", [testBranch label]);
+		 UKStringsEqual(@"Sandbox", testBranch.label);
 		 UKObjectsEqual(originalBranch.UUID, testBranch.parentBranch.UUID);
 		 
 		 UKObjectsEqual(testProot, testBranch.persistentRoot);
@@ -109,7 +109,7 @@
 	[rootObj setValue: @"Untitled" forProperty: @"label"];
 	[persistentRoot commit];
     
-	//CORevision *rev1 = [persistentRoot.currentBranch currentRevision];
+	//CORevision *rev1 = persistentRoot.currentBranch.currentRevision;
 	
 	COBranch *branch = [originalBranch makeBranchWithLabel: @"Sandbox"];
     

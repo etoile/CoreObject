@@ -237,8 +237,8 @@
     ctx2.rootObject = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
 	OutlineItem *root = ctx2.rootObject;
 
-    UKObjectsEqual(S(root.UUID), [ctx2 insertedObjectUUIDs]);
-    UKObjectsEqual([NSSet set], [ctx2 updatedObjectUUIDs]);
+    UKObjectsEqual(S(root.UUID), ctx2.insertedObjectUUIDs);
+    UKObjectsEqual([NSSet set], ctx2.updatedObjectUUIDs);
     
     OutlineItem *root2 = [self addObjectWithLabel: @"root2" toContext: ctx2];
     //[ctx2 setRootObject: root2];
@@ -248,21 +248,21 @@
     OutlineItem *list1 = [self addObjectWithLabel: @"List1" toObject: root2];
 
     
-    UKObjectsEqual(S(root.UUID, list1.UUID, root2.UUID), [ctx2 insertedObjectUUIDs]);
-    UKObjectsEqual([NSSet set], [ctx2 updatedObjectUUIDs]);
+    UKObjectsEqual(S(root.UUID, list1.UUID, root2.UUID), ctx2.insertedObjectUUIDs);
+    UKObjectsEqual([NSSet set], ctx2.updatedObjectUUIDs);
     
     [ctx2 acceptAllChanges];
     
-    UKObjectsEqual([NSSet set], [ctx2 insertedObjectUUIDs]);
-    UKObjectsEqual([NSSet set], [ctx2 updatedObjectUUIDs]);
+    UKObjectsEqual([NSSet set], ctx2.insertedObjectUUIDs);
+    UKObjectsEqual([NSSet set], ctx2.updatedObjectUUIDs);
     
     // After calling -acceptAllChanges, further changes to those recently inserted
     // objects count as modifications.
     
     [root2 setValue: @"test" forProperty: kCOLabel];
     
-    UKObjectsEqual([NSSet set], [ctx2 insertedObjectUUIDs]);
-    UKObjectsEqual(S(root2.UUID), [ctx2 updatedObjectUUIDs]);
+    UKObjectsEqual([NSSet set], ctx2.insertedObjectUUIDs);
+    UKObjectsEqual(S(root2.UUID), ctx2.updatedObjectUUIDs);
 }
 
 - (void)testShoppingList
@@ -343,7 +343,7 @@
     [root1 insertObject: group2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     [group1 insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     
-    UKObjectsSame(group1, [child parentContainer]);
+    UKObjectsSame(group1, child.parentContainer);
     
     // Move child from group1 to group2 at the COItem level
     
@@ -356,7 +356,7 @@
     
     // Check that inverses were recalculated
     
-    UKObjectsSame(group2, [child parentContainer]);
+    UKObjectsSame(group2, child.parentContainer);
 }
 
 - (void) testRootObjectIsSetOnceOnly
@@ -724,13 +724,13 @@
 	[ctx1obj addObject: ctx2root];
 	[ctx1obj addObject: ctx3root];
 
-	UKObjectsSame(ctx1obj, [ctx2root parentContainer]);
-	UKObjectsSame(ctx1obj, [ctx3root parentContainer]);
+	UKObjectsSame(ctx1obj, ctx2root.parentContainer);
+	UKObjectsSame(ctx1obj, ctx3root.parentContainer);
 	
 	[ctx1 removeUnreachableObjects];
 	
-	UKNil([ctx2root parentContainer]);
-	UKNil([ctx3root parentContainer]);
+	UKNil(ctx2root.parentContainer);
+	UKNil(ctx3root.parentContainer);
 }
 
 - (void) testCrossContextReferencedObjectDeallocated
@@ -751,9 +751,9 @@
 	UKFalse([root1.contents isEmpty]);
 	
 	// GC ctx2obj (it's not set as the root object)
-	UKFalse([ctx2obj isZombie]);
+	UKFalse(ctx2obj.isZombie);
 	[ctx2 removeUnreachableObjects];
-	UKTrue([ctx2obj isZombie]);
+	UKTrue(ctx2obj.isZombie);
 	
 	// check that ctx1 is still valid?
 	UKTrue([root1.contents isEmpty]);

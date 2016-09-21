@@ -146,8 +146,8 @@ static ETUUID *rootUUID;
     
     UKNotNil([store persistentRootInfoForUUID: prootB.UUID]);
 
-    UKObjectsEqual([self prootAitemTree], [store itemGraphForRevisionUUID: [prootA currentRevisionUUID] persistentRoot: prootA.UUID]);
-    UKObjectsEqual([self prooBitemTree], [store itemGraphForRevisionUUID: [prootB currentRevisionUUID] persistentRoot: prootB.UUID]);
+    UKObjectsEqual([self prootAitemTree], [store itemGraphForRevisionUUID: prootA.currentRevisionUUID persistentRoot: prootA.UUID]);
+    UKObjectsEqual([self prooBitemTree], [store itemGraphForRevisionUUID: prootB.currentRevisionUUID persistentRoot: prootB.UUID]);
 }
 
 - (void) testDeleteCopiedPersistentRoot
@@ -167,8 +167,8 @@ static ETUUID *rootUUID;
     
     UKNotNil([store persistentRootInfoForUUID: prootA.UUID]);
     
-    UKObjectsEqual([self prootAitemTree], [store itemGraphForRevisionUUID: [prootA currentRevisionUUID] persistentRoot: prootA.UUID]);
-    UKNil([store itemGraphForRevisionUUID: [prootB currentRevisionUUID] persistentRoot: prootB.UUID]);
+    UKObjectsEqual([self prootAitemTree], [store itemGraphForRevisionUUID: prootA.currentRevisionUUID persistentRoot: prootA.UUID]);
+    UKNil([store itemGraphForRevisionUUID: prootB.currentRevisionUUID persistentRoot: prootB.UUID]);
 }
 
 @end

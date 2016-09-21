@@ -14,12 +14,12 @@
 
 - (void) testPersistentRootMetadataReplicated
 {
-	UKObjectsEqual([self persistentRootMetadataForTest], clientPersistentRoot.metadata);
+	UKObjectsEqual(self.persistentRootMetadataForTest, clientPersistentRoot.metadata);
 }
 
 - (void) testBranchMetadataReplicated
 {
-	UKObjectsEqual([self branchMetadataForTest], clientBranch.metadata);
+	UKObjectsEqual(self.branchMetadataForTest, clientBranch.metadata);
 }
 
 - (void) testBasicReplicationToClient

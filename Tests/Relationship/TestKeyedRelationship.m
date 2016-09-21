@@ -49,7 +49,7 @@
 {
 	model.entries = @{ @"pear" : pear, @"banana" : banana };
 	
-	UKObjectsEqual(S(model.UUID, pear.UUID, banana.UUID), [model.objectGraphContext insertedObjectUUIDs]);
+	UKObjectsEqual(S(model.UUID, pear.UUID, banana.UUID), model.objectGraphContext.insertedObjectUUIDs);
 
 	[ctx commit];
 

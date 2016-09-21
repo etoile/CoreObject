@@ -43,7 +43,7 @@
 			
 			// Check that the proper objects are marked as updated and inserted
 			
-			UKObjectsEqual(S(root.UUID, chunk0.UUID), [graph insertedObjectUUIDs]);
+			UKObjectsEqual(S(root.UUID, chunk0.UUID), graph.insertedObjectUUIDs);
 		}
 		
 		[ctx commit];

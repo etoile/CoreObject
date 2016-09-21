@@ -84,7 +84,7 @@
 	[_testTrack undo];
 	UKObjectsEqual(r0, persistentRoot.currentRevision);
 	
-	UKFalse([_testTrack canUndo]);
+	UKFalse(_testTrack.canUndo);
 	
 	[_testTrack redo];
 	UKObjectsEqual(r1, persistentRoot.currentRevision);
@@ -97,7 +97,7 @@
 	[_testTrack redo];
 	UKObjectsEqual(r2b, persistentRoot.currentRevision);
 	
-	UKFalse([_testTrack canRedo]);
+	UKFalse(_testTrack.canRedo);
 }
 
 - (void) checkPersistentRoot: (COPersistentRoot *)proot hasCurrentRevision: (CORevision *)currentExpected head: (CORevision *)headExpected
@@ -106,7 +106,7 @@
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKObjectsEqual(currentExpected, testProot.currentRevision);
-		 UKObjectsEqual(headExpected, [testProot headRevision]);
+		 UKObjectsEqual(headExpected, testProot.headRevision);
 	 }];
 }
 

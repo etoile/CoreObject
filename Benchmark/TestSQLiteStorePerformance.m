@@ -123,7 +123,7 @@ static int itemChangedAtCommit(int i)
 	
 	// Commit a change to each object
 	
-    [revisionUUIDs addObject: [proot currentRevisionUUID]];
+    revisionUUIDs addObject: [proot.currentRevisionUUID];
     for (int commit=1; commit<NUM_COMMITS; commit++)
     {
         int i = itemChangedAtCommit(commit);
@@ -213,7 +213,7 @@ static int itemChangedAtCommit(int i)
     
     COPersistentRootInfo *proot = [store persistentRootInfoForUUID: prootUUID];
     
-    ETUUID *lastCommitId = [proot.currentBranchInfo currentRevisionUUID];
+    ETUUID *lastCommitId = proot.currentBranchInfo.currentRevisionUUID;
     
     // Now traverse them in reverse order and test that the items are as expected.
     // There are NUM_CHILDREN + 1 commits (the initial one made by creating the persistent roots)
@@ -251,7 +251,7 @@ static int itemChangedAtCommit(int i)
 
     COPersistentRootInfo *proot = [store persistentRootInfoForUUID: prootUUID];
     
-    ETUUID *lastCommitId = [proot.currentBranchInfo currentRevisionUUID];
+    ETUUID *lastCommitId = proot.currentBranchInfo.currentRevisionUUID;
     
     for (int rev=NUM_COMMITS-1; rev>=0; rev--)
     {
@@ -345,7 +345,7 @@ static int itemChangedAtCommit(int i)
 					 parentPersistentRootUUID: proot.UUID
 								   branchUUID: [ETUUID UUID]
 							 parentBranchUUID: nil
-						  initialRevisionUUID: [proot.currentBranchInfo currentRevisionUUID]];
+						  initialRevisionUUID: proot.currentBranchInfo.currentRevisionUUID];
     }
     UKTrue([store commitStoreTransaction: txn]);
     

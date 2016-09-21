@@ -118,7 +118,7 @@
 	
     // Verify that the revert to firstRevision is not committed
     UKObjectsEqual(thirdRevision.UUID,
-                   [[store persistentRootInfoForUUID: persistentRoot.UUID] currentRevisionUUID]);
+                   [store persistentRootInfoForUUID: persistentRoot.UUID].currentRevisionUUID);
     
 	// First redo (Groceries -> Shopping List)
 	[originalBranch redo]; //[originalBranch setCurrentRevision: secondRevision];
@@ -336,21 +336,21 @@
 {
     [ctx commit];
     
-    UKNil([originalBranch label]);
+    UKNil(originalBranch.label);
     UKFalse(ctx.hasChanges);
     UKFalse(persistentRoot.hasChanges);
     UKFalse(originalBranch.hasChanges);
     
     originalBranch.label = @"Hello world";
     
-    UKObjectsEqual(@"Hello world", [originalBranch label]);
+    UKObjectsEqual(@"Hello world", originalBranch.label);
     UKTrue(ctx.hasChanges);
     UKTrue(persistentRoot.hasChanges);
     UKTrue(originalBranch.hasChanges);
     
     [originalBranch discardAllChanges];
     
-    UKNil([originalBranch label]);
+    UKNil(originalBranch.label);
     UKFalse(originalBranch.hasChanges);
     
     originalBranch.label = @"Hello world";
@@ -365,18 +365,18 @@
 	[self checkBranchWithExistingAndNewContext: originalBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(@"Hello world", [testBranch label]);
+		 UKObjectsEqual(@"Hello world", testBranch.label);
 		 UKFalse(testCtx.hasChanges);
 		 UKFalse(testProot.hasChanges);
 		 UKFalse(testBranch.hasChanges);
 	 }];
     
     originalBranch.label = @"Hello world 2";
-    UKObjectsEqual(@"Hello world 2", [originalBranch label]);
+    UKObjectsEqual(@"Hello world 2", originalBranch.label);
     
     [originalBranch discardAllChanges];
     
-    UKObjectsEqual(@"Hello world", [originalBranch label]);
+    UKObjectsEqual(@"Hello world", originalBranch.label);
 }
 
 - (void) testBranchMetadata
@@ -539,7 +539,7 @@
 	
 	CORevision *mergedRevision = persistentRoot.currentRevision;
 	UKObjectsEqual(headRevBeforeMerge, mergedRevision.parentRevision);
-	UKObjectsEqual(mergingBranchRevision, [mergedRevision mergeParentRevision]);
+	UKObjectsEqual(mergingBranchRevision, mergedRevision.mergeParentRevision);
 }
 
 - (void) testRevertToRevision
@@ -740,38 +740,38 @@
 	
     // undo doc1 -> doc1a
 	
-	UKObjectsEqual(@"doc1a", [root label]);
-	UKObjectsEqual(@"child1a", [child1 label]);
+	UKObjectsEqual(@"doc1a", root.label);
+	UKObjectsEqual(@"child1a", child1.label);
 	
 	[originalBranch undoNode: doc1Todoc1aRevision];
 	[ctx commit];
 	
-	UKObjectsEqual(@"doc1", [root label]);
-	UKObjectsEqual(@"child1a", [child1 label]);
+	UKObjectsEqual(@"doc1", root.label);
+	UKObjectsEqual(@"child1a", child1.label);
 	
 	[originalBranch undo];
 	[ctx commit];
 	
-	UKObjectsEqual(@"doc1a", [root label]);
-	UKObjectsEqual(@"child1a", [child1 label]);
+	UKObjectsEqual(@"doc1a", root.label);
+	UKObjectsEqual(@"child1a", child1.label);
 	
 	[originalBranch redo];
 	[ctx commit];
 
-	UKObjectsEqual(@"doc1", [root label]);
-	UKObjectsEqual(@"child1a", [child1 label]);
+	UKObjectsEqual(@"doc1", root.label);
+	UKObjectsEqual(@"child1a", child1.label);
 
 	[originalBranch undoNode: child1Tochild1aRevision];
 	[ctx commit];
 	
-	UKObjectsEqual(@"doc1", [root label]);
-	UKObjectsEqual(@"child1", [child1 label]);
+	UKObjectsEqual(@"doc1", root.label);
+	UKObjectsEqual(@"child1", child1.label);
 	
 	[originalBranch redoNode: doc1Todoc1aRevision];
 	[ctx commit];
 	
-	UKObjectsEqual(@"doc1a", [root label]);
-	UKObjectsEqual(@"child1", [child1 label]);
+	UKObjectsEqual(@"doc1a", root.label);
+	UKObjectsEqual(@"child1", child1.label);
 }
 
 /**

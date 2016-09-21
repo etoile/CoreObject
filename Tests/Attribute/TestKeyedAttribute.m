@@ -122,7 +122,7 @@
 {
 	[model setValue: D(@"boum", @"sound") forProperty: @"entries"];
 	
-	UKObjectsEqual(S(model.UUID), [[model objectGraphContext] insertedObjectUUIDs]);
+	UKObjectsEqual(S(model.UUID), model.objectGraphContext.insertedObjectUUIDs);
 
 	[ctx commit];
 

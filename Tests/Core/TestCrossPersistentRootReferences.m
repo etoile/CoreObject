@@ -249,9 +249,9 @@
 		 UKObjectsEqual(@"John", testJohnRoot.label);
 		 UKObjectsEqual(@"Lucy", testLucyRoot.label);
 		 
-		 UKFalse([testGroupRoot.objectGraphContext isTrackingSpecificBranch]);
-		 UKFalse([testJohnRoot.objectGraphContext isTrackingSpecificBranch]);
-		 UKFalse([testLucyRoot.objectGraphContext isTrackingSpecificBranch]);
+		 UKFalse(testGroupRoot.objectGraphContext.trackingSpecificBranch);
+		 UKFalse(testJohnRoot.objectGraphContext.trackingSpecificBranch);
+		 UKFalse(testLucyRoot.objectGraphContext.trackingSpecificBranch);
 		 
 		 // Ensure that the computed parents of Lucy and John are the "current branch object context" of Group,
 		 // not a specific branch one.
@@ -273,9 +273,9 @@
 		 UKObjectsEqual(@"John", testJohnRoot.label);
 		 UKObjectsEqual(@"Lucy", testLucyRoot.label);
 
-		 UKTrue([testBranchARoot.objectGraphContext isTrackingSpecificBranch]);
-		 UKFalse([testJohnRoot.objectGraphContext isTrackingSpecificBranch]);
-		 UKFalse([testLucyRoot.objectGraphContext isTrackingSpecificBranch]);
+		 UKTrue(testBranchARoot.objectGraphContext.trackingSpecificBranch);
+		 UKFalse(testJohnRoot.objectGraphContext.trackingSpecificBranch);
+		 UKFalse(testLucyRoot.objectGraphContext.trackingSpecificBranch);
 		 
 		 // Ensure that the computed parents of Lucy and John are the "current branch object context" of Group,
 		 // not a specific branch one.
@@ -298,9 +298,9 @@
 		 UKObjectsEqual(@"John", testJohnRoot.label);
 		 UKObjectsEqual(@"Lucy", testLucyRoot.label);
 		 
-		 UKTrue([testBranchBRoot.objectGraphContext isTrackingSpecificBranch]);
-		 UKFalse([testJohnRoot.objectGraphContext isTrackingSpecificBranch]);
-		 UKFalse([testLucyRoot.objectGraphContext isTrackingSpecificBranch]);
+		 UKTrue(testBranchBRoot.objectGraphContext.trackingSpecificBranch);
+		 UKFalse(testJohnRoot.objectGraphContext.trackingSpecificBranch);
+		 UKFalse(testLucyRoot.objectGraphContext.trackingSpecificBranch);
 
 		 // Ensure that the computed parents of Lucy and John are the "current branch object context" of Group
 		 // not a specific branch one.
@@ -364,7 +364,7 @@
 		 UKIntsEqual(1, testLucyARoot.parentGroups.count);
 		 UKObjectsSame(testGroup, [testLucyARoot.parentGroups anyObject]);
 		 
-		 UKFalse([testGroup.objectGraphContext isTrackingSpecificBranch]);
+		 UKFalse(testGroup.objectGraphContext.trackingSpecificBranch);
 		 UKObjectsEqual(@"GroupA", testGroup.label);
 	 }];
 	
@@ -381,7 +381,7 @@
 		 UKIntsEqual(1, testLucyBRoot.parentGroups.count);
 		 UKObjectsSame(testGroup, [testLucyBRoot.parentGroups anyObject]);
 		 
-		 UKFalse([testGroup.objectGraphContext isTrackingSpecificBranch]);
+		 UKFalse(testGroup.objectGraphContext.trackingSpecificBranch);
 		 UKObjectsEqual(@"GroupA", testGroup.label);
 	 }];
 }

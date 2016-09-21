@@ -57,37 +57,37 @@ selective undo is involved. */
     
 	/* First undo  (Todo -> Shopping List) */
 
-	UKTrue([_testTrack canUndo]);
+	UKTrue(_testTrack.canUndo);
 	[_testTrack undo];
     
 	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
-	UKObjectsEqual(secondRevision, [object.persistentRoot currentRevision]);
+	UKObjectsEqual(secondRevision, object.persistentRoot.currentRevision);
 
 	/*  Second undo (Shopping List -> Groceries) */
 
-    UKTrue([_testTrack canUndo]);
+    UKTrue(_testTrack.canUndo);
 	[_testTrack undo];
-	UKFalse([_testTrack canUndo]);
+	UKFalse(_testTrack.canUndo);
     
 	UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
-	UKObjectsEqual(firstRevision, [object.persistentRoot currentRevision]);
+	UKObjectsEqual(firstRevision, object.persistentRoot.currentRevision);
 
 	/* First redo (Groceries -> Shopping List) */
 
-	UKTrue([_testTrack canRedo]);
+	UKTrue(_testTrack.canRedo);
 	[_testTrack redo];
 
 	UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
-	UKObjectsEqual(secondRevision, [object.persistentRoot currentRevision]);
+	UKObjectsEqual(secondRevision, object.persistentRoot.currentRevision);
 
 	/* Second redo (Shopping List -> Todo) */
 
-	UKTrue([_testTrack canRedo]);
+	UKTrue(_testTrack.canRedo);
 	[_testTrack redo];
-	UKFalse([_testTrack canRedo]);
+	UKFalse(_testTrack.canRedo);
     
 	UKStringsEqual(@"Todo", [object valueForProperty: @"label"]);
-	UKObjectsEqual(thirdRevision, [object.persistentRoot currentRevision]);
+	UKObjectsEqual(thirdRevision, object.persistentRoot.currentRevision);
 }
 
 - (NSArray *)makeCommitsWithMultiplePersistentRoots
@@ -246,7 +246,7 @@ selective undo is involved. */
 	[_testTrack redo];
     [_testTrack redo];
     [_testTrack redo];
-    UKFalse([_testTrack canRedo]);
+    UKFalse(_testTrack.canRedo);
 	UKStringsEqual(@"Todo", [object valueForProperty: @"label"]);
 	UKStringsEqual(@"paragraph with different contents", [para1 valueForProperty: @"label"]);
 	UKNotNil([docPersistentRoot loadedObjectForUUID: para2.UUID]);

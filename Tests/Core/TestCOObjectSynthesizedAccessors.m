@@ -34,7 +34,7 @@
     UKObjectKindOf(item, OutlineItem);
     
     item.label = @"hello";
-    UKObjectsEqual(@"hello", [item label]);
+    UKObjectsEqual(@"hello", item.label);
     
     OutlineItem *child1 = [item.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
     child1.label = @"child1";

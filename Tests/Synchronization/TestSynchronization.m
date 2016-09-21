@@ -137,9 +137,9 @@ static ETUUID *branchBUUID;
     
     // Check out the revisions of the branches
 
-    UKObjectsEqual([serverInfo currentRevisionUUID], [currentBranch currentRevisionUUID]);
-    UKObjectsEqual([serverInfo currentRevisionUUID], [replicatedBranchA currentRevisionUUID]);
-    UKObjectsEqual([serverInfo currentRevisionUUID], [replicatedBranchB currentRevisionUUID]);
+    UKObjectsEqual(serverInfo.currentRevisionUUID, currentBranch.currentRevisionUUID);
+    UKObjectsEqual(serverInfo.currentRevisionUUID, replicatedBranchA.currentRevisionUUID);
+    UKObjectsEqual(serverInfo.currentRevisionUUID, replicatedBranchB.currentRevisionUUID);
     
 	UKObjectsEqual([self itemGraphWithLabel: @"1"], [self currentItemGraphForBranch: currentBranch.UUID]);
     UKObjectsEqual([self itemGraphWithLabel: @"1"], [self currentItemGraphForBranch: replicatedBranchA.UUID]);
@@ -244,7 +244,7 @@ static ETUUID *branchBUUID;
 															 parentPersistentRootUUID: persistentRootUUID
 																		   branchUUID: cheapCopyBranchUUID
 																	 parentBranchUUID: nil
-																  initialRevisionUUID: [serverInfo currentRevisionUUID]];
+																  initialRevisionUUID: serverInfo.currentRevisionUUID];
 	
     // Server writes a second commit.
     
@@ -253,7 +253,7 @@ static ETUUID *branchBUUID;
 	[txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"2"]
 						   revisionUUID: serverCommit2
 							   metadata: nil
-					   parentRevisionID: [serverCheapCopyInfo currentRevisionUUID]
+					   parentRevisionID: serverCheapCopyInfo.currentRevisionUUID
 				  mergeParentRevisionID: nil
 					 persistentRootUUID: cheapCopyUUID
 							 branchUUID: branchAUUID];

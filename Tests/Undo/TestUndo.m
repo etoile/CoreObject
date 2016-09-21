@@ -458,8 +458,8 @@
 - (void) testTrackAPI
 {
     UKIntsEqual(1, [_testTrack.nodes count]); // Placeholder node
-    UKFalse([_testTrack canRedo]);
-    UKFalse([_testTrack canUndo]);
+    UKFalse(_testTrack.canRedo);
+    UKFalse(_testTrack.canUndo);
     
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
     [ctx commitWithUndoTrack: _testTrack];
@@ -469,8 +469,8 @@
     
     UKIntsEqual(3, [_testTrack.nodes count]);
     UKIntsEqual(2, [_testTrack.nodes indexOfObject: [_testTrack currentNode]]);
-    UKFalse([_testTrack canRedo]);
-    UKTrue([_testTrack canUndo]);
+    UKFalse(_testTrack.canRedo);
+    UKTrue(_testTrack.canUndo);
     
     UKObjectsEqual(@"hello", [persistentRoot.rootObject valueForProperty: kCOLabel]);
     
@@ -571,32 +571,32 @@
     [ctx commitWithUndoTrack: _testTrack];
 	id<COTrackNode> node3 = _testTrack.nodes.lastObject;
 	
-	UKObjectsEqual(@"doc1a", [root label]);
-	UKObjectsEqual(@"child1a", [child1 label]);
+	UKObjectsEqual(@"doc1a", root.label);
+	UKObjectsEqual(@"child1a", child1.label);
 	
     [_testTrack undoNode: node2]; // selective undo doc1 -> doc1a
 	id<COTrackNode> node4 = _testTrack.nodes.lastObject;
 	
-	UKObjectsEqual(@"doc1", [root label]);
-	UKObjectsEqual(@"child1a", [child1 label]);
+	UKObjectsEqual(@"doc1", root.label);
+	UKObjectsEqual(@"child1a", child1.label);
 
 	[_testTrack undo]; // undo the above -undoNode
 	
 	UKObjectsEqual(node3, [_testTrack currentNode]);
-	UKObjectsEqual(@"doc1a", [root label]);
-	UKObjectsEqual(@"child1a", [child1 label]);
+	UKObjectsEqual(@"doc1a", root.label);
+	UKObjectsEqual(@"child1a", child1.label);
 	
 	[_testTrack undo]; // undo child1 -> child1a
 	
 	UKObjectsEqual(node2, [_testTrack currentNode]);
-	UKObjectsEqual(@"doc1a", [root label]);
-	UKObjectsEqual(@"child1", [child1 label]);
+	UKObjectsEqual(@"doc1a", root.label);
+	UKObjectsEqual(@"child1", child1.label);
 	
 	[_testTrack undo]; // undo doc1 -> doc1a
 	
 	UKObjectsEqual(node1, [_testTrack currentNode]);
-	UKObjectsEqual(@"doc1", [root label]);
-	UKObjectsEqual(@"child1", [child1 label]);
+	UKObjectsEqual(@"doc1", root.label);
+	UKObjectsEqual(@"child1", child1.label);
 }
 
 - (void) checkCommandIsEndOfTrack: (id<COTrackNode>)aCommand

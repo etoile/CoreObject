@@ -163,7 +163,7 @@
 - (void) testRevisionParentRevision
 {
 	UKNil(r0.parentRevision);
-	UKNil([r0 mergeParentRevision]);
+	UKNil(r0.mergeParentRevision);
 	UKObjectsEqual(r0, r1.parentRevision);
 	UKObjectsEqual(r1, r2.parentRevision);
 	UKObjectsEqual(r1, r3.parentRevision);
@@ -273,7 +273,7 @@
 	COPersistentRootInfo *p1Info = [ctx.store persistentRootInfoForUUID: p1.UUID];
 
 	UKObjectsEqual(r5.UUID, [p1Info branchInfoForUUID: branch1C.UUID].headRevisionUUID);
-	UKObjectsEqual(r3.UUID, [[p1Info branchInfoForUUID: branch1C.UUID] currentRevisionUUID]);
+	UKObjectsEqual(r3.UUID, [p1Info branchInfoForUUID: branch1C.UUID].currentRevisionUUID);
 
 	UKObjectsEqual(A(r0, r1, r3, r5, r6, r7, r9, r10), [self revisionsForBranch: branch1C options: options]);
 	UKObjectsEqual(A(r0, r1, r3, r5, r6, r8), [self revisionsForBranch: branch1B options: options]);

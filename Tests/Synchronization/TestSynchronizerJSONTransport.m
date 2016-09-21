@@ -153,11 +153,11 @@
 	
 	jsonServer.paused = NO;
 		
-	UKIntsEqual(0, [[[client1.persistentRoot rootObject] contents] count]);
+	UKIntsEqual(0, [[client1.persistentRoot.rootObject contents] count]);
 	
 	jsonClient1.paused = NO;
 	
-	UKIntsEqual(1, [[[client1.persistentRoot rootObject] contents] count]);
+	UKIntsEqual(1, [[client1.persistentRoot.rootObject contents] count]);
 }
 
 - (void) testClientEditWhilePausedAndServerReceivingWhilePaused
@@ -169,11 +169,11 @@
 	
 	jsonClient1.paused = NO;
 	
-	UKIntsEqual(0, [[[server.persistentRoot rootObject] contents] count]);
+	UKIntsEqual(0, [[server.persistentRoot.rootObject contents] count]);
 	
 	jsonServer.paused = NO;
 	
-	UKIntsEqual(1, [[[server.persistentRoot rootObject] contents] count]);
+	UKIntsEqual(1, [[server.persistentRoot.rootObject contents] count]);
 }
 
 @end

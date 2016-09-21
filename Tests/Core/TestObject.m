@@ -169,7 +169,7 @@
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
 	COObject *object = proot.rootObject;
 
-	UKStringsEqual([object description], [object stringValue]);
+	UKStringsEqual(object.description, [object stringValue]);
 }
 
 - (void) testCreationAndModificationDates
@@ -177,16 +177,16 @@
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
 	COObject *object = proot.rootObject;
 
-	UKNil([proot creationDate]);
-	UKNil([proot modificationDate]);
+	UKNil(proot.creationDate);
+	UKNil(proot.modificationDate);
 
 	object.name = @"Bing";
 	[ctx commit];
 
 	CORevision *firstRev = object.revision;
 
-	UKObjectsEqual([firstRev date], [proot creationDate]);
-	UKObjectsEqual([firstRev date], [proot modificationDate]);
+	UKObjectsEqual(firstRev.date, proot.creationDate);
+	UKObjectsEqual(firstRev.date, proot.modificationDate);
 
 	object.name = @"Bong";
 	[ctx commit];
@@ -197,8 +197,8 @@
 	[self checkPersistentRootWithExistingAndNewContext: proot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual([firstRev date], [testProot creationDate]);
-		 UKObjectsEqual([lastRev date], [testProot modificationDate]);
+		 UKObjectsEqual(firstRev.date, testProot.creationDate);
+		 UKObjectsEqual(lastRev.date, testProot.modificationDate);
 	 }];
 }
 
@@ -210,7 +210,7 @@
 
 	[bookmark setValue: date forProperty: @"lastVisitedDate"];
 
-	UKObjectsEqual(date, [bookmark lastVisitedDate]);
+	UKObjectsEqual(date, bookmark.lastVisitedDate);
 	UKTrue(bookmark->setterInvoked);
 }
 
@@ -235,7 +235,7 @@
 
 	NSString *dateString = [bookmark serializedValueForPropertyDescription: propertyDesc];
 
-	UKObjectsEqual([[bookmark lastVisitedDate] stringValue], dateString);
+	UKObjectsEqual([bookmark.lastVisitedDate stringValue], dateString);
 	UKTrue(bookmark->serialized);
 }
 
@@ -249,7 +249,7 @@
 
 	[bookmark setSerializedValue: date forPropertyDescription: propertyDesc];
 	
-	UKObjectsEqual(date, [bookmark lastVisitedDate]);
+	UKObjectsEqual(date, bookmark.lastVisitedDate);
 	UKTrue(bookmark->deserialized);
 	UKTrue(bookmark->setterInvoked);
 }
@@ -324,20 +324,20 @@
 	COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
 	COObject *object = [[COObject alloc] initWithObjectGraphContext: objectGraphContext];
 	
-	UKObjectsSame(objectGraphContext, [object objectGraphContext]);
-	UKNil([object branch]);
+	UKObjectsSame(objectGraphContext, object.objectGraphContext);
+	UKNil(object.branch);
 	UKNil(object.persistentRoot);
-	UKNil([object editingContext]);
+	UKNil(object.editingContext);
 	
 	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithRootObject: object];
 	COBranch *branch = persistentRoot.currentBranch;
 	UKNotNil(persistentRoot);
 	UKNotNil(branch);
 	
-	UKObjectsSame(objectGraphContext, [object objectGraphContext]);
-	UKObjectsSame(branch, [object branch]);
+	UKObjectsSame(objectGraphContext, object.objectGraphContext);
+	UKObjectsSame(branch, object.branch);
 	UKObjectsSame(persistentRoot, object.persistentRoot);
-	UKObjectsSame(ctx, [object editingContext]);
+	UKObjectsSame(ctx, object.editingContext);
 }
 
 - (void) testEntityDescriptionImmutableAfterCOObjectCreation
