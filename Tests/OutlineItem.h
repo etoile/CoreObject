@@ -10,7 +10,7 @@
 @interface OutlineItem : COContainer
 
 @property (nonatomic, readwrite, assign) BOOL isShared;
-@property (nonatomic, readwrite, strong) NSString *label;
+@property (nonatomic, readwrite, copy) NSString *label;
 @property (nonatomic, readwrite, copy) NSArray *contents;
 @property (nonatomic, readonly, weak) OutlineItem *parentContainer;
 @property (nonatomic, readonly, weak) NSSet *parentCollections;

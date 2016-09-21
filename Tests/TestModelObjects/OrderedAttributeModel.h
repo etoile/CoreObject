@@ -11,6 +11,6 @@
  * Test model object that has an ordered multivalued NSString attribute
  */
 @interface OrderedAttributeModel : COObject
-@property (nonatomic, readwrite, strong) NSString *label;
-@property (nonatomic, readwrite, strong) NSArray *contents;
+@property (nonatomic, readwrite, copy) NSString *label;
+@property (nonatomic, readwrite, copy) NSArray *contents;
 @end

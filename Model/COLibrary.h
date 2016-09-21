@@ -43,7 +43,7 @@
  * The identifier is used to look up the libraries in 
  * COEditingContext(COCommonLibraries) API. 
  */
-@property (nonatomic, readwrite, strong) NSString *identifier;
+@property (nonatomic, readwrite, copy) NSString *identifier;
 
 
 /** @taskunit Type Querying */

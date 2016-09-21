@@ -17,10 +17,10 @@
  */
 @interface COSynchronizerRevision : NSObject
 @property (nonatomic, readwrite, strong) COItemGraph *modifiedItems;
-@property (nonatomic, readwrite, strong) ETUUID *revisionUUID;
-@property (nonatomic, readwrite, strong) ETUUID *parentRevisionUUID;
+@property (nonatomic, readwrite, copy) ETUUID *revisionUUID;
+@property (nonatomic, readwrite, copy) ETUUID *parentRevisionUUID;
 @property (nonatomic, readwrite, copy) NSDictionary *metadata;
-@property (nonatomic, readwrite, strong) NSDate *date;
+@property (nonatomic, readwrite, copy) NSDate *date;
 
 - (void) writeToTransaction: (COStoreTransaction *)txn
 		 persistentRootUUID: (ETUUID *)persistentRoot

@@ -14,16 +14,16 @@
  * in response
  */
 @interface COSynchronizerPushedRevisionsFromClientMessage : NSObject
-@property (nonatomic, readwrite, strong) NSString *clientID;
+@property (nonatomic, readwrite, copy) NSString *clientID;
 /** 
  * Array of COSynchronizerRevision
  * The parent of the first revision in the array should be the last revision
  * the client received from the server.
  */
-@property (nonatomic, readwrite, strong) NSArray *revisions;
+@property (nonatomic, readwrite, copy) NSArray *revisions;
 /**
  * Identifier for the message
  */
-@property (nonatomic, readwrite, strong) ETUUID *lastRevisionUUIDSentByServer;
+@property (nonatomic, readwrite, copy) ETUUID *lastRevisionUUIDSentByServer;
 
 @end

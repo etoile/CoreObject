@@ -30,24 +30,24 @@
  *
  * See -[COHistoryCompaction finalizablePersistentRootUUIDs].
  */
-@property (nonatomic, readwrite, strong) NSSet *finalizablePersistentRootUUIDs;
+@property (nonatomic, readwrite, copy) NSSet *finalizablePersistentRootUUIDs;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
  * See -[COHistoryCompaction compactablePersistentRootUUIDs].
  */
-@property (nonatomic, readwrite, strong) NSSet *compactablePersistentRootUUIDs;
+@property (nonatomic, readwrite, copy) NSSet *compactablePersistentRootUUIDs;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
  * See -[COHistoryCompaction finalizableBranchUUIDs].
  */
-@property (nonatomic, readwrite, strong) NSSet *finalizableBranchUUIDs;
+@property (nonatomic, readwrite, copy) NSSet *finalizableBranchUUIDs;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
  * See -[COHistoryCompaction compactableBranchUUIDs].
  */
-@property (nonatomic, readwrite, strong) NSSet *compactableBranchUUIDs;
+@property (nonatomic, readwrite, copy) NSSet *compactableBranchUUIDs;
 
 @end

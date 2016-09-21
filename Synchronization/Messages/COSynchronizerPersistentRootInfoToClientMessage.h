@@ -17,10 +17,10 @@
  */
 @interface COSynchronizerPersistentRootInfoToClientMessage : NSObject
 
-@property (nonatomic, readwrite, strong) ETUUID *persistentRootUUID;
+@property (nonatomic, readwrite, copy) ETUUID *persistentRootUUID;
 @property (readwrite, nonatomic, copy) NSDictionary *persistentRootMetadata;
-@property (nonatomic, readwrite, strong) ETUUID *branchUUID;
-@property (nonatomic, readwrite, strong) NSDictionary *branchMetadata;
+@property (nonatomic, readwrite, copy) ETUUID *branchUUID;
+@property (nonatomic, readwrite, copy) NSDictionary *branchMetadata;
 @property (nonatomic, readwrite, strong) COSynchronizerRevision *currentRevision;
 
 @end

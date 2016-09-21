@@ -50,7 +50,7 @@
 
 @protocol COAttributedStringDiffOperation <NSObject>
 @required
-@property (nonatomic, readwrite, strong) ETUUID *attributedStringUUID;
+@property (nonatomic, readwrite, copy) ETUUID *attributedStringUUID;
 @property (nonatomic, readwrite, assign) NSRange range;
 @property (nonatomic, readwrite, strong) id source;
 /**

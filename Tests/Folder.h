@@ -6,8 +6,8 @@
  */
 @interface Folder : COObject
 
-@property (nonatomic, readwrite, strong) NSString *label;
-@property (nonatomic, readwrite, strong) NSSet *contents;
+@property (nonatomic, readwrite, copy) NSString *label;
+@property (nonatomic, readwrite, copy) NSSet *contents;
 @property (nonatomic, readwrite, weak) Folder *parent;
 
 @end

@@ -51,7 +51,7 @@
 /**
  * The undo track name on which the command was recorded.
  */
-@property (nonatomic, readwrite, strong) NSString *trackName;
+@property (nonatomic, readwrite, copy) NSString *trackName;
 /**
  * The commit UUID. 
  *

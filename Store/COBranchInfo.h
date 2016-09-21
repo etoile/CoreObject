@@ -21,9 +21,9 @@
     ETUUID *parentBranchUUID_;
 }
 
-@property (nonatomic, readwrite, strong) ETUUID *UUID;
+@property (nonatomic, readwrite, copy) ETUUID *UUID;
 
-@property (nonatomic, readwrite, strong) ETUUID *persistentRootUUID;
+@property (nonatomic, readwrite, copy) ETUUID *persistentRootUUID;
 
 /**
  * The newest revision on the branch.
@@ -46,11 +46,11 @@
  * revision, haven't yet made a change) which suggests it should probably be
  * removed.
  */
-@property (nonatomic, readwrite, strong) ETUUID *headRevisionUUID;
+@property (nonatomic, readwrite, copy) ETUUID *headRevisionUUID;
 /**
  * The current revision of this branch.
  */
-@property (nonatomic, readwrite, strong) ETUUID *currentRevisionUUID;
+@property (nonatomic, readwrite, copy) ETUUID *currentRevisionUUID;
 
 /**
  * Metadata, like the user-facing name of the branch.
@@ -59,10 +59,10 @@
  * (If there is a real use case for unversioned persistent root metadata,
  *  we can easily re-add it)
  */
-@property (nonatomic, readwrite, strong) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy) NSDictionary *metadata;
 @property (nonatomic, readwrite, getter=isDeleted) BOOL deleted;
 
-@property (nonatomic, readwrite, strong) ETUUID *parentBranchUUID;
+@property (nonatomic, readwrite, copy) ETUUID *parentBranchUUID;
 
 /**
  * In git terminology, if the receiver is "master", returns "origin/master", or

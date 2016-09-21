@@ -49,7 +49,7 @@
  *
  * See -suggestedColorForNode:.
  */
-@property (nonatomic, readwrite, strong)  UIColor *pastColor;
+@property (nonatomic, readwrite, copy)  UIColor *pastColor;
 /**
  * The color used to indicate the future history.
  *
@@ -57,7 +57,7 @@
  *
  * See -suggestedColorForNode:.
  */
-@property (nonatomic, readwrite, strong)  UIColor *futureColor;
+@property (nonatomic, readwrite, copy)  UIColor *futureColor;
 /**
  * Returns either -pastColor or -futureColor based on where the node sits 
  * relative to -[COTrack currentNode].

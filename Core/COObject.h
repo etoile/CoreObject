@@ -570,7 +570,7 @@
 /**
  * The object name.
  */
-@property (nonatomic, readwrite, strong) NSString *name;
+@property (nonatomic, readwrite, copy) NSString *name;
 /**
  * <override-dummy />
  * Returns the object identifier.

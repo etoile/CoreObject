@@ -14,8 +14,8 @@
 	NSString *text;
 }
 
-@property (nonatomic, readwrite, strong) NSString *text;
-@property (nonatomic, readwrite, strong) NSSet *attributes;
+@property (nonatomic, readwrite, copy) NSString *text;
+@property (nonatomic, readwrite, copy) NSSet *attributes;
 @property (nonatomic, readonly, weak) COAttributedString *parentString;
 /**
  * Returns an item graph that contains a copy of the receiver that has been trimmed to the given subrange as its root object.

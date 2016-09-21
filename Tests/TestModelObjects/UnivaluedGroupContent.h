@@ -11,6 +11,6 @@
  * Test model object to be inserted as content in UnivaluedGroupWithOpposite
  */
 @interface UnivaluedGroupContent : COObject
-@property (nonatomic, readwrite, strong) NSString *label;
-@property (nonatomic, readwrite, strong) NSSet *parents;
+@property (nonatomic, readwrite, copy) NSString *label;
+@property (nonatomic, readwrite, copy) NSSet *parents;
 @end

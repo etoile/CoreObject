@@ -9,12 +9,12 @@
 #include <assert.h>
 
 @interface Calendar : COObject
-@property (nonatomic, readwrite, strong) NSSet *appointments;
+@property (nonatomic, readwrite, copy) NSSet *appointments;
 @end
 
 @interface Appointment : COObject
-@property (nonatomic, readwrite, strong) NSDate *startDate;
-@property (nonatomic, readwrite, strong) NSDate *endDate;
+@property (nonatomic, readwrite, copy) NSDate *startDate;
+@property (nonatomic, readwrite, copy) NSDate *endDate;
 @property (nonatomic, readonly, weak) Calendar *calendar;
 
 - (id)initWithStartDate: (NSDate *)aStartDate

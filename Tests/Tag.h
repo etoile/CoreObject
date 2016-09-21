@@ -9,10 +9,10 @@
 
 @interface Tag : COGroup
 
-@property (nonatomic, readwrite, strong) NSString *label;
-@property (nonatomic, readwrite, strong) NSSet *contents;
+@property (nonatomic, readwrite, copy) NSString *label;
+@property (nonatomic, readwrite, copy) NSSet *contents;
 
-@property (nonatomic, readwrite, strong) NSSet *childTags;
+@property (nonatomic, readwrite, copy) NSSet *childTags;
 @property (nonatomic, readonly, weak) Tag *parentTag;
 
 @end

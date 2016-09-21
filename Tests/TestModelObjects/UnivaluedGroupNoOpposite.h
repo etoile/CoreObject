@@ -10,7 +10,7 @@
  * Test model object that has an univalued relationship to COObject (no opposite)
  */
 @interface UnivaluedGroupNoOpposite: COObject
-@property (nonatomic, readwrite, strong) NSString *label;
+@property (nonatomic, readwrite, copy) NSString *label;
 @property (nonatomic, readwrite, strong) COObject *content;
 
 + (NSUInteger) countOfDeallocCalls;

@@ -12,11 +12,11 @@
 /**
  * e.g. font-weight
  */
-@property (nonatomic, readwrite, strong) NSString *styleKey;
+@property (nonatomic, readwrite, copy) NSString *styleKey;
 /**
  * e.g. bold
  */
-@property (nonatomic, readwrite, strong) NSString *styleValue;
+@property (nonatomic, readwrite, copy) NSString *styleValue;
 
 @property (nonatomic, readonly) COItemGraph *attributeItemGraph;
 

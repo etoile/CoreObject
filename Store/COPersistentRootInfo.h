@@ -35,12 +35,12 @@
  */
 @property (nonatomic, readonly) ETUUID *currentRevisionUUID;
 
-@property (nonatomic, readwrite, strong) ETUUID *UUID;
-@property (nonatomic, readwrite, strong) ETUUID *currentBranchUUID;
-@property (nonatomic, readwrite, strong) NSDictionary *branchForUUID;
+@property (nonatomic, readwrite, copy) ETUUID *UUID;
+@property (nonatomic, readwrite, copy) ETUUID *currentBranchUUID;
+@property (nonatomic, readwrite, copy) NSDictionary *branchForUUID;
 @property (nonatomic, readwrite, getter=isDeleted) BOOL deleted;
 @property (nonatomic, readwrite, assign) int64_t transactionID;
-@property (nonatomic, readwrite, strong) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy) NSDictionary *metadata;
 
 - (NSArray *)branchInfosWithMetadataValue: (id)aValue forKey: (NSString *)aKey;
 

@@ -28,7 +28,7 @@
  *   be added / removed.
  */
 @interface COAttributedString : COObject
-@property (nonatomic, readwrite, strong) NSArray *chunks;
+@property (nonatomic, readwrite, copy) NSArray *chunks;
 
 @property (nonatomic, readonly) NSString *string;
 

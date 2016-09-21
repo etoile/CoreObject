@@ -29,7 +29,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
 
 @interface COUndoTrackSerializedCommand : NSObject
 @property (nonatomic, readwrite, strong) id JSONData;
-@property (nonatomic, readwrite, strong) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy) NSDictionary *metadata;
 @property (nonatomic, readwrite, copy) ETUUID *UUID;
 @property (nonatomic, readwrite, copy) ETUUID *parentUUID;
 @property (nonatomic, readwrite, copy) NSString *trackName;
