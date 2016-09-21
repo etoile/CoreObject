@@ -59,6 +59,6 @@
  * For the migration registered under this package/version pair, the entity or
  * property move must have been done.
  */
-@property (nonatomic, assign) int64_t packageVersion;
+@property (nonatomic, readwrite, assign) int64_t packageVersion;
 
 @end

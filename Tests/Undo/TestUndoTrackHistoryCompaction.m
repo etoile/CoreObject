@@ -13,10 +13,10 @@
 @end
 
 @interface COExpectedCompaction : COUndoTrackHistoryCompaction
-@property (nonatomic, readwrite) NSSet *finalizablePersistentRootUUIDs;
-@property (nonatomic, readwrite) NSSet *compactablePersistentRootUUIDs;
-@property (nonatomic, readwrite) NSDictionary *deadRevisionUUIDs;
-@property (nonatomic, readwrite) NSDictionary *liveRevisionUUIDs;
+@property (nonatomic, readwrite, copy) NSSet *finalizablePersistentRootUUIDs;
+@property (nonatomic, readwrite, copy) NSSet *compactablePersistentRootUUIDs;
+@property (nonatomic, readwrite, copy) NSDictionary *deadRevisionUUIDs;
+@property (nonatomic, readwrite, copy) NSDictionary *liveRevisionUUIDs;
 @end
 
 @implementation COExpectedCompaction

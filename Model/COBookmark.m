@@ -55,7 +55,7 @@
 - (void)setURL: (NSURL *)aURL
 {
 	[self willChangeValueForProperty: @"URL"];
-	_URL =  aURL;
+	_URL =  [aURL copy];
 	[self didChangeValueForProperty: @"URL"];
 }
 
@@ -74,14 +74,14 @@ support bookmark search based on URL text. */
 - (void)setLastVisitedDate:(NSDate *)aDate
 {
 	[self willChangeValueForProperty: @"lastVisitedDate"];
-	_lastVisitedDate =  aDate;
+	_lastVisitedDate =  [aDate copy];
 	[self didChangeValueForProperty: @"lastVisitedDate"];
 }
 
 - (void)setFavIconData: (NSData *)favIconData
 {
 	[self willChangeValueForProperty: @"favIconData"];
-	_favIconData =  favIconData;
+	_favIconData =  [favIconData copy];
 	[self didChangeValueForProperty: @"favIconData"];
 }
 

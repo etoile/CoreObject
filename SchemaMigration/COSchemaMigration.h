@@ -354,7 +354,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  *
  * See -sourceVersion.
  */
-@property (nonatomic, assign) int64_t destinationVersion;
+@property (nonatomic, readwrite, assign) int64_t destinationVersion;
 /**
  * The old schema version, one version behind -destinationVersion.
  *

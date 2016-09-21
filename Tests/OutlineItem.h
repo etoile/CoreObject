@@ -9,20 +9,20 @@
 
 @interface OutlineItem : COContainer
 
-@property (nonatomic, readwrite) BOOL isShared;
-@property (readwrite, strong, nonatomic) NSString *label;
-@property (readwrite, strong, nonatomic) NSArray *contents;
-@property (weak, readonly, nonatomic) OutlineItem *parentContainer;
-@property (strong, readonly, nonatomic) NSSet *parentCollections;
-@property (readwrite, nonatomic, getter=isChecked, setter=setChecked:) BOOL checked;
-@property (readwrite, strong, nonatomic) COAttachmentID *attachmentID;
+@property (nonatomic, readwrite, assign) BOOL isShared;
+@property (nonatomic, readwrite, strong) NSString *label;
+@property (nonatomic, readwrite, copy) NSArray *contents;
+@property (nonatomic, readonly, weak) OutlineItem *parentContainer;
+@property (nonatomic, readonly, weak) NSSet *parentCollections;
+@property (nonatomic, readwrite, assign, getter=isChecked) BOOL checked;
+@property (nonatomic, readwrite, strong) COAttachmentID *attachmentID;
 
 @end
 
 /* OutlineItem variant to test a composite/container transient relationship */
 @interface TransientOutlineItem : COContainer
 
-@property (nonatomic, readwrite, strong) NSArray *contents;
+@property (nonatomic, readwrite, copy) NSArray *contents;
 @property (nonatomic, readwrite, weak) TransientOutlineItem *parentContainer;
 
 @end

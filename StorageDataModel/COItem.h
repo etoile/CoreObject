@@ -144,9 +144,9 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes NS_DESIGNATED_INITIALIZ
 /** @taskunit Convenience */
 
 
-@property (nonatomic, readwrite) NSString *entityName;
-@property (nonatomic, readwrite) int64_t packageVersion;
-@property (nonatomic, readwrite) NSString *packageName;
+@property (nonatomic, readwrite, copy) NSString *entityName;
+@property (nonatomic, readwrite, assign) int64_t packageVersion;
+@property (nonatomic, readwrite, copy) NSString *packageName;
 
 - (void) setValue: (id)aValue
 	 forAttribute: (NSString*)anAttribute;

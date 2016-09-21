@@ -18,7 +18,7 @@ extern NSString * const COPersistentRootName;
 
 /** @taskunit Framework Private */
 
-@property (nonatomic, assign) int64_t lastTransactionID;
+@property (nonatomic, readwrite, assign) int64_t lastTransactionID;
 
 /**
  * <init />

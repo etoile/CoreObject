@@ -18,8 +18,8 @@
 	COMutableArray *_contents;
 }
 
-@property (nonatomic, readwrite) NSString *label;
-@property (nonatomic, readwrite) NSArray *contents;
+@property (nonatomic, readwrite, copy) NSString *label;
+@property (nonatomic, readwrite, copy) NSArray *contents;
 
 @end
 

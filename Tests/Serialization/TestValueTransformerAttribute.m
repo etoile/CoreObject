@@ -10,7 +10,7 @@
 #import "TestCommon.h"
 
 @interface ValueTransformerModel : COObject
-@property (readwrite, strong, nonatomic) NSColor *color;
+@property (nonatomic, readwrite, strong) NSColor *color;
 @end
 
 @implementation ValueTransformerModel

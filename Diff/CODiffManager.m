@@ -10,7 +10,7 @@
 #import <CoreObject/CoreObject.h>
 
 @interface CODiffManager ()
-@property (nonatomic, strong) NSMutableDictionary *subDiffsByAlgorithmName;
+@property (nonatomic, readwrite, strong) NSMutableDictionary *subDiffsByAlgorithmName;
 @end
 
 @implementation CODiffManager

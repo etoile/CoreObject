@@ -10,23 +10,23 @@
 
 @interface Person : COObject
 
-@property (nonatomic, strong) NSString *role;
-@property (nonatomic, strong) NSString *summary;
-@property (nonatomic, assign) NSInteger age;
-@property (nonatomic, strong) NSData *iconData;
+@property (nonatomic, readwrite, strong) NSString *role;
+@property (nonatomic, readwrite, strong) NSString *summary;
+@property (nonatomic, readwrite, assign) NSInteger age;
+@property (nonatomic, readwrite, strong) NSData *iconData;
 
-@property (nonatomic, strong) NSString *streetAddress;
-@property (nonatomic, strong) NSString *city;
-@property (nonatomic, strong) NSString *administrativeArea;
-@property (nonatomic, strong) NSString *postalCode;
-@property (nonatomic, strong) NSString *country;
+@property (nonatomic, readwrite, strong) NSString *streetAddress;
+@property (nonatomic, readwrite, strong) NSString *city;
+@property (nonatomic, readwrite, strong) NSString *administrativeArea;
+@property (nonatomic, readwrite, strong) NSString *postalCode;
+@property (nonatomic, readwrite, strong) NSString *country;
 
-@property (nonatomic, strong) NSString *phoneNumber;
-@property (nonatomic, strong) NSString *emailAddress;
-@property (nonatomic, strong) NSURL *website;
+@property (nonatomic, readwrite, strong) NSString *phoneNumber;
+@property (nonatomic, readwrite, strong) NSString *emailAddress;
+@property (nonatomic, readwrite, strong) NSURL *website;
 
-@property (nonatomic, strong) NSArray *stuff;
-@property (nonatomic, strong) NSSet *teachers;
-@property (nonatomic, strong) NSSet *students;
+@property (nonatomic, readwrite, strong) NSArray *stuff;
+@property (nonatomic, readwrite, strong) NSSet *teachers;
+@property (nonatomic, readwrite, strong) NSSet *students;
 
 @end

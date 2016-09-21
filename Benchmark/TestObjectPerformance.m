@@ -26,8 +26,8 @@
  */
 
 @interface FoundationModelObject : NSObject
-@property (nonatomic, readwrite) NSString *stringProperty;
-@property (nonatomic, readwrite) NSMutableArray *arrayProperty;
+@property (nonatomic, readwrite, copy) NSString *stringProperty;
+@property (nonatomic, readwrite, copy) NSMutableArray *arrayProperty;
 @end
 
 @implementation FoundationModelObject

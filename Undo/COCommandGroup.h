@@ -100,7 +100,7 @@
  *
  * See also -[COUndoTrack childrenOfNode:].
  */
-@property (nonatomic, readwrite) ETUUID *parentUUID;
+@property (nonatomic, readwrite, copy) ETUUID *parentUUID;
 /**
  * The commit time.
  */
@@ -108,7 +108,7 @@
 /**
  * The commit order in the Undo track store.
  */
-@property (nonatomic, readwrite) int64_t sequenceNumber;
+@property (nonatomic, readwrite, assign) int64_t sequenceNumber;
 /**
  * The parent command, see -parentUUID.
  *

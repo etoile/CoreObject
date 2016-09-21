@@ -390,7 +390,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  *
  * See also -rootItemUUID.
  */
-@property (nonatomic, strong) id rootObject;
+@property (nonatomic, readwrite, strong) id rootObject;
 
 
 /** @taskunit Change Tracking */

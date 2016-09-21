@@ -56,7 +56,7 @@
  *
  * This property is persistent and never nil.
  */
-@property (nonatomic, strong) NSURL *URL;
+@property (nonatomic, readwrite, strong) NSURL *URL;
 /**
  * The last time the URL was visited.
  *
@@ -65,7 +65,7 @@
  *
  * This property is persistent.
  */
-@property (nonatomic, strong) NSDate *lastVisitedDate;
+@property (nonatomic, readwrite, strong) NSDate *lastVisitedDate;
 /**
  * The image data for the fav icon bound to the URL.
  *
@@ -74,7 +74,7 @@
  *
  * This property is persistent.
  */
-@property (nonatomic, strong) NSData *favIconData;
+@property (nonatomic, readwrite, strong) NSData *favIconData;
 
 @end
 

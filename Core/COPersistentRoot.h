@@ -290,7 +290,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  *
  * TODO: Document the deletion behavior for [self.currentBranch setDeleted: YES]. 
  */
-@property (nonatomic, strong) COBranch *currentBranch;
+@property (nonatomic, readwrite, strong) COBranch *currentBranch;
 /**
  * All the branches owned by the persistent root (excluding those that are 
  * marked as deleted on disk), plus those pending insertion and undeletion (and 
@@ -419,7 +419,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * if the current branch changes in the receiver, the other persistent root 
  * will continue to refer to the root object of the previous current branch.
  */
-@property (nonatomic, strong) id rootObject;
+@property (nonatomic, readwrite, strong) id rootObject;
 /**
  * Shorthand for <code>[self.objectGraphContext loadedObjectForUUID:]</code>.
  */
@@ -430,11 +430,11 @@ extern NSString * const COPersistentRootDidChangeNotification;
  * For a new persistent root, the revision is nil, unless it is a cheap copy. 
  * See -[COBranch makeCopyFromRevision:].
  */
-@property (nonatomic, strong) CORevision *currentRevision;
+@property (nonatomic, readwrite, strong) CORevision *currentRevision;
 /**
  * Shortcut for <code>self.currentBranch.headRevision</code>.
  */
-@property (nonatomic, strong) CORevision *headRevision;
+@property (nonatomic, readwrite, strong) CORevision *headRevision;
 /**
  * Shorthand for <code>self.editingContext.store</code>.
  */

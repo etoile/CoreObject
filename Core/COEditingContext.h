@@ -354,7 +354,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  *
  * By default, returns COEditingContextUnloadingOnDeletion.
  */
-@property (nonatomic, assign) COEditingContextUnloadingBehavior unloadingBehavior;
+@property (nonatomic, readwrite, assign) COEditingContextUnloadingBehavior unloadingBehavior;
 
 
 /** @taskunit Pending Changes */

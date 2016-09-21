@@ -130,6 +130,6 @@
  */
 - (void)doPreCommitChecks;
 
-@property (nonatomic, readwrite) BOOL ignoresChangeTrackingNotifications;
+@property (nonatomic, readwrite, assign) BOOL ignoresChangeTrackingNotifications;
 
 @end

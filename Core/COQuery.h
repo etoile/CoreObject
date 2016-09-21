@@ -65,7 +65,7 @@
 /**
  * The predicate that expresses the query.
  */
-@property (nonatomic, strong) NSPredicate *predicate;
+@property (nonatomic, readwrite, strong) NSPredicate *predicate;
 /**
  * Returns a SQL representation that can be passed to the COStore API.
  */

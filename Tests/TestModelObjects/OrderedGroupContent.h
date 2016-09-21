@@ -11,6 +11,6 @@
  * Test model object to be inserted as content in OrderedGroupWithOpposite
  */
 @interface OrderedGroupContent : COObject
-@property (readwrite, strong, nonatomic) NSString *label;
-@property (readwrite, strong, nonatomic) NSSet *parentGroups;
+@property (nonatomic, readwrite, strong) NSString *label;
+@property (nonatomic, readwrite, strong) NSSet *parentGroups;
 @end
