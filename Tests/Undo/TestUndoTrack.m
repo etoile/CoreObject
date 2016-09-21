@@ -143,7 +143,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 
 - (void) testEmptyTrack
 {
-	UKObjectsEqual(A(placeholderNode), [_track nodes]);
+	UKObjectsEqual(A(placeholderNode), _track.nodes);
 	UKObjectsEqual(placeholderNode, _track.currentNode);
 }
 
@@ -158,7 +158,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	COCommandGroup *group = [[COCommandGroup alloc] init];
 	[_track recordCommand: group];
 
-	UKObjectsEqual(A(placeholderNode, group), [_track nodes]);
+	UKObjectsEqual(A(placeholderNode, group), _track.nodes);
 	UKObjectsEqual(group, [_track currentNode]);
 	
 	/* -recordCommand: reloads the track before recording the command */
@@ -170,7 +170,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	
 	COUndoTrack *secondTrackInstance = [COUndoTrack trackForName: TEST_TRACK withEditingContext: ctx];
 	UKObjectsNotSame(_track, secondTrackInstance);
-	UKObjectsEqual(A(placeholderNode, group), [secondTrackInstance nodes]);
+	UKObjectsEqual(A(placeholderNode, group), secondTrackInstance.nodes);
 	UKObjectsEqual(group, [secondTrackInstance currentNode]);
 }
 
@@ -190,7 +190,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	[_track recordCommand: group1];
 	[_track recordCommand: group2];
 	
-	UKObjectsEqual(A(placeholderNode, group1, group2), [_track nodes]);
+	UKObjectsEqual(A(placeholderNode, group1, group2), _track.nodes);
 	UKObjectsEqual(group2, [_track currentNode]);
 	UKObjectsEqual(group1.UUID, group2.parentUUID);
 
@@ -203,7 +203,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	
 	COUndoTrack *secondTrackInstance = [COUndoTrack trackForName: TEST_TRACK withEditingContext: ctx];
 	UKObjectsNotSame(_track, secondTrackInstance);
-	UKObjectsEqual(A(placeholderNode, group1, group2), [secondTrackInstance nodes]);
+	UKObjectsEqual(A(placeholderNode, group1, group2), secondTrackInstance.nodes);
 	UKObjectsEqual(group2, [secondTrackInstance currentNode]);
 	UKObjectsEqual(group1.UUID, [(COCommandGroup *)[secondTrackInstance currentNode] parentUUID]);
 	
@@ -234,7 +234,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	// Check with a second COUndoTrack
 	{
 		COUndoTrack *secondTrackInstance = [COUndoTrack trackForName: TEST_TRACK withEditingContext: ctx];
-		UKObjectsEqual(A(placeholderNode, group1, group2), [secondTrackInstance nodes]);
+		UKObjectsEqual(A(placeholderNode, group1, group2), secondTrackInstance.nodes);
 		UKObjectsEqual(group1, [secondTrackInstance currentNode]);
 		UKObjectsEqual(placeholderNode.UUID,
 					   [(COCommandGroup *)[secondTrackInstance currentNode] parentUUID]);
@@ -261,7 +261,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	[_track setCurrentNode: group1];
 	[_track recordCommand: group1b];
 	
-	UKObjectsEqual(A(placeholderNode, group1, group1b), [_track nodes]);
+	UKObjectsEqual(A(placeholderNode, group1, group1b), _track.nodes);
 	UKObjectsEqual(S(group1, group1a, group1b), SA([_track allCommands]));
 	UKIntsEqual(3, [S(group1, group1a, group1b) count]);
 }
@@ -285,11 +285,11 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	UKObjectsEqual(group1.UUID, group1b.parentUUID);
 	UKObjectsEqual(placeholderNode.UUID, group1.parentUUID);
 
-	UKObjectsEqual(A(placeholderNode, group1, group1b), [_track nodes]);
+	UKObjectsEqual(A(placeholderNode, group1, group1b), _track.nodes);
 
 	[_track setCurrentNode: group1a];
 
-	UKObjectsEqual(A(placeholderNode, group1, group1a), [_track nodes]);
+	UKObjectsEqual(A(placeholderNode, group1, group1a), _track.nodes);
 }
 
 - (void) testDivergentNodesWhereCommonAncestorIsPlaceholderNode
@@ -300,21 +300,21 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	[_track recordCommand: group1a];
 	UKObjectsEqual(placeholderNode, group1a.parentNode);
 	UKObjectsEqual(placeholderNode.UUID, group1a.parentUUID);
-	UKObjectsEqual(A(placeholderNode, group1a), [_track nodes]);
+	UKObjectsEqual(A(placeholderNode, group1a), _track.nodes);
 	UKObjectsEqual(group1a, _track.currentNode);
 	
 	[_track setCurrentNode: placeholderNode];
-	UKObjectsEqual(A(placeholderNode, group1a), [_track nodes]);
+	UKObjectsEqual(A(placeholderNode, group1a), _track.nodes);
 	UKObjectsEqual(placeholderNode, _track.currentNode);
 	
 	[_track recordCommand: group1b];
 	UKObjectsEqual(placeholderNode, group1b.parentNode);
 	UKObjectsEqual(placeholderNode.UUID, group1b.parentUUID);
-	UKObjectsEqual(A(placeholderNode, group1b), [_track nodes]);
+	UKObjectsEqual(A(placeholderNode, group1b), _track.nodes);
 	UKObjectsEqual(group1b, _track.currentNode);
 	
 	[_track setCurrentNode: group1a];
-	UKObjectsEqual(A(placeholderNode, group1a), [_track nodes]);
+	UKObjectsEqual(A(placeholderNode, group1a), _track.nodes);
 	UKObjectsEqual(group1a, _track.currentNode);
 }
 
@@ -328,17 +328,17 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	[_track recordCommand: group1b];
 	[_track setCurrentNode: placeholderNode];
 	
-	UKObjectsEqual(A(placeholderNode, group1b), [_track nodes]);
+	UKObjectsEqual(A(placeholderNode, group1b), _track.nodes);
 	
 	[_track setCurrentNode: group1a];
 	
-	UKObjectsEqual(A(placeholderNode, group1a), [_track nodes]);
+	UKObjectsEqual(A(placeholderNode, group1a), _track.nodes);
 	UKObjectsEqual(group1a, _track.currentNode);
 }
 
 - (void) testUndoOnPatternTrack
 {
-	UKObjectsEqual(A(placeholderNode), [_patternTrack nodes]);
+	UKObjectsEqual(A(placeholderNode), _patternTrack.nodes);
 	
 	COCommandGroup *group1a = [[COCommandGroup alloc] init];
 	COCommandGroup *group1b = [[COCommandGroup alloc] init];
@@ -346,16 +346,16 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	COCommandGroup *group2b = [[COCommandGroup alloc] init];
 	
 	[_track recordCommand: group1a];
-	UKObjectsEqual(A(placeholderNode, group1a), [_patternTrack nodes]);
+	UKObjectsEqual(A(placeholderNode, group1a), _patternTrack.nodes);
 	
 	[_track2 recordCommand: group2a];
-	UKObjectsEqual(A(placeholderNode, group1a, group2a), [_patternTrack nodes]);
+	UKObjectsEqual(A(placeholderNode, group1a, group2a), _patternTrack.nodes);
 	
 	[_track recordCommand: group1b];
-	UKObjectsEqual(A(placeholderNode, group1a, group2a, group1b), [_patternTrack nodes]);
+	UKObjectsEqual(A(placeholderNode, group1a, group2a, group1b), _patternTrack.nodes);
 	
 	[_track2 recordCommand: group2b];
-	UKObjectsEqual(A(placeholderNode, group1a, group2a, group1b, group2b), [_patternTrack nodes]);
+	UKObjectsEqual(A(placeholderNode, group1a, group2a, group1b, group2b), _patternTrack.nodes);
 	
 	[_patternTrack undo];
 	
@@ -412,12 +412,12 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 
 	[_track recordCommand: D];
 	
-	UKObjectsEqual(A(placeholderNode, A, B, D, C), [_patternTrack nodes]);
+	UKObjectsEqual(A(placeholderNode, A, B, D, C), _patternTrack.nodes);
 	UKObjectsEqual(D, [_patternTrack currentNode]);
 
 	[_patternTrack redo];
 
-	UKObjectsEqual(A(placeholderNode, A, B, C, D), [_patternTrack nodes]);
+	UKObjectsEqual(A(placeholderNode, A, B, C, D), _patternTrack.nodes);
 	UKObjectsEqual(D, [_patternTrack currentNode]);
 }
 
@@ -439,12 +439,12 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 
 	[_track recordCommand: D];
 	
-	UKObjectsEqual(A(placeholderNode, A, B, D, C), [_patternTrack nodes]);
+	UKObjectsEqual(A(placeholderNode, A, B, D, C), _patternTrack.nodes);
 	UKObjectsEqual(D, [_patternTrack currentNode]);
 
 	[_patternTrack undo];
 
-	UKObjectsEqual(A(placeholderNode, A, B, C, D), [_patternTrack nodes]);
+	UKObjectsEqual(A(placeholderNode, A, B, C, D), _patternTrack.nodes);
 	UKObjectsEqual(B, [_patternTrack currentNode]);
 }
 
@@ -460,15 +460,15 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	[_track recordCommand: group1b];
 	[_track2 recordCommand: group2b];
 
-	// NOTE: This has the effect of reordering the commands in [_patternTrack nodes]
+	// NOTE: This has the effect of reordering the commands in _patternTrack.nodes
 	[_track undo];
 	
-	UKObjectsEqual(A(placeholderNode, group1a, group2a, group2b, group1b), [_patternTrack nodes]);
+	UKObjectsEqual(A(placeholderNode, group1a, group2a, group2b, group1b), _patternTrack.nodes);
 	UKObjectsEqual(group2b, [_patternTrack currentNode]);
 	
 	[_track undo];
 
-	UKObjectsEqual(A(placeholderNode, group2a, group2b, group1a, group1b), [_patternTrack nodes]);
+	UKObjectsEqual(A(placeholderNode, group2a, group2b, group1a, group1b), _patternTrack.nodes);
 	UKObjectsEqual(group2b, [_patternTrack currentNode]);
 }
 
@@ -489,7 +489,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	UKObjectsEqual(group2, undoGroup1.parentNode);
 	UKIntsEqual(group2.sequenceNumber + 1, undoGroup1.sequenceNumber);
 
-	UKObjectsEqual(A(placeholderNode, group1, group2, undoGroup1), [_track nodes]);
+	UKObjectsEqual(A(placeholderNode, group1, group2, undoGroup1), _track.nodes);
 	UKObjectsEqual(undoGroup1, [_track currentNode]);
 
 	/* -recordCommand: reloads the track before recording the command */
@@ -509,7 +509,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 
 	COCommandGroup *undoGroup1 = _patternTrack.nodes.lastObject;
 
-	UKObjectsEqual(undoGroup1, [_track nodes].lastObject);
+	UKObjectsEqual(undoGroup1, _track.nodes.lastObject);
 
 	UKObjectsNotEqual(group1, undoGroup1);
 	UKObjectsNotEqual(group1.parentUndoTrack, undoGroup1.parentUndoTrack);
@@ -517,9 +517,9 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	UKObjectsEqual(group2, undoGroup1.parentNode);
 	UKIntsEqual(group2.sequenceNumber + 1, undoGroup1.sequenceNumber);
 
-	UKObjectsEqual(A(placeholderNode, group1, group2, undoGroup1), [_track nodes]);
+	UKObjectsEqual(A(placeholderNode, group1, group2, undoGroup1), _track.nodes);
 	UKObjectsEqual(undoGroup1, [_track currentNode]);
-	UKObjectsEqual(A(placeholderNode, group1, group2, undoGroup1), [_patternTrack nodes]);
+	UKObjectsEqual(A(placeholderNode, group1, group2, undoGroup1), _patternTrack.nodes);
 	UKObjectsEqual(undoGroup1, [_patternTrack currentNode]);
 
 	/* -recordCommand: reloads the track before recording the command */
@@ -545,7 +545,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	UKObjectsEqual(group2, redoGroup1.parentNode);
 	UKIntsEqual(group2.sequenceNumber + 1, redoGroup1.sequenceNumber);
 
-	UKObjectsEqual(A(placeholderNode, group1, group2, redoGroup1), [_track nodes]);
+	UKObjectsEqual(A(placeholderNode, group1, group2, redoGroup1), _track.nodes);
 	UKObjectsEqual(redoGroup1, [_track currentNode]);
 
 	/* -recordCommand: reloads the track before recording the command */
@@ -571,9 +571,9 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 	UKObjectsEqual(group2, redoGroup1.parentNode);
 	UKIntsEqual(group2.sequenceNumber + 1, redoGroup1.sequenceNumber);
 
-	UKObjectsEqual(A(placeholderNode, group1, group2, redoGroup1), [_track nodes]);
+	UKObjectsEqual(A(placeholderNode, group1, group2, redoGroup1), _track.nodes);
 	UKObjectsEqual(redoGroup1, [_track currentNode]);
-	UKObjectsEqual(A(placeholderNode, group1, group2, redoGroup1), [_patternTrack nodes]);
+	UKObjectsEqual(A(placeholderNode, group1, group2, redoGroup1), _patternTrack.nodes);
 	UKObjectsEqual(redoGroup1, [_patternTrack currentNode]);
 
 	/* -recordCommand: reloads the track before recording the command */

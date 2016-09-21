@@ -267,12 +267,12 @@
 	   
 	   'current revision' <= 'head revision' */
 	branch1C.currentRevision = r3;
-	[branch1C setHeadRevision: r5];
+	branch1C.headRevision = r5;
 	[ctx commit];
 
 	COPersistentRootInfo *p1Info = [ctx.store persistentRootInfoForUUID: p1.UUID];
 
-	UKObjectsEqual(r5.UUID, [[p1Info branchInfoForUUID: branch1C.UUID] headRevisionUUID]);
+	UKObjectsEqual(r5.UUID, [p1Info branchInfoForUUID: branch1C.UUID].headRevisionUUID);
 	UKObjectsEqual(r3.UUID, [[p1Info branchInfoForUUID: branch1C.UUID] currentRevisionUUID]);
 
 	UKObjectsEqual(A(r0, r1, r3, r5, r6, r7, r9, r10), [self revisionsForBranch: branch1C options: options]);
@@ -287,10 +287,10 @@
 
 - (void)testBranchNodes
 {
-	UKObjectsEqual((@[r0, r1, r2]), [branch1A nodes]);
-	UKObjectsEqual((@[r0, r1, r3, r6, r8]), [branch1B nodes]);
-	UKObjectsEqual((@[r0, r1, r3, r6, r10]), [branch1C nodes]);
-	UKObjectsEqual((@[r0, r1, r2, r4]), [branch2A nodes]);
+	UKObjectsEqual((@[r0, r1, r2]), branch1A.nodes);
+	UKObjectsEqual((@[r0, r1, r3, r6, r8]), branch1B.nodes);
+	UKObjectsEqual((@[r0, r1, r3, r6, r10]), branch1C.nodes);
+	UKObjectsEqual((@[r0, r1, r2, r4]), branch2A.nodes);
 }
 
 - (void)testBranchNodeUpdateForNewCommit
@@ -303,7 +303,7 @@
     [ctx commit];
     CORevision *r11 = branch2A.currentRevision;
 
-	UKObjectsEqual(A(r0, r1, r2, r4, r11), [branch2A nodes]);
+	UKObjectsEqual(A(r0, r1, r2, r4, r11), branch2A.nodes);
 }
 
 // TODO: Test these things when reloading from a store

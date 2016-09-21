@@ -54,7 +54,7 @@
     UKObjectsEqual(S(library.rootObject), [photo2.rootObject parentCollections]);
     
     // Check that nothing is committed yet
-    UKObjectsEqual(@[], [store persistentRootUUIDs]);
+    UKObjectsEqual(@[], store.persistentRootUUIDs);
     
     [ctx commit];
 
@@ -654,7 +654,7 @@
         // Undelete library1, which should restore the cross-root inverse relationship
 		
 		// Check the -deletedPersistentRoots property
-		NSSet *deletedProots = [ctx2 deletedPersistentRoots];
+		NSSet *deletedProots = ctx2.deletedPersistentRoots;
 		UKIntsEqual(1, deletedProots.count);
         COPersistentRoot *library1ctx2 = [deletedProots anyObject];
 		UKObjectsEqual(library1.UUID, library1ctx2.UUID);

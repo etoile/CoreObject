@@ -697,8 +697,8 @@ static ETUUID *childUUID2;
 
 - (void) testDeletePersistentRoot
 {
-    UKObjectsEqual(@[], [store deletedPersistentRootUUIDs]);
-    UKObjectsEqual(A(prootUUID), [store persistentRootUUIDs]);
+    UKObjectsEqual(@[], store.deletedPersistentRootUUIDs);
+    UKObjectsEqual(A(prootUUID), store.persistentRootUUIDs);
     UKFalse([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
 
 	[self checkHasTables: YES forUUID: prootUUID];
@@ -711,8 +711,8 @@ static ETUUID *childUUID2;
 	}
 
     UKTrue([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
-    UKObjectsEqual(A(prootUUID), [store deletedPersistentRootUUIDs]);
-    UKObjectsEqual(@[], [store persistentRootUUIDs]);
+    UKObjectsEqual(A(prootUUID), store.deletedPersistentRootUUIDs);
+    UKObjectsEqual(@[], store.persistentRootUUIDs);
     UKNotNil([store persistentRootInfoForUUID: prootUUID]);
     UKFalse([[[store persistentRootInfoForUUID: prootUUID] currentBranchInfo] isDeleted]); // Deleting proot does not mark branch as deleted.
     
@@ -724,8 +724,8 @@ static ETUUID *childUUID2;
 	}
     
     UKFalse([[store persistentRootInfoForUUID: prootUUID] isDeleted]);
-    UKObjectsEqual(@[], [store deletedPersistentRootUUIDs]);
-    UKObjectsEqual(A(prootUUID), [store persistentRootUUIDs]);
+    UKObjectsEqual(@[], store.deletedPersistentRootUUIDs);
+    UKObjectsEqual(A(prootUUID), store.persistentRootUUIDs);
     
     // Delete it, and finalize the deletion
 	{
@@ -736,8 +736,8 @@ static ETUUID *childUUID2;
 		UKTrue([store finalizeDeletionsForPersistentRoot: prootUUID error: NULL]);
 	}
     
-    UKObjectsEqual(@[], [store persistentRootUUIDs]);
-    UKObjectsEqual(@[], [store deletedPersistentRootUUIDs]);
+    UKObjectsEqual(@[], store.persistentRootUUIDs);
+    UKObjectsEqual(@[], store.deletedPersistentRootUUIDs);
     UKNil([store persistentRootInfoForUUID: prootUUID]);
     UKNil([store revisionInfoForRevisionUUID: initialRevisionUUID persistentRootUUID: prootUUID]);
     UKNil([store itemGraphForRevisionUUID: initialRevisionUUID persistentRoot: prootUUID]);
@@ -756,7 +756,7 @@ static ETUUID *childUUID2;
 //    
 //    UKTrue([store deletePersistentRoot: prootUUID]);
 //    // Persistent root returned since we have not called finalizeDeletions.
-//    UKObjectsEqual(A(prootUUID), [store persistentRootUUIDs]);
+//    UKObjectsEqual(A(prootUUID), store.persistentRootUUIDs);
 //    
 //    // Persistent root returned since we have not called finalizeDeletions.
 //    UKNotNil([store persistentRootWithUUID: prootUUID]);
@@ -772,7 +772,7 @@ static ETUUID *childUUID2;
 
 - (void) testPersistentRootBasic
 {
-    UKObjectsEqual(S(prootUUID), [NSSet setWithArray: [store persistentRootUUIDs]]);
+    UKObjectsEqual(S(prootUUID), [NSSet setWithArray: store.persistentRootUUIDs]);
 	
 	[self checkPersistentRoot: prootUUID
 					  current: initialRevisionUUID
@@ -802,7 +802,7 @@ static ETUUID *childUUID2;
 		UKTrue([store commitStoreTransaction: txn]);
 	}
     
-    UKObjectsEqual(S(prootUUID, copy.UUID), [NSSet setWithArray:[store persistentRootUUIDs]]);
+    UKObjectsEqual(S(prootUUID, copy.UUID), [NSSet setWithArray:store.persistentRootUUIDs]);
 
     // 1. check setup
     

@@ -220,7 +220,7 @@ extern NSString * const kCOBranchLabel;
  *
  * For all branches in a persistent root, returns the same revision.
  *
- * This is the same than <code>[[self nodes] firstObject]</code>.
+ * This is the same than <code>self.nodes.firstObject</code>.
  *
  * See also -initialRevision.
  */
@@ -246,7 +246,7 @@ extern NSString * const kCOBranchLabel;
 /**
  * The revision bound to the most recent commit in the branch.
  *
- * This is the same than <code>[[self nodes] lastObject]</code>.
+ * This is the same than <code>self.nodes.lastObject</code>.
  *
  * See also -currentRevision.
  */

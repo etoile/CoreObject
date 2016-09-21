@@ -172,14 +172,14 @@
 	OutlineItem *garbage = [self addObjectWithLabel: @"garbage" toContext: ctx1];
 	
 	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
-	UKFalse([ctx2 hasChanges]);
+	UKFalse(ctx2.hasChanges);
 	
 	[ctx2 setItemGraph: ctx1];
 	UKObjectsEqual(S(root1.UUID, child.UUID), SA(ctx2.itemUUIDs));
 	UKObjectsEqual(@"root1", [[ctx2 loadedObjectForUUID: root1.UUID] label]);
 	UKObjectsEqual(@"child", [[ctx2 loadedObjectForUUID: child.UUID] label]);
 	UKNil([ctx2 loadedObjectForUUID: garbage.UUID]);
-	UKFalse([ctx2 hasChanges]);
+	UKFalse(ctx2.hasChanges);
 }
 
 - (void) testSetItemGraphLackingRootItem
@@ -190,7 +190,7 @@
 - (void)testInsertItemWithInsertOrUpdateItems
 {
 	[ctx1 acceptAllChanges]; // TODO: Move to test -init
-	UKFalse([ctx1 hasChanges]);
+	UKFalse(ctx1.hasChanges);
 	
 	ETEntityDescription *entity = [ctx1.modelDescriptionRepository descriptionForName: @"OutlineItem"];
 	COMutableItem *mutableItem = [COMutableItem item];
@@ -199,7 +199,7 @@
 	mutableItem.packageVersion = entity.owner.version;
     [ctx1 insertOrUpdateItems: A(mutableItem)];
 	
-	UKTrue([ctx1 hasChanges]);
+	UKTrue(ctx1.hasChanges);
 	UKObjectsEqual(S(mutableItem.UUID), ctx1.insertedObjectUUIDs);
 	UKObjectsEqual(S(), ctx1.updatedObjectUUIDs);
 	
@@ -216,13 +216,13 @@
 - (void)testUpdateItemWithInsertOrUpdateItems
 {
 	[ctx1 acceptAllChanges]; // TODO: Move to test -init
-	UKFalse([ctx1 hasChanges]);
+	UKFalse(ctx1.hasChanges);
 	
 	COMutableItem *mutableItem = [[ctx1 itemForUUID: root1.UUID] mutableCopy];
     [mutableItem setValue: @"test" forAttribute: kCOLabel type: kCOTypeString];
     [ctx1 insertOrUpdateItems: A(mutableItem)];
 	
-	UKTrue([ctx1 hasChanges]);
+	UKTrue(ctx1.hasChanges);
 	UKObjectsEqual(S(), ctx1.insertedObjectUUIDs);
 	UKObjectsEqual(S(root1.UUID), ctx1.updatedObjectUUIDs);
 	
@@ -514,7 +514,7 @@
 	
 	COObjectGraphContext *persistentCtx = proot.objectGraphContext;
 	OutlineItem *persistentCtxRoot = persistentCtx.rootObject;
-	UKFalse([persistentCtx hasChanges]);
+	UKFalse(persistentCtx.hasChanges);
 	
 	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: persistentCtx];
 	child1.label = @"child1";
@@ -646,7 +646,7 @@
 - (void) testAddUnchangedItem
 {
 	[ctx1 acceptAllChanges];
-	UKFalse([ctx1 hasChanges]);
+	UKFalse(ctx1.hasChanges);
 	
 	COItem *rootItem = [ctx1 itemForUUID: ctx1.rootItemUUID];
 	
@@ -654,7 +654,7 @@
 	[ctx1 insertOrUpdateItems: @[rootItem]];
 	
 #if 0
-	UKFalse([ctx1 hasChanges]);
+	UKFalse(ctx1.hasChanges);
 #endif
 }
 

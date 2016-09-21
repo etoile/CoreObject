@@ -212,7 +212,7 @@
 	// Before the merged changes arrives at the client, make another commit on the client
 	
 	[clientBranch.rootObject setLabel: @"more changes"];
-	[clientPersistentRoot commitWithMetadata: [self clientRevisionMetadataForTest]];
+	[clientPersistentRoot commitWithMetadata: self.clientRevisionMetadataForTest];
 	UKObjectsEqual([self clientRevisionMetadataForTest], [clientPersistentRoot.currentRevision metadata]);
 	
 	// This should not produce any more messages

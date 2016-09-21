@@ -174,7 +174,7 @@
 	[emptyTrack clear];
 	
 	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [emptyTrack currentNode]);
-	UKObjectsEqual(@[[COEndOfUndoTrackPlaceholderNode sharedInstance]], [emptyTrack nodes]);
+	UKObjectsEqual(@[[COEndOfUndoTrackPlaceholderNode sharedInstance]], emptyTrack.nodes);
 }
 
 - (void) checkNodes: (NSArray *)nodes
@@ -193,7 +193,7 @@
 	[self checkNodes: nodes];
 }
 
-// N.B.: These must be 3 separate tests, since [track nodes] caches
+// N.B.: These must be 3 separate tests, since track.nodes caches
 // the result, and we need to make sure it's calculated corrently when there
 // are are multiple commands in both the undo and redo tracks.
 

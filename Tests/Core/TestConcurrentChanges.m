@@ -55,9 +55,9 @@
 
 	CORevision *newRev = [ctx revisionForRevisionUUID: newRevID persistentRootUUID: persistentRoot.UUID];
 
-	UKObjectsEqual([revs arrayByAddingObject: newRev], [persistentRoot.currentBranch nodes]);
+	UKObjectsEqual([revs arrayByAddingObject: newRev], persistentRoot.currentBranch.nodes);
     UKObjectsEqual(@"hello", [persistentRoot.rootObject valueForProperty: @"label"]);
-    UKFalse([ctx hasChanges]);
+    UKFalse(ctx.hasChanges);
 }
 
 - (void) testsDetectsStoreSetCurrentRevision
@@ -88,7 +88,7 @@
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKObjectsEqual(firstRevid, [persistentRoot.currentRevision UUID]);
-    UKFalse([ctx hasChanges]);
+    UKFalse(ctx.hasChanges);
 }
 
 - (void) testsDetectsStoreCreateBranch
@@ -111,7 +111,7 @@
     COBranch *secondBranch = [persistentRoot branchForUUID: secondbranchUUID];
     UKNotNil(secondBranch);
     UKObjectsEqual(persistentRoot.currentRevision, secondBranch.currentRevision);
-    UKFalse([ctx hasChanges]);
+    UKFalse(ctx.hasChanges);
 }
 
 - (void) testsDetectsStoreDeleteBranch
@@ -126,8 +126,8 @@
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKTrue(testBranch.deleted);
-	UKTrue([[persistentRoot deletedBranches] containsObject: testBranch]);
-    UKFalse([ctx hasChanges]);
+	UKTrue([persistentRoot.deletedBranches containsObject: testBranch]);
+    UKFalse(ctx.hasChanges);
 }
 
 - (void) testsDetectsStoreUndeleteBranch
@@ -149,8 +149,8 @@
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKFalse(testBranch.deleted);
-    UKFalse([[persistentRoot deletedBranches] containsObject: testBranch]);
-    UKFalse([ctx hasChanges]);
+    UKFalse([persistentRoot.deletedBranches containsObject: testBranch]);
+    UKFalse(ctx.hasChanges);
 }
 
 - (void) testsDetectsStoreSetBranchMetadata
@@ -168,7 +168,7 @@
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKObjectsEqual(metadata, testBranch.metadata);
-    UKFalse([ctx hasChanges]);
+    UKFalse(ctx.hasChanges);
 }
 
 - (void) testsDetectsStoreSetCurrentBranch
@@ -183,7 +183,7 @@
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKObjectsEqual(testBranch, persistentRoot.currentBranch);
-    UKFalse([ctx hasChanges]);
+    UKFalse(ctx.hasChanges);
 }
 
 - (void) testsDetectsStoreSetCurrentBranchInTransaction
@@ -198,7 +198,7 @@
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKObjectsEqual(testBranch, persistentRoot.currentBranch);
-    UKFalse([ctx hasChanges]);
+    UKFalse(ctx.hasChanges);
 }
 
 - (void) testsDetectsStoreDeletePersistentRoot
@@ -212,8 +212,8 @@
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKTrue(persistentRoot.deleted);
-    UKTrue([[ctx deletedPersistentRoots] containsObject: persistentRoot]);
-    UKFalse([ctx hasChanges]);
+    UKTrue([ctx.deletedPersistentRoots containsObject: persistentRoot]);
+    UKFalse(ctx.hasChanges);
 }
 
 - (void) testsDetectsStoreUndeletePersistentRoot
@@ -233,8 +233,8 @@
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKFalse(persistentRoot.deleted);
-    UKFalse([[ctx deletedPersistentRoots] containsObject: persistentRoot]);
-    UKFalse([ctx hasChanges]);
+    UKFalse([ctx.deletedPersistentRoots containsObject: persistentRoot]);
+    UKFalse(ctx.hasChanges);
 }
 
 - (void) testsDetectsStoreCreatePersistentRoot
@@ -263,7 +263,7 @@
     }
     UKTrue(found);
     UKNotNil([ctx persistentRootForUUID: info.UUID]);
-    UKFalse([ctx hasChanges]);
+    UKFalse(ctx.hasChanges);
 }
 
 @end

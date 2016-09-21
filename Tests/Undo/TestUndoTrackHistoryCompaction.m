@@ -619,10 +619,10 @@
 		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
 		                                            upToCommand: (COCommandGroup *)track.nodes.lastObject];
 
-	UKIntsEqual(2, [track nodes].count);
+	UKIntsEqual(2, track.nodes.count);
 	UKDoesNotRaiseException([compaction compute]);
 	UKDoesNotRaiseException([store compactHistory: compaction]);
-	UKIntsEqual(1, [track nodes].count);
+	UKIntsEqual(1, track.nodes.count);
 	
 	object.name = @"Ding";
 	[ctx commitWithUndoTrack: concreteTrack1];

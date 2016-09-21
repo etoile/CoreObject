@@ -457,7 +457,7 @@
 
 - (void) testTrackAPI
 {
-    UKIntsEqual(1, [[_testTrack nodes] count]); // Placeholder node
+    UKIntsEqual(1, [_testTrack.nodes count]); // Placeholder node
     UKFalse([_testTrack canRedo]);
     UKFalse([_testTrack canUndo]);
     
@@ -467,8 +467,8 @@
     [persistentRoot.rootObject setValue: @"hello" forProperty: kCOLabel];
     [ctx commitWithUndoTrack: _testTrack];
     
-    UKIntsEqual(3, [[_testTrack nodes] count]);
-    UKIntsEqual(2, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
+    UKIntsEqual(3, [_testTrack.nodes count]);
+    UKIntsEqual(2, [_testTrack.nodes indexOfObject: [_testTrack currentNode]]);
     UKFalse([_testTrack canRedo]);
     UKTrue([_testTrack canUndo]);
     
@@ -648,7 +648,7 @@
 	UKObjectsEqual((@[child1, child2]), root.contents);
 	
 	// Check track contents
-	UKIntsEqual(2, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
+	UKIntsEqual(2, [_testTrack.nodes indexOfObject: [_testTrack currentNode]]);
 	UKIntsEqual(3, _testTrack.nodes.count);
 	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
 	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r0 to: r1];
@@ -663,7 +663,7 @@
 	UKObjectsEqual(@[child2], root.contents);
 	
 	// Check track contents
-	UKIntsEqual(3, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
+	UKIntsEqual(3, [_testTrack.nodes indexOfObject: [_testTrack currentNode]]);
 	UKIntsEqual(4, _testTrack.nodes.count);
 	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
 	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r0 to: r1];
@@ -730,7 +730,7 @@
 
 	// N.B. Intentionally calling -nodes, which has the side effect of causing
 	// COUndoTrack to cache the nodes in memory, to try to break things
-	UKIntsEqual(2, [[_testTrack nodes] count]);
+	UKIntsEqual(2, [_testTrack.nodes count]);
 	
 	// Second coalesced block
 	
@@ -757,7 +757,7 @@
 	r6 = item.revision;
 
 	// Check track contents
-	UKIntsEqual(4, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
+	UKIntsEqual(4, [_testTrack.nodes indexOfObject: [_testTrack currentNode]]);
 	UKIntsEqual(5, _testTrack.nodes.count);
 	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
 	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r0 to: r2];

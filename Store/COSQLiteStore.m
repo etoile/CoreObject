@@ -303,7 +303,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 #if 0
 		// gather finalized persistent root UUIDs
 
-		for (ETUUID *modifiedUUID in [aTransaction persistentRootUUIDs])
+		for (ETUUID *modifiedUUID in aTransaction.persistentRootUUIDs)
         {
 			const BOOL isPresent = [db_ boolForQuery: @"SELECT COUNT(*) > 0 FROM persistentroots WHERE uuid = ?", [modifiedUUID dataValue]];
 			

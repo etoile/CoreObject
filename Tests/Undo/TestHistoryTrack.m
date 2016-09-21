@@ -229,7 +229,7 @@
 	[leaf5 setValue: @"Pizza" forProperty: kCOLabel]; [ctx commitWithUndoTrack: _doc2Track];
 	[leaf6 setValue: @"Beer" forProperty: kCOLabel]; [ctx commitWithUndoTrack: _doc2Track];
 	
-	UKFalse([ctx hasChanges]);
+	UKFalse(ctx.hasChanges);
 	
 	// Now try undoing changes made to Document 1, using @"doc1" track.
 

@@ -337,21 +337,21 @@
     [ctx commit];
     
     UKNil([originalBranch label]);
-    UKFalse([ctx hasChanges]);
-    UKFalse([persistentRoot hasChanges]);
-    UKFalse([originalBranch hasChanges]);
+    UKFalse(ctx.hasChanges);
+    UKFalse(persistentRoot.hasChanges);
+    UKFalse(originalBranch.hasChanges);
     
     originalBranch.label = @"Hello world";
     
     UKObjectsEqual(@"Hello world", [originalBranch label]);
-    UKTrue([ctx hasChanges]);
-    UKTrue([persistentRoot hasChanges]);
-    UKTrue([originalBranch hasChanges]);
+    UKTrue(ctx.hasChanges);
+    UKTrue(persistentRoot.hasChanges);
+    UKTrue(originalBranch.hasChanges);
     
     [originalBranch discardAllChanges];
     
     UKNil([originalBranch label]);
-    UKFalse([originalBranch hasChanges]);
+    UKFalse(originalBranch.hasChanges);
     
     originalBranch.label = @"Hello world";
         
@@ -366,9 +366,9 @@
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKObjectsEqual(@"Hello world", [testBranch label]);
-		 UKFalse([testCtx hasChanges]);
-		 UKFalse([testProot hasChanges]);
-		 UKFalse([testBranch hasChanges]);
+		 UKFalse(testCtx.hasChanges);
+		 UKFalse(testProot.hasChanges);
+		 UKFalse(testBranch.hasChanges);
 	 }];
     
     originalBranch.label = @"Hello world 2";
@@ -387,9 +387,9 @@
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKObjectsEqual(@{}, testBranch.metadata);
-		 UKFalse([testCtx hasChanges]);
-		 UKFalse([testProot hasChanges]);
-		 UKFalse([testBranch hasChanges]);
+		 UKFalse(testCtx.hasChanges);
+		 UKFalse(testProot.hasChanges);
+		 UKFalse(testBranch.hasChanges);
 	 }];
     
     [originalBranch setMetadata: D(@"value", @"key")];
@@ -397,14 +397,14 @@
     UKObjectsEqual(D(@"value", @"key"), originalBranch.metadata);
 
 	UKRaisesException(((NSMutableDictionary *)originalBranch.metadata)[@"bar"] = @"foo");
-	UKTrue([ctx hasChanges]);
-    UKTrue([persistentRoot hasChanges]);
-    UKTrue([originalBranch hasChanges]);
+	UKTrue(ctx.hasChanges);
+    UKTrue(persistentRoot.hasChanges);
+    UKTrue(originalBranch.hasChanges);
     
     [originalBranch discardAllChanges];
     
     UKObjectsEqual(@{}, originalBranch.metadata);
-    UKFalse([originalBranch hasChanges]);
+    UKFalse(originalBranch.hasChanges);
     
     [originalBranch setMetadata: D(@"value", @"key")];
     
@@ -419,9 +419,9 @@
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKObjectsEqual((@{@"key" : @"value"}), testBranch.metadata);
-		 UKFalse([testCtx hasChanges]);
-		 UKFalse([testProot hasChanges]);
-		 UKFalse([testBranch hasChanges]);
+		 UKFalse(testCtx.hasChanges);
+		 UKFalse(testProot.hasChanges);
+		 UKFalse(testBranch.hasChanges);
 	 }];
     
     [originalBranch setMetadata: D(@"value2", @"key")];
@@ -572,7 +572,7 @@
 
     // -discardAllChanges raises an exception on uncommitted branches
     UKRaisesException([uncommittedBranch discardAllChanges]);
-    UKTrue([uncommittedBranch hasChanges]);
+    UKTrue(uncommittedBranch.hasChanges);
     
     [persistentRoot commit];
 	
@@ -580,7 +580,7 @@
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 UKDoesNotRaiseException([testBranch discardAllChanges]);
-		 UKFalse([testBranch hasChanges]);
+		 UKFalse(testBranch.hasChanges);
 	 }];
 }
 
@@ -597,16 +597,16 @@
 	[self checkBranchWithExistingAndNewContext: originalBranch
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKFalse([testBranch hasChanges]);
+		 UKFalse(testBranch.hasChanges);
 		 UKObjectsEqual(@"test", [testBranch.rootObject label]);
 		
 		 testBranch.currentRevision = firstRevision;
-		 UKTrue([testBranch hasChanges]);
+		 UKTrue(testBranch.hasChanges);
 		 UKFalse([[testBranch objectGraphContext] hasChanges]);
 		 UKNil([testBranch.rootObject label]);
 
 		 [testBranch discardAllChanges];
-		 UKFalse([testBranch hasChanges]);
+		 UKFalse(testBranch.hasChanges);
 		 UKObjectsEqual(secondRevision, testBranch.currentRevision);
 		 UKObjectsEqual(@"test", [testBranch.rootObject label]);
 	 }];
@@ -623,7 +623,7 @@
 									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 testBranch.deleted = YES;
-		 UKTrue([testBranch hasChanges]);
+		 UKTrue(testBranch.hasChanges);
 		 [testBranch discardAllChanges];
 		 UKFalse(testBranch.deleted);
 	 }];
@@ -693,7 +693,7 @@
 		 UKTrue(testBranch.deleted);
 		 
 		 [testBranch.rootObject setLabel: @"hi"];
-		 UKTrue([testBranch hasChanges]);
+		 UKTrue(testBranch.hasChanges);
 		 UKRaisesException([testCtx commit]);
 	 }];
 }
