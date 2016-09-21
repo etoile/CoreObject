@@ -192,6 +192,8 @@ retain attributes
 	- don't declare a readonly property as copy (copy only describes if the 
 object is copied by the setter)
 
+Note: for overriden properties, sometimes we have to break these rules to ensure the code compile without warnings or disable -Wproperty-attribute-mismatch with clang diagnostic pragma. For instance, NSObject.description is marked with copy, this implies COObject.description has to be marked as copy too, although copy is useless when no setter exists.
+
 
 Blocks
 ------

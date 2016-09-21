@@ -514,7 +514,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
 /**
  * Returns a short description to summarize the receiver.
  */
-@property (nonatomic, readonly, copy) NSString *description;
+@property (readonly, copy) NSString *description;
 /**
  * Returns a multi-line description including informations about the branches,  
  * deletion status, attached metadata and pending changes.

@@ -469,7 +469,7 @@ extern NSString * const kCOBranchLabel;
 /**
  * Returns a short description to summarize the receiver.
  */
-@property (nonatomic, readonly, copy) NSString *description;
+@property (readonly, copy) NSString *description;
 /**
  * Returns a multi-line description including informations about the branch kind, 
  * deletion status, revisions and pending changes.

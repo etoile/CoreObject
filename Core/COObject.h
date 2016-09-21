@@ -978,7 +978,7 @@
  * description (limited to -UUID and -entity description), or just call the 
  * superclass description that is expected to comply the present rule.
  */
-@property (nonatomic, readonly, copy) NSString *description;
+@property (readonly, copy) NSString *description;
 /**
  * Returns a short and human-readable description of the receiver type.
  *
