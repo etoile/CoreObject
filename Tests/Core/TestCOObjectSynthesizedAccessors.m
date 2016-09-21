@@ -24,7 +24,7 @@
 - (id) init
 {
     SUPERINIT;
-    item = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"].rootObject;
+    item = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
     return self;
 }
 
@@ -36,10 +36,10 @@
     item.label = @"hello";
     UKObjectsEqual(@"hello", item.label);
     
-    OutlineItem *child1 = [item.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    OutlineItem *child1 = [item.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     child1.label = @"child1";
 
-    OutlineItem *child2 = [item.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    OutlineItem *child2 = [item.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     child2.label = @"child2";
 
     [item setContents: A(child1, child2)];
@@ -57,7 +57,7 @@
 
 - (void) testMutableProxy
 {
-    OutlineItem *child1 = [item.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    OutlineItem *child1 = [item.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     
     // At first I didn't think this would work right now, but
     // when -mutableArrayValueForKey: does its accessor search, it causes

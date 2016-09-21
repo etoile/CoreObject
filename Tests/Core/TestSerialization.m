@@ -39,7 +39,7 @@
 - (void) testAttachment
 {
 	COAttachmentID *attachmentID = [self createAttachment];
-	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	OutlineItem *item = proot.rootObject;
 	item.attachmentID = attachmentID;
 	
@@ -61,7 +61,7 @@
 
 - (void) testUnknowItemAttributes
 {
-	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	COObject *rootObject = proot.rootObject;
 	COMutableItem *item = [rootObject.storeItem mutableCopy];
 	

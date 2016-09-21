@@ -23,10 +23,10 @@
 {
     SUPERINIT;
 
-    persistentRoot1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    persistentRoot1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [persistentRoot1.rootObject setLabel: @"hello"];
 	
-	persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [persistentRoot2.rootObject setLabel: @"hello2"];
 	
     [ctx commit];
@@ -167,13 +167,13 @@
 - (void)testEditingContextNotificationOnInsertPersistentRoot
 {
 	[self checkBlock: ^(){
-		[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-		[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+		[ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+		[ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 		[ctx commit];
 	} postsNotification: COEditingContextDidChangeNotification withCount: 1 fromObject: ctx	withUserInfo: nil];
 	
 	[self checkBlock: ^(){
-		[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+		[ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 		[ctx discardAllChanges];
 	} postsNotification: COEditingContextDidChangeNotification withCount: 0 fromObject: ctx	withUserInfo: nil];
 }

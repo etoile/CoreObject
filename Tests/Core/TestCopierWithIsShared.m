@@ -153,8 +153,8 @@ static NSArray *initialUUIDs;
 {
 	COObjectGraphContext *ctx = [[COObjectGraphContext alloc] init];
 	
-	Tag *a = [ctx insertObjectWithEntityName: @"Anonymous.Tag"];
-	OutlineItem *b = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	Tag *a = [ctx insertObjectWithEntityName: @"Tag"];
+	OutlineItem *b = [ctx insertObjectWithEntityName: @"OutlineItem"];
 	[[a mutableSetValueForKey: @"contents"] addObject: b];
 	
 	ETUUID *aCopyUUID = [copier copyItemWithUUID: a.UUID fromGraph: ctx toGraph: ctx];
@@ -169,8 +169,8 @@ static NSArray *initialUUIDs;
 {
 	COObjectGraphContext *ctx = [[COObjectGraphContext alloc] init];
 	
-	Tag *a = [ctx insertObjectWithEntityName: @"Anonymous.Tag"];
-	OutlineItem *b = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	Tag *a = [ctx insertObjectWithEntityName: @"Tag"];
+	OutlineItem *b = [ctx insertObjectWithEntityName: @"OutlineItem"];
 	[[a mutableSetValueForKey: @"contents"] addObject: b];
 	
 	b.isShared = YES;
@@ -187,8 +187,8 @@ static NSArray *initialUUIDs;
 {
 	COObjectGraphContext *ctx = [[COObjectGraphContext alloc] init];
 	
-	Tag *a = [ctx insertObjectWithEntityName: @"Anonymous.Tag"];
-	OutlineItem *b = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	Tag *a = [ctx insertObjectWithEntityName: @"Tag"];
+	OutlineItem *b = [ctx insertObjectWithEntityName: @"OutlineItem"];
 	[[a mutableSetValueForKey: @"contents"] addObject: b];
 	
 	b.isShared = NO;

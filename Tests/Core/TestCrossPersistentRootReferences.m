@@ -37,13 +37,13 @@
     
     // 1. Set it up in memory
     
-    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [photo1.rootObject setLabel: @"photo1"];
     
-    COPersistentRoot *photo2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *photo2 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [photo2.rootObject setLabel: @"photo2"];
     
-    COPersistentRoot *library = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
+    COPersistentRoot *library = [ctx insertNewPersistentRootWithEntityName: @"Tag"];
     [library.rootObject addObject: photo1.rootObject];
     [library.rootObject addObject: photo2.rootObject];
     
@@ -90,7 +90,7 @@
 
 - (void) testSpecificAndCurrentBranchReferenceInSet
 {
-    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	COBranch *branchA = photo1.currentBranch;
     
 	OutlineItem *photo1root = photo1.rootObject;
@@ -129,12 +129,12 @@
 	//  |
 	//  \--childB
     
-    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	COBranch *branchA = photo1.currentBranch;
     OutlineItem *photo1root = photo1.rootObject;
     photo1root.label = @"photo1, branch A";
     
-    OutlineItem *childA = [photo1.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    OutlineItem *childA = [photo1.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     childA.label = @"childA";
     
     [photo1root addObject: childA];
@@ -151,7 +151,7 @@
     
     // Set up library
     
-    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
+    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Tag"];
     [(Tag *)library1.rootObject setContents: S(photo1.rootObject, branchA.rootObject)];
 	UKIntsEqual(2, [[library1.rootObject contents] count]);
 	
@@ -398,7 +398,7 @@
     //
     // Test the effect of deleting branchB
     
-    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [photo1 commit];
 
     COBranch *branchA = photo1.currentBranch;
@@ -407,7 +407,7 @@
     
     // Set up library
     
-    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
+    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Tag"];
     
     /* This creates a reference to branch B of photo1. */
 	[library1.rootObject addObject: branchB.rootObject];
@@ -468,9 +468,9 @@
 	//
     // Test the effect of deleting photo1 (photo2 should continue to work)
     
-    COPersistentRoot *tag1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
-	COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    COPersistentRoot *photo2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *tag1 = [ctx insertNewPersistentRootWithEntityName: @"Tag"];
+	COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    COPersistentRoot *photo2 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 
 	NSMutableSet *tag1ContentsProxy = [tag1.rootObject mutableSetValueForKey: @"contents"];
 	[tag1ContentsProxy addObject: photo1.rootObject];
@@ -504,13 +504,13 @@
     //
     // Test that deleting photo1 hides the child relationship in library1 to phtoto1
     
-    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [photo1.rootObject setValue: @"photo1" forProperty: @"label"];
     [photo1 commit];
     
     // Set up library
     
-    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
+    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Tag"];
     /* This creates a reference to photo1. */
     [library1.rootObject insertObject: photo1.rootObject atIndex: ETUndeterminedIndex hint:nil forProperty: @"contents"];
     [ctx commit];
@@ -536,13 +536,13 @@
     //
     // Test that deleting library1 hides the parent relationship in photo1 to library1
     
-    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [photo1.rootObject setLabel: @"photo1"];
     [photo1 commit];
     
     // Set up library
     
-    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
+    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Tag"];
     [library1.rootObject setLabel: @"library1"];
     [library1.rootObject addObject: photo1.rootObject];
     [ctx commit];
@@ -571,13 +571,13 @@
     //
     // Test that undeleting photo1 restores the child relationship in library1
     
-    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [photo1.rootObject setLabel: @"photo1"];
     [photo1 commit];
         
     // Set up library
     
-    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
+    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Tag"];
     /* This creates a reference to photo1. */
     [library1.rootObject addObject: photo1.rootObject];
     
@@ -593,7 +593,7 @@
     // Add photo2 inner item. Note that the photo1 cross-persistent-root reference is
     // still present in library1.contents, it's just hidden.
 	
-    COObject *photo2 = [library1.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    COObject *photo2 = [library1.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     [photo2 setValue: @"photo2" forProperty: @"label"];
     [library1.rootObject addObject: photo2];
     
@@ -627,13 +627,13 @@
     //
     // Test that undeleting library1 restores the parent relationship in photo1
     
-    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [photo1.rootObject setLabel: @"photo1"];
     [photo1 commit];
     
     // Set up library
     
-    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.Tag"];
+    COPersistentRoot *library1 = [ctx insertNewPersistentRootWithEntityName: @"Tag"];
     [library1.rootObject setLabel: @"library1"];
     [library1.rootObject addObject: photo1.rootObject];
     [ctx commit];
@@ -668,8 +668,8 @@
 
 - (void) testCompositeCrossReference
 {
-    COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    COPersistentRoot *child1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    COPersistentRoot *child1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     UKRaisesException([doc1.rootObject addObject: child1.rootObject]);
 	
 	// TODO: In fact, the illegal reference was actually inserted, so the object graph is in an

@@ -38,16 +38,16 @@
 
 - (void)testBasic
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	COContainer *workspace = persistentRoot.rootObject;
-	COContainer *document1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *group1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *leaf1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COContainer *leaf2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
-	COContainer *group2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];	
-	COContainer *leaf3 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *document1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
+	COContainer *group1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
+	COContainer *leaf1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
+	COContainer *leaf2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];	
+	COContainer *group2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];	
+	COContainer *leaf3 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 
-	COContainer *document2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *document2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	
 	// Set up the initial state
 	
@@ -144,7 +144,7 @@
 	
 	// introduce some new objects
 	
-	COContainer *leaf4 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *leaf4 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	
 	[leaf4 setValue: @"Leaf 4" forProperty: kCOLabel];
 	
@@ -170,7 +170,7 @@
 	//          |
 	//          \-leaf2
 	
-    COContainer *leaf5 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    COContainer *leaf5 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     
     [leaf5 setValue: @"Leaf 5" forProperty: kCOLabel];
 
@@ -196,7 +196,7 @@
 	//          |
 	//          \-leaf5
 		
-    COContainer *leaf6 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    COContainer *leaf6 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     
 	[leaf6 setValue: @"Leaf 6" forProperty: kCOLabel];
 

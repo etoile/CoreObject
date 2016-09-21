@@ -110,28 +110,28 @@ See +[NSObject typePrefix]. */
 	/* Persistency Attributes (subset) */
 
 	ETPropertyDescription *UUID =
-		[ETPropertyDescription descriptionWithName: @"UUID" type: (id)@"ETUUID"];
+		[ETPropertyDescription descriptionWithName: @"UUID" typeName: @"ETUUID"];
 	[UUID setReadOnly: YES];
 	ETPropertyDescription *isPersistent =
-		[ETPropertyDescription descriptionWithName: @"isPersistent" type: (id)@"BOOL"];
-	[isPersistent setDerived: YES];
+		[ETPropertyDescription descriptionWithName: @"isPersistent" typeName: @"BOOL"];
+	isPersistent.derived = YES;
 	ETPropertyDescription *isRoot =
-		[ETPropertyDescription descriptionWithName: @"isRoot" type: (id)@"BOOL"];
-	[isRoot setDerived: YES];
+		[ETPropertyDescription descriptionWithName: @"isRoot" typeName: @"BOOL"];
+	isRoot.derived = YES;
 	ETPropertyDescription *isShared =
-		[ETPropertyDescription descriptionWithName: @"isShared" type: (id)@"BOOL"];
+		[ETPropertyDescription descriptionWithName: @"isShared" typeName: @"BOOL"];
 	[isShared setReadOnly: YES];
 
 	/* Basic Properties */
 
 	ETPropertyDescription *name =
-		[ETPropertyDescription descriptionWithName: @"name" type: (id)@"NSString"];
+		[ETPropertyDescription descriptionWithName: @"name" typeName: @"NSString"];
 	ETPropertyDescription *identifier =
-		[ETPropertyDescription descriptionWithName: @"identifier" type: (id)@"NSString"];
+		[ETPropertyDescription descriptionWithName: @"identifier" typeName: @"NSString"];
 	ETPropertyDescription *tags  =
-		[ETPropertyDescription descriptionWithName: @"tags" type: (id)@"COTag"];
-	[tags setMultivalued: YES];
-	[tags setDerived: YES];
+		[ETPropertyDescription descriptionWithName: @"tags" typeName: @"COTag"];
+	tags.multivalued = YES;
+	tags.derived = YES;
 
 	// TODO: Move these properties to EtoileFoundation (by adding a NSObject
 	// entity description) or just use -basicPropertyNames in
@@ -147,23 +147,23 @@ See +[NSObject typePrefix]. */
 #ifndef GNUSTEP
 	// FIXME: We don't link NSImage on GNUstep because AppKit won't work
 	ETPropertyDescription *icon = 
-		[ETPropertyDescription descriptionWithName: @"icon" type: (id)imageType];
+		[ETPropertyDescription descriptionWithName: @"icon" typeName: imageType];
 #endif
 	ETPropertyDescription *displayName = 
-		[ETPropertyDescription descriptionWithName: @"displayName" type: (id)@"NSString"];
-	[displayName setDisplayName: _(@"Name")];
+		[ETPropertyDescription descriptionWithName: @"displayName" typeName: @"NSString"];
+	displayName.displayName = _(@"Name");
 
 	/* Description Properties */
 
 	ETPropertyDescription *revisionDescription =
-		[ETPropertyDescription descriptionWithName: @"revisionDescription" type: (id)@"NSString"];
-	[revisionDescription setDisplayName: _(@"Version")];
+		[ETPropertyDescription descriptionWithName: @"revisionDescription" typeName: @"NSString"];
+	revisionDescription.displayName = _(@"Version");
 	ETPropertyDescription *tagDescription =
-		[ETPropertyDescription descriptionWithName: @"tagDescription" type: (id)@"NSString"];
-	[tagDescription setDisplayName: _(@"Tags")];
+		[ETPropertyDescription descriptionWithName: @"tagDescription" typeName: @"NSString"];
+	tagDescription.displayName = _(@"Tags");
 	ETPropertyDescription *typeDescription =
-		[ETPropertyDescription descriptionWithName: @"typeDescription" type: (id)@"NSString"];
-	[typeDescription setDisplayName: _(@"Type")];
+		[ETPropertyDescription descriptionWithName: @"typeDescription" typeName: @"NSString"];
+	typeDescription.displayName = _(@"Type");
 
 	NSArray *transientProperties = A(UUID, isPersistent, isRoot, identifier,
 		displayName, revisionDescription, tagDescription, typeDescription, tags);
@@ -281,7 +281,7 @@ See +[NSObject typePrefix]. */
 		                     NSStringFromClass(entityClass)];
 	}
 	
-	if (![anEntityDescription isKindOfEntity: [repo descriptionForName: @"Anonymous.COObject"]])
+	if (![anEntityDescription isKindOfEntity: [repo descriptionForName: @"COObject"]])
 	{
 		[NSException raise: NSInvalidArgumentException
 					format: @"The COObject class only supports entitiy descriptions that "

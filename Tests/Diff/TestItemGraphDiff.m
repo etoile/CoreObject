@@ -19,12 +19,12 @@
 	COObjectGraphContext *ctx1 = [[COObjectGraphContext alloc] init];
 	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
 	
-	COObject *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = parent;
-	COObject *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COObject *subchild1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COObject *subchild2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COObject *subchild3 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *child = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	COObject *subchild1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	COObject *subchild2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	COObject *subchild3 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
 	
 	[parent setValue: @"Shopping" forProperty: @"label"];
 	[child setValue: @"Groceries" forProperty: @"label"];
@@ -55,7 +55,7 @@
 	// Now make some modifications to ctx2: 
 	
 	[childCtx2 removeObject: subchild2Ctx2 atIndex: ETUndeterminedIndex hint: nil forProperty:@"contents"]; // Remove "Salad"
-	COObject *subchild4Ctx2 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *subchild4Ctx2 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
 	ETUUID *subchild4UUID = subchild4Ctx2.UUID;
 	[subchild4Ctx2 setValue: @"Salsa" forProperty: @"label"];
 	[childCtx2 insertObject: subchild4Ctx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"]; // Add "Salsa"
@@ -87,11 +87,11 @@
 	COObjectGraphContext *ctx1 = [[COObjectGraphContext alloc] init];
 	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
 	
-	COObject *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = parent;
-	COObject *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COObject *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	COObject *subchild1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COObject *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	COObject *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	COObject *subchild1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
 	
 	[parent setValue: @"Shopping" forProperty: @"label"];
 	[child1 setValue: @"Groceries" forProperty: @"label"];

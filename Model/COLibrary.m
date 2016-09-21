@@ -25,10 +25,10 @@
 	[collection setLocalizedDescription: _(@"Library")];
 
 	ETPropertyDescription *idProperty = 
-		[ETPropertyDescription descriptionWithName: @"identifier" type: (id)@"NSString"];
-	[idProperty setPersistent: YES];
+		[ETPropertyDescription descriptionWithName: @"identifier" typeName: @"NSString"];
+	idProperty.persistent = YES;
 
-	[collection setPropertyDescriptions: A(idProperty)];
+	collection.propertyDescriptions = A(idProperty);
 
 	return collection;	
 }
@@ -41,7 +41,7 @@
 		                                    type: (id)aType
 		                                opposite: nil];
 
-	collection.parent = (id)@"COLibrary";
+	collection.parentName = @"COLibrary";
 	[collection addPropertyDescription: objects];
 
 	return collection;
@@ -119,7 +119,7 @@
 
 	if (lib == nil)
 	{
-		lib = [self insertNewPersistentRootWithEntityName: @"Anonymous.COTagLibrary"].rootObject;
+		lib = [self insertNewPersistentRootWithEntityName: @"COTagLibrary"].rootObject;
 	}
 	return lib;
 }
@@ -130,7 +130,7 @@
 	
 	if (lib == nil)
 	{
-		lib = [self insertNewPersistentRootWithEntityName: @"Anonymous.COBookmarkLibrary"].rootObject;
+		lib = [self insertNewPersistentRootWithEntityName: @"COBookmarkLibrary"].rootObject;
 		[lib setName: _(@"Bookmarks")];
 		lib.identifier = kCOLibraryIdentifierBookmark;
 	}
@@ -143,7 +143,7 @@
 	
 	if (lib == nil)
 	{
-		lib = [self insertNewPersistentRootWithEntityName: @"Anonymous.CONoteLibrary"].rootObject;
+		lib = [self insertNewPersistentRootWithEntityName: @"CONoteLibrary"].rootObject;
 		[lib setName: _(@"Notes")];
 		lib.identifier = kCOLibraryIdentifierNote;
 	}
@@ -156,7 +156,7 @@
 
 	if (lib == nil)
 	{
-		lib = [self insertNewPersistentRootWithEntityName: @"Anonymous.COLibrary"].rootObject;
+		lib = [self insertNewPersistentRootWithEntityName: @"COLibrary"].rootObject;
 		[lib setName: _(@"Photos")];
 		lib.identifier = kCOLibraryIdentifierPhoto;
 	}
@@ -169,7 +169,7 @@
 
 	if (lib == nil)
 	{
-		lib = [self insertNewPersistentRootWithEntityName: @"Anonymous.COLibrary"].rootObject;
+		lib = [self insertNewPersistentRootWithEntityName: @"COLibrary"].rootObject;
 		[lib setName: _(@"Music")];
 		lib.identifier = kCOLibraryIdentifierMusic;
 	}

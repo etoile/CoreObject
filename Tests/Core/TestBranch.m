@@ -30,7 +30,7 @@
 - (id) init
 {
     SUPERINIT;
-    persistentRoot =  [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    persistentRoot =  [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     rootObj =  persistentRoot.rootObject;
     originalBranch =  persistentRoot.currentBranch;
     
@@ -143,9 +143,9 @@
     CORevision *firstRevision = originalBranch.currentRevision;
     UKNotNil(firstRevision);
     
-	COContainer *para1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	[para1 setValue: @"paragraph 1" forProperty: @"label"];
-	COContainer *para2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	[para2 setValue: @"paragraph 2" forProperty: @"label"];
 	[rootObj addObject: para1];
 	[rootObj addObject: para2];
@@ -174,9 +174,9 @@
     CORevision *firstRevision = originalBranch.currentRevision;
     UKNotNil(firstRevision);
 
-	COContainer *para1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	[para1 setValue: @"paragraph 1" forProperty: @"label"];
-	COContainer *para2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	[para2 setValue: @"paragraph 2" forProperty: @"label"];
 	[rootObj addObject: para1];
 	[rootObj addObject: para2];
@@ -190,7 +190,7 @@
     [originalBranch undo]; //[originalBranch setCurrentRevision: firstRevision];
 	UKIntsEqual(0, rootObj.count);
 
-	COContainer *para3 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para3 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	[para3 setValue: @"paragraph 3" forProperty: @"label"];
 	[rootObj addObject: para3];
 	[ctx commit];
@@ -292,7 +292,7 @@
 
 - (void) testBranchObjectGraphs
 {
-    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [photo1 commit];
     
     COBranch *branchA = photo1.currentBranch;
@@ -311,7 +311,7 @@
     UKObjectsEqual(S(branchBroot.UUID), SA(branchA.objectGraphContext.itemUUIDs));
     UKObjectsEqual(S(branchBroot.UUID), SA(branchB.objectGraphContext.itemUUIDs));
     
-    COObject *childB = [branchB.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    COObject *childB = [branchB.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     [childB setValue: @"childB" forProperty: @"label"];
     
     UKFalse(branchA.objectGraphContext.hasChanges);
@@ -434,7 +434,7 @@
 
 - (void) testBranchMetadataOnPersistentRootFirstCommit
 {
-    COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [persistentRoot2.currentBranch setMetadata: D(@"world", @"hello")];
     [ctx commit];
     
@@ -481,7 +481,7 @@
 
 - (void) testSimpleMerge
 {
-    OutlineItem *childObj = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    OutlineItem *childObj = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     [rootObj insertObject: childObj atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     rootObj.label = @"0";
     childObj.label = @"0";
@@ -717,7 +717,7 @@
 - (void) testSelectiveUndoRedo
 {
 	OutlineItem *root = persistentRoot.rootObject;
-	OutlineItem *child1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	[root addObject: child1];
 	
     [ctx commit];

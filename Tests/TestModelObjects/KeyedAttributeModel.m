@@ -21,10 +21,10 @@
 		return object;
 	
 	ETPropertyDescription *entries =
-	[ETPropertyDescription descriptionWithName: @"entries" type: (id)@"NSString"];
-	[entries setMultivalued: YES];
-	[entries setKeyed: YES];
-	[entries setPersistent: YES];
+	[ETPropertyDescription descriptionWithName: @"entries" typeName: @"NSString"];
+	entries.multivalued = YES;
+	entries.keyed = YES;
+	entries.persistent = YES;
 	
 	[object addPropertyDescription: entries];
 	

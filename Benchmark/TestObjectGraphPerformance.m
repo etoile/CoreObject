@@ -25,17 +25,17 @@
 	for (int i=0; i<10; i++)
 	{
 		@autoreleasepool {
-			COContainer *level1 = [root.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+			COContainer *level1 = [root.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 			[level1 setValue: [NSString stringWithFormat: @"%d", i] forProperty: @"label"];
 			[root addObject: level1];
 			for (int j=0; j<10; j++)
 			{
-				COContainer *level2 = [root.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+				COContainer *level2 = [root.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 				[level2 setValue: [NSString stringWithFormat: @"%d.%d", i, j] forProperty: @"label"];
 				[level1 addObject: level2];
 				for (int k=0; k<10; k++)
 				{
-					COContainer *level3 = [root.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+					COContainer *level3 = [root.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 					[level3 setValue: [NSString stringWithFormat: @"%d.%d.%d", i, j, k] forProperty: @"label"];
 					[level2 addObject: level3];
 				}
@@ -78,7 +78,7 @@
 
 - (void) testCommitIsIncremental
 {
-	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 
 	NSTimeInterval timeToMakeInitialCommitToPersistentRoot = [self timeToMakeInitialCommitToPersistentRoot: persistentRoot];
 	NSTimeInterval timeToMakeIncrementalCommitToPersistentRoot = [self timeToMakeIncrementalCommitToPersistentRoot: persistentRoot];
@@ -99,7 +99,7 @@
 
 - (void) testRead1KItemsSpeed
 {
-	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 
 	NSTimeInterval timeToMakeInitialCommitToPersistentRoot = [self timeToMakeInitialCommitToPersistentRoot: persistentRoot];
 

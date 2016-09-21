@@ -19,11 +19,11 @@
 		return entity;
 	
 	ETPropertyDescription *styleKeyProperty = [ETPropertyDescription descriptionWithName: @"styleKey"
-																					type: (id)@"NSString"];
+																					typeName: @"NSString"];
 	styleKeyProperty.persistent = YES;
 
 	ETPropertyDescription *styleValueProperty = [ETPropertyDescription descriptionWithName: @"styleValue"
-																					  type: (id)@"NSString"];
+																					  typeName: @"NSString"];
 	styleValueProperty.persistent = YES;
 
 	

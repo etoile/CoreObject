@@ -390,7 +390,7 @@ static ETUUID *branchBUUID;
     COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
 
 	COEditingContext *serverCtx = [[COEditingContext alloc] initWithStore: serverStore];
-	COPersistentRoot *serverPersistentRoot = [serverCtx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COPersistentRoot *serverPersistentRoot = [serverCtx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	
 	ETUUID *uuid = nil;
 	uuid = serverPersistentRoot.UUID;

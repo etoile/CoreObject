@@ -38,7 +38,7 @@ selective undo is involved. */
 {
 	/* First commit */
 
-	COContainer *object = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"].rootObject;
+	COContainer *object = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
 	[object setValue: @"Groceries" forProperty: @"label"];
     [ctx commitWithUndoTrack: _setupTrack];
     CORevision *firstRevision = object.persistentRoot.currentBranch.currentRevision;
@@ -104,7 +104,7 @@ selective undo is involved. */
     
 	/* First commit */
 
-	COPersistentRoot *objectPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COPersistentRoot *objectPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	COContainer *object = objectPersistentRoot.rootObject;
 	[object setValue: @"Groceries" forProperty: @"label"];
 
@@ -112,7 +112,7 @@ selective undo is involved. */
     
 	/* Second commit */
 
-    COPersistentRoot *docPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *docPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	COContainer *doc = docPersistentRoot.rootObject;
 	[doc setValue: @"Document" forProperty: @"label"];
 
@@ -120,7 +120,7 @@ selective undo is involved. */
 
 	/* Third commit call (creates commits in objectPersistentRoot and docPersistentRoot) */
 
-	COContainer *para1 = [doc.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para1 = [doc.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	[para1 setValue: @"paragraph 1" forProperty: @"label"];
     [doc addObject: para1];
 	[object setValue: @"Shopping List" forProperty: @"label"];
@@ -135,7 +135,7 @@ selective undo is involved. */
 
 	/* Fifth commit */
 
-	COContainer *para2 = [doc.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COContainer *para2 = [doc.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	[para2 setValue: @"paragraph 2" forProperty: @"label"];
 	[doc addObject: para2];
 

@@ -22,7 +22,7 @@
 - (id) init
 {
     self = [super init];
-    persistentRoot =  [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    persistentRoot =  [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
     
     testBranch =  [persistentRoot.currentBranch makeBranchWithLabel: @"test"];

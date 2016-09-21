@@ -38,11 +38,11 @@
 	[group setLocalizedDescription: _(@"Smart Group")];
 
 	ETPropertyDescription *content = 
-		[ETPropertyDescription descriptionWithName: @"content" type: (id)@"COObject"];
-	[content setMultivalued: YES];
-	[content setOrdered: YES];
+		[ETPropertyDescription descriptionWithName: @"content" typeName: @"COObject"];
+	content.multivalued = YES;
+	content.ordered = YES;
 
-	[group setPropertyDescriptions: A(content)];
+	group.propertyDescriptions = A(content);
 
 	return group;	
 }

@@ -117,7 +117,7 @@
 
 - (void)testDeleteCommittedPersistentRoot
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     ETUUID *uuid = persistentRoot.UUID;
     
     [ctx commit];
@@ -171,7 +171,7 @@
 
 - (void)testUndeleteCommittedPersistentRoot
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     ETUUID *uuid = persistentRoot.UUID;
     [ctx commit];
     
@@ -257,23 +257,23 @@
     
     // 1. Setup the persistent roots
     {
-        regular = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+        regular = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
         [regular commit];
         
-        deletedOnDisk = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+        deletedOnDisk = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
         [deletedOnDisk commit];
         deletedOnDisk.deleted = YES;
         [deletedOnDisk commit];
 		// Force unloaded persistent root to be reloaded
 		deletedOnDisk = [ctx persistentRootForUUID: deletedOnDisk.UUID];
         
-        pendingInsertion = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+        pendingInsertion = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
         
-        pendingDeletion = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+        pendingDeletion = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
         [pendingDeletion commit];
         pendingDeletion.deleted = YES;
         
-        pendingUndeletion = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+        pendingUndeletion = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
         [pendingUndeletion commit];
         pendingUndeletion.deleted = YES;
         [pendingUndeletion commit];
@@ -354,7 +354,7 @@
 
 - (void) testRevisionEqualityFromMultipleEditingContexts
 {
-	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	[ctx commit];
 	
 	CORevision *firstRevision = persistentRoot.currentRevision;
@@ -374,7 +374,7 @@
 
 - (void) testRevisionLifetime
 {
-	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	[ctx commit];
 	CORevision *r1 = persistentRoot.currentRevision;
 	
@@ -418,7 +418,7 @@
 		UKRaisesException([ctx commit]);
 	}];
 		
-	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 
 	insideCommit = YES;
 	[ctx commit];
@@ -431,7 +431,7 @@
 
 - (void) testPersistentRootsPropertyNotLazy
 {
-	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	[ctx commit];
 
 	COEditingContext *ctx2 = [self newContext];
@@ -442,7 +442,7 @@
 
 - (void) testDeletedPersistentRootsPropertyNotLazy
 {
-	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	[ctx commit];
 	
 	persistentRoot.deleted = YES;
@@ -462,7 +462,7 @@
 	// Insert a persistent root in a second context
 	{
 		COEditingContext *ctx2 = [self newContext];
-		COPersistentRoot *persistentRoot = [ctx2 insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+		COPersistentRoot *persistentRoot = [ctx2 insertNewPersistentRootWithEntityName: @"OutlineItem"];
 		uuid = persistentRoot.UUID;
 		[ctx2 commit];
 		

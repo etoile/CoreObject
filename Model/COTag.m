@@ -32,12 +32,12 @@
 		                                    type: @"COObject"
 		                                opposite: @"COObject.tags"];
 	ETPropertyDescription *tagGroups =
-		[ETPropertyDescription descriptionWithName: @"tagGroups" type: (id)@"COTagGroup"];
-	[tagGroups setMultivalued: YES];
-	tagGroups.opposite = (id)@"COTagGroup.objects";
-	[tagGroups setDerived: YES];
+		[ETPropertyDescription descriptionWithName: @"tagGroups" typeName: @"COTagGroup"];
+	tagGroups.multivalued = YES;
+	tagGroups.oppositeName = @"COTagGroup.objects";
+	tagGroups.derived = YES;
 
-	[collection setPropertyDescriptions: A(objects, tagGroups)];
+	collection.propertyDescriptions = A(objects, tagGroups);
 
 	return collection;
 }
@@ -88,7 +88,7 @@
 		                                    type: @"COTag"
 		                                opposite: @"COTag.tagGroups"];
 
-	[collection setPropertyDescriptions: A(objects)];
+	collection.propertyDescriptions = A(objects);
 
 	return collection;
 }
@@ -110,16 +110,16 @@
 		return collection;
 
 	 ETPropertyDescription *tagGroups =
-		[ETPropertyDescription descriptionWithName: @"tagGroups" type: (id)@"COTagGroup"];
-	[tagGroups setMultivalued: YES];
-	[tagGroups setOrdered: YES];
-	[tagGroups setPersistent: YES];
+		[ETPropertyDescription descriptionWithName: @"tagGroups" typeName: @"COTagGroup"];
+	tagGroups.multivalued = YES;
+	tagGroups.ordered = YES;
+	tagGroups.persistent = YES;
 	ETPropertyDescription *objects =
 		[self contentPropertyDescriptionWithName: @"objects"
 		                                    type: (id)@"COTag"
 		                                opposite: nil];
 
-	[collection setPropertyDescriptions: A(tagGroups, objects)];
+	collection.propertyDescriptions = A(tagGroups, objects);
 	
 	return collection;
 }

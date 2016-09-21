@@ -50,7 +50,7 @@
  */
 - (void) testRevertAndMakeDivergentCommit
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
 	CORevision *r0 = persistentRoot.currentRevision;
 	
@@ -118,7 +118,7 @@
  */
 - (void) testUndoAndBranchNavigation
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
 	
 	[persistentRoot.rootObject setLabel: @"r1"];

@@ -86,7 +86,7 @@
 - (id) init
 {
     SUPERINIT;
-    p1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    p1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
     
     branch1A = p1.currentBranch;

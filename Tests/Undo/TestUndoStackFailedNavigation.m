@@ -31,7 +31,7 @@
 	[track clear];
 	
 	// set root to "0" ---- not on undo track
-    persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	[persistentRoot.rootObject setLabel: @"0"];
 	[ctx commit];
 	node1 = [track currentNode];
@@ -42,7 +42,7 @@
 	node2 = [track currentNode];
 	
 	// set child to "a"
-	OutlineItem *child1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	child1.label = @"a";
 	[persistentRoot.rootObject addObject: child1];
 	[ctx commitWithUndoTrack: track];

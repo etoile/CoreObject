@@ -32,11 +32,11 @@
 
 - (void)testSimpleNonconflictingMerge
 {
-	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *child3 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *subchild1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *child3 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *subchild1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
 	ctx1.rootObject = parent;
     
 	[child1 insertObject: subchild1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
@@ -55,7 +55,7 @@
     
 	// ctx3: move subchild1 to child3, insert child4
 	[(id)[ctx3 loadedObjectForUUID: child3.UUID] insertObject: [ctx3 loadedObjectForUUID: subchild1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	OutlineItem *child4Ctx3 = [ctx3 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child4Ctx3 = [ctx3 insertObjectWithEntityName: @"OutlineItem"];
 	[(id)[ctx3 loadedObjectForUUID: parent.UUID] insertObject: child4Ctx3 atIndex: 0];
 	assert([[(id)[ctx1 loadedObjectForUUID: parent.UUID] contentArray] count] == 3);
 	
@@ -86,10 +86,10 @@
 {
 	// Expected result: conflict
 	
-	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = parent;
-	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
 	
 	[parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	[parent insertObject: child2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
@@ -115,7 +115,7 @@
 	//   \-child2
     
 	// ctx3: put child1 inside  child2, and add a new child3 inside child2
-	OutlineItem *child3Ctx3 = [ctx3 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child3Ctx3 = [ctx3 insertObjectWithEntityName: @"OutlineItem"];
 	[(id)[ctx3 loadedObjectForUUID: child2.UUID] insertObject: [ctx3 loadedObjectForUUID: child1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	[(id)[ctx3 loadedObjectForUUID: child2.UUID] insertObject: child3Ctx3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	
@@ -142,12 +142,12 @@
 - (void)testMoveAndDeleteOnManyToManyRelationship
 {
 	// Expected: both succeed
-    Tag *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+    Tag *parent = [ctx1 insertObjectWithEntityName: @"Tag"];
     ctx1.rootObject = parent;
     
-	Tag *tag1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
-	Tag *tag2 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
-	OutlineItem *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	Tag *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
+	Tag *tag2 = [ctx1 insertObjectWithEntityName: @"Tag"];
+	OutlineItem *child = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
 	
     [parent insertObject: tag1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"childTags"];
     [parent insertObject: tag2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"childTags"];
@@ -220,10 +220,10 @@
 
 - (void)testConflictingInsertInsertOnOneToManyRelationship
 {
-	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = parent;
-	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
 	
 	[parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	[parent insertObject: child2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
@@ -239,7 +239,7 @@
 	[ctx2 setItemGraph: ctx1];	
 	
 	// ctx2: insert subchild1 in child1
-	OutlineItem *subchild1Ctx2 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *subchild1Ctx2 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
 	[(id)[ctx2 loadedObjectForUUID: child1.UUID] insertObject: subchild1Ctx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	UKObjectsSame([ctx2 loadedObjectForUUID: child1.UUID], [subchild1Ctx2 valueForProperty: @"parentContainer"]);
 	UKIntsEqual(1, [[(id)[ctx2 loadedObjectForUUID: child1.UUID] contentArray] count]);
@@ -292,9 +292,9 @@
 {
 	// Expected: both succeed
 
-	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = parent;
-	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
 	
 	[parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	
@@ -307,7 +307,7 @@
 	[ctx2 setItemGraph: ctx1];
 	
 	// ctx2: insert subchild1 in child1
-	OutlineItem *subchild1Ctx2 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *subchild1Ctx2 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
 	[(id)[ctx2 loadedObjectForUUID: child1.UUID] insertObject: subchild1Ctx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	UKObjectsSame([ctx2 loadedObjectForUUID: child1.UUID], [subchild1Ctx2 valueForProperty: @"parentContainer"]);
 	UKIntsEqual(1, [[(id)[ctx2 loadedObjectForUUID: child1.UUID] contentArray] count]);
@@ -356,11 +356,11 @@
 {
 	// Expected: both succeed
     
-	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = parent;
-	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-    OutlineItem *child3 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child3 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     
 	[parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	[parent insertObject: child2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
@@ -378,9 +378,9 @@
     
 	[ctx2 setItemGraph: ctx1];
 	
-	OutlineItem *child0 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *child1a = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *child4 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child0 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *child1a = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *child4 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
     
 	[ctx2.rootObject insertObject: child0 atIndex: 0 hint: nil forProperty: @"contents"];
 	[ctx2.rootObject insertObject: child1a atIndex: 2 hint: nil forProperty: @"contents"];
@@ -413,7 +413,7 @@
 	// ctx3:
     [ctx3 setItemGraph: ctx2];
     
-    OutlineItem *child2a = [ctx3 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    OutlineItem *child2a = [ctx3 insertObjectWithEntityName: @"OutlineItem"];
     [[ctx3.rootObject mutableArrayValueForKey: @"contents"] removeObjectAtIndex: 2];
     [[ctx3.rootObject mutableArrayValueForKey: @"contents"] insertObject: child2a atIndex: 3];
 
@@ -480,15 +480,15 @@
  */
 - (void)testConflictingMixedSequenceEdit
 {
-	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = parent;
     
-	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-    OutlineItem *child3 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *child4 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *child5 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-    OutlineItem *child6 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child3 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *child4 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *child5 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child6 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
 
     parent.contents = @[child1, child2, child3, child4, child5, child6];
 
@@ -524,10 +524,10 @@
 {
 	// Expected: both succeed
 
-    Tag *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+    Tag *parent = [ctx1 insertObjectWithEntityName: @"Tag"];
     ctx1.rootObject = parent;
-	Tag *tag1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
-	Tag *tag2 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+	Tag *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
+	Tag *tag2 = [ctx1 insertObjectWithEntityName: @"Tag"];
     
     [parent insertObject: tag1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"childTags"];
     [parent insertObject: tag2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"childTags"];
@@ -538,7 +538,7 @@
 	
     [ctx2 setItemGraph: ctx1];
 
-	OutlineItem *childCtx2 = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *childCtx2 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
     [[ctx2 loadedObjectForUUID: tag1.UUID] insertObject: childCtx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	
 	// ctx2:
@@ -594,12 +594,12 @@
 
 - (void)testConflictingMoveAndMoveOnOneToManyRelationship
 {
-	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = parent;
-	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *child3 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *subchild1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *child3 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *subchild1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
 	
 	[child1 insertObject: subchild1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	[parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
@@ -661,11 +661,11 @@
 
 - (void)testNonconflictingMoveAndMoveOnOneToManyRelationship
 {
-	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = parent;
-	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *subchild1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *subchild1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
 	
 	[child1 insertObject: subchild1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
 	[parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
@@ -730,13 +730,13 @@
 {
 	// Expected: both succeed
 
-    Tag *parent = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
+    Tag *parent = [ctx1 insertObjectWithEntityName: @"Tag"];
     ctx1.rootObject = parent;
     
-	COGroup *tag1 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
-	COGroup *tag2 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
-	COGroup *tag3 = [ctx1 insertObjectWithEntityName: @"Anonymous.Tag"];
-	OutlineItem *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	COGroup *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
+	COGroup *tag2 = [ctx1 insertObjectWithEntityName: @"Tag"];
+	COGroup *tag3 = [ctx1 insertObjectWithEntityName: @"Tag"];
+	OutlineItem *child = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
 	
     [parent insertObject: tag1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"childTags"];
     [parent insertObject: tag2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"childTags"];
@@ -811,12 +811,12 @@
 
 - (void)testSelectiveUndoOfGroupOperation
 {
-	OutlineItem *doc = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *doc = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = doc;
-	OutlineItem *line1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *circle1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *square1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *image1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *line1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *circle1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *square1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+	OutlineItem *image1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     
 	[line1 setValue: @"line1" forProperty: @"label"];
 	[circle1 setValue: @"circle1" forProperty: @"label"];
@@ -831,7 +831,7 @@
 	// snapshot the state: (line1, circle1, square1, image1) into ctx2
 	[ctx2 setItemGraph: ctx1];
 	
-	OutlineItem *group1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *group1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
 	[group1 setValue: @"group1" forProperty: @"label"];
 	[doc insertObject: group1 atIndex: 1 hint: nil forProperty: @"contents"];
 	[group1 insertObject: circle1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
@@ -841,7 +841,7 @@
 	// snapshot the state:  (line1, group1=(circle1, square1), image1) into ctx3
 	[ctx3 setItemGraph: ctx1];
 	
-	OutlineItem *triangle1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *triangle1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
 	[triangle1 setValue: @"triangle1" forProperty: @"label"];
 	[doc insertObject: triangle1 atIndex: 0];	
 	

@@ -29,7 +29,7 @@
 #endif
 
     ETPropertyDescription *colorProperty = [ETPropertyDescription descriptionWithName: @"color"
-																				 type: (id)colorType];
+																				 typeName: colorType];
 	colorProperty.valueTransformerName = @"COColorToHTMLString";
 	colorProperty.persistentType = (id)@"NSString";
     colorProperty.persistent = YES;

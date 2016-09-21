@@ -21,11 +21,11 @@
 		return bookmark;
 	
 	ETPropertyDescription *URL =
-		[ETPropertyDescription descriptionWithName: @"URL" type: (id)@"NSURL"];
+		[ETPropertyDescription descriptionWithName: @"URL" typeName: @"NSURL"];
 	ETPropertyDescription *lastVisitedDate =
-		[ETPropertyDescription descriptionWithName: @"lastVisitedDate" type: (id)@"NSDate"];
+		[ETPropertyDescription descriptionWithName: @"lastVisitedDate" typeName: @"NSDate"];
 	ETPropertyDescription *favIconData =
-		[ETPropertyDescription descriptionWithName: @"favIconData" type: (id)@"NSData"];
+		[ETPropertyDescription descriptionWithName: @"favIconData" typeName: @"NSData"];
 
 	NSArray *persistentProperties = A(URL, lastVisitedDate, favIconData);
 	

@@ -234,7 +234,7 @@
 - (void)testChangeTrackingBasic
 {
 	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
-    ctx2.rootObject = [ctx2 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    ctx2.rootObject = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
 	OutlineItem *root = ctx2.rootObject;
 
     UKObjectsEqual(S(root.UUID), ctx2.insertedObjectUUIDs);
@@ -336,9 +336,9 @@
 
 - (void) testRelationshipInverseAfterInsertOrUpdateItems
 {
-    OutlineItem *group1 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-    OutlineItem *group2 = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-    OutlineItem *child = [ctx1 insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    OutlineItem *group1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *group2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     [root1 insertObject: group1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     [root1 insertObject: group2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     [group1 insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];

@@ -75,7 +75,7 @@
 
 - (UnorderedGroupNoOpposite *) addAndCommitServerChild
 {
-	UnorderedGroupNoOpposite *serverChild1 = [serverBranch.objectGraphContext insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];
+	UnorderedGroupNoOpposite *serverChild1 = [serverBranch.objectGraphContext insertObjectWithEntityName: @"UnorderedGroupNoOpposite"];
 	[[serverBranch.rootObject mutableSetValueForKey: @"contents"] addObject: serverChild1];
 	[serverPersistentRoot commitWithMetadata: self.serverRevisionMetadataForTest];
 	return serverChild1;
@@ -83,7 +83,7 @@
 
 - (UnorderedGroupNoOpposite *) addAndCommitClientChild
 {
-	UnorderedGroupNoOpposite *clientChild1 = [clientBranch.objectGraphContext insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];
+	UnorderedGroupNoOpposite *clientChild1 = [clientBranch.objectGraphContext insertObjectWithEntityName: @"UnorderedGroupNoOpposite"];
 	[[clientBranch.rootObject mutableSetValueForKey: @"contents"] addObject: clientChild1];
 	[clientPersistentRoot commitWithMetadata: self.clientRevisionMetadataForTest];
 	return clientChild1;

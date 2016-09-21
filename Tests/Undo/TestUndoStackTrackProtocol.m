@@ -31,7 +31,7 @@
 	track = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
 	[track clear];
 	
-    persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	[persistentRoot.rootObject setLabel: @"0"];
 	[ctx commit]; // not on undo track
 	r0 = persistentRoot.currentRevision;

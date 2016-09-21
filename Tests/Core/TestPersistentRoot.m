@@ -44,7 +44,7 @@
 	// - invalid/unloaded deleted persistent root reference
 	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorManual;
 
-    persistentRoot =  [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    persistentRoot =  [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	rootObj = persistentRoot.rootObject;
     originalBranch =  persistentRoot.currentBranch;
     
@@ -65,7 +65,7 @@
 
 - (void)testUncommittedPersistentRootCurrentRevision
 {
-	COPersistentRoot *newPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COPersistentRoot *newPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	UKNil(newPersistentRoot.currentRevision);
 }
 
@@ -158,10 +158,10 @@
 	//  |
 	//  \--childB
     
-    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     COObject *photo1root = photo1.rootObject;
     
-    COObject *childA = [photo1.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    COObject *childA = [photo1.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     [childA setValue: @"childA" forKey: @"label"];
     [photo1root insertObject: childA atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     
@@ -599,7 +599,7 @@
 
 - (void) testPersistentRootMetadataOnPersistentRootFirstCommit
 {
-    COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     persistentRoot2.metadata = @{@"hello" : @"world"};
     [ctx commit];
     
@@ -612,7 +612,7 @@
 
 - (void) testAttributesOnUncommittedPersistentRoot
 {
-    COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	UKNil([persistentRoot2 attributes]);
 }
 
@@ -719,7 +719,7 @@
 
 - (void) testNormalPersistentRootUsageDoesNotCreateBranchObjectGraphContext
 {
-    COPersistentRoot *proot2 =  [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *proot2 =  [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	COBranch *branch = proot2.currentBranch;
 	[ctx commit];
 	

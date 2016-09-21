@@ -27,11 +27,11 @@
                                                      opposite: (NSString *)oppositeType
 {
 	ETPropertyDescription *contentProperty = 
-		[ETPropertyDescription descriptionWithName: aName type: (id)aType];
-	[contentProperty setMultivalued: YES];
+		[ETPropertyDescription descriptionWithName: aName typeName: aType];
+	contentProperty.multivalued = YES;
 	contentProperty.opposite = (id)oppositeType;
-	[contentProperty setOrdered: YES];
-	[contentProperty setPersistent: YES];
+	contentProperty.ordered = YES;
+	contentProperty.persistent = YES;
 	return contentProperty;
 }
 

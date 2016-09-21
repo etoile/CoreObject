@@ -16,7 +16,7 @@
 
 - (void)testBaseRevision
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     UKNotNil(persistentRoot.UUID);
     
 	COObject *obj = persistentRoot.rootObject;
@@ -57,7 +57,7 @@
 	//       4
 	ETUUID *objectUUID;
 	
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     
 	// 1
 	COObject *obj = persistentRoot.rootObject;

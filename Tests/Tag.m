@@ -17,30 +17,30 @@
 		return entity;
 
     ETPropertyDescription *tagLabelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                type: (id)@"Anonymous.NSString"];
-    [tagLabelProperty setPersistent: YES];
+                                                                                typeName: @"NSString"];
+    tagLabelProperty.persistent = YES;
 
     ETPropertyDescription *contentsProperty =
-    [ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.OutlineItem"];
-    [contentsProperty setMultivalued: YES];
-    [contentsProperty setOrdered: NO];
-    [contentsProperty setPersistent: YES];
+    [ETPropertyDescription descriptionWithName: @"contents" typeName: @"OutlineItem"];
+    contentsProperty.multivalued = YES;
+    contentsProperty.ordered = NO;
+    contentsProperty.persistent = YES;
 
     ETPropertyDescription *childTagsProperty =
-    [ETPropertyDescription descriptionWithName: @"childTags" type: (id)@"Anonymous.Tag"];
-    [childTagsProperty setMultivalued: YES];
-    [childTagsProperty setOrdered: NO];
-	[childTagsProperty setPersistent: YES];
+    [ETPropertyDescription descriptionWithName: @"childTags" typeName: @"Tag"];
+    childTagsProperty.multivalued = YES;
+    childTagsProperty.ordered = NO;
+	childTagsProperty.persistent = YES;
     
     ETPropertyDescription *parentTagProperty =
-    [ETPropertyDescription descriptionWithName: @"parentTag" type: (id)@"Anonymous.Tag"];
+    [ETPropertyDescription descriptionWithName: @"parentTag" typeName: @"Tag"];
     parentTagProperty.opposite = childTagsProperty;
-	[parentTagProperty setDerived: YES];
+	parentTagProperty.derived = YES;
 	
 	ETAssert(childTagsProperty.isComposite);
 	ETAssert(parentTagProperty.isContainer);
     
-    [entity setPropertyDescriptions: A(tagLabelProperty, contentsProperty, childTagsProperty, parentTagProperty)];
+    entity.propertyDescriptions = A(tagLabelProperty, contentsProperty, childTagsProperty, parentTagProperty);
     return entity;
 }
 

@@ -17,15 +17,15 @@
 		return entity;
 	
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 type: (id)@"Anonymous.NSString"];
-    [labelProperty setPersistent: YES];
+                                                                                 typeName: @"NSString"];
+    labelProperty.persistent = YES;
    
     ETPropertyDescription *parentProperty =
-    [ETPropertyDescription descriptionWithName: @"parent" type: (id)@"Anonymous.Parent"];
+    [ETPropertyDescription descriptionWithName: @"parent" typeName: @"Parent"];
     
-    [parentProperty setMultivalued: NO];
-    parentProperty.opposite = (id)@"Anonymous.Parent.child";
-	[parentProperty setDerived: YES];
+    parentProperty.multivalued = NO;
+    parentProperty.oppositeName = @"Parent.child";
+	parentProperty.derived = YES;
     
     entity.propertyDescriptions = @[labelProperty, parentProperty];
 	

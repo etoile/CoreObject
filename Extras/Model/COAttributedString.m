@@ -26,11 +26,11 @@
 		return entity;
 	
 	ETPropertyDescription *chunksProperty = [ETPropertyDescription descriptionWithName: @"chunks"
-																				  type: (id)@"COAttributedStringChunk"];
+																				  typeName: @"COAttributedStringChunk"];
 	chunksProperty.multivalued = YES;
 	chunksProperty.ordered = YES;
 	chunksProperty.persistent = YES;
-	chunksProperty.opposite = (id)@"Anonymous.COAttributedStringChunk.parentString";
+	chunksProperty.oppositeName = @"COAttributedStringChunk.parentString";
 	
 	entity.propertyDescriptions = @[chunksProperty];
 	

@@ -55,7 +55,7 @@
 {
     ETEntityDescription *rootEntity = [ETEntityDescription descriptionWithName: @"RootEntity"];
 	ETEntityDescription *emptyEntity = [ETEntityDescription descriptionWithName: @"EmptyEntity"];
-	emptyEntity.parent = (id)@"Anonymous.COObject";
+	emptyEntity.parentName = @"COObject";
 
 	[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: rootEntity];
 	[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: emptyEntity];
@@ -64,11 +64,11 @@
 	// Expected to fail because rootEntity does not declare COObject as its parent
 	UKRaisesException([[COObject alloc] initWithEntityDescription: rootEntity
 											   objectGraphContext: [COObjectGraphContext new]]);
-	UKRaisesException([ctx insertNewPersistentRootWithEntityName: @"Anonymous.RootEntity"]);
+	UKRaisesException([ctx insertNewPersistentRootWithEntityName: @"RootEntity"]);
 	
 	UKDoesNotRaiseException([[COObject alloc] initWithEntityDescription: emptyEntity
 													 objectGraphContext: [COObjectGraphContext new]]);
-	UKDoesNotRaiseException([ctx insertNewPersistentRootWithEntityName: @"Anonymous.EmptyEntity"]);
+	UKDoesNotRaiseException([ctx insertNewPersistentRootWithEntityName: @"EmptyEntity"]);
 }
 
 - (void) testInit
@@ -349,7 +349,7 @@
 	ETPropertyDescription *contentsDesc = [entityDesc propertyDescriptionForName: @"contents"];
 	
 	UKTrue(contentsDesc.ordered);
-	UKRaisesException([contentsDesc setOrdered: NO]);
+	UKRaisesException(contentsDesc.ordered = NO);
 }
 
 - (void) testDidChangeValueForWrongProperty

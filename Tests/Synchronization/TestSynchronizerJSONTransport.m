@@ -130,7 +130,7 @@
 
 - (UnorderedGroupNoOpposite *) addAndCommitServerChild
 {
-	UnorderedGroupNoOpposite *serverChild1 = [server.persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];
+	UnorderedGroupNoOpposite *serverChild1 = [server.persistentRoot.objectGraphContext insertObjectWithEntityName: @"UnorderedGroupNoOpposite"];
 	[[server.persistentRoot.rootObject mutableSetValueForKey: @"contents"] addObject: serverChild1];
 	[server.persistentRoot commit];
 	return serverChild1;
@@ -138,7 +138,7 @@
 
 - (UnorderedGroupNoOpposite *) addAndCommitClient1Child
 {
-	UnorderedGroupNoOpposite *clientChild1 = [client1.persistentRoot.objectGraphContext insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];
+	UnorderedGroupNoOpposite *clientChild1 = [client1.persistentRoot.objectGraphContext insertObjectWithEntityName: @"UnorderedGroupNoOpposite"];
 	[[client1.persistentRoot.rootObject mutableSetValueForKey: @"contents"] addObject: clientChild1];
 	[client1.persistentRoot commit];
 	return clientChild1;
