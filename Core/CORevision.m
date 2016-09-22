@@ -47,8 +47,8 @@
 - (NSArray *)propertyNames
 {
 	return [[super propertyNames] arrayByAddingObjectsFromArray: 
-		A(@"UUID", @"date", @"type", @"localizedTypeDescription",
-		@"localizedShortDescription", @"metadata")];
+		@[@"UUID", @"date", @"type", @"localizedTypeDescription",
+		@"localizedShortDescription", @"metadata"]];
 }
 
 - (ETUUID *)UUID

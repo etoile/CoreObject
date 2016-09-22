@@ -43,7 +43,7 @@ static ETUUID *tagUUID;
           forAttribute: @"taggedDocuments"
                   type: kCOTypeReference | kCOTypeSet];
 
-    return [COItemGraph itemGraphWithItemsRootFirst: A(rootItem)];
+    return [COItemGraph itemGraphWithItemsRootFirst: @[rootItem]];
 }
 
 - (COItemGraph *) docItemTree
@@ -51,7 +51,7 @@ static ETUUID *tagUUID;
     COMutableItem *rootItem = [[COMutableItem alloc] initWithUUID: docUUID];
     [rootItem setValue: @"my document" forAttribute: @"name" type: kCOTypeString];
     
-    return [COItemGraph itemGraphWithItemsRootFirst: A(rootItem)];
+    return [COItemGraph itemGraphWithItemsRootFirst: @[rootItem]];
 }
 
 - (id) init

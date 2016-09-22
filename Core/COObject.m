@@ -165,12 +165,12 @@ See +[NSObject typePrefix]. */
 		[ETPropertyDescription descriptionWithName: @"typeDescription" typeName: @"NSString"];
 	typeDescription.displayName = _(@"Type");
 
-	NSArray *transientProperties = A(UUID, isPersistent, isRoot, identifier,
-		displayName, revisionDescription, tagDescription, typeDescription, tags);
+	NSArray *transientProperties = @[UUID, isPersistent, isRoot, identifier,
+		displayName, revisionDescription, tagDescription, typeDescription, tags];
 #ifndef GNUSTEP
 	transientProperties = [transientProperties arrayByAddingObject: icon];
 #endif
-	NSArray *persistentProperties = A(isShared, name);
+	NSArray *persistentProperties = @[isShared, name];
 	NSArray *properties =
 		[transientProperties arrayByAddingObjectsFromArray: persistentProperties];
 
@@ -1476,7 +1476,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 		return;
 	
 	// NOTE: A KVO notification must be posted.
-	[oldParent removeObjects: A(child)
+	[oldParent removeObjects: @[child]
 				   atIndexes: [NSIndexSet indexSet]
 					   hints: @[]
 				 forProperty: key];
@@ -1541,7 +1541,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 				continue;
 
 			// NOTE: A KVO notification must be posted.
-			[oldParent removeObjects: A(child)
+			[oldParent removeObjects: @[child]
 			               atIndexes: [NSIndexSet indexSet]
 			                   hints: @[]
 						 forProperty: key];
@@ -1874,7 +1874,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
 {
 	// TODO: Check and traverse relationships to visit the object graph
-	return ([aQuery.predicate evaluateWithObject: self] ? A(self) : @[]);
+	return ([aQuery.predicate evaluateWithObject: self] ? @[self] : @[]);
 }
 
 #pragma mark - Description

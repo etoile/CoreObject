@@ -49,7 +49,7 @@
     [ETPropertyDescription descriptionWithName: @"attachmentID" typeName: @"COAttachmentID"];
 	attachmentProperty.persistent = YES;
     
-    entity.propertyDescriptions = A(isShared, labelProperty, contentsProperty, parentContainerProperty, parentCollectionsProperty, attachmentProperty);
+    entity.propertyDescriptions = @[isShared, labelProperty, contentsProperty, parentContainerProperty, parentCollectionsProperty, attachmentProperty];
 
     return entity;
 }
@@ -105,7 +105,7 @@
     parentContainerProperty.multivalued = NO;
     parentContainerProperty.oppositeName = @"TransientOutlineItem.contents";
        
-    entity.propertyDescriptions = A(contentsProperty, parentContainerProperty);
+    entity.propertyDescriptions = @[contentsProperty, parentContainerProperty];
 
     return entity;
 }

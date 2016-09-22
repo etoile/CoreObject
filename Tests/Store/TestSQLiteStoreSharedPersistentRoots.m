@@ -41,7 +41,7 @@ static ETUUID *rootUUID;
     COMutableItem *rootItem = [[COMutableItem alloc] initWithUUID: rootUUID];
     [rootItem setValue: @"prootB" forAttribute: @"name" type: kCOTypeString];
     
-    return [COItemGraph itemGraphWithItemsRootFirst: A(rootItem)];
+    return [COItemGraph itemGraphWithItemsRootFirst: @[rootItem]];
 }
 
 - (COItemGraph *) prootAitemTree
@@ -49,7 +49,7 @@ static ETUUID *rootUUID;
     COMutableItem *rootItem = [[COMutableItem alloc] initWithUUID: rootUUID];
     [rootItem setValue: @"prootA" forAttribute: @"name" type: kCOTypeString];
     
-    return [COItemGraph itemGraphWithItemsRootFirst: A(rootItem)];
+    return [COItemGraph itemGraphWithItemsRootFirst: @[rootItem]];
 }
 
 - (id) init

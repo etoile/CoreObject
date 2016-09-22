@@ -104,7 +104,7 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 	   (it doesn't link the CoreObject framework) */
 	NSBundle *coreObjectBundle = [NSBundle bundleForClass: self];
 	NSArray *bundles =
-		[A([NSBundle mainBundle], coreObjectBundle) arrayByAddingObjectsFromArray: [NSBundle allFrameworks]];
+		[@[[NSBundle mainBundle], coreObjectBundle] arrayByAddingObjectsFromArray: [NSBundle allFrameworks]];
 
 	for (NSBundle *bundle in bundles)
 	{
@@ -130,8 +130,8 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 				return [localizedDirectory stringByAppendingPathComponent: subpath];
 			}];
 
-			[commitsFiles addObjectsFromArray: [localizedFiles pathsMatchingExtensions: A(@"json")]];
-			[stringsFiles addObjectsFromArray: [localizedFiles pathsMatchingExtensions: A(@"strings")]];
+			[commitsFiles addObjectsFromArray: [localizedFiles pathsMatchingExtensions: @[@"json"]]];
+			[stringsFiles addObjectsFromArray: [localizedFiles pathsMatchingExtensions: @[@"strings"]]];
 		}
 	}
 	

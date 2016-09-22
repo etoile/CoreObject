@@ -73,7 +73,7 @@
 	         forAttribute: @"sound"
 	                 type: kCOTypeString];
 
-	[model.objectGraphContext insertOrUpdateItems: A(newDictItem)];
+	[model.objectGraphContext insertOrUpdateItems: @[newDictItem]];
 
 	UKObjectsEqual(D(@"tic", @"sound"), [model valueForProperty: @"entries"]);
 	
@@ -83,13 +83,13 @@
 	         forAttribute: @"sound"
 	                 type: kCOTypeString];
 
-	[model.objectGraphContext insertOrUpdateItems: A(newDictItem)];
+	[model.objectGraphContext insertOrUpdateItems: @[newDictItem]];
 	
 	UKObjectsEqual(D(@"boum", @"sound"), [model valueForProperty: @"entries"]);
 
 	/* Model Item Update */
 	
-	[model.objectGraphContext insertOrUpdateItems: A([self modelItem])];
+	[model.objectGraphContext insertOrUpdateItems: @[[self modelItem]]];
 
 	UKObjectsEqual(D(@"boum", @"sound"), [model valueForProperty: @"entries"]);
 	
@@ -99,7 +99,7 @@
 	         forAttribute: @"location"
 	                 type: kCOTypeString];
 
-	[model.objectGraphContext insertOrUpdateItems: A(newDictItem, [self modelItem])];
+	[model.objectGraphContext insertOrUpdateItems: @[newDictItem, [self modelItem]]];
 
 	UKObjectsEqual(D(@"boum", @"sound", @"here", @"location"), [model valueForProperty: @"entries"]);
 }

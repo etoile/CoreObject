@@ -109,8 +109,9 @@ static ETUUID *childUUID2;
 
 - (COItemGraph*) makeInitialItemTree
 {
-    return [COItemGraph itemGraphWithItemsRootFirst: A([self initialRootItemForChildren: A(childUUID1)],
-                                                 [self initialChildItemForUUID: childUUID1 name: @"initial child"])];
+    return [COItemGraph itemGraphWithItemsRootFirst:
+		@[[self initialRootItemForChildren: @[childUUID1]],
+		  [self initialChildItemForUUID: childUUID1 name: @"initial child"]]];
 }
 
 /**
@@ -119,8 +120,9 @@ static ETUUID *childUUID2;
 - (COItemGraph*) makeBranchAItemTreeAtIndex: (int)index
 {
     NSString *name = [NSString stringWithFormat: @"branch A commit %d", index];
-    return [COItemGraph itemGraphWithItemsRootFirst: A([self initialRootItemForChildren: A(childUUID1)],
-                                                       [self initialChildItemForUUID: childUUID1 name: name])];
+    return [COItemGraph itemGraphWithItemsRootFirst:
+		@[[self initialRootItemForChildren: @[childUUID1]],
+		  [self initialChildItemForUUID: childUUID1 name: name]]];
 }
 
 /**
@@ -129,8 +131,9 @@ static ETUUID *childUUID2;
 - (COItemGraph*) makeBranchBItemTreeAtIndex: (int)index
 {
     NSString *name = [NSString stringWithFormat: @"branch B commit %d", index];
-    return [COItemGraph itemGraphWithItemsRootFirst: A([self initialRootItemForChildren: A(childUUID2)],
-                                                       [self initialChildItemForUUID: childUUID2 name: name])];
+    return [COItemGraph itemGraphWithItemsRootFirst:
+		@[[self initialRootItemForChildren: @[childUUID2]],
+		  [self initialChildItemForUUID: childUUID2 name: name]]];
 }
 
 - (COItemGraph *)itemTreeWithChildNameChange: (NSString*)aName

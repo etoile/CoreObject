@@ -142,8 +142,8 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
 - (NSArray *)propertyNames
 {
 	return [[super propertyNames] arrayByAddingObjectsFromArray: 
-		A(@"metadata", @"UUID", @"persistentRootUUID", @"branchUUID", @"date",
-		  @"localizedTypeDescription", @"localizedShortDescription")];
+		@[@"metadata", @"UUID", @"persistentRootUUID", @"branchUUID", @"date",
+		  @"localizedTypeDescription", @"localizedShortDescription"]];
 }
 
 - (NSString *)kind

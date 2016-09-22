@@ -183,7 +183,7 @@
 - (void)testNullDisallowedInCollection
 {
     UKObjectsEqual(A(child1, child2), parent.contents);
-	UKRaisesException([parent setContents: A([NSNull null])]);
+	UKRaisesException([parent setContents: @[[NSNull null]]]);
     // Unfortunately, the collection is modified
     UKObjectsEqual(A([NSNull null]), parent.contents);
 }
@@ -243,7 +243,7 @@
 
 - (void)testReplaceChildren
 {
-	parent.contents = A(child);
+	parent.contents = @[child];
 
 	[self checkVariableStorageCollectionForProperty: @"contents"];
 

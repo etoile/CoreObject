@@ -367,9 +367,9 @@ doesNotPostNotification: (NSString *)notif
 	NSIndexSet *indexes =
 		(index != ETUndeterminedIndex ? [NSIndexSet indexSetWithIndex: index] : [NSIndexSet indexSet]);
 	
-	[self insertObjects: (object != nil ? A(object) : @[])
+	[self insertObjects: (object != nil ? @[object] : @[])
 	          atIndexes: indexes
-	              hints: (hint != nil ? A(hint) : @[])
+	              hints: (hint != nil ? @[hint] : @[])
 	        forProperty: key];
 }
 
@@ -378,9 +378,9 @@ doesNotPostNotification: (NSString *)notif
 	NSIndexSet *indexes =
 		(index != ETUndeterminedIndex ? [NSIndexSet indexSetWithIndex: index] : [NSIndexSet indexSet]);
 	
-	[self removeObjects: (object != nil ? A(object) : @[])
+	[self removeObjects: (object != nil ? @[object] : @[])
 	          atIndexes: indexes
-	              hints: (hint != nil ? A(hint) : @[])
+	              hints: (hint != nil ? @[hint] : @[])
 	        forProperty: key];
 }
 

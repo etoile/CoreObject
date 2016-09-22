@@ -212,7 +212,7 @@
 	UKObjectsEqual(@"Test", parentItem.packageName);
 	parentItem.packageVersion = 1;
 	
-	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: A(parentItem)]);
+	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: @[parentItem]]);
 }
 					  
 - (void)testExceptionOnNegativeSchemaVersion
@@ -224,7 +224,7 @@
 	UKObjectsEqual(@"Test", parentItem.packageName);
 	parentItem.packageVersion = -2;
 	
-	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: A(parentItem)]);
+	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: @[parentItem]]);
 }
 
 - (void)testExceptionOnMissingMigration
@@ -240,7 +240,7 @@
 	COObjectGraphContext *migratedContext =
 		[COObjectGraphContext objectGraphContextWithModelDescriptionRepository: repo];
 	
-	UKRaisesException([migratedContext insertOrUpdateItems: A(childItem)]);
+	UKRaisesException([migratedContext insertOrUpdateItems: @[childItem]]);
 }
 
 - (void)testExceptionOnMigrationReturningItemsWithIncorrectVersion

@@ -30,14 +30,14 @@ static ETUUID *rootUUID;
 
 - (COItemGraph *) makeInitialItemGraph
 {
-    return [COItemGraph itemGraphWithItemsRootFirst: A([[COMutableItem alloc] initWithUUID: rootUUID])];
+    return [COItemGraph itemGraphWithItemsRootFirst: @[[[COMutableItem alloc] initWithUUID: rootUUID]]];
 }
 
 - (COItemGraph *) makeChangedItemGraph
 {
     COMutableItem *item = [[COMutableItem alloc] initWithUUID: rootUUID];
     [item setValue: @"hello" forAttribute: @"name" type: kCOTypeString];
-    return [COItemGraph itemGraphWithItemsRootFirst: A(item)];
+    return [COItemGraph itemGraphWithItemsRootFirst: @[item]];
 }
 
 

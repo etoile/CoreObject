@@ -155,12 +155,12 @@ TIME_METHOD_WITH_EXPECTED_RESULT(timeToAccessCoreObjectStringProperty, ACCESS_IT
 TIME_METHOD_WITH_EXPECTED_RESULT(timeToAccessFoundationObjectOrderedRelationship,
 								 ACCESS_ITERATIONS,
 								 foundationParent.arrayProperty,
-								 A(foundationChild1, foundationChild2, foundationChild3))
+								 @[foundationChild1, foundationChild2, foundationChild3])
 
 TIME_METHOD_WITH_EXPECTED_RESULT(timeToAccessCoreObjectOrderedRelationship,
 								 ACCESS_ITERATIONS,
 								 coreobjectParent.contents,
-								 A(coreobjectChild1, coreobjectChild2, coreobjectChild3))
+								 @[coreobjectChild1, coreobjectChild2, coreobjectChild3])
 
 - (void) testOrderedRelationshipAccess
 {

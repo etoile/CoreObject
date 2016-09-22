@@ -273,7 +273,7 @@
 	UKObjectsEqual(rev5.UUID, [[[store persistentRootInfoForUUID: persistentRoot.UUID]
                                          branchInfoForUUID: branch2.UUID] currentRevisionUUID]);
 	
-//	NSArray *parentTrackUUIDs = A(initialTrack.UUID, branch1.UUID);
+//	NSArray *parentTrackUUIDs = @[initialTrack.UUID, branch1.UUID];
 //	
 //	UKObjectsEqual(parentTrackUUIDs, [store parentTrackUUIDsForCommitTrackUUID: branch2.UUID]);
 //	UKObjectsEqual(A(rev1, rev2, rev5), [[[branch2 loadedNodes] mappedCollection] revision]);

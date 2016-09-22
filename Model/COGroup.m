@@ -31,7 +31,7 @@
 		                                    type: @"COObject"
 		                                opposite: nil];
 
-	collection.propertyDescriptions = A(objects);
+	collection.propertyDescriptions = @[objects];
 
 	return collection;
 }

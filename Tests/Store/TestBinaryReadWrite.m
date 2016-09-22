@@ -103,7 +103,7 @@ static void test_read_null(void *ctx)
     co_buffer_end_array(&buf);
     co_buffer_end_object(&buf);
     
-    NSArray *expected = A(beginObject,
+    NSArray *expected = @[beginObject,
                           beginArray,
                           @(0),
                           @(-1),
@@ -122,7 +122,7 @@ static void test_read_null(void *ctx)
                           uuid,
                           [NSNull null],
                           endArray,
-                          endObject);
+                          endObject];
     
     co_reader_callback_t cb = {
         test_read_int64,

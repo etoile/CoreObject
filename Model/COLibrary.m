@@ -28,7 +28,7 @@
 		[ETPropertyDescription descriptionWithName: @"identifier" typeName: @"NSString"];
 	idProperty.persistent = YES;
 
-	collection.propertyDescriptions = A(idProperty);
+	collection.propertyDescriptions = @[idProperty];
 
 	return collection;	
 }

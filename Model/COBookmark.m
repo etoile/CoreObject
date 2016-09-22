@@ -27,7 +27,7 @@
 	ETPropertyDescription *favIconData =
 		[ETPropertyDescription descriptionWithName: @"favIconData" typeName: @"NSData"];
 
-	NSArray *persistentProperties = A(URL, lastVisitedDate, favIconData);
+	NSArray *persistentProperties = @[URL, lastVisitedDate, favIconData];
 	
 	[[persistentProperties mappedCollection] setPersistent: YES];
 	bookmark.propertyDescriptions = persistentProperties;

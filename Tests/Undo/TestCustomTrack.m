@@ -147,7 +147,7 @@ selective undo is involved. */
 
 	[ctx commitWithUndoTrack: _testTrack];
 
-	return A(object, doc, para1, para2);
+	return @[object, doc, para1, para2];
 }
 
 - (void)testUndoWithMultiplePersistentRoots

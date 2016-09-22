@@ -40,7 +40,7 @@
 	ETAssert(childTagsProperty.isComposite);
 	ETAssert(parentTagProperty.isContainer);
     
-    entity.propertyDescriptions = A(tagLabelProperty, contentsProperty, childTagsProperty, parentTagProperty);
+    entity.propertyDescriptions = @[tagLabelProperty, contentsProperty, childTagsProperty, parentTagProperty];
     return entity;
 }
 

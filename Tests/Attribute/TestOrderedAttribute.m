@@ -66,7 +66,7 @@
 	UKObjectKindOf(group1.contents, COMutableArray);
 	UKFalse([group1.contents isKindOfClass: [COUnsafeRetainedMutableArray class]]);
 	
-	group1.contents = A(@"hello");
+	group1.contents = @[@"hello"];
 	UKObjectKindOf(group1.contents, COMutableArray);
 	UKFalse([group1.contents isKindOfClass: [COUnsafeRetainedMutableArray class]]);
 }
@@ -75,7 +75,7 @@
 {
 	@autoreleasepool
 	{
-		group1.contents = A([@"hello" mutableCopy]);
+		group1.contents = @[[@"hello" mutableCopy]];
 		UKObjectsEqual(A(@"hello"), group1.contents);
 	}
 	
@@ -87,7 +87,7 @@
 
 - (void)testNullDisallowedInCollection
 {
-	UKRaisesException([group1 setContents: A([NSNull null])]);
+	UKRaisesException([group1 setContents: @[[NSNull null]]]);
 }
 
 @end

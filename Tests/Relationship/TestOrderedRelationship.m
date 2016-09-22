@@ -134,7 +134,7 @@
 	COObjectGraphContext *ctx = [COObjectGraphContext new];
 	OrderedGroupNoOpposite *group1 = [ctx insertObjectWithEntityName: @"OrderedGroupNoOpposite"];
 
-	UKRaisesException([group1 setContents: A([NSNull null])]);
+	UKRaisesException([group1 setContents: @[[NSNull null]]]);
 }
 
 @end
@@ -178,7 +178,7 @@
 		item1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
 		item1.label = @"current";
 		item2 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
-		group1.contents = A(item1, item2);
+		group1.contents = @[item1, item2];
 		group1.label = @"current";
 		[ctx commit];
 
@@ -311,7 +311,7 @@
  */
 - (void)testTargetPersistentRootUndeletionWithEmptyGroup
 {
-	group1.contents = A(item1);
+	group1.contents = @[item1];
 	[ctx commit];
 
 	item1.persistentRoot.deleted = YES;
@@ -332,7 +332,7 @@
 
 - (void)testTargetPersistentRootDeletionForReferenceToSpecificBranch
 {
-	group1.contents = A(otherItem1, item2);
+	group1.contents = @[otherItem1, item2];
 	[ctx commit];
 
 	item1.persistentRoot.deleted = YES;
@@ -350,7 +350,7 @@
 
 - (void)testTargetPersistentRootUndeletionForReferenceToSpecificBranch
 {
-	group1.contents = A(otherItem1, item2);
+	group1.contents = @[otherItem1, item2];
 	[ctx commit];
 
 	item1.persistentRoot.deleted = YES;
@@ -377,7 +377,7 @@
  */
 - (void)testTargetBranchDeletionForReferenceToSpecificBranch
 {
-	group1.contents = A(otherItem1, item2);
+	group1.contents = @[otherItem1, item2];
 	[ctx commit];
 	
 	otherItem1.branch.deleted = YES;
@@ -395,7 +395,7 @@
 
 - (void)testTargetBranchUndeletionForReferenceToSpecificBranch
 {
-	group1.contents = A(otherItem1, item2);
+	group1.contents = @[otherItem1, item2];
 	[ctx commit];
 	
 	otherItem1.branch.deleted = YES;
@@ -454,7 +454,7 @@
 	UKObjectsEqual(S(group1, otherGroup1), item1.referringObjects);
 	
 	UKObjectsEqual(A(item1, item2), otherGroup1.contents);
-	otherGroup1.contents = A(item1, item2);
+	otherGroup1.contents = @[item1, item2];
 	[ctx commit];
 
 	otherGroup1.persistentRoot.deleted = YES;
@@ -474,7 +474,7 @@
 
 - (void)testSourcePersistentRootUndeletionForReferenceToSpecificBranch
 {
-	otherGroup1.contents = A(item1, item2);
+	otherGroup1.contents = @[item1, item2];
 	[ctx commit];
 
 	otherGroup1.persistentRoot.deleted = YES;
@@ -497,7 +497,7 @@
 
 - (void)testSourceBranchDeletionForReferenceToSpecificBranch
 {
-	otherGroup1.contents = A(item1, item2);
+	otherGroup1.contents = @[item1, item2];
 	[ctx commit];
 	
 	otherGroup1.branch.deleted = YES;
@@ -515,7 +515,7 @@
 
 - (void)testSourceBranchUndeletionForReferenceToSpecificBranch
 {
-	otherGroup1.contents = A(item1, item2);
+	otherGroup1.contents = @[item1, item2];
 	[ctx commit];
 	
 	otherGroup1.branch.deleted = YES;
@@ -577,7 +577,7 @@
 													 branch: otherItem1.branch.UUID];
 	COPath *item2Path = [COPath pathWithPersistentRoot: item2uuid];
 	
-	group1.contents = A(otherItem1, item2);
+	group1.contents = @[otherItem1, item2];
 	[ctx commit];
 	
 	COEditingContext *ctx2 = [self newContext];

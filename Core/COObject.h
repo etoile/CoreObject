@@ -193,7 +193,7 @@
  *
  * - (void)addName: (NSString *)aName
  * {
- *     NSArray *insertedObjects = A(aName);
+ *     NSArray *insertedObjects = @[aName];
  *     NSIndexSet *insertionIndexes = [NSIndexSet indexSet];
  *
  *     [self willChangeValueForProperty: key
@@ -213,7 +213,7 @@
  *
  * - (void)removeName: (NSString *)aName
  * {
- *     NSArray *removedObjects = A(aName);
+ *     NSArray *removedObjects = @[aName];
  *     NSIndexSet *removalIndexes = [NSIndexSet indexSet];
  *
  *     [self willChangeValueForProperty: key
@@ -234,7 +234,7 @@
  * // Direct setters are rare, but nonetheless it is possible to write one as below...
  * - (void)setNames: (id &lt;ETCollection&gt;)newNames
  * {
- *     NSArray *replacementObjects = A(aName);
+ *     NSArray *replacementObjects = @[aName];
  *     // If no indexes are provided, the entire collection is replaced or set.
  *     NSIndexSet *replacementIndexes = [NSIndexSet indexSet];
  *

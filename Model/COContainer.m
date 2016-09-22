@@ -22,7 +22,7 @@
 	ETPropertyDescription *objects =
 		[self contentPropertyDescriptionWithName: @"objects" type: (id)@"COObject" opposite: nil];
 	
-	collection.propertyDescriptions = A(objects);
+	collection.propertyDescriptions = @[objects];
 
 	return collection;	
 }

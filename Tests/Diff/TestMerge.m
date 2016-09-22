@@ -192,7 +192,7 @@
 	
 	
 	// Now do the merge
-	//NSArray *uuids = (id)[[A(tag1, tag2, child) mappedCollection] UUID];
+	//NSArray *uuids = (id)[[@[tag1, tag2, child] mappedCollection] UUID];
     COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
     COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
 	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];

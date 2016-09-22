@@ -37,7 +37,7 @@
 	tagGroups.oppositeName = @"COTagGroup.objects";
 	tagGroups.derived = YES;
 
-	collection.propertyDescriptions = A(objects, tagGroups);
+	collection.propertyDescriptions = @[objects, tagGroups];
 
 	return collection;
 }
@@ -88,7 +88,7 @@
 		                                    type: @"COTag"
 		                                opposite: @"COTag.tagGroups"];
 
-	collection.propertyDescriptions = A(objects);
+	collection.propertyDescriptions = @[objects];
 
 	return collection;
 }
@@ -119,7 +119,7 @@
 		                                    type: (id)@"COTag"
 		                                opposite: nil];
 
-	collection.propertyDescriptions = A(tagGroups, objects);
+	collection.propertyDescriptions = @[tagGroups, objects];
 	
 	return collection;
 }

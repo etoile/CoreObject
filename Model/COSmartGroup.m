@@ -42,7 +42,7 @@
 	content.multivalued = YES;
 	content.ordered = YES;
 
-	group.propertyDescriptions = A(content);
+	group.propertyDescriptions = @[content];
 
 	return group;	
 }

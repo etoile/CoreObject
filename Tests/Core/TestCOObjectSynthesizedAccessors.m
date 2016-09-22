@@ -42,7 +42,7 @@
     OutlineItem *child2 = [item.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     child2.label = @"child2";
 
-    [item setContents: A(child1, child2)];
+    [item setContents: @[child1, child2]];
     UKObjectsEqual(A(child1, child2), item.contents);
 }
 

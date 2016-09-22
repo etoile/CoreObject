@@ -54,7 +54,7 @@
     [item setValue: @-8000000000LL forAttribute: @"-8000000000" type: kCOTypeInt64];
     [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeInt64];
     
-    [item setValue: A(@1, @8000000000LL)
+    [item setValue: @[@1, @8000000000LL]
       forAttribute: @"[1, 8000000000]"
               type: kCOTypeArray | kCOTypeInt64];
 
@@ -112,7 +112,7 @@
 	[item setValue: @123.456789012 forAttribute: @"123.456789012" type: kCOTypeDouble];
     [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeDouble];
     
-    [item setValue: A(@3.14, @123.456789012)
+    [item setValue: @[@3.14, @123.456789012]
       forAttribute: @"[3.14, 123.456789012]"
               type: kCOTypeArray | kCOTypeDouble];
     
@@ -129,7 +129,7 @@
     [item setValue: @"abc" forAttribute: @"abc" type: kCOTypeString];
     [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeString];
     
-    [item setValue: A(@"abc", @"def")
+    [item setValue: @[@"abc", @"def"]
       forAttribute: @"[abc, def]"
               type: kCOTypeArray | kCOTypeString];
     
@@ -157,7 +157,7 @@
     [item setValue: threeBytes forAttribute: @"xyz" type: kCOTypeBlob];
     [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeBlob];
     
-    [item setValue: A(zeroBytes, threeBytes, bigBlob)
+    [item setValue: @[zeroBytes, threeBytes, bigBlob]
       forAttribute: @"[zeroBytes, xyz, bigBlob]"
               type: kCOTypeArray | kCOTypeBlob];
     
@@ -183,7 +183,7 @@
     [item setValue: rootObject forAttribute: @"rootObject" type: kCOTypeReference];
     [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeReference];
     
-    [item setValue: A(persistentRootPath, branchPath, rootObject)
+    [item setValue: @[persistentRootPath, branchPath, rootObject]
       forAttribute: @"[persistentRootPath, branchPath, rootObject]"
               type: kCOTypeArray | kCOTypeReference];
     
@@ -203,7 +203,7 @@
     [item setValue: rootObject forAttribute: @"rootObject" type: kCOTypeCompositeReference];
     [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeCompositeReference];
     
-    [item setValue: A(rootObject, rootObject2)
+    [item setValue: @[rootObject, rootObject2]
       forAttribute: @"[rootObject, rootObject2]"
               type: kCOTypeArray | kCOTypeCompositeReference];
     
@@ -224,7 +224,7 @@
     [item setValue: threeBytes forAttribute: @"xyz" type: kCOTypeAttachment];
     [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeAttachment];
     
-    [item setValue: A(zeroBytes, threeBytes)
+    [item setValue: @[zeroBytes, threeBytes]
       forAttribute: @"[zeroBytes, xyz]"
               type: kCOTypeArray | kCOTypeAttachment];
     
@@ -310,7 +310,7 @@
 {
     COMutableItem *item = [COMutableItem item];
 
-    [item setValue: A([NSNull null])
+    [item setValue: @[[NSNull null]]
       forAttribute: @"array of null"
               type: kCOTypeArray | kCOTypeString];
     [item setValue: S([NSNull null])

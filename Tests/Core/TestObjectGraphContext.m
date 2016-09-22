@@ -197,7 +197,7 @@
     mutableItem.entityName = entity.name;
 	mutableItem.packageName = entity.owner.name;
 	mutableItem.packageVersion = entity.owner.version;
-    [ctx1 insertOrUpdateItems: A(mutableItem)];
+    [ctx1 insertOrUpdateItems: @[mutableItem]];
 	
 	UKTrue(ctx1.hasChanges);
 	UKObjectsEqual(S(mutableItem.UUID), ctx1.insertedObjectUUIDs);
@@ -220,7 +220,7 @@
 	
 	COMutableItem *mutableItem = [[ctx1 itemForUUID: root1.UUID] mutableCopy];
     [mutableItem setValue: @"test" forAttribute: kCOLabel type: kCOTypeString];
-    [ctx1 insertOrUpdateItems: A(mutableItem)];
+    [ctx1 insertOrUpdateItems: @[mutableItem]];
 	
 	UKTrue(ctx1.hasChanges);
 	UKObjectsEqual(S(), ctx1.insertedObjectUUIDs);

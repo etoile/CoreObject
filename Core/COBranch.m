@@ -124,11 +124,11 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 
 - (NSString *)detailedDescription
 {
-	NSArray *properties = A(@"persistentRoot", @"rootObject",
+	NSArray *properties = @[@"persistentRoot", @"rootObject",
 		@"deleted", @"currentRevision.UUID", @"headRevision.UUID",
 		@"initialRevision.UUID", @"firstRevision.UUID", @"parentBranch",
 		@"isCurrentBranch", @"isTrunkBranch", @"isCopy", @"supportsRevert",
-		@"hasChanges");
+		@"hasChanges"];
 	NSMutableDictionary *options =
 		[D(properties, kETDescriptionOptionValuesForKeyPaths,
 		@"\t", kETDescriptionOptionPropertyIndent) mutableCopy];

@@ -182,11 +182,11 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (NSString *)detailedDescription
 {
-	NSArray *properties = A(@"editingContext", @"currentBranch",
+	NSArray *properties = @[@"editingContext", @"currentBranch",
 		@"branches", @"deleted", @"modificationDate", @"creationDate",
 		@"parentPersistentRoot", @"isCopy", @"attributes", @"hasChanges",
 		@"branchesPendingInsertion", @"branchesPendingUpdate",
-		@"branchesPendingDeletion", @"branchesPendingUndeletion");
+		@"branchesPendingDeletion", @"branchesPendingUndeletion"];
 	NSMutableDictionary *options =
 		[D(properties, kETDescriptionOptionValuesForKeyPaths,
 		@"\t", kETDescriptionOptionPropertyIndent) mutableCopy];
@@ -597,7 +597,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		[metadata addEntriesFromDictionary: additionalMetadata];
 	}
 	return [_parentContext commitWithMetadata: metadata
-		          restrictedToPersistentRoots: A(self)
+		          restrictedToPersistentRoots: @[self]
 								withUndoTrack: undoTrack
 	                                    error: anError];
 }
@@ -610,7 +610,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
 {
 	return [_parentContext commitWithMetadata: metadata
-                  restrictedToPersistentRoots: A(self)
+                  restrictedToPersistentRoots: @[self]
 								withUndoTrack: nil
 	                                    error: NULL];
 }

@@ -44,17 +44,17 @@ static ETUUID *drawing2;
     copier = [[COCopier alloc] init];
     
     COMutableItem *drawingItem = [COMutableItem itemWithUUID: drawing];
-    [drawingItem setValue: A(group1) forAttribute: @"contents" type: kCOTypeArray | kCOTypeCompositeReference];
+    [drawingItem setValue: @[group1] forAttribute: @"contents" type: kCOTypeArray | kCOTypeCompositeReference];
     
     COMutableItem *group1Item = [COMutableItem itemWithUUID: group1];
-    [group1Item setValue: A(shape1) forAttribute: @"contents" type: kCOTypeArray | kCOTypeCompositeReference];
+    [group1Item setValue: @[shape1] forAttribute: @"contents" type: kCOTypeArray | kCOTypeCompositeReference];
     
     COMutableItem *shape1Item = [COMutableItem itemWithUUID: shape1];
-    [shape1Item setValue: A(style1) forAttribute: @"styles" type: kCOTypeArray | kCOTypeReference];
+    [shape1Item setValue: @[style1] forAttribute: @"styles" type: kCOTypeArray | kCOTypeReference];
     
     COItem *style1Item = [COMutableItem itemWithUUID: style1];
     
-    initialGraph = [[COItemGraph alloc] initWithItems: A(drawingItem, group1Item, shape1Item, style1Item)
+    initialGraph = [[COItemGraph alloc] initWithItems: @[drawingItem, group1Item, shape1Item, style1Item]
                                         rootItemUUID: drawing];
     return self;
 }
@@ -118,10 +118,10 @@ static ETUUID *drawing2;
 - (void) testCopyToDifferentContext
 {
     COMutableItem *drawing2Item = [COMutableItem itemWithUUID: drawing2];
-    [drawing2Item setValue: A(style1) forAttribute: @"styles" type: kCOTypeArray | kCOTypeReference];
+    [drawing2Item setValue: @[style1] forAttribute: @"styles" type: kCOTypeArray | kCOTypeReference];
     COMutableItem *style1Item = [COMutableItem itemWithUUID: style1];
     
-    COItemGraph *drawing2Graph = [[COItemGraph alloc] initWithItems: A(drawing2Item, style1Item)
+    COItemGraph *drawing2Graph = [[COItemGraph alloc] initWithItems: @[drawing2Item, style1Item]
                                                      rootItemUUID: drawing2];
     
     UKIntsEqual(2, drawing2Graph.itemUUIDs.count);

@@ -126,10 +126,10 @@
 
 - (NSString *)detailedDescription
 {
-	NSArray *properties = A(@"modelDescriptionRepository", @"hasChanges", 
+	NSArray *properties = @[@"modelDescriptionRepository", @"hasChanges", 
 		@"persistentRootsPendingInsertion", @"persistentRootsPendingUpdate",
 		@"persistentRootsPendingDeletion", @"persistentRootsPendingUndeletion",
-		@"persistentRoots");
+		@"persistentRoots"];
 	NSMutableDictionary *options =
 		[D(properties, kETDescriptionOptionValuesForKeyPaths,
 		@"\t", kETDescriptionOptionPropertyIndent) mutableCopy];
