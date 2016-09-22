@@ -147,17 +147,17 @@ static ETUUID *childUUID2;
 
 - (NSDictionary *)initialMetadata
 {
-    return D(@"first commit", @"name");
+    return @{ @"name": @"first commit" };
 }
 
 - (NSDictionary *)branchAMetadata
 {
-    return D(@"branch A", @"name");
+    return @{ @"name": @"branch A" };
 }
 
 - (NSDictionary *)branchBMetadata
 {
-    return D(@"branch B", @"name");
+    return @{ @"name": @"branch B" };
 }
 
 
@@ -334,7 +334,7 @@ static ETUUID *childUUID2;
     
 	{
 		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-		[txn setMetadata: D(@"hello world", @"msg")
+		[txn setMetadata: @{@"msg": @"hello world"}
 			   forBranch: initialBranchUUID
 		ofPersistentRoot: prootUUID];
 		[self updateChangeCountAndCommitTransaction: txn];
@@ -360,7 +360,7 @@ static ETUUID *childUUID2;
     
 	{
 		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-		[txn setMetadata: D(@"hello world", @"msg")
+		[txn setMetadata: @{ @"msg": @"hello world" }
 	   forPersistentRoot: prootUUID];
 		[self updateChangeCountAndCommitTransaction: txn];
 	}

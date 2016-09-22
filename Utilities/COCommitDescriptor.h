@@ -76,7 +76,7 @@
  *
  * <example>
  * NSString *objType = @"Folder";
- * NSDictionary *metadata = D(@[objType], kCOCommitMetadataShortDescriptionArguments);
+ * NSDictionary *metadata = @{ kCOCommitMetadataShortDescriptionArguments: @[objType] }
  * COError *error = nil;
  *
  * // kOMCommitCreate is a constant that represents 'org.etoile-project.ObjectManager.create'

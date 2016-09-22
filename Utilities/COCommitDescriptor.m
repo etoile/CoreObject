@@ -235,9 +235,9 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 
 - (NSString *)description
 {
-	return (D([self identifier], kCOCommitMetadataIdentifier,
-	          [self typeDescription], kCOCommitMetadataTypeDescription,
-	          [self shortDescription], kCOCommitMetadataShortDescription)).description;
+	return @{ kCOCommitMetadataIdentifier: self.identifier,
+	          kCOCommitMetadataTypeDescription: [self typeDescription],
+	          kCOCommitMetadataShortDescription: [self shortDescription] }.description;
 }
 											
 - (NSString *)domain

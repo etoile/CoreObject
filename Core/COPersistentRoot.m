@@ -188,8 +188,8 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		@"branchesPendingInsertion", @"branchesPendingUpdate",
 		@"branchesPendingDeletion", @"branchesPendingUndeletion"];
 	NSMutableDictionary *options =
-		[D(properties, kETDescriptionOptionValuesForKeyPaths,
-		@"\t", kETDescriptionOptionPropertyIndent) mutableCopy];
+		[@{ kETDescriptionOptionValuesForKeyPaths: properties,
+		kETDescriptionOptionPropertyIndent: @"\t" } mutableCopy];
 
 	return [self descriptionWithOptions: options];
 }
@@ -590,7 +590,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 		![additionalMetadata containsKey: aCommitDescriptorId]);
 
 	NSMutableDictionary *metadata =
-		[D(aCommitDescriptorId, kCOCommitMetadataIdentifier) mutableCopy];
+		[@{ kCOCommitMetadataIdentifier: aCommitDescriptorId } mutableCopy];
 
 	if (additionalMetadata != nil)
 	{
@@ -826,7 +826,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
                                         parentBranchUUID: aParent.UUID
                               parentRevisionForNewBranch: aRev.UUID];
     
-    [newBranch setMetadata: D(aLabel, @"COBranchLabel")];
+    [newBranch setMetadata: @{ @"COBranchLabel": aLabel }];
     
     _branchForUUID[newBranch.UUID] = newBranch;
     

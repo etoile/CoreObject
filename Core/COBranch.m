@@ -130,8 +130,8 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch
 		@"isCurrentBranch", @"isTrunkBranch", @"isCopy", @"supportsRevert",
 		@"hasChanges"];
 	NSMutableDictionary *options =
-		[D(properties, kETDescriptionOptionValuesForKeyPaths,
-		@"\t", kETDescriptionOptionPropertyIndent) mutableCopy];
+		[@{ kETDescriptionOptionValuesForKeyPaths: properties,
+		kETDescriptionOptionPropertyIndent: @"\t" } mutableCopy];
 
 	return [self descriptionWithOptions: options];
 }

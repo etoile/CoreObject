@@ -437,7 +437,7 @@
 	}
 	else if (COTypeIsMultivalued(type) && COTypeIsOrdered(type))
 	{
-		CODiffArrays(valueA, valueB, self, D(itemUUID, @"UUID", anAttribute, @"attribute", aSource, @"sourceIdentifier", @(type), @"type"));
+		CODiffArrays(valueA, valueB, self, @{ @"UUID": itemUUID, @"attribute": anAttribute, @"sourceIdentifier": aSource, @"type": @(type) });
 	}
 	else
 	{

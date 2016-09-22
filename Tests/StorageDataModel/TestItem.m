@@ -73,7 +73,7 @@
 	UKTrue(strcmp([value objCType], "d") == 0);
 
 	NSNumber *decimalValue = [NSDecimalNumber numberWithDouble: 123.456789012];
-	NSData *data = [NSJSONSerialization dataWithJSONObject: D(value, @"number") options: 0 error: NULL];
+	NSData *data = [NSJSONSerialization dataWithJSONObject: @{ @"number": value } options: 0 error: NULL];
 	NSNumber *roundTripValue =
 		[NSJSONSerialization JSONObjectWithData: data options: 0 error: NULL][@"number"];
 	NSNumber *newValue = @(roundTripValue.doubleValue);
@@ -243,12 +243,12 @@
 
 - (void) testMutability
 {	
-	COItem *immutable = [COItem itemWithTypesForAttributes: D(@(kCOTypeString | kCOTypeSet), @"key1",
-															  @(kCOTypeString | kCOTypeArray), @"key2",
-															  @(kCOTypeString), @"name")
-									   valuesForAttributes: D([NSMutableSet setWithObject: @"a"], @"key1",	
-															  [NSMutableArray arrayWithObject: @"A"], @"key2",
-															  @"my name", @"name")];
+	COItem *immutable = [COItem itemWithTypesForAttributes: @{ @"key1": @(kCOTypeString | kCOTypeSet),
+															  @"key2": @(kCOTypeString | kCOTypeArray),
+															  @"name": @(kCOTypeString) }
+									   valuesForAttributes: @{ @"key1": [NSMutableSet setWithObject: @"a"],
+															  @"key2": [NSMutableArray arrayWithObject: @"A"],
+															  @"name": @"my name" }];
 
 	UKRaisesException([(COMutableItem *)immutable setValue: @"foo" forAttribute: @"bar" type: kCOTypeString]);
 

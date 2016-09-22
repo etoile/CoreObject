@@ -23,9 +23,9 @@
 
 - (NSDictionary *)descriptionDictionary
 {
-	return D(_targetProperty != nil ? _targetProperty : @"nil", @"property",
-	         _sourceProperty, @"opposite property",
-	        _sourceObject.UUID, @"opposite object");
+	return @{ @"property": _targetProperty != nil ? _targetProperty : @"nil",
+	         @"opposite property": _sourceProperty,
+	        @"opposite object": _sourceObject.UUID };
 }
 
 - (NSString *)description
@@ -71,7 +71,7 @@
 {
 	NSArray *relationships =
 		(id)[[_cachedRelationships mappedCollection] descriptionDictionary];
-	return (D(_owner.UUID, @"owner", relationships, @"relationships")).description;
+	return @{ @"owner": _owner.UUID, @"relationships": relationships }.description;
 }
 
 - (NSSet *) referringObjectsForPropertyInTarget: (NSString *)aProperty

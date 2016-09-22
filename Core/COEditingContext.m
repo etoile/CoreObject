@@ -131,8 +131,8 @@
 		@"persistentRootsPendingDeletion", @"persistentRootsPendingUndeletion",
 		@"persistentRoots"];
 	NSMutableDictionary *options =
-		[D(properties, kETDescriptionOptionValuesForKeyPaths,
-		@"\t", kETDescriptionOptionPropertyIndent) mutableCopy];
+		[@{ kETDescriptionOptionValuesForKeyPaths: properties,
+		kETDescriptionOptionPropertyIndent: @"\t" } mutableCopy];
 
 	return [self descriptionWithOptions: options];
 }
@@ -682,7 +682,7 @@
 	INVALIDARG_EXCEPTION_TEST(additionalMetadata, ![additionalMetadata containsKey: aCommitDescriptorId]);
 
 	NSMutableDictionary *metadata =
-		[D(aCommitDescriptorId, kCOCommitMetadataIdentifier) mutableCopy];
+		[@{ kCOCommitMetadataIdentifier: aCommitDescriptorId } mutableCopy];
 
 	if (additionalMetadata != nil)
 	{
@@ -723,7 +723,7 @@
 	}
 
 	NSDictionary *userInfo =
-		(command != nil ? D(command, kCOCommandKey) : @{});
+		(command != nil ? @{ kCOCommandKey: command } : @{});
 
 	// NOTE: COEditingContextDidChangeNotification needs more testing.
 	// In particular, test that the changes are already committed (which they are)

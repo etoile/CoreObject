@@ -392,7 +392,7 @@
 		 UKFalse(testBranch.hasChanges);
 	 }];
     
-    [originalBranch setMetadata: D(@"value", @"key")];
+    [originalBranch setMetadata: @{ @"key": @"value" }];
     
     UKObjectsEqual(D(@"value", @"key"), originalBranch.metadata);
 
@@ -406,7 +406,7 @@
     UKObjectsEqual(@{}, originalBranch.metadata);
     UKFalse(originalBranch.hasChanges);
     
-    [originalBranch setMetadata: D(@"value", @"key")];
+    [originalBranch setMetadata: @{ @"key": @"value" }];
     
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: store.URL];
@@ -424,7 +424,7 @@
 		 UKFalse(testBranch.hasChanges);
 	 }];
     
-    [originalBranch setMetadata: D(@"value2", @"key")];
+    [originalBranch setMetadata: @{@"key": @"value2"}];
     UKObjectsEqual(D(@"value2", @"key"), originalBranch.metadata);
     
     [originalBranch discardAllChanges];
@@ -435,7 +435,7 @@
 - (void) testBranchMetadataOnPersistentRootFirstCommit
 {
     COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-    [persistentRoot2.currentBranch setMetadata: D(@"world", @"hello")];
+    [persistentRoot2.currentBranch setMetadata: @{ @"hello": @"world" }];
     [ctx commit];
     
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot2
@@ -464,7 +464,7 @@
     [ctx commit];
     
     COBranch *branch2 = [persistentRoot.currentBranch makeBranchWithLabel: @""];
-    [branch2 setMetadata: D(@"world", @"hello")];
+    [branch2 setMetadata: @{ @"hello": @"world" }];
     [ctx commit];
     
 	[self checkBranchWithExistingAndNewContext: branch2

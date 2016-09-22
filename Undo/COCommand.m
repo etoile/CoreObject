@@ -46,16 +46,16 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
 
 + (NSDictionary *) mapping
 {
-    return D([COCommandGroup class], kCOCommandTypeEditGroup,
-           [COCommandDeleteBranch class], kCOCommandTypeDeleteBranch,
-           [COCommandUndeleteBranch class], kCOCommandTypeUndeleteBranch,
-           [COCommandSetBranchMetadata class], kCOCommandTypeSetBranchMetadata,
-           [COCommandSetCurrentBranch class], kCOCommandTypeSetCurrentBranch,
-           [COCommandSetCurrentVersionForBranch class], kCOCommandTypeSetCurrentVersionForBranch,
-           [COCommandDeletePersistentRoot class], kCOCommandTypeDeletePersistentRoot,
-           [COCommandUndeletePersistentRoot class], kCOCommandTypeUndeletePersistentRoot, 
-	       [COCommandCreatePersistentRoot class], kCOCommandTypeCreatePersistentRoot,
-		   [COCommandSetPersistentRootMetadata class], kCOCommandTypeSetPersistentRootMetadata);
+    return @{ kCOCommandTypeEditGroup: [COCommandGroup class],
+           kCOCommandTypeDeleteBranch: [COCommandDeleteBranch class],
+           kCOCommandTypeUndeleteBranch: [COCommandUndeleteBranch class],
+           kCOCommandTypeSetBranchMetadata: [COCommandSetBranchMetadata class],
+           kCOCommandTypeSetCurrentBranch: [COCommandSetCurrentBranch class],
+           kCOCommandTypeSetCurrentVersionForBranch: [COCommandSetCurrentVersionForBranch class],
+           kCOCommandTypeDeletePersistentRoot: [COCommandDeletePersistentRoot class],
+           kCOCommandTypeUndeletePersistentRoot: [COCommandUndeletePersistentRoot class], 
+	       kCOCommandTypeCreatePersistentRoot: [COCommandCreatePersistentRoot class],
+		   kCOCommandTypeSetPersistentRootMetadata: [COCommandSetPersistentRootMetadata class] };
 }
 
 + (COCommand *) commandWithPropertyList: (id)aPlist parentUndoTrack: (COUndoTrack *)aParent

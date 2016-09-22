@@ -120,7 +120,7 @@
 
 - (void)testSetContent
 {
-	[model setValue: D(@"boum", @"sound") forProperty: @"entries"];
+	[model setValue: @{ @"sound": @"boum" } forProperty: @"entries"];
 	
 	UKObjectsEqual(S(model.UUID), model.objectGraphContext.insertedObjectUUIDs);
 

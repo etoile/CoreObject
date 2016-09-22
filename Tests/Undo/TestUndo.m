@@ -308,10 +308,10 @@
 - (void) testUndoSetBranchMetadata
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-    [persistentRoot.currentBranch setMetadata: D(@"world", @"hello")];
+    [persistentRoot.currentBranch setMetadata: @{ @"hello": @"world" }];
     [ctx commit];
     
-    [persistentRoot.currentBranch setMetadata: D(@"world2", @"hello")];
+    [persistentRoot.currentBranch setMetadata: @{ @"hello": @"world2" }];
     [ctx commitWithUndoTrack: _testTrack];
     
     // Load in another context
@@ -332,10 +332,10 @@
 - (void) testUndoSetPersistentRootMetadata
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-    [persistentRoot setMetadata: D(@"world", @"hello")];
+    [persistentRoot setMetadata: @{ @"hello": @"world" }];
     [ctx commit];
     
-    [persistentRoot setMetadata: D(@"world2", @"hello")];
+    [persistentRoot setMetadata: @{ @"hello": @"world2" }];
     [ctx commitWithUndoTrack: _testTrack];
     
     // Load in another context
