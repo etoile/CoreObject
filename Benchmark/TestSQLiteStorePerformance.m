@@ -123,7 +123,7 @@ static int itemChangedAtCommit(int i)
 	
 	// Commit a change to each object
 	
-    revisionUUIDs addObject: [proot.currentRevisionUUID];
+    [revisionUUIDs addObject: proot.currentRevisionUUID];
     for (int commit=1; commit<NUM_COMMITS; commit++)
     {
         int i = itemChangedAtCommit(commit);

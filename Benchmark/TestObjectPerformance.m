@@ -27,7 +27,7 @@
 
 @interface FoundationModelObject : NSObject
 @property (nonatomic, readwrite, copy) NSString *stringProperty;
-@property (nonatomic, readwrite, copy) NSMutableArray *arrayProperty;
+@property (nonatomic, readwrite, strong) NSMutableArray *arrayProperty;
 @end
 
 @implementation FoundationModelObject
@@ -155,12 +155,12 @@ TIME_METHOD_WITH_EXPECTED_RESULT(timeToAccessCoreObjectStringProperty, ACCESS_IT
 TIME_METHOD_WITH_EXPECTED_RESULT(timeToAccessFoundationObjectOrderedRelationship,
 								 ACCESS_ITERATIONS,
 								 foundationParent.arrayProperty,
-								 @[foundationChild1, foundationChild2, foundationChild3])
+								 A(foundationChild1, foundationChild2, foundationChild3))
 
 TIME_METHOD_WITH_EXPECTED_RESULT(timeToAccessCoreObjectOrderedRelationship,
 								 ACCESS_ITERATIONS,
 								 coreobjectParent.contents,
-								 @[coreobjectChild1, coreobjectChild2, coreobjectChild3])
+								 A(coreobjectChild1, coreobjectChild2, coreobjectChild3))
 
 - (void) testOrderedRelationshipAccess
 {

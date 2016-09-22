@@ -24,7 +24,7 @@
 {
 	COObjectGraphContext *result = [COObjectGraphContext new];
 	COAttributedString *attrStr = [[COAttributedString alloc] initWithObjectGraphContext: result];
-	[result setRootObject: attrStr];
+	result.rootObject = attrStr;
 	
 	NSMutableArray *chunksArray = [NSMutableArray new];
 	
@@ -40,13 +40,15 @@
 	return result;
 }
 
-- (NSTimeInterval) timeToCopyObjectGraph: (COObjectGraphContext *)ctx
+- (NSTimeInterval) timeToCopyObjectGraph: (COObjectGraphContext *)objectGraph
 {
 	NSDate *start = [NSDate date];
-	
-	COObjectGraphContext *tempCtx = [COObjectGraphContext new];
-	(void) [[COCopier new] copyItemWithUUID: ctx.rootItemUUID fromGraph: ctx toGraph: tempCtx];
-	
+	COObjectGraphContext *tempObjectGraph = [COObjectGraphContext new];
+
+	(void) [[COCopier new] copyItemWithUUID: objectGraph.rootItemUUID
+	                              fromGraph: objectGraph
+	                                toGraph: tempObjectGraph];
+
 	NSTimeInterval time = [[NSDate date] timeIntervalSinceDate: start];
 	return time;
 }
