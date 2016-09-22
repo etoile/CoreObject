@@ -12,13 +12,13 @@
 #import "COAttachmentID.h"
 #import <EtoileFoundation/Macros.h>
 
-typedef enum {
+typedef NS_ENUM(unsigned int, reader_state) {
     co_reader_expect_object_uuid,
     co_reader_expect_property,
     co_reader_expect_type,
     co_reader_expect_value,
     co_reader_error
-} reader_state;
+};
 
 @interface COReaderState : NSObject
 {
@@ -36,7 +36,7 @@ typedef enum {
 
 @implementation COReaderState
 
-- (id) init
+- (instancetype) init
 {
     SUPERINIT;
     values = [[NSMutableDictionary alloc] init];

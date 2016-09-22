@@ -36,7 +36,7 @@
 	
 	UKObjectsEqual(baseString, clientWrapper.string);
 	
-	for (NSUInteger i = 0; i < [charactersToInsert length]; i++)
+	for (NSUInteger i = 0; i < charactersToInsert.length; i++)
 	{
 		[clientWrapper replaceCharactersInRange: NSMakeRange(i, 0)
 									 withString: [charactersToInsert substringWithRange: NSMakeRange(i, 1)]];
@@ -90,7 +90,7 @@
 	for (NSUInteger i = 0; i < objectsToInsert; i++)
 	{
 		OrderedGroupNoOpposite *child = [[OrderedGroupNoOpposite alloc] initWithObjectGraphContext: clientBranch.objectGraphContext];
-		child.label = [@(i) stringValue];
+		child.label = (@(i)).stringValue;
 		[[clientGroup mutableArrayValueForKey: @"contents"] addObject: child];
 		[clientPersistentRoot commit];
 	}

@@ -30,15 +30,15 @@
 - (NSSet *) editsForUUID: (ETUUID *)aUUID attribute: (NSString *)aString;
 - (void) addEdit: (COItemGraphEdit *)anEdit;
 - (void) removeEdit: (COItemGraphEdit *)anEdit;
-- (NSSet *)allEditedUUIDs;
-- (NSSet *)allEdits;
+@property (nonatomic, readonly) NSSet *allEditedUUIDs;
+@property (nonatomic, readonly) NSSet *allEdits;
 
 @end
 
 
 @implementation CODiffDictionary
 
-- (id) init
+- (instancetype) init
 {
 	SUPERINIT;
 	diffDictStorage = [[NSMutableSet alloc] init];
@@ -714,7 +714,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
     
 	// apply all of the edits
 	
-	for (ETUUID *modifiedUUID in [diffDict allEditedUUIDs])
+	for (ETUUID *modifiedUUID in diffDict.allEditedUUIDs)
 	{
 		COMutableItem *item = [[dest itemForUUID: modifiedUUID] mutableCopy];
 		
@@ -812,7 +812,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 - (NSSet *)modifiedItemUUIDs
 {
-	return [diffDict allEditedUUIDs];
+	return diffDict.allEditedUUIDs;
 }
 - (NSSet *) modifiedAttributesForUUID: (ETUUID *)aUUID
 {

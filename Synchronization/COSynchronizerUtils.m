@@ -15,7 +15,7 @@
 	ETUUID *persistentRoot;
 	NSMutableDictionary *cache;
 }
-- (instancetype) initWithPersistentRootUUID: (ETUUID *)aUUID store: (COSQLiteStore *)aStore;
+- (instancetype) initWithPersistentRootUUID: (ETUUID *)aUUID store: (COSQLiteStore *)aStore NS_DESIGNATED_INITIALIZER;
 /**
  * Don't modify the returned graph
  */
@@ -26,11 +26,18 @@
 
 - (instancetype) initWithPersistentRootUUID: (ETUUID *)aUUID store: (COSQLiteStore *)aStore
 {
+	NILARG_EXCEPTION_TEST(aUUID);
+	NILARG_EXCEPTION_TEST(aStore)
 	SUPERINIT;
 	persistentRoot = aUUID;
 	store = aStore;
 	cache = [NSMutableDictionary new];
 	return self;
+}
+
+- (instancetype)init
+{
+	return [self initWithPersistentRootUUID: nil store: nil];
 }
 
 - (COItemGraph *) graphForUUID: (ETUUID *)aRevision

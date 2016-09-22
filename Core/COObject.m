@@ -1882,7 +1882,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 - (NSString *)detailedDescriptionWithTraversalKey: (NSString *)aProperty
 {
 	NSMutableDictionary *options =
-		[@{ kETDescriptionOptionValuesForKeyPaths: [self propertyNames],
+		[@{ kETDescriptionOptionValuesForKeyPaths: self.propertyNames,
 		kETDescriptionOptionPropertyIndent: @"\t" } mutableCopy];
 
 	if (aProperty != nil)

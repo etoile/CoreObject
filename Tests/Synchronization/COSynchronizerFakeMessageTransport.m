@@ -18,7 +18,7 @@
 
 @synthesize server = server;
 
-- (id) initWithSynchronizerServer: (COSynchronizerServer *)aServer
+- (instancetype) initWithSynchronizerServer: (COSynchronizerServer *)aServer
 {
 	SUPERINIT;
 	server = aServer;

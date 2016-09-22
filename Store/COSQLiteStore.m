@@ -49,7 +49,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 
 @interface COSQLiteStore (AttachmentsPrivate)
 
-- (NSArray *) attachments;
+@property (nonatomic, readonly) NSArray *attachments;
 - (BOOL) deleteAttachment: (COAttachmentID *)hash;
 
 @end
@@ -903,7 +903,7 @@ NSString * const COPersistentRootAttributeUsedSize = @"COPersistentRootAttribute
 {
     assert(dispatch_get_current_queue() == queue_);
     
-    NSMutableSet *garbage = [NSMutableSet setWithArray: [self attachments]];
+    NSMutableSet *garbage = [NSMutableSet setWithArray: self.attachments];
     
     FMResultSet *rs = [db_ executeQuery: @"SELECT attachment_hash FROM attachment_refs"];
     while ([rs next])

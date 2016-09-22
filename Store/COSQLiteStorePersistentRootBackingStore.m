@@ -39,7 +39,7 @@
 
 @interface COSQLiteStore (Private)
 
-- (FMDatabase *) database;
+@property (nonatomic, readonly, strong) FMDatabase *database;
 
 @end
 
@@ -84,7 +84,7 @@
     
     if (_shareDB)
     {
-        db_ =  [store database];
+        db_ =  store.database;
     }
     else
     {

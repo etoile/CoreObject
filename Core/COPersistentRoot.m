@@ -826,7 +826,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
                                         parentBranchUUID: aParent.UUID
                               parentRevisionForNewBranch: aRev.UUID];
     
-    [newBranch setMetadata: @{ @"COBranchLabel": aLabel }];
+    newBranch.metadata = @{ @"COBranchLabel": aLabel };
     
     _branchForUUID[newBranch.UUID] = newBranch;
     

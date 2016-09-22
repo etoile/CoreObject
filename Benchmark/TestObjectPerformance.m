@@ -52,7 +52,7 @@
 
 @implementation TestObjectPerformance
 
-- (id)init
+- (instancetype)init
 {
 	SUPERINIT;
 	[self createFoundationObjects];
@@ -274,7 +274,7 @@ static NSString *FormatTimeInterval(NSTimeInterval s)
 
 @implementation TestLargeOrderedRelationsip
 
-- (id)init
+- (instancetype)init
 {
 	SUPERINIT;
 	objectGraphContext = [COObjectGraphContext new];

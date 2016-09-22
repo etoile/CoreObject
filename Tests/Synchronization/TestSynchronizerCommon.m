@@ -10,7 +10,7 @@
 
 @implementation TestSynchronizerCommon
 
-- (id) init
+- (instancetype) init
 {
 	SUPERINIT;
 	

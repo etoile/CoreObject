@@ -71,7 +71,7 @@ doesNotPostNotification: (NSString *)notif
 
 @implementation SQLiteStoreTestCase
 
-- (id) init
+- (instancetype) init
 {
     self = [super init];
     
@@ -273,7 +273,7 @@ doesNotPostNotification: (NSString *)notif
 #endif
 }
 
-- (id) init
+- (instancetype) init
 {
 	SUPERINIT;
 	COUndoTrackStore *undoStore = [[COUndoTrackStore alloc] initWithURL: [[self class] undoTrackStoreURL]];
