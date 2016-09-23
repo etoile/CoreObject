@@ -28,21 +28,22 @@
  *
  * TODO: If we keep it around, this should probably become a mask.
  */
-typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
+typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
+{
 	/**
 	 * Persistent roots are never unloaded automatically, except uncommitted 
 	 * persistent roots on deletion.
 	 *
 	 * -unloadPersistentRoot: can still be used to unload persistent roots explicitly.
 	 */
-	COEditingContextUnloadingBehaviorManual,
+	  COEditingContextUnloadingBehaviorManual,
 	/**
 	 * Persistent roots are unloaded on deletion.
 	 *
      * For external deletions committed in other editing contexts, persistent
 	 * roots will be unloaded in the current one.
 	 */
-	COEditingContextUnloadingBehaviorOnDeletion
+	  COEditingContextUnloadingBehaviorOnDeletion
 };
 
 /**
@@ -152,22 +153,22 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  */
 @interface COEditingContext : NSObject <COPersistentObjectContext>
 {
-	@private
+@private
 	COSQLiteStore *_store;
 	ETModelDescriptionRepository *_modelDescriptionRepository;
 	Class _migrationDriverClass;
 	/** Loaded (or inserted) persistent roots by UUID */
 	NSMutableDictionary *_loadedPersistentRoots;
 	COEditingContextUnloadingBehavior _unloadingBehavior;
-    /** Set of persistent roots pending deletion */
+	/** Set of persistent roots pending deletion */
 	NSMutableSet *_persistentRootsPendingDeletion;
-    /** Set of persistent roots pending undeletion */
+	/** Set of persistent roots pending undeletion */
 	NSMutableSet *_persistentRootsPendingUndeletion;
 	COCrossPersistentRootDeadRelationshipCache *_deadRelationshipCache;
-    /** Undo */
+	/** Undo */
 	COUndoTrackStore *_undoTrackStore;
-    BOOL _recordingUndo;
-    COCommandGroup *_currentEditGroup;
+	BOOL _recordingUndo;
+	COCommandGroup *_currentEditGroup;
 	CORevisionCache *_revisionCache;
 	/** Detect illegal recursive calls to commit */
 	BOOL _inCommit;
@@ -415,7 +416,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  * See -commitWithIdentitifer:metadata:undoTrack:error.
  */
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
-				   undoTrack: (COUndoTrack *)undoTrack
+                   undoTrack: (COUndoTrack *)undoTrack
                        error: (COError **)anError;
 /**
  * Commits the current changes to the store, bound to a commit descriptor 
@@ -443,8 +444,8 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  * See COCommitDescriptor to understand how the localization works.
  */
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
-					metadata: (NSDictionary *)additionalMetadata
-				   undoTrack: (COUndoTrack *)undoTrack
+                    metadata: (NSDictionary *)additionalMetadata
+                   undoTrack: (COUndoTrack *)undoTrack
                        error: (COError **)anError;
 /**
  * Commits the current changes to the store along the metadatas and returns 
@@ -463,7 +464,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  * localization through COCommitDescriptor.
  */
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
-				 undoTrack: (COUndoTrack *)undoTrack
+                 undoTrack: (COUndoTrack *)undoTrack
                      error: (COError **)anError;
 /**
  * Commits the current changes to the store and returns whether it succeeds.
@@ -532,11 +533,11 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  *
  * The sender is the affected COEditingContext object.
  */
-extern NSString * const COEditingContextDidChangeNotification;
+extern NSString *const COEditingContextDidChangeNotification;
 /**
  * See userInfo explanation in COEditingContextDidChangeNotification.
  */
-extern NSString * const kCOCommandKey;
+extern NSString *const kCOCommandKey;
 
 
 /**
@@ -550,8 +551,8 @@ extern NSString * const kCOCommandKey;
  *
  * The sender is the COEditingContext that does the unloading.
  */
-extern NSString * const COEditingContextDidUnloadPersistentRootsNotification;
+extern NSString *const COEditingContextDidUnloadPersistentRootsNotification;
 /**
  * The unloaded COPersistentRoot set.
  */
-extern NSString * const kCOUnloadedPersistentRootsKey;
+extern NSString *const kCOUnloadedPersistentRootsKey;

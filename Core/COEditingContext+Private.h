@@ -8,7 +8,7 @@
 #import <CoreObject/COEditingContext.h>
 #import <CoreObject/CORevision.h>
 
-@class  COCrossPersistentRootDeadRelationshipCache, COPath, COUndoTrack;
+@class COCrossPersistentRootDeadRelationshipCache, COPath, COUndoTrack;
 
 @interface COEditingContext ()
 
@@ -20,7 +20,7 @@
  * This method is only exposed to be used internally by CoreObject.
  */
 - (COPersistentRoot *)insertNewPersistentRootWithRevisionUUID: (ETUUID *)aRevid
-												 parentBranch: (COBranch *)aParentBranch;
+                                                 parentBranch: (COBranch *)aParentBranch;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -50,10 +50,10 @@
  * Changes must belong to the given persistent root subset, otherwise they
  * won't be committed. -hasChanges can still be YES on return.
  */
-- (BOOL)commitWithMetadata: (NSDictionary *)metadata
+- (BOOL) commitWithMetadata: (NSDictionary *)metadata
 restrictedToPersistentRoots: (NSArray *)persistentRoots
-			 withUndoTrack: (COUndoTrack *)track
-					 error: (COError **)anError;
+              withUndoTrack: (COUndoTrack *)track
+                      error: (COError **)anError;
 /**
  * This property is only exposed to be used internally by CoreObject.
  */
