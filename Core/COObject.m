@@ -1186,7 +1186,23 @@ See +[NSObject typePrefix]. */
 }
 
 /**
- * Fast path version of -commonWillChangeValueForProperty:
+ * Fast path version of -commonWillChangeValueForProperty: where objects 
+ * represent the inserted, removed or replacement objects.
+ *
+ * For an array and ETCollectionMutationKindReplacement, replaced objects can be
+ * computed based the replacement objects.
+ *
+ * For a set, ETCollectionKindReplacement represents both [NSMutableSet intersectSet:] 
+ * and [NSMutableSet setSet:]. The objects argument represents all the elements
+ * in the final set. For a set intersection, we consider the entire set is replaced.
+ *
+ * For a dictionary, the objects argument represent the values and
+ * ETCollectionKindReplacement represent [NSMutableDictionary setObject(s):forKey(s):].
+ * For a replacement operation, we have no way to determine the replaced objects, 
+ * this would requires to receive the keys rather than the values, so we consider 
+ * the entire dictionary is replaced.
+ * ETCollectionKindInsertion is a valid dictionary operation, but is never used 
+ * in practice when writing will/DidChangeValueForProperty:.
  */
 - (void)commonWillChangeValueForProperty: (NSString *)key
 							   atIndexes: (NSIndexSet *)indexes
@@ -1214,18 +1230,20 @@ See +[NSObject typePrefix]. */
 	}
 	else if (mutationKind == ETCollectionMutationKindReplacement)
 	{
-		// FIXME: How do we know which objects were replaced if it's an unordered collection?
-		// FIXME: Is the 'objects' param the new replacement objects or the old objects?
-		ETAssert([oldValue isOrdered]);
-
-		NSMutableArray *objs = [NSMutableArray new];
-		if (![indexes isEmpty])
+		if ([oldValue isOrdered])
 		{
-			[indexes enumerateIndexesUsingBlock: ^(NSUInteger idx, BOOL *stop){
-				[objs addObject: oldValue[idx]];
-			}];
+			replacedOrRemoved = [oldValue objectsAtIndexes: indexes];
 		}
-		replacedOrRemoved = objs;
+		else if ([oldValue isKeyed])
+		{
+			replacedOrRemoved = [oldValue allValues];
+		}
+		else
+		{
+			// For an unordered collection, we consider all the objects have
+			// been replaced/removed in a way similar to -[NSMutableSet setSet:].
+			replacedOrRemoved = oldValue;
+		}
 	}
 	else
 	{
@@ -1352,6 +1370,9 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 	ETModelDescriptionRepository *repo = _objectGraphContext.modelDescriptionRepository;
 	BOOL isPersistentRelationship = propertyDesc.isPersistentRelationship;
 	BOOL isValidatableType = ([self serializationGetterForProperty: propertyDesc.name] == NULL);
+	
+	if (!isValidatableType)
+		return;
 
 	if (propertyDesc.multivalued)
 	{
@@ -1366,11 +1387,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 				ETAssert([self isObjectGraphContextValidForObject: object
 			                                  propertyDescription: propertyDesc]);
 			}
-			
-			if (isValidatableType)
-			{
-				validateSingleValueConformsToPropertyDescriptionInRepository(object, propertyDesc, repo);
-			}
+			validateSingleValueConformsToPropertyDescriptionInRepository(object, propertyDesc, repo);
 		}
 	}
 	else
@@ -1384,10 +1401,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 			                                           propertyDescription: propertyDesc]);
 		}
 		
-		if (isValidatableType)
-		{
-			validateSingleValueConformsToPropertyDescriptionInRepository(newValue, propertyDesc, repo);
-		}
+		validateSingleValueConformsToPropertyDescriptionInRepository(newValue, propertyDesc, repo);
 	}
 }
 
