@@ -42,18 +42,20 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 	[self applyTraitFromClass: [ETCollectionTrait class]];
 }
 
-- (id)init
+- (instancetype)init
 {
-    SUPERINIT;
-	_UUID = [ETUUID UUID];
-    _contents = [[NSMutableArray alloc] init];
-	_timestamp = [NSDate date];
-    return self;
+	COUndoTrackSerializedCommand *command = [COUndoTrackSerializedCommand new];
+	
+	command.UUID = [ETUUID UUID];
+	command.timestamp = [NSDate date];
+
+    return [self initWithSerializedCommand: command owner: nil];
 }
 
 - (instancetype) initWithSerializedCommand: (COUndoTrackSerializedCommand *)aCommand
 									 owner: (COUndoTrack *)anOwner
 {
+	NILARG_EXCEPTION_TEST(aCommand);
 	SUPERINIT;
 	_parentUndoTrack = anOwner;
 	_contents = [self commandsFromPropertyList: aCommand.JSONData
@@ -62,7 +64,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 	_UUID = aCommand.UUID;
 	if (aCommand.parentUUID == nil)
 	{
-		_parentUUID = [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID];
+		_parentUUID = [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID;
 	}
 	else
 	{
@@ -80,7 +82,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 	cmd.JSONData = [self commandsPropertyList];
 	cmd.metadata = _metadata;
 	cmd.UUID = _UUID;
-	if ([_parentUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
+	if ([_parentUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID])
 	{
 		cmd.parentUUID = nil;
 	}
@@ -103,7 +105,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 {
 	NSMutableArray *commands = [NSMutableArray array];
 
-    for (id subplist in [plist objectForKey: kCOCommandContents])
+    for (id subplist in plist[kCOCommandContents])
     {
         COCommand *command = [COCommand commandWithPropertyList: subplist
 												parentUndoTrack: aParent];
@@ -115,7 +117,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (BOOL)isEqual: (id)object
 {
-	if ([object isKindOfClass: [COCommandGroup class]] == NO)
+	if (![object isKindOfClass: [COCommandGroup class]])
 		return NO;
 
 	return ([((COCommandGroup *)object)->_UUID isEqual: _UUID]);
@@ -123,7 +125,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (NSUInteger) hash
 {
-	return [_UUID hash];
+	return _UUID.hash;
 }
 
 - (NSMutableArray *)inversedCommands
@@ -134,7 +136,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     {
 		// Insert the inverses back to front, so the inverse of the most recent
 		// action will be first.
-        [inversedCommands insertObject: [command inverse] atIndex: 0];
+        [inversedCommands insertObject: command.inverse atIndex: 0];
     }
 
 	return inversedCommands;
@@ -245,7 +247,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 - (COCommitDescriptor *)commitDescriptor
 {
 	NSString *commitDescriptorId =
-		[[self metadata] objectForKey: kCOCommitMetadataIdentifier];
+		self.metadata[kCOCommitMetadataIdentifier];
 
 	if (commitDescriptorId == nil)
 		return nil;
@@ -255,12 +257,12 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (NSString *)localizedTypeDescription
 {
-	COCommitDescriptor *descriptor = [self commitDescriptor];
+	COCommitDescriptor *descriptor = self.commitDescriptor;
 
 	if (descriptor == nil)
-		return [[self metadata] objectForKey: kCOCommitMetadataTypeDescription];
+		return self.metadata[kCOCommitMetadataTypeDescription];
 
-	return [descriptor localizedTypeDescription];
+	return descriptor.localizedTypeDescription;
 }
 
 - (NSString *)localizedShortDescription
@@ -272,7 +274,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 {
 	ETAssert(self.parentUUID != nil);
 	
-	if ([self.parentUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
+	if ([self.parentUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID])
 		return [COEndOfUndoTrackPlaceholderNode sharedInstance];
 	
 	return [_parentUndoTrack commandForUUID: self.parentUUID];
@@ -298,7 +300,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (NSArray *)contentArray
 {
-	return [NSArray arrayWithArray: [self content]];
+	return [NSArray arrayWithArray: self.content];
 }
 
 #pragma mark -

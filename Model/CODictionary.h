@@ -44,5 +44,5 @@
  * Returns YES when the item doesn't represent an entity object in the 
  * object graph context, but just a property attached to some COObject instance.
  */
-- (BOOL)isAdditionalItem;
+@property (nonatomic, readonly) BOOL isAdditionalItem;
 @end

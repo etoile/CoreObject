@@ -91,11 +91,10 @@ static int itemChangedAtCommit(int i)
 - (COItemGraph*) makeInitialItemTree
 {
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity: NUM_CHILDREN+1];
-    [dict setObject: [self initialRootItem] forKey: rootUUID];
+    dict[rootUUID] = [self initialRootItem];
     for (int i=0; i<NUM_CHILDREN; i++)
     {
-        [dict setObject: [self initialChildItem: i]
-                 forKey: childUUIDs[i]];
+        dict[childUUIDs[i]] = [self initialChildItem: i];
     }
     COItemGraph *it = [[COItemGraph alloc] initWithItemForUUID: dict rootItemUUID: rootUUID];
     return it;
@@ -123,7 +122,7 @@ static int itemChangedAtCommit(int i)
 	
 	// Commit a change to each object
 	
-    [revisionUUIDs addObject: [proot currentRevisionUUID]];
+    [revisionUUIDs addObject: proot.currentRevisionUUID];
     for (int commit=1; commit<NUM_COMMITS; commit++)
     {
         int i = itemChangedAtCommit(commit);
@@ -137,27 +136,27 @@ static int itemChangedAtCommit(int i)
           forAttribute: @"name"];
         
 		COItemGraph *deltaGraph = [[COItemGraph alloc] initWithItems: @[item]
-														rootItemUUID: [initialTree rootItemUUID]];
+														rootItemUUID: initialTree.rootItemUUID];
 		
 		ETUUID *revisionUUID = [ETUUID UUID];
 		
 		[txn writeRevisionWithModifiedItems: deltaGraph
 							   revisionUUID: revisionUUID
 								   metadata: nil
-						   parentRevisionID: [revisionUUIDs lastObject]
+						   parentRevisionID: revisionUUIDs.lastObject
 					  mergeParentRevisionID: nil
-						 persistentRootUUID: [proot UUID]
-								 branchUUID: [proot currentBranchUUID]];
+						 persistentRootUUID: proot.UUID
+								 branchUUID: proot.currentBranchUUID];
 		
         [revisionUUIDs addObject: revisionUUID];
     }
     
     // Set the persistent root's state to the last commit
     
-    [txn setCurrentRevision: [revisionUUIDs lastObject]
-			   headRevision: [revisionUUIDs lastObject]
-				  forBranch: [proot currentBranchUUID]
-             ofPersistentRoot: [proot UUID]];
+    [txn setCurrentRevision: revisionUUIDs.lastObject
+			   headRevision: revisionUUIDs.lastObject
+				  forBranch: proot.currentBranchUUID
+             ofPersistentRoot: proot.UUID];
     
 	UKTrue([store commitStoreTransaction: txn]);
 	
@@ -170,7 +169,7 @@ static int itemChangedAtCommit(int i)
 //                                           child: i]);
 //    }
     
-    return [proot UUID];
+    return proot.UUID;
 }
 
 
@@ -182,22 +181,22 @@ static int itemChangedAtCommit(int i)
     {
         @autoreleasepool {
             COMutableItem *item = [COMutableItem item];
-            [item setValue: [NSNumber numberWithInt: i] forAttribute: @"name" type: kCOTypeInt64];
+            [item setValue: @(i) forAttribute: @"name" type: kCOTypeInt64];
             [item setValue: @"blah blah 1" forAttribute: @"test1" type: kCOTypeString];
             [item setValue: @"blah blah 2" forAttribute: @"test2" type: kCOTypeString];
             [item setValue: @"blah blah 3" forAttribute: @"test3" type: kCOTypeString];
             [item setValue: @"blah blah 4" forAttribute: @"test4" type: kCOTypeString];
-            [dict setObject: item forKey: [item UUID]];
+            dict[item.UUID] = item;
         }
     }
     
     COMutableItem *rootItem = [COMutableItem item];
-    [rootItem setValue: [dict allKeys]
+    [rootItem setValue: dict.allKeys
           forAttribute: @"children" type: kCOTypeArray | kCOTypeCompositeReference];
-    [dict setObject: rootItem forKey: [rootItem UUID]];
+    dict[rootItem.UUID] = rootItem;
     
     COItemGraph *it = [[COItemGraph alloc] initWithItemForUUID: dict
-                                                 rootItemUUID: [rootItem UUID]];
+                                                 rootItemUUID: rootItem.UUID];
     return it;
 }
 
@@ -213,14 +212,14 @@ static int itemChangedAtCommit(int i)
     
     COPersistentRootInfo *proot = [store persistentRootInfoForUUID: prootUUID];
     
-    ETUUID *lastCommitId = [[proot currentBranchInfo] currentRevisionUUID];
+    ETUUID *lastCommitId = proot.currentBranchInfo.currentRevisionUUID;
     
     // Now traverse them in reverse order and test that the items are as expected.
     // There are NUM_CHILDREN + 1 commits (the initial one made by creating the persistent roots)
 
     for (int rev=NUM_COMMITS-1; rev>=1; rev--)
     {
-        ETUUID *parentCommitId = [[store revisionInfoForRevisionUUID: lastCommitId persistentRootUUID: prootUUID] parentRevisionUUID];
+        ETUUID *parentCommitId = [store revisionInfoForRevisionUUID: lastCommitId persistentRootUUID: prootUUID].parentRevisionUUID;
         
         COItemGraph *tree = [store partialItemGraphFromRevisionUUID: parentCommitId
 													 toRevisionUUID: lastCommitId
@@ -251,14 +250,14 @@ static int itemChangedAtCommit(int i)
 
     COPersistentRootInfo *proot = [store persistentRootInfoForUUID: prootUUID];
     
-    ETUUID *lastCommitId = [[proot currentBranchInfo] currentRevisionUUID];
+    ETUUID *lastCommitId = proot.currentBranchInfo.currentRevisionUUID;
     
     for (int rev=NUM_COMMITS-1; rev>=0; rev--)
     {
         COItemGraph *tree = [store itemGraphForRevisionUUID: lastCommitId persistentRoot: prootUUID];
         
         // Check the state
-        UKObjectsEqual(rootUUID, [tree rootItemUUID]);
+        UKObjectsEqual(rootUUID, tree.rootItemUUID);
 		      
         for (int i=0; i<NUM_CHILDREN; i++)
         {
@@ -275,7 +274,7 @@ static int itemChangedAtCommit(int i)
         
         // Step back one revision
         
-        lastCommitId = [[store revisionInfoForRevisionUUID: lastCommitId persistentRootUUID: prootUUID] parentRevisionUUID];
+        lastCommitId = [store revisionInfoForRevisionUUID: lastCommitId persistentRootUUID: prootUUID].parentRevisionUUID;
     }
     
     NSLog(@"reading back %d full snapshots of a %d-item persistent root took %lf ms",
@@ -297,12 +296,12 @@ static int itemChangedAtCommit(int i)
     
     NSLog(@"FTS took %lf ms", 1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
     
-    UKTrue([results count] == 1);
-    if ([results count] == 1)
+    UKTrue(results.count == 1);
+    if (results.count == 1)
     {
-        COSearchResult *result = [results objectAtIndex: 0];
-        UKObjectsEqual([proot UUID], result.persistentRoot);
-        UKObjectsEqual([revisionUUIDs objectAtIndex: 32], result.revision);
+        COSearchResult *result = results[0];
+        UKObjectsEqual(proot.UUID, result.persistentRoot);
+        UKObjectsEqual(revisionUUIDs[32], result.revision);
     }
 }
 
@@ -342,10 +341,10 @@ static int itemChangedAtCommit(int i)
     for (int i =0; i<NUM_PERSISTENT_ROOT_COPIES; i++)
     {
         [txn createPersistentRootCopyWithUUID: [ETUUID UUID]
-					 parentPersistentRootUUID: [proot UUID]
+					 parentPersistentRootUUID: proot.UUID
 								   branchUUID: [ETUUID UUID]
 							 parentBranchUUID: nil
-						  initialRevisionUUID: [[proot currentBranchInfo] currentRevisionUUID]];
+						  initialRevisionUUID: proot.currentBranchInfo.currentRevisionUUID];
     }
     UKTrue([store commitStoreTransaction: txn]);
     
@@ -383,9 +382,9 @@ static int itemChangedAtCommit(int i)
     
     startDate = [NSDate date];
     
-    COItemGraph *readBack = [self currentItemGraphForPersistentRoot: [proot UUID]];
+    COItemGraph *readBack = [self currentItemGraphForPersistentRoot: proot.UUID];
     
-    NSLog(@"reading %d item itemtree took %lf ms", (int)[[readBack itemUUIDs] count],
+    NSLog(@"reading %d item itemtree took %lf ms", (int)readBack.itemUUIDs.count,
           1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
 }
 

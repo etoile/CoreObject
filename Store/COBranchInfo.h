@@ -21,9 +21,9 @@
     ETUUID *parentBranchUUID_;
 }
 
-@property (readwrite, nonatomic, strong) ETUUID *UUID;
+@property (nonatomic, readwrite, copy) ETUUID *UUID;
 
-@property (readwrite, nonatomic, strong) ETUUID *persistentRootUUID;
+@property (nonatomic, readwrite, copy) ETUUID *persistentRootUUID;
 
 /**
  * The newest revision on the branch.
@@ -46,11 +46,11 @@
  * revision, haven't yet made a change) which suggests it should probably be
  * removed.
  */
-@property (readwrite, nonatomic, strong) ETUUID *headRevisionUUID;
+@property (nonatomic, readwrite, copy) ETUUID *headRevisionUUID;
 /**
  * The current revision of this branch.
  */
-@property (readwrite, nonatomic, strong) ETUUID *currentRevisionUUID;
+@property (nonatomic, readwrite, copy) ETUUID *currentRevisionUUID;
 
 /**
  * Metadata, like the user-facing name of the branch.
@@ -59,21 +59,21 @@
  * (If there is a real use case for unversioned persistent root metadata,
  *  we can easily re-add it)
  */
-@property (readwrite, nonatomic, strong) NSDictionary *metadata;
-@property (readwrite, nonatomic, getter=isDeleted, setter=setDeleted:) BOOL deleted;
+@property (nonatomic, readwrite, copy) NSDictionary *metadata;
+@property (nonatomic, readwrite, getter=isDeleted) BOOL deleted;
 
-@property (readwrite, nonatomic, strong) ETUUID *parentBranchUUID;
+@property (nonatomic, readwrite, copy) ETUUID *parentBranchUUID;
 
 /**
  * In git terminology, if the receiver is "master", returns "origin/master", or
  * nil if there is no corresponding "origin/master"
  */
-- (ETUUID *) remoteMirror;
+@property (nonatomic, readonly) ETUUID *remoteMirror;
 
 /**
  * In git terminology, if the receiver is "origin/master", returns the UUID
  * of the "master" branch in the remote store "origin". Otherwise, returns nil.
  */
-- (ETUUID *) replcatedBranch;
+@property (nonatomic, readonly) ETUUID *replcatedBranch;
 
 @end

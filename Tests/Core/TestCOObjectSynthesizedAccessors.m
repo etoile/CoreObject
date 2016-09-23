@@ -24,7 +24,7 @@
 - (id) init
 {
     SUPERINIT;
-    item = [[ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"] rootObject];
+    item = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
     return self;
 }
 
@@ -33,31 +33,31 @@
 
     UKObjectKindOf(item, OutlineItem);
     
-    [item setLabel: @"hello"];
-    UKObjectsEqual(@"hello", [item label]);
+    item.label = @"hello";
+    UKObjectsEqual(@"hello", item.label);
     
-    OutlineItem *child1 = [[item objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-    [child1 setLabel: @"child1"];
+    OutlineItem *child1 = [item.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
+    child1.label = @"child1";
 
-    OutlineItem *child2 = [[item objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
-    [child2 setLabel: @"child2"];
+    OutlineItem *child2 = [item.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
+    child2.label = @"child2";
 
-    [item setContents: A(child1, child2)];
-    UKObjectsEqual(A(child1, child2), [item contents]);
+    [item setContents: @[child1, child2]];
+    UKObjectsEqual(A(child1, child2), item.contents);
 }
 
 - (void)testSynthesizedAccessorsRestrictedToDynamicProperties
 {
 	UKRaisesException([item unkownMethod]);
 
-	NSAssert([[[item entityDescription] propertyDescriptionForName: @"isPersistent"] isReadOnly],
+	NSAssert([[item.entityDescription propertyDescriptionForName: @"isPersistent"] isReadOnly],
 		@"We expect isPersistent to be read-only for COObject and its subclasses");
 	UKRaisesException([(id)item setIsPersistent: YES]);
 }
 
 - (void) testMutableProxy
 {
-    OutlineItem *child1 = [[item objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    OutlineItem *child1 = [item.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     
     // At first I didn't think this would work right now, but
     // when -mutableArrayValueForKey: does its accessor search, it causes
@@ -70,10 +70,10 @@
     
     // FIXME: Change to mutableOrderedSetValueForKey
     [[item mutableArrayValueForKey: @"contents"] addObject: child1];
-    UKObjectsEqual(@[child1], [item contents]);
+    UKObjectsEqual(@[child1], item.contents);
 
     [[item mutableArrayValueForKey: @"contents"] removeObject: child1];
-    UKObjectsEqual(@[], [item contents]);
+    UKObjectsEqual(@[], item.contents);
 }
 
 - (void) testSetterToProperty

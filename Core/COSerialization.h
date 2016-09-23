@@ -89,7 +89,7 @@
  * or AppKit types, but the storage representation remains the same in all
  * cases.
  */
-@property (nonatomic, copy) COItem *storeItem;
+@property (nonatomic, readwrite, copy) COItem *storeItem;
 
 /** @taskunit Serialization */
 

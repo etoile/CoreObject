@@ -20,33 +20,33 @@
 
 - (NSSet *) branchUUIDs
 {
-    return [NSSet setWithArray: [branchForUUID_ allKeys]];
+    return [NSSet setWithArray: branchForUUID_.allKeys];
 }
 
 - (NSArray *) branches
 {
-    return [branchForUUID_ allValues];
+    return branchForUUID_.allValues;
 }
 
 - (COBranchInfo *)branchInfoForUUID: (ETUUID *)aUUID
 {
-    return [branchForUUID_ objectForKey: aUUID];
+    return branchForUUID_[aUUID];
 }
 - (COBranchInfo *)currentBranchInfo
 {
-    return [self branchInfoForUUID: [self currentBranchUUID]];
+    return [self branchInfoForUUID: self.currentBranchUUID];
 }
 - (ETUUID *)currentRevisionUUID
 {
-	return [[self currentBranchInfo] currentRevisionUUID];
+	return self.currentBranchInfo.currentRevisionUUID;
 }
 
 - (NSArray *)branchInfosWithMetadataValue: (id)aValue forKey: (NSString *)aKey
 {
     NSMutableArray *result = [NSMutableArray array];
-    for (COBranchInfo *info in [branchForUUID_ allValues])
+    for (COBranchInfo *info in branchForUUID_.allValues)
     {
-        if ([[[info metadata] objectForKey: aKey] isEqual: aValue])
+        if ([info.metadata[aKey] isEqual: aValue])
         {
             [result addObject: info];
         }

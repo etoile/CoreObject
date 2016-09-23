@@ -23,9 +23,9 @@
 
 @property (nonatomic, readonly) NSMutableArray *operations;
 
-- (id) initWithFirstAttributedString: (COAttributedString *)first
+- (instancetype) initWithFirstAttributedString: (COAttributedString *)first
               secondAttributedString: (COAttributedString *)second
-							  source: (id)source;
+							  source: (id)source NS_DESIGNATED_INITIALIZER;
 
 - (void) addOperationsFromDiff: (COAttributedStringDiff *)aDiff;
 - (COAttributedStringDiff *) diffByMergingWithDiff: (COAttributedStringDiff *)aDiff;
@@ -44,13 +44,13 @@
 /** 
  * For testing
  */
-- (instancetype) initWithOperations: (NSArray *)ops;
+- (instancetype) initWithOperations: (NSArray *)ops NS_DESIGNATED_INITIALIZER;
 
 @end
 
 @protocol COAttributedStringDiffOperation <NSObject>
 @required
-@property (nonatomic, readwrite, strong) ETUUID *attributedStringUUID;
+@property (nonatomic, readwrite, copy) ETUUID *attributedStringUUID;
 @property (nonatomic, readwrite, assign) NSRange range;
 @property (nonatomic, readwrite, strong) id source;
 /**

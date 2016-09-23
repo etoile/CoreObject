@@ -63,7 +63,7 @@
 /**
  * Returns whether this is a [COPath brokenPath]
  */
-@property (nonatomic, readonly, assign) BOOL isBroken;
+@property (nonatomic, readonly, getter=isBroken) BOOL broken;
 
 
 /** @taskunit Persistent String Representation */
@@ -76,6 +76,6 @@
 /**
  * Returns a string representation of the path.
  */
-- (NSString *) stringValue;
+@property (nonatomic, readonly) NSString *stringValue;
 
 @end

@@ -25,12 +25,12 @@
 	self = [super init];
 	
 	persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Folder"];
-	parent = [persistentRoot rootObject];
+	parent = persistentRoot.rootObject;
 	parent.label = @"Parent";
 	UKObjectsEqual([NSSet set], parent.contents);
 	
-	child1 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Folder"];
-	child2 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Folder"];
+	child1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Folder"];
+	child2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Folder"];
 	child1.label = @"Child1";
 	child2.label = @"Child2";
 	parent.contents = S(child1, child2);
@@ -54,7 +54,7 @@
 		 Folder *testChild1 = sortedChildren[0];
 		 Folder *testChild2 = sortedChildren[1];
 		 
-		 UKIntsEqual(2, [sortedChildren count]);
+		 UKIntsEqual(2, sortedChildren.count);
 		 
 		 UKObjectsEqual(@"Parent", testParent.label);
 		 UKObjectsSame(testParent, testChild1.parent);
@@ -66,7 +66,7 @@
 
 - (void)testAddAndRemoveChildren
 {
-	Folder *child3 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Folder"];
+	Folder *child3 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Folder"];
 	child3.label = @"Child3";
 
 	UKNil(child3.parent);
@@ -94,7 +94,7 @@
 		 Folder *testChild2 = sortedChildren[0];
 		 Folder *testChild3 = sortedChildren[1];
 		 
-		 UKIntsEqual(2, [sortedChildren count]);
+		 UKIntsEqual(2, sortedChildren.count);
 		 
 		 UKObjectsEqual(@"Parent", testParent.label);
 		 UKObjectsSame(testParent, testChild2.parent);
@@ -106,7 +106,7 @@
 
 - (void)testMoveChildren
 {
-	Folder *parent2 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Folder"];
+	Folder *parent2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Folder"];
 	parent2.label = @"Parent2";
 	
 	UKObjectsEqual([NSSet set], parent2.contents);

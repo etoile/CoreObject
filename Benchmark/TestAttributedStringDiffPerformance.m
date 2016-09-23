@@ -24,7 +24,7 @@
 {
 	COObjectGraphContext *result = [COObjectGraphContext new];
 	COAttributedString *attrStr = [[COAttributedString alloc] initWithObjectGraphContext: result];
-	[result setRootObject: attrStr];
+	result.rootObject = attrStr;
 	
 	NSMutableArray *chunksArray = [NSMutableArray new];
 	
@@ -40,13 +40,15 @@
 	return result;
 }
 
-- (NSTimeInterval) timeToCopyObjectGraph: (COObjectGraphContext *)ctx
+- (NSTimeInterval) timeToCopyObjectGraph: (COObjectGraphContext *)objectGraph
 {
 	NSDate *start = [NSDate date];
-	
-	COObjectGraphContext *tempCtx = [COObjectGraphContext new];
-	(void) [[COCopier new] copyItemWithUUID: [ctx rootItemUUID] fromGraph: ctx toGraph: tempCtx];
-	
+	COObjectGraphContext *tempObjectGraph = [COObjectGraphContext new];
+
+	(void) [[COCopier new] copyItemWithUUID: objectGraph.rootItemUUID
+	                              fromGraph: objectGraph
+	                                toGraph: tempObjectGraph];
+
 	NSTimeInterval time = [[NSDate date] timeIntervalSinceDate: start];
 	return time;
 }
@@ -69,8 +71,8 @@
 	COObjectGraphContext *ctx1 = [self make1KChunkAttributedString];
 	COObjectGraphContext *ctx2 = [self make1KChunkAttributedString];
 	
-	COAttributedString *as1 = [ctx1 rootObject];
-	COAttributedString *as2 = [ctx2 rootObject];
+	COAttributedString *as1 = ctx1.rootObject;
+	COAttributedString *as2 = ctx2.rootObject;
 	
 	[self appendHTMLString: @"<I>test</I>" toAttributedString: as2];
 	
@@ -81,9 +83,9 @@
 	UKTrue(diffTimesFaster >= 5);
 		
 	NSLog(@"COAttributedStringDiff diff with a trivial insertion and %d chunks took %d ms. Copying %d objects took %d ms. Expected diff to be at least 5x faster than copy, was %f x faster.",
-		  (int)[[as1 chunks] count],
+		  (int)as1.chunks.count,
 		  (int)(diffTime * 1000),
-		  (int)[[ctx1 itemUUIDs] count],
+		  (int)ctx1.itemUUIDs.count,
 		  (int)(copyTime * 1000),
 		  diffTimesFaster);
 }

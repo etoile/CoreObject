@@ -17,24 +17,24 @@
 		return entity;
 	
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 type: (id)@"Anonymous.NSString"];
-    [labelProperty setPersistent: YES];
+                                                                                 typeName: @"NSString"];
+    labelProperty.persistent = YES;
 	
 	ETPropertyDescription *contentsProperty =
-    [ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.Folder"];
+    [ETPropertyDescription descriptionWithName: @"contents" typeName: @"Folder"];
 	
-    [contentsProperty setPersistent: YES];
-    [contentsProperty setMultivalued: YES];
-    [contentsProperty setOrdered: NO];
+    contentsProperty.persistent = YES;
+    contentsProperty.multivalued = YES;
+    contentsProperty.ordered = NO;
 
     ETPropertyDescription *parentProperty =
-    [ETPropertyDescription descriptionWithName: @"parent" type: (id)@"Anonymous.Folder"];
+    [ETPropertyDescription descriptionWithName: @"parent" typeName: @"Folder"];
     
-    [parentProperty setMultivalued: NO];
-	[parentProperty setDerived: YES];
-    [parentProperty setOpposite: (id)@"Anonymous.Folder.contents"];
+    parentProperty.multivalued = NO;
+	parentProperty.derived = YES;
+    parentProperty.oppositeName = @"Folder.contents";
     
-    [entity setPropertyDescriptions: @[labelProperty, contentsProperty, parentProperty]];
+    entity.propertyDescriptions = @[labelProperty, contentsProperty, parentProperty];
 	
     return entity;
 }

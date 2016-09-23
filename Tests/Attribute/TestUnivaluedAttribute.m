@@ -24,7 +24,7 @@
 	ctx = [COObjectGraphContext new];
 	item1 = [ctx insertObjectWithEntityName: @"UnivaluedAttributeModel"];
 	item1.label = @"test";
-	[ctx setRootObject: item1];
+	ctx.rootObject = item1;
 	return self;
 }
 
@@ -64,7 +64,7 @@
 
 - (void) testNumberValueDisallowedForStringAttribute
 {
-	UKRaisesException([item1 setLabel: (id)[NSNumber numberWithInt: 123]]);
+	UKRaisesException([item1 setLabel: (id)@123]);
 }
 
 @end

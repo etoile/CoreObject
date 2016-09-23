@@ -84,7 +84,7 @@
  * the track implementation should rely on -nextNodeOnTrackFrom:backwards: as 
  * much as possible.
  */
-- (NSArray *)nodes;
+@property (nonatomic, readonly) NSArray *nodes;
 /**
  * Returns the node that follows aNode on the track when back is NO, otherwise
  * when back is YES, returns the node that precedes aNode.
@@ -144,13 +144,13 @@
  *
  * See also -undo and -canRedo.
  */
-- (BOOL)canUndo;
+@property (nonatomic, readonly) BOOL canUndo;
 /**
  * Returns whether a redo can be performed.
  *
  * See also -redo and -canUndo.
  */
-- (BOOL)canRedo;
+@property (nonatomic, readonly) BOOL canRedo;
 /**
  * Performs an undo. The meaning of undo is left up to subclasses.
  *
@@ -181,38 +181,38 @@
 /**
  * See -[CORevision metadata].
  */
-- (NSDictionary *)metadata;
+@property (nonatomic, readonly, copy) NSDictionary *metadata;
 /**
  * See -[CORevision UUID].
  */
-- (ETUUID *)UUID;
+@property (nonatomic, readonly, copy) ETUUID *UUID;
 /**
  * See -[CORevision persistentRootUUID].
  */
-- (ETUUID *)persistentRootUUID;
+@property (nonatomic, readonly, copy) ETUUID *persistentRootUUID;
 /**
  * See -[CORevision branchUUID].
  */
-- (ETUUID *)branchUUID;
+@property (nonatomic, readonly) ETUUID *branchUUID;
 /**
  * See -[CORevision date].
  */
-- (NSDate *)date;
+@property (nonatomic, readonly) NSDate *date;
 /**
  * See -[CORevision localizedTypeDescription].
  */
-- (NSString *)localizedTypeDescription;
+@property (nonatomic, readonly) NSString *localizedTypeDescription;
 /** 
  * See -[CORevision localizedShortDescription].
  */
-- (NSString *)localizedShortDescription;
+@property (nonatomic, readonly) NSString *localizedShortDescription;
 /**
  * Returns the parent node of this node, or nil if there is none.
  */
-- (id<COTrackNode>)parentNode;
+@property (nonatomic, readonly) id <COTrackNode> parentNode;
 /**
  * Returns the merge parent node of this node, or nil if there is none.
  */
-- (id<COTrackNode>)mergeParentNode;
+@property (nonatomic, readonly) id <COTrackNode> mergeParentNode;
 
 @end

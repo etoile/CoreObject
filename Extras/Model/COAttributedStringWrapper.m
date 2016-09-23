@@ -23,9 +23,14 @@
 	SUPERINIT;
 	_observedObjectsSet = [NSHashTable hashTableWithOptions: NSPointerFunctionsObjectPointerPersonality | NSHashTableStrongMemory];
 	
-	[self setBacking: aBacking];
+	self.backing = aBacking;
 	
 	return self;
+}
+
+- (instancetype)init
+{
+	return [self initWithBacking: nil];
 }
 
 - (void) registerToObserveBacking
@@ -69,7 +74,7 @@
 		[self unregisterAsObserverOf: object];
 	}
 
-	ETAssert([_observedObjectsSet count] == 0);
+	ETAssert(_observedObjectsSet.count == 0);
 }
 
 - (COAttributedString *)backing
@@ -79,8 +84,8 @@
 
 - (void)setBacking:(COAttributedString *)backing
 {
-	_lastNotifiedLength = [backing length];
-	_cachedString = [backing string];
+	_lastNotifiedLength = backing.length;
+	_cachedString = backing.string;
 	
 	[self unregisterToObserveBacking];
 	_backing = backing;
@@ -108,8 +113,8 @@
 
 static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *prefixOut, NSUInteger *suffixOut)
 {
-	const NSUInteger alen = [a length];
-	const NSUInteger blen = [b length];
+	const NSUInteger alen = a.length;
+	const NSUInteger blen = b.length;
 	
 	NSUInteger i;
 	
@@ -125,7 +130,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	
 	for (j = 0; j < MIN(alen - i, blen - i); j++)
 	{
-		if ([a characterAtIndex: [a length] - 1 - j] != [b characterAtIndex: [b length] - 1 - j])
+		if ([a characterAtIndex: a.length - 1 - j] != [b characterAtIndex: b.length - 1 - j])
 			break;
 	}
 
@@ -138,14 +143,14 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 					insertedObjects: (id)anArray
 						   userInfo: (id)info
 {
-	NSRange characterRange = {[(COAttributedStringChunk *)anArray[0] characterIndex], 0};
+	NSRange characterRange = {[anArray[0] characterIndex], 0};
 	NSUInteger lengthDelta = 0;
 	BOOL hasAttributes = NO;
 	for (COAttributedStringChunk *insertedChunk in anArray)
 	{
 		ETAssert(insertedChunk.parentString == _backing);
 		lengthDelta += insertedChunk.length;
-		if ([insertedChunk.attributes count] > 0)
+		if (insertedChunk.attributes.count > 0)
 		{
 			hasAttributes = YES;
 		}
@@ -184,7 +189,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	{
 		COAttributedStringChunk *chunkBeforeDeletedChunk = oldArray[aRange.location - 1];
 		ETAssert(chunkBeforeDeletedChunk.parentString == _backing);
-		characterRange.location = NSMaxRange([chunkBeforeDeletedChunk characterRange]);
+		characterRange.location = NSMaxRange(chunkBeforeDeletedChunk.characterRange);
 	}
 	
 	[self edited: NSTextStorageEditedCharacters | NSTextStorageEditedAttributes range: characterRange changeInLength: -deletedChunksLength];
@@ -215,7 +220,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	{
 		COAttributedStringChunk *chunkBeforeDeletedChunk = oldArray[aRange.location - 1];
 		ETAssert(chunkBeforeDeletedChunk.parentString == _backing);
-		characterRange.location = NSMaxRange([chunkBeforeDeletedChunk characterRange]);
+		characterRange.location = NSMaxRange(chunkBeforeDeletedChunk.characterRange);
 	}
 	
 	NSInteger delta = insertedChunksLength - deletedChunksLength;
@@ -275,14 +280,14 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		// N.B. This used to be above the -beginEditingCall, but that would violate
 		// the principle that you can't modify an NSAttributedStringWrapper from
 		// outside a -beginEditing/-endEditing block
-		_cachedString = [_backing string];
+		_cachedString = _backing.string;
 		
 		CODiffArrays(oldArray, newArray, self, oldArray);
 		[self endEditing];
 	}
 	else if ([keyPath isEqualToString: @"text"])
 	{
-		_cachedString = [_backing string];
+		_cachedString = _backing.string;
 		
 		
 		NSLog(@"%@: Text changed from %@ to %@", object, change[NSKeyValueChangeOldKey], change[NSKeyValueChangeNewKey]);
@@ -296,7 +301,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		}
 		
 		NSString *newText = change[NSKeyValueChangeNewKey];
-		NSInteger lengthDelta = (NSInteger)[newText length] - (NSInteger)[oldText length];
+		NSInteger lengthDelta = (NSInteger)newText.length - (NSInteger)oldText.length;
 		
 		
 		if ([oldText isEqualToString: newText])
@@ -324,7 +329,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	}
 	else if ([keyPath isEqualToString: @"attributes"])
 	{
-		_cachedString = [_backing string];
+		_cachedString = _backing.string;
 		
 		
 		COAttributedStringChunk *chunk = object;
@@ -335,7 +340,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 			return;
 		}
 		
-		[self edited: NSTextStorageEditedAttributes range: [chunk characterRange] changeInLength: 0];
+		[self edited: NSTextStorageEditedAttributes range: chunk.characterRange changeInLength: 0];
 	}
 }
 
@@ -363,7 +368,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 
 - (void) objectGraphContextWillRelinquishObjectsNotification: (NSNotification *)notif
 {
-	NSArray *objects = [notif userInfo][CORelinquishedObjectsKey];
+	NSArray *objects = notif.userInfo[CORelinquishedObjectsKey];
 	for (COObject *object in objects)
 	{
 		[self unregisterAsObserverOf: object];
@@ -399,7 +404,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 
 - (NSDictionary *)attributesAtIndex: (NSUInteger)anIndex effectiveRange: (NSRangePointer)aRangeOut
 {
-	//NSLog(@"%p (%@) attributesAtIndex %d", self, [self string], (int)anIndex);
+	//NSLog(@"%p (%@) attributesAtIndex %d", self, self.string, (int)anIndex);
 	
 	_inPrimitiveMethod = YES;
 	
@@ -465,7 +470,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 
 - (void)replaceCharactersInRange: (NSRange)aRange withString: (NSString *)aString
 {
-	//NSLog(@"%p (%@) replaceCharactersInRange %@ with '%@'", self, [self string], NSStringFromRange(aRange), aString);
+	//NSLog(@"%p (%@) replaceCharactersInRange %@ with '%@'", self, self.string, NSStringFromRange(aRange), aString);
 	
 	_inPrimitiveMethod = YES;
 		
@@ -474,7 +479,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	const NSUInteger firstChunkIndex = chunkIndex;
 	
 	/* Sepecial case: empty string */
-	if ([self length] == 0)
+	if (self.length == 0)
 	{
 		chunk = [[COAttributedStringChunk alloc] initWithObjectGraphContext: _backing.objectGraphContext];
 		chunk.text = @"";
@@ -482,14 +487,14 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	}
 	
 	/* Special case: inserting at end of string */
-	if (chunk == nil && aRange.location == [self length])
+	if (chunk == nil && aRange.location == self.length)
 	{
 		ETAssert([self length] > 0);
 		chunk = [_backing chunkContainingIndex: aRange.location - 1 chunkStart: &chunkStart chunkIndex: &chunkIndex];
 	}
 	
 	ETAssert(chunk != nil);
-	const NSUInteger chunkLength = [[chunk text] length];
+	const NSUInteger chunkLength = chunk.text.length;
 	
 	const NSUInteger indexInChunk = aRange.location - chunkStart;
 	NSUInteger lengthInChunkToReplace = aRange.length;
@@ -501,7 +506,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	NSString *newText = [chunk.text stringByReplacingCharactersInRange: NSMakeRange(indexInChunk, lengthInChunkToReplace) withString: aString];
 	chunk.text = newText;
 	
-	if ([newText length] == 0)
+	if (newText.length == 0)
 	{
 		[[_backing mutableArrayValueForKey: @"chunks"] removeObjectAtIndex: chunkIndex--];
 	}
@@ -518,7 +523,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		chunk.text = [chunk.text stringByReplacingCharactersInRange: NSMakeRange(0, lengthInChunkToReplace) withString: @""];
 		remainingLengthToDelete -= lengthInChunkToReplace;
 		
-		if ([chunk.text length] == 0)
+		if (chunk.text.length == 0)
 		{
 			[[_backing mutableArrayValueForKey: @"chunks"] removeObjectAtIndex: chunkIndex--];
 		}
@@ -527,8 +532,8 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	[self mergeChunksInChunkRange: NSMakeRange(firstChunkIndex, chunkIndex + 1 - firstChunkIndex)];
 	
 	// TODO: Add tests that check for this
-	const NSInteger delta = [aString length] - aRange.length;
-	_cachedString = [_backing string];
+	const NSInteger delta = aString.length - aRange.length;
+	_cachedString = _backing.string;
 	[self edited: NSTextStorageEditedCharacters range: aRange changeInLength: delta];
 	_lastNotifiedLength += delta;
 	
@@ -537,7 +542,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 
 - (COAttributedStringAttribute *) makeAttr: (NSString *)key value: (NSString *)value
 {
-	COAttributedStringAttribute *attribute = [[COAttributedStringAttribute alloc] initWithObjectGraphContext: [_backing objectGraphContext]];
+	COAttributedStringAttribute *attribute = [[COAttributedStringAttribute alloc] initWithObjectGraphContext: _backing.objectGraphContext];
 	attribute.styleKey = key;
 	attribute.styleValue = value;
 	return attribute;
@@ -561,7 +566,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 		else if ([attributeName isEqual: NSFontAttributeName])
 		{
 			NSFont *font = attributeValue;
-			NSFontSymbolicTraits traits = [[font fontDescriptor] symbolicTraits];
+			NSFontSymbolicTraits traits = font.fontDescriptor.symbolicTraits;
 			if ((traits & NSFontBoldTrait) == NSFontBoldTrait)
 			{
 				[newAttribs addObject: [self makeAttr: @"font-weight" value: @"bold"]];
@@ -601,7 +606,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	
 	for (NSUInteger i = range.location; i <= NSMaxRange(range); i++)
 	{
-		if (i >= [chunksProxy count])
+		if (i >= chunksProxy.count)
 			break;
 		
 		if (i == 0)
@@ -625,7 +630,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 
 - (void)setAttributes: (NSDictionary *)aDict range: (NSRange)aRange
 {
-	//NSLog(@"%p (%@) Set attributes %@ range %@", self, [self string], aDict, NSStringFromRange(aRange));
+	//NSLog(@"%p (%@) Set attributes %@ range %@", self, self.string, aDict, NSStringFromRange(aRange));
 	
 	if (aRange.length == 0)
 	{
@@ -684,7 +689,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	
 	if (_beginEditingStackDepth == 0)
 	{
-		_lengthAtStartOfBatch = [self length];
+		_lengthAtStartOfBatch = self.length;
 		_lengthDeltaInBatch = 0;
 	}
 	
@@ -713,7 +718,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a, NSString *b, NSUInteger *
 	{
 		// Self-check
 		
-		NSInteger lengthAtEndOfBatch = [self length];
+		NSInteger lengthAtEndOfBatch = self.length;
 		NSInteger expectedLength = _lengthAtStartOfBatch + _lengthDeltaInBatch;
 		
 		if (lengthAtEndOfBatch != expectedLength)

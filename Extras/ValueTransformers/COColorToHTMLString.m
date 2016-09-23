@@ -27,7 +27,7 @@ static NSString *HexFromFraction(CGFloat fraction)
 static CGFloat FractionFromHex(NSString *twoChars)
 {
 	int value = 0;
-	if (1 == sscanf([twoChars UTF8String], "%x", &value))
+	if (1 == sscanf(twoChars.UTF8String, "%x", &value))
 	{
 		return value / 255.0;
 	}

@@ -17,7 +17,7 @@
 	NSMutableSet *result = [NSMutableSet set];
 	
 	COItem *item = [source itemForUUID: aUUID];
-	for (NSString *key in [item attributeNames])
+	for (NSString *key in item.attributeNames)
 	{
 		COType type = [item typeForAttribute: key];
 		if (COTypePrimitivePart(type) == kCOTypeCompositeReference)
@@ -40,7 +40,7 @@
 		}
 	}
 	
-	return [result allObjects];
+	return result.allObjects;
 }
 
 - (void) collectItemAndAllDescendents: (ETUUID *)aUUID
@@ -86,7 +86,7 @@
 	
 		// FIXME: This isn't intuitive... we just copy one layer deep of non-composite references 		
 		// FIXME: referencedItemUUIDs ignores composite references, which sounds wrong! Test!
-        for (ETUUID *referenced in [item referencedItemUUIDs])
+        for (ETUUID *referenced in item.referencedItemUUIDs)
         {
             if (![compositeObjectCopySet containsObject: referenced])
             {
@@ -128,8 +128,7 @@
     NSMutableDictionary *mapping = [NSMutableDictionary dictionary];
     for (ETUUID *oldUUID in uuidsToCopy)
     {
-        [mapping setObject: [ETUUID UUID]
-                    forKey: oldUUID];
+        mapping[oldUUID] = [ETUUID UUID];
     }
     
     NSMutableArray *result = [NSMutableArray array];
@@ -144,7 +143,7 @@
     [dest insertOrUpdateItems: result];
     
 	return [uuids mappedCollectionWithBlock:
-			^(id inputUUID){ return [mapping objectForKey: inputUUID]; }];
+			^(id inputUUID){ return mapping[inputUUID]; }];
 }
 
 @end

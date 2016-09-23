@@ -23,11 +23,11 @@
 	
 	BOOL ok = YES;
 	
-	ok = ok && [[store database] executeUpdate: @"INSERT INTO persistentroots (uuid, currentbranch, deleted, transactionid) VALUES(?, NULL, 0, ?)",
+	ok = ok && [store.database executeUpdate: @"INSERT INTO persistentroots (uuid, currentbranch, deleted, transactionid) VALUES(?, NULL, 0, ?)",
 			[persistentRoot dataValue],
             @(transactionID)];
 	
-	ok = ok && [[store database] executeUpdate: @"INSERT INTO persistentroot_backingstores (uuid, backingstore) VALUES(?, COALESCE((SELECT backingstore FROM persistentroot_backingstores WHERE uuid = ?), ?))",
+	ok = ok && [store.database executeUpdate: @"INSERT INTO persistentroot_backingstores (uuid, backingstore) VALUES(?, COALESCE((SELECT backingstore FROM persistentroot_backingstores WHERE uuid = ?), ?))",
 				[persistentRoot dataValue],
 				[persistentRootForCopy dataValue],
 				[persistentRoot dataValue]];

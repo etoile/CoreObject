@@ -17,18 +17,18 @@
  */
 @interface COSynchronizerRevision : NSObject
 @property (nonatomic, readwrite, strong) COItemGraph *modifiedItems;
-@property (nonatomic, readwrite, strong) ETUUID *revisionUUID;
-@property (nonatomic, readwrite, strong) ETUUID *parentRevisionUUID;
+@property (nonatomic, readwrite, copy) ETUUID *revisionUUID;
+@property (nonatomic, readwrite, copy) ETUUID *parentRevisionUUID;
 @property (nonatomic, readwrite, copy) NSDictionary *metadata;
-@property (nonatomic, readwrite, strong) NSDate *date;
+@property (nonatomic, readwrite, copy) NSDate *date;
 
 - (void) writeToTransaction: (COStoreTransaction *)txn
 		 persistentRootUUID: (ETUUID *)persistentRoot
 				 branchUUID: (ETUUID *)branch;
 
-- (id) initWithUUID: (ETUUID *)aUUID persistentRoot: (ETUUID *)aPersistentRoot store: (COSQLiteStore *)store recordAsDeltaAgainstParent: (BOOL)delta;
+- (instancetype) initWithUUID: (ETUUID *)aUUID persistentRoot: (ETUUID *)aPersistentRoot store: (COSQLiteStore *)store recordAsDeltaAgainstParent: (BOOL)delta NS_DESIGNATED_INITIALIZER;
 
-- (id) propertyList;
-- (id) initWithPropertyList: (id)aPropertyList;
+@property (nonatomic, readonly, strong) id propertyList;
+- (instancetype) initWithPropertyList: (id)aPropertyList NS_DESIGNATED_INITIALIZER;
 
 @end

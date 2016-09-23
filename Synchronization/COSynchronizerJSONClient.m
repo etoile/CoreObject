@@ -16,7 +16,7 @@
 
 @implementation COSynchronizerJSONClient
 
-@synthesize delegate, client;
+@synthesize delegate, client, paused;
 
 - (instancetype) init
 {
@@ -133,12 +133,7 @@
 	}
 }
 
-- (BOOL) paused
-{
-	return paused;
-}
-
-- (void)setPaused:(BOOL)flag
+- (void)setPaused: (BOOL)flag
 {
 	paused = flag;
 	if (!paused)

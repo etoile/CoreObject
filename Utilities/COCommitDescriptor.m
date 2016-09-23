@@ -35,15 +35,14 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 #endif
 	NSDictionary *plist = COJSONObjectWithData(JSONData, NULL);
 
-	[aTypeTable addEntriesFromDictionary: [plist objectForKey: @"types"]];
+	[aTypeTable addEntriesFromDictionary: plist[@"types"]];
 
-	NSDictionary *descriptors = [plist objectForKey: @"descriptors"];
+	NSDictionary *descriptors = plist[@"descriptors"];
 
 	for (NSString *name in descriptors)
 	{
-		NSDictionary *plist = [descriptors objectForKey: name];
-		NSString *identifier = [[[aCommitFile lastPathComponent]
-			stringByDeletingPathExtension] stringByAppendingPathExtension: name];
+		NSDictionary *plist = descriptors[name];
+		NSString *identifier = [aCommitFile.lastPathComponent.stringByDeletingPathExtension stringByAppendingPathExtension: name];
 		COCommitDescriptor *descriptor =
 			[[COCommitDescriptor alloc] initWithIdentifier: identifier
 		                                      propertyList: plist];
@@ -52,7 +51,7 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 		ETAssert([descriptor typeDescription] != nil);
 		ETAssert([descriptor shortDescription] != nil);
 
-		[aDescriptorTable setObject: descriptor forKey: identifier];
+		aDescriptorTable[identifier] = descriptor;
 	}
 }
 
@@ -70,7 +69,7 @@ static NSMutableDictionary *descriptorTypeTable = nil;
 	                                                 error: &error];
 	ETAssert(error == nil);
 	NSDictionary *plist = [content propertyListFromStringsFileFormat];
-	NSString *domain = [[aStringsFile lastPathComponent] stringByDeletingPathExtension];
+	NSString *domain = aStringsFile.lastPathComponent.stringByDeletingPathExtension;
 	
 	someLocalizationTables[domain] = plist;
 }
@@ -83,7 +82,7 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 
 	if ([localization isEqualToString: bundle.developmentLocalization])
 	{
-		NSString *baseDirectory = [[bundle resourcePath]
+		NSString *baseDirectory = [bundle.resourcePath
 			stringByAppendingPathComponent: [@"Base" stringByAppendingPathExtension: @"lproj"]];
 		
 		if ([fileManager fileExistsAtPath: baseDirectory isDirectory: &isDir] && isDir)
@@ -91,7 +90,7 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 			lang = @"Base";
 		}
 	}
-	return [[bundle resourcePath] stringByAppendingPathComponent:
+	return [bundle.resourcePath stringByAppendingPathComponent:
 		[lang stringByAppendingPathExtension: @"lproj"]];
 }
 
@@ -105,7 +104,7 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 	   (it doesn't link the CoreObject framework) */
 	NSBundle *coreObjectBundle = [NSBundle bundleForClass: self];
 	NSArray *bundles =
-		[A([NSBundle mainBundle], coreObjectBundle) arrayByAddingObjectsFromArray: [NSBundle allFrameworks]];
+		[@[[NSBundle mainBundle], coreObjectBundle] arrayByAddingObjectsFromArray: [NSBundle allFrameworks]];
 
 	for (NSBundle *bundle in bundles)
 	{
@@ -131,8 +130,8 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 				return [localizedDirectory stringByAppendingPathComponent: subpath];
 			}];
 
-			[commitsFiles addObjectsFromArray: [localizedFiles pathsMatchingExtensions: A(@"json")]];
-			[stringsFiles addObjectsFromArray: [localizedFiles pathsMatchingExtensions: A(@"strings")]];
+			[commitsFiles addObjectsFromArray: [localizedFiles pathsMatchingExtensions: @[@"json"]]];
+			[stringsFiles addObjectsFromArray: [localizedFiles pathsMatchingExtensions: @[@"strings"]]];
 		}
 	}
 	
@@ -214,31 +213,31 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 	INVALIDARG_EXCEPTION_TEST(aDescriptor, [aDescriptor domain] != nil);
 	INVALIDARG_EXCEPTION_TEST(aDescriptor, [[aDescriptor domain] isEqual: [aDescriptor identifier]]);
 
-	[descriptorTable setObject: aDescriptor forKey: [aDescriptor identifier]];
+	descriptorTable[aDescriptor.identifier] = aDescriptor;
 }
 
 + (COCommitDescriptor *) registeredDescriptorForIdentifier: (NSString *)anIdentifier
 {
 	NILARG_EXCEPTION_TEST(anIdentifier);
 
-	return [descriptorTable objectForKey: anIdentifier];
+	return descriptorTable[anIdentifier];
 }
 
-- (id)initWithIdentifier: (NSString *)anId
+- (instancetype)initWithIdentifier: (NSString *)anId
             propertyList: (NSDictionary *)plist
 {
 	SUPERINIT;
 	_identifier = anId;
-	_type = [plist objectForKey: @"type"];
-	_shortDescription = [plist objectForKey: @"shortDescription"];
+	_type = plist[@"type"];
+	_shortDescription = plist[@"shortDescription"];
 	return self;
 }
 
 - (NSString *)description
 {
-	return [D([self identifier], kCOCommitMetadataIdentifier,
-	          [self typeDescription], kCOCommitMetadataTypeDescription,
-	          [self shortDescription], kCOCommitMetadataShortDescription) description];
+	return @{ kCOCommitMetadataIdentifier: self.identifier,
+	          kCOCommitMetadataTypeDescription: self.typeDescription,
+	          kCOCommitMetadataShortDescription: self.shortDescription }.description;
 }
 											
 - (NSString *)domain
@@ -248,14 +247,14 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 
 	/* Trim property suffix if present (e.g. /shortDescription) */
 
-	NSArray *components = [[self identifier] componentsSeparatedByString: @"/"];
-	ETAssert([components count] == 1 || [components count] == 2);
-	NSString *idMinusProperty = [components firstObject];
+	NSArray *components = [self.identifier componentsSeparatedByString: @"/"];
+	ETAssert(components.count == 1 || components.count == 2);
+	NSString *idMinusProperty = components.firstObject;
 
 	/* Trim operation suffix (e.g. .rename) */
 
 	NSArray *subcomponents = [idMinusProperty componentsSeparatedByString: @"."];
-	NSRange domainRange = NSMakeRange(0, [subcomponents count] - 1);
+	NSRange domainRange = NSMakeRange(0, subcomponents.count - 1);
 	NSString *domain =
 		[[subcomponents subarrayWithRange: domainRange] componentsJoinedByString: @"."];
 	
@@ -264,20 +263,20 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 
 - (NSString *)name
 {
-	return [[[self identifier] componentsSeparatedByString: @"."] lastObject];
+	return [self.identifier componentsSeparatedByString: @"."].lastObject;
 }
 
 - (NSString *)typeDescription
 {
-	return [descriptorTypeTable objectForKey: [self type]];
+	return descriptorTypeTable[self.type];
 }
 
 - (NSString *)localizedTypeDescription
 {
 	NSString *localizationKey =
-		[NSString stringWithFormat: @"types/%@/TypeDescription", [self type]];
+		[NSString stringWithFormat: @"types/%@/TypeDescription", self.type];
 	return [self localizedStringForKey: localizationKey
-	                             value: [self typeDescription]
+	                             value: self.typeDescription
 	                         arguments: nil];
 }
 
@@ -303,10 +302,10 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 - (NSString *)localizedShortDescriptionWithArguments: (NSArray *)args
 {
 	NSString *localizationKey =
-		[NSString stringWithFormat: @"descriptors/%@/ShortDescription", [self name]];
+		[NSString stringWithFormat: @"descriptors/%@/ShortDescription", self.name];
 
 	return [self localizedStringForKey: localizationKey
-	                             value: [self shortDescription]
+	                             value: self.shortDescription
 	                         arguments: [self localizedArgumentsFromArguments: args]];
 }
 

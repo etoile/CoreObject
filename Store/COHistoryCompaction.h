@@ -46,7 +46,7 @@
  *
  * To attempt finalizing all persistent roots, return -compactablePersistentRootUUIDs.
  */
-@property (nonatomic, readonly) NSSet *finalizablePersistentRootUUIDs;
+@property (nonatomic, readonly, copy) NSSet *finalizablePersistentRootUUIDs;
 /**
  * The persistent roots to be kept when compacting the history, but whose 
  * branches and revisions can be deleted.
@@ -57,7 +57,7 @@
  * If some of these persistent roots are returned among -finalizablePersistentRootUUIDs,
  * they will be finalized if marked as deleted, or compacted otherwise.
  */
-@property (nonatomic, readonly) NSSet *compactablePersistentRootUUIDs;
+@property (nonatomic, readonly, copy) NSSet *compactablePersistentRootUUIDs;
 
 
 /** @taskunit Branch Status */
@@ -73,7 +73,7 @@
  *
  * To attempt finalizing all branches, return -compactableBranchUUIDs.
  */
-@property (nonatomic, readonly) NSSet *finalizableBranchUUIDs;
+@property (nonatomic, readonly, copy) NSSet *finalizableBranchUUIDs;
 /**
  * The branches to be kept when compacting the history, but whose revisions can 
  * be deleted.
@@ -84,7 +84,7 @@
  * If some of these branches are returned among -finalizableBranchUUIDs and end
  * up being finalized, they will be ignored.
  */
-@property (nonatomic, readonly) NSSet *compactableBranchUUIDs;
+@property (nonatomic, readonly, copy) NSSet *compactableBranchUUIDs;
 
 
 /** @taskunit Revision Status */

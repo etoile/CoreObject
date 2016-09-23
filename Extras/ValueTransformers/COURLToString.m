@@ -26,7 +26,7 @@
 
 	NSParameterAssert([value isKindOfClass: [NSURL class]]);
 
-	return [(NSURL *)value absoluteString];
+	return ((NSURL *)value).absoluteString;
 }
 
 - (id)reverseTransformedValue: (id)value

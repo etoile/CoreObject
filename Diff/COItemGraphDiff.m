@@ -30,15 +30,15 @@
 - (NSSet *) editsForUUID: (ETUUID *)aUUID attribute: (NSString *)aString;
 - (void) addEdit: (COItemGraphEdit *)anEdit;
 - (void) removeEdit: (COItemGraphEdit *)anEdit;
-- (NSSet *)allEditedUUIDs;
-- (NSSet *)allEdits;
+@property (nonatomic, readonly) NSSet *allEditedUUIDs;
+@property (nonatomic, readonly) NSSet *allEdits;
 
 @end
 
 
 @implementation CODiffDictionary
 
-- (id) init
+- (instancetype) init
 {
 	SUPERINIT;
 	diffDictStorage = [[NSMutableSet alloc] init];
@@ -68,9 +68,9 @@
 	NSMutableSet *result = [NSMutableSet set];
 	for (COItemGraphEdit *edit in diffDictStorage)
 	{
-		if ([[edit UUID] isEqual: aUUID])
+		if ([edit.UUID isEqual: aUUID])
 		{
-			[result addObject: [edit attribute]];
+			[result addObject: edit.attribute];
 		}
 	}
 	return [NSSet setWithSet: result];
@@ -81,7 +81,7 @@
 	NSMutableSet *result = [NSMutableSet set];
 	for (COItemGraphEdit *edit in diffDictStorage)
 	{
-		if ([[edit UUID] isEqual: aUUID] && [[edit attribute] isEqual: aString])
+		if ([edit.UUID isEqual: aUUID] && [edit.attribute isEqual: aString])
 		{
 			[result addObject: edit];
 		}
@@ -94,7 +94,7 @@
 	NSMutableSet *result = [NSMutableSet set];
 	for (COItemGraphEdit *edit in diffDictStorage)
 	{
-		if ([[edit UUID] isEqual: aUUID])
+		if ([edit.UUID isEqual: aUUID])
 		{
 			[result addObject: edit];
 		}
@@ -117,7 +117,7 @@
 	NSMutableSet *result = [NSMutableSet set];
 	for (COItemGraphEdit *edit in diffDictStorage)
 	{
-		[result addObject: [edit UUID]];
+		[result addObject: edit.UUID];
 	}
 	return [NSSet setWithSet: result];
 }
@@ -132,7 +132,7 @@
 
 @implementation COItemGraphConflict
 
-- (id) initWithParentDiff: (COItemGraphDiff *)aParent
+- (instancetype) initWithParentDiff: (COItemGraphDiff *)aParent
 {
 	SUPERINIT;
 	
@@ -149,9 +149,8 @@
 	aCopy->editsForSourceIdentifier = [[NSMutableDictionary alloc] init];
 	for (id aSource in editsForSourceIdentifier)
 	{
-		NSMutableSet *aSet = [editsForSourceIdentifier objectForKey: aSource];
-		[aCopy->editsForSourceIdentifier setObject: [NSMutableSet setWithSet: aSet]
-											forKey: aSource];
+		NSMutableSet *aSet = editsForSourceIdentifier[aSource];
+		aCopy->editsForSourceIdentifier[aSource] = [NSMutableSet setWithSet: aSet];
 	}
 	
 	return aCopy;
@@ -165,7 +164,7 @@
 
 - (NSSet *) sourceIdentifiers
 {
-	return [NSSet setWithArray: [editsForSourceIdentifier allKeys]];
+	return [NSSet setWithArray: editsForSourceIdentifier.allKeys];
 }
 
 /**
@@ -175,13 +174,13 @@
  */
 - (NSSet *) editsForSourceIdentifier: (id)anIdentifier
 {
-	return [editsForSourceIdentifier objectForKey: anIdentifier];
+	return editsForSourceIdentifier[anIdentifier];
 }
 
 - (NSSet *) allEdits
 {
 	NSMutableSet *result = [NSMutableSet set];
-	for (NSSet *edits in [editsForSourceIdentifier allValues])
+	for (NSSet *edits in editsForSourceIdentifier.allValues)
 	{
 		[result unionSet: edits];
 	}
@@ -193,7 +192,7 @@
  */
 - (void) removeEdit: (COItemGraphEdit *)anEdit
 {
-	for (NSMutableSet *edits in [editsForSourceIdentifier allValues])
+	for (NSMutableSet *edits in editsForSourceIdentifier.allValues)
 	{
 		if ([edits containsObject: anEdit])
 		{
@@ -207,11 +206,11 @@
  */
 - (void) addEdit: (COItemGraphEdit *)anEdit
 {
-	NSMutableSet *set = [editsForSourceIdentifier objectForKey: [anEdit sourceIdentifier]];
+	NSMutableSet *set = editsForSourceIdentifier[anEdit.sourceIdentifier];
 	if (nil == set)
 	{
 		set = [NSMutableSet set];
-		[editsForSourceIdentifier setObject: set forKey: [anEdit sourceIdentifier]];
+		editsForSourceIdentifier[anEdit.sourceIdentifier] = set;
 	}
 	[set addObject: anEdit];
 }
@@ -222,8 +221,8 @@
  */
 - (BOOL) isNonconflicting
 {
-	NSSet *allEdits = [self allEdits];
-	if ([allEdits count] > 0)
+	NSSet *allEdits = self.allEdits;
+	if (allEdits.count > 0)
 	{
 		COItemGraphEdit *referenceEdit = [allEdits anyObject];
 		for (COItemGraphEdit *edit in allEdits)
@@ -237,11 +236,11 @@
 
 - (NSString *)description
 {
-	NSMutableString *desc = [NSMutableString stringWithString: [super description]];
+	NSMutableString *desc = [NSMutableString stringWithString: super.description];
 	[desc appendFormat: @" {\n"];
-	for (COItemGraphEdit *edit in [self allEdits])
+	for (COItemGraphEdit *edit in self.allEdits)
 	{
-		[desc appendFormat: @"\t%@\n", [edit description]];
+		[desc appendFormat: @"\t%@\n", edit.description];
 	}
  	[desc appendFormat: @"}"];
 	return desc;
@@ -256,7 +255,7 @@
 
 #pragma mark other stuff
 
-- (id) initWithOldRootUUID: (ETUUID*)anOldRoot
+- (instancetype) initWithOldRootUUID: (ETUUID*)anOldRoot
 			   newRootUUID: (ETUUID*)aNewRoot
 {
 	SUPERINIT;
@@ -352,11 +351,11 @@
 					insertedObjects: (id)anArray
 						   userInfo: (id)info
 {
-	COSequenceInsertion *op = [[COSequenceInsertion alloc] initWithUUID: [info objectForKey: @"UUID"]
-															  attribute: [info objectForKey: @"attribute"]
-													   sourceIdentifier: [info objectForKey: @"sourceIdentifier"]
+	COSequenceInsertion *op = [[COSequenceInsertion alloc] initWithUUID: info[@"UUID"]
+															  attribute: info[@"attribute"]
+													   sourceIdentifier: info[@"sourceIdentifier"]
 															   location: aLocation
-																   type: [[info objectForKey: @"type"] intValue]
+																   type: [info[@"type"] intValue]
 																objects: anArray];
 	[self addEdit: op];
 }
@@ -364,9 +363,9 @@
 - (void)recordDeletionWithRange: (NSRange)aRange
 					   userInfo: (id)info
 {
-	COSequenceDeletion *op = [[COSequenceDeletion alloc] initWithUUID: [info objectForKey: @"UUID"]
-															attribute: [info objectForKey: @"attribute"]
-													 sourceIdentifier: [info objectForKey: @"sourceIdentifier"]
+	COSequenceDeletion *op = [[COSequenceDeletion alloc] initWithUUID: info[@"UUID"]
+															attribute: info[@"attribute"]
+													 sourceIdentifier: info[@"sourceIdentifier"]
 																range: aRange];
 	[self addEdit: op];
 }
@@ -375,11 +374,11 @@
 					insertedObjects: (id)anArray
 						   userInfo: (id)info
 {
-	COSequenceModification *op = [[COSequenceModification alloc] initWithUUID: [info objectForKey: @"UUID"]
-																	attribute: [info objectForKey: @"attribute"]
-															 sourceIdentifier: [info objectForKey: @"sourceIdentifier"]
+	COSequenceModification *op = [[COSequenceModification alloc] initWithUUID: info[@"UUID"]
+																	attribute: info[@"attribute"]
+															 sourceIdentifier: info[@"sourceIdentifier"]
 																		range: aRange
-																		 type: [[info objectForKey: @"type"] intValue]
+																		 type: [info[@"type"] intValue]
 																	  objects: anArray];
 	[self addEdit: op];
 }
@@ -438,7 +437,7 @@
 	}
 	else if (COTypeIsMultivalued(type) && COTypeIsOrdered(type))
 	{
-		CODiffArrays(valueA, valueB, self, D(itemUUID, @"UUID", anAttribute, @"attribute", aSource, @"sourceIdentifier", @(type), @"type"));
+		CODiffArrays(valueA, valueB, self, @{ @"UUID": itemUUID, @"attribute": anAttribute, @"sourceIdentifier": aSource, @"type": @(type) });
 	}
 	else
 	{
@@ -455,21 +454,21 @@
 	NILARG_EXCEPTION_TEST(itemB);
 	
 	if (itemA != nil 
-		&& ![[itemA UUID] isEqual: [itemB UUID]])
+		&& ![itemA.UUID isEqual: itemB.UUID])
 	{
 		[NSException raise: NSInvalidArgumentException format: @"expected same UUID"];
 	}
 	
-	ETUUID *uuid = [itemB UUID];
+	ETUUID *uuid = itemB.UUID;
 	
-	NSMutableSet *removedAttrs = [NSMutableSet setWithArray: [itemA attributeNames]]; // itemA may be nil => may be empty set
-	[removedAttrs minusSet: [NSSet setWithArray: [itemB attributeNames]]];
+	NSMutableSet *removedAttrs = [NSMutableSet setWithArray: itemA.attributeNames]; // itemA may be nil => may be empty set
+	[removedAttrs minusSet: [NSSet setWithArray: itemB.attributeNames]];
 	
-	NSMutableSet *addedAttrs = [NSMutableSet setWithArray: [itemB attributeNames]];
-	[addedAttrs minusSet: [NSSet setWithArray: [itemA attributeNames]]];
+	NSMutableSet *addedAttrs = [NSMutableSet setWithArray: itemB.attributeNames];
+	[addedAttrs minusSet: [NSSet setWithArray: itemA.attributeNames]];
 	
-	NSMutableSet *commonAttrs = [NSMutableSet setWithArray: [itemB attributeNames]];
-	[commonAttrs intersectSet: [NSSet setWithArray: [itemA attributeNames]]];
+	NSMutableSet *commonAttrs = [NSMutableSet setWithArray: itemB.attributeNames];
+	[commonAttrs intersectSet: [NSSet setWithArray: itemA.attributeNames]];
 	
 	
 	// process 'insert attribute's
@@ -528,7 +527,7 @@
 					withItemTree: (COItemGraph *)b
                 sourceIdentifier: (id)aSource
 {
-	return [self diffItemUUIDs: [b itemUUIDs]
+	return [self diffItemUUIDs: b.itemUUIDs
 					 fromGraph: a
 					   toGraph: b
 			  sourceIdentifier: aSource];
@@ -542,8 +541,8 @@
 	NILARG_EXCEPTION_TEST(a);
 	NILARG_EXCEPTION_TEST(b);
 	
-	COItemGraphDiff *result = [[self alloc] initWithOldRootUUID: [a rootItemUUID]
-													newRootUUID: [b rootItemUUID]];
+	COItemGraphDiff *result = [[self alloc] initWithOldRootUUID: a.rootItemUUID
+													newRootUUID: b.rootItemUUID];
 	
 	for (ETUUID *aUUID in uuids)
 	{
@@ -558,11 +557,11 @@
 
 - (NSString *)description
 {
-	NSMutableString *desc = [NSMutableString stringWithString: [super description]];
+	NSMutableString *desc = [NSMutableString stringWithString: super.description];
 	[desc appendFormat: @" {\n"];
-	for (COItemGraphEdit *edit in [self allEdits])
+	for (COItemGraphEdit *edit in self.allEdits)
 	{
-		[desc appendFormat: @"\t%@\n", [edit description]];
+		[desc appendFormat: @"\t%@\n", edit.description];
 	}
  	[desc appendFormat: @"}"];
 	return desc;
@@ -570,7 +569,7 @@
 
 static void COAssertEditsEquivelant(NSSet *edits)
 {
-	if ([edits count] > 0)
+	if (edits.count > 0)
 	{
 		COItemGraphEdit *anyEdit = [edits anyObject];
 		for (COItemGraphEdit *edit in edits)
@@ -607,16 +606,16 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	if ([anyEdit isKindOfClass: [COSetAttribute class]])
 	{
 		COAssertEditsEquivelant(edits);
-		[anItem setValue: [(COSetAttribute *)anyEdit value]
-			forAttribute: [anyEdit attribute]
-					type: [(COSetAttribute *)anyEdit type]];
+		[anItem setValue: ((COSetAttribute *)anyEdit).value
+			forAttribute: anyEdit.attribute
+					type: ((COSetAttribute *)anyEdit).type];
 		return;
 	}
 	
 	if ([anyEdit isKindOfClass: [CODeleteAttribute class]])
 	{
 		COAssertEditsEquivelant(edits);
-		[anItem removeValueForAttribute: [anyEdit attribute]];
+		[anItem removeValueForAttribute: anyEdit.attribute];
 		return;
 	}
 	
@@ -625,17 +624,17 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	if ([anyEdit isKindOfClass: [COSetInsertion class]] || 
 		[anyEdit isKindOfClass: [COSetDeletion class]])
 	{
-		NSMutableSet *newSet = [NSMutableSet setWithSet: [anItem valueForAttribute: [anyEdit attribute]]];
+		NSMutableSet *newSet = [NSMutableSet setWithSet: [anItem valueForAttribute: anyEdit.attribute]];
 		
 		for (COItemGraphEdit *edit in edits)
 		{
 			if ([edit isMemberOfClass: [COSetInsertion class]])
 			{
-				[newSet addObject: [(COSetInsertion *)edit object]];
+				[newSet addObject: ((COSetInsertion *)edit).object];
 			}
 			else if ([edit isMemberOfClass: [COSetDeletion class]])
 			{
-				[newSet removeObject: [(COSetDeletion *)edit object]];
+				[newSet removeObject: ((COSetDeletion *)edit).object];
 			}
 			else
 			{
@@ -645,8 +644,8 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 		}
 		
 		[anItem setValue: newSet
-			forAttribute: [anyEdit attribute]
-					type: [anItem typeForAttribute: [anyEdit attribute]]];
+			forAttribute: anyEdit.attribute
+					type: [anItem typeForAttribute: anyEdit.attribute]];
 		return;
 	}
 	
@@ -656,7 +655,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	{
         // Assert they are all sequence edits
         
-		for (COItemGraphEdit *edit in [edits allObjects])
+		for (COItemGraphEdit *edit in edits.allObjects)
 		{
 			if (![edit isKindOfClass: [COSequenceEdit class]])
 			{
@@ -665,13 +664,13 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 			}
 		}
         
-        NSArray *editsUnsorted = [edits allObjects];
-        NSArray *originalArray = [anItem valueForAttribute: [anyEdit attribute]];
+        NSArray *editsUnsorted = edits.allObjects;
+        NSArray *originalArray = [anItem valueForAttribute: anyEdit.attribute];
         NSArray *newArray = COArrayByApplyingEditsToArray(originalArray, editsUnsorted);
         
         [anItem setValue: newArray
-            forAttribute: [anyEdit attribute]
-                    type: [anItem typeForAttribute: [anyEdit attribute]]];
+            forAttribute: anyEdit.attribute
+                    type: [anItem typeForAttribute: anyEdit.attribute]];
 
 		return;
 	}
@@ -699,13 +698,13 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	 
 	 */
     
-	if (![[dest rootItemUUID] isEqual: oldRoot])
+	if (![dest.rootItemUUID isEqual: oldRoot])
 	{
 		[NSException raise: NSInvalidArgumentException
-					format: @"diff was created from a subtree with UUID %@ and being applied to a subtree with UUID %@", oldRoot, [dest rootItemUUID]];
+					format: @"diff was created from a subtree with UUID %@ and being applied to a subtree with UUID %@", oldRoot, dest.rootItemUUID];
 	}
 	
-	if ([self hasConflicts])
+	if (self.hasConflicts)
 	{
 		[NSException raise: NSInvalidArgumentException
 					format: @"resolve conflicts before applying diff"];
@@ -715,7 +714,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
     
 	// apply all of the edits
 	
-	for (ETUUID *modifiedUUID in [diffDict allEditedUUIDs])
+	for (ETUUID *modifiedUUID in diffDict.allEditedUUIDs)
 	{
 		COMutableItem *item = [[dest itemForUUID: modifiedUUID] mutableCopy];
 		
@@ -727,7 +726,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 		for (NSString *modifiedAttribute in [diffDict modifiedAttributesForUUID: modifiedUUID])
 		{
 			NSSet *edits = [diffDict editsForUUID: modifiedUUID attribute: modifiedAttribute];
-			assert([edits count] > 0);
+			assert(edits.count > 0);
             
 			COApplyEditsToMutableItem(edits, item);
 		}
@@ -741,13 +740,13 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 - (BOOL) applyTo: (id<COItemGraph>)dest
 {
 	NSDictionary *insertedOrUpdated = [self addedOrUpdatedItemsForApplyingTo: dest];
-    [dest insertOrUpdateItems: [insertedOrUpdated allValues]];
+    [dest insertOrUpdateItems: insertedOrUpdated.allValues];
 	return ![insertedOrUpdated isEmpty];
 }
 
 - (BOOL) isEmpty
 {
-	return [[self allEdits] isEmpty];
+	return [self.allEdits isEmpty];
 }
 
 - (COItemGraph *) itemTreeWithDiffAppliedToItemGraph: (id<COItemGraph>)aGraph
@@ -766,7 +765,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 					format: @"for now, merging subtree diffs with conflicting changes to the root UUID of the tree is unsupported."];
 	}	
 	
-	for (COItemGraphEdit *edit in [other allEdits])
+	for (COItemGraphEdit *edit in other.allEdits)
 	{
 		[self addEdit: edit];
 	}
@@ -781,9 +780,9 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 - (BOOL) hasConflicts
 {	
-	for (COItemGraphConflict *conflict in [self conflicts])
+	for (COItemGraphConflict *conflict in self.conflicts)
 	{
-		if (![conflict isNonconflicting])
+		if (!conflict.nonconflicting)
 			return YES;
 	}
 	return NO;
@@ -793,7 +792,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 - (NSSet *)allEdits
 {
-	return [diffDict allEdits];
+	return diffDict.allEdits;
 }
 - (NSSet *)conflicts
 {
@@ -813,7 +812,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 - (NSSet *)modifiedItemUUIDs
 {
-	return [diffDict allEditedUUIDs];
+	return diffDict.allEditedUUIDs;
 }
 - (NSSet *) modifiedAttributesForUUID: (ETUUID *)aUUID
 {
@@ -844,7 +843,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
  */
 - (void) removeConflict: (COItemGraphConflict *)aConflict
 {
-	for (COItemGraphEdit *edit in [aConflict allEdits])
+	for (COItemGraphEdit *edit in aConflict.allEdits)
 	{
 		[self removeEdit: edit isRemovingConflict: YES];
 	}
@@ -861,7 +860,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	
 	for (COItemGraphConflict *aConflict in aSet)
 	{
-		if ([[aConflict allEdits] containsObject: existingEdit])
+		if ([aConflict.allEdits containsObject: existingEdit])
 		{
 			conflict = aConflict;
 			break;
@@ -958,8 +957,8 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 	// check for existing edits for that same attribute
 	
-	NSMutableSet *existingEditsForSameAttribute = [NSMutableSet setWithSet: [diffDict editsForUUID: [anEdit UUID]
-																						 attribute: [anEdit attribute]]];
+	NSMutableSet *existingEditsForSameAttribute = [NSMutableSet setWithSet: [diffDict editsForUUID: anEdit.UUID
+																						 attribute: anEdit.attribute]];
 	
 	NSAssert([existingEditsForSameAttribute containsObject: anEdit], @"expected argument to _updateConflictsForAddingEdit to have been already inserted.");
 	
@@ -968,7 +967,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	// Now the set truly contains only the existing edits, minus the one just inserted, anEdit.
 	
 	
-	if ([existingEditsForSameAttribute count] > 0)
+	if (existingEditsForSameAttribute.count > 0)
 	{
 		// first, check for the existing edits being of a different type (automatic conflict)
 		
@@ -1028,12 +1027,12 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 	// check for same inner item inserted in more than one place
 	
-	NSSet *anEditInnerItemInsertions = [anEdit insertedInnerItemUUIDs];
-	for (COItemGraphEdit *edit in [self allEdits])
+	NSSet *anEditInnerItemInsertions = anEdit.insertedInnerItemUUIDs;
+	for (COItemGraphEdit *edit in self.allEdits)
 	{
 		if (![edit isEqual: anEdit])
 		{
-			NSSet *editInnerItemInsertions = [edit insertedInnerItemUUIDs];
+			NSSet *editInnerItemInsertions = edit.insertedInnerItemUUIDs;
 			if ([anEditInnerItemInsertions intersectsSet: editInnerItemInsertions])
 			{
 				// edit and anEdit conflict! create a new conflict or update an existing one.
@@ -1052,9 +1051,9 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 - (void) _updateConflictsForRemovingEdit: (COItemGraphEdit *)anEdit isRemovingConflict: (BOOL)isRemovingConflict
 {
-	for (COItemGraphConflict *conflict in [self conflicts])
+	for (COItemGraphConflict *conflict in self.conflicts)
 	{
-		for (COItemGraphEdit *edit in [conflict allEdits])
+		for (COItemGraphEdit *edit in conflict.allEdits)
 		{
 			if (edit == anEdit)
 			{
@@ -1068,11 +1067,11 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 	if (isRemovingConflict)
 		return;
 
-	for (COItemGraphConflict *conflict in [self conflicts])
+	for (COItemGraphConflict *conflict in self.conflicts)
 	{
-		if ([conflict allEdits].count <= 1)
+		if (conflict.allEdits.count <= 1)
 		{
-			id edit = [conflict allEdits].anyObject;
+			id edit = conflict.allEdits.anyObject;
 			// Will call -removeEdit: and -_updateConflictsForRemovingEdit:,
 			// we don't want to add the edits back when we reenter the current
 			// method, but wait until -removeConflict: returns, that's why we
@@ -1102,7 +1101,7 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
 - (void) resolveConflictsFavoringSourceIdentifier: (NSString*)anIdentifier
 {
-    for (COItemGraphConflict *conflict in [self conflicts])
+    for (COItemGraphConflict *conflict in self.conflicts)
     {
         NSSet *edits = [NSSet setWithSet: [conflict editsForSourceIdentifier: anIdentifier]];
         [self removeConflict: conflict];

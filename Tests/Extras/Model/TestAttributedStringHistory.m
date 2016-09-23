@@ -27,12 +27,12 @@
 		[track clear];
 		
 		COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COAttributedString"];
-		COAttributedStringWrapper *as = [[COAttributedStringWrapper alloc] initWithBacking: [proot rootObject]];
-		[[as mutableString] appendString: @"x"];
+		COAttributedStringWrapper *as = [[COAttributedStringWrapper alloc] initWithBacking: proot.rootObject];
+		[as.mutableString appendString: @"x"];
 		
 		{
-			COObjectGraphContext *graph = [proot objectGraphContext];
-			COAttributedString *root = [proot rootObject];
+			COObjectGraphContext *graph = proot.objectGraphContext;
+			COAttributedString *root = proot.rootObject;
 			COAttributedStringChunk *chunk0 = root.chunks[0];
 			
 			// Check that the object graph is correctly constructed
@@ -43,19 +43,19 @@
 			
 			// Check that the proper objects are marked as updated and inserted
 			
-			UKObjectsEqual(S(root.UUID, chunk0.UUID), [graph insertedObjectUUIDs]);
+			UKObjectsEqual(S(root.UUID, chunk0.UUID), graph.insertedObjectUUIDs);
 		}
 		
 		[ctx commit];
 		
 		[as appendAttributedString: [self html: @"<u>y</u>"]];
-		UKObjectsEqual(@"xy", [as string]);
+		UKObjectsEqual(@"xy", as.string);
 		[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(1,1) inAttributedString: as];
 		
 		
 		{
-			COObjectGraphContext *graph = [proot objectGraphContext];
-			COAttributedString *root = [proot rootObject];
+			COObjectGraphContext *graph = proot.objectGraphContext;
+			COAttributedString *root = proot.rootObject;
 			COAttributedStringChunk *chunk0 = root.chunks[0];
 			COAttributedStringChunk *chunk1 = root.chunks[1];
 
@@ -69,7 +69,7 @@
 			
 			UKObjectsEqual(@"x", chunk0.text);
 			UKObjectsEqual(@"y", chunk1.text);
-			UKIntsEqual(2, [root.chunks count]);
+			UKIntsEqual(2, root.chunks.count);
 	
 			// Check that chunk0 has no underline attribute, and chunk1 does
 			UKTrue([[chunk0.attributes filteredCollectionWithBlock: underlineAttributesFilter] isEmpty]);
@@ -82,11 +82,11 @@
 		
 		[track undo];
 		
-		UKObjectsEqual(@"x", [as string]);
+		UKObjectsEqual(@"x", as.string);
 		
 		[track redo];
 		
-		UKObjectsEqual(@"xy", [as string]);
+		UKObjectsEqual(@"xy", as.string);
 		[self checkAttribute: NSUnderlineStyleAttributeName hasValue: @(NSUnderlineStyleSingle) withLongestEffectiveRange: NSMakeRange(1,1) inAttributedString: as];
 	}
 }

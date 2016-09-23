@@ -60,7 +60,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	                                 editingContext: aContext];
 }
 
-- (id) initWithName: (NSString *)aName
+- (instancetype) initWithName: (NSString *)aName
      editingContext: (COEditingContext *)aContext
 {
     SUPERINIT;
@@ -91,7 +91,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 
 - (BOOL)canUndo
 {
-	return [[self currentNode] parentNode] != nil;
+	return [self currentNode].parentNode != nil;
 }
 
 - (BOOL)canRedo
@@ -111,7 +111,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 
 - (id <COTrackNode>)nextNodeOnTrackFrom: (id <COTrackNode>)aNode backwards: (BOOL)back
 {
-	NSInteger nodeIndex = [[self nodes] indexOfObject: aNode];
+	NSInteger nodeIndex = [self.nodes indexOfObject: aNode];
 	
 	if (nodeIndex == NSNotFound)
 	{
@@ -127,13 +127,13 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		nodeIndex++;
 	}
 	
-	BOOL hasNoPreviousOrNextNode = (nodeIndex < 0 || nodeIndex >= [[self nodes] count]);
+	BOOL hasNoPreviousOrNextNode = (nodeIndex < 0 || nodeIndex >= self.nodes.count);
 	
 	if (hasNoPreviousOrNextNode)
 	{
 		return nil;
 	}
-	return [[self nodes] objectAtIndex: nodeIndex];
+	return self.nodes[nodeIndex];
 }
 
 #pragma mark - Track Protocol - Primitive Methods
@@ -227,7 +227,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 - (NSArray *) nodesFromNode: (id <COTrackNode>)node toTargetNode: (id <COTrackNode>)targetNode
 {
 	NSMutableArray *result = [NSMutableArray new];
-	for (id <COTrackNode> temp = targetNode; temp != nil; temp = [temp parentNode])
+	for (id <COTrackNode> temp = targetNode; temp != nil; temp = temp.parentNode)
 	{
 		if ([temp isEqual: node])
 		{
@@ -298,7 +298,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	// the receiver name with -[COUndoTrackStore string:matchesGlobPattern:].
 	INVALIDARG_EXCEPTION_TEST(aNode, [((COCommandGroup *)aNode).trackName isEqual: self.name]);
 
-	COCommandGroup *command = [(COCommandGroup *)aNode inverse];
+	COCommandGroup *command = ((COCommandGroup *)aNode).inverse;
 	[command applyToContext: _editingContext];
 	
 	NSMutableDictionary *md = [aNode.metadata mutableCopy];
@@ -348,7 +348,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 {
 	ETAssert([aCommand isKindOfClass: [COCommandGroup class]]);
 
-	ETAssert([_trackStateForName count] <= 1);
+	ETAssert(_trackStateForName.count <= 1);
 	COUndoTrackState *state = _trackStateForName[_name];
 	
 	// Set ownership pointers (not parent UUID!)
@@ -370,7 +370,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	// Set aCommand's parent pointer
 	if (state.currentCommandUUID == nil)
 	{
-		aCommand.parentUUID = [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID];
+		aCommand.parentUUID = [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID;
 	}
 	else
 	{
@@ -398,7 +398,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		_lastCoalescedCommandUUID = aCommand.UUID;
 	}
 	
-	COUndoTrackSerializedCommand *serialized = [aCommand serializedCommand];
+	COUndoTrackSerializedCommand *serialized = aCommand.serializedCommand;
 	[self.store addCommand: serialized];
 	aCommand.sequenceNumber = serialized.sequenceNumber;
 	
@@ -440,7 +440,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	
 	NSSortDescriptor *descriptor = [NSSortDescriptor sortDescriptorWithKey: @"sequenceNumber"
 	                                                             ascending: YES];
-	return [[_commandsByUUID allValues] sortedArrayUsingDescriptors: @[descriptor]];
+	return [_commandsByUUID.allValues sortedArrayUsingDescriptors: @[descriptor]];
 }
 
 - (NSArray *) childrenOfNode: (id<COTrackNode>)aNode
@@ -448,7 +448,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	// TODO: Precompute this and cache in a dictionary?
 	
 	NSMutableArray *result = [NSMutableArray new];
-	for (COCommandGroup *command in [self allCommands])
+	for (COCommandGroup *command in self.allCommands)
 	{
 		if (aNode == [COEndOfUndoTrackPlaceholderNode sharedInstance])
 		{
@@ -457,7 +457,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		}
 		else
 		{
-			if ([command.parentUUID isEqual: [aNode UUID]])
+			if ([command.parentUUID isEqual: aNode.UUID])
 				[result addObject: command];
 		}
 	}
@@ -475,8 +475,8 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
         {
             return YES;
         }
-        rev = [[self commandForUUID: rev] parentUUID];
-		if ([rev isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
+        rev = [self commandForUUID: rev].parentUUID;
+		if ([rev isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID])
 			rev = nil;
     }
     return NO;
@@ -486,14 +486,14 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 {
 	NSMutableSet *ancestorUUIDsOfA = [NSMutableSet set];
 	
-	for (id<COTrackNode> temp = commitA; temp != nil; temp = [temp parentNode])
+	for (id<COTrackNode> temp = commitA; temp != nil; temp = temp.parentNode)
 	{
 		[ancestorUUIDsOfA addObject: temp.UUID];
 	}
 
-	ETAssert([ancestorUUIDsOfA containsObject: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+	ETAssert([ancestorUUIDsOfA containsObject: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
 
-	for (id<COTrackNode> temp = commitB; temp != nil; temp = [temp parentNode])
+	for (id<COTrackNode> temp = commitB; temp != nil; temp = temp.parentNode)
 	{
 		if ([ancestorUUIDsOfA containsObject: temp.UUID])
 		{
@@ -510,8 +510,8 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
  */
 - (void) undo: (NSArray *)undo1 redo: (NSArray *)redo1 undo: (NSArray *)undo2 redo: (NSArray *)redo2
 {
-	ETAssert([undo1 count] == 0 || [redo1 count] == 0);
-	ETAssert([undo2 count] == 0 || [redo2 count] == 0);
+	ETAssert(undo1.count == 0 || redo1.count == 0);
+	ETAssert(undo2.count == 0 || redo2.count == 0);
 	
 	COStoreTransaction *txn = [COStoreTransaction new];
 	
@@ -538,7 +538,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 - (void) commitStoreTransaction: (COStoreTransaction *)txn
 {
 	// Set the last transaction IDs so the store will accept our transaction
-	for (ETUUID *uuid in [txn persistentRootUUIDs])
+	for (ETUUID *uuid in txn.persistentRootUUIDs)
 	{
 		NSNumber *lastTransactionID = [_editingContext lastTransactionIDForPersistentRootUUID: uuid];
 		if (lastTransactionID != nil)
@@ -551,14 +551,14 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 		// notification mechanism will refresh the in-memory state
 	}
 	
-	BOOL ok = [[_editingContext store] commitStoreTransaction: txn];
+	BOOL ok = [_editingContext.store commitStoreTransaction: txn];
 	ETAssert(ok);
 }
 
 - (void) doCommand: (COCommandGroup *)aCommand inverse: (BOOL)inverse addToStoreTransaction: (COStoreTransaction *)txn
 {
-	COCommandGroup *commandToApply = (inverse ? [aCommand inverse] : aCommand);
-	[commandToApply setParentUndoTrack: self];
+	COCommandGroup *commandToApply = (inverse ? aCommand.inverse : aCommand);
+	commandToApply.parentUndoTrack = self;
 
 	NSMutableDictionary *md = [aCommand.metadata mutableCopy];
 	NSNumber *inversedValue = aCommand.metadata[kCOCommitMetadataUndoInitialBaseInversed];
@@ -582,7 +582,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	
 	// FIgure out the new current and head UUIDS
 	ETUUID *newCurrentNodeUUID = inverse ? aCommand.parentUUID : aCommand.UUID;
-	if ([newCurrentNodeUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
+	if ([newCurrentNodeUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID])
 		newCurrentNodeUUID = nil;
 	
 	ETUUID *newHeadNodeUUID;
@@ -628,7 +628,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	[self loadIfNeeded];
 	
 	NSMutableArray *potentialCurrentCommands = [NSMutableArray new];
-	for (COUndoTrackState *state in [_trackStateForName allValues])
+	for (COUndoTrackState *state in _trackStateForName.allValues)
 	{
 		if (state.currentCommandUUID != nil)
 		{
@@ -667,17 +667,17 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	[_nodesOnCurrentUndoBranch removeAllObjects];
 	
 	// Populate _nodesOnCurrentUndoBranch, from the head backwards
-	if ([_trackStateForName count] > 0)
+	if (_trackStateForName.count > 0)
 	{
 		NSMutableArray *undoNodes = [NSMutableArray new];
 		NSMutableArray *redoNodes = [NSMutableArray new];
 		
-		for (COUndoTrackState *trackState in [_trackStateForName allValues])
+		for (COUndoTrackState *trackState in _trackStateForName.allValues)
 		{
 			NSMutableArray *targetArray = redoNodes;
 			ETUUID *commandUUID = trackState.headCommandUUID;
 
-			while (commandUUID != nil && ![commandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]])
+			while (commandUUID != nil && ![commandUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID])
 			{
 				if ([commandUUID isEqual: trackState.currentCommandUUID])
 					targetArray = undoNodes;
@@ -752,7 +752,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 - (COCommandGroup *) commandForUUID:(ETUUID *)aUUID
 {
 	NILARG_EXCEPTION_TEST(aUUID);
-	ETAssert(![aUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+	ETAssert(![aUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
 	
 	COCommandGroup *command = _commandsByUUID[aUUID];
 	if (command == nil)
@@ -791,7 +791,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	}
 	else
 	{
-		shortDescription = [node localizedShortDescription];
+		shortDescription = node.localizedShortDescription;
 	}
 	
 	// TODO: Localize the "Undo" string
@@ -808,7 +808,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 	}
 	else
 	{
-		shortDescription = [node localizedShortDescription];
+		shortDescription = node.localizedShortDescription;
 	}
 	
 	// TODO: Localize the "Redo" string
@@ -819,7 +819,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
 
 - (void) storeTrackDidChange: (NSNotification *)notif
 {
-	NSDictionary *userInfo = [notif userInfo];
+	NSDictionary *userInfo = notif.userInfo;
 	COUndoTrackState *notifState = [COUndoTrackState new];
 	notifState.trackName = userInfo[COUndoTrackStoreTrackName];
 	if (userInfo[COUndoTrackStoreTrackHeadCommandUUID] != nil)
@@ -864,7 +864,7 @@ NSString * const kCOUndoTrackName = @"COUndoTrackName";
                                                       userInfo: userInfo];
     // FIXME: Implement distributed notification support
     //    [[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
-    //                                                                   object: [[self UUID] stringValue]
+    //                                                                   object: [self.UUID stringValue]
     //                                                                 userInfo: userInfo
     //                                                       deliverImmediately: NO];
 }
@@ -917,7 +917,7 @@ static BOOL coalesceOpPair(COCommand *op, COCommand *nextOp)
 
 static void coalesceOpsInternal(NSMutableArray *ops, NSUInteger i)
 {
-	if (i+1 >= [ops count])
+	if (i+1 >= ops.count)
 		return;
 	
 	if (coalesceOpPair(ops[i], ops[i+1]))
@@ -963,12 +963,12 @@ static void coalesceOps(NSMutableArray *ops)
 
 - (id)content
 {
-	return [self nodes];
+	return self.nodes;
 }
 
 - (NSArray *)contentArray
 {
-	return [NSArray arrayWithArray: [self nodes]];
+	return [NSArray arrayWithArray: self.nodes];
 }
 
 @end
@@ -997,7 +997,7 @@ static void coalesceOps(NSMutableArray *ops)
 - (void) recordCommand: (COCommand *)aCommand
 {
     [NSException raise: NSGenericException
-	            format: @"You can't push actions to a %@", [self className]];
+	            format: @"You can't push actions to a %@", self.className];
 }
 
 @end

@@ -139,7 +139,7 @@ Property Attributes
 
 - weak attribute must only be used if it corresponds to a weak ivar
 
-- readonly can be combined with copy or weak (see the rule before too)
+- readonly can be combined with strong and weak (see the rule before too)
 
 - weak and strong must be used for object properties in place of assign and 
 retain attributes
@@ -150,7 +150,7 @@ retain attributes
 
 - readwrite must be used for properties not declared as readonly
 
-- the ordering must be: atomicity, writability, memory-management
+- the ordering must be: atomicity, writability, memory-management, getter, setter
 
 ### Examples
 
@@ -159,6 +159,8 @@ retain attributes
 		@private
 		id __weak _owner;
 		id _owned;
+		NSMutableSet *_collection;
+		NSMutableSet *_container
 		NSString *_name;
 		NSDictionary *_elementsByName;
 		id relatedObject;
@@ -168,20 +170,29 @@ retain attributes
 	@property (nonatomic, readonly) id derivedOwner;
 	@property (nonatomic, readonly, strong) id owned;
 
+	@property (nonatomic, readonly) NSSet *collection;
+	@property (nonatomic, readonly, strong) NSMutableSet *container;
+
 	@property (nonatomic, readwrite, copy) NSString *name;
 	@property (nonatomic, readwrite, copy) NSDictionary *elementsByName;
 	@property (nonatomic, readwrite, strong) id relatedObject;
 
-	@property (nonatomic, readwrite, assign) BOOL success;
+	@property (nonatomic, readwrite, assign, getter=isEmpty) BOOL empty;
 
 - Invalid: @property (nonatomic, readonly, weak) id derivedOwner
 
 	- don't declare a weak or strong property when there is no _derivedOwner ivar
-	
+
+- Invalid: @property (nonatomic, readonly, strong) NSSet *collection
+
+	- don't declare a readonly property as strong when the returned value is a defensive copy or might be (if ivar and property types are not identical, this is usually the case)
+
 - Invalid: @property (nonatomic, readonly, copy) NSDictionary *elementsByName;
 
 	- don't declare a readonly property as copy (copy only describes if the 
-object is copied by the setter)
+object is copied by the setter), unless you are overriding a (readwrite, copy) property
+
+Note: for overriden properties, sometimes we have to break these rules to ensure the code compile without warnings or disable -Wproperty-attribute-mismatch with clang diagnostic pragma. For instance, NSObject.description is marked with copy, this implies COObject.description has to be marked as copy too, although copy is useless when no setter exists.
 
 
 Blocks

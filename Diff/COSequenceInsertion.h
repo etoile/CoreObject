@@ -9,11 +9,11 @@
 
 @interface COSequenceInsertion : COSequenceModification
 
-- (id) initWithUUID: (ETUUID *)aUUID
+- (instancetype) initWithUUID: (ETUUID *)aUUID
 		  attribute: (NSString *)anAttribute
    sourceIdentifier: (id)aSourceIdentifier
 		   location: (NSUInteger)aLocation
 			   type: (COType)aType
-			objects: (NSArray *)anArray;
+			objects: (NSArray *)anArray NS_DESIGNATED_INITIALIZER;
 
 @end

@@ -18,8 +18,8 @@
 	COMutableArray *_contents;
 }
 
-@property (nonatomic, readwrite) NSString *label;
-@property (nonatomic, readwrite) NSArray *contents;
+@property (nonatomic, readwrite, copy) NSString *label;
+@property (nonatomic, readwrite, copy) NSArray *contents;
 
 @end
 
@@ -59,7 +59,7 @@
 {
 	ETEntityDescription *entity = [self newBasicEntityDescription];
 	
-	if ([[entity name] isEqual: [TestObjectUpdateEntity className]] == NO)
+	if (![entity.name isEqual: [TestObjectUpdateEntity className]])
 		return entity;
 	
 	ETPropertyDescription *label =
@@ -132,8 +132,8 @@
 {
 	if ([keyPath isEqual: [self property]])
 	{
-		oldValue = [change objectForKey: NSKeyValueChangeOldKey];
-		newValue = [change objectForKey: NSKeyValueChangeNewKey];
+		oldValue = change[NSKeyValueChangeOldKey];
+		newValue = change[NSKeyValueChangeNewKey];
 		poster = anObject;
 		notificationCount++;
 	}
@@ -142,7 +142,7 @@
 - (id)init
 {
 	SUPERINIT;
-	object = [[ctx insertNewPersistentRootWithEntityName: [self entityName]] rootObject];
+	object = [ctx insertNewPersistentRootWithEntityName: [self entityName]].rootObject;
 	[object addObserver: self
 	         forKeyPath: [self property]
 	            options: NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
@@ -197,7 +197,7 @@
 
 - (void) testSetter
 {
-	[(TestObjectUpdateEntity *)object setLabel: [self newValue]];
+	((TestObjectUpdateEntity *)object).label = [self newValue];
 
 	[self validateUpdate];
 }
@@ -238,7 +238,7 @@
 
 - (void) testSetter
 {
-	[(OrderedAttributeModel *)object setContents: [self newValue]];
+	((OrderedAttributeModel *)object).contents = [self newValue];
 	
 	[self validateUpdate];
 }
@@ -325,7 +325,7 @@
 
 - (void) testSetter
 {
-	[(OrderedAttributeModel *)object setContents: [self newValue]];
+	((OrderedAttributeModel *)object).contents = [self newValue];
 	
 	[self validateUpdate];
 }
@@ -363,7 +363,7 @@
 
 + (void)addCityPropertyToEntity: (ETEntityDescription *)anEntity
 {
-	if (![[anEntity propertyDescriptionNames] containsObject: @"city"])
+	if (![anEntity.propertyDescriptionNames containsObject: @"city"])
 	{
 		ETEntityDescription *stringType =
 			[[ETModelDescriptionRepository mainRepository] descriptionForName: @"NSString"];

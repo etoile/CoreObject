@@ -55,7 +55,7 @@
 {
     ETEntityDescription *rootEntity = [ETEntityDescription descriptionWithName: @"RootEntity"];
 	ETEntityDescription *emptyEntity = [ETEntityDescription descriptionWithName: @"EmptyEntity"];
-	[emptyEntity setParent: (id)@"Anonymous.COObject"];
+	emptyEntity.parentName = @"COObject";
 
 	[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: rootEntity];
 	[[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: emptyEntity];
@@ -64,11 +64,11 @@
 	// Expected to fail because rootEntity does not declare COObject as its parent
 	UKRaisesException([[COObject alloc] initWithEntityDescription: rootEntity
 											   objectGraphContext: [COObjectGraphContext new]]);
-	UKRaisesException([ctx insertNewPersistentRootWithEntityName: @"Anonymous.RootEntity"]);
+	UKRaisesException([ctx insertNewPersistentRootWithEntityName: @"RootEntity"]);
 	
 	UKDoesNotRaiseException([[COObject alloc] initWithEntityDescription: emptyEntity
 													 objectGraphContext: [COObjectGraphContext new]]);
-	UKDoesNotRaiseException([ctx insertNewPersistentRootWithEntityName: @"Anonymous.EmptyEntity"]);
+	UKDoesNotRaiseException([ctx insertNewPersistentRootWithEntityName: @"EmptyEntity"]);
 }
 
 - (void) testInit
@@ -78,8 +78,8 @@
 
 - (void) testEquality
 {
-	COObject *object = [[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
-	COObject *otherObject = [[ctx insertNewPersistentRootWithEntityName: @"COObject"] rootObject];
+	COObject *object = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
+	COObject *otherObject = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
 	
 	// FIXME: bookmark stuff is commented out because it fails serialization to an item graph
 	
@@ -106,7 +106,7 @@
 {
 	COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
 	COObject *object = [[COObject alloc] initWithObjectGraphContext: objectGraphContext];
-	NSUInteger hash = [object hash];
+	NSUInteger hash = object.hash;
 
 	/* For testing the hash stability with -[NSSet containsObject:], we must 
 	   insert the objects in the set before object becomes persistent */
@@ -130,12 +130,12 @@
 - (void) testHashStabilityAcrossSetCurrentBranch
 {
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-	COObject *object = [proot rootObject];
-	const NSUInteger hash = [object hash];
+	COObject *object = proot.rootObject;
+	const NSUInteger hash = object.hash;
 	[ctx commit];
 	
-	COBranch *secondaryBranch = [[proot currentBranch] makeBranchWithLabel: @"secondaryBranch"];
-	[proot setCurrentBranch: secondaryBranch];
+	COBranch *secondaryBranch = [proot.currentBranch makeBranchWithLabel: @"secondaryBranch"];
+	proot.currentBranch = secondaryBranch;
 	[ctx commit];
 	
 	UKIntsEqual(hash, [object hash]);
@@ -146,20 +146,20 @@
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	[ctx commit];
 	
-	COObject *object = [proot rootObject];
+	COObject *object = proot.rootObject;
 	
 	[self checkPersistentRootWithExistingAndNewContext: proot
 											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
 		 if (isNewContext)
 		 {
-			 UKObjectsNotEqual(object, [testProot rootObject]);
-			 UKObjectsNotSame(object, [testProot rootObject]);
+			 UKObjectsNotEqual(object, testProot.rootObject);
+			 UKObjectsNotSame(object, testProot.rootObject);
 		 }
 		 else
 		 {
-			 UKObjectsEqual(object, [testProot rootObject]);
-			 UKObjectsSame(object, [testProot rootObject]);
+			 UKObjectsEqual(object, testProot.rootObject);
+			 UKObjectsSame(object, testProot.rootObject);
 		 }
 	 }];
 }
@@ -167,57 +167,57 @@
 - (void) testDetailedDescription
 {
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
-	COObject *object = [proot rootObject];
+	COObject *object = proot.rootObject;
 
-	UKStringsEqual([object description], [object stringValue]);
+	UKStringsEqual(object.description, [object stringValue]);
 }
 
 - (void) testCreationAndModificationDates
 {
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
-	COObject *object = [proot rootObject];
+	COObject *object = proot.rootObject;
 
-	UKNil([proot creationDate]);
-	UKNil([proot modificationDate]);
+	UKNil(proot.creationDate);
+	UKNil(proot.modificationDate);
 
-	[object setName: @"Bing"];
+	object.name = @"Bing";
 	[ctx commit];
 
-	CORevision *firstRev = [object revision];
+	CORevision *firstRev = object.revision;
 
-	UKObjectsEqual([firstRev date], [proot creationDate]);
-	UKObjectsEqual([firstRev date], [proot modificationDate]);
+	UKObjectsEqual(firstRev.date, proot.creationDate);
+	UKObjectsEqual(firstRev.date, proot.modificationDate);
 
-	[object setName: @"Bong"];
+	object.name = @"Bong";
 	[ctx commit];
 
-	CORevision *lastRev = [object revision];
+	CORevision *lastRev = object.revision;
 	UKObjectsNotEqual(lastRev, firstRev);
 	
 	[self checkPersistentRootWithExistingAndNewContext: proot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual([firstRev date], [testProot creationDate]);
-		 UKObjectsEqual([lastRev date], [testProot modificationDate]);
+		 UKObjectsEqual(firstRev.date, testProot.creationDate);
+		 UKObjectsEqual(lastRev.date, testProot.modificationDate);
 	 }];
 }
 
 - (void) testKVCForSynthesizedSetterName
 {
 	COOverridenSetterBookmark *bookmark =
-		[[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"] rootObject];
+		[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"].rootObject;
 	NSDate *date = [NSDate date];
 
 	[bookmark setValue: date forProperty: @"lastVisitedDate"];
 
-	UKObjectsEqual(date, [bookmark lastVisitedDate]);
+	UKObjectsEqual(date, bookmark.lastVisitedDate);
 	UKTrue(bookmark->setterInvoked);
 }
 
 - (void) testValidationForSynthesizedSetterName
 {
 	COOverridenSetterBookmark *bookmark =
-		[[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"] rootObject];
+		[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"].rootObject;
 	NSDate *date = [NSDate date];
 	NSArray *results = [bookmark validateValue: date forProperty: @"lastVisitedDate"];
 
@@ -228,28 +228,28 @@
 - (void) testSerializationForSynthesizedSetterName
 {
 	COOverridenSetterBookmark *bookmark =
-		[[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"] rootObject];
-	[bookmark setLastVisitedDate: [NSDate date]];
+		[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"].rootObject;
+	bookmark.lastVisitedDate = [NSDate date];
 	ETPropertyDescription *propertyDesc =
-		[[bookmark entityDescription] propertyDescriptionForName: @"lastVisitedDate"];
+		[bookmark.entityDescription propertyDescriptionForName: @"lastVisitedDate"];
 
 	NSString *dateString = [bookmark serializedValueForPropertyDescription: propertyDesc];
 
-	UKObjectsEqual([[bookmark lastVisitedDate] stringValue], dateString);
+	UKObjectsEqual([bookmark.lastVisitedDate stringValue], dateString);
 	UKTrue(bookmark->serialized);
 }
 
 - (void) testDeserializationForSynthesizedSetterName
 {
 	COOverridenSetterBookmark *bookmark =
-		[[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"] rootObject];
+		[ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"].rootObject;
 	NSDate *date = [NSDate date];
 	ETPropertyDescription *propertyDesc =
-		[[bookmark entityDescription] propertyDescriptionForName: @"lastVisitedDate"];
+		[bookmark.entityDescription propertyDescriptionForName: @"lastVisitedDate"];
 
 	[bookmark setSerializedValue: date forPropertyDescription: propertyDesc];
 	
-	UKObjectsEqual(date, [bookmark lastVisitedDate]);
+	UKObjectsEqual(date, bookmark.lastVisitedDate);
 	UKTrue(bookmark->deserialized);
 	UKTrue(bookmark->setterInvoked);
 }
@@ -308,7 +308,7 @@
 	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	
 	OutlineItem *obj2 = [[OutlineItem alloc] initWithObjectGraphContext: proot.objectGraphContext];
-	[obj2 setLabel: @"test"];
+	obj2.label = @"test";
 	
 	/* obj2 is removed since it's unreachable */
 	[proot.objectGraphContext removeUnreachableObjects];
@@ -324,20 +324,20 @@
 	COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
 	COObject *object = [[COObject alloc] initWithObjectGraphContext: objectGraphContext];
 	
-	UKObjectsSame(objectGraphContext, [object objectGraphContext]);
-	UKNil([object branch]);
-	UKNil([object persistentRoot]);
-	UKNil([object editingContext]);
+	UKObjectsSame(objectGraphContext, object.objectGraphContext);
+	UKNil(object.branch);
+	UKNil(object.persistentRoot);
+	UKNil(object.editingContext);
 	
 	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithRootObject: object];
-	COBranch *branch = [persistentRoot currentBranch];
+	COBranch *branch = persistentRoot.currentBranch;
 	UKNotNil(persistentRoot);
 	UKNotNil(branch);
 	
-	UKObjectsSame(objectGraphContext, [object objectGraphContext]);
-	UKObjectsSame(branch, [object branch]);
-	UKObjectsSame(persistentRoot, [object persistentRoot]);
-	UKObjectsSame(ctx, [object editingContext]);
+	UKObjectsSame(objectGraphContext, object.objectGraphContext);
+	UKObjectsSame(branch, object.branch);
+	UKObjectsSame(persistentRoot, object.persistentRoot);
+	UKObjectsSame(ctx, object.editingContext);
 }
 
 - (void) testEntityDescriptionImmutableAfterCOObjectCreation
@@ -345,11 +345,11 @@
 	COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
 	OutlineItem *object = [[OutlineItem alloc] initWithObjectGraphContext: objectGraphContext];
 	
-	ETEntityDescription *entityDesc = [object entityDescription];
+	ETEntityDescription *entityDesc = object.entityDescription;
 	ETPropertyDescription *contentsDesc = [entityDesc propertyDescriptionForName: @"contents"];
 	
-	UKTrue([contentsDesc isOrdered]);
-	UKRaisesException([contentsDesc setOrdered: NO]);
+	UKTrue(contentsDesc.ordered);
+	UKRaisesException(contentsDesc.ordered = NO);
 }
 
 - (void) testDidChangeValueForWrongProperty
@@ -386,7 +386,7 @@
 - (void) setLastVisitedDate: (NSDate *)lastVisitedDate
 {
 	setterInvoked = YES;
-	[super setLastVisitedDate: lastVisitedDate];
+	super.lastVisitedDate = lastVisitedDate;
 }
 
 - (id) validateLastVisitedDate: (id)aValue
@@ -398,13 +398,13 @@
 - (id) serializedLastVisitedDate
 {
 	serialized = YES;
-	return [[self lastVisitedDate] stringValue];
+	return [self.lastVisitedDate stringValue];
 }
 
 - (void) setSerializedLastVisitedDate: (id)aValue
 {
 	deserialized = YES;
-	[self setLastVisitedDate: aValue];
+	self.lastVisitedDate = aValue;
 }
 
 @end
@@ -462,7 +462,7 @@
 {
 	UKNil(parent.insertObjectArgumentsForCalls);
 	[parent addObject: other];
-	UKIntsEqual(1, [parent.insertObjectArgumentsForCalls count]);
+	UKIntsEqual(1, parent.insertObjectArgumentsForCalls.count);
 	
 	// Check the arguments that were passed to -insertObject:atIndex:hint:
 	NSDictionary *args = parent.insertObjectArgumentsForCalls[0];

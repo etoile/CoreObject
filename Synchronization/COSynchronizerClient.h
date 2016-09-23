@@ -81,8 +81,8 @@
 	id<COSynchronizerClientDelegate> __weak _delegate;
 }
 
-- (id) initWithClientID: (NSString *)clientID
-		 editingContext: (COEditingContext *)ctx;
+- (instancetype) initWithClientID: (NSString *)clientID
+		 editingContext: (COEditingContext *)ctx NS_DESIGNATED_INITIALIZER;
 
 
 @property (nonatomic, readonly, strong) NSString *clientID;

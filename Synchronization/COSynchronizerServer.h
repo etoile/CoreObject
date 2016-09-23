@@ -44,7 +44,7 @@
 	NSString *currentlyRespondingToClient;
 }
 
-- (id) initWithBranch: (COBranch *)aBranch;
+- (instancetype) initWithBranch: (COBranch *)aBranch NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readonly, strong) COPersistentRoot *persistentRoot;
 @property (nonatomic, readonly, strong) COBranch *branch;

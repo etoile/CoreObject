@@ -25,17 +25,17 @@
 	for (int i=0; i<10; i++)
 	{
 		@autoreleasepool {
-			COContainer *level1 = [root.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+			COContainer *level1 = [root.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 			[level1 setValue: [NSString stringWithFormat: @"%d", i] forProperty: @"label"];
 			[root addObject: level1];
 			for (int j=0; j<10; j++)
 			{
-				COContainer *level2 = [root.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+				COContainer *level2 = [root.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 				[level2 setValue: [NSString stringWithFormat: @"%d.%d", i, j] forProperty: @"label"];
 				[level1 addObject: level2];
 				for (int k=0; k<10; k++)
 				{
-					COContainer *level3 = [root.objectGraphContext insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+					COContainer *level3 = [root.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 					[level3 setValue: [NSString stringWithFormat: @"%d.%d.%d", i, j, k] forProperty: @"label"];
 					[level2 addObject: level3];
 				}
@@ -46,8 +46,8 @@
 
 - (NSTimeInterval) timeToMakeInitialCommitToPersistentRoot: (COPersistentRoot *)persistentRoot
 {
-	COObjectGraphContext *graph = [persistentRoot objectGraphContext];
-	[self make3LevelNestedTreeInContainer: [graph rootObject]];
+	COObjectGraphContext *graph = persistentRoot.objectGraphContext;
+	[self make3LevelNestedTreeInContainer: graph.rootObject];
 	
 	NSDate *start = [NSDate date];
 	[ctx commit];
@@ -57,10 +57,10 @@
 
 - (void) makeIncrementalCommitToPersistentRoot: (COPersistentRoot *)persistentRoot
 {
-	COObjectGraphContext *graph = [persistentRoot objectGraphContext];
-	NSArray *itemUUIDS = [graph itemUUIDs];
+	COObjectGraphContext *graph = persistentRoot.objectGraphContext;
+	NSArray *itemUUIDS = graph.itemUUIDs;
 	int randNumber = rand();
-	OutlineItem *randomItem = [graph loadedObjectForUUID: itemUUIDS[randNumber % [itemUUIDS count]]];
+	OutlineItem *randomItem = [graph loadedObjectForUUID: itemUUIDS[randNumber % itemUUIDS.count]];
 	randomItem.label = [NSString stringWithFormat: @"random number: %d", randNumber];
 	[ctx commit];
 }
@@ -78,7 +78,7 @@
 
 - (void) testCommitIsIncremental
 {
-	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 
 	NSTimeInterval timeToMakeInitialCommitToPersistentRoot = [self timeToMakeInitialCommitToPersistentRoot: persistentRoot];
 	NSTimeInterval timeToMakeIncrementalCommitToPersistentRoot = [self timeToMakeIncrementalCommitToPersistentRoot: persistentRoot];
@@ -89,7 +89,7 @@
 	
 	NSLog(@"Took %f ms to commit %d objects",
 		  timeToMakeInitialCommitToPersistentRoot * MS_PER_SECOND,
-		  (int)[[persistentRoot.objectGraphContext itemUUIDs] count]);
+		  (int)persistentRoot.objectGraphContext.itemUUIDs.count);
 	
 	NSLog(@"Took %f ms to commit a change to 1 object in that graph. SQLite takes %f ms to commit 1K bytes. CO is %f times worse.",
 		  timeToMakeIncrementalCommitToPersistentRoot * MS_PER_SECOND,
@@ -99,19 +99,19 @@
 
 - (void) testRead1KItemsSpeed
 {
-	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+	COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 
 	NSTimeInterval timeToMakeInitialCommitToPersistentRoot = [self timeToMakeInitialCommitToPersistentRoot: persistentRoot];
 
 	NSDate *start = [NSDate date];
-	COEditingContext *ctx2 = [COEditingContext contextWithURL: [[persistentRoot store] URL]];
-	COPersistentRoot *ctx2PersistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-	NSArray *contents = [[ctx2PersistentRoot rootObject] contents];
+	COEditingContext *ctx2 = [COEditingContext contextWithURL: persistentRoot.store.URL];
+	COPersistentRoot *ctx2PersistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
+	NSArray *contents = [ctx2PersistentRoot.rootObject contents];
 	const NSTimeInterval time = [[NSDate date] timeIntervalSinceDate: start];
 
 	NSLog(@"Took %f ms to commit %d objects",
 		  timeToMakeInitialCommitToPersistentRoot * MS_PER_SECOND,
-		  (int)[[persistentRoot.objectGraphContext itemUUIDs] count]);
+		  (int)persistentRoot.objectGraphContext.itemUUIDs.count);
 	
 	NSLog(@"Took %f ms to load back objects. Top level objects: %@", time, contents);
 }

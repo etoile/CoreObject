@@ -42,7 +42,7 @@
 	
 	NSMutableArray *siblingsArray = [NSMutableArray arrayWithObject: commitB];
 	
-	while ([siblingsArray count] > 0)
+	while (siblingsArray.count > 0)
 	{
 		NSMutableArray *nextSiblingsArray = [NSMutableArray new];
 		
@@ -80,7 +80,7 @@
         {
             return YES;
         }
-        rev = [[[self revisionForRevisionUUID: rev persistentRootUUID: persistentRoot] parentRevision] UUID];
+        rev = [self revisionForRevisionUUID: rev persistentRootUUID: persistentRoot].parentRevision.UUID;
     }
     return NO;
 }
@@ -99,7 +99,7 @@
             return result;
         }
 		[result insertObject: rev atIndex: 0];
-        rev = [[[self revisionForRevisionUUID: rev persistentRootUUID: persistentRoot] parentRevision] UUID];
+        rev = [self revisionForRevisionUUID: rev persistentRootUUID: persistentRoot].parentRevision.UUID;
     }
     return nil;
 }

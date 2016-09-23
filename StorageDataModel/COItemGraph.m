@@ -20,13 +20,11 @@
 
 - (instancetype) init
 {
-	SUPERINIT;
-    itemForUUID_ = [[NSMutableDictionary alloc] init];
-	return self;
+	return [self initWithItemForUUID: @{} rootItemUUID: nil];
 }
 
-- (id) initWithItemForUUID: (NSDictionary *) itemForUUID
-              rootItemUUID: (ETUUID *)root
+- (instancetype) initWithItemForUUID: (NSDictionary *) itemForUUID
+                        rootItemUUID: (ETUUID *)root
 {
     SUPERINIT;
     itemForUUID_ = [itemForUUID mutableCopy];
@@ -34,45 +32,45 @@
     return self;
 }
 
-- (id) initWithItems: (NSArray *)items
-        rootItemUUID: (ETUUID *)root
+- (instancetype) initWithItems: (NSArray *)items
+                  rootItemUUID: (ETUUID *)root
 {
-    SUPERINIT;
-    itemForUUID_ = [[NSMutableDictionary alloc] init];
-    rootItemUUID_ = [root copy];
+    self = [self initWithItemForUUID: @{} rootItemUUID: root];
+	if (self == nil)
+		return nil;
     
     for (COItem *item in items)
     {
-        [itemForUUID_ setObject: item forKey: [item UUID]];
+        itemForUUID_[item.UUID] = item;
     }
     
     return self;
 }
 
-- (id) initWithItemGraph: (id<COItemGraph>)aGraph
+- (instancetype) initWithItemGraph: (id<COItemGraph>)aGraph
 {
     NSMutableArray *array = [NSMutableArray array];
     
-    for (ETUUID *uuid in [aGraph itemUUIDs])
+    for (ETUUID *uuid in aGraph.itemUUIDs)
     {
         COItem *item = [aGraph itemForUUID: uuid];
         [array addObject: item];
     }
     
-    return [self initWithItems: array rootItemUUID: [aGraph rootItemUUID]];
+    return [self initWithItems: array rootItemUUID: aGraph.rootItemUUID];
 }
 
 + (COItemGraph *)itemGraphWithItemsRootFirst: (NSArray*)items
 {
-    NSParameterAssert([items count] >= 1);
+    NSParameterAssert(items.count >= 1);
 
     COItemGraph *result = [[self alloc] init];
-    result->rootItemUUID_ = [[[items objectAtIndex: 0] UUID] copy];
-    result->itemForUUID_ = [[NSMutableDictionary alloc] initWithCapacity: [items count]];
+    result->rootItemUUID_ = [[items[0] UUID] copy];
+    result->itemForUUID_ = [[NSMutableDictionary alloc] initWithCapacity: items.count];
     
     for (COItem *item in items)
     {
-        [result->itemForUUID_ setObject: item forKey: [item UUID]];
+        result->itemForUUID_[item.UUID] = item;
     }
     return result;
 }
@@ -81,17 +79,17 @@
 
 - (COMutableItem *) itemForUUID: (ETUUID *)aUUID
 {
-    return [itemForUUID_ objectForKey: aUUID];
+    return itemForUUID_[aUUID];
 }
 
 - (NSArray *) itemUUIDs
 {
-    return [itemForUUID_ allKeys];
+    return itemForUUID_.allKeys;
 }
 
 - (NSArray *) items
 {
-	return [itemForUUID_ allValues];
+	return itemForUUID_.allValues;
 }
 
 - (NSString *)description
@@ -99,7 +97,7 @@
 	NSMutableString *result = [NSMutableString string];
     
 	[result appendFormat: @"[%@ root: %@\n", NSStringFromClass([self class]), rootItemUUID_];
-	for (COItem *item in [itemForUUID_ allValues])
+	for (COItem *item in itemForUUID_.allValues)
 	{
 		[result appendFormat: @"%@", item];
 	}
@@ -112,8 +110,7 @@
 {
     for (COItem *anItem in items)
     {
-        [itemForUUID_ setObject: anItem
-                         forKey: [anItem UUID]];
+        itemForUUID_[anItem.UUID] = anItem;
     }
 }
 
@@ -134,13 +131,13 @@
 
 - (void) addItemGraph: (id<COItemGraph>)aGraph
 {
-    rootItemUUID_ = [aGraph rootItemUUID];
-    for (ETUUID *uuid in [aGraph itemUUIDs])
+    rootItemUUID_ = aGraph.rootItemUUID;
+    for (ETUUID *uuid in aGraph.itemUUIDs)
     {
         COItem *item = [aGraph itemForUUID: uuid];
         if (item != nil)
         {
-            [itemForUUID_ setObject: item forKey: uuid];
+            itemForUUID_[uuid] = item;
         }
     }
 }
@@ -163,19 +160,19 @@
  */
 void COValidateItemGraph(id<COItemGraph> aGraph)
 {
-    if (nil == [aGraph itemForUUID: [aGraph rootItemUUID]])
+    if (nil == [aGraph itemForUUID: aGraph.rootItemUUID])
     {
         [NSException raise: NSInvalidArgumentException
                     format: @"Graph root item is missing"];
     }
     
-    NSSet *uuidSet = [NSSet setWithArray: [aGraph itemUUIDs]];
+    NSSet *uuidSet = [NSSet setWithArray: aGraph.itemUUIDs];
     
-    for (ETUUID *uuid in [aGraph itemUUIDs])
+    for (ETUUID *uuid in aGraph.itemUUIDs)
     {
         COItem *item = [aGraph itemForUUID: uuid];
         
-        for (NSString *key in [item attributeNames])
+        for (NSString *key in item.attributeNames)
         {
             id value = [item valueForAttribute: key];
             COType type = [item typeForAttribute: key];
@@ -195,7 +192,7 @@ void COValidateItemGraph(id<COItemGraph> aGraph)
                 || COTypePrimitivePart(type) == kCOTypeCompositeReference)
             {
                 for (id subValue in
-                     [value respondsToSelector: @selector(objectEnumerator)] ? value : [NSArray arrayWithObject: value])
+                     [value respondsToSelector: @selector(objectEnumerator)] ? value : @[value])
                 {
                     if ([subValue isKindOfClass: [ETUUID class]])
                     {
@@ -214,16 +211,15 @@ void COValidateItemGraph(id<COItemGraph> aGraph)
 id COItemGraphToJSONPropertyList(id<COItemGraph> aGraph)
 {
     NSMutableDictionary *objectsDict = [NSMutableDictionary dictionary];
-    for (ETUUID *uuid in [aGraph itemUUIDs])
+    for (ETUUID *uuid in aGraph.itemUUIDs)
     {
         COItem *item = [aGraph itemForUUID: uuid];
-        id objectPlist = [item JSONPlist];
-        [objectsDict setObject: objectPlist
-                        forKey: [uuid stringValue]];
+        id objectPlist = item.JSONPlist;
+        objectsDict[[uuid stringValue]] = objectPlist;
     }
     
     return @{@"objects" : objectsDict,
-             @"rootObjectUUID" : [[aGraph rootItemUUID] stringValue]};
+             @"rootObjectUUID" : [aGraph.rootItemUUID stringValue]};
 }
 
 NSData *COItemGraphToJSONData(id<COItemGraph> aGraph)
@@ -234,15 +230,14 @@ NSData *COItemGraphToJSONData(id<COItemGraph> aGraph)
 
 COItemGraph *COItemGraphFromJSONPropertyLisy(id plist)
 {
-    id objectsPlist = [plist objectForKey: @"objects"];
-    ETUUID *rootObjectUUID = [ETUUID UUIDWithString: [plist objectForKey: @"rootObjectUUID"]];
+    id objectsPlist = plist[@"objects"];
+    ETUUID *rootObjectUUID = [ETUUID UUIDWithString: plist[@"rootObjectUUID"]];
     NSMutableDictionary *itemForUUID = [NSMutableDictionary dictionary];
     
     for (NSString *uuidString in objectsPlist)
     {
-        COItem *item = [[COItem alloc] initWithJSONPlist: [objectsPlist objectForKey: uuidString]];
-        [itemForUUID setObject: item
-                        forKey: [item UUID]];
+        COItem *item = [[COItem alloc] initWithJSONPlist: objectsPlist[uuidString]];
+        itemForUUID[item.UUID] = item;
     }
     
     COItemGraph *graph = [[COItemGraph alloc] initWithItemForUUID: itemForUUID
@@ -276,14 +271,14 @@ NSData *COItemGraphToBinaryData(id<COItemGraph> aGraph)
     
     const uint32_t version = NSSwapHostIntToLittle(1);
     [result appendBytes: &version length: sizeof(version)];
-    [result appendData: [[aGraph rootItemUUID] dataValue]];
+    [result appendData: [aGraph.rootItemUUID dataValue]];
     [result appendData: contentsBLOBWithItemTree(aGraph)];
     return result;
 }
 
 COItemGraph *COItemGraphFromBinaryData(NSData *binarydata)
 {
-    const NSUInteger formatLen = [BinaryHeaderString length];
+    const NSUInteger formatLen = BinaryHeaderString.length;
     const NSUInteger versionLen = 4;
     const NSUInteger uuidLen = 16;
     
@@ -294,7 +289,7 @@ COItemGraph *COItemGraphFromBinaryData(NSData *binarydata)
     pos += versionLen;
     NSData *uuidData = [binarydata subdataWithRange: NSMakeRange(pos, uuidLen)];
     pos += uuidLen;
-    NSData *itemsData = [binarydata subdataWithRange: NSMakeRange(pos, [binarydata length] - pos)];
+    NSData *itemsData = [binarydata subdataWithRange: NSMakeRange(pos, binarydata.length - pos)];
     
     // Check format
     NSString *formatStr = [[NSString alloc] initWithData: formatData encoding: NSUTF8StringEncoding];
@@ -351,12 +346,12 @@ static BOOL COItemGraphEqualToItemGraphComparingItemUUID(id<COItemGraph> first, 
         return NO;
     }
     
-    if (![[my compositeReferencedItemUUIDs] isEqual: [other compositeReferencedItemUUIDs]])
+    if (![my.compositeReferencedItemUUIDs isEqual: other.compositeReferencedItemUUIDs])
     {
         return NO;
     }
     
-    for (ETUUID *aChild in [my compositeReferencedItemUUIDs])
+    for (ETUUID *aChild in my.compositeReferencedItemUUIDs)
     {
         if (!COItemGraphEqualToItemGraphComparingItemUUID(first, second, aChild))
         {
@@ -368,12 +363,12 @@ static BOOL COItemGraphEqualToItemGraphComparingItemUUID(id<COItemGraph> first, 
 
 BOOL COItemGraphEqualToItemGraph(id<COItemGraph> first, id<COItemGraph> second)
 {
-    if (![[first rootItemUUID] isEqual: [second rootItemUUID]])
+    if (![first.rootItemUUID isEqual: second.rootItemUUID])
     {
         return NO;
     }
     
-    return COItemGraphEqualToItemGraphComparingItemUUID(first, second, [first rootItemUUID]);
+    return COItemGraphEqualToItemGraphComparingItemUUID(first, second, first.rootItemUUID);
 }
 
 static void
@@ -390,7 +385,7 @@ COItemGraphReachableUUIDsInternal(id<COItemGraph> aGraph, ETUUID *aUUID, NSMutab
 	[result addObject: aUUID];
 	
     COItem *item = [aGraph itemForUUID: aUUID];
-    for (id aChild in [item allInnerReferencedItemUUIDs])
+    for (id aChild in item.allInnerReferencedItemUUIDs)
     {
         COItemGraphReachableUUIDsInternal(aGraph, aChild, result);
     }
@@ -400,9 +395,9 @@ NSSet *
 COItemGraphReachableUUIDs(id<COItemGraph> aGraph)
 {
     NSMutableSet *result = [NSMutableSet new];
-	if ([aGraph rootItemUUID] != nil)
+	if (aGraph.rootItemUUID != nil)
 	{
-		COItemGraphReachableUUIDsInternal(aGraph, [aGraph rootItemUUID], result);
+		COItemGraphReachableUUIDsInternal(aGraph, aGraph.rootItemUUID, result);
 	}
 	return result;
 }

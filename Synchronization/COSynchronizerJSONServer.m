@@ -16,7 +16,7 @@
 
 @implementation COSynchronizerJSONServer
 
-@synthesize delegate, server;
+@synthesize delegate, server, paused;
 
 - (instancetype) init
 {
@@ -75,7 +75,7 @@
 	{
 		plist[@"branchMetadata"] = message.branchMetadata;
 	}
-	plist[@"currentRevision"] = [message.currentRevision propertyList];
+	plist[@"currentRevision"] = message.currentRevision.propertyList;
 	plist[@"class"] = @"COSynchronizerPersistentRootInfoToClientMessage";
 	[self sendPropertyList: plist toClient: aClient];
 }
@@ -133,12 +133,7 @@
 	}
 }
 
-- (BOOL) paused
-{
-	return paused;
-}
-
-- (void)setPaused:(BOOL)flag
+- (void)setPaused: (BOOL)flag
 {
 	paused = flag;
 	if (!paused)

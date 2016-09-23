@@ -27,13 +27,15 @@
  *
  * The hash represents the attachment in a unique way. For example, you can 
  * pass a hash generated from the attachment content.
+ *
+ * For nil data, raises a NSInvalidArgumentException.
  */
-- (instancetype) initWithData: (NSData *)aData;
+- (instancetype) initWithData: (NSData *)aData NS_DESIGNATED_INITIALIZER;
 /**
  * Returns the attachment hash.
  *
  * See -initWithData:.
  */
-- (NSData *) dataValue;
+@property (nonatomic, readonly) NSData *dataValue;
 
 @end

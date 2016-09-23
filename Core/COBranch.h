@@ -148,7 +148,7 @@ extern NSString * const kCOBranchLabel;
 /**
  * The branch label (used as the branch name in most cases).
  */
-@property (nonatomic, copy) NSString *label;
+@property (nonatomic, readwrite, copy) NSString *label;
 /**
  * The metadata in JSON format attached to the branch.
  *
@@ -156,7 +156,7 @@ extern NSString * const kCOBranchLabel;
  *
  * You must never overwrite any existing metadata set by CoreObject.
  */
-@property (nonatomic, copy) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy) NSDictionary *metadata;
 /** 
  * The branch deletion status.
  *
@@ -167,7 +167,7 @@ extern NSString * const kCOBranchLabel;
  * setting -deleted to YES throws an exception) because persistent roots must
  * always have a current branch.
  */
-@property (nonatomic, assign, getter=isDeleted) BOOL deleted;
+@property (nonatomic, readwrite, assign, getter=isDeleted) BOOL deleted;
 /**
  * Controls whether -setCurrentRevision: can be used to revert the branch to an 
  * older state.
@@ -182,7 +182,7 @@ extern NSString * const kCOBranchLabel;
  * or commit the equivalent selective undo. Also, if NO, the -undo and -redo 
  * methods on COBranch are disabled (-canUndo and -canRedo return NO).
  */
-@property (nonatomic, assign) BOOL supportsRevert;
+@property (nonatomic, readwrite, assign) BOOL supportsRevert;
 
 
 /** @taskunit History */
@@ -220,7 +220,7 @@ extern NSString * const kCOBranchLabel;
  *
  * For all branches in a persistent root, returns the same revision.
  *
- * This is the same than <code>[[self nodes] firstObject]</code>.
+ * This is the same than <code>self.nodes.firstObject</code>.
  *
  * See also -initialRevision.
  */
@@ -242,11 +242,11 @@ extern NSString * const kCOBranchLabel;
  *
  * See also -headRevision.
  */
-@property (nonatomic, strong) CORevision *currentRevision;
+@property (nonatomic, readwrite, strong) CORevision *currentRevision;
 /**
  * The revision bound to the most recent commit in the branch.
  *
- * This is the same than <code>[[self nodes] lastObject]</code>.
+ * This is the same than <code>self.nodes.lastObject</code>.
  *
  * See also -currentRevision.
  */
@@ -286,7 +286,7 @@ extern NSString * const kCOBranchLabel;
  *
  * See also -discardAllChanges and -[COObjectGraphContext hasChanges].
  */
-- (BOOL)hasChanges;
+@property (nonatomic, readonly) BOOL hasChanges;
 /**
  * Discards the uncommitted changes to reset the branch to its last commit state.
  *
@@ -303,7 +303,7 @@ extern NSString * const kCOBranchLabel;
  *
  * Use it to cause a "checkpoint" revision to be written.
  */
-@property (nonatomic, assign) BOOL shouldMakeEmptyCommit;
+@property (nonatomic, readwrite, assign) BOOL shouldMakeEmptyCommit;
 /**
  * Returns whether the editing context has relinquished
  * control over this object. If YES, this instance can no longer be used
@@ -371,7 +371,7 @@ extern NSString * const kCOBranchLabel;
  * the current branch. For example:
  *
  * <example>
- * [persistentRoot setCurrentBranch: [[persistentRoot currentBranch] makeBranchWithLabel: @"Sandbox"]];
+ * [persistentRoot setCurrentBranch: [persistentRoot.currentBranch makeBranchWithLabel: @"Sandbox"]];
  * </example>
  *
  * The receiver must be committed - not a newly created branch, or the default
@@ -402,7 +402,7 @@ extern NSString * const kCOBranchLabel;
  *
  * See -makePersistentRootCopyFromRevision:
  */
-- (COPersistentRoot *)makePersistentRootCopy;
+@property (nonatomic, readonly) COPersistentRoot *makePersistentRootCopy;
 
 
 /** @taskunit Merging Between Branches */
@@ -417,7 +417,7 @@ extern NSString * const kCOBranchLabel;
  * If it is set at commit time, records the <em>current revision</em> of 
  * the merging branch as the merge parent of the new commit.
  */
-@property (nonatomic, strong) COBranch *mergingBranch;
+@property (nonatomic, readwrite, strong) COBranch *mergingBranch;
 /**
  * The revision that is currently being merged.
  *
@@ -427,7 +427,7 @@ extern NSString * const kCOBranchLabel;
  * If it is set at commit time, records the given revision
  * as the merge parent of the new commit.
  */
-@property (nonatomic, strong) CORevision *mergingRevision;
+@property (nonatomic, readwrite, strong) CORevision *mergingRevision;
 /**
  * Returns a merge info object representing the changes between the receiver and 
  * the given branch to be merged.
@@ -469,12 +469,12 @@ extern NSString * const kCOBranchLabel;
 /**
  * Returns a short description to summarize the receiver.
  */
-- (NSString *)description;
+@property (readonly, copy) NSString *description;
 /**
  * Returns a multi-line description including informations about the branch kind, 
  * deletion status, revisions and pending changes.
  */
-- (NSString *)detailedDescription;
+@property (nonatomic, readonly) NSString *detailedDescription;
 
 
 @end

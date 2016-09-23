@@ -182,7 +182,7 @@ extern NSString * const kCOUndoTrackName;
 /**
  * Returns whether coalescing is active.
  */
-- (BOOL)isCoalescing;
+@property (nonatomic, readonly, getter=isCoalescing) BOOL coalescing;
 
 
 /** @taskunit Convenience */
@@ -191,11 +191,11 @@ extern NSString * const kCOUndoTrackName;
 /**
  * Returns a localized menu item title describing the command to undo.
  */
-- (NSString *) undoMenuItemTitle;
+@property (nonatomic, readonly) NSString *undoMenuItemTitle;
 /**
  * Returns a localized menu item title describing the command to redo.
  */
-- (NSString *) redoMenuItemTitle;
+@property (nonatomic, readonly) NSString *redoMenuItemTitle;
 
 
 /** @taskunit Divergent Commands */
@@ -206,7 +206,7 @@ extern NSString * const kCOUndoTrackName;
  *
  * See also -[COCommandGroup sequenceNumber].
  */
-- (NSArray *) allCommands;
+@property (nonatomic, readonly) NSArray *allCommands;
 /**
  * Returns all commands that are children of the given node (the order is 
  * undefined).

@@ -7,11 +7,11 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreObject/COItemGraph.h>
+#import <CoreObject/COSQLiteStore.h>
 
 @class FMDatabase;
 @class COItemGraph;
 @class CORevisionInfo;
-@class COSQLiteStore;
 
 /**
  * Database connection for manipulating a persistent root backing store.
@@ -36,17 +36,17 @@
  *      aPath the pathn of a directory where the backing store
  *      should be opened or created.
  */
-- (id)initWithPersistentRootUUID: (ETUUID*)aUUID
+- (instancetype)initWithPersistentRootUUID: (ETUUID*)aUUID
                            store: (COSQLiteStore *)store
                       useStoreDB: (BOOL)share
-                           error: (NSError **)error;
+                           error: (NSError **)error NS_DESIGNATED_INITIALIZER;
 
-- (BOOL)close;
+@property (nonatomic, readonly) BOOL close;
 
 - (CORevisionInfo *) revisionInfoForRevisionUUID: (ETUUID *)aToken;
 
-- (ETUUID *) UUID;
-- (ETUUID *) rootUUID;
+@property (nonatomic, readonly, strong) ETUUID *UUID;
+@property (nonatomic, readonly, strong) ETUUID *rootUUID;
 - (BOOL) hasRevid: (int64_t)revid;
 
 - (COItemGraph *) itemGraphForRevid: (int64_t)revid;
@@ -85,7 +85,7 @@
  * Initially this revision set starts at zero, but after compacting the history
  * the first index corresponds to the first kept revision.
  */
-- (NSIndexSet *) revidsUsedRange;
+@property (nonatomic, readonly) NSIndexSet *revidsUsedRange;
 
 - (int64_t) revidForUUID: (ETUUID *)aUUID;
 - (NSIndexSet *)revidsForUUIDs: (NSArray *)UUIDs;
@@ -94,11 +94,11 @@
 
 - (NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
                        headRevisionUUID: (ETUUID *)aHeadRevUUID
-                                options: (NSUInteger)options;
+                                options: (COBranchRevisionReadingOptions)options;
 
-- (NSArray *)revisionInfos;
+@property (nonatomic, readonly) NSArray *revisionInfos;
 
-- (uint64_t) fileSize;
+@property (nonatomic, readonly) uint64_t fileSize;
 
 - (void) clearBackingStore;
 

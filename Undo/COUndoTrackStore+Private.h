@@ -29,7 +29,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
 
 @interface COUndoTrackSerializedCommand : NSObject
 @property (nonatomic, readwrite, strong) id JSONData;
-@property (nonatomic, readwrite, strong) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy) NSDictionary *metadata;
 @property (nonatomic, readwrite, copy) ETUUID *UUID;
 @property (nonatomic, readwrite, copy) ETUUID *parentUUID;
 @property (nonatomic, readwrite, copy) NSString *trackName;
@@ -50,7 +50,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
  * For state objects returned by -[COUndoTrackStore stateForTrackName:], this 
  * property is currently always NO.
  */
-@property (nonatomic, readwrite, assign) BOOL compacted;
+@property (nonatomic, readwrite, assign, getter=isCompacted) BOOL compacted;
 @end
 
 
@@ -85,7 +85,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
  *
  * This method must be run in the main thread.
  */
-- (BOOL) beginTransaction;
+- (BOOL)beginTransaction;
 /**
  * Ends a COUndoTrackStore transaction previously initiated with 
  * -beginTransaction.
@@ -94,7 +94,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
  *
  * This method must be run in the main thread.
  */
-- (BOOL) commitTransaction;
+- (BOOL)commitTransaction;
 
 
 /** @taskunit Managing Undo Tracks */
@@ -106,7 +106,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
  * Once a track persistent state is saved with -setStateForTrackName:, the
  * track appears in the returned array until -removeTrackWithName: is called.
  */
-- (NSArray *) trackNames;
+@property (nonatomic, readonly) NSArray *trackNames;
 /**
  * Returns the current track names that match a pattern built with '*'.
  *

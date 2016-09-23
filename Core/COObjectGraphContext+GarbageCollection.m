@@ -20,19 +20,19 @@
 static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject, COObjectGraphContext *restrictToObjectGraph)
 {
 	NSMutableArray *result = [NSMutableArray array];
-	for (ETPropertyDescription *propDesc in [[anObject entityDescription] allPropertyDescriptions])
+	for (ETPropertyDescription *propDesc in anObject.entityDescription.allPropertyDescriptions)
 	{
-		if (![propDesc isPersistent])
+		if (!propDesc.persistent)
 		{
 			continue;
 		}
 		
-		NSString *propertyName = [propDesc name];
+		NSString *propertyName = propDesc.name;
 		id value = [anObject valueForProperty: propertyName shouldLoad: NO];
 		
-        if ([propDesc isMultivalued])
+        if (propDesc.multivalued)
         {
-			if ([propDesc isKeyed])
+			if (propDesc.keyed)
 			{
 				assert([value isKindOfClass: [NSDictionary class]]);
 			}
@@ -69,7 +69,7 @@ static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject, COObjectG
 
 static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *collectedUUIDSet, COObjectGraphContext *restrictToObjectGraph)
 {
-    ETUUID *uuid = [anObject UUID];
+    ETUUID *uuid = anObject.UUID;
     if ([collectedUUIDSet containsObject: uuid])
     {
         return;
@@ -85,10 +85,10 @@ static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *col
 
 - (NSSet *) allReachableObjectUUIDs
 {
-	NSParameterAssert([self rootObject] != nil);
+	NSParameterAssert(self.rootObject != nil);
 	
-	NSMutableSet *result = [[NSMutableSet alloc] initWithCapacity: [_loadedObjects count]];
-	FindReachableObjectsFromObject([self rootObject], result, self);
+	NSMutableSet *result = [[NSMutableSet alloc] initWithCapacity: _loadedObjects.count];
+	FindReachableObjectsFromObject(self.rootObject, result, self);
 	return result;
 }
 
@@ -96,11 +96,11 @@ static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *col
 
 static void FindCyclesInContainersOfObject(COObject *currentObject, COObject *objectBeingSearchedFor)
 {
-	for (ETPropertyDescription *propDesc in [[currentObject entityDescription] allPropertyDescriptions])
+	for (ETPropertyDescription *propDesc in currentObject.entityDescription.allPropertyDescriptions)
 	{
-		if ([propDesc isContainer])
+		if (propDesc.isContainer)
 		{
-			NSString *propertyName = [propDesc name];
+			NSString *propertyName = propDesc.name;
 			COObject *container = [currentObject valueForKey: propertyName];
 			
 			if (container == objectBeingSearchedFor)
@@ -127,7 +127,7 @@ static void FindCyclesInContainersOfObject(COObject *currentObject, COObject *ob
 
 - (void) checkForCyclesInCompositeRelationshipsInChangedObjects
 {
-	[self checkForCyclesInCompositeRelationshipsInObjects: [self changedObjects]];
+	[self checkForCyclesInCompositeRelationshipsInObjects: self.changedObjects];
 }
 
 @end

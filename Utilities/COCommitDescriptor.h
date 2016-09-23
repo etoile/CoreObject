@@ -76,7 +76,7 @@
  *
  * <example>
  * NSString *objType = @"Folder";
- * NSDictionary *metadata = D(A(objType), kCOCommitMetadataShortDescriptionArguments);
+ * NSDictionary *metadata = @{ kCOCommitMetadataShortDescriptionArguments: @[objType] }
  * COError *error = nil;
  *
  * // kOMCommitCreate is a constant that represents 'org.etoile-project.ObjectManager.create'
@@ -172,7 +172,7 @@
  * metadata:
  *
  * <example>
- * NSString *identifier = [[aRevision metadata] objectForKey: kCOCommitMetadataIdentifier];
+ * NSString *identifier = aRevision.metadata[kCOCommitMetadataIdentifier];
  * COCommitDescriptor *descriptor = 
  *     [COCommitDescriptor registeredDescriptorForIdentifier: identitifier];
  * </example>

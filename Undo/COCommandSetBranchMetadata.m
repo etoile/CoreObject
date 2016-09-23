@@ -22,26 +22,26 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
 @synthesize oldMetadata = _oldMetadata;
 @synthesize metadata = _newMetadata;
 
-- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
+- (instancetype) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
     self = [super initWithPropertyList: plist parentUndoTrack: aParent];
-    self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandBranchUUID]];
-    self.oldMetadata = [plist objectForKey: kCOCommandOldMetadata];
-    self.metadata = [plist objectForKey: kCOCommandNewMetadata];
+    self.branchUUID = [ETUUID UUIDWithString: plist[kCOCommandBranchUUID]];
+    self.oldMetadata = plist[kCOCommandOldMetadata];
+    self.metadata = plist[kCOCommandNewMetadata];
     return self;
 }
 
 - (id) propertyList
 {
-    NSMutableDictionary *result = [super propertyList];
-    [result setObject: [_branchUUID stringValue] forKey: kCOCommandBranchUUID];
+    NSMutableDictionary *result = super.propertyList;
+    result[kCOCommandBranchUUID] = [_branchUUID stringValue];
     if (_oldMetadata != nil)
     {
-        [result setObject: _oldMetadata forKey: kCOCommandOldMetadata];
+        result[kCOCommandOldMetadata] = _oldMetadata;
     }
     if (_newMetadata != nil)
     {
-        [result setObject: _newMetadata forKey: kCOCommandNewMetadata];
+        result[kCOCommandNewMetadata] = _newMetadata;
     }
     return result;
 }
@@ -77,7 +77,7 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
     COBranch *branch = [proot branchForUUID: _branchUUID];
    	ETAssert(branch != nil);
 
-    [branch setMetadata: _newMetadata];
+    branch.metadata = _newMetadata;
 }
 
 - (NSString *)kind

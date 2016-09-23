@@ -346,7 +346,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  *
  * See -[ETPackageDescription name] and -[COCommitDescriptor domain].
  */
-@property (nonatomic, copy) NSString *packageName;
+@property (nonatomic, readwrite, copy) NSString *packageName;
 /**
  * The new schema version.
  *
@@ -354,7 +354,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  *
  * See -sourceVersion.
  */
-@property (nonatomic, assign) int64_t destinationVersion;
+@property (nonatomic, readwrite, assign) int64_t destinationVersion;
 /**
  * The old schema version, one version behind -destinationVersion.
  *
@@ -370,7 +370,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  * You can put the migration logic in this block, rather than creating a 
  * subclass and overriding -migrateItems:.
  */
-@property (nonatomic, copy) COMigrationBlock migrationBlock;
+@property (nonatomic, readwrite, copy) COMigrationBlock migrationBlock;
 /**
  * Package names depended on by the -sourceVersion of -packageName, along with
  * their versions.
@@ -378,13 +378,13 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  * This acts as a snapshot of the necessary parts of the metamodel at 
  * -sourceVersion.
  */
-@property (nonatomic, copy) NSDictionary *dependentSourceVersionsByPackageName;
+@property (nonatomic, readwrite, copy) NSDictionary *dependentSourceVersionsByPackageName;
 
 /** @task Move Operations Accross Packages */
 
 
-@property (nonatomic, copy) NSSet *entityMoves;
-@property (nonatomic, copy) NSSet *propertyMoves;
+@property (nonatomic, readwrite, copy) NSSet *entityMoves;
+@property (nonatomic, readwrite, copy) NSSet *propertyMoves;
 
 
 /** @taskunit Migration Process */

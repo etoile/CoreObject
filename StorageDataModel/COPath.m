@@ -52,15 +52,15 @@
 	ETUUID *branch = nil;
 	ETUUID *persistentRoot = nil;
 	
-	if ([pathString length] > 0)
+	if (pathString.length > 0)
 	{
 		NSArray *components = [pathString componentsSeparatedByString: @":"];
-		switch ([components count])
+		switch (components.count)
 		{
 			case 2:
-				branch = [ETUUID UUIDWithString: [components objectAtIndex: 1]];
+				branch = [ETUUID UUIDWithString: components[1]];
 			case 1:
-				persistentRoot = [ETUUID UUIDWithString: [components objectAtIndex: 0]];
+				persistentRoot = [ETUUID UUIDWithString: components[0]];
 				break;
 			default:
 				[NSException raise: NSInvalidArgumentException format: @"unsupported COPath string '%@'", pathString];
@@ -93,7 +93,7 @@
 
 - (NSUInteger) hash
 {
-	return [_branch hash] ^ [_persistentRoot hash];
+	return _branch.hash ^ _persistentRoot.hash;
 }
 
 - (BOOL) isEqual: (id)anObject
@@ -117,7 +117,7 @@
 
 - (NSString *) description
 {
-	return [self stringValue];
+	return self.stringValue;
 }
 
 @end
@@ -152,7 +152,7 @@
 
 - (NSString *) description
 {
-	return [self stringValue];
+	return self.stringValue;
 }
 
 @end

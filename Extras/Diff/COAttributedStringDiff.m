@@ -28,17 +28,17 @@ static BOOL coalesceOpPair(id<COAttributedStringDiffOperation> op, id<COAttribut
 	const BOOL isOpAttributeOp = ([op isKindOfClass: [COAttributedStringDiffOperationAddAttribute class]]
 								  || [op isKindOfClass: [COAttributedStringDiffOperationRemoveAttribute class]]);
 	const BOOL isOpSameClassAsNextOp = ([op class] == [nextOp class]);
-	const BOOL isAdjacent = NSMaxRange([op range]) == [nextOp range].location;
+	const BOOL isAdjacent = NSMaxRange(op.range) == nextOp.range.location;
 	
 	if (isOpAttributeOp && isOpSameClassAsNextOp && isAdjacent)
 	{
 		COObjectGraphContext *opAttributeGraph = [COObjectGraphContext new];
-		[opAttributeGraph setItemGraph: [(COAttributedStringDiffOperationAddAttribute *)op attributeItemGraph]];
-		COAttributedStringAttribute *opAttribute = [opAttributeGraph rootObject];
+		[opAttributeGraph setItemGraph: [(id)op attributeItemGraph]];
+		COAttributedStringAttribute *opAttribute = opAttributeGraph.rootObject;
 		
 		COObjectGraphContext *nextOpAttributeGraph = [COObjectGraphContext new];
-		[nextOpAttributeGraph setItemGraph: [(COAttributedStringDiffOperationAddAttribute *)nextOp attributeItemGraph]];
-		COAttributedStringAttribute *nextOpAttribute = [nextOpAttributeGraph rootObject];
+		[nextOpAttributeGraph setItemGraph: [(id)nextOp attributeItemGraph]];
+		COAttributedStringAttribute *nextOpAttribute = nextOpAttributeGraph.rootObject;
 		
 		const BOOL sameAttributes = [opAttribute isDeeplyEqualToAttribute: nextOpAttribute];
 		if (sameAttributes)
@@ -52,7 +52,7 @@ static BOOL coalesceOpPair(id<COAttributedStringDiffOperation> op, id<COAttribut
 
 static void coalesceOpsInternal(NSMutableArray *ops, NSUInteger i)
 {
-	if (i+1 >= [ops count])
+	if (i+1 >= ops.count)
 		return;
 	
 	if (coalesceOpPair(ops[i], ops[i+1]))
@@ -82,8 +82,7 @@ static void coalesceOps(NSMutableArray *ops)
 	COObjectGraphContext *ctxB = [[COObjectGraphContext alloc] init];
 	[ctxB setItemGraph: b];
 	
-	COAttributedStringDiff *result = [[COAttributedStringDiff alloc] init];
-	result->_operations = [NSMutableArray new];
+	COAttributedStringDiff *result = [[COAttributedStringDiff alloc] initWithOperations: @[]];
 	
 	for (ETUUID *uuid in uuids)
 	{
@@ -95,7 +94,7 @@ static void coalesceOps(NSMutableArray *ops)
 		if (objectA == nil)
 		{
 			objectA = [[COAttributedString alloc] prepareWithUUID: uuid
-												entityDescription: [[ctxA modelDescriptionRepository] entityDescriptionForClass: [COAttributedString class]]
+												entityDescription: [ctxA.modelDescriptionRepository entityDescriptionForClass: [COAttributedString class]]
 											   objectGraphContext: ctxA
 															isNew: YES];
 		}
@@ -111,8 +110,7 @@ static void coalesceOps(NSMutableArray *ops)
 
 - (id<CODiffAlgorithm>) itemTreeDiffByMergingWithDiff: (id<CODiffAlgorithm>)aDiff
 {
-	COAttributedStringDiff *result = [COAttributedStringDiff new];
-	result->_operations = [NSMutableArray new];
+	COAttributedStringDiff *result = [[COAttributedStringDiff alloc] initWithOperations: @[]];
 	[result addOperationsFromDiff: self];
 	[result addOperationsFromDiff: (COAttributedStringDiff *)aDiff];
 	return result;
@@ -129,20 +127,27 @@ static void coalesceOps(NSMutableArray *ops)
 						secondAttributedString: (COAttributedString *)second
 										source: (id)source
 {
+	NILARG_EXCEPTION_TEST(first);
+	NILARG_EXCEPTION_TEST(second);
 	SUPERINIT;
 	_operations = [NSMutableArray new];
 	[self diffFirst: first second: second source: source];
 	return self;
 }
 
+- (instancetype)init
+{
+	return [self initWithFirstAttributedString: nil secondAttributedString: nil source: nil];
+}
+
 - (void) diffFirst: (COAttributedString *)first
 			second: (COAttributedString *)second
 			source: (id)source
 {
-	NSString *firstString = [[[COAttributedStringWrapper alloc] initWithBacking: first] string];
-	NSString *secondString = [[[COAttributedStringWrapper alloc] initWithBacking: second] string];
+	NSString *firstString = [[COAttributedStringWrapper alloc] initWithBacking: first].string;
+	NSString *secondString = [[COAttributedStringWrapper alloc] initWithBacking: second].string;
 		
-	diffresult_t *result = diff_arrays([firstString length], [secondString length], arraycomparefn, (__bridge void *)firstString, (__bridge void *)secondString);
+	diffresult_t *result = diff_arrays(firstString.length, secondString.length, arraycomparefn, (__bridge void *)firstString, (__bridge void *)secondString);
 	
 	for (size_t i = 0; i < diff_editcount(result); i++)
 	{
@@ -216,7 +221,7 @@ static void coalesceOps(NSMutableArray *ops)
 
 - (void) recordAddAttribute: (COAttributedStringAttribute *)attr toRangeA: (NSRange)rangeInA first: (COAttributedString *)first second: (COAttributedString *)second source: (id)source
 {
-	COItemGraph *graph = [attr attributeItemGraph];
+	COItemGraph *graph = attr.attributeItemGraph;
 	
 	COAttributedStringDiffOperationAddAttribute *op = [COAttributedStringDiffOperationAddAttribute new];
 	op.range = rangeInA;
@@ -229,7 +234,7 @@ static void coalesceOps(NSMutableArray *ops)
 
 - (void) recordRemoveAttribute: (COAttributedStringAttribute *)attr toRangeA: (NSRange)rangeInA first: (COAttributedString *)first second: (COAttributedString *)second source: (id)source
 {
-	COItemGraph *graph = [attr attributeItemGraph];
+	COItemGraph *graph = attr.attributeItemGraph;
 	
 	COAttributedStringDiffOperationRemoveAttribute *op = [COAttributedStringDiffOperationRemoveAttribute new];
 	op.range = rangeInA;
@@ -322,11 +327,11 @@ static void coalesceOps(NSMutableArray *ops)
 		}
 		if (r1.location == r2.location)
 		{
-			if ([aSource isEqual: [string1 source]])
+			if ([aSource isEqual: string1.source])
 			{
 				return NSOrderedAscending;
 			}
-			if ([aSource isEqual: [string2 source]])
+			if ([aSource isEqual: string2.source])
 			{
 				return NSOrderedDescending;
 			}
@@ -352,10 +357,9 @@ static void coalesceOps(NSMutableArray *ops)
 
 - (COAttributedStringDiff *) diffByMergingWithDiff: (COAttributedStringDiff *)aDiff
 {
-	COAttributedStringDiff *result = [COAttributedStringDiff new];
-	result->_operations = [NSMutableArray new];
+	COAttributedStringDiff *result = [[COAttributedStringDiff alloc] initWithOperations: @[]];
 	[result->_operations addObjectsFromArray: _operations];
-	[result->_operations addObjectsFromArray: [aDiff operations]];
+	[result->_operations addObjectsFromArray: aDiff.operations];
 	[result sortOperationsFavouringSourceIdentifier: nil];
 	return result;
 }
@@ -412,7 +416,7 @@ static void coalesceOps(NSMutableArray *ops)
 		if (attrStr == nil)
 		{
 			attrStr = [[COAttributedString alloc] prepareWithUUID: attributedStringUUID
-												entityDescription: [[dest modelDescriptionRepository] entityDescriptionForClass: [COAttributedString class]]
+												entityDescription: [dest.modelDescriptionRepository entityDescriptionForClass: [COAttributedString class]]
 											   objectGraphContext: dest
 															isNew: YES];
 		}
@@ -448,11 +452,11 @@ static void coalesceOps(NSMutableArray *ops)
 
 - (NSString *)description
 {
-	NSMutableString *desc = [NSMutableString stringWithString: [super description]];
+	NSMutableString *desc = [NSMutableString stringWithString: super.description];
 	[desc appendFormat: @" {\n"];
 	for (COItemGraphEdit *edit in _operations)
 	{
-		[desc appendFormat: @"\t%@\n", [edit description]];
+		[desc appendFormat: @"\t%@\n", edit.description];
 	}
  	[desc appendFormat: @"}"];
 	return desc;
@@ -465,7 +469,7 @@ static void coalesceOps(NSMutableArray *ops)
 static NSString *
 COHTMLCodesForAttributesItemGraph(COItemGraph *graph)
 {
-	NSString *htmlCodes = [[[graph items] mappedCollectionWithBlock:
+	NSString *htmlCodes = [[graph.items mappedCollectionWithBlock:
 							^(id obj) { return [obj valueForAttribute: @"htmlCode"]; }] componentsJoinedByString: @","];
 	return htmlCodes;
 }
@@ -476,7 +480,7 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 	COObjectGraphContext *tempCtx = [COObjectGraphContext new];
 	[tempCtx setItemGraph: graph];
 	
-	COAttributedString *string = [tempCtx rootObject];
+	COAttributedString *string = tempCtx.rootObject;
 	NSMutableString *result = [NSMutableString new];
 	for (COAttributedStringChunk *chunk in string.chunks)
 	{
@@ -491,7 +495,7 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 
 - (NSUInteger)hash
 {
-	return [NSStringFromClass([self class]) hash] ^ range.location ^ range.length ^ [attributedStringUUID hash];
+	return NSStringFromClass([self class]).hash ^ range.location ^ range.length ^ attributedStringUUID.hash;
 }
 
 - (BOOL)isEqual:(id)object
@@ -518,18 +522,18 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
-	COObjectGraphContext *targetCtx = [target objectGraphContext];
+	COObjectGraphContext *targetCtx = target.objectGraphContext;
 	const NSInteger insertionPos = range.location + offset;
 		
-	[targetCtx insertOrUpdateItems: [attributedStringItemGraph items]];
+	[targetCtx insertOrUpdateItems: attributedStringItemGraph.items];
 	
-	COAttributedString *sourceString = [targetCtx loadedObjectForUUID: [attributedStringItemGraph rootItemUUID]];
-	const NSUInteger sourceStringLength = [sourceString length];
+	COAttributedString *sourceString = [targetCtx loadedObjectForUUID: attributedStringItemGraph.rootItemUUID];
+	const NSUInteger sourceStringLength = sourceString.length;
 	const NSInteger insertionPosChunkIndex = [target splitChunkAtIndex: insertionPos];
 		
 	// FIXME: Why is -insertObjects:atIndexes:hints:forProperty: private?!
 	[target insertObjects: sourceString.chunks
-				atIndexes: [[NSIndexSet alloc] initWithIndexesInRange: NSMakeRange(insertionPosChunkIndex, [sourceString.chunks count])]
+				atIndexes: [[NSIndexSet alloc] initWithIndexesInRange: NSMakeRange(insertionPosChunkIndex, sourceString.chunks.count)]
 					hints: @[]
 			  forProperty: @"chunks"];
 	
@@ -580,11 +584,11 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
-	COObjectGraphContext *targetCtx = [target objectGraphContext];
+	COObjectGraphContext *targetCtx = target.objectGraphContext;
 	
-	[targetCtx insertOrUpdateItems: [attributedStringItemGraph items]];
-	COAttributedString *sourceString = [targetCtx loadedObjectForUUID: [attributedStringItemGraph rootItemUUID]];
-	const NSUInteger sourceStringLength = [sourceString length];
+	[targetCtx insertOrUpdateItems: attributedStringItemGraph.items];
+	COAttributedString *sourceString = [targetCtx loadedObjectForUUID: attributedStringItemGraph.rootItemUUID];
+	const NSUInteger sourceStringLength = sourceString.length;
 	
 	const NSInteger deletionStartChunkIndex = [target splitChunkAtIndex: range.location + offset];
 	const NSInteger deletionEndChunkIndex = [target splitChunkAtIndex: NSMaxRange(range) + offset];
@@ -619,8 +623,8 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
-	[target.objectGraphContext insertOrUpdateItems: [attributeItemGraph items]];
-	COAttributedStringAttribute *attributeToAdd = [target.objectGraphContext loadedObjectForUUID: [attributeItemGraph rootItemUUID]];
+	[target.objectGraphContext insertOrUpdateItems: attributeItemGraph.items];
+	COAttributedStringAttribute *attributeToAdd = [target.objectGraphContext loadedObjectForUUID: attributeItemGraph.rootItemUUID];
 	
 	const NSInteger editStartChunkIndex = [target splitChunkAtIndex: range.location + offset];
 	const NSInteger editEndChunkIndex = [target splitChunkAtIndex: NSMaxRange(range) + offset];
@@ -659,8 +663,8 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 
 - (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
 {
-	[target.objectGraphContext insertOrUpdateItems: [attributeItemGraph items]];
-	COAttributedStringAttribute *attributeToRemove = [target.objectGraphContext loadedObjectForUUID: [attributeItemGraph rootItemUUID]];
+	[target.objectGraphContext insertOrUpdateItems: attributeItemGraph.items];
+	COAttributedStringAttribute *attributeToRemove = [target.objectGraphContext loadedObjectForUUID: attributeItemGraph.rootItemUUID];
 	
 	const NSInteger editStartChunkIndex = [target splitChunkAtIndex: range.location + offset];
 	const NSInteger editEndChunkIndex = [target splitChunkAtIndex: NSMaxRange(range) + offset];

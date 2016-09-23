@@ -96,13 +96,13 @@ See +[NSObject typePrefix]. */
 
 	// For subclasses that don't override -newEntityDescription, we must not add the 
 	// property descriptions that we will inherit through the parent
-	if ([[object name] isEqual: [COObject className]] == NO) 
+	if (![object.name isEqual: [COObject className]]) 
 		return object;
 
 	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COObject"
 	                               description: @"Core Object"
-	                          supertypeStrings: [NSArray array]
-	                                  typeTags: [NSDictionary dictionary]];
+	                          supertypeStrings: @[]
+	                                  typeTags: @{}];
 	ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
 
 	[object setLocalizedDescription: _(@"Basic Object")];
@@ -110,28 +110,28 @@ See +[NSObject typePrefix]. */
 	/* Persistency Attributes (subset) */
 
 	ETPropertyDescription *UUID =
-		[ETPropertyDescription descriptionWithName: @"UUID" type: (id)@"ETUUID"];
+		[ETPropertyDescription descriptionWithName: @"UUID" typeName: @"ETUUID"];
 	[UUID setReadOnly: YES];
 	ETPropertyDescription *isPersistent =
-		[ETPropertyDescription descriptionWithName: @"isPersistent" type: (id)@"BOOL"];
-	[isPersistent setDerived: YES];
+		[ETPropertyDescription descriptionWithName: @"isPersistent" typeName: @"BOOL"];
+	isPersistent.derived = YES;
 	ETPropertyDescription *isRoot =
-		[ETPropertyDescription descriptionWithName: @"isRoot" type: (id)@"BOOL"];
-	[isRoot setDerived: YES];
+		[ETPropertyDescription descriptionWithName: @"isRoot" typeName: @"BOOL"];
+	isRoot.derived = YES;
 	ETPropertyDescription *isShared =
-		[ETPropertyDescription descriptionWithName: @"isShared" type: (id)@"BOOL"];
+		[ETPropertyDescription descriptionWithName: @"isShared" typeName: @"BOOL"];
 	[isShared setReadOnly: YES];
 
 	/* Basic Properties */
 
 	ETPropertyDescription *name =
-		[ETPropertyDescription descriptionWithName: @"name" type: (id)@"NSString"];
+		[ETPropertyDescription descriptionWithName: @"name" typeName: @"NSString"];
 	ETPropertyDescription *identifier =
-		[ETPropertyDescription descriptionWithName: @"identifier" type: (id)@"NSString"];
+		[ETPropertyDescription descriptionWithName: @"identifier" typeName: @"NSString"];
 	ETPropertyDescription *tags  =
-		[ETPropertyDescription descriptionWithName: @"tags" type: (id)@"COTag"];
-	[tags setMultivalued: YES];
-	[tags setDerived: YES];
+		[ETPropertyDescription descriptionWithName: @"tags" typeName: @"COTag"];
+	tags.multivalued = YES;
+	tags.derived = YES;
 
 	// TODO: Move these properties to EtoileFoundation (by adding a NSObject
 	// entity description) or just use -basicPropertyNames in
@@ -147,37 +147,37 @@ See +[NSObject typePrefix]. */
 #ifndef GNUSTEP
 	// FIXME: We don't link NSImage on GNUstep because AppKit won't work
 	ETPropertyDescription *icon = 
-		[ETPropertyDescription descriptionWithName: @"icon" type: (id)imageType];
+		[ETPropertyDescription descriptionWithName: @"icon" typeName: imageType];
 #endif
 	ETPropertyDescription *displayName = 
-		[ETPropertyDescription descriptionWithName: @"displayName" type: (id)@"NSString"];
-	[displayName setDisplayName: _(@"Name")];
+		[ETPropertyDescription descriptionWithName: @"displayName" typeName: @"NSString"];
+	displayName.displayName = _(@"Name");
 
 	/* Description Properties */
 
 	ETPropertyDescription *revisionDescription =
-		[ETPropertyDescription descriptionWithName: @"revisionDescription" type: (id)@"NSString"];
-	[revisionDescription setDisplayName: _(@"Version")];
+		[ETPropertyDescription descriptionWithName: @"revisionDescription" typeName: @"NSString"];
+	revisionDescription.displayName = _(@"Version");
 	ETPropertyDescription *tagDescription =
-		[ETPropertyDescription descriptionWithName: @"tagDescription" type: (id)@"NSString"];
-	[tagDescription setDisplayName: _(@"Tags")];
+		[ETPropertyDescription descriptionWithName: @"tagDescription" typeName: @"NSString"];
+	tagDescription.displayName = _(@"Tags");
 	ETPropertyDescription *typeDescription =
-		[ETPropertyDescription descriptionWithName: @"typeDescription" type: (id)@"NSString"];
-	[typeDescription setDisplayName: _(@"Type")];
+		[ETPropertyDescription descriptionWithName: @"typeDescription" typeName: @"NSString"];
+	typeDescription.displayName = _(@"Type");
 
-	NSArray *transientProperties = A(UUID, isPersistent, isRoot, identifier,
-		displayName, revisionDescription, tagDescription, typeDescription, tags);
+	NSArray *transientProperties = @[UUID, isPersistent, isRoot, identifier,
+		displayName, revisionDescription, tagDescription, typeDescription, tags];
 #ifndef GNUSTEP
 	transientProperties = [transientProperties arrayByAddingObject: icon];
 #endif
-	NSArray *persistentProperties = A(isShared, name);
+	NSArray *persistentProperties = @[isShared, name];
 	NSArray *properties =
 		[transientProperties arrayByAddingObjectsFromArray: persistentProperties];
 
 	[[[properties arrayByRemovingObject: name] mappedCollection] setReadOnly: YES];
 	[[persistentProperties mappedCollection] setPersistent: YES];
 
-	[object setPropertyDescriptions: properties];
+	object.propertyDescriptions = properties;
 
 	return object;
 }
@@ -186,13 +186,13 @@ See +[NSObject typePrefix]. */
 
 - (Class)coreObjectCollectionClassForPropertyDescription: (ETPropertyDescription *)propDesc
 {
-	NSParameterAssert([propDesc isMultivalued]);
+	NSParameterAssert(propDesc.multivalued);
 
-	if ([propDesc isKeyed])
+	if (propDesc.keyed)
 	{
 		// NOTE: Could be better to return nil in the assertion case, and move
 		// the assertion in methods calling -collectionClassForPropertyDescription:.
-		NSAssert1([propDesc isOrdered] == NO || [propDesc isPersistent] == NO,
+		NSAssert1(!propDesc.ordered || !propDesc.persistent,
 			@"Persistent keyed collection %@ cannot be ordered.", propDesc);
 		return [COMutableDictionary class];
 	}
@@ -200,36 +200,36 @@ See +[NSObject typePrefix]. */
 	{
 		if (propDesc.isPersistentRelationship)
 		{
-			return ([propDesc isOrdered] ? [COUnsafeRetainedMutableArray class] : [COUnsafeRetainedMutableSet class]);
+			return (propDesc.ordered ? [COUnsafeRetainedMutableArray class] : [COUnsafeRetainedMutableSet class]);
 		}
 		else
 		{
-			return ([propDesc isOrdered] ? [COMutableArray class] : [COMutableSet class]);
+			return (propDesc.ordered ? [COMutableArray class] : [COMutableSet class]);
 		}
 	}
 }
 
 - (Class)collectionClassForPropertyDescription: (ETPropertyDescription *)propDesc
 {
-	NSParameterAssert([propDesc isMultivalued]);
+	NSParameterAssert(propDesc.multivalued);
 	
-	if ([propDesc isKeyed])
+	if (propDesc.keyed)
 	{
 		// NOTE: Could be better to return nil in the assertion case, and move
 		// the assertion in methods calling -collectionClassForPropertyDescription:.
-		NSAssert1([propDesc isOrdered] == NO || [propDesc isPersistent] == NO,
+		NSAssert1(!propDesc.ordered || !propDesc.persistent,
 				  @"Persistent keyed collection %@ cannot be ordered.", propDesc);
 		return [NSDictionary class];
 	}
 	else
 	{
-		return ([propDesc isOrdered] ? [NSArray class] : [NSSet class]);
+		return (propDesc.ordered ? [NSArray class] : [NSSet class]);
 	}
 }
 
 - (id)newCollectionForPropertyDescription: (ETPropertyDescription *)propDesc
 {
-	if ([propDesc isPersistent])
+	if (propDesc.persistent)
 	{
 		Class collectionClass = [self coreObjectCollectionClassForPropertyDescription: propDesc];
 		return [collectionClass new];
@@ -246,20 +246,20 @@ See +[NSObject typePrefix]. */
 {
 	NSMutableDictionary *variableStorage = [[NSMutableDictionary alloc] initWithCapacity: 20];
 
-	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
+	for (ETPropertyDescription *propDesc in self.entityDescription.allPropertyDescriptions)
 	{
-		if ([propDesc isMultivalued] == NO || [propDesc isDerived])
+		if (!propDesc.multivalued || propDesc.derived)
 			continue;
 
 		id value = nil;
-		BOOL ivarExists = ETGetInstanceVariableValueForKey(self, &value, [propDesc name]);
+		BOOL ivarExists = ETGetInstanceVariableValueForKey(self, &value, propDesc.name);
 
 		if (ivarExists)
 			continue;
 
 		id collection = [self newCollectionForPropertyDescription: propDesc];
 		
-		[variableStorage setObject: collection forKey: [propDesc name]];
+		variableStorage[propDesc.name] = collection;
 	}
 
 	return variableStorage;
@@ -270,23 +270,23 @@ See +[NSObject typePrefix]. */
 {
 	Class entityClass = [repo classForEntityDescription: anEntityDescription];
 
-	if ([entityClass isSubclassOfClass: [self class]] == NO
-	 && [[self class] isSubclassOfClass: entityClass] == NO)
+	if (![entityClass isSubclassOfClass: [self class]]
+	 && ![[self class] isSubclassOfClass: entityClass])
 	{
 		[NSException raise: NSInvalidArgumentException
 					format: @"There is mismatch between the entity description "
 		                     "%@ and the class %@. For this entity description, "
 		                     "the class must be a %@ class, subclass or superclass.",
-		                     [anEntityDescription fullName], [self className],
+		                     anEntityDescription.fullName, self.className,
 		                     NSStringFromClass(entityClass)];
 	}
 	
-	if (![anEntityDescription isKindOfEntity: [repo descriptionForName: @"Anonymous.COObject"]])
+	if (![anEntityDescription isKindOfEntity: [repo descriptionForName: @"COObject"]])
 	{
 		[NSException raise: NSInvalidArgumentException
 					format: @"The COObject class only supports entitiy descriptions that "
 							"are subentities of COObject, but %@ is not.",
-							[anEntityDescription fullName]];
+							anEntityDescription.fullName];
 	}
 }
 
@@ -297,7 +297,7 @@ See +[NSObject typePrefix]. */
 
 	for (ETPropertyDescription *propertyDesc in propertyDescs)
 	{
-		if (propertyDesc.isKeyed)
+		if (propertyDesc.keyed)
 		{
 			[keyedPropertyDescs addObject: propertyDesc];
 		}
@@ -312,8 +312,7 @@ See +[NSObject typePrefix]. */
 
 	for (ETPropertyDescription *propertyDesc in [self keyedPersistentPropertyDescriptions])
 	{
-		[storeItemUUIDs setObject: (isDeserialization ? cachedNSNull : [ETUUID UUID])
-		                   forKey: [propertyDesc name]];
+		storeItemUUIDs[propertyDesc.name] = (isDeserialization ? cachedNSNull : [ETUUID UUID]);
 	}
 	return storeItemUUIDs;
 }
@@ -334,7 +333,7 @@ See +[NSObject typePrefix]. */
 	INVALIDARG_EXCEPTION_TEST(aContext, [aContext isKindOfClass: [COObjectGraphContext class]]);
 
 	[self validateEntityDescription: anEntityDescription
-	   inModelDescriptionRepository: [aContext modelDescriptionRepository]];
+	   inModelDescriptionRepository: aContext.modelDescriptionRepository];
 
 	[anEntityDescription makeFrozen];
 	
@@ -347,14 +346,14 @@ See +[NSObject typePrefix]. */
 	_variableStorage = [self newVariableStorage];
 	_incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
 	_propertyChangeStack = [NSMutableArray new];
-	_additionalStoreItemUUIDs = [self newAdditionalStoreItemUUIDs: (inserted == NO)];
+	_additionalStoreItemUUIDs = [self newAdditionalStoreItemUUIDs: !inserted];
 
 	[_objectGraphContext registerObject: self isNew: inserted];
 
 	return self;
 }
 
-- (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
+- (instancetype)initWithObjectGraphContext:(COObjectGraphContext *)aContext
 {
 	/* We execute overriden initializer implementations e.g. 
 	   -[ETShape initWithBezierPath:objectGraphContext:], until reaching the 
@@ -366,19 +365,19 @@ See +[NSObject typePrefix]. */
 
 	NILARG_EXCEPTION_TEST(aContext);
 
-	ETModelDescriptionRepository *repo = [aContext modelDescriptionRepository];
+	ETModelDescriptionRepository *repo = aContext.modelDescriptionRepository;
 	return [self prepareWithUUID: [ETUUID UUID]
 	           entityDescription: [repo entityDescriptionForClass: [self class]]
 	          objectGraphContext: aContext
 	                       isNew: YES];
 }
 
-- (id)init
+- (instancetype)init
 {
 	return [self initWithObjectGraphContext: nil];
 }
 
-- (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
+- (instancetype)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
              objectGraphContext: (COObjectGraphContext *)aContext
 {
 	return [self initWithEntityDescription: anEntityDesc
@@ -386,7 +385,7 @@ See +[NSObject typePrefix]. */
 	                    objectGraphContext: aContext];
 }
 
-- (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
+- (instancetype)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
                            UUID: (ETUUID *)aUUID
              objectGraphContext: (COObjectGraphContext *)aContext
 {
@@ -427,27 +426,27 @@ See +[NSObject typePrefix]. */
 
 - (COBranch *) branch
 {
-	return [_objectGraphContext branch];
+	return _objectGraphContext.branch;
 }
 
 - (COPersistentRoot *)persistentRoot
 {
-	return [_objectGraphContext persistentRoot];
+	return _objectGraphContext.persistentRoot;
 }
 
 - (COEditingContext *)editingContext
 {
-	return [_objectGraphContext editingContext];
+	return _objectGraphContext.editingContext;
 }
 
 - (id) rootObject
 {
-	return [_objectGraphContext rootObject];
+	return _objectGraphContext.rootObject;
 }
 
 - (BOOL) isRoot
 {
-	return ([self rootObject] == self);
+	return (self.rootObject == self);
 }
 
 - (BOOL) isShared
@@ -457,12 +456,12 @@ See +[NSObject typePrefix]. */
 
 - (CORevision *)revision
 {
-	return [[_objectGraphContext branch] currentRevision];
+	return _objectGraphContext.branch.currentRevision;
 }
 
 - (BOOL) isPersistent
 {
-	return ([self persistentRoot] != nil);
+	return (self.persistentRoot != nil);
 }
 
 - (BOOL)isZombie
@@ -474,7 +473,7 @@ See +[NSObject typePrefix]. */
 
 - (NSString *)displayName
 {
-	return [self name];
+	return self.name;
 }
 
 - (NSString *)name
@@ -484,7 +483,7 @@ See +[NSObject typePrefix]. */
 
 - (NSString *)identifier
 {
-	return [self name];
+	return self.name;
 }
 
 - (void)setName: (NSString *)aName
@@ -509,12 +508,12 @@ See +[NSObject typePrefix]. */
 
 - (NSArray *)propertyNames
 {
-	return [[self entityDescription] allPropertyDescriptionNames];
+	return self.entityDescription.allPropertyDescriptionNames;
 }
 
 - (NSArray *) persistentPropertyNames
 {
-	return (id)[[[[self entityDescription] allPersistentPropertyDescriptions] mappedCollection] name];
+	return (id)[[self.entityDescription.allPersistentPropertyDescriptions mappedCollection] name];
 }
 
 - (SEL)getterForKey: (NSString *)key useIsPrefix: (BOOL)useIsPrefix
@@ -557,7 +556,7 @@ See +[NSObject typePrefix]. */
 
 - (id) valueForProperty: (NSString *)key shouldLoad: (BOOL)shouldLoad
 {
-	if (![[self propertyNames] containsObject: key])
+	if (![self.propertyNames containsObject: key])
 	{
 		[NSException raise: NSInvalidArgumentException
 					format: @"Tried to get value for invalid property %@", key];
@@ -614,8 +613,8 @@ See +[NSObject typePrefix]. */
 		return NO;
 	}
 	
-	COEditingContext *valueEditingContext = [[value persistentRoot] parentContext];
-	COEditingContext *currentEditingContext = [[self persistentRoot] parentContext];
+	COEditingContext *valueEditingContext = value.persistentRoot.parentContext;
+	COEditingContext *currentEditingContext = self.persistentRoot.parentContext;
 	BOOL involvesTransientObject = (valueEditingContext == nil || currentEditingContext == nil);
 	
 	return (involvesTransientObject || valueEditingContext == currentEditingContext);
@@ -630,19 +629,19 @@ See +[NSObject typePrefix]. */
 	const BOOL isSameObjectGraphContext = (value.objectGraphContext == self.objectGraphContext);
 	const BOOL isEqualPersistentRootUUID = [value.persistentRoot.UUID isEqual: self.persistentRoot.UUID];
 
-	if ([propertyDesc isComposite] || [propertyDesc isContainer])
+	if (propertyDesc.isComposite || propertyDesc.isContainer)
 	{
 		/* Composite and container are relationship opposite in the metamodel */
-		COObject *parent = ([propertyDesc isComposite] ? self : value);
-		COObject *child = ([propertyDesc isComposite] ? value : self);
-		BOOL involvesTransientParent = ([parent persistentRoot] == nil);
-		BOOL involvesTransientChild = ([child persistentRoot] == nil);
+		COObject *parent = (propertyDesc.isComposite ? self : value);
+		COObject *child = (propertyDesc.isComposite ? value : self);
+		BOOL involvesTransientParent = (parent.persistentRoot == nil);
+		BOOL involvesTransientChild = (child.persistentRoot == nil);
 
 		/* For a composite/container relationship, parent and child can't be 
 		   references accross object graph contexts (or persistent roots), 
 		   unless the parent object graph context is transient. */
 		return isSameObjectGraphContext
-			|| (involvesTransientParent && involvesTransientChild == NO)
+			|| (involvesTransientParent && !involvesTransientChild)
 			|| (involvesTransientParent && involvesTransientChild);
 	}
 	else
@@ -663,22 +662,22 @@ See +[NSObject typePrefix]. */
 - (void)validateEditingContextForNewCollectionValue: (id)value
 								propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if (propertyDesc.isPersistentRelationship == NO)
+	if (!propertyDesc.isPersistentRelationship)
 		return;
 	
-	ETAssert([propertyDesc isMultivalued]);
+	ETAssert(propertyDesc.multivalued);
 	ETAssert([self isEditingContextValidForObject: value]);
 }
 
 - (void)validateEditingContextForNewValue: (id)value
                       propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if (propertyDesc.isPersistentRelationship == NO)
+	if (!propertyDesc.isPersistentRelationship)
 		return;
 
 	if ([value isPrimitiveCollection])
 	{
-		ETAssert([propertyDesc isMultivalued]);
+		ETAssert(propertyDesc.multivalued);
 
 		for (COObject *object in [value objectEnumerator])
 		{
@@ -700,10 +699,10 @@ See +[NSObject typePrefix]. */
 - (void)validateObjectGraphContextForNewCollectionValue: (id)value
 									propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if (propertyDesc.isPersistentRelationship == NO)
+	if (!propertyDesc.isPersistentRelationship)
 		return;
 	
-	ETAssert([propertyDesc isMultivalued]);
+	ETAssert(propertyDesc.multivalued);
 	
 	ETAssert([self isObjectGraphContextValidForObject: value
 								  propertyDescription: propertyDesc]);
@@ -712,12 +711,12 @@ See +[NSObject typePrefix]. */
 - (void)validateObjectGraphContextForNewValue: (id)value
 						  propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if (propertyDesc.isPersistentRelationship == NO)
+	if (!propertyDesc.isPersistentRelationship)
 		return;
 
 	if ([value isPrimitiveCollection])
 	{
-		ETAssert([propertyDesc isMultivalued]);
+		ETAssert(propertyDesc.multivalued);
 		
 		for (COObject *object in [value objectEnumerator])
 		{
@@ -736,7 +735,7 @@ See +[NSObject typePrefix]. */
 
 - (BOOL) setValue: (id)value forProperty: (NSString *)key
 {
-	if (![[self propertyNames] containsObject: key])
+	if (![self.propertyNames containsObject: key])
 	{
 		[NSException raise: NSInvalidArgumentException
 		            format: @"Tried to set value for invalid property %@", key];
@@ -766,7 +765,7 @@ See +[NSObject typePrefix]. */
 + (BOOL)automaticallyNotifiesObserversForKey:(NSString *)key
 {
 	ETEntityDescription *desc = [[ETModelDescriptionRepository mainRepository] entityDescriptionForClass: self];
-	NSArray *propertyNames = [desc allPropertyDescriptionNames];
+	NSArray *propertyNames = desc.allPropertyDescriptionNames;
 	
 	if ([propertyNames containsObject: key])
 	{
@@ -782,7 +781,7 @@ See +[NSObject typePrefix]. */
 	NSMutableArray *results = [NSMutableArray array];
 	
 	// TODO: We might want to coalesce bidirectional relationships validation results
-	for (NSString *key in [self persistentPropertyNames])
+	for (NSString *key in self.persistentPropertyNames)
 	{
 		[results addObjectsFromArray: [self validateValue: [self valueForProperty: key shouldLoad: NO]
 		                                      forProperty: key]];
@@ -794,12 +793,12 @@ See +[NSObject typePrefix]. */
 - (ETValidationResult *)validateValueUsingMetamodel: (id)value forProperty: (NSString *)key
 {
 	ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
-	ETPropertyDescription *opposite = [propertyDesc opposite];
+	ETPropertyDescription *opposite = propertyDesc.opposite;
 	ETValidationResult *oppositeResult = nil;
 
 	if (opposite != nil)
 	{
-		NSString *oppositeKey = [opposite name];
+		NSString *oppositeKey = opposite.name;
 		id oppositeValue = [value valueForProperty: oppositeKey];
 
 		oppositeResult = [opposite validateValue: oppositeValue forKey: oppositeKey];
@@ -829,7 +828,7 @@ See +[NSObject typePrefix]. */
 
 	SEL keySelector = sel_getUid(validator);
 
-	if ([self respondsToSelector: keySelector] == NO)
+	if (![self respondsToSelector: keySelector])
 		return [ETValidationResult validResult: value];
 
 	return [self performSelector: keySelector withObject: value];
@@ -845,11 +844,11 @@ See +[NSObject typePrefix]. */
 
 	NSMutableArray *results = [NSMutableArray arrayWithCapacity: 2];
 
-	if ([metamodelResult isValid] == NO)
+	if (!metamodelResult.isValid)
 	{
 		[results addObject: metamodelResult];
 	}
-	if ([modelResult isValid] == NO)
+	if (!modelResult.isValid)
 	{
 		[results addObject: modelResult];
 	}
@@ -866,10 +865,10 @@ See +[NSObject typePrefix]. */
 	NSParameterAssert(aValue != NULL);
 	NSArray *results = [self validateValue: *aValue forProperty: key];
 
-	if ([results count] == 1 && [[results firstObject] isValid])
+	if (results.count == 1 && [results.firstObject isValid])
 		return YES;
 
-	*aValue = [(ETValidationResult *)[results lastObject] value];
+	*aValue = [results.lastObject value];
 	if (anError != NULL)
 	{
 		*anError = [COError errorWithValidationResults: results];
@@ -881,7 +880,7 @@ See +[NSObject typePrefix]. */
 
 - (BOOL)isIncomingRelationship: (ETPropertyDescription *)propDesc
 {
-	if ([propDesc opposite] != nil && [propDesc isPersistent] && [[propDesc opposite] isPersistent])
+	if (propDesc.opposite != nil && propDesc.persistent && propDesc.opposite.persistent)
 	{
 		[NSException raise: NSInternalInconsistencyException
 		            format: @"For %@, %@ and its opposite are both declared as "
@@ -890,7 +889,7 @@ See +[NSObject typePrefix]. */
 		                     "as persistent.", self, propDesc];
 	}
 
-	return (![propDesc isPersistent] && nil != [propDesc opposite] && [[propDesc opposite] isPersistent]);
+	return (!propDesc.persistent && nil != propDesc.opposite && propDesc.opposite.persistent);
 }
 
 - (void) checkIsNotRemovedFromContext
@@ -927,17 +926,17 @@ See +[NSObject typePrefix]. */
 	// For the relationship cache API, parent(s) = referringObject(s) and self = target
     if ([self isIncomingRelationship: propDesc])
     {
-        if ([propDesc isMultivalued])
+        if (propDesc.multivalued)
         {
             return [_incomingRelationshipCache referringObjectsForPropertyInTarget: key];
         }
         return [_incomingRelationshipCache referringObjectForPropertyInTarget: key];
     }
 
-	id value = [_variableStorage objectForKey: key];
+	id value = _variableStorage[key];
 	
 	// If the value is a collection, try to load all of the cross persistent root references
-	if ([self isLoadingEnabled] && shouldLoad && [self isCoreObjectCollection: value])
+	if (self.loadingEnabled && shouldLoad && [self isCoreObjectCollection: value])
 	{
 		[self replaceReferencesWithLoadedObjectsForKey: key collection: value];
 	}
@@ -957,7 +956,7 @@ See +[NSObject typePrefix]. */
 	}
 	else if ([value isKindOfClass: [COPath class]])
 	{
-		if ([self isLoadingEnabled] && shouldLoad)
+		if (self.loadingEnabled && shouldLoad)
 		{
 			return [self.editingContext crossPersistentRootReferenceWithPath: value shouldLoad: YES];
 		}
@@ -1013,11 +1012,11 @@ See +[NSObject typePrefix]. */
 		[collection beginMutation];
 	}
 
-	if ([propDesc isKeyed])
+	if (propDesc.keyed)
 	{
 		[(NSMutableDictionary *)collection setDictionary: content];
 	}
-	else if ([propDesc isOrdered])
+	else if (propDesc.ordered)
 	{
 		// FIXME: Remove this copy hack to ensure KVO doesn't report a old value
 		// identical to the new one.
@@ -1071,7 +1070,7 @@ See +[NSObject typePrefix]. */
 	{
 		storageValue = [[COWeakRef alloc] initWithObject: aValue];
 	}
-	else if ([propertyDesc isMultivalued] && [self isCoreObjectCollection: aValue] == NO)
+	else if (propertyDesc.multivalued && ![self isCoreObjectCollection: aValue])
 	{
 		storageValue = _variableStorage[key];
 		storageValue = [self replaceContentOfCollection: storageValue
@@ -1083,15 +1082,14 @@ See +[NSObject typePrefix]. */
 		// TODO: In debugging mode, we could check the class of the value
 		// is permitted
 		// TODO: Once EtoileUI is migrated to serialization transformers,
-		// replace [self isCoreObjectValue: aValue] by [propertyDesc isPersistent]
+		// replace [self isCoreObjectValue: aValue] by propertyDesc.persistent
 		// (Also, remember it will affect COSerialization's value transformer support,
 		// since if a value transformer is in use you can have random NSObjects in the
 		// variable storage --Eric)
 		storageValue = ([self isCoreObjectValue: aValue] ? [aValue copy] : aValue);
 	}
 	
-	[_variableStorage setObject: storageValue
-	                     forKey: key];
+	_variableStorage[key] = storageValue;
 }
 
 - (id)valueForUndefinedKey: (NSString *)key
@@ -1149,7 +1147,7 @@ See +[NSObject typePrefix]. */
 
 - (void)setValue: (id)value forStorageKey: (NSString *)key
 {
-	if (ETSetInstanceVariableValueForKey(self, value, key) == NO)
+	if (!ETSetInstanceVariableValueForKey(self, value, key))
 	{
 		[self setValue: value forVariableStorageKey: key];
 	}
@@ -1224,7 +1222,7 @@ See +[NSObject typePrefix]. */
 		if (![indexes isEmpty])
 		{
 			[indexes enumerateIndexesUsingBlock: ^(NSUInteger idx, BOOL *stop){
-				[objs addObject: [oldValue objectAtIndex: idx]];
+				[objs addObject: oldValue[idx]];
 			}];
 		}
 		replacedOrRemoved = objs;
@@ -1307,7 +1305,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 
 	[NSException raise: NSInvalidArgumentException
 	            format: @"single value '%@' (entity %@) does not conform to type %@ (property %@)",
-	                    singleValue, newValueEntityDesc, [propertyDesc type], propertyDesc];
+	                    singleValue, newValueEntityDesc, propertyDesc.type, propertyDesc];
 }
 
 /**
@@ -1317,13 +1315,13 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 - (void)validateTypeForNewCollectionValue: (id)value
 					  propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	if ([propertyDesc isPersistent] == NO)
+	if (!propertyDesc.persistent)
 		return;
 	
-	if ([self serializationGetterForProperty: [propertyDesc name]] != NULL)
+	if ([self serializationGetterForProperty: propertyDesc.name] != NULL)
 		return;
 	
-	ETAssert([propertyDesc isMultivalued]);
+	ETAssert(propertyDesc.multivalued);
 	
 	ETModelDescriptionRepository *repo = _objectGraphContext.modelDescriptionRepository;
 
@@ -1355,7 +1353,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 	BOOL isPersistentRelationship = propertyDesc.isPersistentRelationship;
 	BOOL isValidatableType = ([self serializationGetterForProperty: propertyDesc.name] == NULL);
 
-	if ([propertyDesc isMultivalued])
+	if (propertyDesc.multivalued)
 	{
 		// We count on -objectEnumerator to detect when newValue isn't a collection
 		for (COObject *object in [newValue objectEnumerator])
@@ -1405,15 +1403,15 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
  */
 - (BOOL) removeDuplicatesInValue: (id)value propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	NSString *key = [propertyDesc name];
+	NSString *key = propertyDesc.name;
 	
 	if (!propertyDesc.isPersistentRelationship)
 		return NO;
 	
-	if (![propertyDesc isMultivalued])
+	if (!propertyDesc.multivalued)
 		return NO;
 
-	if (![propertyDesc isOrdered])
+	if (!propertyDesc.ordered)
 		return NO;
  
 	BOOL hasDuplicates = NO;
@@ -1454,17 +1452,17 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 - (void)updateCompositeRelationshipForNewCollectionValue: (COObject *)child
 									 propertyDescription: (ETPropertyDescription *)propertyDesc
 {
-	ETAssert([propertyDesc isMultivalued]);
+	ETAssert(propertyDesc.multivalued);
 
-	if ([propertyDesc isComposite] == NO)
+	if (!propertyDesc.isComposite)
 		return;
 	
-	NSString *key = [propertyDesc name];
-	ETPropertyDescription *parentDesc = [propertyDesc opposite];
+	NSString *key = propertyDesc.name;
+	ETPropertyDescription *parentDesc = propertyDesc.opposite;
 
 	/* From the child viewpoint (the child as target), the parent is a referring object */
-	COObject *oldParent = [[child incomingRelationshipCache]
-						   referringObjectForPropertyInTarget: [parentDesc name]];
+	COObject *oldParent = [child.incomingRelationshipCache
+						   referringObjectForPropertyInTarget: parentDesc.name];
 
 	if (oldParent == nil || oldParent == self)
 		return;
@@ -1478,9 +1476,9 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 		return;
 	
 	// NOTE: A KVO notification must be posted.
-	[oldParent removeObjects: A(child)
+	[oldParent removeObjects: @[child]
 				   atIndexes: [NSIndexSet indexSet]
-					   hints: [NSArray array]
+					   hints: @[]
 				 forProperty: key];
 }
 
@@ -1504,11 +1502,11 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
  */
 - (void)updateCompositeRelationshipForPropertyDescription: (ETPropertyDescription *)propertyDesc
 {
-    if ([propertyDesc isComposite] == NO)
+    if (!propertyDesc.isComposite)
 		return;
 
-	NSString *key = [propertyDesc name];
-	ETPropertyDescription *parentDesc = [propertyDesc opposite];
+	NSString *key = propertyDesc.name;
+	ETPropertyDescription *parentDesc = propertyDesc.opposite;
 	id value = [self valueForStorageKey: key];
 	
 	if (value == nil)
@@ -1516,13 +1514,13 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 	
 	/* For parent-to-children relationship, just handle to-one or to-many in the same way  */
 	id <ETCollection> children =
-		([propertyDesc isMultivalued] ? value : [NSArray arrayWithObject: value]);
+		(propertyDesc.multivalued ? value : @[value]);
 
 	for (COObject *child in children)
 	{
 		/* From the child viewpoint (the child as target), the parent is a referring object */
-		COObject *oldParent = [[child incomingRelationshipCache]
-				referringObjectForPropertyInTarget: [parentDesc name]];
+		COObject *oldParent = [child.incomingRelationshipCache
+				referringObjectForPropertyInTarget: parentDesc.name];
 		
 		// FIXME: Minor flaw, you can insert a composite twice if the collection is ordered.
 		// e.g.
@@ -1532,7 +1530,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 		if (oldParent == nil || oldParent == self)
 			continue;
 		
-		if ([propertyDesc isMultivalued])
+		if (propertyDesc.multivalued)
 		{
 			// FIXME: EtoileUI handles removing the object from its old parent.
 			// In that case, don't try to do it ourselves.
@@ -1543,9 +1541,9 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 				continue;
 
 			// NOTE: A KVO notification must be posted.
-			[oldParent removeObjects: A(child)
+			[oldParent removeObjects: @[child]
 			               atIndexes: [NSIndexSet indexSet]
-			                   hints: [NSArray array]
+			                   hints: @[]
 						 forProperty: key];
 		}
 		else
@@ -1560,9 +1558,9 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 
 - (void)popProperty: (NSString *)key
 {
-	NSString *top = [_propertyChangeStack lastObject];
+	NSString *top = _propertyChangeStack.lastObject;
 
-	if ([top isEqual: key] == NO)
+	if (![top isEqual: key])
 	{
 		[NSException raise: NSInternalInconsistencyException
 		            format: @"-willChangeValueForProperty: and -didChangeValueForProperty: "
@@ -1700,7 +1698,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 
 - (id)collectionForProperty: (NSString *)key mutationIndexes: (NSIndexSet *)indexes
 {
-	ETPropertyDescription *desc = [[self entityDescription] propertyDescriptionForName: key];
+	ETPropertyDescription *desc = [self.entityDescription propertyDescriptionForName: key];
 	id collection = [self valueForStorageKey: key];
 	Class expectedCollectionClass = [[self collectionClassForPropertyDescription: desc] mutableClass];
 
@@ -1715,7 +1713,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 
 	if ([indexes isEmpty])
 	{
-		if (![desc isMultivalued])
+		if (!desc.multivalued)
 		{
 			[NSException raise: NSInvalidArgumentException 
 						format: @"Attempt to call insertion or mutation methods "
@@ -1725,7 +1723,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 	}
 	else
 	{
-		if (!([desc isMultivalued] && [desc isOrdered]))
+		if (!(desc.multivalued && desc.ordered))
 		{
 			[NSException raise: NSInvalidArgumentException
 						format: @"Attempt to call index-based insertion and "
@@ -1774,10 +1772,10 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 
 - (void) validateMultivaluedPropertiesUsingMetamodel
 {
-	for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
+	for (ETPropertyDescription *propDesc in self.entityDescription.allPropertyDescriptions)
 	{
 		/* At validation time, derived properties should return a valid collection */
-		if ([propDesc isMultivalued] == NO)
+		if (!propDesc.multivalued)
 			continue;
 
 		Class class = [self collectionClassForPropertyDescription: propDesc];
@@ -1791,13 +1789,13 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 			collection = [self valueForKey: propDesc.name];
 		}
 
-		if ([collection isKindOfClass: class] == NO)
+		if (![collection isKindOfClass: class])
 		{
 			[NSException raise: NSInternalInconsistencyException
 			            format: @"Property %@ of %@ is declared as a collection "
 			                     "in the metamodel but the value class is %@ and "
 			                     "doesn't match the requirements.",
-			                    [propDesc name], self, [collection class]];
+			                    propDesc.name, self, [collection class]];
 		}
 	}
 }
@@ -1806,7 +1804,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 
 - (void)awakeFromDeserialization
 {
-	ETAssert([[_additionalStoreItemUUIDs allValues] containsObject: cachedNSNull] == NO);
+	ETAssert(![[_additionalStoreItemUUIDs allValues] containsObject: cachedNSNull]);
 }
 
 - (void)willLoadObjectGraph
@@ -1864,7 +1862,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 	{
 		return NO;
 	}
-	if ([[anObject UUID] isEqual: _UUID] && [[anObject revision] isEqual: [self revision]])
+	if ([[anObject UUID] isEqual: _UUID] && [[anObject revision] isEqual: self.revision])
 	{
 		return YES;
 	}
@@ -1876,7 +1874,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
 {
 	// TODO: Check and traverse relationships to visit the object graph
-	return ([[aQuery predicate] evaluateWithObject: self] ? A(self) : [NSArray array]);
+	return ([aQuery.predicate evaluateWithObject: self] ? @[self] : @[]);
 }
 
 #pragma mark - Description
@@ -1884,12 +1882,12 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 - (NSString *)detailedDescriptionWithTraversalKey: (NSString *)aProperty
 {
 	NSMutableDictionary *options =
-		[D([self propertyNames], kETDescriptionOptionValuesForKeyPaths,
-		@"\t", kETDescriptionOptionPropertyIndent) mutableCopy];
+		[@{ kETDescriptionOptionValuesForKeyPaths: self.propertyNames,
+		kETDescriptionOptionPropertyIndent: @"\t" } mutableCopy];
 
 	if (aProperty != nil)
 	{
-		[options setObject: aProperty forKey: kETDescriptionOptionTraversalKey];
+		options[kETDescriptionOptionTraversalKey] = aProperty;
 	}
 
 	return [self descriptionWithOptions: options];
@@ -1902,25 +1900,25 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 
 - (NSString *)description
 {
-	NSString *name = [self isZombie] ? @"<zombie object>" : self.name;
+	NSString *name = self.isZombie ? @"<zombie object>" : self.name;
 		
 	return [NSString stringWithFormat: @"<%@(%@) '%@' %p - %@>",
-		NSStringFromClass([self class]), [[self entityDescription] name], name, self, _UUID];
+		NSStringFromClass([self class]), self.entityDescription.name, name, self, _UUID];
 }
 
 - (NSString *)typeDescription
 {
-	return [[self entityDescription] localizedDescription];
+	return self.entityDescription.localizedDescription;
 }
 
 - (NSString *)revisionDescription
 {
-	return [[[self revision] UUID] stringValue];
+	return [self.revision.UUID stringValue];
 }
 
 - (NSString *)tagDescription
 {
-	return [(NSArray *)[[[[self tags] allObjects] mappedCollection] tagString]
+	return [(NSArray *)[[self.tags.allObjects mappedCollection] tagString]
 		componentsJoinedByString: @", "];
 }
 
@@ -1961,7 +1959,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 	
 	if (isDeletion)
 	{
-		if (anObject.objectGraphContext.isTrackingSpecificBranch)
+		if (anObject.objectGraphContext.trackingSpecificBranch)
 		{
 			replacement = [COPath pathWithPersistentRoot: anObject.persistentRoot.UUID
 			                                      branch: anObject.branch.UUID];
@@ -1973,7 +1971,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 	}
 	else if (isUndeletion)
 	{
-		if (aReplacement.objectGraphContext.isTrackingSpecificBranch)
+		if (aReplacement.objectGraphContext.trackingSpecificBranch)
 		{
 			object = [COPath pathWithPersistentRoot: aReplacement.persistentRoot.UUID
 			                                 branch: aReplacement.branch.UUID];
@@ -1984,7 +1982,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 		}
 	}
 
-	for (NSString *key in [self persistentPropertyNames])
+	for (NSString *key in self.persistentPropertyNames)
 	{
 		id value = [self serializableValueForStorageKey: key];
 		BOOL updated = NO;
@@ -2139,7 +2137,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 
 - (NSSet *) referringObjects
 {
-	return [_incomingRelationshipCache referringObjects];
+	return _incomingRelationshipCache.referringObjects;
 }
 
 @end

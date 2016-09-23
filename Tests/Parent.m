@@ -17,14 +17,14 @@
 		return entity;
 	
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 type: (id)@"Anonymous.NSString"];
-    [labelProperty setPersistent: YES];
+                                                                                 typeName: @"NSString"];
+    labelProperty.persistent = YES;
     
     ETPropertyDescription *childProperty =
-    [ETPropertyDescription descriptionWithName: @"child" type: (id)@"Anonymous.Child"];
-    [childProperty setPersistent: YES];
+    [ETPropertyDescription descriptionWithName: @"child" typeName: @"Child"];
+    childProperty.persistent = YES;
     
-    [entity setPropertyDescriptions: @[labelProperty, childProperty]];
+    entity.propertyDescriptions = @[labelProperty, childProperty];
 	
     return entity;
 }

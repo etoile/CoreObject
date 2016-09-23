@@ -13,7 +13,6 @@
 @synthesize type;
 @synthesize value;
 
-
 - (BOOL) isEqualIgnoringSourceIdentifier: (id)other
 {
 	return [super isEqualIgnoringSourceIdentifier: other]
@@ -23,21 +22,48 @@
 
 - (NSUInteger) hash
 {
-	return 4265092495078449026ULL ^ [super hash] ^ type ^ [value hash];
+	return 4265092495078449026ULL ^ super.hash ^ type ^ [value hash];
 }
 
-- (id) initWithUUID: (ETUUID *)aUUID
-		  attribute: (NSString *)anAttribute
-   sourceIdentifier: (id)aSourceIdentifier
-			   type: (COType)aType
-			  value: (id)aValue
+- (instancetype) initWithUUID: (ETUUID *)aUUID
+                    attribute: (NSString *)anAttribute
+             sourceIdentifier: (id)aSourceIdentifier
+                         type: (COType)aType
+                        value: (id)aValue
 {
+	NILARG_EXCEPTION_TEST(aUUID);
+	NILARG_EXCEPTION_TEST(anAttribute);
 	NILARG_EXCEPTION_TEST(aValue);
+
 	self = [super initWithUUID: aUUID attribute: anAttribute sourceIdentifier: aSourceIdentifier];
+	if (self == nil)
+		return nil;
+
 	type = aType;
 	value = [aValue copy];
 	return self;
 }
+
+- (instancetype) initWithUUID: (ETUUID *)aUUID
+                    attribute: (NSString *)anAttribute
+             sourceIdentifier: (id)aSourceIdentifier
+{
+	return [self initWithUUID: nil
+	                attribute: nil
+	         sourceIdentifier: nil
+	                     type: kCOTypeString
+	                    value: nil];
+}
+
+- (instancetype)init
+{
+	return [self initWithUUID: nil
+	                attribute: nil
+	         sourceIdentifier: nil
+	                     type: kCOTypeString
+	                    value: nil];
+}
+
 
 - (NSString *) description
 {

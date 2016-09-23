@@ -27,7 +27,7 @@
 /**
  * The track whose nodes are presented in the table view.
  */
-@property (nonatomic, retain) id <COTrack> track;
+@property (nonatomic, readwrite, strong)  id <COTrack> track;
 /**
  * Returns the node at the given index path in the table view.
  *
@@ -49,7 +49,7 @@
  *
  * See -suggestedColorForNode:.
  */
-@property (nonatomic, retain) UIColor *pastColor;
+@property (nonatomic, readwrite, copy)  UIColor *pastColor;
 /**
  * The color used to indicate the future history.
  *
@@ -57,7 +57,7 @@
  *
  * See -suggestedColorForNode:.
  */
-@property (nonatomic, retain) UIColor *futureColor;
+@property (nonatomic, readwrite, copy)  UIColor *futureColor;
 /**
  * Returns either -pastColor or -futureColor based on where the node sits 
  * relative to -[COTrack currentNode].

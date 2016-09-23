@@ -24,11 +24,11 @@
 	self = [super init];
 	
 	persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Parent"];
-	parent = [persistentRoot rootObject];
+	parent = persistentRoot.rootObject;
 	parent.label = @"Parent";
 	UKNil(parent.child);
 	
-	child = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Child"];
+	child = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Child"];
 	child.label = @"Child";
 	parent.child = child;
 	
@@ -52,7 +52,7 @@
 
 - (void)testSetNewChild
 {
-	Child *child2 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Child"];
+	Child *child2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Child"];
 	child2.label = @"Child2";
 
 	UKObjectsSame(parent, child.parent);
@@ -78,10 +78,10 @@
 
 - (void)testMoveChild
 {
-	Parent *parent2 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Parent"];
+	Parent *parent2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Parent"];
 	parent2.label = @"Parent2";
 	
-	Child *child2 = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Child"];
+	Child *child2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"Child"];
 	child2.label = @"Child2";
 	
 	parent2.child = child2;

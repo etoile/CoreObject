@@ -69,7 +69,7 @@
  * For a nil argument or a URL which doesn't referenced the local filesystem,
  * raises a NSInvalidArgumentException.
  */
-- (instancetype)initWithURL: (NSURL *)aURL;
+- (instancetype)initWithURL: (NSURL *)aURL NS_DESIGNATED_INITIALIZER;
 
 
 /** @taskunit Basic Properties */

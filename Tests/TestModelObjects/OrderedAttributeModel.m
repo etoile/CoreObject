@@ -17,16 +17,16 @@
 		return entity;
 	
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 type: (id)@"Anonymous.NSString"];
-    [labelProperty setPersistent: YES];
+                                                                                 typeName: @"NSString"];
+    labelProperty.persistent = YES;
 	
 	ETPropertyDescription *contentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
-																					type: (id)@"Anonymous.NSString"];
-    [contentsProperty setPersistent: YES];
-    [contentsProperty setMultivalued: YES];
-    [contentsProperty setOrdered: YES];
+																					typeName: @"NSString"];
+    contentsProperty.persistent = YES;
+    contentsProperty.multivalued = YES;
+    contentsProperty.ordered = YES;
 	
-	[entity setPropertyDescriptions: @[labelProperty, contentsProperty]];
+	entity.propertyDescriptions = @[labelProperty, contentsProperty];
 	
     return entity;
 }

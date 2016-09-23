@@ -18,7 +18,7 @@ extern NSString * const COPersistentRootName;
 
 /** @taskunit Framework Private */
 
-@property (nonatomic, assign) int64_t lastTransactionID;
+@property (nonatomic, readwrite, assign) int64_t lastTransactionID;
 
 /**
  * <init />
@@ -29,7 +29,7 @@ extern NSString * const COPersistentRootName;
  * cheapCopyRevisionID is normally nil, and only set to create a cheap copy.
  * See -[COBranch makeCopyFromRevision:]
  */
-- (id) initWithInfo: (COPersistentRootInfo *)info
+- (instancetype) initWithInfo: (COPersistentRootInfo *)info
 cheapCopyRevisionUUID: (ETUUID *)cheapCopyRevisionID
 cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
    parentBranchUUID: (ETUUID *)aBranchUUID
@@ -75,7 +75,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
  * coherent view until the store transaction is constructed.
  */
 - (void)clearBranchesPendingDeletionAndUndeletion;
-- (COPersistentRootInfo *) persistentRootInfo;
+@property (nonatomic, readonly, strong) COPersistentRootInfo *persistentRootInfo;
 
 - (void)didMakeNewCommit;
 
@@ -83,7 +83,7 @@ cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
 
 - (COBranch *)makeBranchWithUUID: (ETUUID *)aUUID metadata: (NSDictionary *)metadata atRevision: (CORevision *)aRev parentBranch: (COBranch *)aParent;
 
-- (BOOL) isPersistentRootUncommitted;
+@property (nonatomic, readonly, getter=isPersistentRootUncommitted) BOOL persistentRootUncommitted;
 
 - (void)storePersistentRootDidChange: (NSNotification *)notif isDistributed: (BOOL)isDistributed;
 

@@ -15,10 +15,10 @@
 @property (readonly, nonatomic) COType type;
 @property (readonly, nonatomic) id value;
 
-- (id) initWithUUID: (ETUUID *)aUUID
+- (instancetype) initWithUUID: (ETUUID *)aUUID
 		  attribute: (NSString *)anAttribute
    sourceIdentifier: (id)aSourceIdentifier
 			   type: (COType)aType
-			  value: (id)aValue;
+			  value: (id)aValue NS_DESIGNATED_INITIALIZER;
 
 @end

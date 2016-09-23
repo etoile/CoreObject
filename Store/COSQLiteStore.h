@@ -15,7 +15,7 @@
 
 #define BACKING_STORES_SHARE_SAME_SQLITE_DB 1
 
-enum
+typedef NS_OPTIONS(NSUInteger, COBranchRevisionReadingOptions)
 {
 	/**
 	 * Return revisions between the branch's initial revision and head revision, inclusive
@@ -45,7 +45,6 @@ enum
 	 */
 	COBranchRevisionReadingDivergentRevisions = 4
 };
-typedef NSUInteger COBranchRevisionReadingOptions;
 
 /**
  * Semi-private notification name posted by COSQLiteStore. Only intended for
@@ -357,14 +356,14 @@ extern NSString * const COPersistentRootAttributeUsedSize;
 /**
  * Opens an exisiting, or creates a new CoreObject store at the given file:// URL.
  */
-- (id)initWithURL: (NSURL*)aURL;
+- (instancetype)initWithURL: (NSURL*)aURL NS_DESIGNATED_INITIALIZER;
 
 /**
  * Returns the file:// URL the receiver was created with.
  */
-- (NSURL*)URL;
+@property (nonatomic, readonly, strong) NSURL *URL;
 
-@property (strong, readonly, nonatomic) ETUUID *UUID;
+@property (nonatomic, readonly, strong) ETUUID *UUID;
 
 
 /** @taskunit Revision Reading */
@@ -430,8 +429,8 @@ extern NSString * const COPersistentRootAttributeUsedSize;
 /**
  * Only returns non-deleted persistent root UUIDs.
  */
-- (NSArray *) persistentRootUUIDs;
-- (NSArray *) deletedPersistentRootUUIDs;
+@property (nonatomic, readonly) NSArray *persistentRootUUIDs;
+@property (nonatomic, readonly) NSArray *deletedPersistentRootUUIDs;
 
 /**
  * @return  a snapshot of the state of a persistent root, or nil if
@@ -518,11 +517,11 @@ extern NSString * const COPersistentRootAttributeUsedSize;
 /**
  * Returns a short description to summarize the receiver.
  */
-- (NSString *)description;
+@property (readonly, copy) NSString *description;
 /**
  * Returns a multi-line description listing all the backing stores and their 
  * revisions.
  */
-- (NSString *)detailedDescription;
+@property (nonatomic, readonly) NSString *detailedDescription;
 
 @end

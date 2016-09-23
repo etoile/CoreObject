@@ -29,7 +29,7 @@
 @property (readwrite, nonatomic, copy) NSString *targetProperty;
 
 - (BOOL) isSourceObjectTrackingSpecificBranchForTargetObject: (COObject *)aTargetObject;
-- (BOOL)isSourceObjectBranchDeleted;
+@property (nonatomic, readonly, getter=isSourceObjectBranchDeleted) BOOL sourceObjectBranchDeleted;
 
 @end
 
@@ -44,9 +44,9 @@
     COObject *__weak _owner;
 }
 
-- (id) initWithOwner: (COObject *)owner;
+- (instancetype) initWithOwner: (COObject *)owner NS_DESIGNATED_INITIALIZER;
 
-- (NSSet *) referringObjects;
+@property (nonatomic, readonly) NSSet *referringObjects;
 
 /**
  * Returns an array of COObject which have a reference to the
@@ -58,7 +58,7 @@
 
 - (void) removeAllEntries;
 
-- (NSArray *) allEntries;
+@property (nonatomic, readonly) NSArray *allEntries;
 
 - (void) removeReferencesForPropertyInSource: (NSString *)aTargetProperty
                                 sourceObject: (COObject *)anObject;

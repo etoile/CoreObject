@@ -17,10 +17,10 @@
 		return entity;
 	
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 type: (id)@"Anonymous.NSString"];
-    [labelProperty setPersistent: YES];
+                                                                                 typeName: @"NSString"];
+    labelProperty.persistent = YES;
 	
-	[entity setPropertyDescriptions: @[labelProperty]];
+	entity.propertyDescriptions = @[labelProperty];
 	
     return entity;
 }

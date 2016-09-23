@@ -26,36 +26,36 @@
 	group2.content = item1;
 	UKNil(group3.content);
 	
-	UKObjectsEqual(S(group1, group2), [item1 parents]);
+	UKObjectsEqual(S(group1, group2), item1.parents);
 	
 	// Make some changes
 	
 	group2.content = nil;
 	
-	UKObjectsEqual(S(group1), [item1 parents]);
+	UKObjectsEqual(S(group1), item1.parents);
 	
 	group3.content = item1;
 	
-	UKObjectsEqual(S(group1, group3), [item1 parents]);
+	UKObjectsEqual(S(group1, group3), item1.parents);
 	
 	// Reload in another graph
 	
 	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
 	[ctx2 setItemGraph: ctx];
 	
-	UnivaluedGroupWithOpposite *group1ctx2 = [ctx2 loadedObjectForUUID: [group1 UUID]];
-	UnivaluedGroupWithOpposite *group2ctx2 = [ctx2 loadedObjectForUUID: [group2 UUID]];
-	UnivaluedGroupWithOpposite *group3ctx2 = [ctx2 loadedObjectForUUID: [group3 UUID]];
-	UnivaluedGroupContent *item1ctx2 = [ctx2 loadedObjectForUUID: [item1 UUID]];
+	UnivaluedGroupWithOpposite *group1ctx2 = [ctx2 loadedObjectForUUID: group1.UUID];
+	UnivaluedGroupWithOpposite *group2ctx2 = [ctx2 loadedObjectForUUID: group2.UUID];
+	UnivaluedGroupWithOpposite *group3ctx2 = [ctx2 loadedObjectForUUID: group3.UUID];
+	UnivaluedGroupContent *item1ctx2 = [ctx2 loadedObjectForUUID: item1.UUID];
 	
-	UKObjectsEqual(item1ctx2, [group1ctx2 content]);
-	UKNil([group2ctx2 content]);
-	UKObjectsEqual(item1ctx2, [group3ctx2 content]);
-	UKObjectsEqual(S(group1ctx2, group3ctx2), [item1ctx2 parents]);
+	UKObjectsEqual(item1ctx2, group1ctx2.content);
+	UKNil(group2ctx2.content);
+	UKObjectsEqual(item1ctx2, group3ctx2.content);
+	UKObjectsEqual(S(group1ctx2, group3ctx2), item1ctx2.parents);
 	
 	// Check the relationship cache
-	UKObjectsEqual(S(group1, group3), [item1 referringObjects]);
-	UKObjectsEqual(S(group1ctx2, group3ctx2), [item1ctx2 referringObjects]);
+	UKObjectsEqual(S(group1, group3), item1.referringObjects);
+	UKObjectsEqual(S(group1ctx2, group3ctx2), item1ctx2.referringObjects);
 }
 
 - (void)testNullAllowedForUnivalued
@@ -422,7 +422,7 @@
 	// First, all persistent roots should be unloaded.
 	UKNil([ctx2 loadedPersistentRootForUUID: group1uuid]);
 	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
-	UKFalse([ctx2 hasChanges]);
+	UKFalse(ctx2.hasChanges);
 	
 	// Load group1
 	UnivaluedGroupWithOpposite *group1ctx2 = [ctx2 persistentRootForUUID: group1uuid].rootObject;
@@ -430,17 +430,17 @@
 	
 	// Ensure the persistent root is still unloaded
 	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
-	UKFalse([ctx2 hasChanges]);
+	UKFalse(ctx2.hasChanges);
 	
 	// Access cross reference to trigger loading
 	UnivaluedGroupContent *item1ctx2 = (UnivaluedGroupContent *) group1ctx2.content;
 	UKObjectsEqual(item1.UUID, item1ctx2.UUID);
 	UKNotNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
-	UKFalse([ctx2 hasChanges]);
+	UKFalse(ctx2.hasChanges);
 
 	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
 
-	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
+	UKNil([ctx2.deadRelationshipCache referringObjectsForPath: item1Path]);
 }
 
 - (void)testTargetBranchLazyLoading
@@ -456,7 +456,7 @@
 	// First, all persistent roots should be unloaded.
 	UKNil([ctx2 loadedPersistentRootForUUID: group1uuid]);
 	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
-	UKFalse([ctx2 hasChanges]);
+	UKFalse(ctx2.hasChanges);
 	
 	// Load group1
 	UnivaluedGroupWithOpposite *group1ctx2 = [ctx2 persistentRootForUUID: group1uuid].rootObject;
@@ -466,27 +466,27 @@
 	UKNotNil(otherItem1.branch.UUID);
 	UKObjectsEqual(otherItemPath, [group1ctx2 serializableValueForStorageKey: @"content"]);
 	
-	NSArray *referrers = [[[ctx2 deadRelationshipCache] referringObjectsForPath: otherItemPath] allObjects];
+	NSArray *referrers = [ctx2.deadRelationshipCache referringObjectsForPath: otherItemPath].allObjects;
 	UKObjectsEqual(A(group1ctx2), referrers);
 	
 	// Ensure item1 persistent root is still unloaded
 	UKNil([ctx2 loadedPersistentRootForUUID: item1.persistentRoot.UUID]);
-	UKFalse([ctx2 hasChanges]);
+	UKFalse(ctx2.hasChanges);
 	
 	// Load item1, but not the other branch yet
 	UnivaluedGroupContent *item1ctx2 = [ctx2 persistentRootForUUID: item1uuid].rootObject;
 	UKObjectsEqual(item1.UUID, item1ctx2.UUID);
 	UKNotNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
 	UKObjectsEqual(otherItemPath, [group1ctx2 serializableValueForStorageKey: @"content"]);
-	UKFalse([ctx2 hasChanges]);
+	UKFalse(ctx2.hasChanges);
 	
 	// Finally load the other branch.
 	// This should trigger group1ctx2 to unfault its reference.
 	UnivaluedGroupContent *otherItem1ctx2 = [item1ctx2.persistentRoot branchForUUID: otherItem1.branch.UUID].rootObject;
 	UKObjectsEqual(otherItem1ctx2, [group1ctx2 serializableValueForStorageKey: @"content"]);
-	UKFalse([ctx2 hasChanges]);
+	UKFalse(ctx2.hasChanges);
 
-	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: otherItemPath]);
+	UKNil([ctx2.deadRelationshipCache referringObjectsForPath: otherItemPath]);
 }
 
 - (void) testSourcePersistentRootLazyLoading
@@ -496,7 +496,7 @@
 	// First, all persistent roots should be unloaded.
 	UKNil([ctx2 loadedPersistentRootForUUID: group1uuid]);
 	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
-	UKFalse([ctx2 hasChanges]);
+	UKFalse(ctx2.hasChanges);
 	
 	// Load item1
 	UnivaluedGroupContent *item1ctx2 = [ctx2 persistentRootForUUID: item1uuid].rootObject;
@@ -514,11 +514,11 @@
 	// That should have updated the parentGroups property
 	UKObjectsEqual(S(group1ctx2), item1ctx2.parents);
 	
-	UKFalse([ctx2 hasChanges]);
+	UKFalse(ctx2.hasChanges);
 
 	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
 
-	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
+	UKNil([ctx2.deadRelationshipCache referringObjectsForPath: item1Path]);
 }
 
 - (void) testSourcePersistentRootLazyLoadingReverseOrder
@@ -528,7 +528,7 @@
 	// First, all persistent roots should be unloaded.
 	UKNil([ctx2 loadedPersistentRootForUUID: group1uuid]);
 	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
-	UKFalse([ctx2 hasChanges]);
+	UKFalse(ctx2.hasChanges);
 	
 	// Load group1
 	UnivaluedGroupWithOpposite *group1ctx2 = [ctx2 persistentRootForUUID: group1uuid].rootObject;
@@ -544,11 +544,11 @@
 	
 	UKObjectsEqual(S(group1ctx2), item1ctx2.parents);
 	
-	UKFalse([ctx2 hasChanges]);
+	UKFalse(ctx2.hasChanges);
 
 	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
 
-	UKNil([[ctx2 deadRelationshipCache] referringObjectsForPath: item1Path]);
+	UKNil([ctx2.deadRelationshipCache referringObjectsForPath: item1Path]);
 }
 
 - (void)testSourcePersistentRootUnloadingOnDeletion

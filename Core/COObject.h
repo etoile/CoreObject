@@ -193,7 +193,7 @@
  *
  * - (void)addName: (NSString *)aName
  * {
- *     NSArray *insertedObjects = A(aName);
+ *     NSArray *insertedObjects = @[aName];
  *     NSIndexSet *insertionIndexes = [NSIndexSet indexSet];
  *
  *     [self willChangeValueForProperty: key
@@ -213,7 +213,7 @@
  *
  * - (void)removeName: (NSString *)aName
  * {
- *     NSArray *removedObjects = A(aName);
+ *     NSArray *removedObjects = @[aName];
  *     NSIndexSet *removalIndexes = [NSIndexSet indexSet];
  *
  *     [self willChangeValueForProperty: key
@@ -234,7 +234,7 @@
  * // Direct setters are rare, but nonetheless it is possible to write one as below...
  * - (void)setNames: (id &lt;ETCollection&gt;)newNames
  * {
- *     NSArray *replacementObjects = A(aName);
+ *     NSArray *replacementObjects = @[aName];
  *     // If no indexes are provided, the entire collection is replaced or set.
  *     NSIndexSet *replacementIndexes = [NSIndexSet indexSet];
  *
@@ -447,14 +447,14 @@
  * COObjectGraphContext *graphContext = [COObjectGraphContext new];
  * COObject *object = [[COObject alloc] initWithObjectGraphContext: graphContext];
  *
- * [editingContext insertPersistentRootWithRootObject: [graphContext rootObject]];
+ * [editingContext insertPersistentRootWithRootObject: graphContext.rootObject];
  * </example>
  *
  * You cannot use -init to create a COObject instance.
  *
  * For a nil context, raises an NSInvalidArgumentException.
  */
-- (id)initWithObjectGraphContext: (COObjectGraphContext *)aContext;
+- (instancetype)initWithObjectGraphContext: (COObjectGraphContext *)aContext;
 /**
  * Initializes and returns an object that uses a custom entity description.
  *
@@ -473,9 +473,9 @@
  * For a subclass, this method results in the subclass designated initializer
  * being called.
  */
-- (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
+- (instancetype)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
              objectGraphContext: (COObjectGraphContext *)aContext;
-- (id)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
+- (instancetype)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
                            UUID: (ETUUID *)aUUID
              objectGraphContext: (COObjectGraphContext *)aContext;
 
@@ -570,7 +570,7 @@
 /**
  * The object name.
  */
-@property (nonatomic, strong) NSString *name;
+@property (nonatomic, readwrite, copy) NSString *name;
 /**
  * <override-dummy />
  * Returns the object identifier.
@@ -585,7 +585,7 @@
 /**
  * Returns -name.
  */
-- (NSString *)displayName;
+@property (nonatomic, readonly) NSString *displayName;
 /**
  * Returns the tags attached to the receiver. 
  *
@@ -603,7 +603,7 @@
  *
  * See also -entityDescription and -persistentPropertyNames.
  */
-- (NSArray *)propertyNames;
+@property (nonatomic, readonly) NSArray *propertyNames;
 /**
  * <override-never />
  * Returns the persistent properties declared in the receiver entity description.
@@ -613,7 +613,7 @@
  *
  * See also -entityDescription and -propertyNames.
  */
-- (NSArray *)persistentPropertyNames;
+@property (nonatomic, readonly) NSArray *persistentPropertyNames;
 /**
  * <override-never />
  * Returns the property value.
@@ -956,7 +956,7 @@
  * See -detailedDescriptionWithTraversalKey:, and -[NSObject descriptionWithOptions:] 
  * to implement custom detailed descriptions.
  */
-- (NSString *)detailedDescription;
+@property (nonatomic, readonly) NSString *detailedDescription;
 /** 
  * Returns a tree description for all the objects encountered while traversing 
  * the given relationship (including the receiver).
@@ -978,7 +978,7 @@
  * description (limited to -UUID and -entity description), or just call the 
  * superclass description that is expected to comply the present rule.
  */
-- (NSString *)description;
+@property (readonly, copy) NSString *description;
 /**
  * Returns a short and human-readable description of the receiver type.
  *

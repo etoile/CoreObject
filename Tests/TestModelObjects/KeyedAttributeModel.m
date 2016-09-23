@@ -17,14 +17,14 @@
 	
 	// For subclasses that don't override -newEntityDescription, we must not add
 	// the property descriptions that we will inherit through the parent
-	if ([[object name] isEqual: [KeyedAttributeModel className]] == NO)
+	if (![object.name isEqual: [KeyedAttributeModel className]])
 		return object;
 	
 	ETPropertyDescription *entries =
-	[ETPropertyDescription descriptionWithName: @"entries" type: (id)@"NSString"];
-	[entries setMultivalued: YES];
-	[entries setKeyed: YES];
-	[entries setPersistent: YES];
+	[ETPropertyDescription descriptionWithName: @"entries" typeName: @"NSString"];
+	entries.multivalued = YES;
+	entries.keyed = YES;
+	entries.persistent = YES;
 	
 	[object addPropertyDescription: entries];
 	

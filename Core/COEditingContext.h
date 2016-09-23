@@ -166,7 +166,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
 	COCrossPersistentRootDeadRelationshipCache *_deadRelationshipCache;
     /** Undo */
 	COUndoTrackStore *_undoTrackStore;
-    BOOL _isRecordingUndo;
+    BOOL _recordingUndo;
     COCommandGroup *_currentEditGroup;
 	CORevisionCache *_revisionCache;
 	/** Detect illegal recursive calls to commit */
@@ -224,7 +224,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
 - (instancetype)initWithStore: (COSQLiteStore *)store
    modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
          migrationDriverClass: (Class)aDriverClass
-               undoTrackStore: (COUndoTrackStore *)aUndoTrackStore;
+               undoTrackStore: (COUndoTrackStore *)aUndoTrackStore NS_DESIGNATED_INITIALIZER;
 /**
  * Initializes a context which persists its content in the given store, and
  * manages it using the metamodel provided by the model description repository.
@@ -354,7 +354,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  *
  * By default, returns COEditingContextUnloadingOnDeletion.
  */
-@property (nonatomic, assign) COEditingContextUnloadingBehavior unloadingBehavior;
+@property (nonatomic, readwrite, assign) COEditingContextUnloadingBehavior unloadingBehavior;
 
 
 /** @taskunit Pending Changes */
@@ -386,7 +386,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  *
  * See also -discardAllChanges and -[COPersistentRoot hasChanges].
  */
-- (BOOL)hasChanges;
+@property (nonatomic, readonly) BOOL hasChanges;
 /**
  * Discards the uncommitted changes to reset the context to its last commit state.
  *
@@ -492,12 +492,12 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
 /**
  * Returns a short description to summarize the receiver.
  */
-- (NSString *)description;
+@property (readonly, copy) NSString *description;
 /**
  * Returns a multi-line description including informations about the pending 
  * changes.
  */
-- (NSString *)detailedDescription;
+@property (nonatomic, readonly) NSString *detailedDescription;
 
 
 /** @taskunit Deprecated */

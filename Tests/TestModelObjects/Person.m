@@ -15,7 +15,7 @@
 {
 	ETEntityDescription *entity = [self newBasicEntityDescription];
 	
-	if ([entity.name isEqual: [Person className]] == NO)
+	if (![entity.name isEqual: [Person className]])
 		return entity;
 
 	ETPropertyDescription *role =
@@ -40,8 +40,8 @@
 		[ETPropertyDescription descriptionWithName: @"phoneNumber" typeName: @"NSString"];
 	ETPropertyDescription *website =
 		[ETPropertyDescription descriptionWithName: @"website" typeName: @"NSURL"];
-	[website setValueTransformerName: @"COURLToString"];
-	[website setPersistentTypeName: @"NSString"];
+	website.valueTransformerName = @"COURLToString";
+	website.persistentTypeName = @"NSString";
 	ETPropertyDescription *emailAddress =
 		[ETPropertyDescription descriptionWithName: @"emailAddress" typeName: @"NSString"];
 	ETPropertyDescription *stuff =
@@ -65,13 +65,12 @@
 			country, phoneNumber, website, emailAddress, stuff, students];
 	[[persistentProperties mappedCollection] setPersistent: YES];
 
-	[entity setPropertyDescriptions:
-	 	[@[teachers] arrayByAddingObjectsFromArray: persistentProperties]];
+	entity.propertyDescriptions =	[@[teachers] arrayByAddingObjectsFromArray: persistentProperties];
 
 	return entity;
 }
 
-- (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
+- (instancetype)initWithObjectGraphContext:(COObjectGraphContext *)aContext
 {
 	self = [super initWithObjectGraphContext: aContext];
 	if (self == nil)

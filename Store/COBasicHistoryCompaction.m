@@ -14,7 +14,7 @@
 	finalizableBranchUUIDs = _finalizableBranchUUIDs,
 	compactableBranchUUIDs = _compactableBranchUUIDs;
 
-- (id)init
+- (instancetype)init
 {
 	SUPERINIT;
 	_finalizablePersistentRootUUIDs = [NSSet new];

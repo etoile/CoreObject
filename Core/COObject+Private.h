@@ -33,7 +33,7 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
  * dictionary contains mutable collections that matches the metamodel.
  * 
  */
- - (NSMutableDictionary *)newVariableStorage;
+- (NSMutableDictionary *)newVariableStorage;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -56,15 +56,18 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (NSDictionary *)additionalStoreItemUUIDs;
+@property (nonatomic, readonly) NSDictionary *additionalStoreItemUUIDs;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (CORelationshipCache *)incomingRelationshipCache;
+@property (nonatomic, readonly, strong) CORelationshipCache *incomingRelationshipCache;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
 - (void) markAsRemovedFromContext;
+
+@property (nonatomic, readonly, getter=isLoadingEnabled) BOOL loadingEnabled;
+
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
@@ -81,6 +84,10 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
  * This method is only exposed to be used internally by CoreObject.
  */
 - (void)setValue: (id)value forStorageKey: (NSString *)key;
+/**
+ * This method is only exposed to be used internally by CoreObject.
+ */
+- (id) valueForProperty: (NSString *)key shouldLoad: (BOOL)shouldLoad;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -127,13 +134,9 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
 /**
  * This method is only exposed to be used in the CoreObject tests.
  */
-- (NSSet *) referringObjects;
+@property (nonatomic, readonly) NSSet *referringObjects;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
 - (void) replaceReferencesToObjectIdenticalTo: (COObject *)anObject withObject: (COObject *)aReplacement;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-- (id) valueForProperty: (NSString *)key shouldLoad: (BOOL)shouldLoad;
 @end

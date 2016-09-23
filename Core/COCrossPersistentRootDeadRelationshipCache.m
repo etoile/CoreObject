@@ -13,7 +13,7 @@
 
 @implementation COCrossPersistentRootDeadRelationshipCache
 
-- (id)init
+- (instancetype)init
 {
 	SUPERINIT;
 	_pathToReferringObjects = [NSMutableDictionary new];

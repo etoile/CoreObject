@@ -18,7 +18,7 @@
 
 @synthesize server = server;
 
-- (id) initWithSynchronizerServer: (COSynchronizerServer *)aServer
+- (instancetype) initWithSynchronizerServer: (COSynchronizerServer *)aServer
 {
 	SUPERINIT;
 	server = aServer;
@@ -54,11 +54,11 @@
 
 - (void) queueMessage: (id)aMessage forClient: (NSString *)aClient
 {
-	NSMutableArray *array = [clientMessagesForID objectForKey: aClient];
+	NSMutableArray *array = clientMessagesForID[aClient];
 	if (array == nil)
 	{
 		array = [[NSMutableArray alloc] init];
-		[clientMessagesForID setObject: array forKey: aClient];
+		clientMessagesForID[aClient] = array;
 	}
 	[array addObject: aMessage];
 }
@@ -175,7 +175,7 @@
 
 - (NSArray *) messagesForClient: (NSString *)anID
 {
-	return [[clientMessagesForID objectForKey: anID] copy];
+	return [clientMessagesForID[anID] copy];
 }
 
 @end

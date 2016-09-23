@@ -139,7 +139,7 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
 	_URL = aURL;
 	_modifiedTrackStateForTrackName = [NSMutableDictionary new];
-	_queue = dispatch_queue_create([[NSString stringWithFormat: @"COUndoTrackStore-%p", self] UTF8String], NULL);
+	_queue = dispatch_queue_create([NSString stringWithFormat: @"COUndoTrackStore-%p", self].UTF8String, NULL);
 	_transactionLock = dispatch_semaphore_create(1);
 
    	__block BOOL ok = YES;
@@ -366,8 +366,8 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 			result.currentCommandUUID = nil;
 		}
 		
-		ETAssert(![result.currentCommandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
-		ETAssert(![result.headCommandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+		ETAssert(![result.currentCommandUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
+		ETAssert(![result.headCommandUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
 	}
 	[rs close];
 
@@ -390,8 +390,8 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 {
     assert(dispatch_get_current_queue() != _queue);
 	ETAssert([NSThread isMainThread]);
-	ETAssert(![aState.headCommandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
-	ETAssert(![aState.currentCommandUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+	ETAssert(![aState.headCommandUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
+	ETAssert(![aState.currentCommandUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
 	
 	dispatch_sync(_queue, ^() {
 		ETAssert([_db inTransaction]);
@@ -445,8 +445,8 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 - (void) addCommand: (COUndoTrackSerializedCommand *)aCommand
 {
 	assert(dispatch_get_current_queue() != _queue);
-	ETAssert(![aCommand.parentUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
-	ETAssert(![aCommand.UUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+	ETAssert(![aCommand.parentUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
+	ETAssert(![aCommand.UUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
 	
 	__block int64_t rowid = -1;
 	
@@ -486,12 +486,12 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 			result.JSONData = [self deserialize: [rs dataForColumn: @"data"]];
 			result.metadata = [self deserialize: [rs dataForColumn: @"metadata"]];
 			result.UUID = aUUID;
-			ETAssert(![result.UUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+			ETAssert(![result.UUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
 
 			if ([rs dataForColumn: @"parentuuid"] != nil)
 			{
 				result.parentUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"parentuuid"]];
-				ETAssert(![result.parentUUID isEqual: [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID]]);
+				ETAssert(![result.parentUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
 			}
 
 			result.trackName = [rs stringForColumn: @"trackname"];

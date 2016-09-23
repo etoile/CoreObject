@@ -98,7 +98,7 @@ static ETUUID *b1A, *b1B, *b2A;
 static NSArray *
 RevisionInfoUUIDs(NSArray *revInfos)
 {
-	return (NSArray *)[(CORevisionInfo *)[revInfos mappedCollection] revisionUUID];
+	return (NSArray *)((CORevisionInfo *)[revInfos mappedCollection]).revisionUUID;
 }
 
 #pragma mark - Tests

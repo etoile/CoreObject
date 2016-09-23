@@ -11,8 +11,8 @@
 
 @interface COSearchResult : NSObject
 
-@property (nonatomic, readwrite, strong) ETUUID *persistentRoot;
-@property (nonatomic, readwrite, strong) ETUUID *revision;
-@property (nonatomic, readwrite, strong) ETUUID *innerObjectUUID;
+@property (nonatomic, readwrite, copy) ETUUID *persistentRoot;
+@property (nonatomic, readwrite, copy) ETUUID *revision;
+@property (nonatomic, readwrite, copy) ETUUID *innerObjectUUID;
 
 @end

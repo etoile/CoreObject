@@ -12,10 +12,11 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (id)        initWithUUID: (ETUUID *)aUUID
+- (instancetype)        initWithUUID: (ETUUID *)aUUID
             persistentRoot: (COPersistentRoot *)aPersistentRoot
           parentBranchUUID: (ETUUID *)aParentBranchUUID
 parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
+@property (nonatomic, readonly) COSQLiteStore *store;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
@@ -24,11 +25,11 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (COBranchInfo *)branchInfo;
+@property (nonatomic, readonly, strong) COBranchInfo *branchInfo;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (BOOL)isDeletedInStore;
+@property (nonatomic, readonly, getter=isDeletedInStore) BOOL deletedInStore;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -54,7 +55,8 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (BOOL)isBranchUncommitted;
+@property (nonatomic, readonly, getter=isBranchUncommitted) BOOL branchUncommitted;
+@property (nonatomic, readonly, getter=isBranchPersistentRootUncommitted) BOOL branchPersistentRootUncommitted;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
@@ -66,8 +68,8 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
  */
 @property (nonatomic) CORevision *headRevision;
 
-- (COObjectGraphContext *) objectGraphContextWithoutUnfaulting;
-- (BOOL)objectGraphContextHasChanges;
+@property (nonatomic, readonly, strong) COObjectGraphContext *objectGraphContextWithoutUnfaulting;
+@property (nonatomic, readonly) BOOL objectGraphContextHasChanges;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *

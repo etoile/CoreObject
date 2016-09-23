@@ -71,9 +71,9 @@ static NSArray *initialUUIDs;
 
 - (void) testCopyWithinContext
 {
-    UKIntsEqual(4, [[initialGraph itemUUIDs] count]);
+    UKIntsEqual(4, initialGraph.itemUUIDs.count);
 	ETUUID *drawing2 = [copier copyItemWithUUID: drawing fromGraph: initialGraph toGraph: initialGraph];
-    UKIntsEqual(8, [[initialGraph itemUUIDs] count]);
+    UKIntsEqual(8, initialGraph.itemUUIDs.count);
     
 	// Check structure ("copy semantics.pdf" page 10)
 	
@@ -85,17 +85,17 @@ static NSArray *initialUUIDs;
 	COItem *style2CopyItemB = [initialGraph itemForUUID: [shape3CopyItem valueForAttribute: @"refs"][0]];
 	
 	UKNotNil(drawingCopyItem);
-	UKFalse([initialUUIDs containsObject: [drawingCopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: drawingCopyItem.UUID]);
 			 
 	UKNotNil(shape2CopyItem);
-	UKFalse([initialUUIDs containsObject: [shape2CopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: shape2CopyItem.UUID]);
 	
 	UKNotNil(shape3CopyItem);
-	UKFalse([initialUUIDs containsObject: [shape3CopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: shape3CopyItem.UUID]);
 
 	UKObjectsSame(style2CopyItemA, style2CopyItemB);
 	UKNotNil(style2CopyItemA);
-	UKFalse([initialUUIDs containsObject: [style2CopyItemA UUID]]);
+	UKFalse([initialUUIDs containsObject: style2CopyItemA.UUID]);
 	UKObjectsEqual(@"style2", [style2CopyItemA valueForAttribute: @"name"]);
 }
 

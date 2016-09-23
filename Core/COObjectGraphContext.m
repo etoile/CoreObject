@@ -6,6 +6,7 @@
  */
 
 #import "COObjectGraphContext.h"
+#import "COObjectGraphContext+Private.h"
 #import "COCrossPersistentRootDeadRelationshipCache.h"
 #import "COEditingContext+Private.h"
 #import "COItemGraph.h"
@@ -68,7 +69,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 #pragma mark Creation
 
-- (id)initWithBranch: (COBranch *)aBranch
+- (instancetype)initWithBranch: (COBranch *)aBranch
      modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
 	       migrationDriverClass: (Class)aDriverClass
 {
@@ -81,11 +82,11 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
     _updatedObjectUUIDs = [[NSMutableSet alloc] init];
     _updatedPropertiesByUUID = [[NSMutableDictionary alloc] init];
     _branch = aBranch;
-	_persistentRoot = [aBranch persistentRoot];
+	_persistentRoot = aBranch.persistentRoot;
 	_futureBranchUUID = (aBranch == nil ? [ETUUID UUID] : nil);
     if (aRepo == nil)
     {
-        aRepo = [[_persistentRoot editingContext] modelDescriptionRepository];
+        aRepo = _persistentRoot.editingContext.modelDescriptionRepository;
     }
 	else
 	{
@@ -107,12 +108,12 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
     return self;
 }
 
-- (id)initWithBranch: (COBranch *)aBranch
+- (instancetype)initWithBranch: (COBranch *)aBranch
 {
     return [self initWithBranch: aBranch modelDescriptionRepository: nil migrationDriverClass: Nil];
 }
 
-- (id)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
+- (instancetype)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
                     migrationDriverClass: (Class)aDriverClass
 {
 	NILARG_EXCEPTION_TEST(aRepo);
@@ -120,7 +121,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
     return [self initWithBranch: nil modelDescriptionRepository: aRepo migrationDriverClass: aDriverClass];
 }
 
-- (id)init
+- (instancetype)init
 {
     return [self initWithModelDescriptionRepository: [ETModelDescriptionRepository mainRepository]
 	                           migrationDriverClass: [COSchemaMigrationDriver class]];
@@ -145,15 +146,15 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 - (NSString *)description
 {
 	return [NSString stringWithFormat: @"<%@: %p - %@ - rootObject: %@>",
-		NSStringFromClass([self class]), self, [self branchUUID], [self rootItemUUID]];
+		NSStringFromClass([self class]), self, self.branchUUID, self.rootItemUUID];
 }
 
 - (NSString *)detailedDescription
 {
 	NSMutableString *result = [NSMutableString string];
     
-	[result appendFormat: @"[COObjectGraphContext root: %@\n", [self rootItemUUID]];
-	for (ETUUID *uuid in [self itemUUIDs])
+	[result appendFormat: @"[COObjectGraphContext root: %@\n", self.rootItemUUID];
+	for (ETUUID *uuid in self.itemUUIDs)
 	{
         COItem *item = [self itemForUUID: uuid];
 		[result appendFormat: @"%@", item];
@@ -175,7 +176,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 {
 	if (_branch == nil && _persistentRoot != nil)
 	{
-		return [_persistentRoot currentBranch];
+		return _persistentRoot.currentBranch;
 	}
 	return _branch;
 }
@@ -183,12 +184,12 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 - (void)setBranch: (COBranch *)aBranch
 {
 	_branch = aBranch;
-	_persistentRoot = [aBranch persistentRoot];
+	_persistentRoot = aBranch.persistentRoot;
 }
 
 - (ETUUID *)branchUUID
 {
-	return ([self branch] != nil ? [[self branch] UUID] : _futureBranchUUID);
+	return (self.branch != nil ? self.branch.UUID : _futureBranchUUID);
 }
 
 - (COPersistentRoot *)persistentRoot
@@ -204,12 +205,12 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (COEditingContext *)editingContext
 {
-    return [_persistentRoot parentContext];
+    return _persistentRoot.parentContext;
 }
 
 - (BOOL) isTrackingSpecificBranch
 {
-	return _persistentRoot != nil && self != [_persistentRoot objectGraphContext];
+	return _persistentRoot != nil && self != _persistentRoot.objectGraphContext;
 }
 
 #pragma mark -
@@ -267,7 +268,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	                               objectGraphContext: self
 	                                            isNew: NO];
 	
-	[_loadedObjects setObject: obj forKey: aUUID];
+	_loadedObjects[aUUID] = obj;
 	
 	return obj;
 }
@@ -276,7 +277,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 {
     ETAssert(_loadingItemGraph != nil);
 	
-	COObject *loadedObject = [_loadedObjects objectForKey: aUUID];
+	COObject *loadedObject = _loadedObjects[aUUID];
 
 	if (loadedObject != nil)
 		return loadedObject;
@@ -301,10 +302,10 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 {
 	NILARG_EXCEPTION_TEST(anItem);
     
-	COObject *obj = [self objectWithUUID: [anItem UUID]
+	COObject *obj = [self objectWithUUID: anItem.UUID
 	                   entityDescription: [self descriptionForItem: anItem]];
 
-    [obj setStoreItem: anItem];
+    obj.storeItem = anItem;
 
 	return obj;
 }
@@ -349,7 +350,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	for (ETUUID *UUID in itemUUIDs)
 	{
 		// NOTE: Based on the assumption, the root object UUID remains the same
-		BOOL isRootObject = [[self rootItemUUID] isEqual: UUID];
+		BOOL isRootObject = [self.rootItemUUID isEqual: UUID];
 
 		if (isRootObject)
 			continue;
@@ -360,11 +361,11 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 		[object didLoadObjectGraph];
 	}
 
-	BOOL wasRootObjectDeserialized = [itemUUIDs containsObject: [self rootItemUUID]];
+	BOOL wasRootObjectDeserialized = [itemUUIDs containsObject: self.rootItemUUID];
 
 	if (wasRootObjectDeserialized)
 	{
-		[[self rootObject] didLoadObjectGraph];
+		[self.rootObject didLoadObjectGraph];
 	}
 }
 
@@ -388,19 +389,19 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 {
 	ETAssert([aUUID isKindOfClass: [ETUUID class]]);
 	
-    COObject *object = [_loadedObjects objectForKey: aUUID];
+    COObject *object = _loadedObjects[aUUID];
 	
 	if (object != nil)
-		return [object storeItem];
+		return object.storeItem;
 
-	return [[_objectsByAdditionalItemUUIDs objectForKey: aUUID] additionalStoreItemForUUID: aUUID];
+	return [_objectsByAdditionalItemUUIDs[aUUID] additionalStoreItemForUUID: aUUID];
 }
 
 - (NSArray *)itemUUIDs
 {
-    NSArray *additionalItemUUIDs = [_objectsByAdditionalItemUUIDs allKeys];
+    NSArray *additionalItemUUIDs = _objectsByAdditionalItemUUIDs.allKeys;
 
-	return [[_loadedObjects allKeys] arrayByAddingObjectsFromArray: additionalItemUUIDs];
+	return [_loadedObjects.allKeys arrayByAddingObjectsFromArray: additionalItemUUIDs];
 }
 
 - (NSArray *)items
@@ -445,11 +446,11 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (void)updateMappingFromAdditionalItemsToObject: (COObject *)currentObject
 {
-	for (ETUUID *itemUUID in [[currentObject additionalStoreItemUUIDs] objectEnumerator])
+	for (ETUUID *itemUUID in [currentObject.additionalStoreItemUUIDs objectEnumerator])
 	{
-		[_objectsByAdditionalItemUUIDs setObject: currentObject forKey: itemUUID];
+		_objectsByAdditionalItemUUIDs[itemUUID] = currentObject;
 	}
-	ETAssert([[_objectsByAdditionalItemUUIDs allKeys] containsCollection: [[currentObject additionalStoreItemUUIDs] allValues]]);
+	ETAssert([_objectsByAdditionalItemUUIDs.allKeys containsCollection: [[currentObject additionalStoreItemUUIDs] allValues]]);
 }
 
 /**
@@ -461,8 +462,8 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	NSParameterAssert(!item.isAdditionalItem);
 	ETAssert(_loadingItemGraph != nil);
 
-    ETUUID *uuid = [item UUID];
-    COObject *currentObject = [_loadedObjects objectForKey: uuid];
+    ETUUID *uuid = item.UUID;
+    COObject *currentObject = _loadedObjects[uuid];
     
     if (currentObject == nil)
     {
@@ -470,7 +471,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
     }
     else
     {
-        [currentObject setStoreItem: item];
+        currentObject.storeItem = item;
     }
 
 	[self updateMappingFromAdditionalItemsToObject: currentObject];
@@ -479,7 +480,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 - (NSSet *)mainItemsFromItemGraph: (id <COItemGraph>)itemGraph
                     loadableUUIDs: (NSSet *)itemUUIDs
 {
-	NSMutableSet *items = [NSMutableSet setWithCapacity: [itemUUIDs count]];
+	NSMutableSet *items = [NSMutableSet setWithCapacity: itemUUIDs.count];
 	
 	for (ETUUID *UUID in itemUUIDs)
 	{
@@ -519,7 +520,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	// Update change tracking
 	for (ETUUID *UUID in itemUUIDs)
 	{
-		if ([_loadedObjects objectForKey: UUID] != nil)
+		if (_loadedObjects[UUID] != nil)
 		{
 			// TODO: Check it the item is actually different?
 			[_updatedObjectUUIDs addObject: UUID];
@@ -548,7 +549,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 {
 	NILARG_EXCEPTION_TEST(items);
 
-    if ([items count] == 0)
+    if (items.count == 0)
         return;
 
 	[[NSNotificationCenter defaultCenter] postNotificationName: COObjectGraphContextBeginBatchChangeNotification
@@ -558,10 +559,10 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
     // -objectReferenceWithUUID:. The rootItemUUID is ignored.
     COItemGraph *itemGraph =
 		[[COItemGraph alloc] initWithItems: items
-                              rootItemUUID: [[items firstObject] UUID]];
+                              rootItemUUID: [items.firstObject UUID]];
 	
 	[self addItemsFromItemGraph: itemGraph
-	              loadableUUIDs: [NSSet setWithArray: [itemGraph itemUUIDs]]];
+	              loadableUUIDs: [NSSet setWithArray: itemGraph.itemUUIDs]];
 	
 	// NOTE: -acceptAllChanges *not* called
 	
@@ -576,16 +577,16 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	
 	NILARG_EXCEPTION_TEST(aTree);
 	// i.e., the root object can be set once and never changed.
-	INVALIDARG_EXCEPTION_TEST(aTree, _rootObjectUUID == nil || [_rootObjectUUID isEqual: [aTree rootItemUUID]]);
-    _rootObjectUUID =  [aTree rootItemUUID];
+	INVALIDARG_EXCEPTION_TEST(aTree, _rootObjectUUID == nil || [_rootObjectUUID isEqual: aTree.rootItemUUID]);
+    _rootObjectUUID =  aTree.rootItemUUID;
     
 	NSSet *aTreeReachableUUIDs = COItemGraphReachableUUIDs(aTree);
-	if ([aTreeReachableUUIDs count] == 0)
+	if (aTreeReachableUUIDs.count == 0)
 	{
 		// Special case. Both the givem graph, and the receiver have no root UUID.
 		// In that case, just take all of the objects from the aTree
 		
-		aTreeReachableUUIDs = [NSSet setWithArray: [aTree itemUUIDs]];
+		aTreeReachableUUIDs = [NSSet setWithArray: aTree.itemUUIDs];
 	}
 
 	[self addItemsFromItemGraph: aTree
@@ -604,19 +605,19 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 - (id)rootObject
 {
 	/* To support -rootObject access during the root object instantiation */
-	if ([self rootItemUUID] == nil)
+	if (self.rootItemUUID == nil)
 		return nil;
 
-    return [self loadedObjectForUUID: [self rootItemUUID]];
+    return [self loadedObjectForUUID: self.rootItemUUID];
 }
 
 - (void)setRootObject: (COObject *)anObject
 {
-    NSParameterAssert([anObject objectGraphContext] == self);
+    NSParameterAssert(anObject.objectGraphContext == self);
 	// i.e., the root object can be set once and never changed.
-	NSParameterAssert(_rootObjectUUID == nil || [_rootObjectUUID isEqual: [anObject UUID]]);
+	NSParameterAssert(_rootObjectUUID == nil || [_rootObjectUUID isEqual: anObject.UUID]);
 	
-    _rootObjectUUID =  [anObject UUID];
+    _rootObjectUUID =  anObject.UUID;
 }
 
 #pragma mark -
@@ -627,19 +628,19 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	NILARG_EXCEPTION_TEST(object);
 	INVALIDARG_EXCEPTION_TEST(object, [object isKindOfClass: [COObject class]]);
 
-    ETUUID *uuid = [object UUID];
+    ETUUID *uuid = object.UUID;
     
-	INVALIDARG_EXCEPTION_TEST(object, [_loadedObjects objectForKey: uuid] == nil);
+	INVALIDARG_EXCEPTION_TEST(object, _loadedObjects[uuid] == nil);
     
-    [_loadedObjects setObject: object forKey: uuid];
+    _loadedObjects[uuid] = object;
 
 	if (inserted)
 	{
 		[_insertedObjectUUIDs addObject: uuid];
 		
-		for (ETUUID *itemUUID in [[object additionalStoreItemUUIDs] objectEnumerator])
+		for (ETUUID *itemUUID in [object.additionalStoreItemUUIDs objectEnumerator])
 		{
-			[_objectsByAdditionalItemUUIDs setObject: object forKey: itemUUID];
+			_objectsByAdditionalItemUUIDs[itemUUID] = object;
 		}
 	}
 }
@@ -683,13 +684,13 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
    
 - (BOOL)hasChanges
 {
-	return [_updatedObjectUUIDs count] > 0
-		|| [_insertedObjectUUIDs count] > 0;
+	return _updatedObjectUUIDs.count > 0
+		|| _insertedObjectUUIDs.count > 0;
 }
    
 - (void)discardAllChanges
 {
-	if ([self branch] == nil)
+	if (self.branch == nil)
 	{
 		[self discardAllObjects];
 		[self acceptAllChanges];
@@ -697,7 +698,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	}
 	else
 	{
-		[[self branch] reloadAtRevision: [[self branch] currentRevision]];
+		[self.branch reloadAtRevision: self.branch.currentRevision];
 	}
 }
 
@@ -734,7 +735,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
  */
 - (void)discardObject: (COObject *)anObject
 {
-	ETUUID *uuid = [anObject UUID];
+	ETUUID *uuid = anObject.UUID;
 	
     // Mark the object as a "zombie"
     
@@ -747,7 +748,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 	// Remove it from the additional item to object lookup table
 
-	[_objectsByAdditionalItemUUIDs removeObjectsForKeys: [[anObject additionalStoreItemUUIDs] allValues]];
+	[_objectsByAdditionalItemUUIDs removeObjectsForKeys: anObject.additionalStoreItemUUIDs.allValues];
     
     // Release it from the objects dictionary (may release it)
     
@@ -771,17 +772,17 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (NSArray *)insertedObjects
 {
-	return [self loadedObjectsForUUIDs: [_insertedObjectUUIDs allObjects]];
+	return [self loadedObjectsForUUIDs: _insertedObjectUUIDs.allObjects];
 }
 
 - (NSArray *)updatedObjects
 {
-	return [self loadedObjectsForUUIDs: [_updatedObjectUUIDs allObjects]];
+	return [self loadedObjectsForUUIDs: _updatedObjectUUIDs.allObjects];
 }
 
 - (NSArray *)changedObjects
 {
-	return [self loadedObjectsForUUIDs: [[self changedObjectUUIDs] allObjects]];
+	return [self loadedObjectsForUUIDs: self.changedObjectUUIDs.allObjects];
 }
 
 - (NSDictionary *)updatedPropertiesByUUID
@@ -794,7 +795,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (NSArray *)loadedObjects
 {
-    return [_loadedObjects allValues];
+    return _loadedObjects.allValues;
 }
 
 - (COObject *)loadedObjectForUUID: (ETUUID *)aUUID
@@ -802,14 +803,14 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	// NOTE: We serialize UUIDs into strings in various places, this check
 	// helps to intercept string objects that ought to be ETUUID objects.
 	NSParameterAssert([aUUID isKindOfClass: [ETUUID class]]);
-    COObject *obj = [_loadedObjects objectForKey: aUUID];
+    COObject *obj = _loadedObjects[aUUID];
 	ETAssert(obj == nil || [obj isKindOfClass: [COObject class]]);
 	return obj;
 }
 
 - (NSArray *)loadedObjectsForUUIDs: (NSArray *)UUIDs
 {
-	NSMutableArray *objects = [NSMutableArray arrayWithCapacity: [UUIDs count]];
+	NSMutableArray *objects = [NSMutableArray arrayWithCapacity: UUIDs.count];
 
 	for (ETUUID *UUID in UUIDs)
 	{
@@ -829,13 +830,13 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (void)removeUnreachableObjects
 {
-    if ([self rootObject] == nil)
+    if (self.rootObject == nil)
     {
         return;
     }
     
-    NSMutableSet *deadUUIDs = [NSMutableSet setWithArray: [_loadedObjects allKeys]];
-	NSSet *liveUUIDs = [self allReachableObjectUUIDs];
+    NSMutableSet *deadUUIDs = [NSMutableSet setWithArray: _loadedObjects.allKeys];
+	NSSet *liveUUIDs = self.allReachableObjectUUIDs;
     [deadUUIDs minusSet: liveUUIDs];
 	
 	[self discardObjectsWithUUIDs: deadUUIDs];
@@ -865,7 +866,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 		_persistentRoot.parentContext.deadRelationshipCache;
 	COPath *pathToUndeletedObject = nil;
 	
-	if ([undeletedObjectGraphContext isTrackingSpecificBranch])
+	if (undeletedObjectGraphContext.trackingSpecificBranch)
 	{
 		pathToUndeletedObject = [COPath pathWithPersistentRoot: undeletedObjectGraphContext.persistentRoot.UUID
 		                                                branch: undeletedObjectGraphContext.branch.UUID];
@@ -924,7 +925,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	}
 	else
 	{
-		referringObjects = [[anObject incomingRelationshipCache] referringObjects];
+		referringObjects = anObject.incomingRelationshipCache.referringObjects;
 	}
 
 	self.ignoresChangeTrackingNotifications = YES;
@@ -941,7 +942,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 
 - (COItemGraph *)modifiedItemsSnapshot
 {
-    NSSet *objectUUIDs = [self changedObjectUUIDs];
+    NSSet *objectUUIDs = self.changedObjectUUIDs;
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
     
     for (ETUUID *uuid in objectUUIDs)
@@ -951,7 +952,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
     }
     
     COItemGraph *modifiedItems = [[COItemGraph alloc] initWithItemForUUID: dict
-															 rootItemUUID: [self rootItemUUID]];
+															 rootItemUUID: self.rootItemUUID];
 	return modifiedItems;
 }
 
@@ -995,7 +996,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
 	// in the same transaction, they still get committed. This isn't a big deal
 	// becuase this should be rare (only a strange app would do this), and the
 	// detached objects will be ignored at reloading time.
-	if ([self hasChanges])
+	if (self.hasChanges)
 	{
 		if ([self incrementCommitCounterAndCheckIfGCNeeded])
 		{

@@ -10,7 +10,7 @@
 #import <CoreObject/CoreObject.h>
 
 @interface CODiffManager ()
-@property (nonatomic, strong) NSMutableDictionary *subDiffsByAlgorithmName;
+@property (nonatomic, readwrite, strong) NSMutableDictionary *subDiffsByAlgorithmName;
 @end
 
 @implementation CODiffManager
@@ -44,7 +44,7 @@
 		if (diffClass == Nil)
 		{
 			NSLog(@"WARNING: Item %@ (entity name %@) specified a diff algorithm (%@) for which there is no corresponding class",
-				  [anItem UUID], [entity name], entity.diffAlgorithm);
+				  anItem.UUID, entity.name, entity.diffAlgorithm);
 		}
 	}
 	
@@ -62,7 +62,7 @@
 {
 	NSMutableDictionary *itemUUIDsByDiffAlgorithmName = [NSMutableDictionary new];
 	
-	for (ETUUID *aUUID in [b itemUUIDs])
+	for (ETUUID *aUUID in b.itemUUIDs)
 	{
 		COItem *commonItemA = [a itemForUUID: aUUID]; // may be nil if the item was inserted in b
 		COItem *commonItemB = [b itemForUUID: aUUID];
@@ -160,8 +160,8 @@
 
 		NSDictionary *diffOutput = [ourSubDiff addedOrUpdatedItemsForApplyingTo: dest];
 		
-		assert(![[NSSet setWithArray: [itemsByUUID allKeys]]
-				 intersectsSet: [NSSet setWithArray: [diffOutput allKeys]]]);
+		assert(![[NSSet setWithArray: itemsByUUID.allKeys]
+				 intersectsSet: [NSSet setWithArray: diffOutput.allKeys]]);
 		
 		[itemsByUUID addEntriesFromDictionary: diffOutput];
 	}
@@ -169,15 +169,15 @@
 	//COItemGraph *preview = [[COItemGraph alloc] initWithItemGraph: dest];
 	//[preview insertOrUpdateItems: [itemsByUUID allValues]];
 
-	[dest insertOrUpdateItems: [itemsByUUID allValues]];
+	[dest insertOrUpdateItems: itemsByUUID.allValues];
 	return ![itemsByUUID isEmpty];
 }
 
 - (BOOL) isEmpty
 {
-	for (id<CODiffAlgorithm> diff in [subDiffsByAlgorithmName allValues])
+	for (id<CODiffAlgorithm> diff in subDiffsByAlgorithmName.allValues)
 	{
-		if (![diff isEmpty])
+		if (!diff.empty)
 			return NO;
 	}
 	return YES;
@@ -185,9 +185,9 @@
 
 - (BOOL) hasConflicts
 {
-	for (id<CODiffAlgorithm> diff in [subDiffsByAlgorithmName allValues])
+	for (id<CODiffAlgorithm> diff in subDiffsByAlgorithmName.allValues)
 	{
-		if ([diff hasConflicts])
+		if (diff.hasConflicts)
 			return YES;
 	}
 	return NO;
@@ -195,7 +195,7 @@
 
 - (void) resolveConflictsFavoringSourceIdentifier: (id)aSource
 {
-	for (id<CODiffAlgorithm> diff in [subDiffsByAlgorithmName allValues])
+	for (id<CODiffAlgorithm> diff in subDiffsByAlgorithmName.allValues)
 	{
 		[diff resolveConflictsFavoringSourceIdentifier: aSource];
 	}
@@ -203,7 +203,7 @@
 
 - (NSString *) description
 {
-	return [subDiffsByAlgorithmName description];
+	return subDiffsByAlgorithmName.description;
 }
 
 @end

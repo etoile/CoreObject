@@ -130,16 +130,16 @@
 
 - (UnorderedGroupNoOpposite *) addAndCommitServerChild
 {
-	UnorderedGroupNoOpposite *serverChild1 = [[server.persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];
-	[[[server.persistentRoot rootObject] mutableSetValueForKey: @"contents"] addObject: serverChild1];
+	UnorderedGroupNoOpposite *serverChild1 = [server.persistentRoot.objectGraphContext insertObjectWithEntityName: @"UnorderedGroupNoOpposite"];
+	[[server.persistentRoot.rootObject mutableSetValueForKey: @"contents"] addObject: serverChild1];
 	[server.persistentRoot commit];
 	return serverChild1;
 }
 
 - (UnorderedGroupNoOpposite *) addAndCommitClient1Child
 {
-	UnorderedGroupNoOpposite *clientChild1 = [[client1.persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.UnorderedGroupNoOpposite"];
-	[[[client1.persistentRoot rootObject] mutableSetValueForKey: @"contents"] addObject: clientChild1];
+	UnorderedGroupNoOpposite *clientChild1 = [client1.persistentRoot.objectGraphContext insertObjectWithEntityName: @"UnorderedGroupNoOpposite"];
+	[[client1.persistentRoot.rootObject mutableSetValueForKey: @"contents"] addObject: clientChild1];
 	[client1.persistentRoot commit];
 	return clientChild1;
 }
@@ -153,11 +153,11 @@
 	
 	jsonServer.paused = NO;
 		
-	UKIntsEqual(0, [[[client1.persistentRoot rootObject] contents] count]);
+	UKIntsEqual(0, [[client1.persistentRoot.rootObject contents] count]);
 	
 	jsonClient1.paused = NO;
 	
-	UKIntsEqual(1, [[[client1.persistentRoot rootObject] contents] count]);
+	UKIntsEqual(1, [[client1.persistentRoot.rootObject contents] count]);
 }
 
 - (void) testClientEditWhilePausedAndServerReceivingWhilePaused
@@ -169,11 +169,11 @@
 	
 	jsonClient1.paused = NO;
 	
-	UKIntsEqual(0, [[[server.persistentRoot rootObject] contents] count]);
+	UKIntsEqual(0, [[server.persistentRoot.rootObject contents] count]);
 	
 	jsonServer.paused = NO;
 	
-	UKIntsEqual(1, [[[server.persistentRoot rootObject] contents] count]);
+	UKIntsEqual(1, [[server.persistentRoot.rootObject contents] count]);
 }
 
 @end

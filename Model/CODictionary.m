@@ -32,31 +32,31 @@
 
 	NSDictionary *dict = [self serializedValueForPropertyDescription: aPropertyDesc];
 	NSMutableDictionary *types =
-		[NSMutableDictionary dictionaryWithCapacity: [dict count]];
+		[NSMutableDictionary dictionaryWithCapacity: dict.count];
 	NSMutableDictionary *values =
-		[NSMutableDictionary dictionaryWithCapacity: [dict count]];
+		[NSMutableDictionary dictionaryWithCapacity: dict.count];
 
-	for (NSString *key in [dict allKeys])
+	for (NSString *key in dict.allKeys)
 	{
 		NSAssert2(isSerializablePrimitiveValue(key),
 			@"Unsupported key type %@ in %@. For dictionary serialization, "
 			  "keys must be a primitive CoreObject values (NSString, NSNumber or NSData).",
 			  key, dict);
 	
-		id value = [dict objectForKey: key];
+		id value = dict[key];
         id serializedValue = [self serializedValueForValue: value
                               univaluedPropertyDescription: aPropertyDesc];
 		COType serializedType = [self serializedTypeForUnivaluedPropertyDescription: aPropertyDesc
 		                                                                    ofValue: serializedValue];
 	
-		[values setObject: serializedValue forKey: key];
-		[types setObject: @(serializedType) forKey: key];
+		values[key] = serializedValue;
+		types[key] = @(serializedType);
 	}
 
 	ETEntityDescription *rootCoreObjectEntity =
 		[_objectGraphContext.modelDescriptionRepository entityDescriptionForClass: [COObject class]];
 
-	return [self storeItemWithUUID: [_additionalStoreItemUUIDs objectForKey: [aPropertyDesc name]]
+	return [self storeItemWithUUID: _additionalStoreItemUUIDs[aPropertyDesc.name]
 	                         types: types
 	                        values: values
 	                    entityName: @"CODictionary"
@@ -71,7 +71,7 @@
 
 	NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 
-	for (NSString *property in [aStoreItem attributeNames])
+	for (NSString *property in aStoreItem.attributeNames)
 	{
         if ([property isEqualToString: kCOObjectEntityNameProperty]
 		 || [property isEqualToString: kCOObjectPackageVersionProperty]
@@ -89,13 +89,13 @@
 			[NSException raise: NSInvalidArgumentException
 			            format: @"Tried to set serialized value %@ of type %@ "
 			                     "for property %@ missing in the metamodel %@",
-			                    serializedValue, @(serializedType), [propertyDesc name], [self entityDescription]];
+			                    serializedValue, @(serializedType), propertyDesc.name, self.entityDescription];
 		}
 
 		id value = [self valueForSerializedValue: serializedValue
 		                                  ofType: serializedType
 		            univaluedPropertyDescription: propertyDesc];
-		[dict setObject: value forKey: property];
+		dict[property] = value;
 	}
 
 	// FIXME: Make read-only if needed
