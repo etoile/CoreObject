@@ -139,7 +139,7 @@ Property Attributes
 
 - weak attribute must only be used if it corresponds to a weak ivar
 
-- readonly can be combined with copy or weak (see the rule before too)
+- readonly can be combined with strong and weak (see the rule before too)
 
 - weak and strong must be used for object properties in place of assign and 
 retain attributes
@@ -190,7 +190,7 @@ retain attributes
 - Invalid: @property (nonatomic, readonly, copy) NSDictionary *elementsByName;
 
 	- don't declare a readonly property as copy (copy only describes if the 
-object is copied by the setter)
+object is copied by the setter), unless you are overriding a (readwrite, copy) property
 
 Note: for overriden properties, sometimes we have to break these rules to ensure the code compile without warnings or disable -Wproperty-attribute-mismatch with clang diagnostic pragma. For instance, NSObject.description is marked with copy, this implies COObject.description has to be marked as copy too, although copy is useless when no setter exists.
 
