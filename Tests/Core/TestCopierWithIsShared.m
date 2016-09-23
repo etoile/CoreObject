@@ -98,9 +98,9 @@ static NSArray *initialUUIDs;
 
 - (void) testCopyWithinContext
 {
-    UKIntsEqual(9, [[initialGraph itemUUIDs] count]);
+    UKIntsEqual(9, initialGraph.itemUUIDs.count);
 	ETUUID *drawing2 = [copier copyItemWithUUID: drawing fromGraph: initialGraph toGraph: initialGraph];
-    UKIntsEqual(17, [[initialGraph itemUUIDs] count]);
+    UKIntsEqual(17, initialGraph.itemUUIDs.count);
     
 	// Check structure ("copy semantics.pdf" page 9)
 	
@@ -115,25 +115,25 @@ static NSArray *initialUUIDs;
 	
 	
 	UKNotNil(drawingCopyItem);
-	UKFalse([initialUUIDs containsObject: [drawingCopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: drawingCopyItem.UUID]);
 			 
 	UKNotNil(group1CopyItem);
-	UKFalse([initialUUIDs containsObject: [group1CopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: group1CopyItem.UUID]);
 
 	UKNotNil(group2CopyItem);
-	UKFalse([initialUUIDs containsObject: [group2CopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: group2CopyItem.UUID]);
 
 	UKNotNil(shape1CopyItem);
-	UKFalse([initialUUIDs containsObject: [shape1CopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: shape1CopyItem.UUID]);
 	
 	UKNotNil(shape2CopyItem);
-	UKFalse([initialUUIDs containsObject: [shape2CopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: shape2CopyItem.UUID]);
 	
 	UKNotNil(shape3CopyItem);
-	UKFalse([initialUUIDs containsObject: [shape3CopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: shape3CopyItem.UUID]);
 
 	UKNotNil(shape4CopyItem);
-	UKFalse([initialUUIDs containsObject: [shape4CopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: shape4CopyItem.UUID]);
 	
 	// Check that the copies of shape1 and shape2 have aliases to the original style1 and style2
 	UKObjectsEqual(style1, [shape1CopyItem valueForAttribute: @"refs"][0]);
@@ -142,63 +142,63 @@ static NSArray *initialUUIDs;
 	// The copy of shape3 has a reference to a copy of style2
 	
 	UKNotNil(style2CopyItem);
-	UKFalse([initialUUIDs containsObject: [style2CopyItem UUID]]);
+	UKFalse([initialUUIDs containsObject: style2CopyItem.UUID]);
 	UKObjectsEqual(@"style2", [style2CopyItem valueForAttribute: @"name"]);
 	
 	// The copy of shape4 should refer to the copy of shape3, not the original
-	UKObjectsEqual([shape3CopyItem UUID], [shape4CopyItem valueForAttribute: @"refs"][0]);
+	UKObjectsEqual(shape3CopyItem.UUID, [shape4CopyItem valueForAttribute: @"refs"][0]);
 }
 
 - (void) testCOObjectCopyWithIsSharedUnset
 {
 	COObjectGraphContext *ctx = [[COObjectGraphContext alloc] init];
 	
-	Tag *a = [ctx insertObjectWithEntityName: @"Anonymous.Tag"];
-	OutlineItem *b = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	Tag *a = [ctx insertObjectWithEntityName: @"Tag"];
+	OutlineItem *b = [ctx insertObjectWithEntityName: @"OutlineItem"];
 	[[a mutableSetValueForKey: @"contents"] addObject: b];
 	
-	ETUUID *aCopyUUID = [copier copyItemWithUUID: [a UUID] fromGraph: ctx toGraph: ctx];
+	ETUUID *aCopyUUID = [copier copyItemWithUUID: a.UUID fromGraph: ctx toGraph: ctx];
 	id aCopy = [ctx loadedObjectForUUID: aCopyUUID];
 	
-	UKIntsEqual(3, [[ctx itemUUIDs] count]);
+	UKIntsEqual(3, ctx.itemUUIDs.count);
 	UKObjectsNotEqual(a, aCopy);
-	UKObjectsEqual([a contents], [aCopy contents]);
+	UKObjectsEqual(a.contents, [aCopy contents]);
 }
 
 - (void) testCOObjectCopyWithIsSharedYES
 {
 	COObjectGraphContext *ctx = [[COObjectGraphContext alloc] init];
 	
-	Tag *a = [ctx insertObjectWithEntityName: @"Anonymous.Tag"];
-	OutlineItem *b = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	Tag *a = [ctx insertObjectWithEntityName: @"Tag"];
+	OutlineItem *b = [ctx insertObjectWithEntityName: @"OutlineItem"];
 	[[a mutableSetValueForKey: @"contents"] addObject: b];
 	
 	b.isShared = YES;
 	
-	ETUUID *aCopyUUID = [copier copyItemWithUUID: [a UUID] fromGraph: ctx toGraph: ctx];
+	ETUUID *aCopyUUID = [copier copyItemWithUUID: a.UUID fromGraph: ctx toGraph: ctx];
 	id aCopy = [ctx loadedObjectForUUID: aCopyUUID];
 	
-	UKIntsEqual(3, [[ctx itemUUIDs] count]);
+	UKIntsEqual(3, ctx.itemUUIDs.count);
 	UKObjectsNotEqual(a, aCopy);
-	UKObjectsEqual([a contents], [aCopy contents]);
+	UKObjectsEqual(a.contents, [aCopy contents]);
 }
 
 - (void) testCOObjectCopyWithIsSharedNO
 {
 	COObjectGraphContext *ctx = [[COObjectGraphContext alloc] init];
 	
-	Tag *a = [ctx insertObjectWithEntityName: @"Anonymous.Tag"];
-	OutlineItem *b = [ctx insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	Tag *a = [ctx insertObjectWithEntityName: @"Tag"];
+	OutlineItem *b = [ctx insertObjectWithEntityName: @"OutlineItem"];
 	[[a mutableSetValueForKey: @"contents"] addObject: b];
 	
 	b.isShared = NO;
 	
-	ETUUID *aCopyUUID = [copier copyItemWithUUID: [a UUID] fromGraph: ctx toGraph: ctx];
+	ETUUID *aCopyUUID = [copier copyItemWithUUID: a.UUID fromGraph: ctx toGraph: ctx];
 	id aCopy = [ctx loadedObjectForUUID: aCopyUUID];
 	
-	UKIntsEqual(4, [[ctx itemUUIDs] count]);
+	UKIntsEqual(4, ctx.itemUUIDs.count);
 	UKObjectsNotEqual(a, aCopy);
-	UKObjectsNotEqual([a contents], [aCopy contents]);
+	UKObjectsNotEqual(a.contents, [aCopy contents]);
 }
 
 @end

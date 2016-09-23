@@ -31,12 +31,12 @@
 	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
 	[ctx2 setItemGraph: ctx];
 	
-	UnivaluedGroupNoOpposite *group1ctx2 = [ctx2 loadedObjectForUUID: [group1 UUID]];
-	UnivaluedGroupNoOpposite *group2ctx2 = [ctx2 loadedObjectForUUID: [group2 UUID]];
-	OutlineItem *item1ctx2 = [ctx2 loadedObjectForUUID: [item1 UUID]];
+	UnivaluedGroupNoOpposite *group1ctx2 = [ctx2 loadedObjectForUUID: group1.UUID];
+	UnivaluedGroupNoOpposite *group2ctx2 = [ctx2 loadedObjectForUUID: group2.UUID];
+	OutlineItem *item1ctx2 = [ctx2 loadedObjectForUUID: item1.UUID];
 	
-	UKObjectsEqual(item1ctx2, [group1ctx2 content]);
-	UKObjectsEqual(item1ctx2, [group2ctx2 content]);
+	UKObjectsEqual(item1ctx2, group1ctx2.content);
+	UKObjectsEqual(item1ctx2, group2ctx2.content);
 }
 
 - (void) testUnivaluedGroupNoOppositeOuterReference
@@ -51,11 +51,11 @@
 	
 	// Check that the relationship cache knows the inverse relationship, even though it is
 	// not used in the metamodel (non-public API)
-	UKObjectsEqual(S(group1), [item1 referringObjects]);
+	UKObjectsEqual(S(group1), item1.referringObjects);
 
 	[ctx1 discardAllChanges];
 	
-	UKTrue([[item1 referringObjects] isEmpty]);
+	UKTrue([item1.referringObjects isEmpty]);
 }
 
 - (void) testRetainCycleMemoryLeakWithUserSuppliedSet
@@ -131,6 +131,10 @@
 	OutlineItem *item1;
 	OutlineItem *otherItem1;
 	UnivaluedGroupNoOpposite *otherGroup1;
+
+	// Convenience - persistent root UUIDs
+	ETUUID *group1uuid;
+	ETUUID *item1uuid;
 }
 
 @end
@@ -141,20 +145,25 @@
 {
 	SUPERINIT;
 	
-	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorNever;
+	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorManual;
 
-	group1 = [ctx insertNewPersistentRootWithEntityName: @"UnivaluedGroupNoOpposite"].rootObject;
-	item1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
-	item1.label = @"current";
-	group1.label = @"current";
-	group1.content = item1;
-	[ctx commit];
+	@autoreleasepool {
+		group1 = [ctx insertNewPersistentRootWithEntityName: @"UnivaluedGroupNoOpposite"].rootObject;
+		item1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
+		item1.label = @"current";
+		group1.label = @"current";
+		group1.content = item1;
+		[ctx commit];
 
-	otherItem1 = [item1.persistentRoot.currentBranch makeBranchWithLabel: @"other"].rootObject;
-	otherItem1.label = @"other";
-	otherGroup1 = [group1.persistentRoot.currentBranch makeBranchWithLabel: @"other"].rootObject;
-	otherGroup1.label = @"other";
-	[ctx commit];
+		otherItem1 = [item1.persistentRoot.currentBranch makeBranchWithLabel: @"other"].rootObject;
+		otherItem1.label = @"other";
+		otherGroup1 = [group1.persistentRoot.currentBranch makeBranchWithLabel: @"other"].rootObject;
+		otherGroup1.label = @"other";
+		[ctx commit];
+	}
+
+	group1uuid = group1.persistentRoot.UUID;
+	item1uuid = item1.persistentRoot.UUID;
 
 	return self;
 }
@@ -197,7 +206,7 @@
 	UKObjectsEqual(item1, group1.content);
 	// Check that the relationship cache knows the inverse relationship,
 	// even though it is not used in the metamodel (non-public API)
-	UKObjectsEqual(S(group1, currentGroup1, otherGroup1), [item1 referringObjects]);
+	UKObjectsEqual(S(group1, currentGroup1, otherGroup1), item1.referringObjects);
 }
 
 - (void)testRelationshipsFromAndToCurrentBranches
@@ -208,7 +217,7 @@
 	UKObjectsEqual(item1, currentGroup1.content);
 	// Check that the relationship cache knows the inverse relationship,
 	// even though it is not used in the metamodel (non-public API)
-	UKTrue([currentItem1 referringObjects].isEmpty);
+	UKTrue(currentItem1.referringObjects.isEmpty);
 }
 
 #pragma mark - Relationship Target Deletion Tests
@@ -223,10 +232,10 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		UKNil(testGroup1.content);
-		UKTrue([testItem1 referringObjects].isEmpty);
+		UKTrue(testItem1.referringObjects.isEmpty);
 
 		UKNil(testCurrentGroup1.content);
-		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+		UKTrue(testCurrentItem1.referringObjects.isEmpty);
 	}];
 }
 
@@ -251,10 +260,10 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		UKNil(testGroup1.content);
-		UKTrue([testItem1 referringObjects].isEmpty);
+		UKTrue(testItem1.referringObjects.isEmpty);
 
 		UKNil(testCurrentGroup1.content);
-		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+		UKTrue(testCurrentItem1.referringObjects.isEmpty);
 	}];
 }
 
@@ -273,7 +282,7 @@
 		UKObjectsEqual(testItem1, testGroup1.content);
 		// Check that the relationship cache knows the inverse relationship,
 		// even though it is not used in the metamodel (non-public API)
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), testItem1.referringObjects);
 
 		// Bidirectional cross persistent root relationships are limited to the
 		// tracking branch, this means item1 in the non-tracking current branch
@@ -284,7 +293,7 @@
 		// accross current branches, but materialized accross tracking branches
 		// in memory (they are not visible accross the current branches in memory).
 		UKObjectsEqual(testItem1, testCurrentGroup1.content);
-		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+		UKTrue(testCurrentItem1.referringObjects.isEmpty);
 	}];
 }
 
@@ -310,10 +319,10 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		UKObjectsEqual(testItem1, testGroup1.content);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), testItem1.referringObjects);
 
 		UKObjectsEqual(testItem1, testCurrentGroup1.content);
-		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+		UKTrue(testCurrentItem1.referringObjects.isEmpty);
 	}];
 }
 
@@ -328,10 +337,10 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		UKNil(testGroup1.content);
-		UKTrue([testItem1 referringObjects].isEmpty);
+		UKTrue(testItem1.referringObjects.isEmpty);
 		
 		UKNil(testCurrentGroup1.content);
-		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+		UKTrue(testCurrentItem1.referringObjects.isEmpty);
 	}];
 }
 
@@ -351,10 +360,10 @@
 		UKStringsEqual(@"other", testOtherItem1.label);
 		UKStringsEqual(@"current", testItem1.label);
 		UKObjectsEqual(testOtherItem1, testGroup1.content);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testOtherItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1), testOtherItem1.referringObjects);
 		
 		UKObjectsEqual(testOtherItem1, testCurrentGroup1.content);
-		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+		UKTrue(testCurrentItem1.referringObjects.isEmpty);
 	}];
 }
 
@@ -373,10 +382,10 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		UKNil(testGroup1.content);
-		UKTrue([testOtherItem1 referringObjects].isEmpty);
+		UKTrue(testOtherItem1.referringObjects.isEmpty);
 
 		UKNil(testCurrentGroup1.content);
-		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+		UKTrue(testCurrentItem1.referringObjects.isEmpty);
 	}];
 }
 
@@ -396,10 +405,10 @@
 		UKStringsEqual(@"other", testOtherItem1.label);
 		UKStringsEqual(@"current", testItem1.label);
 		UKObjectsEqual(testOtherItem1, testGroup1.content);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1), [testOtherItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1), testOtherItem1.referringObjects);
 
 		UKObjectsEqual(testOtherItem1, testCurrentGroup1.content);
-		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+		UKTrue(testCurrentItem1.referringObjects.isEmpty);
 	}];
 }
 
@@ -413,10 +422,10 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		UKObjectsEqual(testItem1, testGroup1.content);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), testItem1.referringObjects);
 
 		UKObjectsEqual(testItem1, testCurrentGroup1.content);
-		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+		UKTrue(testCurrentItem1.referringObjects.isEmpty);
 	}];
 }
 
@@ -431,10 +440,10 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		UKObjectsEqual(testItem1, testGroup1.content);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), testItem1.referringObjects);
 		 
 		UKObjectsEqual(testItem1, testCurrentGroup1.content);
-		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+		UKTrue(testCurrentItem1.referringObjects.isEmpty);
 	}];
 }
 
@@ -449,10 +458,10 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		UKObjectsEqual(testItem1, testOtherGroup1.content);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), testItem1.referringObjects);
 		
 		UKObjectsEqual(testItem1, testCurrentGroup1.content);
-		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+		UKTrue(testCurrentItem1.referringObjects.isEmpty);
 	}];
 }
 
@@ -472,10 +481,10 @@
 		UKStringsEqual(@"other", testOtherGroup1.label);
 		UKStringsEqual(@"current", testGroup1.label);
 		UKObjectsEqual(testItem1, testOtherGroup1.content);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), testItem1.referringObjects);
 		
 		UKObjectsEqual(testItem1, testCurrentGroup1.content);
-		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+		UKTrue(testCurrentItem1.referringObjects.isEmpty);
 	}];
 }
 
@@ -490,10 +499,10 @@
 	[self checkPersistentRootsWithExistingAndNewContextInBlock: ^(CHECK_BLOCK_ARGS)
 	{
 		 UKObjectsEqual(testItem1, testOtherGroup1.content);
-		 UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
+		 UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), testItem1.referringObjects);
 		 
 		 UKObjectsEqual(testItem1, testCurrentGroup1.content);
-		 UKTrue([testCurrentItem1 referringObjects].isEmpty);
+		 UKTrue(testCurrentItem1.referringObjects.isEmpty);
 	}];
 }
 
@@ -513,11 +522,194 @@
 		UKStringsEqual(@"other", testOtherItem1.label);
 		UKStringsEqual(@"current", testItem1.label);
 		UKObjectsEqual(testItem1, testGroup1.content);
-		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), [testItem1 referringObjects]);
+		UKObjectsEqual(S(testGroup1, testCurrentGroup1, testOtherGroup1), testItem1.referringObjects);
 
 		UKObjectsEqual(testItem1, testCurrentGroup1.content);
-		UKTrue([testCurrentItem1 referringObjects].isEmpty);
+		UKTrue(testCurrentItem1.referringObjects.isEmpty);
 	}];
+}
+
+- (void) testTargetPersistentRootLazyLoading
+{
+	COEditingContext *ctx2 = [self newContext];
+	
+	// First, all persistent roots should be unloaded.
+	UKNil([ctx2 loadedPersistentRootForUUID: group1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKFalse(ctx2.hasChanges);
+	
+	// Load group1
+	UnivaluedGroupNoOpposite *group1ctx2 = [ctx2 persistentRootForUUID: group1uuid].rootObject;
+	UKObjectsEqual(@"current", group1ctx2.label);
+	
+	// Ensure the persistent root is still unloaded
+	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKFalse(ctx2.hasChanges);
+	
+	// Access cross reference to trigger loading
+	OutlineItem *item1ctx2 = (OutlineItem *) group1ctx2.content;
+	UKObjectsEqual(item1.UUID, item1ctx2.UUID);
+	UKNotNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKFalse(ctx2.hasChanges);
+
+	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
+
+	UKNil([ctx2.deadRelationshipCache referringObjectsForPath: item1Path]);
+}
+
+- (void)testTargetBranchLazyLoading
+{
+	COPath *otherItemPath = [COPath pathWithPersistentRoot: item1uuid
+										   branch: otherItem1.branch.UUID];
+	
+	group1.content = otherItem1;
+	[ctx commit];
+	
+	COEditingContext *ctx2 = [self newContext];
+	
+	// First, all persistent roots should be unloaded.
+	UKNil([ctx2 loadedPersistentRootForUUID: group1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKFalse(ctx2.hasChanges);
+	
+	// Load group1
+	UnivaluedGroupNoOpposite *group1ctx2 = [ctx2 persistentRootForUUID: group1uuid].rootObject;
+	UKObjectsEqual(@"current", group1ctx2.label);
+	
+	// Check group1ctx2.contents without triggering loading
+	UKNotNil(otherItem1.branch.UUID);
+	UKObjectsEqual(otherItemPath, [group1ctx2 serializableValueForStorageKey: @"content"]);
+	
+	NSArray *referrers = [ctx2.deadRelationshipCache referringObjectsForPath: otherItemPath].allObjects;
+	UKObjectsEqual(A(group1ctx2), referrers);
+	
+	// Ensure item1 persistent root is still unloaded
+	UKNil([ctx2 loadedPersistentRootForUUID: item1.persistentRoot.UUID]);
+	UKFalse(ctx2.hasChanges);
+	
+	// Load item1, but not the other branch yet
+	OutlineItem *item1ctx2 = [ctx2 persistentRootForUUID: item1uuid].rootObject;
+	UKObjectsEqual(item1.UUID, item1ctx2.UUID);
+	UKNotNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKObjectsEqual(otherItemPath, [group1ctx2 serializableValueForStorageKey: @"content"]);
+	UKFalse(ctx2.hasChanges);
+	
+	// Finally load the other branch.
+	// This should trigger group1ctx2 to unfault its reference.
+	OutlineItem *otherItem1ctx2 = [item1ctx2.persistentRoot branchForUUID: otherItem1.branch.UUID].rootObject;
+	UKObjectsEqual(otherItem1ctx2, [group1ctx2 serializableValueForStorageKey: @"content"]);
+	UKFalse(ctx2.hasChanges);
+
+	UKNil([ctx2.deadRelationshipCache referringObjectsForPath: otherItemPath]);
+}
+
+- (void) testSourcePersistentRootLazyLoading
+{
+	COEditingContext *ctx2 = [self newContext];
+	
+	// First, all persistent roots should be unloaded.
+	UKNil([ctx2 loadedPersistentRootForUUID: group1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKFalse(ctx2.hasChanges);
+	
+	// Load item1
+	OutlineItem *item1ctx2 = [ctx2 persistentRootForUUID: item1uuid].rootObject;
+	
+	// Because group1 is not currently loaded, we have no way of
+	// knowing that it has a cross-reference to item1.
+	// So item1ctx2.parentGroups is currently empty.
+	// This is sort of a leak in the abstraction of lazy loading.
+	UKObjectsEqual(S(), item1ctx2.referringObjects);
+	
+	// Load group1
+	UnivaluedGroupNoOpposite *group1ctx2 = [ctx2 persistentRootForUUID: group1uuid].rootObject;
+	UKObjectsEqual(@"current", group1ctx2.label);
+	
+	// That should have updated the referringObjects
+	UKObjectsEqual(S(group1ctx2), item1ctx2.referringObjects);
+	
+	UKFalse(ctx2.hasChanges);
+
+	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
+
+	UKNil([ctx2.deadRelationshipCache referringObjectsForPath: item1Path]);
+}
+
+- (void) testSourcePersistentRootLazyLoadingReverseOrder
+{
+	COEditingContext *ctx2 = [self newContext];
+	
+	// First, all persistent roots should be unloaded.
+	UKNil([ctx2 loadedPersistentRootForUUID: group1uuid]);
+	UKNil([ctx2 loadedPersistentRootForUUID: item1uuid]);
+	UKFalse(ctx2.hasChanges);
+	
+	// Load group1
+	UnivaluedGroupNoOpposite *group1ctx2 = [ctx2 persistentRootForUUID: group1uuid].rootObject;
+	
+	// Ensure the references are faulted
+	UKObjectsEqual([COPath pathWithPersistentRoot: item1uuid], [group1ctx2 serializableValueForStorageKey: @"content"]);
+	
+	// Load item1
+	OutlineItem *item1ctx2 = [ctx2 persistentRootForUUID: item1uuid].rootObject;
+	
+	// Check that the reference in group1 was unfaulted by the loading of item1
+	UKObjectsSame(item1ctx2, [group1ctx2 serializableValueForStorageKey: @"content"]);
+	
+	UKObjectsEqual(S(group1ctx2), item1ctx2.referringObjects);
+	
+	UKFalse(ctx2.hasChanges);
+
+	COPath *item1Path = [COPath pathWithPersistentRoot: item1uuid];
+
+	UKNil([ctx2.deadRelationshipCache referringObjectsForPath: item1Path]);
+}
+
+- (void)testSourcePersistentRootUnloadingOnDeletion
+{
+	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorOnDeletion;
+
+	@autoreleasepool {
+		item1.persistentRoot.deleted = YES;
+		[ctx commit];
+		item1 = nil;
+	}
+
+	UKObjectsEqual([COPath pathWithPersistentRoot: item1uuid], [group1 serializableValueForStorageKey: @"content"]);
+
+	@autoreleasepool {
+		group1.persistentRoot.deleted = YES;
+		[ctx commit];
+		group1 = nil;
+	}
+
+	group1 = [ctx persistentRootForUUID: group1uuid].rootObject;
+
+	UKObjectsEqual([COPath pathWithPersistentRoot: item1uuid], [group1 serializableValueForStorageKey: @"content"]);
+	UKNil(group1.content);
+}
+
+- (void)testSourcePersistentRootManualUnloading
+{
+	@autoreleasepool {
+		[ctx unloadPersistentRoot: item1.persistentRoot];
+		item1 = nil;
+	}
+
+	UKObjectsEqual([COPath pathWithPersistentRoot: item1uuid], [group1 serializableValueForStorageKey: @"content"]);
+	
+	@autoreleasepool {
+		[ctx unloadPersistentRoot: group1.persistentRoot];
+		group1 = nil;
+	}
+
+	group1 = [ctx persistentRootForUUID: group1uuid].rootObject;
+	// Force lazy loading of item1
+	COObject *reloadedContent = group1.content;
+	item1 = [ctx persistentRootForUUID: item1uuid].rootObject;
+
+	UKObjectsEqual(item1, reloadedContent);
+	UKObjectsEqual(S(group1), item1.incomingRelationshipCache.referringObjects);
 }
 
 @end

@@ -12,6 +12,6 @@
     ETUUID *_branchUUID;
 }
 
-@property (nonatomic, copy) ETUUID *branchUUID;
+@property (nonatomic, readwrite, copy) ETUUID *branchUUID;
 
 @end

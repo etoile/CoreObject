@@ -4,8 +4,6 @@ TODO
 Major Missing Features
 ----------------------
 
-- Supporting broken cross-references. Since we don't support it, you must not permanently delete anything from a store (with `-[COSQLiteStore finalizeDeletionsForPersistentRoot:error:]`) unless your application doesn't use cross-references.
-
 - COUndoTrack doesn't cope with attempts by the user to undo changes in persistent roots that are not present in the store (assetions will fail)
 
 - Persistent root faulting; currently the entire store is loaded in memory
@@ -26,10 +24,8 @@ Major Missing Features
 
         - (ETEntityDescription *)persistentEntityDescription
         {
-            return  [[[self objectGraphContext] modelDescriptionRepository] descriptionForName: @"COObject"];
+            return  [self.objectGraphContext.modelDescriptionRepository descriptionForName: @"COObject"];
         }
-
-- Schema Upgrade
 
 - Better query support (in-memory and in-store as sketched in COQuery)
 
@@ -118,11 +114,6 @@ Future Work (Minor features, refactoring, cleanup)
   - Perhaps don't treat `-[NSSet countByEnumeratingWithState:objects:count:]` as a primitive method to match Mac OS X behavior
 
 
-- iOS
-
-  - iOS 5 and higher support
-
-
 - Store
 
   - exportRevisions: and importRevisions: that take a set of CORevisionID an returns a delta-compressed NSData
@@ -146,8 +137,6 @@ Future Work (Minor features, refactoring, cleanup)
 
 
 - COEditingContext
-
-  - Implement support for "dead cross-references"; currently an assertion will fail.
 
   - Expose COSQLiteStore's attachments feature
 
@@ -235,16 +224,12 @@ Future Work (Minor features, refactoring, cleanup)
     
   - Throw an exception if the developer names a property that conflicts with a NSObject/COObject method
 
-  - Remove -copyWithZone: in COObject and CODictionary (but EtoileUI must be migrated to COCopier first)
-
-  - Turn _variableStorage into a private ivar once EtoileUI doesn't access it directly
-  
   - Add dictionary update tests to TestObjectUpdate.m
   
   - Add relationship update check to detect persistent objects inserted into a transient relationship. The object put in the relationship could belong to:
   
     - a transient object graph context --> allowed (see transient property _dropIndicator in -[ETLayout awakeFromDeserialization)
-    - the same object graph context --> disallowed (otherwise we can accidentally easily look up shared instance using the wrong object graph context e.g. `_dropIndicator = [ETDropIndicator sharedInstanceForObjectGraphContext: [layout objectGraphContext]])`
+    - the same object graph context --> disallowed (otherwise we can accidentally easily look up shared instance using the wrong object graph context e.g. `_dropIndicator = [ETDropIndicator sharedInstanceForObjectGraphContext: layout.objectGraphContext])`
     - some other persistent object graph context --> allowed or disallowed (not sure yet)
 
   - Make primitives with potentially mutable subclasses (NSString and NSData)
@@ -389,9 +374,6 @@ the following situations at least:
 
   - Make a strict set of supported types, see: Scraps/serialization_todo.txt
 
-  - For collection metamodel assertions, check all collection metamodel attributes (isKeyed, isOrdered, isMultivalued) and document we should update these assertions if we add more collection attributes to the metamodel:
-        
-        NSAssert([aPropertyDesc isKeyed] && [aPropertyDesc isMultivalued], @"Serialization type doesn't match metamodel");
 
 - Utilities
 
@@ -438,18 +420,10 @@ the following situations at least:
     - talk about change notifications in the class descriptions. mention the notifications we support for each class description.
 
 
-- EtoileUI
-
-  - Standardizing on -setValue:forProperty: and -valueForProperty: for COObject/NSObject. Existing methods in ETLayoutItem and ETViewpoint will become -setValue:forRepresentedProperty: and -valueForRepresentedProperty:.
-
-  - Fix properly EtoileUI test suite crash on assertion in -checkIsNotRemoveFromContext (for now, we just override it in ETUIObject)
-
-  - Remove deprecated -type and -shortDescription in CORevision (all EtoileUI-based applications need to be check)
-
-
 - Code Quality
 
 	- Reviewed classes: none (COObjectGraphContext, COEditingContext, COBranch underwent a preliminary review)
+
 
 - COAttributedString
 

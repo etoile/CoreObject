@@ -33,7 +33,7 @@
 
 - (void) testNoTrackNames
 {
-	NSArray *names = [_store trackNames];
+	NSArray *names = _store.trackNames;
 	UKFalse([names containsObject: @"test1"]);
 	UKFalse([names containsObject: @"test2"]);
 }

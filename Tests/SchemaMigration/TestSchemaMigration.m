@@ -109,7 +109,7 @@
 		return item.packageVersion;
 	}
 
-	for (ETPackageDescription *package in [anObject.entityDescription allPackageDescriptions])
+	for (ETPackageDescription *package in anObject.entityDescription.allPackageDescriptions)
 	{
 		if ([package.name isEqual: aPackage])
 		{
@@ -125,13 +125,13 @@
 	[self checkObjectGraphBeforeAndAfterSerializationRoundtrip: parent.objectGraphContext
 	                                                   inBlock: ^(COObjectGraphContext *testGraph, id testRootObject, BOOL isObjectGraphCopy)
 	{
-		OutlineItem *newParent = [(Tag *)testRootObject contents].anyObject;
+		OutlineItem *newParent = ((Tag *)testRootObject).contents.anyObject;
 		OutlineItem *newChild = [newParent.content firstObject];
 
 		UKIntsEqual(0, newParent.storeItem.packageVersion);
-		UKIntsEqual(0, [[[[newParent entityDescription] parent] owner] version]);
+		UKIntsEqual(0, newParent.entityDescription.parent.owner.version);
 		UKIntsEqual(0, newChild.storeItem.packageVersion);
-		UKIntsEqual(0, [[[[newChild entityDescription] parent] owner] version]);
+		UKIntsEqual(0, newChild.entityDescription.parent.owner.version);
 		
 		UKObjectsEqual(@"Test", newParent.storeItem.packageName);
 		UKObjectsEqual(@"Test", newParent.entityDescription.owner.name);
@@ -212,7 +212,7 @@
 	UKObjectsEqual(@"Test", parentItem.packageName);
 	parentItem.packageVersion = 1;
 	
-	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: A(parentItem)]);
+	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: @[parentItem]]);
 }
 					  
 - (void)testExceptionOnNegativeSchemaVersion
@@ -224,7 +224,7 @@
 	UKObjectsEqual(@"Test", parentItem.packageName);
 	parentItem.packageVersion = -2;
 	
-	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: A(parentItem)]);
+	UKRaisesException([parent.objectGraphContext insertOrUpdateItems: @[parentItem]]);
 }
 
 - (void)testExceptionOnMissingMigration
@@ -240,7 +240,7 @@
 	COObjectGraphContext *migratedContext =
 		[COObjectGraphContext objectGraphContextWithModelDescriptionRepository: repo];
 	
-	UKRaisesException([migratedContext insertOrUpdateItems: A(childItem)]);
+	UKRaisesException([migratedContext insertOrUpdateItems: @[childItem]]);
 }
 
 - (void)testExceptionOnMigrationReturningItemsWithIncorrectVersion
@@ -251,7 +251,11 @@
 	[ctx commit];
 	// Will retain the current context store and never release it due to the exception
 	// (the store is retained when passed in argument to COEditingContext initializer)
-	UKRaisesException([self prepareNewMigrationContextForDestinationVersion: 1]);
+	UKRaisesException({
+		[self prepareNewMigrationContextForDestinationVersion: 1];
+		// Trigger persistent root loading
+		COTag *testTag = [[migrationCtx persistentRootForUUID: tag.persistentRoot.UUID] rootObject];
+	});
 }
 
 - (id)registerLabelUpdateMigrationWithVersion: (int64_t)version
@@ -1028,7 +1032,7 @@
 
 	// NOTE: For CoreObject, we don't support property extensions (extending
 	// entities with categories).
-	ETAssert([[testPackage propertyDescriptions] isEmpty]);
+	ETAssert([testPackage.propertyDescriptions isEmpty]);
 
 	for (ETEntityDescription *entity in testPackage.entityDescriptions)
 	{

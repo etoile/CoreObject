@@ -16,7 +16,7 @@
 	__weak COObject *_object;
 }
 
-- (instancetype)initWithObject: (COObject *)anObject;
+- (instancetype)initWithObject: (COObject *)anObject NS_DESIGNATED_INITIALIZER;
 
 @end
 
@@ -24,7 +24,7 @@
 @protocol COPrimitiveCollection <NSObject>
 - (void) beginMutation;
 - (void) endMutation;
-@property (nonatomic, readonly) BOOL isMutable;
+@property (nonatomic, readonly, getter=isMutable) BOOL mutable;
 @property (nonatomic, readonly) id <NSFastEnumeration> enumerableReferences;
 @end
 
@@ -39,6 +39,9 @@
 - (void)addReference: (id)aReference;
 - (void)removeReference: (id)aReference;
 - (BOOL)containsReference: (id)aReference;
+
+@property (nonatomic, readonly) NSArray *deadReferencesArray;
+
 @end
 
 @interface COMutableSet (TestPrimitiveCollection)

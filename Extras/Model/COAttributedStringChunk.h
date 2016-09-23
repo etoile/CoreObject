@@ -14,8 +14,8 @@
 	NSString *text;
 }
 
-@property (nonatomic, readwrite, strong) NSString *text;
-@property (nonatomic, readwrite, strong) NSSet *attributes;
+@property (nonatomic, readwrite, copy) NSString *text;
+@property (nonatomic, readwrite, copy) NSSet *attributes;
 @property (nonatomic, readonly, weak) COAttributedString *parentString;
 /**
  * Returns an item graph that contains a copy of the receiver that has been trimmed to the given subrange as its root object.
@@ -27,13 +27,13 @@
 /**
  * Returns a string like @"b,u" if the chunk is bold and underlined
  */
-- (NSString *) attributesDebugDescription;
+@property (nonatomic, readonly) NSString *attributesDebugDescription;
 
 /**
  * Character index of the start of the chunk. Currently O(N)
  */
-- (NSUInteger) characterIndex;
+@property (nonatomic, readonly) NSUInteger characterIndex;
 
-- (NSRange) characterRange;
+@property (nonatomic, readonly) NSRange characterRange;
 
 @end

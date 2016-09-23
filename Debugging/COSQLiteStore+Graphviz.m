@@ -86,8 +86,8 @@
 		
 		// Add revisions
 		
-		NSIndexSet *revidsUsed = [backing revidsUsedRange];
-		for (NSUInteger i = [revidsUsed firstIndex]; i != NSNotFound; i = [revidsUsed indexGreaterThanIndex: i])
+		NSIndexSet *revidsUsed = backing.revidsUsedRange;
+		for (NSUInteger i = revidsUsed.firstIndex; i != NSNotFound; i = [revidsUsed indexGreaterThanIndex: i])
 		{
 			ETUUID *revUUID = [backing revisionUUIDForRevid: i];
 			if (revUUID != nil)
@@ -170,7 +170,7 @@ void COViewDOTGraphFile(NSString *dotFilePath)
 		}
 
 		// NOTE: Using NSTask rather than system() breaks 'po [objectGraphContext showGraph]' in LLDB on 10.7 
-		system([[NSString stringWithFormat: @"%@ -Tpdf '%@' -o '%@'", executablePath, dotFilePath, pdfPath] UTF8String]);
+		system([NSString stringWithFormat: @"%@ -Tpdf '%@' -o '%@'", executablePath, dotFilePath, pdfPath].UTF8String);
 		[[NSWorkspace sharedWorkspace] openFile: pdfPath];
 		break;
 	}

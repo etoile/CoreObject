@@ -31,26 +31,26 @@
 	track = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
 	[track clear];
 	
-    persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	[[persistentRoot rootObject] setLabel: @"0"];
+    persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+	[persistentRoot.rootObject setLabel: @"0"];
 	[ctx commit]; // not on undo track
-	r0 = [persistentRoot currentRevision];
+	r0 = persistentRoot.currentRevision;
 	
-	[[persistentRoot rootObject] setLabel: @"1"];
+	[persistentRoot.rootObject setLabel: @"1"];
 	[ctx commitWithUndoTrack: track];
-	r1 = [persistentRoot currentRevision];
+	r1 = persistentRoot.currentRevision;
 	
-	[[persistentRoot rootObject] setLabel: @"2"];
+	[persistentRoot.rootObject setLabel: @"2"];
 	[ctx commitWithUndoTrack: track];
-	r2 = [persistentRoot currentRevision];
+	r2 = persistentRoot.currentRevision;
 	
-	[[persistentRoot rootObject] setLabel: @"3"];
+	[persistentRoot.rootObject setLabel: @"3"];
 	[ctx commitWithUndoTrack: track];
-	r3 = [persistentRoot currentRevision];
+	r3 = persistentRoot.currentRevision;
 	
-	[[persistentRoot rootObject] setLabel: @"4"];
+	[persistentRoot.rootObject setLabel: @"4"];
 	[ctx commitWithUndoTrack: track];
-	r4 = [persistentRoot currentRevision];
+	r4 = persistentRoot.currentRevision;
 	
     return self;
 }
@@ -59,7 +59,7 @@
 	 isSetVersionFrom: (CORevision *)a
 				   to: (CORevision *)b
 {
-	COCommandSetCurrentVersionForBranch *command = [[(COCommandGroup *)aCommand contents] firstObject];
+	COCommandSetCurrentVersionForBranch *command = [((COCommandGroup *)aCommand).contents firstObject];
 	UKObjectKindOf(command, COCommandSetCurrentVersionForBranch);
 	UKObjectsEqual(a, command.oldRevision);
 	UKObjectsEqual(b, command.revision);
@@ -69,7 +69,7 @@
 {
 	id <COTrackNode> current = [track currentNode];
 	
-	double timeIntervalSinceLastNodeCommitted = [[NSDate date] timeIntervalSinceDate: [current date]];
+	double timeIntervalSinceLastNodeCommitted = [[NSDate date] timeIntervalSinceDate: current.date];
 	
 	// i.e., the last undo node must have been created between 0 and 250ms ago.
 	UKTrue(timeIntervalSinceLastNodeCommitted < 0.250);
@@ -174,12 +174,12 @@
 	[emptyTrack clear];
 	
 	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [emptyTrack currentNode]);
-	UKObjectsEqual(@[[COEndOfUndoTrackPlaceholderNode sharedInstance]], [emptyTrack nodes]);
+	UKObjectsEqual(@[[COEndOfUndoTrackPlaceholderNode sharedInstance]], emptyTrack.nodes);
 }
 
 - (void) checkNodes: (NSArray *)nodes
 {
-	UKIntsEqual(5, [nodes count]);
+	UKIntsEqual(5, nodes.count);
 	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], nodes[0]);
 	[self checkCommand: nodes[1] isSetVersionFrom: r0 to: r1];
 	[self checkCommand: nodes[2] isSetVersionFrom: r1 to: r2];
@@ -189,25 +189,25 @@
 
 - (void) testNodes
 {
-	NSArray *nodes = [track nodes];
+	NSArray *nodes = track.nodes;
 	[self checkNodes: nodes];
 }
 
-// N.B.: These must be 3 separate tests, since [track nodes] caches
+// N.B.: These must be 3 separate tests, since track.nodes caches
 // the result, and we need to make sure it's calculated corrently when there
 // are are multiple commands in both the undo and redo tracks.
 
 - (void) testNodesUnaffectedBy1Undo
 {
 	[track undo];
-	[self checkNodes: [track nodes]];
+	[self checkNodes: track.nodes];
 }
 
 - (void) testNodesUnaffectedBy2Undos
 {
 	[track undo];
 	[track undo];
-	[self checkNodes: [track nodes]];
+	[self checkNodes: track.nodes];
 }
 
 - (void) testNodesUnaffectedBy3Undos
@@ -215,7 +215,7 @@
 	[track undo];
 	[track undo];
 	[track undo];
-	[self checkNodes: [track nodes]];
+	[self checkNodes: track.nodes];
 }
 
 - (void) testNodesUnaffectedBy4Undos
@@ -224,7 +224,7 @@
 	[track undo];
 	[track undo];
 	[track undo];
-	[self checkNodes: [track nodes]];
+	[self checkNodes: track.nodes];
 }
 
 - (void) testSetCurrentNode
@@ -241,14 +241,14 @@
 	[track setCurrentNode: target];
 	
 	[self checkCommand: [track currentNode] isSetVersionFrom: r1 to: r2];
-	UKObjectsEqual(r2, [persistentRoot currentRevision]);
+	UKObjectsEqual(r2, persistentRoot.currentRevision);
 	
 	// Redo back to the start
 	
 	[track setCurrentNode: startNode];
 
 	[self checkCommand: [track currentNode] isSetVersionFrom: r3 to: r4];
-	UKObjectsEqual(r4, [persistentRoot currentRevision]);
+	UKObjectsEqual(r4, persistentRoot.currentRevision);
 }
 
 - (void) testSetCurrentNodeToPlaceholder
@@ -265,10 +265,10 @@
 	[track setCurrentNode: target];
 
 	UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [track currentNode]);
-	UKFalse([track canUndo]);
-	UKTrue([track canRedo]);
-	UKObjectsEqual(@"0", [[persistentRoot rootObject] label]);
-	UKObjectsEqual(r0, [persistentRoot currentRevision]);
+	UKFalse(track.canUndo);
+	UKTrue(track.canRedo);
+	UKObjectsEqual(@"0", [persistentRoot.rootObject label]);
+	UKObjectsEqual(r0, persistentRoot.currentRevision);
 	
 	// Redo 1 node
 	
@@ -276,10 +276,10 @@
 	[track setCurrentNode: target];
 	
 	[self checkCommand: [track currentNode] isSetVersionFrom: r0 to: r1];
-	UKTrue([track canUndo]);
-	UKTrue([track canRedo]);
-	UKObjectsEqual(@"1", [[persistentRoot rootObject] label]);
-	UKObjectsEqual(r1, [persistentRoot currentRevision]);
+	UKTrue(track.canUndo);
+	UKTrue(track.canRedo);
+	UKObjectsEqual(@"1", [persistentRoot.rootObject label]);
+	UKObjectsEqual(r1, persistentRoot.currentRevision);
 }
 
 @end

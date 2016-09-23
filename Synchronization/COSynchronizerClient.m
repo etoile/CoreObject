@@ -26,7 +26,7 @@
 @synthesize branch = _branch;
 @synthesize clientID = _clientID;
 
-- (COPersistentRoot *)persistentRoot { return [_branch persistentRoot]; }
+- (COPersistentRoot *)persistentRoot { return _branch.persistentRoot; }
 
 - (ETUUID *) lastRevisionUUIDInTransitToServer
 {
@@ -38,9 +38,11 @@
 	return _lastRevisionUUIDFromServer;
 }
 
-- (id) initWithClientID: (NSString *)clientID
+- (instancetype) initWithClientID: (NSString *)clientID
 		 editingContext: (COEditingContext *)ctx
 {
+	NILARG_EXCEPTION_TEST(clientID);
+	NILARG_EXCEPTION_TEST(ctx);
 	SUPERINIT;
 	
 	_ctx = ctx;
@@ -49,6 +51,10 @@
 	return self;
 }
 
+- (instancetype)init
+{
+	return [self initWithClientID: nil editingContext: nil];
+}
 
 - (void) handleSetupMessage: (COSynchronizerPersistentRootInfoToClientMessage *)message
 {
@@ -86,7 +92,7 @@
 	}
 	
 	// 3. Do we have the revision?
-	if ([[_ctx store] revisionInfoForRevisionUUID: message.currentRevision.revisionUUID
+	if ([_ctx.store revisionInfoForRevisionUUID: message.currentRevision.revisionUUID
 							  persistentRootUUID: message.persistentRootUUID] == nil)
 	{
 		[message.currentRevision writeToTransaction: txn
@@ -94,13 +100,13 @@
 										 branchUUID: message.branchUUID];
 	}
 	
-	ETAssert([[_ctx store] commitStoreTransaction: txn]);
+	ETAssert([_ctx.store commitStoreTransaction: txn]);
 
 	persistentRoot = [_ctx persistentRootForUUID: message.persistentRootUUID];
 	ETAssert(persistentRoot != nil);
 	_branch = [persistentRoot branchForUUID: message.branchUUID];
 	
-	if ([_branch hasChanges])
+	if (_branch.hasChanges)
 	{
 		[NSException raise: NSGenericException
 		 format: @"-[%@ %@] called but the branch has uncommitted changes. You should ensure all changes are committed before feeding the synchronizer a message.",
@@ -129,7 +135,7 @@
 
 - (void) handleRevisionsFromServer: (NSArray *)revs
 {
-	if ([[[revs lastObject] revisionUUID] isEqual: [[[self branch] currentRevision] UUID]])
+	if ([[revs.lastObject revisionUUID] isEqual: self.branch.currentRevision.UUID])
 	{
 		// Bail out early without doing anything in the trivial case when there are no further changes
 		// since we last sent something to the server.. this prevents the TestSynchronizerImmediateDelivery tests from failing.
@@ -138,7 +144,7 @@
 		// the server replies back with the full content that the client sent (even though it knows it's unnecessary
 		// to send that.) We still need to send the receipts though.
 		
-		_lastRevisionUUIDFromServer = [[revs lastObject] revisionUUID];
+		_lastRevisionUUIDFromServer = [revs.lastObject revisionUUID];
 		_lastRevisionUUIDInTransitToServer = nil;
 		return;
 	}
@@ -173,9 +179,9 @@
 		return;
 	}
 	
-	_lastRevisionUUIDFromServer = [[revs lastObject] revisionUUID];
+	_lastRevisionUUIDFromServer = [revs.lastObject revisionUUID];
 	
-	NSArray *revsToUse = [revs subarrayWithRange: NSMakeRange(i, [revs count] - i)];
+	NSArray *revsToUse = [revs subarrayWithRange: NSMakeRange(i, revs.count - i)];
 	
 	
 	// Apply the revisions
@@ -195,17 +201,17 @@
 	}
 	// TODO: Ideally we'd just do one store commit, instead of two,
 	// but the +rebaseRevision method below requires these revisions to be committed already.
-	ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
+	ETAssert([self.persistentRoot.store commitStoreTransaction: txn]);
 	
 	// Rebase [self.branch currentRevision] onto the new revisions
 	
 	const BOOL isCurrentRevDescendentOfServerRev =
-			[_ctx isRevision: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
-   equalToOrParentOfRevision: [[self.branch currentRevision] UUID]
+			[_ctx isRevision: [revs.lastObject revisionUUID]
+   equalToOrParentOfRevision: self.branch.currentRevision.UUID
 			  persistentRoot: self.persistentRoot.UUID];
 	
 	if (_lastRevisionUUIDInTransitToServer != nil
-		&& ![[[self.branch currentRevision] UUID] isEqual: _lastRevisionUUIDInTransitToServer]
+		&& ![self.branch.currentRevision.UUID isEqual: _lastRevisionUUIDInTransitToServer]
 		&& !isCurrentRevDescendentOfServerRev)
 	{
 		txn = [[COStoreTransaction alloc] init];
@@ -213,32 +219,32 @@
 		// N.B. The reason _lastRevisionUUIDInTransitToServer is the common ancestor for the rebasing is a bit subtle.
 		//
 		// It is the revision we sent to the server earlier, and we are currently
-		// processing the response to sending that revision, so we know that [revsToUse lastObject]
+		// processing the response to sending that revision, so we know that revsToUse.lastObject
 		// has the changes in _lastRevisionUUIDInTransitToServer merged in to it (although there is
 		// no link showing that in our history graph, since the merge was done on the server).
 		//
 		// _lastRevisionUUIDInTransitToServer is also a parent of [self.branch currentRevision], so it is exactly the revision
 		// we want to use as the common ancestor for rebasing.
 		
-		NSArray *rebasedRevs = [COSynchronizerUtils rebaseRevision: [[self.branch currentRevision] UUID]
-													  ontoRevision: [(COSynchronizerRevision *)[revsToUse lastObject] revisionUUID]
+		NSArray *rebasedRevs = [COSynchronizerUtils rebaseRevision: self.branch.currentRevision.UUID
+													  ontoRevision: [revsToUse.lastObject revisionUUID]
 													commonAncestor: _lastRevisionUUIDInTransitToServer
 												persistentRootUUID: self.persistentRoot.UUID
 														branchUUID: self.branch.UUID
-															 store: [self.persistentRoot store]
+															 store: self.persistentRoot.store
 													   transaction: txn
 													editingContext: self.persistentRoot.editingContext
 										modelDescriptionRepository: self.persistentRoot.editingContext.modelDescriptionRepository];
-		ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
+		ETAssert([self.persistentRoot.store commitStoreTransaction: txn]);
 
-		[_branch setCurrentRevisionSkipSupportsRevertCheck: [self.persistentRoot.editingContext revisionForRevisionUUID: [rebasedRevs lastObject]
+		[_branch setCurrentRevisionSkipSupportsRevertCheck: [self.persistentRoot.editingContext revisionForRevisionUUID: rebasedRevs.lastObject
 																									 persistentRootUUID: self.persistentRoot.UUID]];
 	}
 	else if (!isCurrentRevDescendentOfServerRev)
 	{
 		// Fast-forward
 		
-		[_branch setCurrentRevisionSkipSupportsRevertCheck: [self.persistentRoot.editingContext revisionForRevisionUUID: [(COSynchronizerRevision *)[revsToUse lastObject] revisionUUID]
+		[_branch setCurrentRevisionSkipSupportsRevertCheck: [self.persistentRoot.editingContext revisionForRevisionUUID: [revsToUse.lastObject revisionUUID]
 																									 persistentRootUUID: self.persistentRoot.UUID]];
 	}
 	_lastRevisionUUIDInTransitToServer = nil;
@@ -252,7 +258,7 @@
 		return;
 	}
 
-	if ([_branch hasChanges])
+	if (_branch.hasChanges)
 	{
 		[NSException raise: NSGenericException
 		 format: @"-[%@ %@] called but the branch has uncommitted changes. You should ensure all changes are committed before feeding the synchronizer a message.",
@@ -269,7 +275,7 @@
 		return;
 	}
 
-	if ([_branch hasChanges])
+	if (_branch.hasChanges)
 	{
 		[NSException raise: NSGenericException
 		 format: @"-[%@ %@] called but the branch has uncommitted changes. You should ensure all changes are committed before feeding the synchronizer a message.",
@@ -290,7 +296,7 @@
 	{
 		return;
 	}
-	if ([[[self.branch currentRevision] UUID] isEqual: [self lastRevisionUUIDFromServer]])
+	if ([self.branch.currentRevision.UUID isEqual: [self lastRevisionUUIDFromServer]])
 	{
 		NSLog(@"sendPushToServer bailing because there is nothing to push");
 		return;
@@ -299,7 +305,7 @@
 	NSMutableArray *revs = [[NSMutableArray alloc] init];
 	
 	NSArray *revUUIDs = [_ctx revisionUUIDsFromRevisionUUIDExclusive: [self lastRevisionUUIDFromServer]
-											 toRevisionUUIDInclusive: [[self.branch currentRevision] UUID]
+											 toRevisionUUIDInclusive: self.branch.currentRevision.UUID
 													  persistentRoot: self.persistentRoot.UUID];
 
 	for (ETUUID *revUUID in revUUIDs)
@@ -313,7 +319,7 @@
 	
 	ETAssert(![revs isEmpty]);
 	ETAssert(_lastRevisionUUIDInTransitToServer == nil);
-	_lastRevisionUUIDInTransitToServer = [[self.branch currentRevision] UUID];
+	_lastRevisionUUIDInTransitToServer = self.branch.currentRevision.UUID;
 	// Benchmarking:
 	_lastRevisionUUIDInTransitToServerTimestamp = [NSDate date];
 	

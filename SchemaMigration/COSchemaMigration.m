@@ -85,7 +85,7 @@ static NSMutableDictionary *dependencies;
 
 + (NSArray *)migrations
 {
-	return [migrations allValues];
+	return migrations.allValues;
 }
 
 #pragma mark Targeted Versions -

@@ -44,18 +44,18 @@
 
 - (void)testUndoSetCurrentVersionForBranchBasic
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commitWithUndoTrack: _testTrack];
 
-    UKNil([[persistentRoot rootObject] valueForProperty: kCOLabel]);
+    UKNil([persistentRoot.rootObject valueForProperty: kCOLabel]);
     
-    [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
+    [persistentRoot.rootObject setValue: @"hello" forProperty: kCOLabel];
     [ctx commitWithUndoTrack: _testTrack];
 	
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKObjectsEqual(@"hello", [[testProot rootObject] valueForProperty: kCOLabel]);
+		 UKObjectsEqual(@"hello", [testProot.rootObject valueForProperty: kCOLabel]);
 	 }];
     
     [_testTrack undo];
@@ -63,43 +63,43 @@
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 UKNil([[testProot rootObject] valueForProperty: kCOLabel]);
+		 UKNil([testProot.rootObject valueForProperty: kCOLabel]);
 	 }];
 }
 
 - (void)testUndoSetCurrentVersionForBranchMultiplePersistentRoots
 {
-    COPersistentRoot *persistentRoot1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commitWithUndoTrack: _testTrack];
     
-    [[persistentRoot1 rootObject] setLabel: @"hello1"];
-    [[persistentRoot2 rootObject] setLabel: @"hello2"];
+    [persistentRoot1.rootObject setLabel: @"hello1"];
+    [persistentRoot2.rootObject setLabel: @"hello2"];
     [ctx commitWithUndoTrack: _testTrack];
     
-    CORevision *persistentRoot1Revision = [persistentRoot1 currentRevision];
-    CORevision *persistentRoot2Revision = [persistentRoot2 currentRevision];
+    CORevision *persistentRoot1Revision = persistentRoot1.currentRevision;
+    CORevision *persistentRoot2Revision = persistentRoot2.currentRevision;
     
     [_testTrack undo];
     
 	[self checkPersistentRootWithExistingAndNewContext: persistentRoot1
 											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot1, COBranch *testBranch, BOOL isNewContext)
 	 {
-		 COPersistentRoot *testProot2 = [testCtx persistentRootForUUID: [persistentRoot2 UUID]];
+		 COPersistentRoot *testProot2 = [testCtx persistentRootForUUID: persistentRoot2.UUID];
 		 
-		 UKObjectsNotEqual([testProot1 currentRevision], persistentRoot1Revision);
-		 UKObjectsNotEqual([testProot2 currentRevision], persistentRoot2Revision);
-		 UKObjectsEqual([testProot1 currentRevision], [persistentRoot1Revision parentRevision]);
-		 UKObjectsEqual([testProot2 currentRevision], [persistentRoot2Revision parentRevision]);
+		 UKObjectsNotEqual(testProot1.currentRevision, persistentRoot1Revision);
+		 UKObjectsNotEqual(testProot2.currentRevision, persistentRoot2Revision);
+		 UKObjectsEqual(testProot1.currentRevision, persistentRoot1Revision.parentRevision);
+		 UKObjectsEqual(testProot2.currentRevision, persistentRoot2Revision.parentRevision);
 	 }];
 }
 
 - (void)testUndoSetCurrentVersionForBranchSelectiveUndo
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     {
-        COObject *root = [persistentRoot rootObject];
-        COObject *child = [[persistentRoot objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+        COObject *root = persistentRoot.rootObject;
+        COObject *child = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
         [root insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: kCOContents];
         [ctx commitWithIdentifier: @"insert-item" undoTrack: _setupTrack error: NULL];
         
@@ -113,12 +113,12 @@
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
 
 		COUndoTrack *rootEditTrack = [_rootEditTrack trackWithEditingContext: ctx2];
 		COUndoTrack *childEditTrack = [_childEditTrack trackWithEditingContext: ctx2];
 
-        COObject *root = [ctx2persistentRoot rootObject];
+        COObject *root = ctx2persistentRoot.rootObject;
         COObject *child = [[root valueForProperty: kCOContents] firstObject];
         
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
@@ -141,12 +141,12 @@
 		// Check that a new revision was created
 		CORevision *r4 = ctx2persistentRoot.currentRevision;
 		UKObjectsNotEqual(r3, r4);
-		UKObjectsEqual(r3, [r4 parentRevision]);
-		UKObjectsEqual([r2 metadata][kCOCommitMetadataIdentifier], [r4 metadata][kCOCommitMetadataIdentifier]);
+		UKObjectsEqual(r3, r4.parentRevision);
+		UKObjectsEqual(r2.metadata[kCOCommitMetadataIdentifier], r4.metadata[kCOCommitMetadataIdentifier]);
 
-		UKObjectsEqual(@"org.etoile.CoreObject.undo", [r4 metadata][kCOCommitMetadataUndoType]);
-		UKObjectsEqual([[_rootEditTrack.nodes[1] UUID] stringValue], [r4 metadata][kCOCommitMetadataUndoBaseUUID]);
-		UKTrue([[r4 metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
+		UKObjectsEqual(@"org.etoile.CoreObject.undo", r4.metadata[kCOCommitMetadataUndoType]);
+		UKObjectsEqual([[_rootEditTrack.nodes[1] UUID] stringValue], r4.metadata[kCOCommitMetadataUndoBaseUUID]);
+		UKTrue([r4.metadata[kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
 
 		UKObjectsEqual(@"extraValue", r4.metadata[@"extraKey"]);
 		
@@ -157,12 +157,12 @@
         
 		// Check that a new revision was created
 		CORevision *r5 = ctx2persistentRoot.currentRevision;
-		UKObjectsEqual(r4, [r5 parentRevision]);
-		UKObjectsEqual([r3 metadata][kCOCommitMetadataIdentifier], [r5 metadata][kCOCommitMetadataIdentifier]);
+		UKObjectsEqual(r4, r5.parentRevision);
+		UKObjectsEqual(r3.metadata[kCOCommitMetadataIdentifier], r5.metadata[kCOCommitMetadataIdentifier]);
 
-		UKObjectsEqual(@"org.etoile.CoreObject.undo", [r5 metadata][kCOCommitMetadataUndoType]);
-		UKObjectsEqual([[_childEditTrack.nodes[1] UUID] stringValue], [r5 metadata][kCOCommitMetadataUndoBaseUUID]);
-		UKTrue([[r5 metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
+		UKObjectsEqual(@"org.etoile.CoreObject.undo", r5.metadata[kCOCommitMetadataUndoType]);
+		UKObjectsEqual([[_childEditTrack.nodes[1] UUID] stringValue], r5.metadata[kCOCommitMetadataUndoBaseUUID]);
+		UKTrue([r5.metadata[kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
 		
         UKNil([root valueForProperty: kCOLabel]);
         UKNil([child valueForProperty: kCOLabel]);
@@ -174,12 +174,12 @@
         
 		// Check that a new revision was created
 		CORevision *r6 = ctx2persistentRoot.currentRevision;
-		UKObjectsEqual(r5, [r6 parentRevision]);
-		UKObjectsEqual([r4 metadata][kCOCommitMetadataIdentifier], [r6 metadata][kCOCommitMetadataIdentifier]);
+		UKObjectsEqual(r5, r6.parentRevision);
+		UKObjectsEqual(r4.metadata[kCOCommitMetadataIdentifier], r6.metadata[kCOCommitMetadataIdentifier]);
 
-		UKObjectsEqual(@"org.etoile.CoreObject.redo", [r6 metadata][kCOCommitMetadataUndoType]);
-		UKObjectsEqual([[_rootEditTrack.nodes[1] UUID] stringValue], [r6 metadata][kCOCommitMetadataUndoBaseUUID]);
-		UKFalse([[r6 metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
+		UKObjectsEqual(@"org.etoile.CoreObject.redo", r6.metadata[kCOCommitMetadataUndoType]);
+		UKObjectsEqual([[_rootEditTrack.nodes[1] UUID] stringValue], r6.metadata[kCOCommitMetadataUndoBaseUUID]);
+		UKFalse([r6.metadata[kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
 
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
         UKNil([child valueForProperty: kCOLabel]);
@@ -191,12 +191,12 @@
 		
 		// Check that a new revision was created
 		CORevision *r7 = ctx2persistentRoot.currentRevision;
-		UKObjectsEqual(r6, [r7 parentRevision]);
-		UKObjectsEqual([r5 metadata][kCOCommitMetadataIdentifier], [r7 metadata][kCOCommitMetadataIdentifier]);
+		UKObjectsEqual(r6, r7.parentRevision);
+		UKObjectsEqual(r5.metadata[kCOCommitMetadataIdentifier], r7.metadata[kCOCommitMetadataIdentifier]);
 
-		UKObjectsEqual(@"org.etoile.CoreObject.redo", [r7 metadata][kCOCommitMetadataUndoType]);
-		UKObjectsEqual([[_childEditTrack.nodes[1] UUID] stringValue], [r7 metadata][kCOCommitMetadataUndoBaseUUID]);
-		UKFalse([[r7 metadata][kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
+		UKObjectsEqual(@"org.etoile.CoreObject.redo", r7.metadata[kCOCommitMetadataUndoType]);
+		UKObjectsEqual([[_childEditTrack.nodes[1] UUID] stringValue], r7.metadata[kCOCommitMetadataUndoBaseUUID]);
+		UKFalse([r7.metadata[kCOCommitMetadataUndoInitialBaseInversed] boolValue]);
         
         UKObjectsEqual(@"root", [root valueForProperty: kCOLabel]);
         UKObjectsEqual(@"child", [child valueForProperty: kCOLabel]);
@@ -205,85 +205,85 @@
 
 - (void) testUndoCreateBranch
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
     
-    COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
+    COBranch *secondBranch = [persistentRoot.currentBranch makeBranchWithLabel: @"secondBranch"];
     [ctx commitWithUndoTrack: _testTrack];
         
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
+        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: secondBranch.UUID];
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
-        UKFalse([ctx2secondBranch isDeleted]);
+        UKFalse(ctx2secondBranch.deleted);
         [testTrack undo];
-        UKTrue([ctx2secondBranch isDeleted]);
+        UKTrue(ctx2secondBranch.deleted);
         [testTrack redo];
-        UKFalse([ctx2secondBranch isDeleted]);
+        UKFalse(ctx2secondBranch.deleted);
     }
 }
 
 - (void) testUndoCreateBranchWithMetadata
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
     
-    COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
+    COBranch *secondBranch = [persistentRoot.currentBranch makeBranchWithLabel: @"secondBranch"];
 	secondBranch.metadata = @{ @"some" : @"metadata" };
     [ctx commitWithUndoTrack: _testTrack];
 	
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
+        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: secondBranch.UUID];
 		
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
-        UKFalse([ctx2secondBranch isDeleted]);
+        UKFalse(ctx2secondBranch.deleted);
         [testTrack undo];
-        UKTrue([ctx2secondBranch isDeleted]);
+        UKTrue(ctx2secondBranch.deleted);
         [testTrack redo];
-        UKFalse([ctx2secondBranch isDeleted]);
+        UKFalse(ctx2secondBranch.deleted);
     }
 }
 
 - (void) testUndoCreateBranchAndSetCurrent
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
     
-    COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
-    [persistentRoot setCurrentBranch: secondBranch];
+    COBranch *secondBranch = [persistentRoot.currentBranch makeBranchWithLabel: @"secondBranch"];
+    persistentRoot.currentBranch = secondBranch;
     [ctx commitWithUndoTrack: _testTrack];
     
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
+        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: secondBranch.UUID];
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
         UKNotNil(ctx2secondBranch);
-        UKFalse([ctx2secondBranch isDeleted]);
+        UKFalse(ctx2secondBranch.deleted);
         [testTrack undo];
-        UKTrue([ctx2secondBranch isDeleted]);
+        UKTrue(ctx2secondBranch.deleted);
         [testTrack redo];
-        UKFalse([ctx2secondBranch isDeleted]);
+        UKFalse(ctx2secondBranch.deleted);
     }
 }
 
 - (void) testUndoDeleteBranch
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
     
-    COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];
+    COBranch *secondBranch = [persistentRoot.currentBranch makeBranchWithLabel: @"secondBranch"];
     [ctx commit];
     
     [secondBranch setDeleted: YES];
@@ -292,149 +292,149 @@
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
+        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: secondBranch.UUID];
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
-        UKTrue([ctx2secondBranch isDeleted]);
+        UKTrue(ctx2secondBranch.deleted);
         [testTrack undo];
-        UKFalse([ctx2secondBranch isDeleted]);
+        UKFalse(ctx2secondBranch.deleted);
         [testTrack redo];
-        UKTrue([ctx2secondBranch isDeleted]);
+        UKTrue(ctx2secondBranch.deleted);
     }
 }
 
 - (void) testUndoSetBranchMetadata
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [[persistentRoot currentBranch] setMetadata: D(@"world", @"hello")];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    [persistentRoot.currentBranch setMetadata: @{ @"hello": @"world" }];
     [ctx commit];
     
-    [[persistentRoot currentBranch] setMetadata: D(@"world2", @"hello")];
+    [persistentRoot.currentBranch setMetadata: @{ @"hello": @"world2" }];
     [ctx commitWithUndoTrack: _testTrack];
     
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
-        UKObjectsEqual(D(@"world2", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
+        UKObjectsEqual(D(@"world2", @"hello"), ctx2persistentRoot.currentBranch.metadata);
         [testTrack undo];
-        UKObjectsEqual(D(@"world", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
+        UKObjectsEqual(D(@"world", @"hello"), ctx2persistentRoot.currentBranch.metadata);
         [testTrack redo];
-        UKObjectsEqual(D(@"world2", @"hello"), [[ctx2persistentRoot currentBranch] metadata]);
+        UKObjectsEqual(D(@"world2", @"hello"), ctx2persistentRoot.currentBranch.metadata);
     }
 }
 
 - (void) testUndoSetPersistentRootMetadata
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    [persistentRoot setMetadata: D(@"world", @"hello")];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    [persistentRoot setMetadata: @{ @"hello": @"world" }];
     [ctx commit];
     
-    [persistentRoot setMetadata: D(@"world2", @"hello")];
+    [persistentRoot setMetadata: @{ @"hello": @"world2" }];
     [ctx commitWithUndoTrack: _testTrack];
     
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
 		
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
-        UKObjectsEqual(D(@"world2", @"hello"), [ctx2persistentRoot metadata]);
+        UKObjectsEqual(D(@"world2", @"hello"), ctx2persistentRoot.metadata);
         [testTrack undo];
-        UKObjectsEqual(D(@"world", @"hello"), [ctx2persistentRoot metadata]);
+        UKObjectsEqual(D(@"world", @"hello"), ctx2persistentRoot.metadata);
         [testTrack redo];
-        UKObjectsEqual(D(@"world2", @"hello"), [ctx2persistentRoot metadata]);
+        UKObjectsEqual(D(@"world2", @"hello"), ctx2persistentRoot.metadata);
     }
 }
 
 - (void) testUndoSetCurrentBranch
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    COBranch *originalBranch = [persistentRoot currentBranch];
-    [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    COBranch *originalBranch = persistentRoot.currentBranch;
+    [persistentRoot.rootObject setValue: @"hello" forProperty: kCOLabel];
     [ctx commit];
     
-    COBranch *secondBranch = [[persistentRoot currentBranch] makeBranchWithLabel: @"secondBranch"];    
-    [[[secondBranch objectGraphContext] rootObject] setValue: @"hello2" forProperty: kCOLabel];
+    COBranch *secondBranch = [persistentRoot.currentBranch makeBranchWithLabel: @"secondBranch"];    
+    [secondBranch.objectGraphContext.rootObject setValue: @"hello2" forProperty: kCOLabel];
     [ctx commit];
     
-    [persistentRoot setCurrentBranch: secondBranch];
+    persistentRoot.currentBranch = secondBranch;
     [ctx commitWithUndoTrack: _testTrack];
     
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
-        COBranch *ctx2originalBranch = [ctx2persistentRoot branchForUUID: [originalBranch UUID]];
-        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: [secondBranch UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
+        COBranch *ctx2originalBranch = [ctx2persistentRoot branchForUUID: originalBranch.UUID];
+        COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: secondBranch.UUID];
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
-        UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
-        UKObjectsEqual(@"hello2", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
+        UKObjectsEqual(ctx2secondBranch, ctx2persistentRoot.currentBranch);
+        UKObjectsEqual(@"hello2", [ctx2persistentRoot.rootObject valueForProperty: kCOLabel]);
         
         [testTrack undo];
         
-        UKObjectsEqual(ctx2originalBranch, [ctx2persistentRoot currentBranch]);
-        UKObjectsEqual(@"hello", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
+        UKObjectsEqual(ctx2originalBranch, ctx2persistentRoot.currentBranch);
+        UKObjectsEqual(@"hello", [ctx2persistentRoot.rootObject valueForProperty: kCOLabel]);
         
         [testTrack redo];
         
-        UKObjectsEqual(ctx2secondBranch, [ctx2persistentRoot currentBranch]);
-        UKObjectsEqual(@"hello2", [[ctx2persistentRoot rootObject] valueForProperty: kCOLabel]);
+        UKObjectsEqual(ctx2secondBranch, ctx2persistentRoot.currentBranch);
+        UKObjectsEqual(@"hello2", [ctx2persistentRoot.rootObject valueForProperty: kCOLabel]);
     }
 }
 
 - (void) testUndoCreatePersistentRoot
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commitWithUndoTrack: _testTrack];
     
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
 		
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
-        UKFalse([ctx2persistentRoot isDeleted]);
+        UKFalse(ctx2persistentRoot.deleted);
         [testTrack undo];
-        UKTrue([ctx2persistentRoot isDeleted]);
+        UKTrue(ctx2persistentRoot.deleted);
         [testTrack redo];
-        UKFalse([ctx2persistentRoot isDeleted]);
+        UKFalse(ctx2persistentRoot.deleted);
     }
 }
 
 - (void) testUndoCreatePersistentRootWithMetadata
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 	persistentRoot.metadata = @{ @"some" : @"new metadata" };
     [ctx commitWithUndoTrack: _testTrack];
     
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
 		
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 		
-        UKFalse([ctx2persistentRoot isDeleted]);
+        UKFalse(ctx2persistentRoot.deleted);
         [testTrack undo];
-        UKTrue([ctx2persistentRoot isDeleted]);
+        UKTrue(ctx2persistentRoot.deleted);
         [testTrack redo];
-        UKFalse([ctx2persistentRoot isDeleted]);
+        UKFalse(ctx2persistentRoot.deleted);
     }
 }
 
 - (void) testUndoDeletePersistentRoot
 {
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
     
     [persistentRoot setDeleted: YES];
@@ -443,46 +443,46 @@
     // Load in another context
     {
         COEditingContext *ctx2 = [self newContext];
-        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: [persistentRoot UUID]];
+        COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
 
 		COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
-		UKTrue([ctx2persistentRoot isDeleted]);
+		UKTrue(ctx2persistentRoot.deleted);
         [testTrack undo];
-        UKFalse([ctx2persistentRoot isDeleted]);
+        UKFalse(ctx2persistentRoot.deleted);
         [testTrack redo];
-        UKTrue([ctx2persistentRoot isDeleted]);
+        UKTrue(ctx2persistentRoot.deleted);
     }
 }
 
 - (void) testTrackAPI
 {
-    UKIntsEqual(1, [[_testTrack nodes] count]); // Placeholder node
-    UKFalse([_testTrack canRedo]);
-    UKFalse([_testTrack canUndo]);
+    UKIntsEqual(1, _testTrack.nodes.count); // Placeholder node
+    UKFalse(_testTrack.canRedo);
+    UKFalse(_testTrack.canUndo);
     
-    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commitWithUndoTrack: _testTrack];
     
-    [[persistentRoot rootObject] setValue: @"hello" forProperty: kCOLabel];
+    [persistentRoot.rootObject setValue: @"hello" forProperty: kCOLabel];
     [ctx commitWithUndoTrack: _testTrack];
     
-    UKIntsEqual(3, [[_testTrack nodes] count]);
-    UKIntsEqual(2, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
-    UKFalse([_testTrack canRedo]);
-    UKTrue([_testTrack canUndo]);
+    UKIntsEqual(3, _testTrack.nodes.count);
+    UKIntsEqual(2, [_testTrack.nodes indexOfObject: [_testTrack currentNode]]);
+    UKFalse(_testTrack.canRedo);
+    UKTrue(_testTrack.canUndo);
     
-    UKObjectsEqual(@"hello", [[persistentRoot rootObject] valueForProperty: kCOLabel]);
+    UKObjectsEqual(@"hello", [persistentRoot.rootObject valueForProperty: kCOLabel]);
     
     [_testTrack undo];
     
-    UKNil([[persistentRoot rootObject] valueForProperty: kCOLabel]);
+    UKNil([persistentRoot.rootObject valueForProperty: kCOLabel]);
 }
 
 - (void) testPatternTrack
 {
-    COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-    COPersistentRoot *doc2 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    COPersistentRoot *doc2 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commitWithUndoTrack: _setupTrack];
 
     COUndoTrack *workspaceTrack = [COUndoTrack trackForPattern: @"workspace.*"
@@ -495,108 +495,108 @@
 
     // doc1 commits
     
-    [[doc1 rootObject] setLabel: @"doc1"];
+    [doc1.rootObject setLabel: @"doc1"];
     [ctx commitWithUndoTrack: workspaceDoc1Track];
-    [[doc1 rootObject] setLabel: @"sketch"];
+    [doc1.rootObject setLabel: @"sketch"];
     [ctx commitWithUndoTrack: workspaceDoc1Track];
 
     // doc2 commits
     
-    [[doc2 rootObject] setLabel: @"doc2"];
+    [doc2.rootObject setLabel: @"doc2"];
     [ctx commitWithUndoTrack: workspaceDoc2Track];
-    [[doc2 rootObject] setLabel: @"photo"];
+    [doc2.rootObject setLabel: @"photo"];
     [ctx commitWithUndoTrack: workspaceDoc2Track];
 
     // experiment...
 
-    UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
+    UKObjectsEqual(@"photo", [doc2.rootObject label]);
     [workspaceTrack undo];
-    UKObjectsEqual(@"doc2", [[doc2 rootObject] label]);
+    UKObjectsEqual(@"doc2", [doc2.rootObject label]);
     
     [workspaceTrack undo];
-    UKNil([[doc2 rootObject] label]);
+    UKNil([doc2.rootObject label]);
 
-    UKObjectsEqual(@"sketch", [[doc1 rootObject] label]);
+    UKObjectsEqual(@"sketch", [doc1.rootObject label]);
     [workspaceTrack undo];
-    UKObjectsEqual(@"doc1", [[doc1 rootObject] label]);
+    UKObjectsEqual(@"doc1", [doc1.rootObject label]);
     
     [workspaceTrack undo];
-    UKNil([[doc1 rootObject] label]);
+    UKNil([doc1.rootObject label]);
     
     // redo on doc2
     
     [workspaceDoc2Track redo];
-    UKNil([[doc1 rootObject] label]);
-    UKObjectsEqual(@"doc2", [[doc2 rootObject] label]);
+    UKNil([doc1.rootObject label]);
+    UKObjectsEqual(@"doc2", [doc2.rootObject label]);
 
     [workspaceDoc2Track redo];
-    UKNil([[doc1 rootObject] label]);
-    UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
+    UKNil([doc1.rootObject label]);
+    UKObjectsEqual(@"photo", [doc2.rootObject label]);
 
     // redo on doc1
     
     [workspaceDoc1Track redo];
-    UKObjectsEqual(@"doc1", [[doc1 rootObject] label]);
-    UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
+    UKObjectsEqual(@"doc1", [doc1.rootObject label]);
+    UKObjectsEqual(@"photo", [doc2.rootObject label]);
 
     [workspaceDoc1Track redo];
-    UKObjectsEqual(@"sketch", [[doc1 rootObject] label]);
-    UKObjectsEqual(@"photo", [[doc2 rootObject] label]);
+    UKObjectsEqual(@"sketch", [doc1.rootObject label]);
+    UKObjectsEqual(@"photo", [doc2.rootObject label]);
 }
 
 - (void) testSelectiveUndoOfCommands
 {
-    COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *root = [doc1 rootObject];
-	OutlineItem *child1 = [[doc1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+    COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+	OutlineItem *root = doc1.rootObject;
+	OutlineItem *child1 = [doc1.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	[root addObject: child1];
 	
     [ctx commitWithUndoTrack: _setupTrack];
 		
     // make some commits...
     
-    [root setLabel: @"doc1"];
+    root.label = @"doc1";
     [ctx commitWithUndoTrack: _testTrack];
-	id<COTrackNode> node0 = [[_testTrack nodes] lastObject];
+	id<COTrackNode> node0 = _testTrack.nodes.lastObject;
 
-    [child1 setLabel: @"child1"];
+    child1.label = @"child1";
     [ctx commitWithUndoTrack: _testTrack];
-    id<COTrackNode> node1 = [[_testTrack nodes] lastObject];
+    id<COTrackNode> node1 = _testTrack.nodes.lastObject;
 	
-	[root setLabel: @"doc1a"];
+	root.label = @"doc1a";
     [ctx commitWithUndoTrack: _testTrack];
-    id<COTrackNode> node2 = [[_testTrack nodes] lastObject];
+    id<COTrackNode> node2 = _testTrack.nodes.lastObject;
 	
-	[child1 setLabel: @"child1a"];
+	child1.label = @"child1a";
     [ctx commitWithUndoTrack: _testTrack];
-	id<COTrackNode> node3 = [[_testTrack nodes] lastObject];
+	id<COTrackNode> node3 = _testTrack.nodes.lastObject;
 	
-	UKObjectsEqual(@"doc1a", [root label]);
-	UKObjectsEqual(@"child1a", [child1 label]);
+	UKObjectsEqual(@"doc1a", root.label);
+	UKObjectsEqual(@"child1a", child1.label);
 	
     [_testTrack undoNode: node2]; // selective undo doc1 -> doc1a
-	id<COTrackNode> node4 = [[_testTrack nodes] lastObject];
+	id<COTrackNode> node4 = _testTrack.nodes.lastObject;
 	
-	UKObjectsEqual(@"doc1", [root label]);
-	UKObjectsEqual(@"child1a", [child1 label]);
+	UKObjectsEqual(@"doc1", root.label);
+	UKObjectsEqual(@"child1a", child1.label);
 
 	[_testTrack undo]; // undo the above -undoNode
 	
 	UKObjectsEqual(node3, [_testTrack currentNode]);
-	UKObjectsEqual(@"doc1a", [root label]);
-	UKObjectsEqual(@"child1a", [child1 label]);
+	UKObjectsEqual(@"doc1a", root.label);
+	UKObjectsEqual(@"child1a", child1.label);
 	
 	[_testTrack undo]; // undo child1 -> child1a
 	
 	UKObjectsEqual(node2, [_testTrack currentNode]);
-	UKObjectsEqual(@"doc1a", [root label]);
-	UKObjectsEqual(@"child1", [child1 label]);
+	UKObjectsEqual(@"doc1a", root.label);
+	UKObjectsEqual(@"child1", child1.label);
 	
 	[_testTrack undo]; // undo doc1 -> doc1a
 	
 	UKObjectsEqual(node1, [_testTrack currentNode]);
-	UKObjectsEqual(@"doc1", [root label]);
-	UKObjectsEqual(@"child1", [child1 label]);
+	UKObjectsEqual(@"doc1", root.label);
+	UKObjectsEqual(@"child1", child1.label);
 }
 
 - (void) checkCommandIsEndOfTrack: (id<COTrackNode>)aCommand
@@ -608,10 +608,10 @@
 	 isSetVersionFrom: (CORevision *)a
 				   to: (CORevision *)b
 {
-	NSArray *subCommands = [(COCommandGroup *)aCommand contents];
-	UKIntsEqual(1, [subCommands count]);
+	NSArray *subCommands = ((COCommandGroup *)aCommand).contents;
+	UKIntsEqual(1, subCommands.count);
 	
-	COCommandSetCurrentVersionForBranch *command = [subCommands firstObject];
+	COCommandSetCurrentVersionForBranch *command = subCommands.firstObject;
 	UKObjectKindOf(command, COCommandSetCurrentVersionForBranch);
 	UKObjectsEqual(a, command.oldRevision);
 	UKObjectsEqual(b, command.revision);
@@ -630,26 +630,26 @@
 									  |  (selective undo of r0->r1)
 	 */
 	
-    COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"Anonymous.OutlineItem"];
-	OutlineItem *root = [doc1 rootObject];
+    COPersistentRoot *doc1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+	OutlineItem *root = doc1.rootObject;
 	[ctx commit];
-	CORevision *r0 = [doc1 currentRevision];
+	CORevision *r0 = doc1.currentRevision;
 	
-	OutlineItem *child1 = [[doc1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child1 = [doc1.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	[root addObject: child1];
 	[ctx commitWithIdentifier: @"insert-item" undoTrack: _testTrack error: nil];
-	CORevision *r1 = [doc1 currentRevision];
+	CORevision *r1 = doc1.currentRevision;
 	
-	OutlineItem *child2 = [[doc1 objectGraphContext] insertObjectWithEntityName: @"Anonymous.OutlineItem"];
+	OutlineItem *child2 = [doc1.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
 	[root addObject: child2];
 	[ctx commitWithIdentifier: @"insert-item" undoTrack: _testTrack error: nil];
-	CORevision *r2 = [doc1 currentRevision];
+	CORevision *r2 = doc1.currentRevision;
 	
-	UKObjectsEqual((@[child1, child2]), [root contents]);
+	UKObjectsEqual((@[child1, child2]), root.contents);
 	
 	// Check track contents
-	UKIntsEqual(2, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
-	UKIntsEqual(3, [_testTrack.nodes count]);
+	UKIntsEqual(2, [_testTrack.nodes indexOfObject: [_testTrack currentNode]]);
+	UKIntsEqual(3, _testTrack.nodes.count);
 	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
 	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r0 to: r1];
 	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r1 to: r2];
@@ -658,13 +658,13 @@
 	
 	// selective undo child1 insertion
 	[_testTrack undoNode: _testTrack.nodes[1]];
-	CORevision *r3 = [doc1 currentRevision];
+	CORevision *r3 = doc1.currentRevision;
 	
-	UKObjectsEqual(@[child2], [root contents]);
+	UKObjectsEqual(@[child2], root.contents);
 	
 	// Check track contents
-	UKIntsEqual(3, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
-	UKIntsEqual(4, [_testTrack.nodes count]);
+	UKIntsEqual(3, [_testTrack.nodes indexOfObject: [_testTrack currentNode]]);
+	UKIntsEqual(4, _testTrack.nodes.count);
 	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
 	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r0 to: r1];
 	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r1 to: r2];
@@ -688,8 +688,8 @@
 	
 	// Efficiency test: the r3 commit should only have written one item to the store
 	// (root) since that was the only change.
-	COItemGraph *r3PartialItemGraph = [[ctx store] partialItemGraphFromRevisionUUID: [r2 UUID] toRevisionUUID: [r3 UUID] persistentRoot: [doc1 UUID]];
-	UKObjectsEqual(@[root.UUID], [r3PartialItemGraph itemUUIDs]);
+	COItemGraph *r3PartialItemGraph = [ctx.store partialItemGraphFromRevisionUUID: r2.UUID toRevisionUUID: r3.UUID persistentRoot: doc1.UUID];
+	UKObjectsEqual(@[root.UUID], r3PartialItemGraph.itemUUIDs);
 	
 	// selective redo child1 insertion
 	[_testTrack redoNode: _testTrack.nodes[1]];
@@ -710,9 +710,9 @@
 - (void)testUndoCoalescing
 {
 	CORevision *r0, *r1, *r2, *r3, *r4, *r5, *r6;
-    OutlineItem *item = [[ctx insertNewPersistentRootWithEntityName: @"OutlineItem"] rootObject];
+    OutlineItem *item = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
     [ctx commit];
-	r0 = [item revision];
+	r0 = item.revision;
 	
 	// First coalesced block
 	
@@ -720,17 +720,17 @@
 	{
 		item.label = @"a";
 		[ctx commitWithUndoTrack: _testTrack];
-		r1 = [item revision];
+		r1 = item.revision;
 		
 		item.label = @"ab";
 		[ctx commitWithUndoTrack: _testTrack];
-		r2 = [item revision];
+		r2 = item.revision;
 	}
 	[_testTrack endCoalescing];
 
 	// N.B. Intentionally calling -nodes, which has the side effect of causing
 	// COUndoTrack to cache the nodes in memory, to try to break things
-	UKIntsEqual(2, [[_testTrack nodes] count]);
+	UKIntsEqual(2, _testTrack.nodes.count);
 	
 	// Second coalesced block
 	
@@ -738,11 +738,11 @@
 	{
 		item.label = @"abc";
 		[ctx commitWithUndoTrack: _testTrack];
-		r3 = [item revision];
+		r3 = item.revision;
 		
 		item.label = @"abcd";
 		[ctx commitWithUndoTrack: _testTrack];
-		r4 = [item revision];
+		r4 = item.revision;
 	}
 	[_testTrack endCoalescing];
 
@@ -750,15 +750,15 @@
 	
 	item.label = @"foo";
 	[ctx commitWithUndoTrack: _testTrack];
-	r5 = [item revision];
+	r5 = item.revision;
 	
 	item.label = @"bar";
 	[ctx commitWithUndoTrack: _testTrack];
-	r6 = [item revision];
+	r6 = item.revision;
 
 	// Check track contents
-	UKIntsEqual(4, [[_testTrack nodes] indexOfObject: [_testTrack currentNode]]);
-	UKIntsEqual(5, [_testTrack.nodes count]);
+	UKIntsEqual(4, [_testTrack.nodes indexOfObject: [_testTrack currentNode]]);
+	UKIntsEqual(5, _testTrack.nodes.count);
 	[self checkCommandIsEndOfTrack: _testTrack.nodes[0]];
 	[self checkCommand: _testTrack.nodes[1] isSetVersionFrom: r0 to: r2];
 	[self checkCommand: _testTrack.nodes[2] isSetVersionFrom: r2 to: r4];
@@ -768,21 +768,21 @@
 
 - (void)testUndoDisablesCoalescing
 {
-    OutlineItem *item = [[ctx insertNewPersistentRootWithEntityName: @"OutlineItem"] rootObject];
+    OutlineItem *item = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
     [ctx commit];
 	
 	[_testTrack beginCoalescing];
 
-	UKTrue([_testTrack isCoalescing]);
+	UKTrue(_testTrack.coalescing);
 		
 	item.label = @"a";
 	[ctx commitWithUndoTrack: _testTrack];
 
-	UKTrue([_testTrack isCoalescing]);
+	UKTrue(_testTrack.coalescing);
 	
 	[_testTrack undo];
 	
-	UKFalse([_testTrack isCoalescing]);
+	UKFalse(_testTrack.coalescing);
 }
 
 - (void) testSelectiveUndoCommitDescriptor
@@ -802,7 +802,7 @@
 
 - (COUndoTrack *)trackWithEditingContext: (COEditingContext *)aContext
 {
-	return [[self class] trackForName: [self name] withEditingContext: aContext];
+	return [[self class] trackForName: self.name withEditingContext: aContext];
 }
 
 @end

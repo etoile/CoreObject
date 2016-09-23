@@ -31,8 +31,8 @@ static ETUUID *uuid;
 - (NSArray *)propertyNames
 {
 	return [[super propertyNames] arrayByAddingObjectsFromArray: 
-		A(@"metadata", @"UUID", @"persistentRootUUID", @"branchUUID", @"date",
-		  @"localizedTypeDescription", @"localizedShortDescription")];
+		@[@"metadata", @"UUID", @"persistentRootUUID", @"branchUUID", @"date",
+		  @"localizedTypeDescription", @"localizedShortDescription"]];
 }
 
 - (NSDictionary *)metadata { return [NSDictionary new]; }

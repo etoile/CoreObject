@@ -38,13 +38,13 @@
 - (UnorderedGroupNoOpposite *) addAndCommitServerChild;
 - (UnorderedGroupNoOpposite *) addAndCommitClientChild;
 
-- (NSDictionary *)serverRevisionMetadataForTest;
-- (NSDictionary *)clientRevisionMetadataForTest;
+@property (nonatomic, readonly) NSDictionary *serverRevisionMetadataForTest;
+@property (nonatomic, readonly) NSDictionary *clientRevisionMetadataForTest;
 
-- (NSDictionary *)branchMetadataForTest;
-- (NSDictionary *)persistentRootMetadataForTest;
+@property (nonatomic, readonly) NSDictionary *branchMetadataForTest;
+@property (nonatomic, readonly) NSDictionary *persistentRootMetadataForTest;
 
-- (NSArray *)serverMessages;
-- (NSArray *)clientMessages;
+@property (nonatomic, readonly) NSArray *serverMessages;
+@property (nonatomic, readonly) NSArray *clientMessages;
 
 @end

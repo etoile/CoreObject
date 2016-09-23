@@ -12,16 +12,21 @@
 - (void)reloadRevisions;
 @end
 
-@interface COUndoTrackHistoryCompaction (TestUndoTrackHistoryCompaction)
-@property (nonatomic, readwrite) NSSet *finalizablePersistentRootUUIDs;
-@property (nonatomic, readwrite) NSSet *compactablePersistentRootUUIDs;
-@property (nonatomic, readwrite) NSDictionary *deadRevisionUUIDs;
-@property (nonatomic, readwrite) NSDictionary *liveRevisionUUIDs;
+@interface COExpectedCompaction : COUndoTrackHistoryCompaction
+@property (nonatomic, readwrite, copy) NSSet *finalizablePersistentRootUUIDs;
+@property (nonatomic, readwrite, copy) NSSet *compactablePersistentRootUUIDs;
+@property (nonatomic, readwrite, copy) NSDictionary *deadRevisionUUIDs;
+@property (nonatomic, readwrite, copy) NSDictionary *liveRevisionUUIDs;
 @end
 
-@implementation COUndoTrackHistoryCompaction (TestUndoTrackHistoryCompaction)
+@implementation COExpectedCompaction
 
 @dynamic finalizablePersistentRootUUIDs, compactablePersistentRootUUIDs, deadRevisionUUIDs, liveRevisionUUIDs;
+
+- (instancetype)init
+{
+	return self;
+}
 
 - (void)setFinalizablePersistentRootUUIDs: (NSSet *)finalizablePersistentRootUUIDs
 {
@@ -98,7 +103,7 @@
 
 	UKTrue([store compactHistory: compaction]);
 
-	if (otherPersistentRoot.isDeleted)
+	if (otherPersistentRoot.deleted)
 	{
 		// Will retain the store but not release it due to the exception (looks
 		// like the store is retained as a receiver in -[COBranch revisionsWithOptions:]).
@@ -119,14 +124,14 @@
 
 - (void)checkUndoRedo
 {
-	__unused NSUInteger counter = [track nodes].count;
+	__unused NSUInteger counter = track.nodes.count;
 
-	while ([track canUndo])
+	while (track.canUndo)
 	{
 		UKDoesNotRaiseException([track undo]);
 		counter--;
 	}
-	while ([track canRedo])
+	while (track.canRedo)
 	{
 		counter++;
 		UKDoesNotRaiseException([track redo]);
@@ -194,7 +199,7 @@
 
 	NSArray *liveRevs = [oldRevs subarrayFromIndex: 2];
 	NSArray *deadRevs = [oldRevs arrayByRemovingObjectsInArray: liveRevs];
-	COUndoTrackHistoryCompaction *compaction = [COUndoTrackHistoryCompaction new];
+	COExpectedCompaction *compaction = [COExpectedCompaction new];
 
 	compaction.finalizablePersistentRootUUIDs = [NSSet set];
 	compaction.compactablePersistentRootUUIDs = S(persistentRoot.UUID);
@@ -229,7 +234,7 @@
 
 	NSArray *liveRevs = [oldRevs subarrayFromIndex: 1];
 	NSArray *deadRevs = [oldRevs arrayByRemovingObjectsInArray: liveRevs];
-	COUndoTrackHistoryCompaction *compaction = [COUndoTrackHistoryCompaction new];
+	COExpectedCompaction *compaction = [COExpectedCompaction new];
 
 	compaction.finalizablePersistentRootUUIDs = [NSSet set];
 	compaction.compactablePersistentRootUUIDs = S(persistentRoot.UUID);
@@ -247,7 +252,7 @@
 
 	liveRevs = [oldRevs subarrayFromIndex: 2];
 	deadRevs = [oldRevs arrayByRemovingObjectsInArray: liveRevs];
-	compaction = [COUndoTrackHistoryCompaction new];
+	compaction = [COExpectedCompaction new];
 
 	compaction.finalizablePersistentRootUUIDs = [NSSet set];
 	compaction.compactablePersistentRootUUIDs = S(persistentRoot.UUID);
@@ -281,7 +286,7 @@
 	   revision and the one just before, so we keep 2 revisions. */
 	NSArray *mainLiveRevs = [oldRevs[persistentRoot.UUID] subarrayFromIndex: 2];
 	NSArray *mainDeadRevs = [oldRevs[persistentRoot.UUID] arrayByRemovingObjectsInArray: mainLiveRevs];
-	COUndoTrackHistoryCompaction *compaction = [COUndoTrackHistoryCompaction new];
+	COExpectedCompaction *compaction = [COExpectedCompaction new];
 
 	compaction.finalizablePersistentRootUUIDs = S(otherPersistentRoot.UUID);
 	compaction.compactablePersistentRootUUIDs = S(persistentRoot.UUID);
@@ -551,7 +556,7 @@
 
 	NSArray *liveRevs = [oldRevs subarrayFromIndex: 2];
 	NSArray *deadRevs = [oldRevs arrayByRemovingObjectsInArray: liveRevs];
-	COUndoTrackHistoryCompaction *compaction = [COUndoTrackHistoryCompaction new];
+	COExpectedCompaction *compaction = [COExpectedCompaction new];
 
 	compaction.finalizablePersistentRootUUIDs = [NSSet set];
 	compaction.compactablePersistentRootUUIDs = S(persistentRoot.UUID);
@@ -614,10 +619,10 @@
 		[[COUndoTrackHistoryCompaction alloc] initWithUndoTrack: track
 		                                            upToCommand: (COCommandGroup *)track.nodes.lastObject];
 
-	UKIntsEqual(2, [track nodes].count);
+	UKIntsEqual(2, track.nodes.count);
 	UKDoesNotRaiseException([compaction compute]);
 	UKDoesNotRaiseException([store compactHistory: compaction]);
-	UKIntsEqual(1, [track nodes].count);
+	UKIntsEqual(1, track.nodes.count);
 	
 	object.name = @"Ding";
 	[ctx commitWithUndoTrack: concreteTrack1];

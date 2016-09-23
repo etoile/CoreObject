@@ -166,13 +166,13 @@
 
 	[track2 setCurrentNode: track2.nodes[1]];
 	
-	UKIntsEqual(BIG_NUM_PERSISTENT_ROOTS, ctx2.loadedPersistentRoots.count);
+	UKTrue(ctx2.loadedPersistentRoots.isEmpty);
 	
 	NSTimeInterval goToNodeTime = [[NSDate date] timeIntervalSinceDate: startDate];
 	NSLog(@"Time to go to first commit node on undo track: %0.2fs", goToNodeTime);
 	startDate = [NSDate date];
 	
-	UKTrue(goToNodeTime < 3.0); // FIXME: 1.0
+	UKTrue(goToNodeTime < 0.5);
 }
 
 - (void)updatePerson: (Person *)person includesNewStudents: (BOOL)includesNewStudents

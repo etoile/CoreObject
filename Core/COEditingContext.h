@@ -30,12 +30,14 @@
  */
 typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
 	/**
-	 * Persistent roots cannot be unloaded, except uncommitted persistent roots
-	 * on deletion.
+	 * Persistent roots are never unloaded automatically, except uncommitted 
+	 * persistent roots on deletion.
+	 *
+	 * -unloadPersistentRoot: can still be used to unload persistent roots explicitly.
 	 */
-	COEditingContextUnloadingBehaviorNever,
+	COEditingContextUnloadingBehaviorManual,
 	/**
-	 * Persistent roots can be unloaded on deletion.
+	 * Persistent roots are unloaded on deletion.
 	 *
      * For external deletions committed in other editing contexts, persistent
 	 * roots will be unloaded in the current one.
@@ -164,13 +166,14 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
 	COCrossPersistentRootDeadRelationshipCache *_deadRelationshipCache;
     /** Undo */
 	COUndoTrackStore *_undoTrackStore;
-    BOOL _isRecordingUndo;
+    BOOL _recordingUndo;
     COCommandGroup *_currentEditGroup;
 	CORevisionCache *_revisionCache;
 	/** Detect illegal recursive calls to commit */
 	BOOL _inCommit;
 	COObjectGraphContext *_internalTransientObjectGraphContext;
 	NSMutableDictionary *_lastTransactionIDForPersistentRootUUID;
+	BOOL _hasLoadedPersistentRootUUIDs;
 }
 
 
@@ -221,7 +224,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
 - (instancetype)initWithStore: (COSQLiteStore *)store
    modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
          migrationDriverClass: (Class)aDriverClass
-               undoTrackStore: (COUndoTrackStore *)aUndoTrackStore;
+               undoTrackStore: (COUndoTrackStore *)aUndoTrackStore NS_DESIGNATED_INITIALIZER;
 /**
  * Initializes a context which persists its content in the given store, and
  * manages it using the metamodel provided by the model description repository.
@@ -260,7 +263,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  *
  * The returned set includes those that are pending insertion, undeletion or 
  * deletion, and deleted ones (explicitly loaded with -persistentRootForUUID: or 
- * when using COEditingContextUnloadingBehaviorNever).
+ * when using COEditingContextUnloadingBehaviorManual).
  */
 @property (nonatomic, readonly) NSSet *loadedPersistentRoots;
 
@@ -307,6 +310,25 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  */
 - (COPersistentRoot *)persistentRootForUUID: (ETUUID *)aUUID;
 /**
+ * Same as -persistentRootForUUID: but doesn't cause loading.
+ */
+- (COPersistentRoot *)loadedPersistentRootForUUID: (ETUUID *)aUUID;
+/**
+ * Unloads the persistent root including its branches, object graphs and inner
+ * objects.
+ *
+ * To reload a persistent root, use -persistentRootForUUID:.
+ *
+ * Cross persistent root references pointing to inner objects that belongs to 
+ * the unloaded persistent root will be turned into faults. Any future attempts
+ * to access them with -[COObject valueForProperty:] will cause this persistent 
+ * root to be transparently reloaded.
+ *
+ * See -[COEditingContext setUnloadingBehavior:] to control when persistent 
+ * roots are unloaded or prevent unloading to happen.
+ */
+- (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot;
+/**
  * Returns a new persistent root that uses the given root object.
  *
  * The returned persistent root is added to -persistentRootsPendingInsertion 
@@ -332,7 +354,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  *
  * By default, returns COEditingContextUnloadingOnDeletion.
  */
-@property (nonatomic, assign) COEditingContextUnloadingBehavior unloadingBehavior;
+@property (nonatomic, readwrite, assign) COEditingContextUnloadingBehavior unloadingBehavior;
 
 
 /** @taskunit Pending Changes */
@@ -364,7 +386,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
  *
  * See also -discardAllChanges and -[COPersistentRoot hasChanges].
  */
-- (BOOL)hasChanges;
+@property (nonatomic, readonly) BOOL hasChanges;
 /**
  * Discards the uncommitted changes to reset the context to its last commit state.
  *
@@ -470,12 +492,12 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior) {
 /**
  * Returns a short description to summarize the receiver.
  */
-- (NSString *)description;
+@property (readonly, copy) NSString *description;
 /**
  * Returns a multi-line description including informations about the pending 
  * changes.
  */
-- (NSString *)detailedDescription;
+@property (nonatomic, readonly) NSString *detailedDescription;
 
 
 /** @taskunit Deprecated */

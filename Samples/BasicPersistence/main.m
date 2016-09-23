@@ -9,12 +9,12 @@
 #include <assert.h>
 
 @interface Calendar : COObject
-@property (nonatomic, readwrite, strong) NSSet *appointments;
+@property (nonatomic, readwrite, copy) NSSet *appointments;
 @end
 
 @interface Appointment : COObject
-@property (nonatomic, readwrite, strong) NSDate *startDate;
-@property (nonatomic, readwrite, strong) NSDate *endDate;
+@property (nonatomic, readwrite, copy) NSDate *startDate;
+@property (nonatomic, readwrite, copy) NSDate *endDate;
 @property (nonatomic, readonly, weak) Calendar *calendar;
 
 - (id)initWithStartDate: (NSDate *)aStartDate
@@ -29,16 +29,16 @@
 {
 	ETEntityDescription *desc = [self newBasicEntityDescription];
 
-	if (![[desc name] isEqual: [Calendar className]])
+	if (![desc.name isEqual: [Calendar className]])
 		return desc;
 
 	ETPropertyDescription *appointments = [ETPropertyDescription descriptionWithName: @"appointments"
-	                                                                            type: (id)@"Appointment"];
-	[appointments setMultivalued: YES];
-	[appointments setOrdered: NO];
-	[appointments setPersistent: YES];
+	                                                                            typeName: @"Appointment"];
+	appointments.multivalued = YES;
+	appointments.ordered = NO;
+	appointments.persistent = YES;
 
-	[desc setPropertyDescriptions: @[appointments]];
+	desc.propertyDescriptions = @[appointments];
 
 	return desc;
 }
@@ -53,22 +53,22 @@
 {
 	ETEntityDescription *desc = [self newBasicEntityDescription];
 
-	if (![[desc name] isEqual: [Appointment className]])
+	if (![desc.name isEqual: [Appointment className]])
 		return desc;
 
 	ETPropertyDescription *calendar = [ETPropertyDescription descriptionWithName: @"calendar"
-	                                                                        type: (id)@"Calendar"];
-	[calendar setOpposite: (id)@"Calendar.appointments"];
-	[calendar setDerived: YES];
+	                                                                        typeName: @"Calendar"];
+	calendar.oppositeName = @"Calendar.appointments";
+	calendar.derived = YES;
 	
 	ETPropertyDescription *startDate = [ETPropertyDescription descriptionWithName: @"startDate"
-	                                                                         type: (id)@"NSDate"];
-	[startDate setPersistent: YES];
+	                                                                         typeName: @"NSDate"];
+	startDate.persistent = YES;
 	ETPropertyDescription *endDate = [ETPropertyDescription descriptionWithName: @"endDate"
-	                                                                       type: (id)@"NSDate"];
-	[endDate setPersistent: YES];
+	                                                                       typeName: @"NSDate"];
+	endDate.persistent = YES;
 
-	[desc setPropertyDescriptions: @[startDate, endDate, calendar]];
+	desc.propertyDescriptions = @[startDate, endDate, calendar];
 
 	return desc;
 }
@@ -104,12 +104,12 @@ int main(int argc, char **argv)
 		// Create a new calendar and appointment and persist them
 
 		COEditingContext *ctx = [COEditingContext contextWithURL: url];
-		Calendar *calendar = [[ctx insertNewPersistentRootWithEntityName: @"Calendar"] rootObject];
-		ETUUID *persistentRootUUID = [[calendar persistentRoot] UUID];
+		Calendar *calendar = [ctx insertNewPersistentRootWithEntityName: @"Calendar"].rootObject;
+		ETUUID *persistentRootUUID = calendar.persistentRoot.UUID;
 		NSDate *futureDate = [NSDate dateWithTimeIntervalSinceNow: 3600];
 		Appointment *appointment = [[Appointment alloc] initWithStartDate: [NSDate date]
 		                                                          endDate: futureDate
-		                                               objectGraphContext: [calendar objectGraphContext]];
+		                                               objectGraphContext: calendar.objectGraphContext];
 
 		calendar.appointments = [NSSet setWithObject: appointment];
 
@@ -118,10 +118,10 @@ int main(int argc, char **argv)
 		// Reload the calendar from a new context
 
 		COEditingContext *newCtx = [COEditingContext contextWithURL: url];
-		Calendar *newCalendar = [[newCtx persistentRootForUUID: persistentRootUUID] rootObject];	                                         
-		Appointment *newAppointment = [[newCalendar appointments] anyObject];
+		Calendar *newCalendar = [newCtx persistentRootForUUID: persistentRootUUID].rootObject;
+		Appointment *newAppointment = newCalendar.appointments.anyObject;
 	
-		NSLog(@"Reloaded appointment: %@ - %@\n\n", [newAppointment startDate], [newAppointment endDate]);
+		NSLog(@"Reloaded appointment: %@ - %@\n\n", newAppointment.startDate, newAppointment.endDate);
 
 		ShowStoreContentsForContext(newCtx);
 	}
@@ -134,22 +134,22 @@ int main(int argc, char **argv)
  */
 void ShowStoreContentsForContext(COEditingContext *ctx)
 {
-	NSLog(@"Store %@ contents:", [[[ctx store] URL] path]);
+	NSLog(@"Store %@ contents:", ctx.store.URL.path);
 
 	for (COPersistentRoot *persistentRoot in ctx.persistentRoots)
 	{
-		NSLog(@"\tPersistent root %@ (root object class: %@)", [persistentRoot UUID], [[persistentRoot rootObject] class]);
+		NSLog(@"\tPersistent root %@ (root object class: %@)", persistentRoot.UUID, [persistentRoot.rootObject class]);
 		
-		if (![[persistentRoot rootObject] isKindOfClass: [Calendar class]])
+		if (![persistentRoot.rootObject isKindOfClass: [Calendar class]])
 			continue;
 	
-		Calendar *calendar = [persistentRoot rootObject];
+		Calendar *calendar = persistentRoot.rootObject;
 			
 		for (Appointment *appointment in calendar.appointments)
 		{
 			assert(appointment.calendar == calendar);
 
-			NSLog(@"\t\tAppointment %@: %@ - %@", [appointment UUID], [appointment startDate], [appointment endDate]);
+			NSLog(@"\t\tAppointment %@: %@ - %@", appointment.UUID, appointment.startDate, appointment.endDate);
 		}
 	}
 }

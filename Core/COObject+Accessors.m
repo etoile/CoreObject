@@ -62,7 +62,7 @@ static void genericSetter(id self, SEL theCmd, id value)
     
     SetterToProperty(selname, sellen, propname);
     
-    NSString *key = [NSString stringWithUTF8String: propname];
+    NSString *key = @(propname);
 
 	[self willChangeValueForProperty: key];
 	[self setValue: value forVariableStorageKey: key];
@@ -99,7 +99,7 @@ static void genericSetter(id self, SEL theCmd, id value)
         BOOL isDynamic = (strchr(attributes, 'D') != NULL);
         
         // FIXME: Check other property attributes are correct e.g. readwrite and not readonly
-        if (isDynamic == NO)
+        if (!isDynamic)
             return NO;
         
         if (!isSetter)

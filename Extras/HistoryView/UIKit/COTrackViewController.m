@@ -157,7 +157,7 @@
 
 - (NSInteger)tableView: (UITableView *)tableView numberOfRowsInSection: (NSInteger)section
 {
-	return [self.track count];
+	return self.track.count;
 }
 
 - (UITableViewCell *)tableView: (UITableView *)tableView

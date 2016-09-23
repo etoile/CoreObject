@@ -41,7 +41,7 @@
 	if (![current isKindOfClass: [COCommandGroup class]])
 		return nil;
 
-	if ([(COCommandGroup *)current sequenceNumber] < aCommand.sequenceNumber)
+	if (((COCommandGroup *)current).sequenceNumber < aCommand.sequenceNumber)
 	{
 		return (COCommandGroup *)current;
 	}
@@ -69,6 +69,11 @@
 	_liveRevisionUUIDs = [NSMutableDictionary dictionaryWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
 	_newestDeadRevisionUUIDs = [NSMutableDictionary dictionaryWithCapacity: PERSISTENT_ROOT_CAPACITY_HINT];
 	return self;
+}
+
+- (instancetype)init
+{
+	return [self initWithUndoTrack: nil upToCommand: nil];
 }
 
 /**
@@ -412,7 +417,7 @@
 
 - (void)beginCompaction
 {
-	NSArray *allCommands = [_undoTrack allCommands];
+	NSArray *allCommands = _undoTrack.allCommands;
 	NSInteger newestDiscardedCommandIndex =
 		_newestCommandToDiscard == nil ? -1 : [allCommands indexOfObject: _newestCommandToDiscard];
 	ETAssert(newestDiscardedCommandIndex != NSNotFound);

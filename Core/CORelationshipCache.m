@@ -23,14 +23,14 @@
 
 - (NSDictionary *)descriptionDictionary
 {
-	return D(_targetProperty, @"property",
-	         _sourceProperty, @"opposite property",
-	        [_sourceObject UUID], @"opposite object");
+	return @{ @"property": _targetProperty != nil ? _targetProperty : @"nil",
+	         @"opposite property": _sourceProperty,
+	        @"opposite object": _sourceObject.UUID };
 }
 
 - (NSString *)description
 {
-	return [[self descriptionDictionary] description];
+	return self.descriptionDictionary.description;
 }
 
 - (BOOL) isSourceObjectTrackingSpecificBranchForTargetObject: (COObject *)aTargetObject
@@ -39,7 +39,7 @@
 	{
 		return NO;
 	}
-	return [_sourceObject.objectGraphContext isTrackingSpecificBranch];
+	return _sourceObject.objectGraphContext.trackingSpecificBranch;
 }
 
 - (BOOL)isSourceObjectBranchDeleted
@@ -53,19 +53,25 @@
 
 #define INITIAL_ARRAY_CAPACITY 8
 
-- (id) initWithOwner: (COObject *)owner
+- (instancetype) initWithOwner: (COObject *)owner
 {
+	NILARG_EXCEPTION_TEST(owner);
     SUPERINIT;
     _cachedRelationships = [[NSMutableArray alloc] initWithCapacity: INITIAL_ARRAY_CAPACITY];
     _owner = owner;
     return self;
 }
 
+- (instancetype)init
+{
+	return [self initWithOwner: nil];
+}
+
 - (NSString *)description
 {
 	NSArray *relationships =
 		(id)[[_cachedRelationships mappedCollection] descriptionDictionary];
-	return [D([_owner UUID], @"owner", relationships, @"relationships") description];
+	return @{ @"owner": _owner.UUID, @"relationships": relationships }.description;
 }
 
 - (NSSet *) referringObjectsForPropertyInTarget: (NSString *)aProperty
@@ -82,7 +88,7 @@
 		if ([entry isSourceObjectTrackingSpecificBranchForTargetObject: _owner])
 			continue;
 
-		if ([entry isSourceObjectBranchDeleted])
+		if (entry.sourceObjectBranchDeleted)
 			continue;
 		
         if ([aProperty isEqualToString: entry->_targetProperty])
@@ -97,10 +103,10 @@
 	   On slide 2 of 'cross persistent root reference semantics.key',
 	   this corresponds to the non-current branch Lucy (A) viewing the dotted incoming references from
 	   Group (A). */
-	if ([_owner.objectGraphContext isTrackingSpecificBranch])
+	if (_owner.objectGraphContext.trackingSpecificBranch)
 	{
-		COObject *currentBranchRootObject = [[_owner persistentRoot] rootObject];
-		NSSet *referringObjectsToCurrentBranch = [[currentBranchRootObject incomingRelationshipCache] referringObjectsForPropertyInTarget: aProperty];		
+		COObject *currentBranchRootObject = _owner.persistentRoot.rootObject;
+		NSSet *referringObjectsToCurrentBranch = [currentBranchRootObject.incomingRelationshipCache referringObjectsForPropertyInTarget: aProperty];		
 		[result unionSet: referringObjectsToCurrentBranch];
 	}
 	
@@ -139,14 +145,14 @@
         }
     }
     
-    assert([results count] == 0
-           || [results count] == 1);
+    assert(results.count == 0
+           || results.count == 1);
     
-    if ([results count] == 0)
+    if (results.count == 0)
     {
         return nil;
     }
-    return [results firstObject];
+    return results.firstObject;
 }
 
 - (void) removeAllEntries
@@ -165,9 +171,9 @@
     // FIXME: Ugly, rewrite
     
     NSUInteger i = 0;
-    while (i < [_cachedRelationships count])
+    while (i < _cachedRelationships.count)
     {
-        COCachedRelationship *entry = [_cachedRelationships objectAtIndex: i];
+        COCachedRelationship *entry = _cachedRelationships[i];
         if ([aTargetProperty isEqualToString: entry->_sourceProperty]
             && entry.sourceObject == anObject)
         {
@@ -184,8 +190,8 @@
                        sourceProperty: (NSString *)aSource
                        targetProperty: (NSString *)aTarget
 {
-    ETPropertyDescription *prop = [[_owner entityDescription] propertyDescriptionForName: aTarget];
-    if (![prop isMultivalued])
+    ETPropertyDescription *prop = [_owner.entityDescription propertyDescriptionForName: aTarget];
+    if (!prop.multivalued)
     {
         // We are setting the value of a non-multivalued property, so assert
         // that it is currently not already set.

@@ -9,8 +9,8 @@
 #import "COItem.h"
 #import "COSQLiteStore+Attachments.h"
 
-#define READONLY_SEARCHABLE_DIRECTORY_ATTRIBUTES D([NSNumber numberWithShort: 0555], NSFilePosixPermissions)
-#define REABLE_WRITABLE_SEARCHABLE_DIRECTORY_ATTRIBUTES D([NSNumber numberWithShort: 0777], NSFilePosixPermissions)
+#define READONLY_SEARCHABLE_DIRECTORY_ATTRIBUTES @{ NSFilePosixPermissions: @0555 }
+#define REABLE_WRITABLE_SEARCHABLE_DIRECTORY_ATTRIBUTES @{ NSFilePosixPermissions: @0777 }
 
 @interface TestSQLiteStoreErrorHandling : NSObject <UKTest>
 {
@@ -30,14 +30,14 @@ static ETUUID *rootUUID;
 
 - (COItemGraph *) makeInitialItemGraph
 {
-    return [COItemGraph itemGraphWithItemsRootFirst: A([[COMutableItem alloc] initWithUUID: rootUUID])];
+    return [COItemGraph itemGraphWithItemsRootFirst: @[[[COMutableItem alloc] initWithUUID: rootUUID]]];
 }
 
 - (COItemGraph *) makeChangedItemGraph
 {
     COMutableItem *item = [[COMutableItem alloc] initWithUUID: rootUUID];
     [item setValue: @"hello" forAttribute: @"name" type: kCOTypeString];
-    return [COItemGraph itemGraphWithItemsRootFirst: A(item)];
+    return [COItemGraph itemGraphWithItemsRootFirst: @[item]];
 }
 
 
@@ -136,7 +136,7 @@ static ETUUID *rootUUID;
 														UUID: [ETUUID UUID]
 												  branchUUID: [ETUUID UUID]
 										    revisionMetadata: nil];
-		changeCount = [txn setOldTransactionID: -1 forPersistentRoot: [info UUID]];
+		changeCount = [txn setOldTransactionID: -1 forPersistentRoot: info.UUID];
         UKTrue([store commitStoreTransaction: txn]);
         
         UKNotNil(info);
@@ -167,16 +167,16 @@ static ETUUID *rootUUID;
             [txn writeRevisionWithModifiedItems: [self makeChangedItemGraph]
 								   revisionUUID: [ETUUID UUID]
 									   metadata: nil
-							   parentRevisionID: [info currentRevisionUUID]
+							   parentRevisionID: info.currentRevisionUUID
 						  mergeParentRevisionID: nil
-							 persistentRootUUID: [info UUID]
-									 branchUUID: [info currentBranchUUID]];
+							 persistentRootUUID: info.UUID
+									 branchUUID: info.currentBranchUUID];
             UKFalse([store commitStoreTransaction: txn]);
         }
         
         // Check we can still read the initial revision
         
-        UKObjectsEqual([self makeInitialItemGraph], [store itemGraphForRevisionUUID: [info currentRevisionUUID] persistentRoot: [info UUID]]);
+        UKObjectsEqual([self makeInitialItemGraph], [store itemGraphForRevisionUUID: info.currentRevisionUUID persistentRoot: info.UUID]);
     }
     
     assert([[NSFileManager defaultManager] removeItemAtPath: dir error: NULL]);

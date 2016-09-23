@@ -15,7 +15,7 @@
 /**
  * This property is only exposed to be used internally by CoreObject.
  */
-@property (nonatomic, assign) BOOL isRecordingUndo;
+@property (nonatomic, readwrite, assign, getter=isRecordingUndo) BOOL recordingUndo;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
@@ -61,13 +61,13 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (id)crossPersistentRootReferenceWithPath: (COPath *)aPath;
+- (id)crossPersistentRootReferenceWithPath: (COPath *)aPath shouldLoad: (BOOL)shouldLoad;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
 - (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot
                                                      branch: (COBranch *)aBranch
-                                                  isDeleted: (BOOL)isDeletion;
+                                                    isFault: (BOOL)faulting;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

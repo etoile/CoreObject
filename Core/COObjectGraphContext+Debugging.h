@@ -22,21 +22,21 @@
  *
  * After a commit, returns an empty set.
  */
-- (NSArray *)insertedObjects;
+@property (nonatomic, readonly) NSArray *insertedObjects;
 /**
  * Returns the objects whose properties have been edited since change tracking
  * was cleared.
  *
  * After a commit, returns an empty set.
  */
-- (NSArray *)updatedObjects;
+@property (nonatomic, readonly) NSArray *updatedObjects;
 /**
  * Returns the union of the inserted and updated objects. See -insertedObjects
  * and -updatedObjects.
  *
  * After a commit, returns an empty set.
  */
-- (NSArray *)changedObjects;
+@property (nonatomic, readonly) NSArray *changedObjects;
 /**
  * A table listing the properties updated per object since change tracking was
  * cleared.
@@ -44,6 +44,6 @@
  * Useful to debug the object changes reported to the context since the last 
  * commit.
  */
-- (NSDictionary *)updatedPropertiesByUUID;
+@property (nonatomic, readonly) NSDictionary *updatedPropertiesByUUID;
 
 @end

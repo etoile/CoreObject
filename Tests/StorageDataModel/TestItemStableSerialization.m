@@ -33,7 +33,7 @@
 @implementation MutableItemAscendingAttributes
 - (NSArray *)attributeNames
 {
-	NSArray *attrs = [[super attributeNames] sortedArrayUsingSelector: @selector(compare:)];
+	NSArray *attrs = [super.attributeNames sortedArrayUsingSelector: @selector(compare:)];
 	return attrs;
 }
 @end
@@ -41,8 +41,8 @@
 @implementation MutableItemDescendingAttributes
 - (NSArray *)attributeNames
 {
-	NSArray *attrs = [[super attributeNames] sortedArrayUsingSelector: @selector(compare:)];
-	NSArray *reversed = [[attrs reverseObjectEnumerator] allObjects];
+	NSArray *attrs = [super.attributeNames sortedArrayUsingSelector: @selector(compare:)];
+	NSArray *reversed = [attrs reverseObjectEnumerator].allObjects;
 	return reversed;
 }
 @end
@@ -56,7 +56,7 @@
 }
 - (NSUInteger) count
 {
-	return [objects count];
+	return objects.count;
 }
 - (id) member:(id)object
 {
@@ -144,7 +144,7 @@ static COPath *Path(unsigned char num)
 {
 	if (reverse)
 	{
-		order = [[order reverseObjectEnumerator] allObjects];
+		order = [order reverseObjectEnumerator].allObjects;
 	}
 	
 	[item setValue: [[OrderedSet alloc] initWithArray: order]
@@ -190,10 +190,10 @@ static COPath *Path(unsigned char num)
 
 - (void) testItemsPreparedCorrectly
 {
-	UKObjectsEqual(SA([asc attributeNames]), SA([dsc attributeNames]));
-	UKObjectsNotEqual([asc attributeNames], [dsc attributeNames]);
+	UKObjectsEqual(SA(asc.attributeNames), SA(dsc.attributeNames));
+	UKObjectsNotEqual(asc.attributeNames, dsc.attributeNames);
 
-	for (NSString *key in [asc attributeNames])
+	for (NSString *key in asc.attributeNames)
 	{
 		id ascValue = [asc valueForAttribute: key];
 		id dscValue = [dsc valueForAttribute: key];
@@ -207,8 +207,8 @@ static COPath *Path(unsigned char num)
 
 - (void) testItemsHaveIdenticalBinarySerialization
 {
-	NSData *ascData = [asc dataValue];
-	NSData *dscData = [dsc dataValue];
+	NSData *ascData = asc.dataValue;
+	NSData *dscData = dsc.dataValue;
 	UKObjectsEqual(ascData, dscData);
 }
 

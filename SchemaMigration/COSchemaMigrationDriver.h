@@ -52,7 +52,7 @@
  *
  * For a nil repository, raises a NSInvalidArgumentException.
  */
-- (instancetype)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)repo;
+- (instancetype)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)repo NS_DESIGNATED_INITIALIZER;
 
 
 /** @taskunit Metamodel Access */

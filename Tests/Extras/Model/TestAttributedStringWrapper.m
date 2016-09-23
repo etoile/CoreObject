@@ -26,7 +26,7 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	}
 	if ((editedMask & NSTextStorageEditedAttributes) == NSTextStorageEditedAttributes)
 	{
-		if ([mask length] > 0)
+		if (mask.length > 0)
 		{
 			mask = [mask stringByAppendingString: @"|"];
 		}
@@ -65,7 +65,7 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 
 - (NSString *) string
 {
-    return [_backing string];
+    return _backing.string;
 }
 
 - (NSDictionary *) attributesAtIndex: (NSUInteger)anIndex effectiveRange: (NSRangePointer)rangeOut
@@ -76,7 +76,7 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 - (void) replaceCharactersInRange: (NSRange)aRange withString: (NSString *)aString
 {
     [_backing replaceCharactersInRange: aRange withString: aString];
-	[self edited: NSTextStorageEditedCharacters range: aRange changeInLength: [aString length] - aRange.length];
+	[self edited: NSTextStorageEditedCharacters range: aRange changeInLength: aString.length - aRange.length];
 }
 
 - (void) setAttributes: (NSDictionary *)attributes range: (NSRange)aRange
@@ -116,9 +116,9 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 - (void)textStorageWillProcessEditing:(NSNotification *)notification
 {
 	_didProcessEditing = YES;
-	_lastEditedRange = [as editedRange];
-	_lastEditedMask = [as editedMask];
-	_lastChangeInLength = [as changeInLength];
+	_lastEditedRange = as.editedRange;
+	_lastEditedMask = as.editedMask;
+	_lastChangeInLength = as.changeInLength;
 }
 
 /**
@@ -131,7 +131,7 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 {
 	_didProcessEditing = NO;
 	
-	[as setDelegate: self];
+	as.delegate = self;
 	[as beginEditing];
 	aBlock();
 	[as endEditing];
@@ -145,7 +145,7 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 		UKTrue(NSEqualRanges(aRange, _lastEditedRange));
 		UKIntsEqual(aMask, _lastEditedMask);
 		UKIntsEqual(delta, _lastChangeInLength);
-		UKObjectsEqual(newString, [as string]);
+		UKObjectsEqual(newString, as.string);
 		UKIntsEqual([newString length], [as length]);
 	}
 }
@@ -297,7 +297,7 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 
 	// Erase it
 	[self checkBlock: ^() {
-		[as replaceCharactersInRange: NSMakeRange(0, [as length]) withString: @""];
+		[as replaceCharactersInRange: NSMakeRange(0, as.length) withString: @""];
 	} modifiesRange: NSMakeRange(0, 0) mask: NSTextStorageEditedCharacters delta: -3 newString: @""];
 	
 	// Add "x"
@@ -346,24 +346,24 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	self = [super init];
 		
 	objectGraph = [self makeAttributedString];
-	attributedString = [objectGraph rootObject];
+	attributedString = objectGraph.rootObject;
 	as = [[COAttributedStringWrapperTestExtensions alloc] initWithBacking: attributedString];
 	
 	tv = [[NSTextView alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)];
-	[as addLayoutManager: [tv layoutManager]];
+	[as addLayoutManager: tv.layoutManager];
 	
 	return self;
 }
 
 - (void) dealloc
 {
-	[as removeLayoutManager: [tv layoutManager]];
+	[as removeLayoutManager: tv.layoutManager];
 }
 
 - (void) testObjectGraphEdits
 {
 	[self checkBlock: ^() {
-		[self appendString: @"abc" htmlCode: nil toAttributedString: [objectGraph rootObject]];
+		[self appendString: @"abc" htmlCode: nil toAttributedString: objectGraph.rootObject];
 	} modifiesRange: NSMakeRange(0, 3) mask: NSTextStorageEditedCharacters delta: 3 newString: @"abc"];
 
 	[self checkBlock: ^() {
@@ -380,7 +380,7 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	// Set up a clone of objectGraph, type a single character in it
 	COObjectGraphContext *remoteCtx = [COObjectGraphContext new];
 	[remoteCtx setItemGraph: objectGraph];
-	[self appendString: @"x" htmlCode: nil toAttributedString: [remoteCtx rootObject]];
+	[self appendString: @"x" htmlCode: nil toAttributedString: remoteCtx.rootObject];
 	
 	// Replicate that change to objectGraph
 	[self checkBlock: ^() {
@@ -395,7 +395,7 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	// Set up a clone of objectGraph, and make the "c" bold
 	COObjectGraphContext *remoteCtx = [COObjectGraphContext new];
 	[remoteCtx setItemGraph: objectGraph];
-	COAttributedStringWrapper *remoteCtxWrapper = [[COAttributedStringWrapper alloc] initWithBacking: [remoteCtx rootObject]];
+	COAttributedStringWrapper *remoteCtxWrapper = [[COAttributedStringWrapper alloc] initWithBacking: remoteCtx.rootObject];
 	[self setFontTraits: NSFontBoldTrait inRange: NSMakeRange(2, 1) inTextStorage: remoteCtxWrapper];
 		
 	// Replicate that change to objectGraph
@@ -440,8 +440,8 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	[branch1 setItemGraph: objectGraph];
 	
 	// Erase '<b>b</b><i>c</i>' in the snapshot, append '<u>d</u>'
-	[[branch1 rootObject] setChunks: @[[[[branch1 rootObject] chunks] firstObject]]];
-	[self appendString: @"d" htmlCode: @"u" toAttributedString: [branch1 rootObject]];
+	[branch1.rootObject setChunks: @[[[branch1.rootObject chunks] firstObject]]];
+	[self appendString: @"d" htmlCode: @"u" toAttributedString: branch1.rootObject];
 	
 	// revert objectGraph to branch1
 	[self checkBlock: ^() {
@@ -455,8 +455,8 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	
 	[as replaceCharactersInRange: NSMakeRange(1, 1) withString: @""];
 	
-	UKObjectsEqual(@"ac", [as string]);
-	UKIntsEqual(2, [attributedString.chunks count]);
+	UKObjectsEqual(@"ac", as.string);
+	UKIntsEqual(2, attributedString.chunks.count);
 	UKObjectsEqual(@"a", [attributedString.chunks[0] text]);
 	UKObjectsEqual(@"c", [attributedString.chunks[1] text]);
 }
@@ -468,8 +468,8 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	// Delete chunks 'b' and 'c', and the first character of 'dd'
 	[as replaceCharactersInRange: NSMakeRange(1, 3) withString: @""];
 	
-	UKObjectsEqual(@"ad", [as string]);
-	UKIntsEqual(2, [attributedString.chunks count]);
+	UKObjectsEqual(@"ad", as.string);
+	UKIntsEqual(2, attributedString.chunks.count);
 	UKObjectsEqual(@"a", [attributedString.chunks[0] text]);
 	UKObjectsEqual(@"d", [attributedString.chunks[1] text]);
 }
@@ -477,11 +477,11 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 - (void) testRemovingAttributeMergesAdjacentChunks
 {
 	[self appendHTMLString: @"a<B>b</B>c" toAttributedString: attributedString];
-	UKIntsEqual(3, [attributedString.chunks count]);
+	UKIntsEqual(3, attributedString.chunks.count);
 	
 	[self setFontTraits: 0 inRange: NSMakeRange(1,1) inTextStorage:as];
-	UKObjectsEqual(@"abc", [as string]);
-	UKIntsEqual(1, [attributedString.chunks count]);
+	UKObjectsEqual(@"abc", as.string);
+	UKIntsEqual(1, attributedString.chunks.count);
 	UKObjectsEqual(@"abc", [attributedString.chunks[0] text]);
 }
 
@@ -490,8 +490,8 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	[self appendHTMLString: @"a<B>b</B>c" toAttributedString: attributedString];
 	
 	[as replaceCharactersInRange: NSMakeRange(1, 1) withString: @""];
-	UKObjectsEqual(@"ac", [as string]);
-	UKIntsEqual(1, [attributedString.chunks count]);
+	UKObjectsEqual(@"ac", as.string);
+	UKIntsEqual(1, attributedString.chunks.count);
 	UKObjectsEqual(@"ac", [attributedString.chunks[0] text]);
 }
 
@@ -510,7 +510,7 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 	
 	// Set the string to @""
 	[self checkBlock: ^() {
-		[[as mutableString] setString: @""];
+		[as.mutableString setString: @""];
 	} modifiesRange: NSMakeRange(0, 0) mask: NSTextStorageEditedCharacters delta: -1 newString: @""];
 	
 	// Restore to snapshot1
@@ -553,7 +553,7 @@ LogEditedCall(NSUInteger editedMask, NSRange range, NSInteger delta)
 - (instancetype) init
 {
 	self = [super init];
-	as = [[[NSTextView alloc] init] textStorage];
+	as = [[NSTextView alloc] init].textStorage;
 	return self;
 }
 

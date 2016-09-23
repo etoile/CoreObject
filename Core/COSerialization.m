@@ -64,7 +64,7 @@ static const NSRect CONullRect = {{FLT_MIN, FLT_MIN}, {FLT_MIN, FLT_MIN}};
 serialization. */
 BOOL isSerializableScalarValue(id value)
 {
-	if ([value isKindOfClass: [NSValue class]] == NO)
+	if (![value isKindOfClass: [NSValue class]])
 		return NO;
 
 	const char *type = [value objCType];
@@ -81,11 +81,11 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 - (id)serializedValueForScalarValue: (NSValue *)value
 {
 	NSParameterAssert([value isKindOfClass: [NSValue class]]);
-	const char *type = [value objCType];
+	const char *type = value.objCType;
 
 	if (strcmp(type, @encode(NSPoint)) == 0)
 	{
-		NSPoint point = [value pointValue];
+		NSPoint point = value.pointValue;
 		if (NSEqualPoints(point, CONullPoint))
 		{
 			return @"null-point";
@@ -94,7 +94,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	}
 	else if (strcmp(type, @encode(NSSize)) == 0)
 	{
-		NSSize size = [value sizeValue];
+		NSSize size = value.sizeValue;
 		if (NSEqualSizes(size, CONullSize))
 		{
 			return @"null-size";
@@ -103,7 +103,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	}
 	else if (strcmp(type, @encode(NSRect)) == 0)
 	{
-		NSRect rect = [value rectValue];
+		NSRect rect = value.rectValue;
 		if (NSEqualRects(rect, CONullRect))
 		{
 			return @"null-rect";
@@ -113,7 +113,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 	else if (strcmp(type, @encode(NSRange)) == 0)
 	{
 		// TODO: Add null range support
-		return NSStringFromRange([value rangeValue]);
+		return NSStringFromRange(value.rangeValue);
 	}
 	else
 	{
@@ -135,14 +135,14 @@ static id serializedReferenceInContextForObject(COObjectGraphContext *objectGrap
 	   group, but ignore it. At deseserialiation time, the app is responsible
 	   to add the item back to the window group (the parent item would be
 	   restored then). */
-	if (![value isPersistent] && [value objectGraphContext] != objectGraphContext)
+	if (!value.isPersistent && value.objectGraphContext != objectGraphContext)
 	{
 		return null;
 	}
 
-	if ([value persistentRoot] == objectGraphContext.persistentRoot)
+	if (value.persistentRoot == objectGraphContext.persistentRoot)
 	{
-		return [value UUID];
+		return value.UUID;
 	}
 	else
 	{
@@ -151,22 +151,22 @@ static id serializedReferenceInContextForObject(COObjectGraphContext *objectGrap
 		NSCAssert([value isRoot], @"A property must point to a root object "
 			"for references accross persistent roots");
 		
-		COPersistentRoot *referencedPersistentRoot = [value persistentRoot];
+		COPersistentRoot *referencedPersistentRoot = value.persistentRoot;
 		COObjectGraphContext *referencedPersistentRootCurrentBranchGraph =
-			[referencedPersistentRoot objectGraphContext];
-		COObjectGraphContext *referencedObjectGraph = [value objectGraphContext];
-		COBranch *referencedBranch = [value branch];
+			referencedPersistentRoot.objectGraphContext;
+		COObjectGraphContext *referencedObjectGraph = value.objectGraphContext;
+		COBranch *referencedBranch = value.branch;
 		
 		if (referencedObjectGraph == referencedPersistentRootCurrentBranchGraph)
 		{
 			// Serialize as a reference to the current branch
-			return [COPath pathWithPersistentRoot: [referencedPersistentRoot UUID]];
+			return [COPath pathWithPersistentRoot: referencedPersistentRoot.UUID];
 		}
 		else
 		{
 			// Serialize as a reference to a specific branch
-			return [COPath pathWithPersistentRoot: [referencedPersistentRoot UUID]
-			                               branch: [referencedBranch UUID]];
+			return [COPath pathWithPersistentRoot: referencedPersistentRoot.UUID
+			                               branch: referencedBranch.UUID];
 		}
 	}
 }
@@ -177,12 +177,12 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
     NSAssert(value != nil, @"Multivalued properties must not be nil");
 
     /* Don't serialize NSDictionary as multivalue but as CODictionary reference */
-    if ([aPropertyDesc isKeyed])
+    if (aPropertyDesc.keyed)
     {
         ETAssert([value isKindOfClass: [NSDictionary class]]);
-        return [_additionalStoreItemUUIDs objectForKey: [aPropertyDesc name]];
+        return _additionalStoreItemUUIDs[aPropertyDesc.name];
     }
-    else if ([aPropertyDesc isOrdered])
+    else if (aPropertyDesc.ordered)
     {
         ETAssert([value isKindOfClass: [COMutableArray class]]);
 		NSMutableArray *array = [NSMutableArray arrayWithCapacity: [value count]];
@@ -278,7 +278,7 @@ static id serializeUnivalue(COObject *self, id aValue, ETPropertyDescription *aP
 - (id)serializedValueForValue: (id)value
           propertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
-    if ([aPropertyDesc isMultivalued])
+    if (aPropertyDesc.multivalued)
     {
 		return [self serializedValueForValue: value
 		      multivaluedPropertyDescription: aPropertyDesc];
@@ -308,15 +308,15 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
 	if (value == nil)
 		return kCOTypeString;
 
-	if (strcmp([value objCType], @encode(BOOL)) == 0
-	 || strcmp([value objCType], @encode(NSInteger)) == 0
-	 || strcmp([value objCType], @encode(NSUInteger)) == 0)
+	if (strcmp(value.objCType, @encode(BOOL)) == 0
+	 || strcmp(value.objCType, @encode(NSInteger)) == 0
+	 || strcmp(value.objCType, @encode(NSUInteger)) == 0)
 	{
 		return kCOTypeInt64;
 	}
-	else if (strcmp([value objCType], @encode(CGFloat)) == 0
-	      || strcmp([value objCType], @encode(double)) == 0
-	      || strcmp([value objCType], @encode(float)) == 0)
+	else if (strcmp(value.objCType, @encode(CGFloat)) == 0
+	      || strcmp(value.objCType, @encode(double)) == 0
+	      || strcmp(value.objCType, @encode(float)) == 0)
 	{
 		return kCOTypeDouble;
 	}
@@ -364,9 +364,9 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
 - (COType)serializedTypeForUnivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
                                                 ofValue: (id)value
 {
-	ETEntityDescription *type = [aPropertyDesc persistentType];
+	ETEntityDescription *type = aPropertyDesc.persistentType;
     ETAssert(type != nil);
-	NSString *typeName = [type name];
+	NSString *typeName = type.name;
 
 	if (aPropertyDesc.valueTransformerName != nil)
 	{
@@ -388,7 +388,7 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
 
 	if (aPropertyDesc.isPersistentRelationship)
 	{
-		return ([aPropertyDesc isComposite] ? kCOTypeCompositeReference : kCOTypeReference);
+		return (aPropertyDesc.isComposite ? kCOTypeCompositeReference : kCOTypeReference);
 	}
 	else if ([typeName isEqualToString: @"BOOL"]
 	      || [typeName isEqualToString: @"NSInteger"]
@@ -437,17 +437,17 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
 {
 	COType type = 0;
 
-	if ([aPropertyDesc isMultivalued])
+	if (aPropertyDesc.multivalued)
 	{
 		NSAssert(value != nil, @"Multivalued properties must not be nil");
 
 		/* Don't serialize NSDictionary as multivalue but as CODictionary reference */
-		if ([aPropertyDesc isKeyed])
+		if (aPropertyDesc.keyed)
 		{
 			ETAssert([value isKindOfClass: [NSDictionary class]]);
 			type = kCOTypeCompositeReference;
 		}
-		else if ([aPropertyDesc isOrdered])
+		else if (aPropertyDesc.ordered)
 		{
 			ETAssert([value isKindOfClass: [NSArray class]]);
 			// HACK: The ofValue param should be removed.
@@ -469,7 +469,7 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
 		type = [self serializedTypeForUnivaluedPropertyDescription: aPropertyDesc
 		                                                   ofValue: value];
 	}
-	return [NSNumber numberWithInteger: type];
+	return @(type);
 }
 
 - (SEL)serializationGetterForProperty: (NSString *)property
@@ -498,11 +498,11 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
 {
 	/* First we try to use the getter named 'serialized' + 'key' */
 
-	SEL getter = [self serializationGetterForProperty: [aPropertyDesc name]];
+	SEL getter = [self serializationGetterForProperty: aPropertyDesc.name];
 
 	if (getter != NULL)
 	{
-		NSAssert1([self serializationSetterForProperty: [aPropertyDesc name]] != NULL,
+		NSAssert1([self serializationSetterForProperty: aPropertyDesc.name] != NULL,
 			@"Serialization getter %@ must have a matching serialization setter",
 				 NSStringFromSelector(getter));
 
@@ -512,7 +512,7 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
 	/* If no custom getter can be found, we access the stored value directly 
 	   (ivar and variable storage) */
 
-	return [self serializableValueForStorageKey: [aPropertyDesc name]];
+	return [self serializableValueForStorageKey: aPropertyDesc.name];
 }
 
 - (COItem *)storeItemWithUUID: (ETUUID *)aUUID
@@ -521,12 +521,12 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
                    entityName: (NSString *)anEntityName
 		   packageDescription: (ETPackageDescription *)package
 {
-    [values setObject: anEntityName forKey: kCOObjectEntityNameProperty];
-	[types setObject: @(kCOTypeString) forKey: kCOObjectEntityNameProperty];
-	[values setObject: @(package.version) forKey: kCOObjectPackageVersionProperty];
-	[types setObject: @(kCOTypeInt64) forKey: kCOObjectPackageVersionProperty];
-	[values setObject: package.name forKey: kCOObjectPackageNameProperty];
-	[types setObject: @(kCOTypeString) forKey: kCOObjectPackageNameProperty];
+    values[kCOObjectEntityNameProperty] = anEntityName;
+	types[kCOObjectEntityNameProperty] = @(kCOTypeString);
+	values[kCOObjectPackageVersionProperty] = @(package.version);
+	types[kCOObjectPackageVersionProperty] = @(kCOTypeInt64);
+	values[kCOObjectPackageNameProperty] = package.name;
+	types[kCOObjectPackageNameProperty] = @(kCOTypeString);
 
 	return [[COItem alloc] initWithUUID: aUUID
 	                 typesForAttributes: types
@@ -536,11 +536,11 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
 - (COItem *)storeItem
 {
 	NSArray *serializedPropertyDescs =
-		[_entityDescription allPersistentPropertyDescriptions];
+		_entityDescription.allPersistentPropertyDescriptions;
 	NSMutableDictionary *types =
-		[NSMutableDictionary dictionaryWithCapacity: [serializedPropertyDescs count]];
+		[NSMutableDictionary dictionaryWithCapacity: serializedPropertyDescs.count];
 	NSMutableDictionary *values =
-		[NSMutableDictionary dictionaryWithCapacity: [serializedPropertyDescs count]];
+		[NSMutableDictionary dictionaryWithCapacity: serializedPropertyDescs.count];
 
 	for (ETPropertyDescription *propertyDesc in serializedPropertyDescs)
 	{
@@ -552,14 +552,14 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
 		NSNumber *serializedType = [self serializedTypeForPropertyDescription: propertyDesc
 		                                                                value: value];
 	
-		[values setObject: serializedValue forKey: [propertyDesc name]];
-		[types setObject: serializedType forKey: [propertyDesc name]];
+		values[propertyDesc.name] = serializedValue;
+		types[propertyDesc.name] = serializedType;
 	}
 	
 	return [self storeItemWithUUID: _UUID
 	                         types: types
 	                        values: values
-	                    entityName: [_entityDescription name]
+	                    entityName: _entityDescription.name
 				packageDescription: _entityDescription.owner];
 }
 
@@ -580,7 +580,7 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
 	}];
 
 	ETPropertyDescription *propertyDesc =
-		[[self entityDescription] propertyDescriptionForName: property];
+		[self.entityDescription propertyDescriptionForName: property];
 
 	return [self storeItemFromDictionaryForPropertyDescription: propertyDesc];
 }
@@ -658,19 +658,19 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 		NSParameterAssert(COTypePrimitivePart(type) == kCOTypeReference
 						  || COTypePrimitivePart(type) == kCOTypeCompositeReference);
 		/* Look up a inner object reference in the receiver persistent root */
-		object = [[self objectGraphContext] objectReferenceWithUUID: value];
+		object = [self.objectGraphContext objectReferenceWithUUID: value];
 		ETAssert(object != nil);
 	}
 	else /* COPath */
 	{
 		NSParameterAssert(COTypePrimitivePart(type) == kCOTypeReference);
-		object = [[[self persistentRoot] parentContext] crossPersistentRootReferenceWithPath: (COPath *)value];
+		object = [self.persistentRoot.parentContext crossPersistentRootReferenceWithPath: (COPath *)value shouldLoad: NO];
 		/* object may be nil for dead reference */
 	}
 
 	if (object != nil)
 	{
-		ETAssert([[object entityDescription] isKindOfEntity: [aPropertyDesc persistentType]]);
+		ETAssert([object.entityDescription isKindOfEntity: [aPropertyDesc persistentType]]);
 	}
 	
 	return object;
@@ -679,7 +679,7 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 // TODO: Could replace -loadingItemGraph as a semi-private COObjectGraphContext API.
 - (COItem *) itemForUUIDDuringLoading: (ETUUID *)aUUID
 {
-	COItem *item = [[[self objectGraphContext] loadingItemGraph] itemForUUID: aUUID];
+	COItem *item = [self.objectGraphContext.loadingItemGraph itemForUUID: aUUID];
 
 	if (item == nil)
 	{
@@ -690,13 +690,14 @@ Nil is returned when the value type is unsupported by CoreObject deserialization
 	return item;
 }
 
+// NOTE: If we add more collection attributes to the metamodel, we should update this method assertions.
 - (id) valueForSerializedValue: (id)value
                         ofType: (COType)type
 multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
 	if (COTypeMultivaluedPart(type) == kCOTypeArray)
 	{
-		NSAssert([aPropertyDesc isKeyed] == NO && [aPropertyDesc isOrdered] && [aPropertyDesc isMultivalued],
+		NSAssert(!aPropertyDesc.keyed && aPropertyDesc.ordered && aPropertyDesc.multivalued,
 				 @"Serialization type doesn't match metamodel");
 		
 		COMutableArray *resultCollection =
@@ -716,7 +717,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	}
 	else if (COTypeMultivaluedPart(type) == kCOTypeSet)
 	{
-		NSAssert([aPropertyDesc isKeyed] == NO && [aPropertyDesc isOrdered] == NO && [aPropertyDesc isMultivalued],
+		NSAssert(!aPropertyDesc.keyed && !aPropertyDesc.ordered && aPropertyDesc.multivalued,
 				 @"Serialization type doesn't match metamodel");
 		
 		COMutableSet *resultCollection =
@@ -737,15 +738,15 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 	else if (type == kCOTypeCompositeReference)
 	{
 		NSParameterAssert([value isKindOfClass: [ETUUID class]]);
-		NSAssert([aPropertyDesc isKeyed] && [aPropertyDesc isOrdered] == NO && [aPropertyDesc isMultivalued],
+		NSAssert(aPropertyDesc.keyed && !aPropertyDesc.ordered && aPropertyDesc.multivalued,
 			@"Serialization type doesn't match metamodel");
 		
-		ETUUID *itemUUID = [_additionalStoreItemUUIDs objectForKey: [aPropertyDesc name]];
+		ETUUID *itemUUID = _additionalStoreItemUUIDs[aPropertyDesc.name];
 		BOOL isNewObjectFromDeserialization = [itemUUID isEqual: null];
 
 		if (isNewObjectFromDeserialization)
 		{
-			[_additionalStoreItemUUIDs setObject: value forKey: [aPropertyDesc name]];
+			_additionalStoreItemUUIDs[aPropertyDesc.name] = value;
 		}
 		else /* Future deserializations targeting the same object */
 		{
@@ -800,7 +801,7 @@ static id reverseTransformedValueOfPropertyDescription(COObject *self, id value,
 
 	ETEntityDescription *resultEntityDesc = entityDescriptionForObjectInRepository(result, repo);
 
-	assert(result == nil || [resultEntityDesc isKindOfEntity: [aPropertyDesc type]]);
+	assert(result == nil || [resultEntityDesc isKindOfEntity: aPropertyDesc.type]);
 	
 	return result;
 }
@@ -814,7 +815,7 @@ static id reverseTransformedValueOfPropertyDescription(COObject *self, id value,
 
 static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyDescription *aPropertyDesc)
 {
-	NSString *typeName = [[aPropertyDesc persistentType] name];
+	NSString *typeName = aPropertyDesc.persistentType.name;
 	BOOL isNull = (value == null);
 	id result = value;
 
@@ -831,7 +832,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyD
 
 		BOOL isCrossPersistentRootRef = [value isKindOfClass: [COPath class]];
 		BOOL isDeletedCrossPersistentRootRef = isCrossPersistentRootRef
-			&& ([(COObject *)result persistentRoot].isDeleted || [(COObject *)result branch].isDeleted);
+			&& ([result persistentRoot].deleted || [result branch].deleted);
 		BOOL isDeadCrossPersistentRootRef = (result == nil && isCrossPersistentRootRef);
 
 		result = (isDeadCrossPersistentRootRef || isDeletedCrossPersistentRootRef ? value : result);
@@ -880,7 +881,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyD
 {
 	// NOTE: For the elements in a dictionary, type is the key type (e.g.
 	// kCOTypeString). In both cases, aPropertyDesc.isKeyed is YES.
-    if (COTypeIsMultivalued(type) || [aPropertyDesc isKeyed])
+    if (COTypeIsMultivalued(type) || aPropertyDesc.keyed)
     {
 		if (aPropertyDesc.isKeyed)
 		{
@@ -921,7 +922,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyD
 // serialization format has been removed.
 - (void)setSerializedValue: (id)value forPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
-	NSString *key = [aPropertyDesc name];
+	NSString *key = aPropertyDesc.name;
 
 	/* First we try to use the setter named 'setSerialized' + 'key' */
 
@@ -929,7 +930,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyD
 
 	if ([self respondsToSelector: setter])
 	{
-		NSAssert1([self serializationGetterForProperty: [aPropertyDesc name]] != NULL,
+		NSAssert1([self serializationGetterForProperty: aPropertyDesc.name] != NULL,
 			@"Serialization setter %@ must have a matching serialization getter",
 				 NSStringFromSelector(setter));
 		
@@ -948,25 +949,25 @@ static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyD
 /* Validates that the receiver is compatible with the provided store item. */
 - (void)validateStoreItem: (COItem *)aStoreItem
 {
-    if (![[aStoreItem UUID] isEqual: [self UUID]])
+    if (![aStoreItem.UUID isEqual: self.UUID])
     {
         [NSException raise: NSInvalidArgumentException
-                    format: @"-setStoreItem: called with UUID %@ on COObject with UUID %@", [aStoreItem UUID], [self UUID]];
+                    format: @"-setStoreItem: called with UUID %@ on COObject with UUID %@", aStoreItem.UUID, self.UUID];
     }
 
 	NSString *entityName = [aStoreItem valueForAttribute: kCOObjectEntityNameProperty];
 	ETEntityDescription *entityDesc =
-		[[_objectGraphContext modelDescriptionRepository] descriptionForName: entityName];
+		[_objectGraphContext.modelDescriptionRepository descriptionForName: entityName];
 
 	/* If B is a subclass of A, and a property description type is A but the 
 	   the property value is a B object, the deserialized property value is 
 	   accepted because [B isKindOfEntity: A] is true. */
-    if (![_entityDescription isKindOfEntity: entityDesc] && ![_entityDescription isRoot])
+    if (![_entityDescription isKindOfEntity: entityDesc] && !_entityDescription.isRoot)
     {
 		// TODO: Rewrite this exception to provide a better explanation.
         [NSException raise: NSInvalidArgumentException
                     format: @"-setStoreItem: called with entity name %@ on COObject with entity name %@",
-                            entityName, [[self entityDescription] name]];
+                            entityName, self.entityDescription.name];
 
     }
 	
@@ -996,7 +997,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyD
 
 	[self validateStoreItem: aStoreItem];
 	
-	for (NSString *property in [aStoreItem attributeNames])
+	for (NSString *property in aStoreItem.attributeNames)
 	{
         if ([property isEqualToString: kCOObjectEntityNameProperty]
 		 || [property isEqualToString: kCOObjectPackageVersionProperty]
@@ -1016,7 +1017,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyD
 			// Was an exception in 0.5, but that seems overly paranoid
 			NSLog(@"Warning: Tried to set serialized value %@ of type %@ "
 				   "for property %@ missing in the metamodel %@",
-				   serializedValue, COTypeDescription(serializedType), property, [self entityDescription]);
+				   serializedValue, COTypeDescription(serializedType), property, self.entityDescription);
 			continue;
 		}
 
@@ -1034,13 +1035,13 @@ static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyD
 
 - (id)roundTripValueForProperty: (NSString *)key
 {
-	ETPropertyDescription *propertyDesc = [[self entityDescription] propertyDescriptionForName: key];
-	ETAssert([propertyDesc isPersistent]);
+	ETPropertyDescription *propertyDesc = [self.entityDescription propertyDescriptionForName: key];
+	ETAssert(propertyDesc.persistent);
 	id value = [self serializedValueForPropertyDescription: propertyDesc];
 	id serializedValue = [self serializedValueForValue: value propertyDescription: propertyDesc];
 	NSNumber *serializedType = [self serializedTypeForPropertyDescription: propertyDesc
 	                                                                value: value];
-	BOOL isSerializedAsAdditionalItem = [[_additionalStoreItemUUIDs allValues] containsObject: serializedValue];
+	BOOL isSerializedAsAdditionalItem = [_additionalStoreItemUUIDs.allValues containsObject: serializedValue];
 
 	if (isSerializedAsAdditionalItem)
 	{
@@ -1053,8 +1054,8 @@ static id deserializeUnivalue(COObject *self, id value, COType type, ETPropertyD
 	}
 
 	return [self valueForSerializedValue: serializedValue
-	                              ofType: [serializedType intValue]
-	                 propertyDescription: [[self entityDescription] propertyDescriptionForName: key]];
+	                              ofType: serializedType.intValue
+	                 propertyDescription: [self.entityDescription propertyDescriptionForName: key]];
 }
 
 @end

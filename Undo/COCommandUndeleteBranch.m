@@ -19,17 +19,17 @@ static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
 
 @synthesize branchUUID = _branchUUID;
 
-- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
+- (instancetype) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
     self = [super initWithPropertyList: plist parentUndoTrack: aParent];
-    self.branchUUID = [ETUUID UUIDWithString: [plist objectForKey: kCOCommandBranchUUID]];
+    self.branchUUID = [ETUUID UUIDWithString: plist[kCOCommandBranchUUID]];
     return self;
 }
 
 - (id) propertyList
 {
-    NSMutableDictionary *result = [super propertyList];
-    [result setObject: [_branchUUID stringValue] forKey: kCOCommandBranchUUID];
+    NSMutableDictionary *result = super.propertyList;
+    result[kCOCommandBranchUUID] = [_branchUUID stringValue];
     return result;
 }
 

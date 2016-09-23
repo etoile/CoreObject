@@ -43,7 +43,7 @@ static ETUUID *tagUUID;
           forAttribute: @"taggedDocuments"
                   type: kCOTypeReference | kCOTypeSet];
 
-    return [COItemGraph itemGraphWithItemsRootFirst: A(rootItem)];
+    return [COItemGraph itemGraphWithItemsRootFirst: @[rootItem]];
 }
 
 - (COItemGraph *) docItemTree
@@ -51,7 +51,7 @@ static ETUUID *tagUUID;
     COMutableItem *rootItem = [[COMutableItem alloc] initWithUUID: docUUID];
     [rootItem setValue: @"my document" forAttribute: @"name" type: kCOTypeString];
     
-    return [COItemGraph itemGraphWithItemsRootFirst: A(rootItem)];
+    return [COItemGraph itemGraphWithItemsRootFirst: @[rootItem]];
 }
 
 - (id) init
@@ -64,12 +64,12 @@ static ETUUID *tagUUID;
 												  branchUUID: [ETUUID UUID]
 											revisionMetadata: nil];
     
-    tagProot = [txn createPersistentRootWithInitialItemGraph: [self tagItemTreeWithDocProoUUID: [docProot UUID]]
+    tagProot = [txn createPersistentRootWithInitialItemGraph: [self tagItemTreeWithDocProoUUID: docProot.UUID]
 														UUID: [ETUUID UUID]
 												  branchUUID: [ETUUID UUID]
 											revisionMetadata: nil];
-	docProotChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: [docProot UUID]];
-	tagProotChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: [tagProot UUID]];
+	docProotChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: docProot.UUID];
+	tagProotChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: tagProot.UUID];
 
     UKTrue([store commitStoreTransaction: txn]);
     
@@ -79,24 +79,24 @@ static ETUUID *tagUUID;
 
 - (void) testSearch
 {
-    NSArray *results = [store referencesToPersistentRoot: [docProot UUID]];
+    NSArray *results = [store referencesToPersistentRoot: docProot.UUID];
     
-    COSearchResult *result = [results objectAtIndex: 0];
-    UKObjectsEqual([[tagProot currentBranchInfo] currentRevisionUUID], [result revision]);
+    COSearchResult *result = results[0];
+    UKObjectsEqual(tagProot.currentBranchInfo.currentRevisionUUID, result.revision);
     UKObjectsEqual(tagUUID, [result innerObjectUUID]);
 }
 
 - (void) testDeletion
 {
 	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-	[txn deletePersistentRoot: [docProot UUID]];
-	docProotChangeCount = [txn setOldTransactionID: docProotChangeCount forPersistentRoot: [docProot UUID]];
+	[txn deletePersistentRoot: docProot.UUID];
+	docProotChangeCount = [txn setOldTransactionID: docProotChangeCount forPersistentRoot: docProot.UUID];
 	UKTrue([store commitStoreTransaction: txn]);
     
-    UKTrue([store finalizeDeletionsForPersistentRoot: [docProot UUID]
+    UKTrue([store finalizeDeletionsForPersistentRoot: docProot.UUID
                                                error: NULL]);
     
-    UKNil([store itemGraphForRevisionUUID: [[docProot currentBranchInfo] currentRevisionUUID] persistentRoot: [docProot UUID]]);
+    UKNil([store itemGraphForRevisionUUID: docProot.currentBranchInfo.currentRevisionUUID persistentRoot: docProot.UUID]);
 }
 
 @end

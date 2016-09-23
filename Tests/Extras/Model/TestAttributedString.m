@@ -15,7 +15,7 @@
 - (void) testSplit
 {
 	COObjectGraphContext *target = [self makeAttributedStringWithHTML: @"<B>xy</B>wz"];
-	COAttributedString *as = [target rootObject];
+	COAttributedString *as = target.rootObject;
 	COAttributedStringChunk *chunk0 = as.chunks[0];
 	
 	[as splitChunkAtIndex: 1];

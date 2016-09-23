@@ -20,24 +20,24 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
 @synthesize oldMetadata = _oldMetadata;
 @synthesize metadata = _newMetadata;
 
-- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
+- (instancetype) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
     self = [super initWithPropertyList: plist parentUndoTrack: aParent];
-    self.oldMetadata = [plist objectForKey: kCOCommandOldMetadata];
-    self.metadata = [plist objectForKey: kCOCommandNewMetadata];
+    self.oldMetadata = plist[kCOCommandOldMetadata];
+    self.metadata = plist[kCOCommandNewMetadata];
     return self;
 }
 
 - (id) propertyList
 {
-    NSMutableDictionary *result = [super propertyList];
+    NSMutableDictionary *result = super.propertyList;
     if (_oldMetadata != nil)
     {
-        [result setObject: _oldMetadata forKey: kCOCommandOldMetadata];
+        result[kCOCommandOldMetadata] = _oldMetadata;
     }
     if (_newMetadata != nil)
     {
-        [result setObject: _newMetadata forKey: kCOCommandNewMetadata];
+        result[kCOCommandNewMetadata] = _newMetadata;
     }
     return result;
 }
@@ -71,7 +71,7 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
     COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
    	ETAssert(proot != nil);
 	
-    [proot setMetadata: _newMetadata];
+    proot.metadata = _newMetadata;
 }
 
 - (NSString *)kind

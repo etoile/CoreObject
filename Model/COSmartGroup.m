@@ -26,28 +26,28 @@
 
 	// For subclasses that don't override -newEntityDescription, we must not add the 
 	// property descriptions that we will inherit through the parent
-	if ([[group name] isEqual: [COSmartGroup className]] == NO) 
+	if (![group.name isEqual: [COSmartGroup className]]) 
 		return group;
 
 	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COSmartGroup"
 	                               description: @" Smart Core Object Group"
-	                          supertypeStrings: [NSArray array]
-	                                  typeTags: [NSDictionary dictionary]];
+	                          supertypeStrings: @[]
+	                                  typeTags: @{}];
 	ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
 
 	[group setLocalizedDescription: _(@"Smart Group")];
 
 	ETPropertyDescription *content = 
-		[ETPropertyDescription descriptionWithName: @"content" type: (id)@"COObject"];
-	[content setMultivalued: YES];
-	[content setOrdered: YES];
+		[ETPropertyDescription descriptionWithName: @"content" typeName: @"COObject"];
+	content.multivalued = YES;
+	content.ordered = YES;
 
-	[group setPropertyDescriptions: A(content)];
+	group.propertyDescriptions = @[content];
 
 	return group;	
 }
 
-- (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
+- (instancetype)initWithObjectGraphContext:(COObjectGraphContext *)aContext
 {
 	self = [super initWithObjectGraphContext: aContext];
 	if (self == nil)
@@ -116,9 +116,9 @@
 		{
 			result = [(id <COObjectMatching>)targetCollection objectsMatchingQuery: query];
 		}
-		else if ([query predicate] != nil)
+		else if (query.predicate != nil)
 		{
-			result = [[targetCollection contentArray] filteredArrayUsingPredicate: [query predicate]];
+			result = [[targetCollection contentArray] filteredArrayUsingPredicate: query.predicate];
 		}
 	}
 	else if (query != nil)
@@ -140,7 +140,7 @@
 
 - (id)objectForIdentifier: (NSString *)anId
 {
-	for (id object in [self content])
+	for (id object in self.content)
 	{
 		if ([[object identifier] isEqualToString: anId])
 		{
@@ -154,9 +154,9 @@
 {
 	NSMutableArray *result = [NSMutableArray array];
 
-	for (COObject *object in [self content])
+	for (COObject *object in self.content)
 	{
-		if ([[aQuery predicate] evaluateWithObject: object])
+		if ([aQuery.predicate evaluateWithObject: object])
 		{
 			[result addObject: object];
 		}

@@ -19,7 +19,7 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 @synthesize initialRevisionID = _initialRevisionID;
 
-- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
+- (instancetype) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
     self = [super initWithPropertyList: plist parentUndoTrack: aParent];
 	if (self == nil)
@@ -36,11 +36,11 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 - (id) propertyList
 {
-    NSMutableDictionary *result = [super propertyList];
+    NSMutableDictionary *result = super.propertyList;
 
 	if (_initialRevisionID != nil)
 	{
-    	[result setObject: [_initialRevisionID stringValue] forKey: kCOCommandInitialRevisionID];
+    	result[kCOCommandInitialRevisionID] = [_initialRevisionID stringValue];
 	}
     return result;
 }
@@ -61,7 +61,7 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 	if (isCreateInverse)
 	{
-		[(COCommandCreatePersistentRoot *)inverse setInitialRevisionID: _initialRevisionID];
+		((COCommandCreatePersistentRoot *)inverse).initialRevisionID = _initialRevisionID;
 	}
 
     return inverse;

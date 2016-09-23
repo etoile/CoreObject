@@ -13,7 +13,7 @@
 
 @implementation COCrossPersistentRootDeadRelationshipCache
 
-- (id)init
+- (instancetype)init
 {
 	SUPERINIT;
 	_pathToReferringObjects = [NSMutableDictionary new];
@@ -59,13 +59,26 @@
 	return _pathToReferringObjects[aPath];
 }
 
+- (void)removeObjectFromPathsToReferringObjects: (COObject *)aReferrer forPath: (COPath *)path
+{
+	NSHashTable *referringObjects = _pathToReferringObjects[path];
+		
+	[referringObjects removeObject: aReferrer];
+
+	if (referringObjects.count == 0)
+	{
+		[_pathToReferringObjects removeObjectForKey: path];
+	}
+}
+
 - (void)removeReferringObject: (COObject *)aReferrer
                       forPath: (COPath *)aPath
 {
 	NSMutableSet *paths = [_referringObjectToPaths objectForKey: aReferrer];
 
 	[paths removeObject: aPath];
-	[_pathToReferringObjects[aPath] removeObject: aReferrer];
+	[self removeObjectFromPathsToReferringObjects: aReferrer
+	                                      forPath: aPath];
 }
 
 - (void)removeReferringObject: (COObject *)aReferrer
@@ -78,7 +91,8 @@
 	[_referringObjectToPaths removeObjectForKey: aReferrer];
 	for (COPath *path in paths)
 	{
-		[_pathToReferringObjects[path] removeObject: aReferrer];
+		[self removeObjectFromPathsToReferringObjects: aReferrer
+		                                      forPath: path];
 	}
 }
 

@@ -12,7 +12,7 @@
 	
 	COAttributedStringAttribute *attribute = [graph insertObjectWithEntityName: @"COAttributedStringAttribute"];
 	
-	NSArray *keyValue = styleKeyValueForHTML[[htmlCode lowercaseString]];
+	NSArray *keyValue = styleKeyValueForHTML[htmlCode.lowercaseString];
 	attribute.styleKey = keyValue[0];
 	attribute.styleValue = keyValue[1];
 	
@@ -69,14 +69,14 @@ ETUUID *AttributedString2UUID()
 - (COObjectGraphContext *) makeAttributedStringWithHTML: (NSString *)html
 {
 	COObjectGraphContext *result = [self makeAttributedString];
-	[self appendHTMLString: html toAttributedString: [result rootObject]];
+	[self appendHTMLString: html toAttributedString: result.rootObject];
 	return result;
 }
 
 - (COObjectGraphContext *) makeAttributedString2WithHTML: (NSString *)html
 {
 	COObjectGraphContext *result = [self makeAttributedString2];
-	[self appendHTMLString: html toAttributedString: [result rootObject]];
+	[self appendHTMLString: html toAttributedString: result.rootObject];
 	return result;
 }
 
@@ -87,7 +87,7 @@ ETUUID *AttributedString2UUID()
 
 - (COAttributedStringChunk *) appendString: (NSString *)string htmlCodes: (NSArray *)codes toAttributedString: (COAttributedString *)dest
 {
-	COObjectGraphContext *graph = [dest objectGraphContext];
+	COObjectGraphContext *graph = dest.objectGraphContext;
 	COAttributedStringChunk *chunk = [graph insertObjectWithEntityName: @"COAttributedStringChunk"];
 	chunk.text = string;
 	
@@ -111,7 +111,7 @@ ETUUID *AttributedString2UUID()
 	id actualValue = [target attribute: attributeName
 							   atIndex: expectedRange.location
 				 longestEffectiveRange: &actualRange
-							   inRange: NSMakeRange(0, [target length])];
+							   inRange: NSMakeRange(0, target.length)];
 	
 	if (expectedValue == nil)
 	{
@@ -132,9 +132,9 @@ ETUUID *AttributedString2UUID()
 	NSFont *actualFont = [target attribute: NSFontAttributeName
 								   atIndex: expectedRange.location
 					 longestEffectiveRange: &actualRange
-								   inRange: NSMakeRange(0, [target length])];
+								   inRange: NSMakeRange(0, target.length)];
 	
-	NSFontSymbolicTraits actualTraits = [[actualFont fontDescriptor] symbolicTraits];
+	NSFontSymbolicTraits actualTraits = actualFont.fontDescriptor.symbolicTraits;
 	
 	UKTrue((actualTraits & traits) == traits);
 	
@@ -145,7 +145,7 @@ ETUUID *AttributedString2UUID()
 - (void) checkAttributedString: (NSAttributedString *)attrStr equalsHTML: (NSString *)html
 {
 	COObjectGraphContext *expectedCtx = [self makeAttributedStringWithHTML: html];
-	COAttributedStringWrapper *expectedAttrStr = [[COAttributedStringWrapper alloc] initWithBacking: [expectedCtx rootObject]];
+	COAttributedStringWrapper *expectedAttrStr = [[COAttributedStringWrapper alloc] initWithBacking: expectedCtx.rootObject];
 	
 	UKObjectsEqual(expectedAttrStr, attrStr);
 }
@@ -174,7 +174,7 @@ ETUUID *AttributedString2UUID()
 
 - (void) appendHTMLString: (NSString *)html toAttributedString: (COAttributedString *)dest
 {
-	NSUInteger len = [html length];
+	NSUInteger len = html.length;
 	
 	NSMutableSet *attributes = [NSMutableSet new];
 	BOOL inAngleBrackets = NO;
@@ -193,7 +193,7 @@ ETUUID *AttributedString2UUID()
 			}
 			else if ([character isEqualToString: @">"])
 			{
-				NSString *htmlCodeCopy = [NSString stringWithString: [htmlCode lowercaseString]];
+				NSString *htmlCodeCopy = [NSString stringWithString: htmlCode.lowercaseString];
 				if (isRemoving)
 				{
 					[attributes removeObject: htmlCodeCopy];
@@ -216,8 +216,8 @@ ETUUID *AttributedString2UUID()
 		{
 			if ([character isEqualToString: @"<"])
 			{
-				if ([text length] > 0)
-					[self appendString: [NSString stringWithString: text] htmlCodes: [attributes allObjects] toAttributedString: dest];
+				if (text.length > 0)
+					[self appendString: [NSString stringWithString: text] htmlCodes: attributes.allObjects toAttributedString: dest];
 				
 				inAngleBrackets = YES;
 				[text setString: @""];
@@ -229,8 +229,8 @@ ETUUID *AttributedString2UUID()
 		}
 	}
 	
-	if ([text length] > 0)
-		[self appendString: [NSString stringWithString: text] htmlCodes: [attributes allObjects] toAttributedString: dest];
+	if (text.length > 0)
+		[self appendString: [NSString stringWithString: text] htmlCodes: attributes.allObjects toAttributedString: dest];
 }
 
 - (void) checkMergingBase: (NSString *)base
@@ -239,24 +239,24 @@ ETUUID *AttributedString2UUID()
 					gives: (NSString *)result
 {
 	COObjectGraphContext *ctx1 = [self makeAttributedString];
-	[self appendHTMLString: base toAttributedString: [ctx1 rootObject]];
+	[self appendHTMLString: base toAttributedString: ctx1.rootObject];
 	
 	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
 	[ctx2 setItemGraph: ctx1];
-	[self clearAttributedString: [ctx2 rootObject]];
-	[self appendHTMLString: branchA toAttributedString: [ctx2 rootObject]];
+	[self clearAttributedString: ctx2.rootObject];
+	[self appendHTMLString: branchA toAttributedString: ctx2.rootObject];
 	
 	COObjectGraphContext *ctx3 = [COObjectGraphContext new];
 	[ctx3 setItemGraph: ctx1];
-	[self clearAttributedString: [ctx3 rootObject]];
-	[self appendHTMLString: branchB toAttributedString: [ctx3 rootObject]];
+	[self clearAttributedString: ctx3.rootObject];
+	[self appendHTMLString: branchB toAttributedString: ctx3.rootObject];
 	
-	COAttributedStringDiff *diffA = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
-																		   secondAttributedString: [ctx2 rootObject]
+	COAttributedStringDiff *diffA = [[COAttributedStringDiff alloc] initWithFirstAttributedString: ctx1.rootObject
+																		   secondAttributedString: ctx2.rootObject
 																						   source: @"branchA"];
 	
-    COAttributedStringDiff *diffB = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
-																		   secondAttributedString: [ctx3 rootObject]
+    COAttributedStringDiff *diffB = [[COAttributedStringDiff alloc] initWithFirstAttributedString: ctx1.rootObject
+																		   secondAttributedString: ctx3.rootObject
 																						   source: @"branchB"];
 	
 	COAttributedStringDiff *diffMerged = [diffA diffByMergingWithDiff: diffB];
@@ -264,15 +264,15 @@ ETUUID *AttributedString2UUID()
 	COObjectGraphContext *destCtx = [COObjectGraphContext new];
 	[destCtx setItemGraph: ctx1];
 	
-	[diffMerged applyToAttributedString: [destCtx rootObject]];
+	[diffMerged applyToAttributedString: destCtx.rootObject];
 	
 	
 	COObjectGraphContext *expectedCtx = [COObjectGraphContext new];
 	[expectedCtx setItemGraph: ctx1];
-	[self clearAttributedString: [expectedCtx rootObject]];
-	[self appendHTMLString: result toAttributedString: [expectedCtx rootObject]];
+	[self clearAttributedString: expectedCtx.rootObject];
+	[self appendHTMLString: result toAttributedString: expectedCtx.rootObject];
 	
-	[self checkAttributedString: [destCtx rootObject] isEqalToAttributedString: [expectedCtx rootObject]];
+	[self checkAttributedString: destCtx.rootObject isEqalToAttributedString: expectedCtx.rootObject];
 }
 
 #pragma mark - test infrastructure
@@ -281,7 +281,7 @@ ETUUID *AttributedString2UUID()
 {
 	// Easy test: are the string contents equal?
 	
-	UKObjectsEqual([expected string], [actual string]);
+	UKObjectsEqual(expected.string, actual.string);
 	
 	// HACK: use COAttributedStringWrapper to compare the attributes
 	
@@ -296,18 +296,18 @@ ETUUID *AttributedString2UUID()
 	COObjectGraphContext *ctx1 = [self makeAttributedStringWithHTML: stringA];
 	COObjectGraphContext *ctx2 = [self makeAttributedStringWithHTML: stringB];
 	
-	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: [ctx1 rootObject]
-																			secondAttributedString: [ctx2 rootObject]
+	COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: ctx1.rootObject
+																			secondAttributedString: ctx2.rootObject
 																							source: nil];
 	
-	NSSet *ops = [NSSet setWithArray: [diff12 operations]];
+	NSSet *ops = [NSSet setWithArray: diff12.operations];
 	
 	UKObjectsEqual(aSet, ops);
 	
 	// Now check that we can apply the diff
-	[diff12 applyToAttributedString: [ctx1 rootObject]];
+	[diff12 applyToAttributedString: ctx1.rootObject];
 	
-	[self checkAttributedString: [ctx1 rootObject] isEqalToAttributedString: [ctx2 rootObject]];
+	[self checkAttributedString: ctx1.rootObject isEqalToAttributedString: ctx2.rootObject];
 }
 
 - (id<COAttributedStringDiffOperation>) insertHTML: (NSString*)aString atIndex: (NSUInteger)index
@@ -344,7 +344,7 @@ ETUUID *AttributedString2UUID()
 {
 	COObjectGraphContext *tempCtx = [COObjectGraphContext new];
 	COAttributedStringAttribute *attr = [self makeAttr: htmlCode inCtx: tempCtx];
-	return [attr attributeItemGraph];
+	return attr.attributeItemGraph;
 }
 
 - (id<COAttributedStringDiffOperation>) addAttributeOp: (NSString*)aString inRange: (NSRange)aRange

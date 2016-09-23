@@ -25,7 +25,7 @@
 							 branchUUID: branch];
 }
 
-- (id) initWithUUID: (ETUUID *)aUUID persistentRoot: (ETUUID *)aPersistentRoot store: (COSQLiteStore *)store recordAsDeltaAgainstParent: (BOOL)delta
+- (instancetype) initWithUUID: (ETUUID *)aUUID persistentRoot: (ETUUID *)aPersistentRoot store: (COSQLiteStore *)store recordAsDeltaAgainstParent: (BOOL)delta
 {
 	SUPERINIT;
 	
@@ -65,8 +65,9 @@
 	return result;
 }
 
-- (id) initWithPropertyList: (id)aPropertyList
+- (instancetype) initWithPropertyList: (id)aPropertyList
 {
+	NILARG_EXCEPTION_TEST(aPropertyList);
 	SUPERINIT;
 	self.modifiedItems = COItemGraphFromJSONPropertyLisy(aPropertyList[@"modifiedItems"]);
 	self.revisionUUID = [ETUUID UUIDWithString: aPropertyList[@"revisionUUID"]];
@@ -75,6 +76,11 @@
 	self.metadata = aPropertyList[@"metadata"];
 	self.date = CODateFromJavaTimestamp(aPropertyList[@"date"]);
 	return self;
+}
+
+- (instancetype)init
+{
+	return [self initWithPropertyList: nil];
 }
 
 @end

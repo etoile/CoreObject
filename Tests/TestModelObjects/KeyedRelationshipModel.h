@@ -8,5 +8,5 @@
 #import "TestCommon.h"
 
 @interface KeyedRelationshipModel : COObject
-@property (nonatomic, strong) NSDictionary *entries;
+@property (nonatomic, readwrite, copy) NSDictionary *entries;
 @end

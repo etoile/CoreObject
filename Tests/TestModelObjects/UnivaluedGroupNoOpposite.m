@@ -29,14 +29,14 @@ static NSUInteger DeallocCalls;
 		return entity;
 	
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 type: (id)@"Anonymous.NSString"];
-    [labelProperty setPersistent: YES];
+                                                                                 typeName: @"NSString"];
+    labelProperty.persistent = YES;
 	
 	ETPropertyDescription *contentProperty = [ETPropertyDescription descriptionWithName: @"content"
-																				   type: (id)@"Anonymous.COObject"];
-    [contentProperty setPersistent: YES];
+																				   typeName: @"COObject"];
+    contentProperty.persistent = YES;
 	
-	[entity setPropertyDescriptions: @[labelProperty, contentProperty]];
+	entity.propertyDescriptions = @[labelProperty, contentProperty];
 	
     return entity;
 }

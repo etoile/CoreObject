@@ -25,14 +25,13 @@
     COPersistentRootInfo *info = [aStore persistentRootInfoForUUID: aRoot];
     
     NSMutableDictionary *clientNewestRevisionIDForBranchUUID = [NSMutableDictionary dictionary];
-    for (COBranchInfo *branch in [info branches])
+    for (COBranchInfo *branch in info.branches)
     {
         // N.B. Only send the server the revision UUID - backing store UUIDs are implementation details of the store
         // and two stores may not use the same backing UUID for a persistent root.
         //
         // Note that we tell the server end the persistent root that the revisions belong to.
-        [clientNewestRevisionIDForBranchUUID setObject: [[branch currentRevisionUUID] stringValue]
-                                                forKey: [[branch UUID] stringValue]];
+        clientNewestRevisionIDForBranchUUID[[branch.UUID stringValue]] = [branch.currentRevisionUUID stringValue];
     }
     
     return @{@"clientNewestRevisionIDForBranchUUID" : clientNewestRevisionIDForBranchUUID,
@@ -150,10 +149,10 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COStoreTransaction *tx
         
         COBranchInfo *branchToUpdate = nil;
         
-        for (COBranchInfo *branch in [info branches])
+        for (COBranchInfo *branch in info.branches)
         {
-            if ([[branch metadata][@"source"] isEqual: serverID]
-                && [[branch metadata][@"replcatedBranch"] isEqual: branchUUIDString])
+            if ([branch.metadata[@"source"] isEqual: serverID]
+                && [branch.metadata[@"replcatedBranch"] isEqual: branchUUIDString])
             {
                 branchToUpdate = branch;
                 break;
@@ -181,7 +180,7 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COStoreTransaction *tx
         }
         else
         {
-            branchUUID = [branchToUpdate UUID];
+            branchUUID = branchToUpdate.UUID;
         }
         
         [txn setCurrentRevision: currentRevisionID
@@ -197,7 +196,7 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COStoreTransaction *tx
     
     // Set a default current branch if there is not one
 
-    if ([info currentBranchUUID] == nil)
+    if (info.currentBranchUUID == nil)
     {
         [txn createBranchWithUUID: currentBranchUUID
 					 parentBranch: nil

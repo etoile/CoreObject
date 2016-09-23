@@ -54,9 +54,9 @@ extern NSString *kCOObjectIsSharedProperty;
 /**
  * <init />
  */
-- (id) initWithUUID: (ETUUID *)aUUID
+- (instancetype) initWithUUID: (ETUUID *)aUUID
  typesForAttributes: (NSDictionary *)typesForAttributes
-valuesForAttributes: (NSDictionary *)valuesForAttributes;
+valuesForAttributes: (NSDictionary *)valuesForAttributes NS_DESIGNATED_INITIALIZER;
 + (COItem *) itemWithTypesForAttributes: (NSDictionary *)typesForAttributes
 					valuesForAttributes: (NSDictionary *)valuesForAttributes;
 
@@ -64,8 +64,8 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 /** @taskunit Accessing Attributes */
 
 
-- (ETUUID *) UUID;
-- (NSArray *) attributeNames;
+@property (nonatomic, readonly, strong) ETUUID *UUID;
+@property (nonatomic, readonly) NSArray *attributeNames;
 - (COType) typeForAttribute: (NSString *)anAttribute;
 - (id) valueForAttribute: (NSString*)anAttribute;
 
@@ -83,15 +83,15 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 // allows treating primitive or container, unordered or ordered as NSArray
 - (NSArray*) allObjectsForAttribute: (NSString*)attribute;
 
-- (NSSet *) compositeReferencedItemUUIDs;
-- (NSSet *) referencedItemUUIDs;
-- (NSSet *) allInnerReferencedItemUUIDs;
+@property (nonatomic, readonly) NSSet *compositeReferencedItemUUIDs;
+@property (nonatomic, readonly) NSSet *referencedItemUUIDs;
+@property (nonatomic, readonly) NSSet *allInnerReferencedItemUUIDs;
 
 // GC helper methods
-- (NSArray *) attachments;
-- (NSArray *) allReferencedPersistentRootUUIDs;
+@property (nonatomic, readonly) NSArray *attachments;
+@property (nonatomic, readonly) NSArray *allReferencedPersistentRootUUIDs;
 
-- (NSString *) fullTextSearchContent;
+@property (nonatomic, readonly) NSString *fullTextSearchContent;
 
 
 /** @taskunit Copying */
@@ -121,7 +121,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 /** @taskunit Initialization */
 
 
-- (id) initWithUUID: (ETUUID*)aUUID;
+- (instancetype) initWithUUID: (ETUUID*)aUUID;
 + (COMutableItem *) itemWithTypesForAttributes: (NSDictionary *)typesForAttributes
 						   valuesForAttributes: (NSDictionary *)valuesForAttributes;
 /**
@@ -144,9 +144,9 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes;
 /** @taskunit Convenience */
 
 
-@property (nonatomic, readwrite) NSString *entityName;
-@property (nonatomic, readwrite) int64_t packageVersion;
-@property (nonatomic, readwrite) NSString *packageName;
+@property (nonatomic, readwrite, copy) NSString *entityName;
+@property (nonatomic, readwrite, assign) int64_t packageVersion;
+@property (nonatomic, readwrite, copy) NSString *packageName;
 
 - (void) setValue: (id)aValue
 	 forAttribute: (NSString*)anAttribute;

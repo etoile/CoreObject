@@ -15,7 +15,7 @@
 	ETUUID *persistentRoot;
 	NSMutableDictionary *cache;
 }
-- (instancetype) initWithPersistentRootUUID: (ETUUID *)aUUID store: (COSQLiteStore *)aStore;
+- (instancetype) initWithPersistentRootUUID: (ETUUID *)aUUID store: (COSQLiteStore *)aStore NS_DESIGNATED_INITIALIZER;
 /**
  * Don't modify the returned graph
  */
@@ -26,11 +26,18 @@
 
 - (instancetype) initWithPersistentRootUUID: (ETUUID *)aUUID store: (COSQLiteStore *)aStore
 {
+	NILARG_EXCEPTION_TEST(aUUID);
+	NILARG_EXCEPTION_TEST(aStore)
 	SUPERINIT;
 	persistentRoot = aUUID;
 	store = aStore;
 	cache = [NSMutableDictionary new];
 	return self;
+}
+
+- (instancetype)init
+{
+	return [self initWithPersistentRootUUID: nil store: nil];
 }
 
 - (COItemGraph *) graphForUUID: (ETUUID *)aRevision
@@ -73,7 +80,7 @@
 											  toRevisionUUIDInclusive: source
 													   persistentRoot: persistentRoot];
 	ETAssert(sourceRevs != nil);
-	ETAssert([sourceRevs count] > 0);
+	ETAssert(sourceRevs.count > 0);
 	
 	NSMutableArray *newRevids = [[NSMutableArray alloc] init];
 	
@@ -83,7 +90,7 @@
 	ETUUID *currentDest = dest;
 	for (ETUUID *sourceRev in sourceRevs)
 	{
-		NSDictionary *sourceMetadata = [[store revisionInfoForRevisionUUID: sourceRev persistentRootUUID: persistentRoot] metadata];
+		NSDictionary *sourceMetadata = [store revisionInfoForRevisionUUID: sourceRev persistentRootUUID: persistentRoot].metadata;
 		id <COItemGraph> currentSourceGraph = [cache graphForUUID: sourceRev];
 		id <COItemGraph> currentDestGraph = [cache graphForUUID: currentDest];
 		id <COItemGraph> currentLCAGraph = [cache graphForUUID: currentLCA];
@@ -93,7 +100,7 @@
 		
 		CODiffManager *mergedDiff = [destBranchDiff diffByMergingWithDiff: sourceBranchDiff];
 		
-		if([mergedDiff hasConflicts])
+		if(mergedDiff.hasConflicts)
 		{
 			NSLog(@"Attempting to auto-resolve conflicts favouring the other user...");
 			[mergedDiff resolveConflictsFavoringSourceIdentifier: @"source"]; // FIXME: Hardcoded

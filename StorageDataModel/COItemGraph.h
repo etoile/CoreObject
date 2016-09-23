@@ -27,7 +27,7 @@
 /**
  * Returns the entry point UUID.
  */
-- (ETUUID *) rootItemUUID;
+@property (nonatomic, readonly) ETUUID *rootItemUUID;
 /**
  * Returns an immutable item for the UUID.
  */
@@ -35,13 +35,13 @@
 /**
  * Returns all the item UUIDs in the graph, including -rootItemUUID.
  */
-- (NSArray *) itemUUIDs;
+@property (nonatomic, readonly) NSArray *itemUUIDs;
 /**
  * Returns all the items in the graph.
  *
  * The returned item count is the same than -itemUUIDs.
  */
-- (NSArray *) items;
+@property (nonatomic, readonly) NSArray *items;
 /**
  * Inserts the items in the graph, or updates existing items when the graph 
  * contains items with matching UUIDs.
@@ -79,14 +79,14 @@
 /**
  * N.B. items doesn't need to contain rootItemUUID.
  */
-- (id) initWithItemForUUID: (NSDictionary *)itemForUUID
-              rootItemUUID: (ETUUID *)root;
+- (instancetype) initWithItemForUUID: (NSDictionary *)itemForUUID
+                        rootItemUUID: (ETUUID *)root NS_DESIGNATED_INITIALIZER;
 /**
  * N.B. items doesn't need to contain rootItemUUID.
  */
-- (id) initWithItems: (NSArray *)items
-        rootItemUUID: (ETUUID *)root;
-- (id) initWithItemGraph: (id<COItemGraph>)aGraph;
+- (instancetype) initWithItems: (NSArray *)items
+                  rootItemUUID: (ETUUID *)root;
+- (instancetype) initWithItemGraph: (id<COItemGraph>)aGraph;
 
 
 /** @taskunit Item Graph Protocol and Additionss */
@@ -102,13 +102,13 @@
 /**
  * See -[COItemGraph itemUUIDs].
  */
-- (NSArray *) itemUUIDs;
+@property (nonatomic, readonly) NSArray *itemUUIDs;
 /**
  * Returns all the items in the graph.
  *
  * The returned item count is the same than -itemUUIDs.
  */
-- (NSArray *) items;
+@property (nonatomic, readonly) NSArray *items;
 /**
  * See -[COItemGraph insertOrUpdateItems:].
  */
@@ -144,6 +144,6 @@ COItemGraph *COItemGraphFromBinaryData(NSData *binarydata);
 BOOL COItemGraphEqualToItemGraph(id<COItemGraph> first, id<COItemGraph> second);
 
 /**
- * If <code>[aGraph rootItemUUID]</code> is nil, returns the empty set.
+ * If <code>aGraph.rootItemUUID</code> is nil, returns the empty set.
  */
 NSSet *COItemGraphReachableUUIDs(id<COItemGraph> aGraph);

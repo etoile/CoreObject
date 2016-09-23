@@ -13,19 +13,44 @@
 @synthesize type;
 @synthesize object;
 
-- (id) initWithUUID: (ETUUID *)aUUID
-		  attribute: (NSString *)anAttribute
-   sourceIdentifier: (id)aSourceIdentifier
-			   type: (COType)aType
-			 object: (id)anObject
+- (instancetype) initWithUUID: (ETUUID *)aUUID
+                    attribute: (NSString *)anAttribute
+             sourceIdentifier: (id)aSourceIdentifier
+                         type: (COType)aType
+                       object: (id)anObject
 {
+	NILARG_EXCEPTION_TEST(aUUID);
+	NILARG_EXCEPTION_TEST(anAttribute);
 	NILARG_EXCEPTION_TEST(anObject);
+
 	self = [super initWithUUID: aUUID attribute: anAttribute sourceIdentifier: aSourceIdentifier];
+	if (self == nil)
+		return nil;
+
 	type = aType;
 	object = [anObject copy];
 	return self;
 }
 
+- (instancetype) initWithUUID: (ETUUID *)aUUID
+                    attribute: (NSString *)anAttribute
+             sourceIdentifier: (id)aSourceIdentifier
+{
+	return [self initWithUUID: nil
+	                attribute: nil
+	         sourceIdentifier: nil
+	                     type: kCOTypeString
+	                   object: nil];
+}
+
+- (instancetype)init
+{
+	return [self initWithUUID: nil
+	                attribute: nil
+	         sourceIdentifier: nil
+	                     type: kCOTypeString
+	                   object: nil];
+}
 
 - (BOOL) isEqualIgnoringSourceIdentifier: (id)other
 {
@@ -36,7 +61,7 @@
 
 - (NSUInteger) hash
 {
-	return 595258568559201742ULL ^ [super hash] ^ type ^ [object hash];
+	return 595258568559201742ULL ^ super.hash ^ type ^ [object hash];
 }
 
 - (NSString *) description

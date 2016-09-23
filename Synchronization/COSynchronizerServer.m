@@ -23,10 +23,11 @@
 
 @synthesize delegate, branch = branch;
 
-- (COPersistentRoot *)persistentRoot { return [branch persistentRoot]; }
+- (COPersistentRoot *)persistentRoot { return branch.persistentRoot; }
 
-- (id) initWithBranch: (COBranch *)aBranch
+- (instancetype) initWithBranch: (COBranch *)aBranch
 {
+	NILARG_EXCEPTION_TEST(aBranch);
 	SUPERINIT;
 	branch = aBranch;
 	branch.supportsRevert = NO;
@@ -37,6 +38,11 @@
 											   object: self.persistentRoot];
 	
 	return self;
+}
+
+- (instancetype)init
+{
+	return [self initWithBranch: nil];
 }
 
 - (void)dealloc
@@ -52,7 +58,7 @@
 		return;
 	}
 	
-	for (NSString *clientID in [self clientIDs])
+	for (NSString *clientID in self.clientIDs)
 	{
 		[self sendPushToClient: clientID];
 	}
@@ -68,18 +74,18 @@
 			 persistentRootUUID: self.persistentRoot.UUID
 					 branchUUID: self.branch.UUID];
 	}
-	ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
+	ETAssert([self.persistentRoot.store commitStoreTransaction: txn]);
 	
-	if (![branch.editingContext isRevision: [[self.branch currentRevision] UUID]
-				 equalToOrParentOfRevision: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
+	if (![branch.editingContext isRevision: self.branch.currentRevision.UUID
+				 equalToOrParentOfRevision: [revs.lastObject revisionUUID]
 							persistentRoot: self.persistentRoot.UUID])
 	{
 		// Rebase revs onto the current revisions
 		
 		txn = [[COStoreTransaction alloc] init];
 		
-		ETUUID *source = [(COSynchronizerRevision *)[revs lastObject] revisionUUID];
-		ETUUID *dest = [[self.branch currentRevision] UUID];
+		ETUUID *source = [revs.lastObject revisionUUID];
+		ETUUID *dest = self.branch.currentRevision.UUID;
 		
 		ETUUID *lca = [self.persistentRoot.editingContext commonAncestorForCommit: source
 																		andCommit: dest
@@ -90,20 +96,20 @@
 													commonAncestor: lca
 												persistentRootUUID: self.persistentRoot.UUID
 														branchUUID: self.branch.UUID
-															 store: [self.persistentRoot store]
+															 store: self.persistentRoot.store
 													   transaction: txn
 													editingContext: self.persistentRoot.editingContext
 										modelDescriptionRepository: self.persistentRoot.editingContext.modelDescriptionRepository];
-		ETAssert([[self.persistentRoot store] commitStoreTransaction: txn]);
+		ETAssert([self.persistentRoot.store commitStoreTransaction: txn]);
 		
-		[branch setCurrentRevisionSkipSupportsRevertCheck: [self.persistentRoot.editingContext revisionForRevisionUUID: [rebasedRevs lastObject]
+		[branch setCurrentRevisionSkipSupportsRevertCheck: [self.persistentRoot.editingContext revisionForRevisionUUID: rebasedRevs.lastObject
 																									persistentRootUUID: self.persistentRoot.UUID]];
 	}
 	else
 	{
 		// Fast-forward
 		
-		[branch setCurrentRevisionSkipSupportsRevertCheck: [self.persistentRoot.editingContext revisionForRevisionUUID: [(COSynchronizerRevision *)[revs lastObject] revisionUUID]
+		[branch setCurrentRevisionSkipSupportsRevertCheck: [self.persistentRoot.editingContext revisionForRevisionUUID: [revs.lastObject revisionUUID]
 																									persistentRootUUID: self.persistentRoot.UUID]];
 	}
 
@@ -111,7 +117,7 @@
 	// instead of a regular push message.
 
 	ETAssert(clientID != nil);
-	currentlyHandlingLastSentRevision = [(COSynchronizerRevision *)[revs lastObject] revisionUUID];
+	currentlyHandlingLastSentRevision = [revs.lastObject revisionUUID];
 	currentlyRespondingToClient = clientID;
 	
 	// Will cause a call to -[self persistentRootDidChange:]
@@ -120,7 +126,7 @@
 
 - (NSArray *)clientIDs
 {
-	return [lastSentRevisionForClientID allKeys];
+	return lastSentRevisionForClientID.allKeys;
 }
 
 - (void) addClientID: (NSString *)clientID
@@ -141,7 +147,7 @@
 
 - (void) handlePushedRevisionsFromClient: (COSynchronizerPushedRevisionsFromClientMessage *)aMessage
 {
-	if ([branch hasChanges])
+	if (branch.hasChanges)
 	{
 		[NSException raise: NSGenericException
 		 format: @"-[%@ %@] called but the branch has uncommitted changes. You should ensure all changes are committed before feeding the synchronizer a message.",
@@ -156,17 +162,17 @@
 - (void) sendPushToClient: (NSString *)clientID
 {
 	ETUUID *lastConfirmedForClient = lastSentRevisionForClientID[clientID];
-	if ([lastConfirmedForClient isEqual: [[branch currentRevision] UUID]])
+	if ([lastConfirmedForClient isEqual: branch.currentRevision.UUID])
 	{
 		return;
 	}
-	lastSentRevisionForClientID[clientID] = [[branch currentRevision] UUID];
+	lastSentRevisionForClientID[clientID] = branch.currentRevision.UUID;
 	
 	NSMutableArray *revs = [[NSMutableArray alloc] init];
 	
 	ETAssert(branch.editingContext != nil);
 	NSArray *revUUIDs = [branch.editingContext revisionUUIDsFromRevisionUUIDExclusive: lastConfirmedForClient
-															  toRevisionUUIDInclusive: [[self.branch currentRevision] UUID]
+															  toRevisionUUIDInclusive: self.branch.currentRevision.UUID
 																	   persistentRoot: self.persistentRoot.UUID];
 	
 	if (revUUIDs == nil)

@@ -16,13 +16,13 @@
 
 	// For subclasses that don't override -newEntityDescription, we must not add the 
 	// property descriptions that we will inherit through the parent
-	if ([[collection name] isEqual: [COTag className]] == NO) 
+	if (![collection.name isEqual: [COTag className]]) 
 		return collection;
 
 	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COTag"
 	                               description: @"Core Object Tag"
-	                          supertypeStrings: [NSArray array]
-	                                  typeTags: [NSDictionary dictionary]];
+	                          supertypeStrings: @[]
+	                                  typeTags: @{}];
 	ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
 
 	[collection setLocalizedDescription: _(@"Tag")];
@@ -32,12 +32,12 @@
 		                                    type: @"COObject"
 		                                opposite: @"COObject.tags"];
 	ETPropertyDescription *tagGroups =
-		[ETPropertyDescription descriptionWithName: @"tagGroups" type: (id)@"COTagGroup"];
-	[tagGroups setMultivalued: YES];
-	[tagGroups setOpposite: (id)@"COTagGroup.objects"];
-	[tagGroups setDerived: YES];
+		[ETPropertyDescription descriptionWithName: @"tagGroups" typeName: @"COTagGroup"];
+	tagGroups.multivalued = YES;
+	tagGroups.oppositeName = @"COTagGroup.objects";
+	tagGroups.derived = YES;
 
-	[collection setPropertyDescriptions: A(objects, tagGroups)];
+	collection.propertyDescriptions = @[objects, tagGroups];
 
 	return collection;
 }
@@ -47,13 +47,13 @@
 	// FIXME: I just commented out this assertion which looks wrong to me,.. do we really want to forbit using tags in
 	// a freestanding COObjectGraphContext, or just not registered with a tag library? -Eric
 	//
-	//assert([[[[self persistentRoot] parentContext] tagLibrary] containsObject: self]);
+	//assert([self.persistentRoot.parentContext.tagLibrary containsObject: self]);
 	return YES;
 }
 
 - (NSString *)tagString
 {
-	return [[self name] lowercaseString];
+	return self.name.lowercaseString;
 }
 
 - (NSSet *)tagGroups
@@ -72,13 +72,13 @@
 
 	// For subclasses that don't override -newEntityDescription, we must not add the 
 	// property descriptions that we will inherit through the parent
-	if ([[collection name] isEqual: [COTagGroup className]] == NO) 
+	if (![collection.name isEqual: [COTagGroup className]]) 
 		return collection;
 
 	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COTagGroup"
 	                               description: @"Core Object Tag Group"
-	                          supertypeStrings: [NSArray array]
-	                                  typeTags: [NSDictionary dictionary]];
+	                          supertypeStrings: @[]
+	                                  typeTags: @{}];
 	ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
 
 	[collection setLocalizedDescription: _(@"Tag Group")];
@@ -88,7 +88,7 @@
 		                                    type: @"COTag"
 		                                opposite: @"COTag.tagGroups"];
 
-	[collection setPropertyDescriptions: A(objects)];
+	collection.propertyDescriptions = @[objects];
 
 	return collection;
 }
@@ -106,31 +106,31 @@
 	
 	// For subclasses that don't override -newEntityDescription, we must not add the
 	// property descriptions that we will inherit through the parent
-	if ([[collection name] isEqual: [COTagLibrary className]] == NO)
+	if (![collection.name isEqual: [COTagLibrary className]])
 		return collection;
 
 	 ETPropertyDescription *tagGroups =
-		[ETPropertyDescription descriptionWithName: @"tagGroups" type: (id)@"COTagGroup"];
-	[tagGroups setMultivalued: YES];
-	[tagGroups setOrdered: YES];
-	[tagGroups setPersistent: YES];
+		[ETPropertyDescription descriptionWithName: @"tagGroups" typeName: @"COTagGroup"];
+	tagGroups.multivalued = YES;
+	tagGroups.ordered = YES;
+	tagGroups.persistent = YES;
 	ETPropertyDescription *objects =
 		[self contentPropertyDescriptionWithName: @"objects"
 		                                    type: (id)@"COTag"
 		                                opposite: nil];
 
-	[collection setPropertyDescriptions: A(tagGroups, objects)];
+	collection.propertyDescriptions = @[tagGroups, objects];
 	
 	return collection;
 }
 
-- (id)initWithObjectGraphContext: (COObjectGraphContext *)aContext
+- (instancetype)initWithObjectGraphContext: (COObjectGraphContext *)aContext
 {
 	self = [super initWithObjectGraphContext: aContext];
 	if (self == nil)
 		return nil;
 
-	[self setIdentifier: kCOLibraryIdentifierTag];
+	self.identifier = kCOLibraryIdentifierTag;
 	[self setName: _(@"Tags")];
 	return self;
 }

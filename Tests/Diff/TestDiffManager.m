@@ -117,8 +117,8 @@
 		[self appendString: @" a test" htmlCode: nil toAttributedString: attributedString];
 	}
 	
-	CODiffManager *diffBaseBranchA = [CODiffManager diffItemGraph: base withItemGraph: branchA modelDescriptionRepository: [base modelDescriptionRepository] sourceIdentifier: @"branchA"];
-	CODiffManager *diffBaseBranchB = [CODiffManager diffItemGraph: base withItemGraph: branchB modelDescriptionRepository: [base modelDescriptionRepository] sourceIdentifier: @"branchB"];
+	CODiffManager *diffBaseBranchA = [CODiffManager diffItemGraph: base withItemGraph: branchA modelDescriptionRepository: base.modelDescriptionRepository sourceIdentifier: @"branchA"];
+	CODiffManager *diffBaseBranchB = [CODiffManager diffItemGraph: base withItemGraph: branchB modelDescriptionRepository: base.modelDescriptionRepository sourceIdentifier: @"branchB"];
 	
 	CODiffManager *merged = [diffBaseBranchA diffByMergingWithDiff: diffBaseBranchB];
 	
@@ -137,7 +137,7 @@
 		COAttributedString *attributedString = [applied loadedObjectForUUID: attributedStringUUID];
 		COAttributedString *attributedString2 = [applied loadedObjectForUUID: attributedString2UUID];
 		
-		UKObjectsSame(parent, [applied rootObject]);
+		UKObjectsSame(parent, applied.rootObject);
 		UKObjectsEqual(S(child1, child2), parent.contents);
 		UKObjectsEqual(S(attributedString2), child1.contents);
 		UKObjectsEqual(S(attributedString), child2.contents);
@@ -145,7 +145,7 @@
 		// Check the attributed string contents
 
 		COAttributedStringWrapper *w1 = [[COAttributedStringWrapper alloc] initWithBacking: attributedString];
-		UKObjectsEqual(@"this isn't a big test", [w1 string]);
+		UKObjectsEqual(@"this isn't a big test", w1.string);
 		
 		[self checkFontHasTraits: NSFontItalicTrait withLongestEffectiveRange: NSMakeRange(0, 5) inAttributedString: w1];
 		// This may not be exactly what we want. the bold "n't" did not pick up the italics
@@ -154,7 +154,7 @@
 		[self checkFontHasTraits: NSFontItalicTrait withLongestEffectiveRange: NSMakeRange(10, 11) inAttributedString: w1];
 		
 		COAttributedStringWrapper *w2 = [[COAttributedStringWrapper alloc] initWithBacking: attributedString2];
-		UKObjectsEqual(@"hello world", [w2 string]);
+		UKObjectsEqual(@"hello world", w2.string);
 	}
 }
 

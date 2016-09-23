@@ -78,7 +78,7 @@
  * For nil track or command, or a command that doesn't on the track, raises an
  * NSInvalidArgumentException.
  */
-- (instancetype)initWithUndoTrack: (COUndoTrack *)aTrack upToCommand: (COCommandGroup *)aCommand;
+- (instancetype)initWithUndoTrack: (COUndoTrack *)aTrack upToCommand: (COCommandGroup *)aCommand NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readonly) COUndoTrack *undoTrack;
 

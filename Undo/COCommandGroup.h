@@ -51,7 +51,7 @@
 /**
  * The undo track name on which the command was recorded.
  */
-@property (nonatomic, readwrite, strong) NSString *trackName;
+@property (nonatomic, readwrite, copy) NSString *trackName;
 /**
  * The commit UUID. 
  *
@@ -60,17 +60,17 @@
  * across reads and writes to the database, but not preserved across calls to 
  * -inverse.
  */
-@property (nonatomic, copy) ETUUID *UUID;
+@property (nonatomic, readwrite, copy) ETUUID *UUID;
 /**
  * The atomic commands grouped in the receiver for a commit. 
  *
  * Cannot contain COCommandGroup objects.
  */
-@property (nonatomic, copy) NSMutableArray *contents;
+@property (nonatomic, readwrite, copy) NSMutableArray *contents;
 /**
  * The commit metadata.
  */
-@property (nonatomic, copy) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy) NSDictionary *metadata;
 /**
  * The commit descriptor matching the commit identifier in -metadata.
  *
@@ -92,7 +92,7 @@
  * The first command in a track is always a non-persistent
  * COEndOfUndoTrackPlaceholderNode instance; its parent UUID is nil. The first 
  * persistent divergent commands in a track have a parent UUID equal to
- * [[COEndOfUndoTrackPlaceholderNode sharedInstance] UUID].
+ * [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID.
  *
  * Before compaction, the parent UUID of the first recorded command is the 
  * placeholder node UUID. After compaction, the parent UUID of the oldest kept 
@@ -100,15 +100,15 @@
  *
  * See also -[COUndoTrack childrenOfNode:].
  */
-@property (nonatomic, readwrite) ETUUID *parentUUID;
+@property (nonatomic, readwrite, copy) ETUUID *parentUUID;
 /**
  * The commit time.
  */
-@property (nonatomic, copy) NSDate *timestamp;
+@property (nonatomic, readwrite, copy) NSDate *timestamp;
 /**
  * The commit order in the Undo track store.
  */
-@property (nonatomic, readwrite) int64_t sequenceNumber;
+@property (nonatomic, readwrite, assign) int64_t sequenceNumber;
 /**
  * The parent command, see -parentUUID.
  *
@@ -133,7 +133,7 @@
  * <code>[[command inverse] inverse]</code> must be equal 
  * <code>[command inverse]</code>.
  */
-- (COCommandGroup *) inverse;
+@property (nonatomic, readonly) COCommandGroup *inverse;
 /** 
  * Returns whether the receiver changes can be applied to the editing context.
  */
@@ -159,10 +159,10 @@
  * undo track.
  */
 - (instancetype) initWithSerializedCommand: (COUndoTrackSerializedCommand *)aCommand
-									 owner: (COUndoTrack *)anOwner;
+									 owner: (COUndoTrack *)anOwner NS_DESIGNATED_INITIALIZER;
 /**
  * Returns a serialized represention.
  */
-- (COUndoTrackSerializedCommand *) serializedCommand;
+@property (nonatomic, readonly, strong) COUndoTrackSerializedCommand *serializedCommand;
 
 @end

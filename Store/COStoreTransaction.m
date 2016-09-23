@@ -29,7 +29,7 @@
 
 @synthesize operations;
 
-- (id) init
+- (instancetype) init
 {
     SUPERINIT;
     self.operations = [NSMutableArray arrayWithCapacity: 16];
@@ -49,7 +49,7 @@
 	{
 		[results addObject: action.persistentRoot];
 	}
-	return [results allObjects];
+	return results.allObjects;
 }
 
 - (BOOL) touchesMutableStateForPersistentRootUUID: (ETUUID *)aUUID
@@ -94,7 +94,7 @@
                              branchUUID: (ETUUID*)branch
 {
     NILARG_EXCEPTION_TEST(anItemTree);
-    NILARG_EXCEPTION_TEST([anItemTree rootItemUUID]);
+    NILARG_EXCEPTION_TEST(anItemTree.rootItemUUID);
     NSParameterAssert([aRevisionUUID isKindOfClass: [ETUUID class]]);
     NSParameterAssert(aParent == nil || [aParent isKindOfClass: [ETUUID class]]);
 	NSParameterAssert(aMergeParent == nil || [aMergeParent isKindOfClass: [ETUUID class]]);

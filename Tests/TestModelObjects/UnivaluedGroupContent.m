@@ -17,17 +17,17 @@
 		return entity;
 	
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 type: (id)@"Anonymous.NSString"];
-    [labelProperty setPersistent: YES];
+                                                                                 typeName: @"NSString"];
+    labelProperty.persistent = YES;
 	
 	ETPropertyDescription *parentsProperty = [ETPropertyDescription descriptionWithName: @"parents"
-																				   type: (id)@"Anonymous.UnivaluedGroupWithOpposite"];
-    [parentsProperty setMultivalued: YES];
-    [parentsProperty setOrdered: NO];
-	[parentsProperty setOpposite: (id)@"Anonymous.UnivaluedGroupWithOpposite.content"];
-	[parentsProperty setDerived: YES];
+																				   typeName: @"UnivaluedGroupWithOpposite"];
+    parentsProperty.multivalued = YES;
+    parentsProperty.ordered = NO;
+	parentsProperty.oppositeName = @"UnivaluedGroupWithOpposite.content";
+	parentsProperty.derived = YES;
 	
-	[entity setPropertyDescriptions: @[labelProperty, parentsProperty]];
+	entity.propertyDescriptions = @[labelProperty, parentsProperty];
 	
     return entity;
 }

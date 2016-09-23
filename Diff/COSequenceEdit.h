@@ -17,9 +17,9 @@
 - (BOOL) overlaps: (COSequenceEdit *)other;
 - (BOOL) touches: (COSequenceEdit *)other;
 
-- (id) initWithUUID: (ETUUID *)aUUID
+- (instancetype) initWithUUID: (ETUUID *)aUUID
 		  attribute: (NSString *)anAttribute
    sourceIdentifier: (id)aSourceIdentifier
-			  range: (NSRange)aRange;
+			  range: (NSRange)aRange NS_DESIGNATED_INITIALIZER;
 
 @end

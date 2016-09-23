@@ -14,7 +14,7 @@
 + (COQuery *)queryWithPredicate: (NSPredicate *)aPredicate
 {
 	COQuery *query = [[COQuery alloc] init];
-	[query setPredicate: aPredicate];
+	query.predicate = aPredicate;
 	return query;
 }
 
@@ -22,7 +22,7 @@
 + (COQuery *)queryWithPredicateBlock: (BOOL (^)(id object, NSDictionary *bindings))aBlock
 {
 	COQuery *query = [[COQuery alloc] init];
-	[query setPredicate: [NSPredicate predicateWithBlock: aBlock]];
+	query.predicate = [NSPredicate predicateWithBlock: aBlock];
 	return query;
 }
 #endif

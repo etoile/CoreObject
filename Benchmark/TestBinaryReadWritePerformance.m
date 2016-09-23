@@ -33,11 +33,11 @@ static NSString *endArray = @"<<end array>>";
 
 static void test_read_int64(void *ctx, int64_t val)
 {
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: [NSNumber numberWithLongLong: val]];
+    [((__bridge TestBinaryReadWrite*)ctx) readObject: @(val)];
 }
 static void test_read_double(void *ctx, double val)
 {
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: [NSNumber numberWithDouble: val]];
+    [((__bridge TestBinaryReadWrite*)ctx) readObject: @(val)];
 }
 static void test_read_string(void *ctx, NSString *val)
 {
@@ -72,7 +72,7 @@ static void test_read_null(void *ctx)
     [((__bridge TestBinaryReadWrite*)ctx) readObject: [NSNull null]];
 }
 
-- (id) init
+- (instancetype) init
 {
     SUPERINIT;
     readObjects = [[NSMutableArray alloc] init];
@@ -108,7 +108,7 @@ static void test_read_null(void *ctx)
     co_buffer_end_array(&buf);
     co_buffer_end_object(&buf);
     
-    NSArray *expected = A(beginObject,
+    NSArray *expected = @[beginObject,
                           beginArray,
                           @(0),
                           @(-1),
@@ -127,7 +127,7 @@ static void test_read_null(void *ctx)
                           uuid,
                           [NSNull null],
                           endArray,
-                          endObject);
+                          endObject];
     
     co_reader_callback_t cb = {
         test_read_int64,

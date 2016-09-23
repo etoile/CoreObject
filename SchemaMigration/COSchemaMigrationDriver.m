@@ -32,8 +32,7 @@
 
 - (instancetype)init
 {
-	[self doesNotRecognizeSelector: _cmd];
-	return nil;
+	return [self initWithModelDescriptionRepository: nil];
 }
 
 #pragma mark Grouping Item by Packages -
@@ -123,7 +122,7 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	
 	NSMutableSet *packagesToMigrate = [NSMutableSet new];
 	
-	for (NSString *package in [versionsByPackageName allKeys])
+	for (NSString *package in versionsByPackageName.allKeys)
 	{
 		/* We migrate even when we encounter these special cases too:
 		   - deleted packages (packageDesc == nil)
@@ -174,7 +173,7 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 	itemsToMigrate = [NSMutableDictionary new];
 	NSArray *upToDateItems = [self prepareMigrationForItems: storeItems];
 
-	for (NSString *packageName in [itemsToMigrate allKeys])
+	for (NSString *packageName in itemsToMigrate.allKeys)
 	{
 		ETPackageDescription *package = [_modelDescriptionRepository descriptionForName: packageName];
 		ETAssert(package != nil);
@@ -211,7 +210,7 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 
 - (NSArray *)attributesForPackage: (ETPackageDescription *)package inItem: (COItem *)item
 {
-	if ([item isAdditionalItem])
+	if (item.isAdditionalItem)
 	{
 		return [item.attributeNames arrayByRemovingObjectsInArray:
 			@[kCOObjectEntityNameProperty, kCOObjectPackageNameProperty, kCOObjectPackageVersionProperty]];
@@ -274,7 +273,7 @@ static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *
 		}
 	}
 
-	return [combinedItems allValues];
+	return combinedItems.allValues;
 }
 
 #pragma mark Migrating Items in a Package to a Future Version -
@@ -411,8 +410,7 @@ static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *
 			NSUInteger index =
 				[destinationItems indexOfObject: selectedDestItems[sourceItem.UUID]];
 			
-			[destinationItems replaceObjectAtIndex: index
-								        withObject: destinationItem];
+			destinationItems[index] = destinationItem;
 		}
 	}
 }

@@ -13,8 +13,8 @@
 #pragma mark - MockStore
 
 @interface MockStore : NSObject
-@property (nonatomic, assign) NSUInteger maxNumberOfDeltaCommits;
-@property (nonatomic, strong) FMDatabase *database;
+@property (nonatomic, readwrite, assign) NSUInteger maxNumberOfDeltaCommits;
+@property (nonatomic, readwrite, strong) FMDatabase *database;
 @end
 
 @implementation MockStore

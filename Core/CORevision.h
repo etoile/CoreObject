@@ -51,47 +51,47 @@
  *
  * This revision UUID is unique accross all CoreObject stores.
  */
-- (ETUUID *)UUID;
+@property (nonatomic, readonly, copy) ETUUID *UUID;
 /**
  * The revision upon which this one is based i.e. the main previous revision. 
  * 
  * For the first revision in a persistent root, returns nil (unless the 
  * persistent root is a cheap copy).
  */
-- (CORevision *)parentRevision;
+@property (nonatomic, readonly) CORevision *parentRevision;
 /**
  * If this revision is the result of merging another branch into the this branch,
  * returns the revision that was merged in, otherwise nil.
  */
-- (CORevision *)mergeParentRevision;
+@property (nonatomic, readonly) CORevision *mergeParentRevision;
 /**
  * Returns the persistent root UUID involved in the revision.
  *
  * It is possible that this persistent root no longer exists.
  */
-- (ETUUID *)persistentRootUUID;
+@property (nonatomic, readonly, copy) ETUUID *persistentRootUUID;
 /**
  * Returns the branch UUID involved in the revision.
  *
  * It is possible that this branch no longer exists.
  */
-- (ETUUID *)branchUUID;
+@property (nonatomic, readonly) ETUUID *branchUUID;
 /** 
  * Returns the date at which the revision was committed. 
  */
-- (NSDate *)date;
+@property (nonatomic, readonly) NSDate *date;
 /**
  * Returns the metadata attached to the revision at commit time. 
  */
-- (NSDictionary *)metadata;
+@property (nonatomic, readonly, copy) NSDictionary *metadata;
 /**
  * Returns the commit descriptor matching the commit identifier in -metadata.
  */
-- (COCommitDescriptor *)commitDescriptor;
+@property (nonatomic, readonly) COCommitDescriptor *commitDescriptor;
 /**
  * Returns -[COCommitDescriptor localizedTypeDescription].
  */
-- (NSString *)localizedTypeDescription;
+@property (nonatomic, readonly) NSString *localizedTypeDescription;
 /**
  * Returns the commit descriptor short description evaluated with the arguments 
  * provided under the key kCOCommitMetadataShortDescriptionArguments in 
@@ -99,15 +99,15 @@
  *
  * See -[COCommitDescriptor localizedShortDescriptionWithArguments:]
  */
-- (NSString *)localizedShortDescription;
+@property (nonatomic, readonly) NSString *localizedShortDescription;
 /**
  * Returns -parentRevision.
  */
-- (id <COTrackNode>)parentNode;
+@property (nonatomic, readonly) id <COTrackNode> parentNode;
 /**
  * Returns -mergeParentRevision.
  */
-- (id<COTrackNode>)mergeParentNode;
+@property (nonatomic, readonly) id <COTrackNode> mergeParentNode;
 
 
 /** @taskunit History Graph Inspection */
@@ -125,27 +125,11 @@
 /** 
  * <init />
  * Initializes and returns a new revision object to represent a precise revision 
- * number in the given revision cache. 
- */
-- (id)initWithCache: (CORevisionCache *)aCache revisionInfo: (CORevisionInfo *)aRevInfo;
-
-
-/** @taskunit Deprecated */
-
-
-/** 
- * Returns the revision type.
+ * number in the given revision cache.
  *
- * e.g. merge, persistent root creation, minor edit, etc.
- *
- * Note: This type notion is a bit vague currently. 
+ * For a nil cache or revision info, raises a NSInvalidArgumentException.
  */
-- (NSString *)type;
-/** 
- * Returns the revision short description.
- *
- * This description is optional.
- */
-- (NSString *)shortDescription;
+- (instancetype)initWithCache: (CORevisionCache *)aCache revisionInfo: (CORevisionInfo *)aRevInfo NS_DESIGNATED_INITIALIZER;
+
 
 @end

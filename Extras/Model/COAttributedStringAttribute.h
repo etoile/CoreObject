@@ -12,13 +12,13 @@
 /**
  * e.g. font-weight
  */
-@property (nonatomic, readwrite, strong) NSString *styleKey;
+@property (nonatomic, readwrite, copy) NSString *styleKey;
 /**
  * e.g. bold
  */
-@property (nonatomic, readwrite, strong) NSString *styleValue;
+@property (nonatomic, readwrite, copy) NSString *styleValue;
 
-- (COItemGraph *) attributeItemGraph;
+@property (nonatomic, readonly) COItemGraph *attributeItemGraph;
 
 + (BOOL) isAttributeSet: (NSSet *)aSet equalToSet: (NSSet *)anotherSet;
 + (NSSet *) attributeSet: (NSSet *)aSet minusSet: (NSSet *)anotherSet;

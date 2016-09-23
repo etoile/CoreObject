@@ -6,10 +6,10 @@
  */
 
 #import "COSequenceEdit.h"
-
 #import "COSequenceDeletion.h"
 #import "COSequenceInsertion.h"
 #import "COSequenceModification.h"
+#import <EtoileFoundation/Macros.h>
 
 static BOOL COOverlappingRanges(NSRange r1, NSRange r2)
 {
@@ -21,14 +21,38 @@ static BOOL COOverlappingRanges(NSRange r1, NSRange r2)
 
 @synthesize range;
 
-- (id) initWithUUID: (ETUUID *)aUUID
-		  attribute: (NSString *)anAttribute
-   sourceIdentifier: (id)aSourceIdentifier
-			  range: (NSRange)aRange
+- (instancetype) initWithUUID: (ETUUID *)aUUID
+                    attribute: (NSString *)anAttribute
+             sourceIdentifier: (id)aSourceIdentifier
+                        range: (NSRange)aRange
 {
+	NILARG_EXCEPTION_TEST(aUUID);
+	NILARG_EXCEPTION_TEST(anAttribute);
+
 	self = [super initWithUUID: aUUID attribute: anAttribute sourceIdentifier: aSourceIdentifier];
+	if (self == nil)
+		return nil;
+
 	range = aRange;
 	return self;
+}
+
+- (instancetype)initWithUUID: (ETUUID *)aUUID
+                   attribute: (NSString *)anAttribute
+            sourceIdentifier: (id)aSourceIdentifier
+{
+	return [self initWithUUID: nil
+	                attribute: nil
+	         sourceIdentifier: nil
+	                    range: NSMakeRange(0, 0)];
+}
+
+- (instancetype)init
+{
+	return [self initWithUUID: nil
+	                attribute: nil
+	         sourceIdentifier: nil
+	                    range: NSMakeRange(0, 0)];
 }
 
 static NSDictionary *classSortOrder;
@@ -45,11 +69,11 @@ static NSDictionary *classSortOrder;
 
 - (NSComparisonResult) compare: (COSequenceEdit*)other
 {
-	if ([other range].location > [self range].location)
+	if (other.range.location > self.range.location)
 	{
 		return NSOrderedAscending;
 	}
-	if ([other range].location == [self range].location)
+	if (other.range.location == self.range.location)
 	{
 		NSNumber *selfOrder = classSortOrder[NSStringFromClass([self class])];
 		NSNumber *otherOrder = classSortOrder[NSStringFromClass([other class])];
@@ -57,11 +81,11 @@ static NSDictionary *classSortOrder;
 		assert(selfOrder != nil);
 		assert(otherOrder != nil);
 		
-		if ([selfOrder intValue] > [otherOrder intValue])
+		if (selfOrder.intValue > otherOrder.intValue)
 		{
 			return NSOrderedDescending;
 		}
-		else if ([selfOrder intValue] < [otherOrder intValue])
+		else if (selfOrder.intValue < otherOrder.intValue)
 		{
 			return NSOrderedAscending;
 		}
@@ -111,7 +135,7 @@ static NSDictionary *classSortOrder;
 
 - (NSUInteger) hash
 {
-	return 9723954873297612448ULL ^ [super hash] ^ range.location ^ range.length;
+	return 9723954873297612448ULL ^ super.hash ^ range.location ^ range.length;
 }
 
 - (BOOL) isSameKindOfEdit: (COItemGraphEdit*)anEdit

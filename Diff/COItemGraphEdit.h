@@ -29,13 +29,13 @@
 
 - (BOOL) isEqualIgnoringSourceIdentifier: (id)other;
 
-- (id) initWithUUID: (ETUUID *)aUUID
+- (instancetype) initWithUUID: (ETUUID *)aUUID
 		  attribute: (NSString *)anAttribute
-   sourceIdentifier: (id)aSourceIdentifier;
+   sourceIdentifier: (id)aSourceIdentifier NS_DESIGNATED_INITIALIZER;
 
 // information
 
-- (NSSet *) insertedInnerItemUUIDs;
+@property (nonatomic, readonly) NSSet *insertedInnerItemUUIDs;
 
 - (BOOL) isSameKindOfEdit: (COItemGraphEdit*)anEdit;
 

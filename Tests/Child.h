@@ -11,7 +11,7 @@
 
 @interface Child : COObject
 
-@property (readwrite, strong, nonatomic) NSString *label;
-@property (readwrite, weak, nonatomic) Parent *parent;
+@property (nonatomic, readwrite, copy) NSString *label;
+@property (nonatomic, readwrite, weak) Parent *parent;
 
 @end

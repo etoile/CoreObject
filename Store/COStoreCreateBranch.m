@@ -14,7 +14,7 @@
 
 - (BOOL) execute: (COSQLiteStore *)store inTransaction: (COStoreTransaction *)aTransaction
 {
-    return [[store database] executeUpdate: @"INSERT INTO branches (uuid, proot, current_revid, head_revid, metadata, deleted, parentbranch) VALUES(?,?,?,?,NULL,0,?)",
+    return [store.database executeUpdate: @"INSERT INTO branches (uuid, proot, current_revid, head_revid, metadata, deleted, parentbranch) VALUES(?,?,?,?,NULL,0,?)",
             [branch dataValue],
             [persistentRoot dataValue],
             [initialRevision dataValue],

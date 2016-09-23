@@ -29,7 +29,7 @@
 - (BOOL) deliverMessagesToClient: (NSString *)clientID;
 - (BOOL) deliverMessagesToServer;
 
-- (NSArray *) serverMessages;
+@property (nonatomic, readonly) NSArray *serverMessages;
 - (NSArray *) messagesForClient: (NSString *)anID;
 
 @end

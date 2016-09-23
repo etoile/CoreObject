@@ -55,12 +55,12 @@
  * The UUID of the store against which the changes were or would be committed
  * (for an inverse).
  */
-@property (nonatomic, copy) ETUUID *storeUUID;
+@property (nonatomic, readwrite, copy) ETUUID *storeUUID;
 /**
  * The UUID of the persistent root to which the changes were or would be applied
  * (for an inverse).
  */
-@property (nonatomic, copy) ETUUID *persistentRootUUID;
+@property (nonatomic, readwrite, copy) ETUUID *persistentRootUUID;
 /**
  * Returns nil.
  *
@@ -90,7 +90,7 @@
  *
  * For each commit, single commands are grouped into a COCommandGroup.
  */
-- (COCommand *) inverse;
+@property (nonatomic, readonly) COCommand *inverse;
 
 // FIXME: Perhaps distinguish between edits that can't be applied and edits that
 // are already applied. (e.g. "create branch", but that branch already exists)
@@ -127,11 +127,16 @@
  * <init />
  * Initializes and returns a command deserialized from a property list.
  */
-- (id) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent;
+- (instancetype) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent NS_DESIGNATED_INITIALIZER;
+/**
+ * <init />
+ * Returns a command that needs to be initialized manually.
+ */
+- (instancetype) init NS_DESIGNATED_INITIALIZER;
 /**
  * Returns the receiver serialized as a property list.
  */
-- (id) propertyList;
+@property (nonatomic, readonly, strong) id propertyList;
 /**
  * Returns a new command equal to the receiver.
  */

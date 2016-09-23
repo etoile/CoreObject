@@ -17,8 +17,8 @@ void ParseCombinedCommitDataInToUUIDToItemDataDictionary(NSMutableDictionary *de
     // |-----------------------|---------------------------------------------------| |---..
     //    ^- length in bytes of item data
     
-    const unsigned char *bytes = [commitData bytes];
-    const NSUInteger len = [commitData length];
+    const unsigned char *bytes = commitData.bytes;
+    const NSUInteger len = commitData.length;
     NSUInteger offset = 0;
     
     while (offset < len)
@@ -32,14 +32,13 @@ void ParseCombinedCommitDataInToUUIDToItemDataDictionary(NSMutableDictionary *de
 		ETUUID *uuid = [[ETUUID alloc] initWithUUID: bytes + offset + 1];
 		
         if ((replaceExisting
-             || nil == [dest objectForKey: uuid])
+             || nil == dest[uuid])
             && (nil == restrictToItemUUIDs
                 || [restrictToItemUUIDs containsObject: uuid]))
         {
 
             NSData *data = [commitData subdataWithRange: NSMakeRange(offset, length)];
-            [dest setObject: data
-                     forKey: uuid];
+            dest[uuid] = data;
         }
         offset += length;
     }
@@ -47,7 +46,7 @@ void ParseCombinedCommitDataInToUUIDToItemDataDictionary(NSMutableDictionary *de
 
 void AddCommitUUIDAndDataToCombinedCommitData(NSMutableData *combinedCommitData, ETUUID *uuidToAdd, NSData *dataToAdd)
 {
-    const NSUInteger len = [dataToAdd length];
+    const NSUInteger len = dataToAdd.length;
     if (len > UINT32_MAX)
     {
         [NSException raise: NSInvalidArgumentException format: @"Can't write item data larger than 2^32-1 bytes"];

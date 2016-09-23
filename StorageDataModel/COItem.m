@@ -23,27 +23,24 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 	
 	for (NSString *key in input)
 	{
-		id obj = [input objectForKey: key];
+		id obj = input[key];
 		
 		if ([obj isKindOfClass: [NSCountedSet class]])
 		{
 			// FIXME: Always mutable
-			[result setObject: obj
-					   forKey: key];
+			result[key] = obj;
 		}
 		else if ([obj isKindOfClass: [NSSet class]])
 		{
-			[result setObject: [(mutable ? [NSMutableSet class] : [NSSet class]) setWithSet: obj]
-					   forKey: key];
+			result[key] = [(mutable ? [NSMutableSet class] : [NSSet class]) setWithSet: obj];
 		}
 		else if ([obj isKindOfClass: [NSArray class]])
 		{
-			[result setObject: [(mutable ? [NSMutableArray class] : [NSArray class]) arrayWithArray: obj]
-					   forKey: key];
+			result[key] = [(mutable ? [NSMutableArray class] : [NSArray class]) arrayWithArray: obj];
 		}
 		else
 		{
-			[result setObject: obj forKey: key];
+			result[key] = obj;
 		}
 	}
 	
@@ -57,7 +54,7 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 
 @implementation COItem
 
-- (id) initWithUUID: (ETUUID *)aUUID
+- (instancetype) initWithUUID: (ETUUID *)aUUID
  typesForAttributes: (NSDictionary *)typesForAttributes
 valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
@@ -73,12 +70,16 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
     
     for (NSString *key in values)
     {
-        ETAssert(COTypeValidateObject([[types objectForKey: key] intValue], [values objectForKey: key]));
+        ETAssert(COTypeValidateObject([types[key] intValue], values[key]));
     }
 
 	return self;
 }
 
+-  (instancetype)init
+{
+	return [self initWithUUID: nil typesForAttributes: nil valuesForAttributes: nil];
+}
 
 + (COItem *) itemWithTypesForAttributes: (NSDictionary *)typesForAttributes
 						 valuesForAttributes: (NSDictionary *)valuesForAttributes
@@ -95,17 +96,17 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 - (NSArray *) attributeNames
 {
-	return [types allKeys];
+	return types.allKeys;
 }
 
 - (COType) typeForAttribute: (NSString *)anAttribute
 {
-	return [[types objectForKey: anAttribute] intValue];
+	return [types[anAttribute] intValue];
 }
 
 - (id) valueForAttribute: (NSString *)anAttribute
 {
-	return [values objectForKey: anAttribute];
+	return values[anAttribute];
 }
 
 
@@ -131,7 +132,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 - (NSUInteger) hash
 {
-	return [uuid hash] ^ [types hash] ^ [values hash] ^ 9014972660509684524LL;
+	return uuid.hash ^ types.hash ^ values.hash ^ 9014972660509684524LL;
 }
 
 /** @taskunit convenience */
@@ -143,17 +144,17 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 
 - (int64_t) packageVersion
 {
-	NSNumber *version = [values objectForKey: kCOObjectPackageVersionProperty];
+	NSNumber *version = values[kCOObjectPackageVersionProperty];
 	if (version != nil)
 	{
-		return [version longLongValue];
+		return version.longLongValue;
 	}
 	return -1;
 }
 
 - (NSString *) packageName
 {
-	return [values objectForKey: kCOObjectPackageNameProperty];
+	return values[kCOObjectPackageNameProperty];
 }
 
 - (NSArray *) allObjectsForAttribute: (NSString *)attribute
@@ -162,13 +163,13 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	
 	if (COTypeIsUnivalued([self typeForAttribute: attribute]))
 	{
-		return ([value isEqual: [NSNull null]] ? [NSArray array] : [NSArray arrayWithObject: value]);
+		return ([value isEqual: [NSNull null]] ? @[] : @[value]);
 	}
 	else
 	{
 		if ([value isKindOfClass: [NSSet class]])
 		{
-			return [(NSSet *)value allObjects];
+			return ((NSSet *)value).allObjects;
 		}
 		else if ([value isKindOfClass: [NSArray class]])
 		{
@@ -176,7 +177,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 		}
 		else
 		{
-			return [NSArray array];
+			return @[];
 		}
 	}
 }
@@ -185,7 +186,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
 	NSMutableSet *result = [NSMutableSet set];
 	
-	for (NSString *key in [self attributeNames])
+	for (NSString *key in self.attributeNames)
 	{
 		COType type = [self typeForAttribute: key];
 		if (COTypePrimitivePart(type) == kCOTypeCompositeReference)
@@ -203,7 +204,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
 	NSMutableSet *result = [NSMutableSet set];
 	
-	for (NSString *key in [self attributeNames])
+	for (NSString *key in self.attributeNames)
 	{
 		COType type = [self typeForAttribute: key];
 		if (COTypePrimitivePart(type) == kCOTypeReference)
@@ -222,7 +223,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
 	NSMutableSet *result = [NSMutableSet set];
 	
-	for (NSString *key in [self attributeNames])
+	for (NSString *key in self.attributeNames)
 	{
 		COType type = [self typeForAttribute: key];
 		if (COTypePrimitivePart(type) == kCOTypeCompositeReference
@@ -251,7 +252,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
 	NSMutableArray *result = [NSMutableArray array];
 	
-	for (NSString *key in [self attributeNames])
+	for (NSString *key in self.attributeNames)
 	{
 		COType type = [self typeForAttribute: key];
 		if (COTypePrimitivePart(type) == kCOTypeAttachment)
@@ -269,7 +270,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
 	NSMutableArray *result = [NSMutableArray array];
 	
-	for (NSString *key in [self attributeNames])
+	for (NSString *key in self.attributeNames)
 	{
 		COType type = [self typeForAttribute: key];
 		if (COTypePrimitivePart(type) == kCOTypeReference)
@@ -289,7 +290,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 - (NSString *) fullTextSearchContent
 {
     NSMutableArray *result = [NSMutableArray array];
-    for (NSString *key in [self attributeNames])
+    for (NSString *key in self.attributeNames)
 	{
 		COType type = [self typeForAttribute: key];
 		if (COTypePrimitivePart(type) == kCOTypeString)
@@ -306,7 +307,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 		
 	[result appendFormat: @"{ COItem %@\n", uuid];
 	
-	for (NSString *attrib in [self attributeNames])
+	for (NSString *attrib in self.attributeNames)
 	{
 		[result appendFormat: @"\t%@ <%@> = '%@'\n",
 			attrib,
@@ -337,13 +338,13 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
 	COMutableItem *aCopy = [self mutableCopy];
 	
-	ETUUID *newUUIDForSelf = [aMapping objectForKey: [self UUID]];
+	ETUUID *newUUIDForSelf = aMapping[self.UUID];
 	if (newUUIDForSelf != nil)
 	{
 		[aCopy setUUID: newUUIDForSelf];
 	}
 	
-	for (NSString *attr in [aCopy attributeNames])
+	for (NSString *attr in aCopy.attributeNames)
 	{
 		id value = [aCopy valueForAttribute: attr];
 		COType type = [aCopy typeForAttribute: attr];
@@ -351,9 +352,9 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 		if (COTypeIsUnivalued(type))
 		{
             /* For COPath and primitive values, the mapping is not used */
-			if ([value isKindOfClass: [ETUUID class]] && [aMapping objectForKey: value] != nil)
+			if ([value isKindOfClass: [ETUUID class]] && aMapping[value] != nil)
             {
-                [aCopy setValue: [aMapping objectForKey: value]
+                [aCopy setValue: aMapping[value]
                    forAttribute: attr
 				           type: type];
 			}
@@ -365,9 +366,9 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
     
             for (id subValue in value)
 			{
-				if ([subValue isKindOfClass: [ETUUID class]] && [aMapping objectForKey: subValue] != nil)
+				if ([subValue isKindOfClass: [ETUUID class]] && aMapping[subValue] != nil)
 				{
-                    [newCollection addObject: [aMapping objectForKey: subValue]];
+                    [newCollection addObject: aMapping[subValue]];
 				}
 				else
 				{
@@ -401,35 +402,34 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
                                           valuesForAttributes: valuesForAttributes];
 }
 
-- (id) initWithUUID: (ETUUID *)aUUID
+- (instancetype) initWithUUID: (ETUUID *)aUUID
  typesForAttributes: (NSDictionary *)typesForAttributes
 valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
 	NILARG_EXCEPTION_TEST(aUUID);
 	NILARG_EXCEPTION_TEST(typesForAttributes);
 	NILARG_EXCEPTION_TEST(valuesForAttributes);
-	
-	SUPERINIT;
+
 	uuid =  aUUID;
 	types = [[NSMutableDictionary alloc] initWithDictionary: typesForAttributes];
 	values = (NSMutableDictionary *)copyValueDictionary(valuesForAttributes, YES);
 	
     for (NSString *key in values)
     {
-        ETAssert(COTypeValidateObject([[types objectForKey: key] intValue], [values objectForKey: key]));
+        ETAssert(COTypeValidateObject([types[key] intValue], values[key]));
     }
     
 	return self;
 }
 
-- (id) initWithUUID: (ETUUID*)aUUID
+- (instancetype) initWithUUID: (ETUUID*)aUUID
 {
 	return [self initWithUUID: aUUID
-		   typesForAttributes: [NSDictionary dictionary]
-		  valuesForAttributes: [NSDictionary dictionary]];
+		   typesForAttributes: @{}
+		  valuesForAttributes: @{}];
 }
 
-- (id) init
+- (instancetype) init
 {
 	return [self initWithUUID: [ETUUID UUID]];
 }
@@ -459,8 +459,8 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes
 	
     ETAssert(COTypeValidateObject(aType, aValue));
     
-	[(NSMutableDictionary *)types setObject: [NSNumber numberWithInt: aType] forKey: anAttribute];
-	[(NSMutableDictionary *)values setObject: aValue forKey: anAttribute];
+	((NSMutableDictionary *)types)[anAttribute] = @(aType);
+	((NSMutableDictionary *)values)[anAttribute] = aValue;
 }
 
 - (void)removeValueForAttribute: (NSString*)anAttribute

@@ -23,7 +23,7 @@
  * array of the COSynchronizerPushedRevisionsFromClientMessage that this
  * is a response to
  */
-@property (nonatomic, readwrite, strong) ETUUID *lastRevisionUUIDSentByClient;
+@property (nonatomic, readwrite, copy) ETUUID *lastRevisionUUIDSentByClient;
 /** Array of COSynchronizerRevision */
-@property (nonatomic, readwrite, strong) NSArray *revisions;
+@property (nonatomic, readwrite, copy) NSArray *revisions;
 @end

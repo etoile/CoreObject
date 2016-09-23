@@ -13,20 +13,20 @@
 {
 	ETEntityDescription *entity = [self newBasicEntityDescription];
 
-	if ([[entity name] isEqual: [ObjectWithTransientState className]] == NO)
+	if (![entity.name isEqual: [ObjectWithTransientState className]])
 		return entity;
 	
     ETPropertyDescription *labelProperty =
 		[ETPropertyDescription descriptionWithName: @"label"
-		                                      type: (id)@"NSString"];
+		                                      typeName: @"NSString"];
     ETPropertyDescription *orderedCollectionProperty =
 		[ETPropertyDescription descriptionWithName: @"orderedCollection"
-		                                      type: (id)@"NSObject"];
+		                                      typeName: @"NSObject"];
 	orderedCollectionProperty.multivalued = YES;
 	orderedCollectionProperty.ordered = YES;
     ETPropertyDescription *derivedOrderedCollectionProperty =
 		[ETPropertyDescription descriptionWithName: @"derivedOrderedCollection"
-		                                      type: (id)@"NSObject"];
+		                                      typeName: @"NSObject"];
 	derivedOrderedCollectionProperty.multivalued = YES;
 	derivedOrderedCollectionProperty.ordered = YES;
 	derivedOrderedCollectionProperty.derived = YES;

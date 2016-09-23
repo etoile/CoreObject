@@ -19,6 +19,6 @@
 /**
  * The persistent root initial revision ID (never nil).
  */
-@property (nonatomic, copy) ETUUID *initialRevisionID;
+@property (nonatomic, readwrite, copy) ETUUID *initialRevisionID;
 
 @end

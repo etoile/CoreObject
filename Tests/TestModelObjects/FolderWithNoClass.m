@@ -16,27 +16,27 @@ void registerFolderWithNoClassEntityDescriptionIfNeeded()
 	registered = YES;
 	
     ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"FolderWithNoClass"];
-    [entity setParent: (id)@"Anonymous.COObject"];
+    entity.parentName = @"COObject";
 	
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 type: (id)@"Anonymous.NSString"];
-    [labelProperty setPersistent: YES];
+                                                                                 typeName: @"NSString"];
+    labelProperty.persistent = YES;
 	
 	ETPropertyDescription *contentsProperty =
-    [ETPropertyDescription descriptionWithName: @"contents" type: (id)@"Anonymous.FolderWithNoClass"];
+    [ETPropertyDescription descriptionWithName: @"contents" typeName: @"FolderWithNoClass"];
 	
-    [contentsProperty setPersistent: YES];
-    [contentsProperty setMultivalued: YES];
-    [contentsProperty setOrdered: NO];
+    contentsProperty.persistent = YES;
+    contentsProperty.multivalued = YES;
+    contentsProperty.ordered = NO;
 
     ETPropertyDescription *parentProperty =
-    [ETPropertyDescription descriptionWithName: @"parent" type: (id)@"Anonymous.FolderWithNoClass"];
+    [ETPropertyDescription descriptionWithName: @"parent" typeName: @"FolderWithNoClass"];
     
-    [parentProperty setMultivalued: NO];
-	[parentProperty setDerived: YES];
-    [parentProperty setOpposite: (id)@"Anonymous.FolderWithNoClass.contents"];
+    parentProperty.multivalued = NO;
+	parentProperty.derived = YES;
+    parentProperty.oppositeName = @"FolderWithNoClass.contents";
     
-    [entity setPropertyDescriptions: @[labelProperty, contentsProperty, parentProperty]];
+    entity.propertyDescriptions = @[labelProperty, contentsProperty, parentProperty];
 	
 	ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
 	[repo addUnresolvedDescription: entity];

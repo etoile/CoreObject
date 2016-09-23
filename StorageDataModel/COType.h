@@ -26,9 +26,7 @@
  * <item>plist import/export of ObjC objects of a known COType</item>
  * </list>
  */
-typedef int32_t COType;
-
-enum {
+typedef NS_OPTIONS(uint32_t, COType) {
 #pragma mark Primitive types
     
     /**

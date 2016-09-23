@@ -17,35 +17,35 @@
 	
 	// For subclasses that don't override -newEntityDescription, we must not add the
 	// property descriptions that we will inherit through the parent
-	if ([[bookmark name] isEqual: [COBookmark className]] == NO)
+	if (![bookmark.name isEqual: [COBookmark className]])
 		return bookmark;
 	
 	ETPropertyDescription *URL =
-		[ETPropertyDescription descriptionWithName: @"URL" type: (id)@"NSURL"];
+		[ETPropertyDescription descriptionWithName: @"URL" typeName: @"NSURL"];
 	ETPropertyDescription *lastVisitedDate =
-		[ETPropertyDescription descriptionWithName: @"lastVisitedDate" type: (id)@"NSDate"];
+		[ETPropertyDescription descriptionWithName: @"lastVisitedDate" typeName: @"NSDate"];
 	ETPropertyDescription *favIconData =
-		[ETPropertyDescription descriptionWithName: @"favIconData" type: (id)@"NSData"];
+		[ETPropertyDescription descriptionWithName: @"favIconData" typeName: @"NSData"];
 
-	NSArray *persistentProperties = A(URL, lastVisitedDate, favIconData);
+	NSArray *persistentProperties = @[URL, lastVisitedDate, favIconData];
 	
 	[[persistentProperties mappedCollection] setPersistent: YES];
-	[bookmark setPropertyDescriptions: persistentProperties];
+	bookmark.propertyDescriptions = persistentProperties;
 
 	return bookmark;
 }
 
 
-- (id) initWithURL: (NSURL *)aURL
+- (instancetype) initWithURL: (NSURL *)aURL
 {
 	NILARG_EXCEPTION_TEST(aURL);
 	SUPERINIT;
 	_URL =  aURL;
-	_favIconData =  [aURL favIconData];
+	_favIconData =  aURL.favIconData;
 	return self;
 }
 
-- (id) initWithURLFile: (NSString *)aFilePath
+- (instancetype) initWithURLFile: (NSString *)aFilePath
 {
 	// TODO: Finish to implement
 	NSURL *URL = nil;
@@ -55,7 +55,7 @@
 - (void)setURL: (NSURL *)aURL
 {
 	[self willChangeValueForProperty: @"URL"];
-	_URL =  aURL;
+	_URL =  [aURL copy];
 	[self didChangeValueForProperty: @"URL"];
 }
 
@@ -63,7 +63,7 @@
 support bookmark search based on URL text. */
 - (NSString *)serializedURL
 {
-	return [_URL relativeString];
+	return _URL.relativeString;
 }
 
 - (void)setSerializedURL: (NSString *)aURLString
@@ -74,14 +74,14 @@ support bookmark search based on URL text. */
 - (void)setLastVisitedDate:(NSDate *)aDate
 {
 	[self willChangeValueForProperty: @"lastVisitedDate"];
-	_lastVisitedDate =  aDate;
+	_lastVisitedDate =  [aDate copy];
 	[self didChangeValueForProperty: @"lastVisitedDate"];
 }
 
 - (void)setFavIconData: (NSData *)favIconData
 {
 	[self willChangeValueForProperty: @"favIconData"];
-	_favIconData =  favIconData;
+	_favIconData =  [favIconData copy];
 	[self didChangeValueForProperty: @"favIconData"];
 }
 

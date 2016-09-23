@@ -13,20 +13,48 @@
 @synthesize type;
 @synthesize objects;
 
-- (id) initWithUUID: (ETUUID *)aUUID
-		  attribute: (NSString *)anAttribute
-   sourceIdentifier: (id)aSourceIdentifier
-			  range: (NSRange)aRange
-			   type: (COType)aType
-			objects: (NSArray *)anArray
+- (instancetype) initWithUUID: (ETUUID *)aUUID
+                    attribute: (NSString *)anAttribute
+             sourceIdentifier: (id)aSourceIdentifier
+                        range: (NSRange)aRange
+                         type: (COType)aType
+                      objects: (NSArray *)anArray
 {
+	NILARG_EXCEPTION_TEST(aUUID);
+	NILARG_EXCEPTION_TEST(anAttribute);
 	NILARG_EXCEPTION_TEST(anArray);
+
 	self = [super initWithUUID: aUUID attribute: anAttribute sourceIdentifier: aSourceIdentifier range: aRange];
+	if (self == nil)
+		return nil;
+
 	type = aType;
 	objects = [[NSArray alloc] initWithArray: anArray copyItems: YES];
 	return self;
 }
 
+- (instancetype) initWithUUID: (ETUUID *)aUUID
+                    attribute: (NSString *)anAttribute
+             sourceIdentifier: (id)aSourceIdentifier
+                        range: (NSRange)aRange
+{
+	return [self initWithUUID: nil
+	                attribute: nil
+	         sourceIdentifier: nil
+	                    range: NSMakeRange(0, 0)
+	                     type: kCOTypeString
+	                  objects: nil];
+}
+
+- (instancetype)init
+{
+	return [self initWithUUID: nil
+	                attribute: nil
+	         sourceIdentifier: nil
+	                    range: NSMakeRange(0, 0)
+	                     type: kCOTypeString
+	                  objects: nil];
+}
 
 - (BOOL) isEqualIgnoringSourceIdentifier: (id)other
 {
@@ -37,7 +65,7 @@
 
 - (NSUInteger) hash
 {
-	return 11773746616539821587ULL ^ [super hash] ^ type ^ [objects hash];
+	return 11773746616539821587ULL ^ super.hash ^ type ^ objects.hash;
 }
 
 - (NSString *) description

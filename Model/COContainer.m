@@ -16,13 +16,13 @@
 
 	// For subclasses that don't override -newEntityDescription, we must not add the 
 	// property descriptions that we will inherit through the parent
-	if ([[collection name] isEqual: [COContainer className]] == NO) 
+	if (![collection.name isEqual: [COContainer className]]) 
 		return collection;
 	
 	ETPropertyDescription *objects =
 		[self contentPropertyDescriptionWithName: @"objects" type: (id)@"COObject" opposite: nil];
 	
-	[collection setPropertyDescriptions: A(objects)];
+	collection.propertyDescriptions = @[objects];
 
 	return collection;	
 }
