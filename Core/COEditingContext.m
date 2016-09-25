@@ -195,7 +195,7 @@
 	[self loadAllPersistentRootsIfNeeded];
 
 	/* Force deleted persistent roots to be reloaded (see -unloadPersistentRoot:) */
-	for (ETUUID *persistentRootUUID in self.store.deletedPersistentRootUUIDs)
+	for (ETUUID *persistentRootUUID in _store.deletedPersistentRootUUIDs)
 	{
 		[self persistentRootForUUID: persistentRootUUID];
 	}
@@ -267,18 +267,18 @@
 
 - (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName
 {
-	ETEntityDescription *desc = [self.modelDescriptionRepository descriptionForName: anEntityName];
+	ETEntityDescription *desc = [_modelDescriptionRepository descriptionForName: anEntityName];
 	if (desc == nil)
 	{
 		[NSException raise: NSInvalidArgumentException
 		            format: @"Found not entity %@ in %@",
-		                    anEntityName, self.modelDescriptionRepository];
+		                    anEntityName, _modelDescriptionRepository];
 	}
 	COObjectGraphContext *graph = [COObjectGraphContext
-	  objectGraphContextWithModelDescriptionRepository: self.modelDescriptionRepository];
+	  objectGraphContextWithModelDescriptionRepository: _modelDescriptionRepository];
 
 	// TODO: For a nil class, fall back on COObject or some other class as we do in COObjectGraphContext
-	Class cls = [self.modelDescriptionRepository classForEntityDescription: desc];
+	Class cls = [_modelDescriptionRepository classForEntityDescription: desc];
 	COObject *rootObject = [[cls alloc] initWithEntityDescription: desc
 	                                           objectGraphContext: graph];
 	graph.rootObject = rootObject;
