@@ -18,6 +18,8 @@
 		6002E290197FD91A00AC9150 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 60C913AD165BBE9E00E0C5F4 /* main.m */; };
 		600F72BF1858A71200CB6AC5 /* COPersistentObjectContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 600F72BD1858A71200CB6AC5 /* COPersistentObjectContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		600F72C01858A71200CB6AC5 /* COPersistentObjectContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 600F72BE1858A71200CB6AC5 /* COPersistentObjectContext.m */; };
+		601AF2E01D97E8350045B4DC /* COEditingContext+Debugging.m in Sources */ = {isa = PBXBuildFile; fileRef = 601AF2DF1D97E8350045B4DC /* COEditingContext+Debugging.m */; };
+		601AF2E11D97E8350045B4DC /* COEditingContext+Debugging.m in Sources */ = {isa = PBXBuildFile; fileRef = 601AF2DF1D97E8350045B4DC /* COEditingContext+Debugging.m */; };
 		601C1D45180C0F5300CED07E /* COObject+Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D44180C0F5300CED07E /* COObject+Private.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		601C1D4F180C115D00CED07E /* COObjectGraphContext+GarbageCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 601C1D4D180C115900CED07E /* COObjectGraphContext+GarbageCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		601C1D50180C115D00CED07E /* COObjectGraphContext+GarbageCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */; };
@@ -1045,6 +1047,7 @@
 		600F72BE1858A71200CB6AC5 /* COPersistentObjectContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COPersistentObjectContext.m; path = Utilities/COPersistentObjectContext.m; sourceTree = "<group>"; };
 		601977FB1860A52200635BE2 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
 		6019CD74197FDF10009EDAFB /* NEWS.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = NEWS.md; sourceTree = "<group>"; };
+		601AF2DF1D97E8350045B4DC /* COEditingContext+Debugging.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COEditingContext+Debugging.m"; path = "Core/COEditingContext+Debugging.m"; sourceTree = "<group>"; };
 		601C1D44180C0F5300CED07E /* COObject+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObject+Private.h"; path = "Core/COObject+Private.h"; sourceTree = "<group>"; };
 		601C1D4D180C115900CED07E /* COObjectGraphContext+GarbageCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "COObjectGraphContext+GarbageCollection.h"; path = "Core/COObjectGraphContext+GarbageCollection.h"; sourceTree = "<group>"; };
 		601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObjectGraphContext+GarbageCollection.m"; path = "Core/COObjectGraphContext+GarbageCollection.m"; sourceTree = "<group>"; };
@@ -2073,8 +2076,9 @@
 				66457FEE17E968F1003C51A8 /* Private */,
 				609C00881704C3DA00D01AAB /* COEditingContext.h */,
 				6646974917CDA78300A1B767 /* COEditingContext+Private.h */,
-				601FD94418893ED50002F957 /* COEditingContext+Debugging.h */,
 				609C00891704C3DA00D01AAB /* COEditingContext.m */,
+				601FD94418893ED50002F957 /* COEditingContext+Debugging.h */,
+				601AF2DF1D97E8350045B4DC /* COEditingContext+Debugging.m */,
 				609C008C1704C3DA00D01AAB /* COObject.h */,
 				601C1D44180C0F5300CED07E /* COObject+Private.h */,
 				609C008D1704C3DA00D01AAB /* COObject.m */,
@@ -3333,6 +3337,7 @@
 				60E08CB919792F4600D1B7AD /* COItemGraphEdit.m in Sources */,
 				60E08CDB19792F4600D1B7AD /* COSequenceDeletion.m in Sources */,
 				60E08CBB19792F4600D1B7AD /* diff.cc in Sources */,
+				601AF2E11D97E8350045B4DC /* COEditingContext+Debugging.m in Sources */,
 				60E08CBC19792F4600D1B7AD /* COType.m in Sources */,
 				60E08C9119792F4600D1B7AD /* FMResultSet.m in Sources */,
 				60E08CA419792F4600D1B7AD /* COItem.m in Sources */,
@@ -3564,6 +3569,7 @@
 				606E3DC21787A07E00ED42DA /* COSerialization.m in Sources */,
 				6633F119185516AB009CE6F7 /* COAttributedStringChunk.m in Sources */,
 				607EB34A178881E60024B34D /* CODictionary.m in Sources */,
+				601AF2E01D97E8350045B4DC /* COEditingContext+Debugging.m in Sources */,
 				6609485E1787A1160049468B /* CORelationshipCache.m in Sources */,
 				66D96CB8178B717200D1553C /* COBinaryReader.m in Sources */,
 				66D96CBB178B717200D1553C /* COItem+Binary.m in Sources */,
