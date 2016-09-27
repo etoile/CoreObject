@@ -825,7 +825,6 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
     dispatch_sync(queue_, ^()
     {
-
         ETUUID *currBranch = nil;
         BOOL deleted = NO;
         int64_t transactionID = -1;
@@ -1119,12 +1118,14 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
     {
         [result appendFormat: @"\t backing UUID %@ (containing ", backingUUID];
 
-        for (ETUUID *persistentRoot in  [[NSSet setWithArray: self.persistentRootUUIDs]
-            objectsPassingTest: ^(id obj, BOOL *stop)
-            {
-                return [[self backingUUIDForPersistentRootUUID: obj
-                                            createIfNotPresent: YES] isEqual: backingUUID];
-            }])
+        NSSet *matches = [[NSSet setWithArray: self.persistentRootUUIDs]
+                             objectsPassingTest: ^(id obj, BOOL *stop)
+                                                 {
+                                                     return [[self backingUUIDForPersistentRootUUID: obj
+                                                                                 createIfNotPresent: YES] isEqual: backingUUID];
+                                                 }];
+
+        for (ETUUID *persistentRoot in matches)
         {
             [result appendFormat: @"%@ ", persistentRoot];
         }
