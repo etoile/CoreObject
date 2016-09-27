@@ -30,26 +30,23 @@ typedef NS_OPTIONS(uint32_t, COType)
 {
 #pragma mark Primitive types
 
+
     /**
      * Represented as NSNumber
      */
     kCOTypeInt64 = 0x01,
-
     /**
      * Represented as NSNumber
      */
     kCOTypeDouble = 0x02,
-
     /**
      * Represented as NSString
      */
     kCOTypeString = 0x03,
-
     /**
      * A byte array. Represented as NSData
      */
     kCOTypeBlob = 0x04,
-
     /**
      * A reference that does not necessairily model parent-child relationships -
      * could be graphs with cycles, etc.
@@ -58,7 +55,6 @@ typedef NS_OPTIONS(uint32_t, COType)
      * to other persistent roots.
      */
     kCOTypeReference = 0x05,
-
     /**
      * A composite reference from a parent to a child. The reference is stored
      * in the parent.
@@ -71,7 +67,6 @@ typedef NS_OPTIONS(uint32_t, COType)
      * Represented as ETUUID.
      */
     kCOTypeCompositeReference = 0x06,
-
     /**
      * A token which can be given to COSQLiteStore to retrieve a local 
      * filesystem path to an immutable attached file.
@@ -80,17 +75,22 @@ typedef NS_OPTIONS(uint32_t, COType)
      */
     kCOTypeAttachment = 0x07,
 
+
 #pragma mark Multivalued types
+
 
     /**
      * Represented as NSSet.
      */
     kCOTypeSet = 0x10,
-
     /**
      * Represented as NSArray
      */
     kCOTypeArray = 0x20,
+
+
+#pragma mark Masks
+
 
     kCOTypePrimitiveMask = 0x0f,
     kCOTypeMultivaluedMask = 0xf0

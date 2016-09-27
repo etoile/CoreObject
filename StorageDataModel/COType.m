@@ -60,8 +60,7 @@ COTypeDescription(COType type)
         return @"invalid type";
     }
 
-    return [COTypeMultivalueDescription(type) stringByAppendingString: COTypePrimitiveDescription(
-        type)];
+    return [COTypeMultivalueDescription(type) stringByAppendingString: COTypePrimitiveDescription(type)];
 }
 
 
@@ -92,7 +91,6 @@ COTypePrimitiveValidateObject(COType type, id anObject)
             return NO;
     }
 }
-
 
 BOOL
 COTypeValidateObject(COType type, id anObject)

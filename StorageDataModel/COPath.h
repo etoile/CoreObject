@@ -41,7 +41,6 @@
  */
 + (COPath *)pathWithPersistentRoot: (ETUUID *)aRoot
                             branch: (ETUUID *)aBranch;
-
 + (COPath *)brokenPath;
 
 /** @taskunit Reference Properties */

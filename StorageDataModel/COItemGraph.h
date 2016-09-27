@@ -52,6 +52,7 @@
  * May broadcast a change notification, up to the subclass.
  */
 - (void)insertOrUpdateItems: (NSArray *)items;
+
 @end
 
 /**
@@ -72,6 +73,7 @@
     NSMutableDictionary *itemForUUID_;
 }
 
+
 /** @taskunit Initialization */
 
 
@@ -90,6 +92,7 @@
 
 
 /** @taskunit Item Graph Protocol and Additionss */
+
 
 /**
  * See -[COItemGraph rootItemUUID].

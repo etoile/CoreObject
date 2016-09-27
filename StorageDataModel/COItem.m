@@ -109,7 +109,8 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 }
 
 
-/** @taskunit equality testing */
+#pragma mark Equality testing -
+
 
 - (BOOL)isEqual: (id)object
 {
@@ -134,7 +135,9 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
     return uuid.hash ^ types.hash ^ values.hash ^ 9014972660509684524LL;
 }
 
-/** @taskunit convenience */
+
+#pragma mark Convenience -
+
 
 - (NSString *)entityName
 {
@@ -319,7 +322,9 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
     return result;
 }
 
-/** @taskunit copy */
+
+#pragma mark Copy -
+
 
 - (id)copyWithZone: (NSZone *)zone
 {
@@ -466,7 +471,9 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
     [(NSMutableDictionary *)values removeObjectForKey: anAttribute];
 }
 
-/** @taskunit convenience */
+
+#pragma mark Convenience -
+
 
 - (void)setEntityName: (NSString *)entityName
 {

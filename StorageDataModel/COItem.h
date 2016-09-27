@@ -114,8 +114,7 @@ extern NSString *kCOObjectIsSharedProperty;
  * A mutable "semi-serialized" representation of an inner object.
  */
 @interface COMutableItem : COItem
-{
-}
+
 
 /** @taskunit Initialization */
 

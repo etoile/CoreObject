@@ -76,8 +76,7 @@ NSString *
 COJSONTypeToString(COType type)
 {
     NSCAssert(COTypeIsValid(type), @"type to serialize not valid");
-    return [COJSONPrimitiveTypeToString(type) stringByAppendingString: COJSONMultivalueTypeToString(
-        type)];
+    return [COJSONPrimitiveTypeToString(type) stringByAppendingString: COJSONMultivalueTypeToString(type)];
 }
 
 // string -> COType
@@ -96,9 +95,13 @@ COJSONStringToType(NSString *type)
                        attachmentPrefix: @(kCOTypeAttachment)}[components[0]] intValue];
 
     if ([type hasSuffix: setSuffix])
+    {
         result |= kCOTypeSet;
+    }
     else if ([type hasSuffix: arraySuffix])
+    {
         result |= kCOTypeArray;
+    }
 
     NSCAssert(COTypeIsValid(result), @"deserialized type not valid");
 
