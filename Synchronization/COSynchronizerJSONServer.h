@@ -17,6 +17,7 @@
 
 @end
 
+
 @interface COSynchronizerJSONServer : NSObject <COSynchronizerServerDelegate>
 {
     NSMutableArray *queuedMessages;
