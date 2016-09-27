@@ -71,8 +71,8 @@
     _recordingUndo = YES;
     _revisionCache = [[CORevisionCache alloc] initWithParentEditingContext: self];
     _internalTransientObjectGraphContext = [[COObjectGraphContext alloc]
-      initWithModelDescriptionRepository: aRepo
-                    migrationDriverClass: aDriverClass];
+        initWithModelDescriptionRepository: aRepo
+                      migrationDriverClass: aDriverClass];
     _lastTransactionIDForPersistentRootUUID = [NSMutableDictionary new];
     CORegisterCoreObjectMetamodel(_modelDescriptionRepository);
 
@@ -119,15 +119,15 @@
 - (NSString *)description
 {
     return [NSString stringWithFormat: @"<%@ %p - store: %@ (%@)>",
-        NSStringFromClass([self class]), self, _store.UUID, _store.URL];
+                                       NSStringFromClass([self class]), self, _store.UUID, _store.URL];
 }
 
 - (NSString *)detailedDescription
 {
     NSArray *properties = @[@"modelDescriptionRepository", @"hasChanges",
-        @"persistentRootsPendingInsertion", @"persistentRootsPendingUpdate",
-        @"persistentRootsPendingDeletion", @"persistentRootsPendingUndeletion",
-        @"persistentRoots"];
+                            @"persistentRootsPendingInsertion", @"persistentRootsPendingUpdate",
+                            @"persistentRootsPendingDeletion", @"persistentRootsPendingUndeletion",
+                            @"persistentRoots"];
     NSMutableDictionary *options =
         [@{kETDescriptionOptionValuesForKeyPaths: properties,
            kETDescriptionOptionPropertyIndent: @"\t"} mutableCopy];
@@ -183,11 +183,11 @@
 {
     [self loadAllPersistentRootsIfNeeded];
 
-    return [NSSet setWithArray: [_loadedPersistentRoots.allValues filteredCollectionWithBlock: ^(
-      COPersistentRoot *obj)
-    {
-        return (BOOL)!obj.deleted;
-    }]];
+    return [NSSet setWithArray:
+        [_loadedPersistentRoots.allValues filteredCollectionWithBlock: ^(COPersistentRoot *obj)
+        {
+            return (BOOL)!obj.deleted;
+        }]];
 }
 
 - (NSSet *)deletedPersistentRoots
@@ -200,11 +200,11 @@
         [self persistentRootForUUID: persistentRootUUID];
     }
 
-    return [NSSet setWithArray: [_loadedPersistentRoots.allValues filteredCollectionWithBlock: ^(
-      COPersistentRoot *obj)
-    {
-        return obj.deleted;
-    }]];
+    return [NSSet setWithArray:
+        [_loadedPersistentRoots.allValues filteredCollectionWithBlock: ^(COPersistentRoot *obj)
+        {
+            return obj.deleted;
+        }]];
 }
 
 - (NSSet *)loadedPersistentRoots
@@ -275,7 +275,7 @@
                             anEntityName, _modelDescriptionRepository];
     }
     COObjectGraphContext *graph = [COObjectGraphContext
-      objectGraphContextWithModelDescriptionRepository: _modelDescriptionRepository];
+        objectGraphContextWithModelDescriptionRepository: _modelDescriptionRepository];
 
     // TODO: For a nil class, fall back on COObject or some other class as we do in COObjectGraphContext
     Class cls = [_modelDescriptionRepository classForEntityDescription: desc];
@@ -737,9 +737,9 @@
 
 - (void)validateMetadata: (NSDictionary *)metadata
 {
-    INVALIDARG_EXCEPTION_TEST(metadata, metadata == nil
-        || [NSJSONSerialization isValidJSONObject: metadata]);
-    
+    INVALIDARG_EXCEPTION_TEST(metadata,
+                              metadata == nil || [NSJSONSerialization isValidJSONObject: metadata]);
+
     /* Validate short description related metadata */
 
     NSArray *shortDescriptionArgs = metadata[kCOCommitMetadataShortDescriptionArguments];
@@ -750,7 +750,7 @@
         containsValidArgs &= [obj isString];
     }
     INVALIDARG_EXCEPTION_TEST(metadata, shortDescriptionArgs == nil
-        || ([shortDescriptionArgs isKindOfClass: [NSArray class]] && containsValidArgs));
+                                        || ([shortDescriptionArgs isKindOfClass: [NSArray class]] && containsValidArgs));
 }
 
 - (BOOL) commitWithMetadata: (NSDictionary *)metadata
@@ -884,7 +884,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
     NSString *storeUUID = userInfo[kCOStoreUUID];
 
     if ([[_store.UUID stringValue] isEqual: storeUUID]
-      && [_store.URL.absoluteString isEqual: storeURL])
+        && [_store.URL.absoluteString isEqual: storeURL])
     {
         [self storePersistentRootsDidChange: notif isDistributed: YES];
     }
@@ -911,27 +911,27 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
     NSDictionary *transactionIDs = notif.userInfo[kCOStorePersistentRootTransactionIDs];
     NSArray *persistentRootUUIDs = [transactionIDs.allKeys
         mappedCollectionWithBlock: ^(id uuidString)
-    {
-        return [ETUUID UUIDWithString: uuidString];
-    }];
+        {
+            return [ETUUID UUIDWithString: uuidString];
+        }];
     NSArray *deletedPersistentRootUUIDs = [notif.userInfo[kCOStoreDeletedPersistentRoots]
         mappedCollectionWithBlock: ^(id uuidString)
-    {
-        return [ETUUID UUIDWithString: uuidString];
-    }];
+        {
+            return [ETUUID UUIDWithString: uuidString];
+        }];
     NSArray *compactedPersistentRootUUIDs = [notif.userInfo[kCOStoreCompactedPersistentRoots]
         mappedCollectionWithBlock: ^(id uuidString)
-    {
-        return [ETUUID UUIDWithString: uuidString];
-    }];
+        {
+            return [ETUUID UUIDWithString: uuidString];
+        }];
     NSArray *finalizedPersistentRootUUIDs = [notif.userInfo[kCOStoreFinalizedPersistentRoots]
         mappedCollectionWithBlock: ^(id uuidString)
-    {
-        return [ETUUID UUIDWithString: uuidString];
-    }];
+        {
+            return [ETUUID UUIDWithString: uuidString];
+        }];
 
     ETAssert(transactionIDs.isEmpty
-        || (finalizedPersistentRootUUIDs.isEmpty && compactedPersistentRootUUIDs.isEmpty));
+             || (finalizedPersistentRootUUIDs.isEmpty && compactedPersistentRootUUIDs.isEmpty));
 
     //NSLog(@"%@: Got change notif for persistent root: %@", self, persistentRootUUID);
 
