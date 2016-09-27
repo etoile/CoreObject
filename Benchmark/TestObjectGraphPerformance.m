@@ -12,11 +12,12 @@
 #import "BenchmarkCommon.h"
 
 @interface TestObjectGraphPerformance : EditingContextTestCase <UKTest>
-
 @end
+
 
 #define COMMIT_ITERATIONS 10
 #define MS_PER_SECOND 1000
+
 
 @implementation TestObjectGraphPerformance
 

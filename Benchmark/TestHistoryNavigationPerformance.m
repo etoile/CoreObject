@@ -15,12 +15,14 @@
 
 @end
 
+
 @interface TestHistoryNavigationPerformance : EditingContextTestCase <UKTest>
 {
     int commitCounter;
 }
 
 @end
+
 
 @implementation TestHistoryNavigationPerformance
 

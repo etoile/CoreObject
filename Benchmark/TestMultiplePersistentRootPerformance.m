@@ -1,8 +1,8 @@
 #import "TestCommon.h"
 
 @interface TestMultiplePersistentRootPerformance : EditingContextTestCase <UKTest>
-
 @end
+
 
 @implementation TestMultiplePersistentRootPerformance
 

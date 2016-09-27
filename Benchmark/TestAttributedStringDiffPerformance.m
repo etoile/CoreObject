@@ -16,6 +16,7 @@
 @interface TestAttributedStringDiffPerformance : EditingContextTestCase <UKTest>
 @end
 
+
 @implementation TestAttributedStringDiffPerformance
 
 - (COObjectGraphContext *)make1KChunkAttributedString

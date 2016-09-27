@@ -32,6 +32,7 @@
 
 @end
 
+
 @implementation FoundationModelObject
 
 @synthesize stringProperty, arrayProperty;

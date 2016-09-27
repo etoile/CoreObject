@@ -17,7 +17,9 @@
 {
     NSMutableArray *readObjects;
 }
+
 @end
+
 
 @implementation TestBinaryReadWrite
 

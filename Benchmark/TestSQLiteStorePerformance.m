@@ -14,6 +14,7 @@
 
 @end
 
+
 @implementation TestSQLiteStorePerformance
 
 // --------------------------------------------
@@ -100,7 +101,6 @@ static int itemChangedAtCommit(int i)
     return it;
 }
 
-
 - (ETUUID *)makeDemoPersistentRoot
 {
     revisionUUIDs = [NSMutableArray array];
@@ -171,7 +171,6 @@ static int itemChangedAtCommit(int i)
 
     return proot.UUID;
 }
-
 
 - (COItemGraph *)makeItemTreeWithChildCount: (NSUInteger)numChildren
 {
@@ -311,7 +310,6 @@ static int itemChangedAtCommit(int i)
     }
 }
 
-
 - (void)testLotsOfPersistentRoots
 {
     COItemGraph *it = [self makeItemTreeWithChildCount: NUM_CHILDREN_PER_PERSISTENT_ROOT];
@@ -359,7 +357,6 @@ static int itemChangedAtCommit(int i)
     NSLog(@"creating %d persistent root copies took %lf ms", NUM_PERSISTENT_ROOT_COPIES,
           1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
 }
-
 
 - (void)testMakeBigItemTree
 {
