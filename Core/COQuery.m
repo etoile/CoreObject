@@ -30,11 +30,11 @@
 + (COQuery *)queryWithSQLString: (NSString *)aSQLString
 {
     COQuery *query = [[COQuery alloc] init];
-    query->SQLString =  aSQLString;
+    query->SQLString = aSQLString;
     return query;
 }
 
-- (NSString *) SQLString
+- (NSString *)SQLString
 {
     if (SQLString != nil)
         return SQLString;

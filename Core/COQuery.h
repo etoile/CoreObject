@@ -28,7 +28,7 @@
  */
 @interface COQuery : NSObject
 {
-    @private
+@private
     NSPredicate *predicate;
     NSString *SQLString;
     BOOL matchesAgainstObjectsInMemory;
@@ -90,7 +90,6 @@
  * See also -[COObjectMatching matchesPredicate:].
  */
 @property (nonatomic, readwrite, assign) BOOL matchesAgainstObjectsInMemory;
-
 
 @end
 

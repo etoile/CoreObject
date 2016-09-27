@@ -37,8 +37,8 @@
  */
 @interface CORevision : NSObject <COTrackNode>
 {
-    @private
-    CORevisionCache * __weak cache;
+@private
+    CORevisionCache *__weak cache;
     CORevisionInfo *revisionInfo;
 }
 
@@ -116,7 +116,7 @@
 /**
  * Returns whether the receiver is equal to an ancestor of the given revision. 
  */
-- (BOOL) isEqualToOrAncestorOfRevision: (CORevision *)aRevision;
+- (BOOL)isEqualToOrAncestorOfRevision: (CORevision *)aRevision;
 
 
 /** @taskunit Framework Private */
@@ -129,7 +129,8 @@
  *
  * For a nil cache or revision info, raises a NSInvalidArgumentException.
  */
-- (instancetype)initWithCache: (CORevisionCache *)aCache revisionInfo: (CORevisionInfo *)aRevInfo NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithCache: (CORevisionCache *)aCache
+                 revisionInfo: (CORevisionInfo *)aRevInfo NS_DESIGNATED_INITIALIZER;
 
 
 @end

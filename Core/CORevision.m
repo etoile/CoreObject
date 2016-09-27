@@ -8,20 +8,18 @@
 #import "CORevision.h"
 #import "COCommitDescriptor.h"
 #import "CORevisionInfo.h"
-#import "COSQLiteStore.h"
 #import "CORevisionCache.h"
-
 
 @implementation CORevision
 
 - (instancetype)initWithCache: (CORevisionCache *)aCache
-       revisionInfo: (CORevisionInfo *)aRevInfo
+                 revisionInfo: (CORevisionInfo *)aRevInfo
 {
     NILARG_EXCEPTION_TEST(aCache);
     NILARG_EXCEPTION_TEST(aRevInfo);
     SUPERINIT;
     cache = aCache;
-    revisionInfo =  aRevInfo;
+    revisionInfo = aRevInfo;
     assert(revisionInfo.revisionUUID != nil);
     return self;
 }
@@ -46,9 +44,9 @@
 
 - (NSArray *)propertyNames
 {
-    return [[super propertyNames] arrayByAddingObjectsFromArray: 
+    return [[super propertyNames] arrayByAddingObjectsFromArray:
         @[@"UUID", @"date", @"type", @"localizedTypeDescription",
-        @"localizedShortDescription", @"metadata"]];
+          @"localizedShortDescription", @"metadata"]];
 }
 
 - (ETUUID *)UUID
@@ -56,7 +54,7 @@
     return revisionInfo.revisionUUID;
 }
 
-- (CORevisionCache *) cache
+- (CORevisionCache *)cache
 {
     if (cache == nil)
         [NSException raise: NSGenericException
@@ -70,7 +68,7 @@
     {
         return nil;
     }
-    
+
     ETUUID *parentRevID = revisionInfo.parentRevisionUUID;
     return [[self cache] revisionForRevisionUUID: parentRevID
                               persistentRootUUID: revisionInfo.persistentRootUUID];
@@ -82,7 +80,7 @@
     {
         return nil;
     }
-    
+
     ETUUID *revID = revisionInfo.mergeParentRevisionUUID;
     return [[self cache] revisionForRevisionUUID: revID
                               persistentRootUUID: revisionInfo.persistentRootUUID];
@@ -142,13 +140,13 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat: @"%@ (%@ <= %@)", 
-        NSStringFromClass([self class]),
-        self.UUID,
-        (self.parentRevision != nil ? self.parentRevision.UUID : @"none")];
+    return [NSString stringWithFormat: @"%@ (%@ <= %@)",
+                                       NSStringFromClass([self class]),
+                                       self.UUID,
+                                       (self.parentRevision != nil ? self.parentRevision.UUID : @"none")];
 }
 
-- (BOOL) isEqualToOrAncestorOfRevision: (CORevision *)aRevision
+- (BOOL)isEqualToOrAncestorOfRevision: (CORevision *)aRevision
 {
     CORevision *rev = aRevision;
     while (rev != nil)
@@ -164,12 +162,12 @@
 
 #pragma mark - COTrackNode Implementation
 
-- (id<COTrackNode>)parentNode
+- (id <COTrackNode>)parentNode
 {
     return self.parentRevision;
 }
 
-- (id<COTrackNode>)mergeParentNode
+- (id <COTrackNode>)mergeParentNode
 {
     return self.mergeParentRevision;
 }
