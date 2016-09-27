@@ -59,7 +59,7 @@
         [ETUUID UUIDWithString: aPlist[@"parentRevisionID"]] : nil;
     info.mergeParentRevisionUUID = aPlist[@"mergeParentRevisionID"] != [NSNull null] ?
         [ETUUID UUIDWithString: aPlist[@"mergeParentRevisionID"]] : nil;
-    info.branchUUID = [ETUUID UUIDWithString: aPlist[@"branchUUID"]],
+    info.branchUUID = [ETUUID UUIDWithString: aPlist[@"branchUUID"]];
     info.metadata = aPlist[@"metadata"] != [NSNull null] ? aPlist[@"metadata"] : nil;
     info.date = [[[NSDateFormatter alloc] init] dateFromString: aPlist[@"date"]];
     return info;
