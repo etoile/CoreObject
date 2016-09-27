@@ -1,6 +1,8 @@
 #import <CoreObject/CoreObject.h>
 
 @interface COBranch (Graphviz)
-- (void) show;
-- (void) showHistory;
+
+- (void)show;
+- (void)showHistory;
+
 @end

@@ -1,5 +1,7 @@
 #import <CoreObject/CoreObject.h>
 
 @interface CORevision (Graphviz)
-- (void) show;
+
+- (void)show;
+
 @end

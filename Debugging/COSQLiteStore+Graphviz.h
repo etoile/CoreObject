@@ -13,8 +13,8 @@ void COViewDOTGraphFile(NSString *path);
 
 @interface COSQLiteStore (Debugging)
 
-- (NSString *) dotGraphForPersistentRootUUID: (ETUUID *)aUUID;
+- (NSString *)dotGraphForPersistentRootUUID: (ETUUID *)aUUID;
 
-- (void) showGraphForPersistentRootUUID: (ETUUID *)aUUID;
+- (void)showGraphForPersistentRootUUID: (ETUUID *)aUUID;
 
 @end

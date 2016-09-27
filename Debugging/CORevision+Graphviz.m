@@ -4,7 +4,7 @@
 
 @implementation CORevision (Graphviz)
 
-- (void) show
+- (void)show
 {
     [[cache.parentEditingContext.store itemGraphForRevisionUUID: self.UUID
                                                  persistentRoot: self.persistentRootUUID] showGraph];
