@@ -276,9 +276,8 @@
     }
     COObjectGraphContext *graph = [COObjectGraphContext
         objectGraphContextWithModelDescriptionRepository: _modelDescriptionRepository];
-
-    // TODO: For a nil class, fall back on COObject or some other class as we do in COObjectGraphContext
     Class cls = [_modelDescriptionRepository classForEntityDescription: desc];
+    ETAssert(cls != Nil);
     COObject *rootObject = [[cls alloc] initWithEntityDescription: desc
                                                objectGraphContext: graph];
     graph.rootObject = rootObject;

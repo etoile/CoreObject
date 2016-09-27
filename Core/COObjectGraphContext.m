@@ -260,6 +260,7 @@ NSString * const COObjectGraphContextEndBatchChangeNotification = @"COObjectGrap
    entityDescription: (ETEntityDescription *)anEntityDescription
 {
     Class objClass = [_modelDescriptionRepository classForEntityDescription: anEntityDescription];
+    ETAssert(objClass != Nil);
     /* For a reloaded object, we must not call -initWithEntityDescription:objectGraphContext:
        to prevent the normal initialization process to occur (the COObject
        subclass designed initializer being called). */
