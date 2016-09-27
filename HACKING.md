@@ -35,7 +35,7 @@ property declarations in headers.
 - Add 1 blank line between properties and method declarations in headers.
 
 - `@end`, `@interface`, `@implementation` always have one blank line before and 
-after.
+after, except in the case of empty interfaces/implementations.
 
 - Don't use blank lines between ivars.
 
