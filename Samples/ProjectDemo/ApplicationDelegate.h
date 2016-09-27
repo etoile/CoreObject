@@ -8,17 +8,17 @@
 
 @interface ApplicationDelegate : NSObject
 {
-	IBOutlet NSWindow *newDocumentTypeWindow;
-	IBOutlet NSWindow *networkWindow;
-	IBOutlet NSWindow *searchWindow;
-	
-	IBOutlet XMPPController *xmppController;
-	IBOutlet CheckpointAsSheetController *checkpointAsSheetController;
-	IBOutlet TagWindowController *tagWindowController;
-	
-	COEditingContext *context;
-	
-	NSMutableDictionary *controllerForWindowID;
+    IBOutlet NSWindow *newDocumentTypeWindow;
+    IBOutlet NSWindow *networkWindow;
+    IBOutlet NSWindow *searchWindow;
+    
+    IBOutlet XMPPController *xmppController;
+    IBOutlet CheckpointAsSheetController *checkpointAsSheetController;
+    IBOutlet TagWindowController *tagWindowController;
+    
+    COEditingContext *context;
+    
+    NSMutableDictionary *controllerForWindowID;
 }
 
 - (COEditingContext*)editingContext;

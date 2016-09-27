@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2012 Eric Wasylishen
+    Copyright (C) 2012 Eric Wasylishen
  
-	Date:  October 2012
-	License:  MIT  (see COPYING)
+    Date:  October 2012
+    License:  MIT  (see COPYING)
  */
 
 

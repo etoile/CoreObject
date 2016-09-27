@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2014 Quentin Mathe
+    Copyright (C) 2014 Quentin Mathe
 
-	Date:  July 2014
-	License:  MIT  (see COPYING)
+    Date:  July 2014
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -37,7 +37,7 @@
 - (void)postNotificationName: (NSString *)aName
                       object: (NSString *)aSender
                     userInfo: (NSDictionary *)userInfo
-		  deliverImmediately: (BOOL)deliverImmediately;
+          deliverImmediately: (BOOL)deliverImmediately;
 @end
 
 /**

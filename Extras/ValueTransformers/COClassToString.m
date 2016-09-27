@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2014 Quentin Mathe
+    Copyright (C) 2014 Quentin Mathe
 
-	Date:  May 2014
-	License:  MIT  (see COPYING)
+    Date:  May 2014
+    License:  MIT  (see COPYING)
  */
 
 #import "COClassToString.h"
@@ -12,12 +12,12 @@
 
 + (Class)transformedValueClass
 {
-	return [NSString class];
+    return [NSString class];
 }
 
 + (BOOL)allowsReverseTransformation
 {
-	return YES;
+    return YES;
 }
 
 - (id)transformedValue: (id)value
@@ -28,7 +28,7 @@
     BOOL isClass = ([value class] == value);
     NSParameterAssert(isClass && !class_isMetaClass(value));
 
-	return NSStringFromClass(value);
+    return NSStringFromClass(value);
 }
 
 - (id)reverseTransformedValue: (id)value
@@ -36,9 +36,9 @@
     if (value == nil)
         return Nil;
 
-	NSParameterAssert([value isKindOfClass: [NSString class]]);
+    NSParameterAssert([value isKindOfClass: [NSString class]]);
 
-	Class class = NSClassFromString(value);
+    Class class = NSClassFromString(value);
     ETAssert(class != Nil);
     ETAssert([NSStringFromClass(class) isEqual: value]);
     return class;

@@ -49,7 +49,7 @@
 - (void)setMainWindow:(NSWindow *)mainWindow {
     // FIXME: get the view
     _inspectingGraphicView = nil;
-	
+    
     [self updatePanel];
 }
 

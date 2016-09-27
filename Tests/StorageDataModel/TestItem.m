@@ -12,7 +12,7 @@
 #import "COItem+JSON.h"
 
 @interface TestItem : NSObject <UKTest> {
-	
+    
 }
 
 @end
@@ -41,7 +41,7 @@
 
 - (void) testInt
 {
-	COMutableItem *item = [COMutableItem item];
+    COMutableItem *item = [COMutableItem item];
     [item setValue: @1 forAttribute: @"1" type: kCOTypeInt64];
     [item setValue: @-1 forAttribute: @"-1" type: kCOTypeInt64];
     [item setValue: @256 forAttribute: @"256" type: kCOTypeInt64];
@@ -68,48 +68,48 @@
 /* See basicNumberFromDecimalNumber() in COItem+JSON.m */
 - (void) testJSONDoubleEquality
 {
-	NSNumber *value = @123.456789012;
+    NSNumber *value = @123.456789012;
 
-	UKTrue(strcmp([value objCType], "d") == 0);
+    UKTrue(strcmp([value objCType], "d") == 0);
 
-	NSNumber *decimalValue = [NSDecimalNumber numberWithDouble: 123.456789012];
-	NSData *data = [NSJSONSerialization dataWithJSONObject: @{ @"number": value } options: 0 error: NULL];
-	NSNumber *roundTripValue =
-		[NSJSONSerialization JSONObjectWithData: data options: 0 error: NULL][@"number"];
-	NSNumber *newValue = @(roundTripValue.doubleValue);
-	NSNumber *newValueFromDesc = @(roundTripValue.description.doubleValue);
+    NSNumber *decimalValue = [NSDecimalNumber numberWithDouble: 123.456789012];
+    NSData *data = [NSJSONSerialization dataWithJSONObject: @{ @"number": value } options: 0 error: NULL];
+    NSNumber *roundTripValue =
+        [NSJSONSerialization JSONObjectWithData: data options: 0 error: NULL][@"number"];
+    NSNumber *newValue = @(roundTripValue.doubleValue);
+    NSNumber *newValueFromDesc = @(roundTripValue.description.doubleValue);
 
 #ifndef GNUSTEP
-	// NOTE: Doesn't matter on GNUstep since newValue is not a NSDecimalNumber, 
-	// and we don't have to convert it into a NSDoubleNumber (unlike on 10.7).
-	UKTrue([[NSDecimalNumber defaultBehavior] scale] == NSDecimalNoScale);
+    // NOTE: Doesn't matter on GNUstep since newValue is not a NSDecimalNumber, 
+    // and we don't have to convert it into a NSDoubleNumber (unlike on 10.7).
+    UKTrue([[NSDecimalNumber defaultBehavior] scale] == NSDecimalNoScale);
 #endif
 
-	NSLog(@"Double representation in JSON: %@",
-		  [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding]);
+    NSLog(@"Double representation in JSON: %@",
+          [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding]);
 
-	/* Rounding is visible in the ouput for numbers that contain more than two 
-	   decimals on 10.7 (e.g. 123.45 output is the same for all numbers). */
-	NSLog(@"value            doubleValue: %.20f, description: %@, class: %@",
-		  value.doubleValue, value, [value class]);
-	NSLog(@"decimalValue     doubleValue: %.20f, description: %@, class: %@",
-		  decimalValue.doubleValue, decimalValue, [decimalValue class]);
-	NSLog(@"roundTripValue   doubleValue: %.20f, description: %@, class: %@",
-		  roundTripValue.doubleValue, roundTripValue, [roundTripValue class]);
-	NSLog(@"newValue         doubleValue: %.20f, description: %@, class: %@",
-		  newValue.doubleValue, newValue, [newValue class]);
-	NSLog(@"newValueFromDesc doubleValue: %.20f, description: %@, class: %@",
-		  newValueFromDesc.doubleValue, newValueFromDesc, [newValueFromDesc class]);
+    /* Rounding is visible in the ouput for numbers that contain more than two 
+       decimals on 10.7 (e.g. 123.45 output is the same for all numbers). */
+    NSLog(@"value            doubleValue: %.20f, description: %@, class: %@",
+          value.doubleValue, value, [value class]);
+    NSLog(@"decimalValue     doubleValue: %.20f, description: %@, class: %@",
+          decimalValue.doubleValue, decimalValue, [decimalValue class]);
+    NSLog(@"roundTripValue   doubleValue: %.20f, description: %@, class: %@",
+          roundTripValue.doubleValue, roundTripValue, [roundTripValue class]);
+    NSLog(@"newValue         doubleValue: %.20f, description: %@, class: %@",
+          newValue.doubleValue, newValue, [newValue class]);
+    NSLog(@"newValueFromDesc doubleValue: %.20f, description: %@, class: %@",
+          newValueFromDesc.doubleValue, newValueFromDesc, [newValueFromDesc class]);
 
-	UKTrue([value compare: newValueFromDesc] == NSOrderedSame);
-	UKTrue([newValueFromDesc compare: value] == NSOrderedSame);
+    UKTrue([value compare: newValueFromDesc] == NSOrderedSame);
+    UKTrue([newValueFromDesc compare: value] == NSOrderedSame);
 }
 
 - (void) testDouble
 {
-	COMutableItem *item = [COMutableItem item];
+    COMutableItem *item = [COMutableItem item];
     [item setValue: @3.14 forAttribute: @"3.14" type: kCOTypeDouble];
-	[item setValue: @123.456789012 forAttribute: @"123.456789012" type: kCOTypeDouble];
+    [item setValue: @123.456789012 forAttribute: @"123.456789012" type: kCOTypeDouble];
     [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeDouble];
     
     [item setValue: @[@3.14, @123.456789012]
@@ -125,7 +125,7 @@
 
 - (void) testString
 {
-	COMutableItem *item = [COMutableItem item];
+    COMutableItem *item = [COMutableItem item];
     [item setValue: @"abc" forAttribute: @"abc" type: kCOTypeString];
     [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeString];
     
@@ -152,7 +152,7 @@
     free(buffer);
     ETAssert([bigBlob length] > UINT8_MAX);
 
-	COMutableItem *item = [COMutableItem item];
+    COMutableItem *item = [COMutableItem item];
     [item setValue: zeroBytes forAttribute: @"zeroBytes" type: kCOTypeBlob];
     [item setValue: threeBytes forAttribute: @"xyz" type: kCOTypeBlob];
     [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeBlob];
@@ -219,7 +219,7 @@
     COAttachmentID *threeBytes = [[COAttachmentID alloc] initWithData: [NSData dataWithBytes: "xyz" length: 3]];
     COAttachmentID *zeroBytes = [[COAttachmentID alloc] initWithData: [NSData data]];
     
-	COMutableItem *item = [COMutableItem item];
+    COMutableItem *item = [COMutableItem item];
     [item setValue: zeroBytes forAttribute: @"zeroBytes" type: kCOTypeAttachment];
     [item setValue: threeBytes forAttribute: @"xyz" type: kCOTypeAttachment];
     [item setValue: [NSNull null] forAttribute: @"null" type: kCOTypeAttachment];
@@ -242,47 +242,47 @@
 }
 
 - (void) testMutability
-{	
-	COItem *immutable = [COItem itemWithTypesForAttributes: @{ @"key1": @(kCOTypeString | kCOTypeSet),
-															  @"key2": @(kCOTypeString | kCOTypeArray),
-															  @"name": @(kCOTypeString) }
-									   valuesForAttributes: @{ @"key1": [NSMutableSet setWithObject: @"a"],
-															  @"key2": [NSMutableArray arrayWithObject: @"A"],
-															  @"name": @"my name" }];
+{   
+    COItem *immutable = [COItem itemWithTypesForAttributes: @{ @"key1": @(kCOTypeString | kCOTypeSet),
+                                                              @"key2": @(kCOTypeString | kCOTypeArray),
+                                                              @"name": @(kCOTypeString) }
+                                       valuesForAttributes: @{ @"key1": [NSMutableSet setWithObject: @"a"],
+                                                              @"key2": [NSMutableArray arrayWithObject: @"A"],
+                                                              @"name": @"my name" }];
 
-	UKRaisesException([(COMutableItem *)immutable setValue: @"foo" forAttribute: @"bar" type: kCOTypeString]);
+    UKRaisesException([(COMutableItem *)immutable setValue: @"foo" forAttribute: @"bar" type: kCOTypeString]);
 
-	UKRaisesException([[immutable valueForAttribute: @"key1"] addObject: @"b"]);
-	UKRaisesException([[immutable valueForAttribute: @"key2"] addObject: @"B"]);
-	
-	COMutableItem *mutable = [immutable mutableCopy];
-	
-	UKDoesNotRaiseException([[mutable valueForAttribute: @"key1"] addObject: @"b"]);
-	UKDoesNotRaiseException([[mutable valueForAttribute: @"key2"] addObject: @"B"]);
-	
-	UKIntsEqual(1, [[immutable valueForAttribute: @"key1"] count]);
-	UKIntsEqual(1, [[immutable valueForAttribute: @"key2"] count]);
-	
-	UKIntsEqual(2, [[mutable valueForAttribute: @"key1"] count]);
-	UKIntsEqual(2, [[mutable valueForAttribute: @"key2"] count]);
-	
-	UKRaisesException([[mutable valueForAttribute: @"name"] appendString: @"xxx"]);
+    UKRaisesException([[immutable valueForAttribute: @"key1"] addObject: @"b"]);
+    UKRaisesException([[immutable valueForAttribute: @"key2"] addObject: @"B"]);
+    
+    COMutableItem *mutable = [immutable mutableCopy];
+    
+    UKDoesNotRaiseException([[mutable valueForAttribute: @"key1"] addObject: @"b"]);
+    UKDoesNotRaiseException([[mutable valueForAttribute: @"key2"] addObject: @"B"]);
+    
+    UKIntsEqual(1, [[immutable valueForAttribute: @"key1"] count]);
+    UKIntsEqual(1, [[immutable valueForAttribute: @"key2"] count]);
+    
+    UKIntsEqual(2, [[mutable valueForAttribute: @"key1"] count]);
+    UKIntsEqual(2, [[mutable valueForAttribute: @"key2"] count]);
+    
+    UKRaisesException([[mutable valueForAttribute: @"name"] appendString: @"xxx"]);
 }
 
 - (void) testEquality
 {
-	COItem *immutable = [COItem itemWithTypesForAttributes:
-		@{ @"key1" : @(kCOTypeString | kCOTypeSet),
-		   @"key2" : @(kCOTypeString | kCOTypeArray),
-		   @"name" : @(kCOTypeString) }
-	                                   valuesForAttributes:
-		@{ @"key1" : [NSMutableSet setWithObject: @"a"],
-		   @"key2" : [NSMutableArray arrayWithObject: @"A"],
-		   @"name" : @"my name" }];
-	COMutableItem *mutable = [immutable mutableCopy];
-	
-	UKObjectsEqual(immutable, mutable);
-	UKObjectsEqual(mutable, immutable);
+    COItem *immutable = [COItem itemWithTypesForAttributes:
+        @{ @"key1" : @(kCOTypeString | kCOTypeSet),
+           @"key2" : @(kCOTypeString | kCOTypeArray),
+           @"name" : @(kCOTypeString) }
+                                       valuesForAttributes:
+        @{ @"key1" : [NSMutableSet setWithObject: @"a"],
+           @"key2" : [NSMutableArray arrayWithObject: @"A"],
+           @"name" : @"my name" }];
+    COMutableItem *mutable = [immutable mutableCopy];
+    
+    UKObjectsEqual(immutable, mutable);
+    UKObjectsEqual(mutable, immutable);
     
     [mutable setValue: @"name 2" forAttribute: @"name"];
     
@@ -291,18 +291,18 @@
 
 - (void) testEmptySet
 {
-	COMutableItem *item1 = [COMutableItem item];
-	[item1 setValue: [NSSet set] forAttribute: @"set" type: kCOTypeString | kCOTypeSet];
+    COMutableItem *item1 = [COMutableItem item];
+    [item1 setValue: [NSSet set] forAttribute: @"set" type: kCOTypeString | kCOTypeSet];
     [self validateRoundTrips: item1];
     
-	COMutableItem *item2 = [COMutableItem item];
+    COMutableItem *item2 = [COMutableItem item];
     
-	UKObjectsNotEqual(item2, item1);
+    UKObjectsNotEqual(item2, item1);
 }
 
 - (void) testEmptyObject
 {
-	COMutableItem *item1 = [COMutableItem item];
+    COMutableItem *item1 = [COMutableItem item];
     [self validateRoundTrips: item1];
 }
 

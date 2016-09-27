@@ -46,7 +46,7 @@
     return @{ @"revisionID" : [_revisionID stringValue],
               @"parentRevisionID" : _parentRevisionID != nil ? [_parentRevisionID stringValue] : [NSNull null],
               @"mergeParentRevisionID" : _mergeParentRevisionID != nil ? [_mergeParentRevisionID stringValue] : [NSNull null],
-			  @"branchUUID" : [_branchUUID stringValue],
+              @"branchUUID" : [_branchUUID stringValue],
               @"metadata" : _metadata != nil ? _metadata : [NSNull null],
               @"date" : [[[NSDateFormatter alloc] init] stringFromDate: _date]  };
 }
@@ -59,7 +59,7 @@
         [ETUUID UUIDWithString: aPlist[@"parentRevisionID"]] : nil;
     info.mergeParentRevisionUUID = aPlist[@"mergeParentRevisionID"] != [NSNull null] ?
         [ETUUID UUIDWithString: aPlist[@"mergeParentRevisionID"]] : nil;
-	info.branchUUID = [ETUUID UUIDWithString: aPlist[@"branchUUID"]],
+    info.branchUUID = [ETUUID UUIDWithString: aPlist[@"branchUUID"]],
     info.metadata = aPlist[@"metadata"] != [NSNull null] ? aPlist[@"metadata"] : nil;
     info.date = [[[NSDateFormatter alloc] init] dateFromString: aPlist[@"date"]];
     return info;

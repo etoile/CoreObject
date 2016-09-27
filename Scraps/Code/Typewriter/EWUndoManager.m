@@ -10,31 +10,31 @@
 
 - (BOOL) canUndo
 {
-	return [delegate_ canUndo];
+    return [delegate_ canUndo];
 }
 
 - (BOOL) canRedo
 {
-	return [delegate_ canRedo];
+    return [delegate_ canRedo];
 }
 
 - (NSString *) undoMenuItemTitle
 {
-	return [delegate_ undoMenuItemTitle];
+    return [delegate_ undoMenuItemTitle];
 }
 - (NSString *) redoMenuItemTitle
 {
-	return [delegate_ redoMenuItemTitle];
+    return [delegate_ redoMenuItemTitle];
 }
 
 - (NSString *)undoMenuTitleForUndoActionName: (NSString *)action
 {
-	return nil;
+    return nil;
 }
 
 - (NSString *)redoMenuTitleForUndoActionName: (NSString *)action
 {
-	return nil;
+    return nil;
 }
 
 - (void) undo

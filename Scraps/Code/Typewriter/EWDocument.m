@@ -249,7 +249,7 @@
                       _title];
     
     return [COUndoTrack trackForName: name
-	              withEditingContext: [_persistentRoot editingContext]];;
+                  withEditingContext: [_persistentRoot editingContext]];;
 }
 
 - (void) commit
@@ -320,15 +320,15 @@
 
 - (IBAction) pull1: (id)sender
 {
-	[EWDocument pullFrom: [(EWAppDelegate *)[NSApp delegate] user1PersistentRoot] into: _persistentRoot];
+    [EWDocument pullFrom: [(EWAppDelegate *)[NSApp delegate] user1PersistentRoot] into: _persistentRoot];
 }
 - (IBAction) pull2: (id)sender
 {
-	[EWDocument pullFrom: [(EWAppDelegate *)[NSApp delegate] user2PersistentRoot] into: _persistentRoot];
+    [EWDocument pullFrom: [(EWAppDelegate *)[NSApp delegate] user2PersistentRoot] into: _persistentRoot];
 }
 - (IBAction) pull3: (id)sender
 {
-	[EWDocument pullFrom: [(EWAppDelegate *)[NSApp delegate] user3PersistentRoot] into: _persistentRoot];
+    [EWDocument pullFrom: [(EWAppDelegate *)[NSApp delegate] user3PersistentRoot] into: _persistentRoot];
 }
 
 /* EWUndoManagerDelegate */
@@ -364,7 +364,7 @@
 
 - (COPersistentRoot *)persistentRoot
 {
-	return _persistentRoot;
+    return _persistentRoot;
 }
 
 @end

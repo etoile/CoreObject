@@ -10,28 +10,28 @@
 @implementation COBasicHistoryCompaction
 
 @synthesize finalizablePersistentRootUUIDs = _finalizablePersistentRootUUIDs,
-	compactablePersistentRootUUIDs = _compactablePersistentRootUUIDs,
-	finalizableBranchUUIDs = _finalizableBranchUUIDs,
-	compactableBranchUUIDs = _compactableBranchUUIDs;
+    compactablePersistentRootUUIDs = _compactablePersistentRootUUIDs,
+    finalizableBranchUUIDs = _finalizableBranchUUIDs,
+    compactableBranchUUIDs = _compactableBranchUUIDs;
 
 - (instancetype)init
 {
-	SUPERINIT;
-	_finalizablePersistentRootUUIDs = [NSSet new];
-	_compactablePersistentRootUUIDs = [NSSet new];
-	_finalizableBranchUUIDs = [NSSet new];
-	_compactableBranchUUIDs = [NSSet new];
-	return self;
+    SUPERINIT;
+    _finalizablePersistentRootUUIDs = [NSSet new];
+    _compactablePersistentRootUUIDs = [NSSet new];
+    _finalizableBranchUUIDs = [NSSet new];
+    _compactableBranchUUIDs = [NSSet new];
+    return self;
 }
 
 - (NSSet *)deadRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs
 {
-	return [NSSet new];
+    return [NSSet new];
 }
 
 - (NSSet *)liveRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs
 {
-	return [NSSet new];
+    return [NSSet new];
 }
 
 - (void)beginCompaction

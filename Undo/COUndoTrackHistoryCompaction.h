@@ -46,16 +46,16 @@
  */
 @interface COUndoTrackHistoryCompaction : NSObject <COHistoryCompaction>
 {
-	@private
-	COUndoTrack *_undoTrack;
-	COCommandGroup *_newestCommandToDiscard;
-	NSMutableSet *_finalizablePersistentRootUUIDs;
-	NSMutableSet *_compactablePersistentRootUUIDs;
-	NSMutableSet *_finalizableBranchUUIDs;
-	NSMutableSet *_compactableBranchUUIDs;
-	NSMutableDictionary *_deadRevisionUUIDs;
-	NSMutableDictionary *_liveRevisionUUIDs;
-	NSMutableDictionary *_newestDeadRevisionUUIDs;
+    @private
+    COUndoTrack *_undoTrack;
+    COCommandGroup *_newestCommandToDiscard;
+    NSMutableSet *_finalizablePersistentRootUUIDs;
+    NSMutableSet *_compactablePersistentRootUUIDs;
+    NSMutableSet *_finalizableBranchUUIDs;
+    NSMutableSet *_compactableBranchUUIDs;
+    NSMutableDictionary *_deadRevisionUUIDs;
+    NSMutableDictionary *_liveRevisionUUIDs;
+    NSMutableDictionary *_newestDeadRevisionUUIDs;
 }
 
 /**

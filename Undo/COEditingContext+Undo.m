@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2013 Eric Wasylishen
+    Copyright (C) 2013 Eric Wasylishen
 
-	Date:  September 2013
-	License:  MIT  (see COPYING)
+    Date:  September 2013
+    License:  MIT  (see COPYING)
  */
 
 #import "COEditingContext+Undo.h"
@@ -38,7 +38,7 @@
     if (_recordingUndo)
     {
         _currentEditGroup = [[COCommandGroup alloc] init];
-		_currentEditGroup.metadata = metadata;
+        _currentEditGroup.metadata = metadata;
     }
     else
     {
@@ -49,22 +49,22 @@
 - (COCommandGroup *) recordEndUndoGroupWithUndoTrack: (COUndoTrack *)track
 {
     if (!_recordingUndo)
-		return nil;
+        return nil;
 
-	if ([_currentEditGroup.contents isEmpty])
-	{
-		// TODO: Raise an exception
-		NSLog(@"-recordEndUndoGroup contents is empty!");
-		_currentEditGroup = nil;
-		return nil;
-	}
+    if ([_currentEditGroup.contents isEmpty])
+    {
+        // TODO: Raise an exception
+        NSLog(@"-recordEndUndoGroup contents is empty!");
+        _currentEditGroup = nil;
+        return nil;
+    }
 
-	[track recordCommand: _currentEditGroup];
+    [track recordCommand: _currentEditGroup];
 
-	COCommandGroup *recordedCommand = _currentEditGroup;
-	_currentEditGroup = nil;
+    COCommandGroup *recordedCommand = _currentEditGroup;
+    _currentEditGroup = nil;
 
-	return recordedCommand;
+    return recordedCommand;
 }
 
 - (void) recordCommand: (COCommand *)aCommand
@@ -103,7 +103,7 @@
     COCommandCreatePersistentRoot *edit = [[COCommandCreatePersistentRoot alloc] init];
     edit.storeUUID = aPersistentRoot.editingContext.store.UUID;
     edit.persistentRootUUID = aPersistentRoot.UUID;
-	edit.initialRevisionID = aRevID;
+    edit.initialRevisionID = aRevID;
     
     [self recordCommand: edit];
 }
@@ -124,15 +124,15 @@
 }
 
 - (void) recordPersistentRootSetMetadata: (COPersistentRoot *)aPersistentRoot
-							 oldMetadata: (id)oldMetadata
+                             oldMetadata: (id)oldMetadata
 {
-	COCommandSetPersistentRootMetadata *edit = [[COCommandSetPersistentRootMetadata alloc] init];
-	edit.storeUUID = aPersistentRoot.editingContext.store.UUID;
+    COCommandSetPersistentRootMetadata *edit = [[COCommandSetPersistentRootMetadata alloc] init];
+    edit.storeUUID = aPersistentRoot.editingContext.store.UUID;
     edit.persistentRootUUID = aPersistentRoot.UUID;
     
-	edit.oldMetadata = oldMetadata;
-	edit.metadata = aPersistentRoot.metadata;
-	
+    edit.oldMetadata = oldMetadata;
+    edit.metadata = aPersistentRoot.metadata;
+    
     [self recordCommand: edit];
 }
 
@@ -142,7 +142,7 @@
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 
-	// TODO: Implement COCommandCreateBranch
+    // TODO: Implement COCommandCreateBranch
     COCommandUndeleteBranch *edit = [[COCommandUndeleteBranch alloc] init];
     edit.storeUUID = aBranch.editingContext.store.UUID;
     edit.persistentRootUUID = aBranch.persistentRoot.UUID;
@@ -154,18 +154,18 @@
 
 - (void) recordBranchSetCurrentRevisionUUID: (ETUUID *)current
                             oldRevisionUUID: (ETUUID *)old
-						   headRevisionUUID: (ETUUID *)head
+                           headRevisionUUID: (ETUUID *)head
                         oldHeadRevisionUUID: (ETUUID *)oldHead
-								   ofBranch: (COBranch *)aBranch
+                                   ofBranch: (COBranch *)aBranch
 
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
     NILARG_EXCEPTION_TEST(current);
-	NILARG_EXCEPTION_TEST(old);
-	NILARG_EXCEPTION_TEST(head);
-	NILARG_EXCEPTION_TEST(oldHead);
-	NILARG_EXCEPTION_TEST(aBranch);
-	
+    NILARG_EXCEPTION_TEST(old);
+    NILARG_EXCEPTION_TEST(head);
+    NILARG_EXCEPTION_TEST(oldHead);
+    NILARG_EXCEPTION_TEST(aBranch);
+    
     COCommandSetCurrentVersionForBranch *edit = [[COCommandSetCurrentVersionForBranch alloc] init];
     edit.storeUUID = aBranch.editingContext.store.UUID;
     edit.persistentRootUUID = aBranch.persistentRoot.UUID;
@@ -173,8 +173,8 @@
     edit.branchUUID = aBranch.UUID;
     edit.oldRevisionUUID = old;
     edit.revisionUUID = current;
-	edit.headRevisionUUID = head;
-	edit.oldHeadRevisionUUID = oldHead;
+    edit.headRevisionUUID = head;
+    edit.oldHeadRevisionUUID = oldHead;
     
     [self recordCommand: edit];
 }

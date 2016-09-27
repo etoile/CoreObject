@@ -483,7 +483,7 @@ int main (int argc, const char * argv[]) {
         FMStatement *statement;
         
         while ((statement = [e nextObject])) {
-        	NSLog(@"%@", statement);
+            NSLog(@"%@", statement);
         }
     }
     NSLog(@"That was version %@ of sqlite", [FMDatabase sqliteLibVersion]);

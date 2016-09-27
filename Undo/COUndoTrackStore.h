@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen
+    Copyright (C) 2013 Eric Wasylishen
 
-	Date:  August 2013
-	License:  MIT  (see COPYING)
+    Date:  August 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -42,12 +42,12 @@
  */
 @interface COUndoTrackStore : NSObject
 {
-	@private
-	NSURL *_URL;
+    @private
+    NSURL *_URL;
     FMDatabase *_db;
-	NSMutableDictionary *_modifiedTrackStateForTrackName;
-	dispatch_queue_t _queue;
-	dispatch_semaphore_t _transactionLock;
+    NSMutableDictionary *_modifiedTrackStateForTrackName;
+    dispatch_queue_t _queue;
+    dispatch_semaphore_t _transactionLock;
 }
 
 

@@ -2,21 +2,21 @@
 
 enum XMPPJIDCompareOptions
 {
-	XMPPJIDCompareUser     = 1, // 001
-	XMPPJIDCompareDomain   = 2, // 010
-	XMPPJIDCompareResource = 4, // 100
-	
-	XMPPJIDCompareBare     = 3, // 011
-	XMPPJIDCompareFull     = 7, // 111
+    XMPPJIDCompareUser     = 1, // 001
+    XMPPJIDCompareDomain   = 2, // 010
+    XMPPJIDCompareResource = 4, // 100
+    
+    XMPPJIDCompareBare     = 3, // 011
+    XMPPJIDCompareFull     = 7, // 111
 };
 typedef enum XMPPJIDCompareOptions XMPPJIDCompareOptions;
 
 
 @interface XMPPJID : NSObject <NSCoding, NSCopying>
 {
-	__strong NSString *user;
-	__strong NSString *domain;
-	__strong NSString *resource;
+    __strong NSString *user;
+    __strong NSString *domain;
+    __strong NSString *resource;
 }
 
 + (XMPPJID *)jidWithString:(NSString *)jidStr;

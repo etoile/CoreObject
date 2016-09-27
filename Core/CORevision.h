@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2010 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2010 Eric Wasylishen, Quentin Mathe
 
-	Date:  November 2010
-	License:  MIT  (see COPYING)
+    Date:  November 2010
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -37,9 +37,9 @@
  */
 @interface CORevision : NSObject <COTrackNode>
 {
-	@private
-	CORevisionCache * __weak cache;
-	CORevisionInfo *revisionInfo;
+    @private
+    CORevisionCache * __weak cache;
+    CORevisionInfo *revisionInfo;
 }
 
 

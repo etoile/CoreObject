@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2013 Eric Wasylishen
+    Copyright (C) 2013 Eric Wasylishen
  
-	Date:  November 2013
-	License:  MIT  (see COPYING)
+    Date:  November 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <UnitKit/UnitKit.h>
@@ -18,16 +18,16 @@
 
 @interface TestSynchronizerCommon : EditingContextTestCase <UKTest>
 {
-	COSynchronizerServer *server;
-	COPersistentRoot *serverPersistentRoot;
-	COBranch *serverBranch;
-	
-	id<MessageTransport> transport;
-	
-	COSynchronizerClient *client;
-	COEditingContext *clientCtx;
-	COPersistentRoot *clientPersistentRoot;
-	COBranch *clientBranch;
+    COSynchronizerServer *server;
+    COPersistentRoot *serverPersistentRoot;
+    COBranch *serverBranch;
+    
+    id<MessageTransport> transport;
+    
+    COSynchronizerClient *client;
+    COEditingContext *clientCtx;
+    COPersistentRoot *clientPersistentRoot;
+    COBranch *clientBranch;
 }
 
 /**

@@ -30,7 +30,7 @@
 {
     NSWindowController *wc = [(NSWindow *)[notif object] windowController];
     
-	[self setInspectedWindowController: wc];
+    [self setInspectedWindowController: wc];
 }
 
 - (void) setInspectedWindowController: (NSWindowController *)aDoc
@@ -40,8 +40,8 @@
 
 - (NSUndoManager *)windowWillReturnUndoManager:(NSWindow *)window
 {
-	NSWindow *appMainWindow = [[NSApplication sharedApplication] mainWindow];
-	NSAssert([self window] != appMainWindow, @"EWUtilityWindowController can only be used with panels (-canBecomeMainWindow must return NO)");
+    NSWindow *appMainWindow = [[NSApplication sharedApplication] mainWindow];
+    NSAssert([self window] != appMainWindow, @"EWUtilityWindowController can only be used with panels (-canBecomeMainWindow must return NO)");
     return [[[NSApplication sharedApplication] mainWindow] undoManager];
 }
 

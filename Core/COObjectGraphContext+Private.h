@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  August 2013
-	License:  MIT  (see COPYING)
+    Date:  August 2013
+    License:  MIT  (see COPYING)
  */
 
 #import "COObjectGraphContext.h"
@@ -106,7 +106,7 @@
  * This method is only exposed to be used internally by CoreObject.
  */
 + (ETEntityDescription *)descriptionForItem: (COItem *)anItem
-				 modelDescriptionRepository: (ETModelDescriptionRepository *)aRepository;
+                 modelDescriptionRepository: (ETModelDescriptionRepository *)aRepository;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

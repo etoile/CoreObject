@@ -29,11 +29,11 @@ extern NSString *const XMPPStreamErrorDomain;
 
 enum XMPPStreamErrorCode
 {
-	XMPPStreamInvalidType,       // Attempting to access P2P methods in a non-P2P stream, or vice-versa
-	XMPPStreamInvalidState,      // Invalid state for requested action, such as connect when already connected
-	XMPPStreamInvalidProperty,   // Missing a required property, such as myJID
-	XMPPStreamInvalidParameter,  // Invalid parameter, such as a nil JID
-	XMPPStreamUnsupportedAction, // The server doesn't support the requested action
+    XMPPStreamInvalidType,       // Attempting to access P2P methods in a non-P2P stream, or vice-versa
+    XMPPStreamInvalidState,      // Invalid state for requested action, such as connect when already connected
+    XMPPStreamInvalidProperty,   // Missing a required property, such as myJID
+    XMPPStreamInvalidParameter,  // Invalid parameter, such as a nil JID
+    XMPPStreamUnsupportedAction, // The server doesn't support the requested action
 };
 typedef enum XMPPStreamErrorCode XMPPStreamErrorCode;
 
@@ -492,7 +492,7 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
  * For example, if the server supplied this stanza within it's reported stream:features:
  *
  * <compression xmlns='http://jabber.org/features/compress'>
- *	  <method>zlib</method>
+ *    <method>zlib</method>
  *    <method>lzw</method>
  * </compression>
  *
@@ -676,8 +676,8 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
 
 @interface XMPPElementReceipt : NSObject
 {
-	uint32_t atomicFlags;
-	dispatch_semaphore_t semaphore;
+    uint32_t atomicFlags;
+    dispatch_semaphore_t semaphore;
 }
 
 /**

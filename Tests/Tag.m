@@ -11,10 +11,10 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-	ETEntityDescription *entity = [self newBasicEntityDescription];
+    ETEntityDescription *entity = [self newBasicEntityDescription];
 
-	if (![entity.name isEqual: [Tag className]])
-		return entity;
+    if (![entity.name isEqual: [Tag className]])
+        return entity;
 
     ETPropertyDescription *tagLabelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                 typeName: @"NSString"];
@@ -30,15 +30,15 @@
     [ETPropertyDescription descriptionWithName: @"childTags" typeName: @"Tag"];
     childTagsProperty.multivalued = YES;
     childTagsProperty.ordered = NO;
-	childTagsProperty.persistent = YES;
+    childTagsProperty.persistent = YES;
     
     ETPropertyDescription *parentTagProperty =
     [ETPropertyDescription descriptionWithName: @"parentTag" typeName: @"Tag"];
     parentTagProperty.opposite = childTagsProperty;
-	parentTagProperty.derived = YES;
-	
-	ETAssert(childTagsProperty.isComposite);
-	ETAssert(parentTagProperty.isContainer);
+    parentTagProperty.derived = YES;
+    
+    ETAssert(childTagsProperty.isComposite);
+    ETAssert(parentTagProperty.isContainer);
     
     entity.propertyDescriptions = @[tagLabelProperty, contentsProperty, childTagsProperty, parentTagProperty];
     return entity;
@@ -46,7 +46,7 @@
 
 - (NSString *)contentKey
 {
-	return @"contents";
+    return @"contents";
 }
 
 @dynamic label;

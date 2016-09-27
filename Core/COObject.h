@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Quentin Mathe, Eric Wasylishen
+    Copyright (C) 2013 Quentin Mathe, Eric Wasylishen
 
-	Date:  November 2013
-	License:  MIT  (see COPYING)
+    Date:  November 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -197,7 +197,7 @@
  *     NSIndexSet *insertionIndexes = [NSIndexSet indexSet];
  *
  *     [self willChangeValueForProperty: key
- *	                          atIndexes: insertionIndexes
+ *                            atIndexes: insertionIndexes
  *                          withObjects: insertedObjects
  *                         mutationKind: ETCollectionMutationKindInsertion];
  *
@@ -217,7 +217,7 @@
  *     NSIndexSet *removalIndexes = [NSIndexSet indexSet];
  *
  *     [self willChangeValueForProperty: key
- *	                          atIndexes: removalIndexes
+ *                            atIndexes: removalIndexes
  *                          withObjects: removedObjects
  *                         mutationKind: ETCollectionMutationKindRemoval];
  *
@@ -239,7 +239,7 @@
  *     NSIndexSet *replacementIndexes = [NSIndexSet indexSet];
  *
  *     [self willChangeValueForProperty: key
- *	                          atIndexes: replacementIndexes
+ *                            atIndexes: replacementIndexes
  *                          withObjects: replacementObjects
  *                         mutationKind: ETCollectionMutationKindReplacement];
  *
@@ -399,30 +399,30 @@
  */
 @interface COObject : NSObject <COObjectMatching>
 {
-	@private
-	ETEntityDescription *_entityDescription;
-	ETUUID *_UUID;
-	COObjectGraphContext *__weak _objectGraphContext;
-	NSMutableDictionary *_variableStorage;
-	/** 
-	 * Storage for incoming relationships e.g. parent(s). CoreObject doesn't
-	 * allow storing incoming relationships in ivars or variable storage. 
-	 */
+    @private
+    ETEntityDescription *_entityDescription;
+    ETUUID *_UUID;
+    COObjectGraphContext *__weak _objectGraphContext;
+    NSMutableDictionary *_variableStorage;
+    /** 
+     * Storage for incoming relationships e.g. parent(s). CoreObject doesn't
+     * allow storing incoming relationships in ivars or variable storage. 
+     */
     CORelationshipCache *_incomingRelationshipCache;
-	/**
-	 * Stack of nested property names for change notifications i.e.
-	 * -willChangeValueForProperty: is called multiple times for the same object.
-	 */
-	NSMutableArray *_propertyChangeStack;
-	/**
-	 * Dictionary UUIDs by property names. Used by 
-	 * -[COObject storeItemFromDictionaryForPropertyDescription:] to recreate 
-	 * a COItem representing a keyed multivalued property using the same stable 
-	 * UUID accross repeated serializations.
-	 */
-	NSMutableDictionary *_additionalStoreItemUUIDs;
-	BOOL _isPrepared;
-	int _skipLoading;
+    /**
+     * Stack of nested property names for change notifications i.e.
+     * -willChangeValueForProperty: is called multiple times for the same object.
+     */
+    NSMutableArray *_propertyChangeStack;
+    /**
+     * Dictionary UUIDs by property names. Used by 
+     * -[COObject storeItemFromDictionaryForPropertyDescription:] to recreate 
+     * a COItem representing a keyed multivalued property using the same stable 
+     * UUID accross repeated serializations.
+     */
+    NSMutableDictionary *_additionalStoreItemUUIDs;
+    BOOL _isPrepared;
+    int _skipLoading;
 }
 
 

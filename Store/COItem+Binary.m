@@ -111,84 +111,84 @@ static inline void writePrimitiveValue(co_buffer_t *dest, id aValue, COType aTyp
  */
 static int comparePointersToBinaryWriterTokens(const void *ptrA, const void *ptrB)
 {
-	const unsigned char **tokenA = (const unsigned char **)ptrA;
-	const unsigned char **tokenB = (const unsigned char **)ptrB;
-	
-	size_t tokenALength = co_reader_length_of_token(*tokenA);
-	size_t tokenBLength = co_reader_length_of_token(*tokenB);
-	assert(tokenALength > 0 && tokenBLength > 0);
+    const unsigned char **tokenA = (const unsigned char **)ptrA;
+    const unsigned char **tokenB = (const unsigned char **)ptrB;
+    
+    size_t tokenALength = co_reader_length_of_token(*tokenA);
+    size_t tokenBLength = co_reader_length_of_token(*tokenB);
+    assert(tokenALength > 0 && tokenBLength > 0);
 
-	if (tokenALength < tokenBLength)
-	{
-		return -1;
-	}
-	else if (tokenALength == tokenBLength)
-	{
-		/*
-		 From RFC 3629 (UTF-8):
-		 
-		 The byte-value lexicographic sorting order of UTF-8 strings is the
-		 same as if ordered by character numbers.  Of course this is of
-		 limited interest since a sort order based on character numbers is
-		 almost never culturally valid.
-		 */
-		return memcmp(*tokenA, *tokenB, tokenALength);
-	}
-	else
-	{
-		return 1;
-	}
+    if (tokenALength < tokenBLength)
+    {
+        return -1;
+    }
+    else if (tokenALength == tokenBLength)
+    {
+        /*
+         From RFC 3629 (UTF-8):
+         
+         The byte-value lexicographic sorting order of UTF-8 strings is the
+         same as if ordered by character numbers.  Of course this is of
+         limited interest since a sort order based on character numbers is
+         almost never culturally valid.
+         */
+        return memcmp(*tokenA, *tokenB, tokenALength);
+    }
+    else
+    {
+        return 1;
+    }
 }
 
 static inline void writeArrayContents(co_buffer_t *dest, NSArray *anArray, COType aType, co_buffer_t *temp)
 {
-	assert([anArray isKindOfClass: [NSArray class]]);
-	
-	for (id obj in anArray)
-	{
-		writePrimitiveValue(dest, obj, aType);
-	}
+    assert([anArray isKindOfClass: [NSArray class]]);
+    
+    for (id obj in anArray)
+    {
+        writePrimitiveValue(dest, obj, aType);
+    }
 }
 
 static inline void writeSetContents(co_buffer_t *dest, NSSet *aSet, COType aType, co_buffer_t *temp)
 {
-	assert([aSet isKindOfClass: [NSSet class]]);
-	const size_t setCount = aSet.count;
-	
-	// We need to sort the serialized values since NSSet has no order.
-	
-	co_buffer_clear(temp);
-	
-	const unsigned char **tokenPointers = malloc(sizeof(const unsigned char *) * setCount);
-	
-	// First, write each primitive value to the temporary byte buffer 'temp',
-	// also storing the pointer to the start of each token in the tokenPointers array
-	{
-		size_t i = 0;
-		for (id obj in aSet)
-		{
-			tokenPointers[i++] = co_buffer_get_data(temp) + co_buffer_get_length(temp);
-			
-			writePrimitiveValue(temp, obj, aType);
-		}
-	}
-	
-	// Sort the tokenPointers using a simple comparison function that
-	// uses the length of the token and the byte-for-byte values of the tokens
-	
-	qsort(tokenPointers, setCount, sizeof(const unsigned char *), comparePointersToBinaryWriterTokens);
-	
-	// Copy the sorted tokens into the dest buffer
-	
-	for (size_t i=0; i<setCount; i++)
-	{
-		const unsigned char *tokenPointer = tokenPointers[i];
-		const size_t tokenLength = co_reader_length_of_token(tokenPointer);
-		
-		co_buffer_write(dest, tokenPointer, tokenLength);
-	}
-	
-	free(tokenPointers);
+    assert([aSet isKindOfClass: [NSSet class]]);
+    const size_t setCount = aSet.count;
+    
+    // We need to sort the serialized values since NSSet has no order.
+    
+    co_buffer_clear(temp);
+    
+    const unsigned char **tokenPointers = malloc(sizeof(const unsigned char *) * setCount);
+    
+    // First, write each primitive value to the temporary byte buffer 'temp',
+    // also storing the pointer to the start of each token in the tokenPointers array
+    {
+        size_t i = 0;
+        for (id obj in aSet)
+        {
+            tokenPointers[i++] = co_buffer_get_data(temp) + co_buffer_get_length(temp);
+            
+            writePrimitiveValue(temp, obj, aType);
+        }
+    }
+    
+    // Sort the tokenPointers using a simple comparison function that
+    // uses the length of the token and the byte-for-byte values of the tokens
+    
+    qsort(tokenPointers, setCount, sizeof(const unsigned char *), comparePointersToBinaryWriterTokens);
+    
+    // Copy the sorted tokens into the dest buffer
+    
+    for (size_t i=0; i<setCount; i++)
+    {
+        const unsigned char *tokenPointer = tokenPointers[i];
+        const size_t tokenLength = co_reader_length_of_token(tokenPointer);
+        
+        co_buffer_write(dest, tokenPointer, tokenLength);
+    }
+    
+    free(tokenPointers);
 }
 
 
@@ -201,15 +201,15 @@ static inline void writeValue(co_buffer_t *dest, id aValue, COType aType, co_buf
     else
     {
         co_buffer_begin_array(dest);
-				
-		if (COTypeIsOrdered(aType))
-		{
-			writeArrayContents(dest, aValue, aType, temp);
-		}
-		else
-		{
-			writeSetContents(dest, aValue, aType, temp);
-		}
+                
+        if (COTypeIsOrdered(aType))
+        {
+            writeArrayContents(dest, aValue, aType, temp);
+        }
+        else
+        {
+            writeSetContents(dest, aValue, aType, temp);
+        }
 
         co_buffer_end_array(dest);
     }
@@ -217,20 +217,20 @@ static inline void writeValue(co_buffer_t *dest, id aValue, COType aType, co_buf
 
 - (NSData *) dataValue
 {
-	/** Parts of the serialization process need temporary storage */
-	co_buffer_t temp;
-	co_buffer_init(&temp);
-	
+    /** Parts of the serialization process need temporary storage */
+    co_buffer_t temp;
+    co_buffer_init(&temp);
+    
     co_buffer_t buf;
     co_buffer_init(&buf);
     co_buffer_store_uuid(&buf, self.UUID);
     co_buffer_begin_object(&buf);
     
-	// TODO: For safety we should probaly serialize the attribute names to UTF-8 and compare
-	// them there. Although, I believe compare: should be the same as comparing Unicode character numbers
-	// which is the same as comparing UTF-8 byte sequences (mentiomed in the RFC.)
-	NSArray *propsSorted = [self.attributeNames sortedArrayUsingSelector: @selector(compare:)];
-	
+    // TODO: For safety we should probaly serialize the attribute names to UTF-8 and compare
+    // them there. Although, I believe compare: should be the same as comparing Unicode character numbers
+    // which is the same as comparing UTF-8 byte sequences (mentiomed in the RFC.)
+    NSArray *propsSorted = [self.attributeNames sortedArrayUsingSelector: @selector(compare:)];
+    
     for (NSString *prop in propsSorted)
     {
         COType type = [self typeForAttribute: prop];
@@ -241,8 +241,8 @@ static inline void writeValue(co_buffer_t *dest, id aValue, COType aType, co_buf
         writeValue(&buf, val, type, &temp);
     }
 
-	co_buffer_free(&temp);
-	
+    co_buffer_free(&temp);
+    
     co_buffer_end_object(&buf);
 
     NSData *result = [NSData dataWithBytes:co_buffer_get_data(&buf)
@@ -352,18 +352,18 @@ static void co_read_bytes(void *ctx, const unsigned char *val, size_t size)
     switch (state->state)
     {
         case co_reader_expect_value:
-		{
-			NSData *data = [NSData dataWithBytes: val length: size];
-			if (COTypePrimitivePart(state->currentType) == kCOTypeAttachment)
+        {
+            NSData *data = [NSData dataWithBytes: val length: size];
+            if (COTypePrimitivePart(state->currentType) == kCOTypeAttachment)
             {
-				co_read_object_value(state, [[COAttachmentID alloc] initWithData: data]);
-			}
-			else
-			{
-				co_read_object_value(state, data);
-			}
+                co_read_object_value(state, [[COAttachmentID alloc] initWithData: data]);
+            }
+            else
+            {
+                co_read_object_value(state, data);
+            }
             break;
-		}
+        }
         default:
             state->state = co_reader_error;
             break;

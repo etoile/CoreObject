@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2014 Quentin Mathe
+    Copyright (C) 2014 Quentin Mathe
 
-	Date:  February 2014
-	License: Modified BSD (see COPYING)
+    Date:  February 2014
+    License: Modified BSD (see COPYING)
  */
 
 #import <UIKit/UIKit.h>
@@ -10,17 +10,17 @@
 
 int main(int argc, char *argv[])
 {
-	int status = EXIT_FAILURE;
+    int status = EXIT_FAILURE;
 
-	@autoreleasepool
-	{
-		UKRunner *runner = [UKRunner new];
+    @autoreleasepool
+    {
+        UKRunner *runner = [UKRunner new];
 
-		[[UKTestHandler handler] setQuiet: YES];
+        [[UKTestHandler handler] setQuiet: YES];
 
-		[runner runTestsInBundle: [NSBundle mainBundle]];
-		status = [runner reportTestResults];
-	}
+        [runner runTestsInBundle: [NSBundle mainBundle]];
+        status = [runner reportTestResults];
+    }
 
-	return status;
+    return status;
 }

@@ -36,9 +36,9 @@ ETUUID *AttributedString2UUID();
 - (void) appendHTMLString: (NSString *)html toAttributedString: (COAttributedString *)dest;
 
 - (void) checkMergingBase: (NSString *)base
-			  withBranchA: (NSString *)branchA
-			  withBranchB: (NSString *)branchB
-					gives: (NSString *)result;
+              withBranchA: (NSString *)branchA
+              withBranchB: (NSString *)branchB
+                    gives: (NSString *)result;
 
 - (void) checkAttributedString: (NSAttributedString *)attrStr equalsHTML: (NSString *)html;
 

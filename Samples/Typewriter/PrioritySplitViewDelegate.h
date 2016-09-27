@@ -22,13 +22,13 @@
 
 @interface PrioritySplitViewDelegate : NSObject <NSSplitViewDelegate>
 {
-	NSMutableDictionary *lengthsByViewIndex;
-	NSMutableDictionary *viewIndicesByPriority;
+    NSMutableDictionary *lengthsByViewIndex;
+    NSMutableDictionary *viewIndicesByPriority;
 }
 
 - (void)setMinimumLength:(CGFloat)minLength
-	forViewAtIndex:(NSInteger)viewIndex;
+    forViewAtIndex:(NSInteger)viewIndex;
 - (void)setPriority:(NSInteger)priorityIndex
-	forViewAtIndex:(NSInteger)viewIndex;
+    forViewAtIndex:(NSInteger)viewIndex;
 
 @end

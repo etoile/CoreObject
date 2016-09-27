@@ -3,11 +3,11 @@
 
 @interface TagWindowController : NSObject <NSTableViewDelegate, NSTableViewDataSource>
 {
-	IBOutlet NSWindow *window;
-	IBOutlet NSTableView *table;
-	IBOutlet NSTextField *tagNameField;
-	
-	Document *document; // the document whose tags are displayed
+    IBOutlet NSWindow *window;
+    IBOutlet NSTableView *table;
+    IBOutlet NSTextField *tagNameField;
+    
+    Document *document; // the document whose tags are displayed
 }
 
 - (IBAction) addTag: (id)sender;

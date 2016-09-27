@@ -9,7 +9,7 @@
 + (ETEntityDescription*)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-	
+    
     return entity;
 }
 

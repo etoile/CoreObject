@@ -14,8 +14,8 @@
 
 @interface SKTGraphicView : NSView {
     @private
-	DrawingController *_drawingController;
-	
+    DrawingController *_drawingController;
+    
     NSMutableArray *_selectedGraphics;
     SKTGraphic *_creatingGraphic;
     NSRect _rubberbandRect;

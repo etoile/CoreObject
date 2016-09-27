@@ -19,14 +19,14 @@ static void FindAllParents(NSMutableSet *resultSet, ETUUID *rev, ETUUID *persist
         return;
 
     if (stopSet != nil && [stopSet containsObject: rev])
-		return;
-	
+        return;
+    
     [resultSet addObject: rev];
     
     // Recursively search the parent(s)
     
     CORevisionInfo *revision = [store revisionInfoForRevisionUUID: rev persistentRootUUID: persistentRootUUID];
-	
+    
     if (revision.parentRevisionUUID != nil)
     {
         FindAllParents(resultSet, revision.parentRevisionUUID, persistentRootUUID, store, stopSet);
@@ -39,11 +39,11 @@ static void FindAllParents(NSMutableSet *resultSet, ETUUID *rev, ETUUID *persist
 
 - (BOOL) shouldSendBranch: (COBranchInfo *)branch
 {
-	if (branch.metadata[@"source"] != nil)
-	{
-		return NO;
-	}
-	return YES;
+    if (branch.metadata[@"source"] != nil)
+    {
+        return NO;
+    }
+    return YES;
 }
 
 
@@ -67,23 +67,23 @@ For now we do.
     ETUUID *persistentRoot = [ETUUID UUIDWithString: aRequest[@"persistentRoot"]];
     COPersistentRootInfo *serverInfo = [aStore persistentRootInfoForUUID: persistentRoot];
     
-	// 1. Calculate the set of revision ETUUID the client has
+    // 1. Calculate the set of revision ETUUID the client has
     NSMutableSet *revisionsClientHas = [NSMutableSet set];
     for (NSString *revisionUUIDString in [aRequest[@"clientNewestRevisionIDForBranchUUID"] allValues])
     {
         ETUUID *revid = [ETUUID UUIDWithString: revisionUUIDString];
 
-		FindAllParents(revisionsClientHas, revid, persistentRoot, aStore, nil);
+        FindAllParents(revisionsClientHas, revid, persistentRoot, aStore, nil);
     }
     
     // 2. Calculate the set of CORevisionID that the client lacks
     NSMutableSet *revisionsClientLacks = [NSMutableSet set];
     for (COBranchInfo *branch in serverInfo.branches)
     {
-		if ([self shouldSendBranch: branch])
-		{
-			FindAllParents(revisionsClientLacks, branch.currentRevisionUUID, persistentRoot, aStore, revisionsClientHas);
-		}
+        if ([self shouldSendBranch: branch])
+        {
+            FindAllParents(revisionsClientLacks, branch.currentRevisionUUID, persistentRoot, aStore, revisionsClientHas);
+        }
     }
     
     // Now prepare the property list output
@@ -125,7 +125,7 @@ For now we do.
         {
             revInfoPlist[@"metadata"] = revInfo.metadata;
         }
-		revInfoPlist[@"branchUUID"] = [revInfo.branchUUID stringValue];
+        revInfoPlist[@"branchUUID"] = [revInfo.branchUUID stringValue];
         
         id graphPlist = COItemGraphToJSONPropertyList(graph);
         

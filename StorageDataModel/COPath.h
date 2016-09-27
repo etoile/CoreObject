@@ -23,8 +23,8 @@
 @interface COPath : NSObject <NSCopying>
 {
 @private
-	ETUUID *_persistentRoot;
-	ETUUID *_branch;
+    ETUUID *_persistentRoot;
+    ETUUID *_branch;
 }
 
 

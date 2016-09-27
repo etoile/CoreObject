@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen
+    Copyright (C) 2013 Eric Wasylishen
 
-	Date:  July 2013
-	License:  MIT  (see COPYING)
+    Date:  July 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -14,12 +14,12 @@
 @interface COCachedRelationship : NSObject
 {
 @public
-	NSString *_targetProperty;
-	/**
-	 * Weak reference.
-	 */
-	COObject *__weak _sourceObject;
-	NSString *_sourceProperty;
+    NSString *_targetProperty;
+    /**
+     * Weak reference.
+     */
+    COObject *__weak _sourceObject;
+    NSString *_sourceProperty;
 }
 
 @property (nonatomic, readonly) NSDictionary *descriptionDictionary;
@@ -39,7 +39,7 @@
  */
 @interface CORelationshipCache : NSObject
 {
-	@private
+    @private
     NSMutableArray *_cachedRelationships;
     COObject *__weak _owner;
 }

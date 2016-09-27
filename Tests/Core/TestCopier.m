@@ -146,15 +146,15 @@ static ETUUID *drawing2;
 {
     // FIXME: Fix this test
 #if 0
-	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
+    COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
     
-	COObject *tag1 = [self addObjectWithLabel: @"tag1" toObject: root1];
-	COObject *child = [self addObjectWithLabel: @"OutlineItem" toObject: root1];
+    COObject *tag1 = [self addObjectWithLabel: @"tag1" toObject: root1];
+    COObject *child = [self addObjectWithLabel: @"OutlineItem" toObject: root1];
     
-	[self addReferenceToObject: child toObject: tag1];
+    [self addReferenceToObject: child toObject: tag1];
     
-	// Copy the tag collection to ctx2.
-	
+    // Copy the tag collection to ctx2.
+    
     ETUUID *tag1copyUUID = [copier copyItemWithUUID: tag1.UUID
                                           fromGraph: ctx1
                                             toGraph: ctx2];

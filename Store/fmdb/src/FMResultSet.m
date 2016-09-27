@@ -117,7 +117,7 @@
             if (col_name) {
                 NSString *colName = [NSString stringWithUTF8String:col_name];
                 id value = [self objectForColumnName: colName];
-				
+                
                 // save to dict
                 if (value) {
                     [dict setObject:value forKey:colName];

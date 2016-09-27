@@ -84,7 +84,7 @@
     COPersistentRoot *user1Proot = nil;
     COPersistentRoot *user2Proot = nil;
     COPersistentRoot *user3Proot = nil;
-	
+    
     if ([[_user1Ctx persistentRoots] isEmpty])
     {
         user1Proot = [_user1Ctx insertNewPersistentRootWithEntityName: @"Anonymous.TypewriterDocument"];
@@ -93,33 +93,33 @@
         COSynchronizationClient *client = [[COSynchronizationClient alloc] init];
         COSynchronizationServer *server = [[COSynchronizationServer alloc] init];
         
-		{
-			id request2 = [client updateRequestForPersistentRoot: [user1Proot UUID]
-														serverID: @"server"
-														   store: [_user2Ctx store]];
-			id response2 = [server handleUpdateRequest: request2 store: [_user1Ctx store]];
-			[client handleUpdateResponse: response2 store: [_user2Ctx store]];
-			
-			user2Proot = [_user2Ctx persistentRootForUUID: [user1Proot UUID]];
-			assert(user2Proot != nil);
-		}
-		
-		{
-			id request2 = [client updateRequestForPersistentRoot: [user1Proot UUID]
-														serverID: @"server"
-														   store: [_user3Ctx store]];
-			id response2 = [server handleUpdateRequest: request2 store: [_user1Ctx store]];
-			[client handleUpdateResponse: response2 store: [_user3Ctx store]];
-			
-			user3Proot = [_user3Ctx persistentRootForUUID: [user1Proot UUID]];
-			assert(user3Proot != nil);
-		}
+        {
+            id request2 = [client updateRequestForPersistentRoot: [user1Proot UUID]
+                                                        serverID: @"server"
+                                                           store: [_user2Ctx store]];
+            id response2 = [server handleUpdateRequest: request2 store: [_user1Ctx store]];
+            [client handleUpdateResponse: response2 store: [_user2Ctx store]];
+            
+            user2Proot = [_user2Ctx persistentRootForUUID: [user1Proot UUID]];
+            assert(user2Proot != nil);
+        }
+        
+        {
+            id request2 = [client updateRequestForPersistentRoot: [user1Proot UUID]
+                                                        serverID: @"server"
+                                                           store: [_user3Ctx store]];
+            id response2 = [server handleUpdateRequest: request2 store: [_user1Ctx store]];
+            [client handleUpdateResponse: response2 store: [_user3Ctx store]];
+            
+            user3Proot = [_user3Ctx persistentRootForUUID: [user1Proot UUID]];
+            assert(user3Proot != nil);
+        }
     }
     else
     {
         assert([[_user1Ctx persistentRoots] count] == 1);
         assert([[_user2Ctx persistentRoots] count] == 1);
-		assert([[_user3Ctx persistentRoots] count] == 1);
+        assert([[_user3Ctx persistentRoots] count] == 1);
         user1Proot = [[_user1Ctx persistentRoots] anyObject];
         user2Proot = [[_user2Ctx persistentRoots] anyObject];
         user3Proot = [[_user3Ctx persistentRoots] anyObject];
@@ -129,7 +129,7 @@
     
     for (NSDictionary *dict in @[@{@"proot" : user1Proot, @"title" : @"user1"},
                                  @{@"proot" : user2Proot, @"title" : @"user2"},
-								 @{@"proot" : user3Proot, @"title" : @"user3"}])
+                                 @{@"proot" : user3Proot, @"title" : @"user3"}])
     {
         EWDocument *doc = [[EWDocument alloc] initWithPersistentRoot: dict[@"proot"] title: dict[@"title"]];
         [[NSDocumentController sharedDocumentController] addDocument: doc];

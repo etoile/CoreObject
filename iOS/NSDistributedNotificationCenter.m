@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2014 Quentin Mathe
+    Copyright (C) 2014 Quentin Mathe
 
-	Date:  July 2014
-	License:  MIT  (see COPYING)
+    Date:  July 2014
+    License:  MIT  (see COPYING)
  */
 
 #import "NSDistributedNotificationCenter.h"
@@ -28,23 +28,23 @@ static CODistributedNotificationCenter *defaultCenter = nil;
 
 + (void)initialize
 {
-	if ([self class] != self)
-		return;
+    if ([self class] != self)
+        return;
 
-	defaultCenter = [[self alloc] init];
+    defaultCenter = [[self alloc] init];
 }
 
 + (CODistributedNotificationCenter *)defaultCenter
 {
-	return defaultCenter;
+    return defaultCenter;
 }
 
 - (void)postNotificationName: (NSString *)aName
                       object: (NSString *)aSender
                     userInfo: (NSDictionary *)userInfo
-		  deliverImmediately: (BOOL)deliverImmediately
+          deliverImmediately: (BOOL)deliverImmediately
 {
-	[self postNotificationName: aName object: aSender userInfo: userInfo];
+    [self postNotificationName: aName object: aSender userInfo: userInfo];
 }
 
 @end

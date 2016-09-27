@@ -7,15 +7,15 @@
 
 @interface OutlineController : EWDocumentWindowController <NSOutlineViewDelegate, EWOutlineViewDelegate>
 {
-	IBOutlet EWOutlineView *outlineView;
-	BOOL preventCommits;
+    IBOutlet EWOutlineView *outlineView;
+    BOOL preventCommits;
 }
 
 - (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
-											 windowID: (NSString*)windowID;
+                                             windowID: (NSString*)windowID;
 
 - (instancetype) initPinnedToBranch: (COBranch *)aBranch
-						   windowID: (NSString*)windowID;
+                           windowID: (NSString*)windowID;
 
 - (Document*)projectDocument;
 - (OutlineItem*)rootObject;

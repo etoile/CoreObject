@@ -53,21 +53,21 @@ COJSONPrimitiveTypeToString(COType type)
 {
     switch (COTypePrimitivePart(type))
     {
-			case kCOTypeInt64: return intPrefix;
-			case kCOTypeDouble: return floatPrefix;
-			case kCOTypeString: return stringPrefix;
-			case kCOTypeBlob: return blobPrefix;
-			case kCOTypeReference: return referencePrefix;
-			case kCOTypeCompositeReference: return compositePrefix;
-			case kCOTypeAttachment: return attachmentPrefix;
-			default: return @"";
+            case kCOTypeInt64: return intPrefix;
+            case kCOTypeDouble: return floatPrefix;
+            case kCOTypeString: return stringPrefix;
+            case kCOTypeBlob: return blobPrefix;
+            case kCOTypeReference: return referencePrefix;
+            case kCOTypeCompositeReference: return compositePrefix;
+            case kCOTypeAttachment: return attachmentPrefix;
+            default: return @"";
     }
 }
 
 NSString *
 COJSONTypeToString(COType type)
 {
-	NSCAssert(COTypeIsValid(type), @"type to serialize not valid");
+    NSCAssert(COTypeIsValid(type), @"type to serialize not valid");
     return [COJSONPrimitiveTypeToString(type) stringByAppendingString: COJSONMultivalueTypeToString(type)];
 }
 
@@ -76,24 +76,24 @@ COJSONTypeToString(COType type)
 static COType
 COJSONStringToType(NSString *type)
 {
-	NSArray *components = [type componentsSeparatedByString: @"-"];
-	
-	COType result = [@{ intPrefix : @(kCOTypeInt64),
-						floatPrefix : @(kCOTypeDouble),
-						stringPrefix : @(kCOTypeString),
-						blobPrefix : @(kCOTypeBlob),
-						referencePrefix : @(kCOTypeReference),
-						compositePrefix : @(kCOTypeCompositeReference),
-						attachmentPrefix : @(kCOTypeAttachment) }[components[0]] intValue];
-		
-	if ([type hasSuffix: setSuffix])
-		result |= kCOTypeSet;
-	else if ([type hasSuffix: arraySuffix])
-		result |= kCOTypeArray;
-	
-	NSCAssert(COTypeIsValid(result), @"deserialized type not valid");
-	
-	return result;
+    NSArray *components = [type componentsSeparatedByString: @"-"];
+    
+    COType result = [@{ intPrefix : @(kCOTypeInt64),
+                        floatPrefix : @(kCOTypeDouble),
+                        stringPrefix : @(kCOTypeString),
+                        blobPrefix : @(kCOTypeBlob),
+                        referencePrefix : @(kCOTypeReference),
+                        compositePrefix : @(kCOTypeCompositeReference),
+                        attachmentPrefix : @(kCOTypeAttachment) }[components[0]] intValue];
+        
+    if ([type hasSuffix: setSuffix])
+        result |= kCOTypeSet;
+    else if ([type hasSuffix: arraySuffix])
+        result |= kCOTypeArray;
+    
+    NSCAssert(COTypeIsValid(result), @"deserialized type not valid");
+    
+    return result;
 }
 
 // COItem attribute value -> JSON-compatible plist
@@ -131,8 +131,8 @@ static id plistValueForPrimitiveValue(id aValue, COType aType)
 
 static id plistValueForValue(id aValue, COType aType)
 {
-	NSString *typeString = COJSONTypeToString(aType);
-	
+    NSString *typeString = COJSONTypeToString(aType);
+    
     if (COTypeIsUnivalued(aType))
     {
         return @{ typeString : plistValueForPrimitiveValue(aValue, aType) };
@@ -163,9 +163,9 @@ static id plistValueForValue(id aValue, COType aType)
  */
 static inline NSNumber * basicNumberFromDecimalNumber(NSNumber *aValue)
 {
-	return @(aValue.description.doubleValue);
+    return @(aValue.description.doubleValue);
 }
-													
+                                                    
 static id valueForPrimitivePlistValue(id aValue, COType aType)
 {
     if (aValue == [NSNull null])
@@ -199,10 +199,10 @@ static id valueForPrimitivePlistValue(id aValue, COType aType)
 
 static id importValueFromPlist(id typeValuePair)
 {
-	NSCAssert([typeValuePair count] == 1, @"JSON value dictionary should be one key : one value");
-	COType aType = COJSONStringToType([typeValuePair allKeys][0]);
-	id aValue = [typeValuePair allValues][0];
-	
+    NSCAssert([typeValuePair count] == 1, @"JSON value dictionary should be one key : one value");
+    COType aType = COJSONStringToType([typeValuePair allKeys][0]);
+    id aValue = [typeValuePair allValues][0];
+    
     if (COTypeIsUnivalued(aType))
     {
         return valueForPrimitivePlistValue(aValue, aType);
@@ -229,62 +229,62 @@ static id importValueFromPlist(id typeValuePair)
 
 static COType importTypeFromPlist(id typeValuePair)
 {
-	NSCAssert([typeValuePair count] == 1, @"JSON value dictionary should be one key : one value");
-	COType aType = COJSONStringToType([typeValuePair allKeys][0]);
-	return aType;
+    NSCAssert([typeValuePair count] == 1, @"JSON value dictionary should be one key : one value");
+    COType aType = COJSONStringToType([typeValuePair allKeys][0]);
+    return aType;
 }
 
 - (id) JSONPlist
 {
-	NSMutableDictionary *plistValues = [NSMutableDictionary dictionaryWithCapacity: values.count];
-	
-	for (NSString *key in values)
-	{
-		id plistValue = plistValueForValue(values[key], [types[key] intValue]);
-		plistValues[key] = plistValue;
-	}
-	
-	ETAssert(plistValues[kCOJSONObjectUUIDProperty] == nil);
-	plistValues[kCOJSONObjectUUIDProperty] = [self.UUID stringValue];
-	
-	ETAssert(plistValues[kCOJSONFormatProperty] == nil);
-	plistValues[kCOJSONFormatProperty] = kCOJSONFormat1_0;
-	
+    NSMutableDictionary *plistValues = [NSMutableDictionary dictionaryWithCapacity: values.count];
+    
+    for (NSString *key in values)
+    {
+        id plistValue = plistValueForValue(values[key], [types[key] intValue]);
+        plistValues[key] = plistValue;
+    }
+    
+    ETAssert(plistValues[kCOJSONObjectUUIDProperty] == nil);
+    plistValues[kCOJSONObjectUUIDProperty] = [self.UUID stringValue];
+    
+    ETAssert(plistValues[kCOJSONFormatProperty] == nil);
+    plistValues[kCOJSONFormatProperty] = kCOJSONFormat1_0;
+    
     return plistValues;
 }
 
 - (instancetype) initWithJSONPlist: (id)aPlist
 {
-	ETUUID *aUUID = [ETUUID UUIDWithString: aPlist[kCOJSONObjectUUIDProperty]];
+    ETUUID *aUUID = [ETUUID UUIDWithString: aPlist[kCOJSONObjectUUIDProperty]];
     
-	NSMutableDictionary *importedValues = [NSMutableDictionary dictionary];
-	NSMutableDictionary *importedTypes = [NSMutableDictionary dictionary];
+    NSMutableDictionary *importedValues = [NSMutableDictionary dictionary];
+    NSMutableDictionary *importedTypes = [NSMutableDictionary dictionary];
 
-	// Check format
-	if (!(aPlist[kCOJSONFormatProperty] == nil // accept JSON written before format tag was added
-		  || [aPlist[kCOJSONFormatProperty] isEqual: kCOJSONFormat1_0]))
-	{
-		[NSException raise: NSInvalidArgumentException
-					format: @"Unknown COItem JSON format '%@'",
-		                    aPlist[kCOJSONFormatProperty]];
-	}
-	
-	for (NSString *key in aPlist)
-	{
-		if ([key isEqualToString: kCOJSONObjectUUIDProperty]
-			|| [key isEqualToString: kCOJSONFormatProperty])
-			continue;
-		
-		id typeValuePair = aPlist[key];
-		
-		importedValues[key] = importValueFromPlist(typeValuePair);
-		
-		importedTypes[key] = @(importTypeFromPlist(typeValuePair));
-	}
-	
-	self = [self initWithUUID: aUUID
-		   typesForAttributes: importedTypes
-		  valuesForAttributes: importedValues];
+    // Check format
+    if (!(aPlist[kCOJSONFormatProperty] == nil // accept JSON written before format tag was added
+          || [aPlist[kCOJSONFormatProperty] isEqual: kCOJSONFormat1_0]))
+    {
+        [NSException raise: NSInvalidArgumentException
+                    format: @"Unknown COItem JSON format '%@'",
+                            aPlist[kCOJSONFormatProperty]];
+    }
+    
+    for (NSString *key in aPlist)
+    {
+        if ([key isEqualToString: kCOJSONObjectUUIDProperty]
+            || [key isEqualToString: kCOJSONFormatProperty])
+            continue;
+        
+        id typeValuePair = aPlist[key];
+        
+        importedValues[key] = importValueFromPlist(typeValuePair);
+        
+        importedTypes[key] = @(importTypeFromPlist(typeValuePair));
+    }
+    
+    self = [self initWithUUID: aUUID
+           typesForAttributes: importedTypes
+          valuesForAttributes: importedValues];
     
     return self;
 }

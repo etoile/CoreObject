@@ -33,21 +33,21 @@
 **/
 @interface XMPPRoster : XMPPModule
 {
-/*	Inherited from XMPPModule:
-	
-	XMPPStream *xmppStream;
+/*  Inherited from XMPPModule:
+    
+    XMPPStream *xmppStream;
  
-	dispatch_queue_t moduleQueue;
-	id multicastDelegate;
+    dispatch_queue_t moduleQueue;
+    id multicastDelegate;
  */
-	__strong id <XMPPRosterStorage> xmppRosterStorage;
-	
-	Byte config;
-	Byte flags;
-	
-	NSMutableArray *earlyPresenceElements;
-	
-	DDList *mucModules;
+    __strong id <XMPPRosterStorage> xmppRosterStorage;
+    
+    Byte config;
+    Byte flags;
+    
+    NSMutableArray *earlyPresenceElements;
+    
+    DDList *mucModules;
 }
 
 - (id)initWithRosterStorage:(id <XMPPRosterStorage>)storage;

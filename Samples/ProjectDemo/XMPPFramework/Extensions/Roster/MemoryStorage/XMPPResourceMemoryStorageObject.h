@@ -8,10 +8,10 @@
 
 @interface XMPPResourceMemoryStorageObject : NSObject <XMPPResource, NSCopying, NSCoding>
 {
-	XMPPJID *jid;
-	XMPPPresence *presence;
-	
-	NSDate *presenceDate;
+    XMPPJID *jid;
+    XMPPPresence *presence;
+    
+    NSDate *presenceDate;
 }
 
 /* From the XMPPResource protocol

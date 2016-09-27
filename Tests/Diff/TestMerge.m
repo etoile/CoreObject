@@ -24,7 +24,7 @@
 {
     self = [super init];
     ctx1 = [[COObjectGraphContext alloc] init];
-	ctx2 = [[COObjectGraphContext alloc] init];
+    ctx2 = [[COObjectGraphContext alloc] init];
     ctx3 = [[COObjectGraphContext alloc] init];
     return self;
 }
@@ -32,47 +32,47 @@
 
 - (void)testSimpleNonconflictingMerge
 {
-	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *child3 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *subchild1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	ctx1.rootObject = parent;
+    OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child3 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *subchild1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    ctx1.rootObject = parent;
     
-	[child1 insertObject: subchild1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[parent insertObject: child2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[parent insertObject: child3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
+    [child1 insertObject: subchild1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [parent insertObject: child2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [parent insertObject: child3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
     // Copy into ctx2 and ctx3
     
     [ctx2 setItemGraph: ctx1];
     [ctx3 setItemGraph: ctx1];
     
-	// ctx2: remove child2, set a label for subchild1
+    // ctx2: remove child2, set a label for subchild1
     [[ctx2 loadedObjectForUUID: parent.UUID] removeObject: [ctx2 loadedObjectForUUID: child2.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[[ctx2 loadedObjectForUUID: subchild1.UUID] setValue: @"Groceries" forProperty: @"label"];
+    [[ctx2 loadedObjectForUUID: subchild1.UUID] setValue: @"Groceries" forProperty: @"label"];
     
-	// ctx3: move subchild1 to child3, insert child4
-	[(id)[ctx3 loadedObjectForUUID: child3.UUID] insertObject: [ctx3 loadedObjectForUUID: subchild1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	OutlineItem *child4Ctx3 = [ctx3 insertObjectWithEntityName: @"OutlineItem"];
-	[(id)[ctx3 loadedObjectForUUID: parent.UUID] insertObject: child4Ctx3 atIndex: 0];
-	assert([(id)[ctx1 loadedObjectForUUID: parent.UUID] contentArray].count == 3);
-	
-	// Now do the merge
+    // ctx3: move subchild1 to child3, insert child4
+    [(id)[ctx3 loadedObjectForUUID: child3.UUID] insertObject: [ctx3 loadedObjectForUUID: subchild1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    OutlineItem *child4Ctx3 = [ctx3 insertObjectWithEntityName: @"OutlineItem"];
+    [(id)[ctx3 loadedObjectForUUID: parent.UUID] insertObject: child4Ctx3 atIndex: 0];
+    assert([(id)[ctx1 loadedObjectForUUID: parent.UUID] contentArray].count == 3);
+    
+    // Now do the merge
     COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
     COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
-	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
     
     UKFalse([merged hasConflicts]);
     
     [merged applyTo: ctx1];
     
-	UKStringsEqual(@"Groceries", [subchild1 valueForProperty: @"label"]);
+    UKStringsEqual(@"Groceries", [subchild1 valueForProperty: @"label"]);
     UKObjectsEqual(@[subchild1], child3.contents);
-	UKObjectsSame(child3, [subchild1 valueForProperty: @"parentContainer"]);
-	UKIntsEqual(3, [parent contentArray].count);
-	OutlineItem *child4 = (id)[ctx1 loadedObjectForUUID: child4Ctx3.UUID];
+    UKObjectsSame(child3, [subchild1 valueForProperty: @"parentContainer"]);
+    UKIntsEqual(3, [parent contentArray].count);
+    OutlineItem *child4 = (id)[ctx1 loadedObjectForUUID: child4Ctx3.UUID];
     UKObjectsSame(child4, [parent contentArray][0]);
     UKObjectsSame(child1, [parent contentArray][1]);
     UKObjectsSame(child3, [parent contentArray][2]);
@@ -84,133 +84,133 @@
 
 - (void)testMoveAndDeleteOnOneToManyRelationship
 {
-	// Expected result: conflict
-	
-	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    // Expected result: conflict
+    
+    OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = parent;
-	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	
-	[parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[parent insertObject: child2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// ctx1:
-	//
-	// parent
-	//  |
-	//  |--child1
-	//  |
-	//   \-child2
+    OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     
-	[ctx2 setItemGraph: ctx1];
-	[ctx3 setItemGraph: ctx1];
-	
-	// ctx2: remove child1
-	[(id)[ctx2 loadedObjectForUUID: parent.UUID] removeObject: [ctx2 loadedObjectForUUID: child1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// ctx2:
-	//
-	// parent
-	//  |
-	//   \-child2
+    [parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [parent insertObject: child2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     
-	// ctx3: put child1 inside  child2, and add a new child3 inside child2
-	OutlineItem *child3Ctx3 = [ctx3 insertObjectWithEntityName: @"OutlineItem"];
-	[(id)[ctx3 loadedObjectForUUID: child2.UUID] insertObject: [ctx3 loadedObjectForUUID: child1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[(id)[ctx3 loadedObjectForUUID: child2.UUID] insertObject: child3Ctx3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// ctx3:
-	//
-	// parent
-	//  |
-	//   \-child2
-	//       |
-	//       |-child1
-	//       |
-	//       \-child3
-	
-	
-	// Now do the merge
+    // ctx1:
+    //
+    // parent
+    //  |
+    //  |--child1
+    //  |
+    //   \-child2
+    
+    [ctx2 setItemGraph: ctx1];
+    [ctx3 setItemGraph: ctx1];
+    
+    // ctx2: remove child1
+    [(id)[ctx2 loadedObjectForUUID: parent.UUID] removeObject: [ctx2 loadedObjectForUUID: child1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    // ctx2:
+    //
+    // parent
+    //  |
+    //   \-child2
+    
+    // ctx3: put child1 inside  child2, and add a new child3 inside child2
+    OutlineItem *child3Ctx3 = [ctx3 insertObjectWithEntityName: @"OutlineItem"];
+    [(id)[ctx3 loadedObjectForUUID: child2.UUID] insertObject: [ctx3 loadedObjectForUUID: child1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [(id)[ctx3 loadedObjectForUUID: child2.UUID] insertObject: child3Ctx3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    // ctx3:
+    //
+    // parent
+    //  |
+    //   \-child2
+    //       |
+    //       |-child1
+    //       |
+    //       \-child3
+    
+    
+    // Now do the merge
     COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
     COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
-	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
-	
+    COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    
     // Currently fails:
     //UKTrue([merged hasConflicts]);
 }
 
 - (void)testMoveAndDeleteOnManyToManyRelationship
 {
-	// Expected: both succeed
+    // Expected: both succeed
     Tag *parent = [ctx1 insertObjectWithEntityName: @"Tag"];
     ctx1.rootObject = parent;
     
-	Tag *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
-	Tag *tag2 = [ctx1 insertObjectWithEntityName: @"Tag"];
-	OutlineItem *child = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	
+    Tag *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
+    Tag *tag2 = [ctx1 insertObjectWithEntityName: @"Tag"];
+    OutlineItem *child = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    
     [parent insertObject: tag1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"childTags"];
     [parent insertObject: tag2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"childTags"];
-	[tag1 insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// ctx1:
-	//
-	// tag1         tag2
-	//  |
-	//   \--child
-	
+    [tag1 insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    // ctx1:
+    //
+    // tag1         tag2
+    //  |
+    //   \--child
+    
     [ctx2 setItemGraph: ctx1];
     [ctx3 setItemGraph: ctx1];
     
-	Tag *tag1Ctx2 = (Tag *)[ctx2 loadedObjectForUUID: tag1.UUID];
-	Tag *tag2Ctx2 = (Tag *)[ctx2 loadedObjectForUUID: tag2.UUID];
-	OutlineItem *childCtx2 = (OutlineItem *)[ctx2 loadedObjectForUUID: child.UUID];
-	
-	Tag *tag1Ctx3 = (Tag *)[ctx3 loadedObjectForUUID: tag1.UUID];
-	OutlineItem *childCtx3 = (OutlineItem *)[ctx3 loadedObjectForUUID: child.UUID];
-	
-	// ctx2: move child to tag2
-	UKTrue([tag1Ctx2.contents containsObject: childCtx2]);
-	[tag1Ctx2 removeObject: childCtx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[tag2Ctx2 insertObject: childCtx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// ctx2:
-	//
-	// tag1         tag2
-	//               |
-	//                \--child
-	
-	// ctx3: delete child from tag1
-	UKTrue([tag1Ctx3.contents containsObject: childCtx3]);
-	[tag1Ctx3 removeObject: childCtx3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// ctx3:
-	//
-	// tag1         tag2
-	//
-	// child
-	
-	
-	// Now do the merge
-	//NSArray *uuids = (id)[[@[tag1, tag2, child] mappedCollection] UUID];
+    Tag *tag1Ctx2 = (Tag *)[ctx2 loadedObjectForUUID: tag1.UUID];
+    Tag *tag2Ctx2 = (Tag *)[ctx2 loadedObjectForUUID: tag2.UUID];
+    OutlineItem *childCtx2 = (OutlineItem *)[ctx2 loadedObjectForUUID: child.UUID];
+    
+    Tag *tag1Ctx3 = (Tag *)[ctx3 loadedObjectForUUID: tag1.UUID];
+    OutlineItem *childCtx3 = (OutlineItem *)[ctx3 loadedObjectForUUID: child.UUID];
+    
+    // ctx2: move child to tag2
+    UKTrue([tag1Ctx2.contents containsObject: childCtx2]);
+    [tag1Ctx2 removeObject: childCtx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [tag2Ctx2 insertObject: childCtx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    // ctx2:
+    //
+    // tag1         tag2
+    //               |
+    //                \--child
+    
+    // ctx3: delete child from tag1
+    UKTrue([tag1Ctx3.contents containsObject: childCtx3]);
+    [tag1Ctx3 removeObject: childCtx3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    // ctx3:
+    //
+    // tag1         tag2
+    //
+    // child
+    
+    
+    // Now do the merge
+    //NSArray *uuids = (id)[[@[tag1, tag2, child] mappedCollection] UUID];
     COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
     COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
-	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
 
     UKFalse([merged hasConflicts]);
-	
-	// Apply the resulting diff to ctx1
-	[merged applyTo: ctx1];
-	
-	// Expected result:
-	//
-	// tag1         tag2
-	//               |
-	//                \--child
-	
-	UKIntsEqual(0, tag1.contents.count);
-	UKIntsEqual(1, tag2.contents.count);
-	UKObjectsEqual(S(tag2), [child valueForProperty: @"parentCollections"]);
+    
+    // Apply the resulting diff to ctx1
+    [merged applyTo: ctx1];
+    
+    // Expected result:
+    //
+    // tag1         tag2
+    //               |
+    //                \--child
+    
+    UKIntsEqual(0, tag1.contents.count);
+    UKIntsEqual(1, tag2.contents.count);
+    UKObjectsEqual(S(tag2), [child valueForProperty: @"parentCollections"]);
 }
 
 //
@@ -220,62 +220,62 @@
 
 - (void)testConflictingInsertInsertOnOneToManyRelationship
 {
-	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = parent;
-	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	
-	[parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[parent insertObject: child2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// ctx1:
-	//
-	// parent
-	//  |
-	//  |\-child1
-	//  |
-	//   \-child2
-	
-	[ctx2 setItemGraph: ctx1];	
-	
-	// ctx2: insert subchild1 in child1
-	OutlineItem *subchild1Ctx2 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
-	[(id)[ctx2 loadedObjectForUUID: child1.UUID] insertObject: subchild1Ctx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	UKObjectsSame([ctx2 loadedObjectForUUID: child1.UUID], [subchild1Ctx2 valueForProperty: @"parentContainer"]);
-	UKIntsEqual(1, [(id)[ctx2 loadedObjectForUUID: child1.UUID] contentArray].count);
-	UKIntsEqual(0, [(id)[ctx2 loadedObjectForUUID: child2.UUID] contentArray].count);
-	
-	// ctx2:
-	//
-	// parent
-	//  |
-	//  |\-child1
-	//  |   |
-	//  |   \-subchild1
-	//  |
-	//   \-child2
-	
-	
-	// ctx3: insert subchild1 in child2
+    OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    
+    [parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [parent insertObject: child2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    // ctx1:
+    //
+    // parent
+    //  |
+    //  |\-child1
+    //  |
+    //   \-child2
+    
+    [ctx2 setItemGraph: ctx1];  
+    
+    // ctx2: insert subchild1 in child1
+    OutlineItem *subchild1Ctx2 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
+    [(id)[ctx2 loadedObjectForUUID: child1.UUID] insertObject: subchild1Ctx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    UKObjectsSame([ctx2 loadedObjectForUUID: child1.UUID], [subchild1Ctx2 valueForProperty: @"parentContainer"]);
+    UKIntsEqual(1, [(id)[ctx2 loadedObjectForUUID: child1.UUID] contentArray].count);
+    UKIntsEqual(0, [(id)[ctx2 loadedObjectForUUID: child2.UUID] contentArray].count);
+    
+    // ctx2:
+    //
+    // parent
+    //  |
+    //  |\-child1
+    //  |   |
+    //  |   \-subchild1
+    //  |
+    //   \-child2
+    
+    
+    // ctx3: insert subchild1 in child2
     [ctx3 setItemGraph: ctx2];
-	[(id)[ctx3 loadedObjectForUUID: child2.UUID] insertObject: [ctx3 loadedObjectForUUID: subchild1Ctx2.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	UKObjectsSame([ctx3 loadedObjectForUUID: child2.UUID], [[ctx3 loadedObjectForUUID: subchild1Ctx2.UUID] valueForProperty: @"parentContainer"]);
-	UKIntsEqual(0, [(id)[ctx3 loadedObjectForUUID: child1.UUID] contentArray].count);
-	UKIntsEqual(1, [(id)[ctx3 loadedObjectForUUID: child2.UUID] contentArray].count);
-	
-	// ctx3:
-	//
-	// parent
-	//  |
-	//  |\-child1
-	//  |
-	//   \-child2
-	//      |
-	//      \-subchild1
-	
+    [(id)[ctx3 loadedObjectForUUID: child2.UUID] insertObject: [ctx3 loadedObjectForUUID: subchild1Ctx2.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    UKObjectsSame([ctx3 loadedObjectForUUID: child2.UUID], [[ctx3 loadedObjectForUUID: subchild1Ctx2.UUID] valueForProperty: @"parentContainer"]);
+    UKIntsEqual(0, [(id)[ctx3 loadedObjectForUUID: child1.UUID] contentArray].count);
+    UKIntsEqual(1, [(id)[ctx3 loadedObjectForUUID: child2.UUID] contentArray].count);
+    
+    // ctx3:
+    //
+    // parent
+    //  |
+    //  |\-child1
+    //  |
+    //   \-child2
+    //      |
+    //      \-subchild1
+    
     COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
     COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
-	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
 
     UKTrue([merged hasConflicts]);
     
@@ -290,62 +290,62 @@
 
 - (void)testNonconflictingInsertInsertOnOneToManyRelationship
 {
-	// Expected: both succeed
+    // Expected: both succeed
 
-	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = parent;
-	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	
-	[parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// ctx1:
-	//
-	// parent
-	//  |
-	//   \-child1
-	
-	[ctx2 setItemGraph: ctx1];
-	
-	// ctx2: insert subchild1 in child1
-	OutlineItem *subchild1Ctx2 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
-	[(id)[ctx2 loadedObjectForUUID: child1.UUID] insertObject: subchild1Ctx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	UKObjectsSame([ctx2 loadedObjectForUUID: child1.UUID], [subchild1Ctx2 valueForProperty: @"parentContainer"]);
-	UKIntsEqual(1, [(id)[ctx2 loadedObjectForUUID: child1.UUID] contentArray].count);
-	
-	// ctx2:
-	//
-	// parent
-	//  |
-	//   \-child1
-	//      |
-	//      \-subchild1
-	
-	
-	// ctx3: insert subchild1 in child1
+    OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    
+    [parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    // ctx1:
+    //
+    // parent
+    //  |
+    //   \-child1
+    
+    [ctx2 setItemGraph: ctx1];
+    
+    // ctx2: insert subchild1 in child1
+    OutlineItem *subchild1Ctx2 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
+    [(id)[ctx2 loadedObjectForUUID: child1.UUID] insertObject: subchild1Ctx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    UKObjectsSame([ctx2 loadedObjectForUUID: child1.UUID], [subchild1Ctx2 valueForProperty: @"parentContainer"]);
+    UKIntsEqual(1, [(id)[ctx2 loadedObjectForUUID: child1.UUID] contentArray].count);
+    
+    // ctx2:
+    //
+    // parent
+    //  |
+    //   \-child1
+    //      |
+    //      \-subchild1
+    
+    
+    // ctx3: insert subchild1 in child1
     [ctx3 setItemGraph: ctx2];
-	UKObjectsSame([ctx3 loadedObjectForUUID: child1.UUID], [[ctx3 loadedObjectForUUID: subchild1Ctx2.UUID] valueForProperty: @"parentContainer"]);
+    UKObjectsSame([ctx3 loadedObjectForUUID: child1.UUID], [[ctx3 loadedObjectForUUID: subchild1Ctx2.UUID] valueForProperty: @"parentContainer"]);
     UKIntsEqual(1, [(OutlineItem *)[ctx3 loadedObjectForUUID: child1.UUID] contents].count);
-	
-	// ctx3:
-	//
-	// parent
-	//  |
-	//   \-child1
-	//      |
-	//      \-subchild1
-	
+    
+    // ctx3:
+    //
+    // parent
+    //  |
+    //   \-child1
+    //      |
+    //      \-subchild1
+    
     COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
     COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
-	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
     UKFalse([merged hasConflicts]);
-	
+    
     [merged applyTo: ctx1];
     
-	OutlineItem *subchild1 = (id)[ctx1 loadedObjectForUUID: subchild1Ctx2.UUID];
+    OutlineItem *subchild1 = (id)[ctx1 loadedObjectForUUID: subchild1Ctx2.UUID];
     UKNotNil(subchild1);
-	UKObjectsSame(child1, [subchild1 valueForProperty: @"parentContainer"]);
+    UKObjectsSame(child1, [subchild1 valueForProperty: @"parentContainer"]);
     UKIntsEqual(1, child1.contents.count);
-	UKObjectsEqual(A(subchild1), child1.contents);
+    UKObjectsEqual(A(subchild1), child1.contents);
 }
 
 /**
@@ -354,36 +354,36 @@
  */
 - (void)testNonconflictingMixedSequenceEdit
 {
-	// Expected: both succeed
+    // Expected: both succeed
     
-	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = parent;
-	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     OutlineItem *child3 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     
-	[parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[parent insertObject: child2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[parent insertObject: child3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [parent insertObject: child2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [parent insertObject: child3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     
-	// ctx1:
-	//
-	// parent
-	//  |
-	//  |--child1
-	//  |
-	//  |--child2
-	//  |
-	//   \-child3
+    // ctx1:
+    //
+    // parent
+    //  |
+    //  |--child1
+    //  |
+    //  |--child2
+    //  |
+    //   \-child3
     
-	[ctx2 setItemGraph: ctx1];
-	
-	OutlineItem *child0 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *child1a = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *child4 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
+    [ctx2 setItemGraph: ctx1];
     
-	[ctx2.rootObject insertObject: child0 atIndex: 0 hint: nil forProperty: @"contents"];
-	[ctx2.rootObject insertObject: child1a atIndex: 2 hint: nil forProperty: @"contents"];
+    OutlineItem *child0 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child1a = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child4 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
+    
+    [ctx2.rootObject insertObject: child0 atIndex: 0 hint: nil forProperty: @"contents"];
+    [ctx2.rootObject insertObject: child1a atIndex: 2 hint: nil forProperty: @"contents"];
     [ctx2.rootObject insertObject: child4 atIndex: 5 hint: nil forProperty: @"contents"];
     
     UKObjectsEqual((@[child0.UUID,
@@ -393,24 +393,24 @@
                     child3.UUID,
                     child4.UUID]), [[[(OutlineItem *)ctx2.rootObject contents] mappedCollection] UUID]);
     
-	// ctx2:
-	//
-	// parent
-	//  |
-	//  |--child0    ** new
-	//  |
-	//  |--child1
-	//  |
-	//  |--child1a   ** new
-	//  |
-	//  |--child2
-	//  |
-	//  |--child3
-	//  |
-	//   \-child4    ** new
-	
-	
-	// ctx3:
+    // ctx2:
+    //
+    // parent
+    //  |
+    //  |--child0    ** new
+    //  |
+    //  |--child1
+    //  |
+    //  |--child1a   ** new
+    //  |
+    //  |--child2
+    //  |
+    //  |--child3
+    //  |
+    //   \-child4    ** new
+    
+    
+    // ctx3:
     [ctx3 setItemGraph: ctx2];
     
     OutlineItem *child2a = [ctx3 insertObjectWithEntityName: @"OutlineItem"];
@@ -424,49 +424,49 @@
                     child3.UUID,
                     child4.UUID]), [[[(OutlineItem *)ctx3.rootObject contents] mappedCollection] UUID]);
     
-	// ctx3:
-	//
-	// parent
-	//  |
-	//  |--child0    ** new
-	//  |
-	//  |--child1
-	//  |
-	//  |--child2
-	//  |
-	//  |--child2a   ** new
-	//  |
-	//  |--child3
-	//  |
-	//   \-child4    ** new
-	
+    // ctx3:
+    //
+    // parent
+    //  |
+    //  |--child0    ** new
+    //  |
+    //  |--child1
+    //  |
+    //  |--child2
+    //  |
+    //  |--child2a   ** new
+    //  |
+    //  |--child3
+    //  |
+    //   \-child4    ** new
+    
     COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
     COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
-	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
     
     UKFalse([merged hasConflicts]);
-	   
+       
     [merged applyTo: ctx1];
     
     // ctx1:
-	//
-	// parent
-	//  |
-	//  |--child0    ** new (from ctx2 and ctx3)
-	//  |
-	//  |--child1
-	//  |
-	//  |--child1a   ** new (from ctx2)
-	//  |
-	//  |--child2
-	//  |
-	//  |--child2a   ** new (from ctx3)
-	//  |
-	//  |--child3
-	//  |
-	//   \-child4    ** new (from ctx2 and ctx3)
+    //
+    // parent
+    //  |
+    //  |--child0    ** new (from ctx2 and ctx3)
+    //  |
+    //  |--child1
+    //  |
+    //  |--child1a   ** new (from ctx2)
+    //  |
+    //  |--child2
+    //  |
+    //  |--child2a   ** new (from ctx3)
+    //  |
+    //  |--child3
+    //  |
+    //   \-child4    ** new (from ctx2 and ctx3)
     
-	UKObjectsEqual((@[child0.UUID,
+    UKObjectsEqual((@[child0.UUID,
                       child1.UUID,
                       child1a.UUID,
                       child2.UUID,
@@ -480,20 +480,20 @@
  */
 - (void)testConflictingMixedSequenceEdit
 {
-	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = parent;
     
-	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     OutlineItem *child3 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *child4 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *child5 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child4 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child5 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     OutlineItem *child6 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
 
     parent.contents = @[child1, child2, child3, child4, child5, child6];
 
     
-	[ctx2 setItemGraph: ctx1];
+    [ctx2 setItemGraph: ctx1];
     ((OutlineItem *)ctx2.rootObject).contents = @[[ctx2 loadedObjectForUUID: child1.UUID],
                                                     [ctx2 loadedObjectForUUID: child4.UUID],
                                                     [ctx2 loadedObjectForUUID: child5.UUID],
@@ -511,7 +511,7 @@
     
     COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
     COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
-	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
     
     // FIXME: Not detected as a conflict.
 #if 0
@@ -522,68 +522,68 @@
 
 - (void)testInsertInsertOnManyToManyRelationship
 {
-	// Expected: both succeed
+    // Expected: both succeed
 
     Tag *parent = [ctx1 insertObjectWithEntityName: @"Tag"];
     ctx1.rootObject = parent;
-	Tag *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
-	Tag *tag2 = [ctx1 insertObjectWithEntityName: @"Tag"];
+    Tag *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
+    Tag *tag2 = [ctx1 insertObjectWithEntityName: @"Tag"];
     
     [parent insertObject: tag1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"childTags"];
     [parent insertObject: tag2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"childTags"];
-	
-	// ctx1:
-	//
-	// tag1         tag2
-	
+    
+    // ctx1:
+    //
+    // tag1         tag2
+    
     [ctx2 setItemGraph: ctx1];
 
-	OutlineItem *childCtx2 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *childCtx2 = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
     [[ctx2 loadedObjectForUUID: tag1.UUID] insertObject: childCtx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// ctx2:
-	//
-	// tag1         tag2
-	//  |
-	//   \--child
-	
+    
+    // ctx2:
+    //
+    // tag1         tag2
+    //  |
+    //   \--child
+    
     [ctx3 setItemGraph: ctx2];
-	
+    
     [[ctx3 loadedObjectForUUID: tag1.UUID] removeObject: [ctx3 loadedObjectForUUID: childCtx2.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     [[ctx3 loadedObjectForUUID: tag2.UUID] insertObject: [ctx3 loadedObjectForUUID: childCtx2.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// ctx3:
-	//
-	// tag1         tag2
-	//               |
-	//                \--child
-	
-	// Now do the merge
+    
+    // ctx3:
+    //
+    // tag1         tag2
+    //               |
+    //                \--child
+    
+    // Now do the merge
 
     COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
     COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
-	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
     UKFalse([merged hasConflicts]);
-	
-	// Apply the resulting diff to ctx1
-	[merged applyTo: ctx1];
-	
-	// Expected result:
-	//
-	// tag1         tag2
-	//  |            |
-	//   \--child    \--child
-	
-	
-	OutlineItem *child = (id)[ctx1 loadedObjectForUUID: childCtx2.UUID];
-	UKIntsEqual(1, tag1.contents.count);
-	UKIntsEqual(1, tag2.contents.count);
-	
+    
+    // Apply the resulting diff to ctx1
+    [merged applyTo: ctx1];
+    
+    // Expected result:
+    //
+    // tag1         tag2
+    //  |            |
+    //   \--child    \--child
+    
+    
+    OutlineItem *child = (id)[ctx1 loadedObjectForUUID: childCtx2.UUID];
+    UKIntsEqual(1, tag1.contents.count);
+    UKIntsEqual(1, tag2.contents.count);
+    
     UKObjectsEqual(S(tag1, tag2), [child valueForProperty: @"parentCollections"]);
-	UKObjectsEqual(A(child), [tag1 contentArray]);
-	UKObjectsEqual(A(child), [tag2 contentArray]);
-	UKObjectsEqual(S(child), tag1.content);
-	UKObjectsEqual(S(child), tag2.content);
+    UKObjectsEqual(A(child), [tag1 contentArray]);
+    UKObjectsEqual(A(child), [tag2 contentArray]);
+    UKObjectsEqual(S(child), tag1.content);
+    UKObjectsEqual(S(child), tag2.content);
 }
 
 
@@ -594,332 +594,332 @@
 
 - (void)testConflictingMoveAndMoveOnOneToManyRelationship
 {
-	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = parent;
-	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *child3 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *subchild1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	
-	[child1 insertObject: subchild1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[parent insertObject: child2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[parent insertObject: child3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child3 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *subchild1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     
-	// ctx1:
-	//
-	// parent
-	//  |
-	//  |\-child1
-	//  |   |
-	//  |   \-subchild1
-	//  |
-	//  |\-child2
-	//  |
-	//   \-child3
-	
-	[ctx2 setItemGraph: ctx1];
-	[ctx3 setItemGraph: ctx1];
+    [child1 insertObject: subchild1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [parent insertObject: child2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [parent insertObject: child3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     
-	// ctx2: move subchild1 to child2
-	[[ctx2 loadedObjectForUUID: child2.UUID] insertObject: [ctx2 loadedObjectForUUID: subchild1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    // ctx1:
+    //
+    // parent
+    //  |
+    //  |\-child1
+    //  |   |
+    //  |   \-subchild1
+    //  |
+    //  |\-child2
+    //  |
+    //   \-child3
     
-	// ctx2:
-	//
-	// parent
-	//  |
-	//  |\-child1
-	//  |
-	//  |\-child2
-	//  |   |
-	//  |   \-subchild1
-	//  |
-	//   \-child3
-	
-	
-	// ctx3: move subchild1 to child3
-	[[ctx3 loadedObjectForUUID: child3.UUID] insertObject: [ctx3 loadedObjectForUUID: subchild1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// ctx3:
-	//
-	// parent
-	//  |
-	//  |\-child1
-	//  |
-	//  |\-child2
-	//  |
-	//   \-child3
-	//      |
-	//      \-subchild1
-	
+    [ctx2 setItemGraph: ctx1];
+    [ctx3 setItemGraph: ctx1];
+    
+    // ctx2: move subchild1 to child2
+    [[ctx2 loadedObjectForUUID: child2.UUID] insertObject: [ctx2 loadedObjectForUUID: subchild1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    // ctx2:
+    //
+    // parent
+    //  |
+    //  |\-child1
+    //  |
+    //  |\-child2
+    //  |   |
+    //  |   \-subchild1
+    //  |
+    //   \-child3
+    
+    
+    // ctx3: move subchild1 to child3
+    [[ctx3 loadedObjectForUUID: child3.UUID] insertObject: [ctx3 loadedObjectForUUID: subchild1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    // ctx3:
+    //
+    // parent
+    //  |
+    //  |\-child1
+    //  |
+    //  |\-child2
+    //  |
+    //   \-child3
+    //      |
+    //      \-subchild1
+    
     COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
     COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
-	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
     
     UKTrue([merged hasConflicts]);
 }
 
 - (void)testNonconflictingMoveAndMoveOnOneToManyRelationship
 {
-	OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *parent = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = parent;
-	OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *subchild1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	
-	[child1 insertObject: subchild1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[parent insertObject: child2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// ctx1:
-	//
-	// parent
-	//  |
-	//  |\-child1
-	//  |    |
-	//  |    \-subchild1
-	//  |
-	//   \-child2
-	
-	[ctx2 setItemGraph: ctx1];
-	[ctx3 setItemGraph: ctx1];
-	
-	// ctx2: move subchild1 to child2
-	[[ctx2 loadedObjectForUUID: child2.UUID] insertObject: [ctx2 loadedObjectForUUID: subchild1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    OutlineItem *child1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *child2 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *subchild1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     
-	// ctx2:
-	//
-	// parent
-	//  |
-	//  |\-child1
-	//  |
-	//   \-child2
-	//      |
-	//      \-subchild1
-	
-	// ctx3: move subchild1 to child2
-	[[ctx3 loadedObjectForUUID: child2.UUID] insertObject: [ctx3 loadedObjectForUUID: subchild1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// ctx3:
-	//
-	// parent
-	//  |
-	//  |\-child1
-	//  |
-	//   \-child2
-	//      |
-	//      \-subchild1
-	
+    [child1 insertObject: subchild1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [parent insertObject: child1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [parent insertObject: child2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    // ctx1:
+    //
+    // parent
+    //  |
+    //  |\-child1
+    //  |    |
+    //  |    \-subchild1
+    //  |
+    //   \-child2
+    
+    [ctx2 setItemGraph: ctx1];
+    [ctx3 setItemGraph: ctx1];
+    
+    // ctx2: move subchild1 to child2
+    [[ctx2 loadedObjectForUUID: child2.UUID] insertObject: [ctx2 loadedObjectForUUID: subchild1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    // ctx2:
+    //
+    // parent
+    //  |
+    //  |\-child1
+    //  |
+    //   \-child2
+    //      |
+    //      \-subchild1
+    
+    // ctx3: move subchild1 to child2
+    [[ctx3 loadedObjectForUUID: child2.UUID] insertObject: [ctx3 loadedObjectForUUID: subchild1.UUID] atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    // ctx3:
+    //
+    // parent
+    //  |
+    //  |\-child1
+    //  |
+    //   \-child2
+    //      |
+    //      \-subchild1
+    
     COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
     COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
-	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
     
     UKFalse([merged hasConflicts]);
-	
+    
     [merged applyTo: ctx1];
     
-	UKIntsEqual(2, [parent contentArray].count);
-	UKIntsEqual(0, [child1 contentArray].count);
-	UKIntsEqual(1, [child2 contentArray].count);
-	UKObjectsEqual(child2, [subchild1 valueForProperty: @"parentContainer"]);
-	UKObjectsEqual(A(child1, child2), [parent contentArray]);
-	UKObjectsEqual(A(subchild1), [child2 contentArray]);
+    UKIntsEqual(2, [parent contentArray].count);
+    UKIntsEqual(0, [child1 contentArray].count);
+    UKIntsEqual(1, [child2 contentArray].count);
+    UKObjectsEqual(child2, [subchild1 valueForProperty: @"parentContainer"]);
+    UKObjectsEqual(A(child1, child2), [parent contentArray]);
+    UKObjectsEqual(A(subchild1), [child2 contentArray]);
 }
 
 - (void)testMoveAndMoveOnManyToManyRelationship
 {
-	// Expected: both succeed
+    // Expected: both succeed
 
     Tag *parent = [ctx1 insertObjectWithEntityName: @"Tag"];
     ctx1.rootObject = parent;
     
-	COGroup *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
-	COGroup *tag2 = [ctx1 insertObjectWithEntityName: @"Tag"];
-	COGroup *tag3 = [ctx1 insertObjectWithEntityName: @"Tag"];
-	OutlineItem *child = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	
+    COGroup *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
+    COGroup *tag2 = [ctx1 insertObjectWithEntityName: @"Tag"];
+    COGroup *tag3 = [ctx1 insertObjectWithEntityName: @"Tag"];
+    OutlineItem *child = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    
     [parent insertObject: tag1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"childTags"];
     [parent insertObject: tag2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"childTags"];
     [parent insertObject: tag3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"childTags"];
-	[tag1 insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// ctx1:
-	//
-	// tag1         tag2          tag3
-	//  |
-	//   \--child
-	
+    [tag1 insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    // ctx1:
+    //
+    // tag1         tag2          tag3
+    //  |
+    //   \--child
+    
     [ctx2 setItemGraph: ctx1];
     [ctx3 setItemGraph: ctx1];
     
-	Tag *tag1Ctx2 = (Tag *)[ctx2 loadedObjectForUUID: tag1.UUID];
-	Tag *tag2Ctx2 = (Tag *)[ctx2 loadedObjectForUUID: tag2.UUID];
-	//Tag *tag3Ctx2 = (Tag *)[ctx2 loadedObjectForUUID: tag3.UUID];
-	OutlineItem *childCtx2 = (OutlineItem *)[ctx2 loadedObjectForUUID: child.UUID];
-	
-	Tag *tag1Ctx3 = (Tag *)[ctx3 loadedObjectForUUID: tag1.UUID];
-	//Tag *tag2Ctx3 = (Tag *)[ctx3 loadedObjectForUUID: tag2.UUID];
-	Tag *tag3Ctx3 = (Tag *)[ctx3 loadedObjectForUUID: tag3.UUID];
-	OutlineItem *childCtx3 = (OutlineItem *)[ctx3 loadedObjectForUUID: child.UUID];
-	
-	// ctx2: move child to tag2
-	UKTrue([[tag1Ctx2 contentArray] containsObject: childCtx2]);
-	[tag1Ctx2 removeObject: childCtx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[tag2Ctx2 insertObject: childCtx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// ctx2:
-	//
-	// tag1         tag2          tag3
-	//               |
-	//                \--child
-	
-	// ctx3: move child to tag3
-	UKTrue([[tag1Ctx3 contentArray] containsObject: childCtx3]);
-	[tag1Ctx3 removeObject: childCtx3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[tag3Ctx3 insertObject: childCtx3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// ctx3:
-	//
-	// tag1         tag2          tag3
-	//                             |
-	//                              \--child
-	
-	// Now do the merge
+    Tag *tag1Ctx2 = (Tag *)[ctx2 loadedObjectForUUID: tag1.UUID];
+    Tag *tag2Ctx2 = (Tag *)[ctx2 loadedObjectForUUID: tag2.UUID];
+    //Tag *tag3Ctx2 = (Tag *)[ctx2 loadedObjectForUUID: tag3.UUID];
+    OutlineItem *childCtx2 = (OutlineItem *)[ctx2 loadedObjectForUUID: child.UUID];
+    
+    Tag *tag1Ctx3 = (Tag *)[ctx3 loadedObjectForUUID: tag1.UUID];
+    //Tag *tag2Ctx3 = (Tag *)[ctx3 loadedObjectForUUID: tag2.UUID];
+    Tag *tag3Ctx3 = (Tag *)[ctx3 loadedObjectForUUID: tag3.UUID];
+    OutlineItem *childCtx3 = (OutlineItem *)[ctx3 loadedObjectForUUID: child.UUID];
+    
+    // ctx2: move child to tag2
+    UKTrue([[tag1Ctx2 contentArray] containsObject: childCtx2]);
+    [tag1Ctx2 removeObject: childCtx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [tag2Ctx2 insertObject: childCtx2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    // ctx2:
+    //
+    // tag1         tag2          tag3
+    //               |
+    //                \--child
+    
+    // ctx3: move child to tag3
+    UKTrue([[tag1Ctx3 contentArray] containsObject: childCtx3]);
+    [tag1Ctx3 removeObject: childCtx3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [tag3Ctx3 insertObject: childCtx3 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    // ctx3:
+    //
+    // tag1         tag2          tag3
+    //                             |
+    //                              \--child
+    
+    // Now do the merge
 
     COItemGraphDiff *diff12 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx2 sourceIdentifier: @"diff12"];
     COItemGraphDiff *diff13 = [COItemGraphDiff diffItemTree: ctx1 withItemTree: ctx3 sourceIdentifier: @"diff13"];
-	COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
+    COItemGraphDiff *merged = [diff12 itemTreeDiffByMergingWithDiff: diff13];
     
     UKFalse([merged hasConflicts]);
     
-	// Apply the resulting diff to ctx1
-	[merged applyTo: ctx1];
-	
-	// Expected result:
-	//
-	// tag1         tag2          tag3
-	//               |             |
-	//                \--child      \--child
-	
-	UKIntsEqual(0, [tag1 contentArray].count);
-	UKIntsEqual(1, [tag2 contentArray].count);
-	UKIntsEqual(1, [tag3 contentArray].count);
-	UKObjectsEqual(S(tag2, tag3), [child valueForProperty: @"parentCollections"]);
-	UKObjectsEqual(A(child), [tag2 contentArray]);
-	UKObjectsEqual(A(child), [tag3 contentArray]);
+    // Apply the resulting diff to ctx1
+    [merged applyTo: ctx1];
+    
+    // Expected result:
+    //
+    // tag1         tag2          tag3
+    //               |             |
+    //                \--child      \--child
+    
+    UKIntsEqual(0, [tag1 contentArray].count);
+    UKIntsEqual(1, [tag2 contentArray].count);
+    UKIntsEqual(1, [tag3 contentArray].count);
+    UKObjectsEqual(S(tag2, tag3), [child valueForProperty: @"parentCollections"]);
+    UKObjectsEqual(A(child), [tag2 contentArray]);
+    UKObjectsEqual(A(child), [tag3 contentArray]);
 }
 
 - (void)testSelectiveUndoOfGroupOperation
 {
-	OutlineItem *doc = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *doc = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     ctx1.rootObject = doc;
-	OutlineItem *line1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *circle1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *square1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *image1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *line1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *circle1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *square1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    OutlineItem *image1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
     
-	[line1 setValue: @"line1" forProperty: @"label"];
-	[circle1 setValue: @"circle1" forProperty: @"label"];
-	[square1 setValue: @"square1" forProperty: @"label"];
-	[image1 setValue: @"image1" forProperty: @"label"];
-	
-	[doc insertObject: line1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[doc insertObject: circle1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[doc insertObject: square1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[doc insertObject: image1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	// snapshot the state: (line1, circle1, square1, image1) into ctx2
-	[ctx2 setItemGraph: ctx1];
-	
-	OutlineItem *group1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	[group1 setValue: @"group1" forProperty: @"label"];
-	[doc insertObject: group1 atIndex: 1 hint: nil forProperty: @"contents"];
-	[group1 insertObject: circle1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	[group1 insertObject: square1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	UKObjectsEqual((@[line1, group1, image1]), doc.contents);
+    [line1 setValue: @"line1" forProperty: @"label"];
+    [circle1 setValue: @"circle1" forProperty: @"label"];
+    [square1 setValue: @"square1" forProperty: @"label"];
+    [image1 setValue: @"image1" forProperty: @"label"];
     
-	// snapshot the state:  (line1, group1=(circle1, square1), image1) into ctx3
-	[ctx3 setItemGraph: ctx1];
-	
-	OutlineItem *triangle1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
-	[triangle1 setValue: @"triangle1" forProperty: @"label"];
-	[doc insertObject: triangle1 atIndex: 0];	
-	
-	// ctx1 state:  (triangle1, line1, group1=(circle1, square1), image1)
-	
-	// Now do the merge, which selectively undoes the group operation
-	
+    [doc insertObject: line1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [doc insertObject: circle1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [doc insertObject: square1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [doc insertObject: image1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    // snapshot the state: (line1, circle1, square1, image1) into ctx2
+    [ctx2 setItemGraph: ctx1];
+    
+    OutlineItem *group1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    [group1 setValue: @"group1" forProperty: @"label"];
+    [doc insertObject: group1 atIndex: 1 hint: nil forProperty: @"contents"];
+    [group1 insertObject: circle1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    [group1 insertObject: square1 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    UKObjectsEqual((@[line1, group1, image1]), doc.contents);
+    
+    // snapshot the state:  (line1, group1=(circle1, square1), image1) into ctx3
+    [ctx3 setItemGraph: ctx1];
+    
+    OutlineItem *triangle1 = [ctx1 insertObjectWithEntityName: @"OutlineItem"];
+    [triangle1 setValue: @"triangle1" forProperty: @"label"];
+    [doc insertObject: triangle1 atIndex: 0];   
+    
+    // ctx1 state:  (triangle1, line1, group1=(circle1, square1), image1)
+    
+    // Now do the merge, which selectively undoes the group operation
+    
     COItemGraphDiff *diff32 = [COItemGraphDiff diffItemTree: ctx3 withItemTree: ctx2 sourceIdentifier: @"diff32"];
     COItemGraphDiff *diff31 = [COItemGraphDiff diffItemTree: ctx3 withItemTree: ctx1 sourceIdentifier: @"diff31"];
-	COItemGraphDiff *merged = [diff32 itemTreeDiffByMergingWithDiff: diff31];
-	
+    COItemGraphDiff *merged = [diff32 itemTreeDiffByMergingWithDiff: diff31];
+    
     UKFalse([merged hasConflicts]);
-	[merged applyTo: ctx3];
-	
-	UKIntsEqual(5, [(OutlineItem *)[ctx3 loadedObjectForUUID: doc.UUID] contentArray].count);
+    [merged applyTo: ctx3];
+    
+    UKIntsEqual(5, [(OutlineItem *)[ctx3 loadedObjectForUUID: doc.UUID] contentArray].count);
 
     UKStringsEqual(@"triangle1", [[(OutlineItem *)[ctx3 loadedObjectForUUID: doc.UUID] contentArray][0] valueForProperty: @"label"]);
     UKStringsEqual(@"line1", [[(OutlineItem *)[ctx3 loadedObjectForUUID: doc.UUID] contentArray][1] valueForProperty: @"label"]);
     UKStringsEqual(@"circle1", [[(OutlineItem *)[ctx3 loadedObjectForUUID: doc.UUID] contentArray][2] valueForProperty: @"label"]);
     UKStringsEqual(@"square1", [[(OutlineItem *)[ctx3 loadedObjectForUUID: doc.UUID] contentArray][3] valueForProperty: @"label"]);
     UKStringsEqual(@"image1", [[(OutlineItem *)[ctx3 loadedObjectForUUID: doc.UUID] contentArray][4] valueForProperty: @"label"]);
-	
-	for (OutlineItem *object in [(OutlineItem *)[ctx3 loadedObjectForUUID: doc.UUID] contentArray])
-	{
-		UKObjectsSame([ctx3 loadedObjectForUUID: doc.UUID], [object valueForProperty: @"parentContainer"]);
-	}
+    
+    for (OutlineItem *object in [(OutlineItem *)[ctx3 loadedObjectForUUID: doc.UUID] contentArray])
+    {
+        UKObjectsSame([ctx3 loadedObjectForUUID: doc.UUID], [object valueForProperty: @"parentContainer"]);
+    }
 }
 
 - (void) testSelectiveUndoDragAndDrop
 {
-	OutlineItem *doc = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+    OutlineItem *doc = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
     ctx1.rootObject = doc;
-		
-	OutlineItem *group1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
-	OutlineItem *group2 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
-	OutlineItem *item1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
-	OutlineItem *item2 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
-	
-	doc.contents = @[group1, group2, item1, item2];
-	
-	// snapshot the state [group1, group2, item1, item2] into ctx3
-	[ctx3 setItemGraph: ctx1];
+        
+    OutlineItem *group1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+    OutlineItem *group2 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+    OutlineItem *item1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+    OutlineItem *item2 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+    
+    doc.contents = @[group1, group2, item1, item2];
+    
+    // snapshot the state [group1, group2, item1, item2] into ctx3
+    [ctx3 setItemGraph: ctx1];
 
-	group2.contents = @[item1];
-	UKObjectsEqual(A(group1, group2, item2), doc.contents);
-	
-	// snapshot the state [group1, group2=[item1], item2] into ctx2
-	[ctx2 setItemGraph: ctx1];
-	
-	group1.contents = @[item2];
-	UKObjectsEqual(A(group1, group2), doc.contents);
-	
-	// the state [group1=[item2], group2=[item1]] is in ctx1
-	
-	// compute diff(ctx2->ctx3) + diff(ctx2->ctx1)
-	//
-	// this is supposed to selectively undo inserting item1 into group2
-		
+    group2.contents = @[item1];
+    UKObjectsEqual(A(group1, group2, item2), doc.contents);
+    
+    // snapshot the state [group1, group2=[item1], item2] into ctx2
+    [ctx2 setItemGraph: ctx1];
+    
+    group1.contents = @[item2];
+    UKObjectsEqual(A(group1, group2), doc.contents);
+    
+    // the state [group1=[item2], group2=[item1]] is in ctx1
+    
+    // compute diff(ctx2->ctx3) + diff(ctx2->ctx1)
+    //
+    // this is supposed to selectively undo inserting item1 into group2
+        
     COItemGraphDiff *diff23 = [COItemGraphDiff diffItemTree: ctx2 withItemTree: ctx3 sourceIdentifier: @"diff23"];
     COItemGraphDiff *diff21 = [COItemGraphDiff diffItemTree: ctx2 withItemTree: ctx1 sourceIdentifier: @"diff21"];
-	COItemGraphDiff *merged = [diff23 itemTreeDiffByMergingWithDiff: diff21];
-	
+    COItemGraphDiff *merged = [diff23 itemTreeDiffByMergingWithDiff: diff21];
+    
     UKFalse([merged hasConflicts]);
-	[merged applyTo: ctx2];
-	
-	// expecting the state [group1=[item2], group2, item1] into ctx2
-	
-	{
-		OutlineItem *docCtx2 = [ctx2 loadedObjectForUUID: doc.UUID];
-		OutlineItem *group1Ctx2 = [ctx2 loadedObjectForUUID: group1.UUID];
-		OutlineItem *group2Ctx2 = [ctx2 loadedObjectForUUID: group2.UUID];
-		OutlineItem *item1Ctx2 = [ctx2 loadedObjectForUUID: item1.UUID];
-		OutlineItem *item2Ctx2 = [ctx2 loadedObjectForUUID: item2.UUID];
-		
-		UKObjectsEqual(A(group1Ctx2, group2Ctx2, item1Ctx2), docCtx2.contents);
-		UKObjectsEqual(A(item2Ctx2), group1Ctx2.contents);
-		UKObjectsEqual(A(), group2Ctx2.contents);
-	}
+    [merged applyTo: ctx2];
+    
+    // expecting the state [group1=[item2], group2, item1] into ctx2
+    
+    {
+        OutlineItem *docCtx2 = [ctx2 loadedObjectForUUID: doc.UUID];
+        OutlineItem *group1Ctx2 = [ctx2 loadedObjectForUUID: group1.UUID];
+        OutlineItem *group2Ctx2 = [ctx2 loadedObjectForUUID: group2.UUID];
+        OutlineItem *item1Ctx2 = [ctx2 loadedObjectForUUID: item1.UUID];
+        OutlineItem *item2Ctx2 = [ctx2 loadedObjectForUUID: item2.UUID];
+        
+        UKObjectsEqual(A(group1Ctx2, group2Ctx2, item1Ctx2), docCtx2.contents);
+        UKObjectsEqual(A(item2Ctx2), group1Ctx2.contents);
+        UKObjectsEqual(A(), group2Ctx2.contents);
+    }
 }
 
 @end

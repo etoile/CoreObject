@@ -14,8 +14,8 @@
 
 @interface TestObjectUpdateEntity : COObject
 {
-	NSString *_label;
-	COMutableArray *_contents;
+    NSString *_label;
+    COMutableArray *_contents;
 }
 
 @property (nonatomic, readwrite, copy) NSString *label;
@@ -25,11 +25,11 @@
 
 @interface TestObjectUpdate : EditingContextTestCase
 {
-	id object;
-	NSString *oldValue;
-	NSString *newValue;
-	id poster;
-	int notificationCount;
+    id object;
+    NSString *oldValue;
+    NSString *newValue;
+    id poster;
+    int notificationCount;
 }
 
 @end
@@ -57,47 +57,47 @@
 
 + (ETEntityDescription *) newEntityDescription
 {
-	ETEntityDescription *entity = [self newBasicEntityDescription];
-	
-	if (![entity.name isEqual: [TestObjectUpdateEntity className]])
-		return entity;
-	
-	ETPropertyDescription *label =
-		[ETPropertyDescription descriptionWithName: @"label" typeName: @"NSString"];
-	label.persistent = YES;
-	ETPropertyDescription *contents =
-		[ETPropertyDescription descriptionWithName: @"contents" typeName: @"NSString"];
-	contents.persistent = YES;
-	contents.multivalued = YES;
-	contents.ordered = YES;
+    ETEntityDescription *entity = [self newBasicEntityDescription];
+    
+    if (![entity.name isEqual: [TestObjectUpdateEntity className]])
+        return entity;
+    
+    ETPropertyDescription *label =
+        [ETPropertyDescription descriptionWithName: @"label" typeName: @"NSString"];
+    label.persistent = YES;
+    ETPropertyDescription *contents =
+        [ETPropertyDescription descriptionWithName: @"contents" typeName: @"NSString"];
+    contents.persistent = YES;
+    contents.multivalued = YES;
+    contents.ordered = YES;
 
-	entity.propertyDescriptions = @[label, contents];
+    entity.propertyDescriptions = @[label, contents];
 
-	return entity;
+    return entity;
 }
 
 - (id)initWithObjectGraphContext: (COObjectGraphContext *)aContext
 {
-	self = [super initWithObjectGraphContext: aContext];
-	if (self == nil)
-		return nil;
+    self = [super initWithObjectGraphContext: aContext];
+    if (self == nil)
+        return nil;
 
-	_contents = [COMutableArray new];
-	return self;
+    _contents = [COMutableArray new];
+    return self;
 }
 
 - (void)setLabel: (NSString *)label
 {
-	[self willChangeValueForProperty: @"label"];
-	_label = label;
-	[self didChangeValueForProperty: @"label"];
+    [self willChangeValueForProperty: @"label"];
+    _label = label;
+    [self didChangeValueForProperty: @"label"];
 }
 
 - (void)setContents: (NSArray *)contents
 {
-	[self willChangeValueForProperty: @"contents"];
-	_contents = [COMutableArray arrayWithArray: contents];
-	[self didChangeValueForProperty: @"contents"];
+    [self willChangeValueForProperty: @"contents"];
+    _contents = [COMutableArray arrayWithArray: contents];
+    [self didChangeValueForProperty: @"contents"];
 }
 
 @end
@@ -107,22 +107,22 @@
 
 - (NSString *) property
 {
-	return nil;
+    return nil;
 }
 
 - (id)oldValue
 {
-	return [NSNull null];
+    return [NSNull null];
 }
 
 - (id) newValue
 {
-	return nil;
+    return nil;
 }
 
 - (NSString *) entityName
 {
-	return @"TestObjectUpdateEntity";
+    return @"TestObjectUpdateEntity";
 }
 
 - (void) observeValueForKeyPath: (NSString *)keyPath
@@ -130,53 +130,53 @@
                          change: (NSDictionary *)change
                         context: (void *)context
 {
-	if ([keyPath isEqual: [self property]])
-	{
-		oldValue = change[NSKeyValueChangeOldKey];
-		newValue = change[NSKeyValueChangeNewKey];
-		poster = anObject;
-		notificationCount++;
-	}
+    if ([keyPath isEqual: [self property]])
+    {
+        oldValue = change[NSKeyValueChangeOldKey];
+        newValue = change[NSKeyValueChangeNewKey];
+        poster = anObject;
+        notificationCount++;
+    }
 }
 
 - (id)init
 {
-	SUPERINIT;
-	object = [ctx insertNewPersistentRootWithEntityName: [self entityName]].rootObject;
-	[object addObserver: self
-	         forKeyPath: [self property]
-	            options: NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
-	            context: NULL];
-	ETAssert([self property] != nil);
-	ETAssert([self oldValue] != nil);
-	ETAssert([self newValue] != nil);
-	if (![[self oldValue] isEqual: [NSNull null]])
-	{
-		[object setValue: [self oldValue] forStorageKey: [self property]];
-	}
-	return self;
+    SUPERINIT;
+    object = [ctx insertNewPersistentRootWithEntityName: [self entityName]].rootObject;
+    [object addObserver: self
+             forKeyPath: [self property]
+                options: NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew
+                context: NULL];
+    ETAssert([self property] != nil);
+    ETAssert([self oldValue] != nil);
+    ETAssert([self newValue] != nil);
+    if (![[self oldValue] isEqual: [NSNull null]])
+    {
+        [object setValue: [self oldValue] forStorageKey: [self property]];
+    }
+    return self;
 }
 
 - (void)dealloc
 {
-	[object removeObserver: self forKeyPath: [self property]];
+    [object removeObserver: self forKeyPath: [self property]];
 }
 
 - (void)validateKVOUpdate
 {
-	UKObjectsEqual([self oldValue], (oldValue != nil ? oldValue : [NSNull null]));
-	UKObjectsEqual([self newValue], newValue);
-	UKObjectsSame(object, poster);
-	UKIntsEqual(1, notificationCount);
+    UKObjectsEqual([self oldValue], (oldValue != nil ? oldValue : [NSNull null]));
+    UKObjectsEqual([self newValue], newValue);
+    UKObjectsSame(object, poster);
+    UKIntsEqual(1, notificationCount);
 }
 
 - (void)validateUpdate
 {
-	UKObjectsEqual([self newValue], [object valueForStorageKey: [self property]]);
-	UKObjectsEqual([self newValue], [object valueForProperty: [self property]]);
-	UKObjectsEqual([self newValue], [object valueForKey: [self property]]);
+    UKObjectsEqual([self newValue], [object valueForStorageKey: [self property]]);
+    UKObjectsEqual([self newValue], [object valueForProperty: [self property]]);
+    UKObjectsEqual([self newValue], [object valueForKey: [self property]]);
 
-	[self validateKVOUpdate];
+    [self validateKVOUpdate];
 }
 
 @end
@@ -187,33 +187,33 @@
 
 - (NSString *) property
 {
-	return @"label";
+    return @"label";
 }
 
 - (id) newValue
 {
-	return @"Nobody";
+    return @"Nobody";
 }
 
 - (void) testSetter
 {
-	((TestObjectUpdateEntity *)object).label = [self newValue];
+    ((TestObjectUpdateEntity *)object).label = [self newValue];
 
-	[self validateUpdate];
+    [self validateUpdate];
 }
 
 - (void) testPVC
 {
-	[object setValue: [self newValue] forProperty: [self property]];
-	
-	[self validateUpdate];
+    [object setValue: [self newValue] forProperty: [self property]];
+    
+    [self validateUpdate];
 }
 
 - (void) testKVC
 {
-	[object setValue: [self newValue] forKey: [self property]];
-	
-	[self validateUpdate];
+    [object setValue: [self newValue] forKey: [self property]];
+    
+    [self validateUpdate];
 }
 
 @end
@@ -223,38 +223,38 @@
 
 - (NSString *) property
 {
-	return @"contents";
+    return @"contents";
 }
 
 - (id) oldValue
 {
-	return @[@"bop", @"poum"];
+    return @[@"bop", @"poum"];
 }
 
 - (id) newValue
 {
-	return @[@"bip", @"bop"];
+    return @[@"bip", @"bop"];
 }
 
 - (void) testSetter
 {
-	((OrderedAttributeModel *)object).contents = [self newValue];
-	
-	[self validateUpdate];
+    ((OrderedAttributeModel *)object).contents = [self newValue];
+    
+    [self validateUpdate];
 }
 
 - (void) testPVC
 {
-	[object setValue: [self newValue] forProperty: [self property]];
-	
-	[self validateUpdate];
+    [object setValue: [self newValue] forProperty: [self property]];
+    
+    [self validateUpdate];
 }
 
 - (void) testKVC
 {
-	[object setValue: [self newValue] forKey: [self property]];
-	
-	[self validateUpdate];
+    [object setValue: [self newValue] forKey: [self property]];
+    
+    [self validateUpdate];
 }
 
 @end
@@ -264,38 +264,38 @@
 
 - (NSString *) property
 {
-	return @"label";
+    return @"label";
 }
 
 - (id) newValue
 {
-	return @"Tree";
+    return @"Tree";
 }
 
 - (NSString *) entityName
 {
-	return @"OutlineItem";
+    return @"OutlineItem";
 }
 
 - (void) testSetter
 {
-	[object setLabel: [self newValue]];
+    [object setLabel: [self newValue]];
 
-	[self validateUpdate];
+    [self validateUpdate];
 }
 
 - (void) testPVC
 {
-	[object setValue: [self newValue] forProperty: [self property]];
+    [object setValue: [self newValue] forProperty: [self property]];
 
-	[self validateUpdate];
+    [self validateUpdate];
 }
 
 - (void) testKVC
 {
-	[object setValue: [self newValue] forKey: [self property]];
-	
-	[self validateUpdate];
+    [object setValue: [self newValue] forKey: [self property]];
+    
+    [self validateUpdate];
 }
 
 @end
@@ -305,43 +305,43 @@
 
 - (NSString *) property
 {
-	return @"contents";
+    return @"contents";
 }
 
 - (id) oldValue
 {
-	return @[@"bop", @"poum"];
+    return @[@"bop", @"poum"];
 }
 
 - (id) newValue
 {
-	return @[@"bip", @"bop"];
+    return @[@"bip", @"bop"];
 }
 
 - (NSString *) entityName
 {
-	return @"OrderedAttributeModel";
+    return @"OrderedAttributeModel";
 }
 
 - (void) testSetter
 {
-	((OrderedAttributeModel *)object).contents = [self newValue];
-	
-	[self validateUpdate];
+    ((OrderedAttributeModel *)object).contents = [self newValue];
+    
+    [self validateUpdate];
 }
 
 - (void) testPVC
 {
-	[object setValue: [self newValue] forProperty: [self property]];
-	
-	[self validateUpdate];
+    [object setValue: [self newValue] forProperty: [self property]];
+    
+    [self validateUpdate];
 }
 
 - (void) testKVC
 {
-	[object setValue: [self newValue] forKey: [self property]];
-	
-	[self validateUpdate];
+    [object setValue: [self newValue] forKey: [self property]];
+    
+    [self validateUpdate];
 }
 
 @end
@@ -353,66 +353,66 @@
 
 - (NSString *) property
 {
-	return @"city";
+    return @"city";
 }
 
 - (id) newValue
 {
-	return @"Edmonton";
+    return @"Edmonton";
 }
 
 + (void)addCityPropertyToEntity: (ETEntityDescription *)anEntity
 {
-	if (![anEntity.propertyDescriptionNames containsObject: @"city"])
-	{
-		ETEntityDescription *stringType =
-			[[ETModelDescriptionRepository mainRepository] descriptionForName: @"NSString"];
-		ETPropertyDescription *propertyDesc =
-			[ETPropertyDescription descriptionWithName: @"city" type: stringType];
-		
-		[anEntity addPropertyDescription: propertyDesc];
-	}
+    if (![anEntity.propertyDescriptionNames containsObject: @"city"])
+    {
+        ETEntityDescription *stringType =
+            [[ETModelDescriptionRepository mainRepository] descriptionForName: @"NSString"];
+        ETPropertyDescription *propertyDesc =
+            [ETPropertyDescription descriptionWithName: @"city" type: stringType];
+        
+        [anEntity addPropertyDescription: propertyDesc];
+    }
 }
 
 - (id) init
 {
-	// N.B., We must add the 'city' property to COObject before registering
-	// an observer for the 'city' key (done in [super init]), because we need
-	// COObject to tell the KVO machinery that COObject will manually send
-	// change notifications for the 'city' key (see +[COObject automaticallyNotifiesObserversForKey:]
-	// and the [super didChangeValueForKey:] call in -[COObject didChangeValueForProperty]).
-	//
-	// If this was done after adding the KVO observer, KVO would do the dynamic
-	// subclassing trick since it doesn't know that COObject will send manual KVO change
-	// notifications for 'city', and we'd end up getting 2 notifications instead of 1 in -testKVC.
-	
-	// NOTE: The above comment no longer applies because you can't modify
-	// an entity description after creating a COObject instance that uses it.
-	
-	[TestDirectVariableStorageUpdate addCityPropertyToEntity:
-	 [[ETModelDescriptionRepository mainRepository] entityDescriptionForClass: [TestObjectUpdateEntity class]]];
-		 
-	SUPERINIT;
-	return self;
+    // N.B., We must add the 'city' property to COObject before registering
+    // an observer for the 'city' key (done in [super init]), because we need
+    // COObject to tell the KVO machinery that COObject will manually send
+    // change notifications for the 'city' key (see +[COObject automaticallyNotifiesObserversForKey:]
+    // and the [super didChangeValueForKey:] call in -[COObject didChangeValueForProperty]).
+    //
+    // If this was done after adding the KVO observer, KVO would do the dynamic
+    // subclassing trick since it doesn't know that COObject will send manual KVO change
+    // notifications for 'city', and we'd end up getting 2 notifications instead of 1 in -testKVC.
+    
+    // NOTE: The above comment no longer applies because you can't modify
+    // an entity description after creating a COObject instance that uses it.
+    
+    [TestDirectVariableStorageUpdate addCityPropertyToEntity:
+     [[ETModelDescriptionRepository mainRepository] entityDescriptionForClass: [TestObjectUpdateEntity class]]];
+         
+    SUPERINIT;
+    return self;
 }
 
 - (void) testAbsentSetter
 {
-	UKFalse([object respondsToSelector: NSSelectorFromString(@"setCity:")]);
+    UKFalse([object respondsToSelector: NSSelectorFromString(@"setCity:")]);
 }
 
 - (void) testPVC
 {
-	[object setValue: [self newValue] forProperty: [self property]];
-	
-	[self validateUpdate];
+    [object setValue: [self newValue] forProperty: [self property]];
+    
+    [self validateUpdate];
 }
 
 - (void) testKVC
 {
-	[object setValue: [self newValue] forKey: [self property]];
-	
-	[self validateUpdate];
+    [object setValue: [self newValue] forKey: [self property]];
+    
+    [self validateUpdate];
 }
 
 @end

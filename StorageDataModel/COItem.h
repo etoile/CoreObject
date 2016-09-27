@@ -40,10 +40,10 @@ extern NSString *kCOObjectIsSharedProperty;
 @interface COItem : NSObject <NSCopying, NSMutableCopying>
 {
     @package
-	ETUUID *uuid;
+    ETUUID *uuid;
     
     @protected
-	NSMutableDictionary *types;
+    NSMutableDictionary *types;
     NSMutableDictionary *values;
 }
 
@@ -58,7 +58,7 @@ extern NSString *kCOObjectIsSharedProperty;
  typesForAttributes: (NSDictionary *)typesForAttributes
 valuesForAttributes: (NSDictionary *)valuesForAttributes NS_DESIGNATED_INITIALIZER;
 + (COItem *) itemWithTypesForAttributes: (NSDictionary *)typesForAttributes
-					valuesForAttributes: (NSDictionary *)valuesForAttributes;
+                    valuesForAttributes: (NSDictionary *)valuesForAttributes;
 
 
 /** @taskunit Accessing Attributes */
@@ -123,7 +123,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes NS_DESIGNATED_INITIALIZ
 
 - (instancetype) initWithUUID: (ETUUID*)aUUID;
 + (COMutableItem *) itemWithTypesForAttributes: (NSDictionary *)typesForAttributes
-						   valuesForAttributes: (NSDictionary *)valuesForAttributes;
+                           valuesForAttributes: (NSDictionary *)valuesForAttributes;
 /**
  * Returns a new item with new UUID.
  */
@@ -136,8 +136,8 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes NS_DESIGNATED_INITIALIZ
 
 - (void) setUUID: (ETUUID *)aUUID;
 - (void) setValue: (id)aValue
-	 forAttribute: (NSString*)anAttribute
-			 type: (COType)aType;
+     forAttribute: (NSString*)anAttribute
+             type: (COType)aType;
 - (void)removeValueForAttribute: (NSString*)anAttribute;
 
 
@@ -149,7 +149,7 @@ valuesForAttributes: (NSDictionary *)valuesForAttributes NS_DESIGNATED_INITIALIZ
 @property (nonatomic, readwrite, copy) NSString *packageName;
 
 - (void) setValue: (id)aValue
-	 forAttribute: (NSString*)anAttribute;
+     forAttribute: (NSString*)anAttribute;
 
 @end
 

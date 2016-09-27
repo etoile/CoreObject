@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Quentin Mathe
+    Copyright (C) 2013 Quentin Mathe
 
-	Date:  March 2013
-	License:  MIT  (see COPYING)
+    Date:  March 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -18,10 +18,10 @@
  */
 @interface COBookmark : COObject
 {
-	@private
-	NSURL *_URL;
-	NSDate *_lastVisitedDate;
-	NSData *_favIconData;
+    @private
+    NSURL *_URL;
+    NSDate *_lastVisitedDate;
+    NSData *_favIconData;
 }
 
 

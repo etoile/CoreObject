@@ -11,11 +11,11 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-	ETEntityDescription *entity = [self newBasicEntityDescription];
-	
-	if (![entity.name isEqual: [Parent className]])
-		return entity;
-	
+    ETEntityDescription *entity = [self newBasicEntityDescription];
+    
+    if (![entity.name isEqual: [Parent className]])
+        return entity;
+    
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                  typeName: @"NSString"];
     labelProperty.persistent = YES;
@@ -25,7 +25,7 @@
     childProperty.persistent = YES;
     
     entity.propertyDescriptions = @[labelProperty, childProperty];
-	
+    
     return entity;
 }
 

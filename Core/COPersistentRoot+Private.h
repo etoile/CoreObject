@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  August 2013
-	License:  MIT  (see COPYING)
+    Date:  August 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <CoreObject/COPersistentRoot.h>

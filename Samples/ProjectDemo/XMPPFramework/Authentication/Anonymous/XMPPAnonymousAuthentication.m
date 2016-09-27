@@ -26,56 +26,56 @@
 @implementation XMPPAnonymousAuthentication
 {
   #if __has_feature(objc_arc_weak)
-	__weak XMPPStream *xmppStream;
+    __weak XMPPStream *xmppStream;
   #else
-	__unsafe_unretained XMPPStream *xmppStream;
+    __unsafe_unretained XMPPStream *xmppStream;
   #endif
 }
 
 + (NSString *)mechanismName
 {
-	return @"ANONYMOUS";
+    return @"ANONYMOUS";
 }
 
 - (id)initWithStream:(XMPPStream *)stream
 {
-	if ((self = [super init]))
-	{
-		xmppStream = stream;
-	}
-	return self;
+    if ((self = [super init]))
+    {
+        xmppStream = stream;
+    }
+    return self;
 }
 
 - (id)initWithStream:(XMPPStream *)stream password:(NSString *)password
 {
-	return [self initWithStream:stream];
+    return [self initWithStream:stream];
 }
 
 - (BOOL)start:(NSError **)errPtr
 {
-	// <auth xmlns="urn:ietf:params:xml:ns:xmpp-sasl" mechanism="ANONYMOUS" />
-	
-	NSXMLElement *auth = [NSXMLElement elementWithName:@"auth" xmlns:@"urn:ietf:params:xml:ns:xmpp-sasl"];
-	[auth addAttributeWithName:@"mechanism" stringValue:@"ANONYMOUS"];
-	
-	[xmppStream sendAuthElement:auth];
-	
-	return YES;
+    // <auth xmlns="urn:ietf:params:xml:ns:xmpp-sasl" mechanism="ANONYMOUS" />
+    
+    NSXMLElement *auth = [NSXMLElement elementWithName:@"auth" xmlns:@"urn:ietf:params:xml:ns:xmpp-sasl"];
+    [auth addAttributeWithName:@"mechanism" stringValue:@"ANONYMOUS"];
+    
+    [xmppStream sendAuthElement:auth];
+    
+    return YES;
 }
 
 - (XMPPHandleAuthResponse)handleAuth:(NSXMLElement *)authResponse
 {
-	// We're expecting a success response.
-	// If we get anything else we can safely assume it's the equivalent of a failure response.
-	
-	if ([[authResponse name] isEqualToString:@"success"])
-	{
-		return XMPP_AUTH_SUCCESS;
-	}
-	else
-	{
-		return XMPP_AUTH_FAIL;
-	}
+    // We're expecting a success response.
+    // If we get anything else we can safely assume it's the equivalent of a failure response.
+    
+    if ([[authResponse name] isEqualToString:@"success"])
+    {
+        return XMPP_AUTH_SUCCESS;
+    }
+    else
+    {
+        return XMPP_AUTH_FAIL;
+    }
 }
 
 @end
@@ -88,44 +88,44 @@
 
 - (BOOL)supportsAnonymousAuthentication
 {
-	return [self supportsAuthenticationMechanism:[XMPPAnonymousAuthentication mechanismName]];
+    return [self supportsAuthenticationMechanism:[XMPPAnonymousAuthentication mechanismName]];
 }
 
 - (BOOL)authenticateAnonymously:(NSError **)errPtr
 {
-	XMPPLogTrace();
-	
-	__block BOOL result = YES;
-	__block NSError *err = nil;
-	
-	dispatch_block_t block = ^{ @autoreleasepool {
-		
-		if ([self supportsAnonymousAuthentication])
-		{
-			XMPPAnonymousAuthentication *anonymousAuth = [[XMPPAnonymousAuthentication alloc] initWithStream:self];
-			
-			result = [self authenticate:anonymousAuth error:&err];
-		}
-		else
-		{
-			NSString *errMsg = @"The server does not support anonymous authentication.";
-			NSDictionary *info = [NSDictionary dictionaryWithObject:errMsg forKey:NSLocalizedDescriptionKey];
-			
-			err = [NSError errorWithDomain:XMPPStreamErrorDomain code:XMPPStreamUnsupportedAction userInfo:info];
-			
-			result = NO;
-		}
-	}};
+    XMPPLogTrace();
+    
+    __block BOOL result = YES;
+    __block NSError *err = nil;
+    
+    dispatch_block_t block = ^{ @autoreleasepool {
+        
+        if ([self supportsAnonymousAuthentication])
+        {
+            XMPPAnonymousAuthentication *anonymousAuth = [[XMPPAnonymousAuthentication alloc] initWithStream:self];
+            
+            result = [self authenticate:anonymousAuth error:&err];
+        }
+        else
+        {
+            NSString *errMsg = @"The server does not support anonymous authentication.";
+            NSDictionary *info = [NSDictionary dictionaryWithObject:errMsg forKey:NSLocalizedDescriptionKey];
+            
+            err = [NSError errorWithDomain:XMPPStreamErrorDomain code:XMPPStreamUnsupportedAction userInfo:info];
+            
+            result = NO;
+        }
+    }};
 
-	if (dispatch_get_specific(self.xmppQueueTag))
-		block();
-	else
-		dispatch_sync(self.xmppQueue, block);
-	
-	if (errPtr)
-		*errPtr = err;
-	
-	return result;
+    if (dispatch_get_specific(self.xmppQueueTag))
+        block();
+    else
+        dispatch_sync(self.xmppQueue, block);
+    
+    if (errPtr)
+        *errPtr = err;
+    
+    return result;
 }
 
 @end

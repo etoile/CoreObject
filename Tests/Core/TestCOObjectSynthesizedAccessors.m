@@ -15,7 +15,7 @@
 
 @interface TestCOObjectSynthesizedAccessors : EditingContextTestCase <UKTest>
 {
-	OutlineItem *item;
+    OutlineItem *item;
 }
 @end
 
@@ -48,11 +48,11 @@
 
 - (void)testSynthesizedAccessorsRestrictedToDynamicProperties
 {
-	UKRaisesException([item unkownMethod]);
+    UKRaisesException([item unkownMethod]);
 
-	NSAssert([[item.entityDescription propertyDescriptionForName: @"isPersistent"] isReadOnly],
-		@"We expect isPersistent to be read-only for COObject and its subclasses");
-	UKRaisesException([(id)item setIsPersistent: YES]);
+    NSAssert([[item.entityDescription propertyDescriptionForName: @"isPersistent"] isReadOnly],
+        @"We expect isPersistent to be read-only for COObject and its subclasses");
+    UKRaisesException([(id)item setIsPersistent: YES]);
 }
 
 - (void) testMutableProxy

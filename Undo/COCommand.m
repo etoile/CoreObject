@@ -54,8 +54,8 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
            kCOCommandTypeSetCurrentVersionForBranch: [COCommandSetCurrentVersionForBranch class],
            kCOCommandTypeDeletePersistentRoot: [COCommandDeletePersistentRoot class],
            kCOCommandTypeUndeletePersistentRoot: [COCommandUndeletePersistentRoot class], 
-	       kCOCommandTypeCreatePersistentRoot: [COCommandCreatePersistentRoot class],
-		   kCOCommandTypeSetPersistentRootMetadata: [COCommandSetPersistentRootMetadata class] };
+           kCOCommandTypeCreatePersistentRoot: [COCommandCreatePersistentRoot class],
+           kCOCommandTypeSetPersistentRootMetadata: [COCommandSetPersistentRootMetadata class] };
 }
 
 + (COCommand *) commandWithPropertyList: (id)aPlist parentUndoTrack: (COUndoTrack *)aParent
@@ -79,9 +79,9 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
 
 - (instancetype) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
-	NILARG_EXCEPTION_TEST(plist);
+    NILARG_EXCEPTION_TEST(plist);
     SUPERINIT;
-	_parentUndoTrack = aParent;
+    _parentUndoTrack = aParent;
     _storeUUID = [ETUUID UUIDWithString: plist[kCOCommandStoreUUID]];
     _persistentRootUUID = [ETUUID UUIDWithString: plist[kCOCommandPersistentRootUUID]];
     return self;
@@ -89,7 +89,7 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
 
 - (instancetype)init
 {
-	return [super init];
+    return [super init];
 }
 
 - (id) propertyList
@@ -99,16 +99,16 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
     {
         if ([self class] == typeToClass[type])
         {
-			NSMutableDictionary *result = [NSMutableDictionary dictionary];
-			result[kCOCommandType] = type;
-			
-			result[kCOCommandStoreUUID] = [_storeUUID stringValue];
-			result[kCOCommandPersistentRootUUID] = [_persistentRootUUID stringValue];
-			return result;
+            NSMutableDictionary *result = [NSMutableDictionary dictionary];
+            result[kCOCommandType] = type;
+            
+            result[kCOCommandStoreUUID] = [_storeUUID stringValue];
+            result[kCOCommandPersistentRootUUID] = [_persistentRootUUID stringValue];
+            return result;
         }
     }
-	
-	ETAssertUnreachable();
+    
+    ETAssertUnreachable();
     return nil;
 }
 
@@ -141,14 +141,14 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
 
 - (NSArray *)propertyNames
 {
-	return [[super propertyNames] arrayByAddingObjectsFromArray: 
-		@[@"metadata", @"UUID", @"persistentRootUUID", @"branchUUID", @"date",
-		  @"localizedTypeDescription", @"localizedShortDescription"]];
+    return [[super propertyNames] arrayByAddingObjectsFromArray: 
+        @[@"metadata", @"UUID", @"persistentRootUUID", @"branchUUID", @"date",
+          @"localizedTypeDescription", @"localizedShortDescription"]];
 }
 
 - (NSString *)kind
 {
-	return nil;
+    return nil;
 }
 
 #pragma mark -
@@ -156,42 +156,42 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
 
 - (ETUUID *)UUID
 {
-	return nil;
+    return nil;
 }
 
 - (ETUUID *)branchUUID
 {
-	return nil;
+    return nil;
 }
 
 - (NSDate *)date
 {
-	return nil;
+    return nil;
 }
 
 - (NSDictionary *)metadata
 {
-	return nil;
+    return nil;
 }
 
 - (NSString *)localizedTypeDescription
 {
-	return self.kind;
+    return self.kind;
 }
 
 - (NSString *)localizedShortDescription
 {
-	return nil;
+    return nil;
 }
 
 - (id <COTrackNode>)parentNode
 {
-	return nil;
+    return nil;
 }
 
 - (id <COTrackNode>)mergeParentNode
 {
-	return nil;
+    return nil;
 }
 
 - (id) copyWithZone:(NSZone *)zone
@@ -204,11 +204,11 @@ static NSString * const kCOCommandPersistentRootUUID = @"COCommandPersistentRoot
 
 - (BOOL)isEqual: (id)object
 {
-	if (![object isKindOfClass: [self class]])
-		return NO;
-	
-	return [((COCommand *)object)->_storeUUID isEqual: _storeUUID]
-	&& [((COCommand *)object)->_persistentRootUUID isEqual: _persistentRootUUID];
+    if (![object isKindOfClass: [self class]])
+        return NO;
+    
+    return [((COCommand *)object)->_storeUUID isEqual: _storeUUID]
+    && [((COCommand *)object)->_persistentRootUUID isEqual: _persistentRootUUID];
 }
 
 @end

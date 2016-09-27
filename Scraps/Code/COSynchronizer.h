@@ -27,9 +27,9 @@ problems:
  */
 @interface COSynchronizer : NSObject
 {
-	COEditingContext *shadowEditingContext;
-	XMPPAccount *account;
-	XMPPConversation *conversation;
+    COEditingContext *shadowEditingContext;
+    XMPPAccount *account;
+    XMPPConversation *conversation;
 }
 
 /** @taskunit Managing the Participants */
@@ -44,7 +44,7 @@ problems:
 
 
 - (void)didCommitChangedObjects: (NSSet *)changedObjects
-				  forRootObject: (COObject *)anObject;
+                  forRootObject: (COObject *)anObject;
 
 - (void)synchronizeClientsUsingDiff: (COObjectGraphDiff *)aDiff;
 

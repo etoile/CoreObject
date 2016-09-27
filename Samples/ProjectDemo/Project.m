@@ -4,8 +4,8 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-	ETEntityDescription *entity = [self newBasicEntityDescription];
-	
+    ETEntityDescription *entity = [self newBasicEntityDescription];
+    
     ETPropertyDescription *documentsProperty = [ETPropertyDescription descriptionWithName: @"documents"
                                                                                      type: (id)@"Document"];
     [documentsProperty setPersistent: YES];
@@ -19,7 +19,7 @@
     [tagsProperty setPersistent: YES];
     
     [entity setPropertyDescriptions: A(documentsProperty, tagsProperty)];
-	return entity;
+    return entity;
 }
 
 @dynamic documents;
@@ -37,20 +37,20 @@
 
 - (void) addTag: (Tag *)tag
 {
-	[[self mutableSetValueForKey: @"tags"] addObject: tag];
+    [[self mutableSetValueForKey: @"tags"] addObject: tag];
 }
 
 - (void) removeTag: (Tag *)tag
 {
-	[[self mutableSetValueForKey: @"tags"] removeObject: tag];
+    [[self mutableSetValueForKey: @"tags"] removeObject: tag];
 }
 
 - (NSArray *) documentsSorted
 {
-	NSArray *unsorted = [self.documents allObjects];
-	
-	return [unsorted sortedArrayUsingDescriptors:
-			@[[[NSSortDescriptor alloc] initWithKey:@"name" ascending: YES]]];
+    NSArray *unsorted = [self.documents allObjects];
+    
+    return [unsorted sortedArrayUsingDescriptors:
+            @[[[NSSortDescriptor alloc] initWithKey:@"name" ascending: YES]]];
 }
 
 @end

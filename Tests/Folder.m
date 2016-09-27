@@ -11,18 +11,18 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-	ETEntityDescription *entity = [self newBasicEntityDescription];
-	
-	if (![entity.name isEqual: [Folder className]])
-		return entity;
-	
+    ETEntityDescription *entity = [self newBasicEntityDescription];
+    
+    if (![entity.name isEqual: [Folder className]])
+        return entity;
+    
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                  typeName: @"NSString"];
     labelProperty.persistent = YES;
-	
-	ETPropertyDescription *contentsProperty =
+    
+    ETPropertyDescription *contentsProperty =
     [ETPropertyDescription descriptionWithName: @"contents" typeName: @"Folder"];
-	
+    
     contentsProperty.persistent = YES;
     contentsProperty.multivalued = YES;
     contentsProperty.ordered = NO;
@@ -31,11 +31,11 @@
     [ETPropertyDescription descriptionWithName: @"parent" typeName: @"Folder"];
     
     parentProperty.multivalued = NO;
-	parentProperty.derived = YES;
+    parentProperty.derived = YES;
     parentProperty.oppositeName = @"Folder.contents";
     
     entity.propertyDescriptions = @[labelProperty, contentsProperty, parentProperty];
-	
+    
     return entity;
 }
 

@@ -13,23 +13,23 @@ extern NSString *const XMPPSRVResolverErrorDomain;
 
 @interface XMPPSRVResolver : NSObject
 {
-	__unsafe_unretained id delegate;
-	dispatch_queue_t delegateQueue;
-	
-	dispatch_queue_t resolverQueue;
-	void *resolverQueueTag;
-	
-	__strong NSString *srvName;
-	NSTimeInterval timeout;
-	
+    __unsafe_unretained id delegate;
+    dispatch_queue_t delegateQueue;
+    
+    dispatch_queue_t resolverQueue;
+    void *resolverQueueTag;
+    
+    __strong NSString *srvName;
+    NSTimeInterval timeout;
+    
     BOOL resolveInProgress;
-	
+    
     NSMutableArray *results;
     DNSServiceRef sdRef;
-	
-	int sdFd;
-	dispatch_source_t sdReadSource;
-	dispatch_source_t timeoutTimer;
+    
+    int sdFd;
+    dispatch_source_t sdReadSource;
+    dispatch_source_t timeoutTimer;
 }
 
 /**
@@ -65,13 +65,13 @@ extern NSString *const XMPPSRVResolverErrorDomain;
 
 @interface XMPPSRVRecord : NSObject
 {
-	UInt16 priority;
-	UInt16 weight;
-	UInt16 port;
-	NSString *target;
-	
-	NSUInteger sum;
-	NSUInteger srvResultsIndex;
+    UInt16 priority;
+    UInt16 weight;
+    UInt16 port;
+    NSString *target;
+    
+    NSUInteger sum;
+    NSUInteger srvResultsIndex;
 }
 
 + (XMPPSRVRecord *)recordWithPriority:(UInt16)priority weight:(UInt16)weight port:(UInt16)port target:(NSString *)target;

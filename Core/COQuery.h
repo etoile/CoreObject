@@ -1,11 +1,11 @@
 /**
-	Copyright (C) 2011 Quentin Mathe
+    Copyright (C) 2011 Quentin Mathe
 
-	Date:  November 2011
-	License:  MIT  (see COPYING)
+    Date:  November 2011
+    License:  MIT  (see COPYING)
 
-	COObjectMatching protocol is based on MIT-licensed code by Yen-Ju Chen 
-	<yjchenx gmail> from the previous CoreObject.
+    COObjectMatching protocol is based on MIT-licensed code by Yen-Ju Chen 
+    <yjchenx gmail> from the previous CoreObject.
  */
 
 #import <Foundation/Foundation.h>
@@ -28,10 +28,10 @@
  */
 @interface COQuery : NSObject
 {
-	@private
-	NSPredicate *predicate;
-	NSString *SQLString;
-	BOOL matchesAgainstObjectsInMemory;
+    @private
+    NSPredicate *predicate;
+    NSString *SQLString;
+    BOOL matchesAgainstObjectsInMemory;
 }
 
 

@@ -11,24 +11,24 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-	ETEntityDescription *entity = [self newBasicEntityDescription];
-	
-	if (![entity.name isEqual: [OrderedGroupContent className]])
-		return entity;
-	
+    ETEntityDescription *entity = [self newBasicEntityDescription];
+    
+    if (![entity.name isEqual: [OrderedGroupContent className]])
+        return entity;
+    
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                  typeName: @"NSString"];
     labelProperty.persistent = YES;
-	
-	ETPropertyDescription *parentGroupsProperty = [ETPropertyDescription descriptionWithName: @"parentGroups"
-																						typeName: @"OrderedGroupWithOpposite"];
+    
+    ETPropertyDescription *parentGroupsProperty = [ETPropertyDescription descriptionWithName: @"parentGroups"
+                                                                                        typeName: @"OrderedGroupWithOpposite"];
     parentGroupsProperty.multivalued = YES;
     parentGroupsProperty.ordered = NO;
-	parentGroupsProperty.oppositeName = @"OrderedGroupWithOpposite.contents";
-	parentGroupsProperty.derived = YES;
-	
-	entity.propertyDescriptions = @[labelProperty, parentGroupsProperty];
-	
+    parentGroupsProperty.oppositeName = @"OrderedGroupWithOpposite.contents";
+    parentGroupsProperty.derived = YES;
+    
+    entity.propertyDescriptions = @[labelProperty, parentGroupsProperty];
+    
     return entity;
 }
 

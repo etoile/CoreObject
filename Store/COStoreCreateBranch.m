@@ -18,8 +18,8 @@
             [branch dataValue],
             [persistentRoot dataValue],
             [initialRevision dataValue],
-			[initialRevision dataValue],
-			[parentBranch dataValue]];
+            [initialRevision dataValue],
+            [parentBranch dataValue]];
 }
 
 @end

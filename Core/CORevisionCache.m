@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2013 Eric Wasylishen
+    Copyright (C) 2013 Eric Wasylishen
 
-	Date:  September 2013
-	License:  MIT  (see COPYING)
+    Date:  September 2013
+    License:  MIT  (see COPYING)
  */
 
 #import "CORevisionCache.h"
@@ -16,34 +16,34 @@
 
 - (instancetype) initWithParentEditingContext: (COEditingContext *)aCtx
 {
-	NILARG_EXCEPTION_TEST(aCtx);
+    NILARG_EXCEPTION_TEST(aCtx);
     SUPERINIT;
-	_parentContext = aCtx;
+    _parentContext = aCtx;
     _revisionForRevisionID = [[NSMutableDictionary alloc] init];
     return self;
 }
 
 - (instancetype)init
 {
-	return [self initWithParentEditingContext: nil];
+    return [self initWithParentEditingContext: nil];
 }
 
 - (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
-					  persistentRootUUID: (ETUUID *)aPersistentRoot
+                      persistentRootUUID: (ETUUID *)aPersistentRoot
 {
-	ETAssert(_parentContext != nil);
-	
+    ETAssert(_parentContext != nil);
+    
     CORevision *cached = _revisionForRevisionID[aRevid];
     if (cached == nil)
     {
-		COSQLiteStore *store = _parentContext.store;
-		ETAssert(store != nil);
-		
-        CORevisionInfo *info = [store revisionInfoForRevisionUUID: aRevid
-											   persistentRootUUID: aPersistentRoot];
+        COSQLiteStore *store = _parentContext.store;
+        ETAssert(store != nil);
         
-		if (info == nil)
-			return nil;
+        CORevisionInfo *info = [store revisionInfoForRevisionUUID: aRevid
+                                               persistentRootUUID: aPersistentRoot];
+        
+        if (info == nil)
+            return nil;
 
         cached = [[CORevision alloc] initWithCache: self revisionInfo: info];
         

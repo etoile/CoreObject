@@ -2,7 +2,7 @@
 
 @interface PreferencesController : NSWindowController
 {
-	IBOutlet NSMatrix *undoMode;
+    IBOutlet NSMatrix *undoMode;
 }
 
 - (IBAction) undoModeChanged: (id)sender;

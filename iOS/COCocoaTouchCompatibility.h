@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2014 Quentin Mathe
+    Copyright (C) 2014 Quentin Mathe
 
-	Date:  July 2014
-	License:  MIT  (see COPYING)
+    Date:  July 2014
+    License:  MIT  (see COPYING)
  */
 
 #if TARGET_OS_IPHONE

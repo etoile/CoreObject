@@ -23,8 +23,8 @@
 @property (nonatomic, readwrite, copy) NSDate *date;
 
 - (void) writeToTransaction: (COStoreTransaction *)txn
-		 persistentRootUUID: (ETUUID *)persistentRoot
-				 branchUUID: (ETUUID *)branch;
+         persistentRootUUID: (ETUUID *)persistentRoot
+                 branchUUID: (ETUUID *)branch;
 
 - (instancetype) initWithUUID: (ETUUID *)aUUID persistentRoot: (ETUUID *)aPersistentRoot store: (COSQLiteStore *)store recordAsDeltaAgainstParent: (BOOL)delta NS_DESIGNATED_INITIALIZER;
 

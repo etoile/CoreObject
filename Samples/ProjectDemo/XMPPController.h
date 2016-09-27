@@ -6,11 +6,11 @@
 
 @interface XMPPController : NSObject
 {
-	XMPPStream *xmppStream;
-	XMPPRosterMemoryStorage *xmppRosterStorage;
-	XMPPRoster *xmppRoster;
-	
-	NSMutableDictionary *sharingSessionsByBranchUUID;
+    XMPPStream *xmppStream;
+    XMPPRosterMemoryStorage *xmppRosterStorage;
+    XMPPRoster *xmppRoster;
+    
+    NSMutableDictionary *sharingSessionsByBranchUUID;
 }
 
 + (XMPPController *) sharedInstance;

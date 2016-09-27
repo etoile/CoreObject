@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2013 Eric Wasylishen
+    Copyright (C) 2013 Eric Wasylishen
 
-	Date:  September 2013
-	License:  MIT  (see COPYING)
+    Date:  September 2013
+    License:  MIT  (see COPYING)
  */
 
 #import "TestCommon.h"
@@ -69,15 +69,15 @@ static id values[ATTRIBUTES];
                   type: types[i]];
     }
     
-	BOOL ok = YES;
+    BOOL ok = YES;
     for (NSUInteger i=0; i<ITERATIONS; i++)
     {
-		// N.B. These could be UKObjectsEqual checks, but this test case would become about 100x slower
+        // N.B. These could be UKObjectsEqual checks, but this test case would become about 100x slower
         ok = ok && [values[i % ATTRIBUTES] isEqual: [item valueForAttribute: attributes[i % ATTRIBUTES]]];
         ok = ok && (types[i % ATTRIBUTES] == [item typeForAttribute: attributes[i % ATTRIBUTES]]);
     }
     UKTrue(ok);
-	
+    
     NSLog(@"reading %d attributes in COItem took %lf ms", ITERATIONS, 1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
 }
 

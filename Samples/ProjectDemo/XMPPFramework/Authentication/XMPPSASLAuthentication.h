@@ -8,14 +8,14 @@
 
 enum XMPPHandleAuthResponse
 {
-	XMPP_AUTH_FAIL,     // Authentication failed.
-	                    // The delegate will be informed via xmppStream:didNotAuthenticate:
-	
-	XMPP_AUTH_SUCCESS,  // Authentication succeeded.
-	                    // The delegate will be informed via xmppStreamDidAuthenticate:
-	
-	XMPP_AUTH_CONTINUE, // The authentication process is still ongoing.
-	
+    XMPP_AUTH_FAIL,     // Authentication failed.
+                        // The delegate will be informed via xmppStream:didNotAuthenticate:
+    
+    XMPP_AUTH_SUCCESS,  // Authentication succeeded.
+                        // The delegate will be informed via xmppStreamDidAuthenticate:
+    
+    XMPP_AUTH_CONTINUE, // The authentication process is still ongoing.
+    
 };
 typedef enum XMPPHandleAuthResponse XMPPHandleAuthResponse;
 

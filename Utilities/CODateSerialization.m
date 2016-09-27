@@ -16,20 +16,20 @@
  */
 NSNumber *CODateToJavaTimestamp(NSDate *aDate)
 {
-	if (aDate == nil)
-		[NSException raise: NSInvalidArgumentException format: @"CODateToJavaTimestamp() requires a non-nil date"];
-	
-	const long long int javaDate = llrint(aDate.timeIntervalSince1970 * 1000.0);
-	
-	return @(javaDate);
+    if (aDate == nil)
+        [NSException raise: NSInvalidArgumentException format: @"CODateToJavaTimestamp() requires a non-nil date"];
+    
+    const long long int javaDate = llrint(aDate.timeIntervalSince1970 * 1000.0);
+    
+    return @(javaDate);
 }
 
 NSDate *CODateFromJavaTimestamp(NSNumber *aNumber)
 {
-	if (aNumber == nil)
-		[NSException raise: NSInvalidArgumentException format: @"CODateFromJavaTimestamp() requires a non-nil date"];
+    if (aNumber == nil)
+        [NSException raise: NSInvalidArgumentException format: @"CODateFromJavaTimestamp() requires a non-nil date"];
 
-	const long long int javaDate = aNumber.longLongValue;
-	
-	return [NSDate dateWithTimeIntervalSince1970: javaDate / 1000.0];
+    const long long int javaDate = aNumber.longLongValue;
+    
+    return [NSDate dateWithTimeIntervalSince1970: javaDate / 1000.0];
 }

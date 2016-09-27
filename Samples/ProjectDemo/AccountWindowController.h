@@ -3,9 +3,9 @@
 
 @interface AccountWindowController : NSWindowController
 {
-	IBOutlet NSTextField *jidBox;
-	IBOutlet NSTextField *passwordBox;
-	IBOutlet NSTextField *serverBox;
+    IBOutlet NSTextField *jidBox;
+    IBOutlet NSTextField *passwordBox;
+    IBOutlet NSTextField *serverBox;
 }
 
 - (IBAction) yes: (id)sender;

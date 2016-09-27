@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2012 Eric Wasylishen
+    Copyright (C) 2012 Eric Wasylishen
 
-	Date:  March 2012
-	License:  MIT  (see COPYING)
+    Date:  March 2012
+    License:  MIT  (see COPYING)
  */
 
 #import "COSetDeletion.h"
@@ -11,17 +11,17 @@
 
 - (NSUInteger) hash
 {
-	return 1310827214389984141ULL ^ super.hash;
+    return 1310827214389984141ULL ^ super.hash;
 }
 
 - (NSString *) description
 {
-	return [NSString stringWithFormat: @"delete from set %@.%@ value %@ (%@)", UUID, attribute, object, sourceIdentifier];
+    return [NSString stringWithFormat: @"delete from set %@.%@ value %@ (%@)", UUID, attribute, object, sourceIdentifier];
 }
 
 - (NSSet *) insertedInnerItemUUIDs
 {
-	return [NSSet set];
+    return [NSSet set];
 }
 
 @end

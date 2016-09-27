@@ -18,11 +18,11 @@
 @interface TestPersistentRoot : EditingContextTestCase <UKTest>
 {
     COPersistentRoot *persistentRoot;
-	OutlineItem *rootObj;
+    OutlineItem *rootObj;
     COBranch *originalBranch;
-	
-	CORevision *r0;
-	CORevision *r1;
+    
+    CORevision *r0;
+    CORevision *r1;
 }
 @end
 
@@ -31,132 +31,132 @@
 - (id) init
 {
     SUPERINIT;
-	
-	// FIXME: If we change the unloading behavior, then we must write the tests
-	// a bit differently.
-	// For example, in -testExceptionOnDeletedPersistentRootCreateBranch the
-	// commits in the check block always succeeds, since the referenced
-	// persistent root has been unloaded in the editing context. Which means we
-	// probably need to catch the persistent root invalidity earlier in
-	// -makeBranchWithLabel:.
-	// To cope with this, the check block could cover more cases:
-	// - valid/loaded deleted persistent root reference
-	// - invalid/unloaded deleted persistent root reference
-	ctx.unloadingBehavior = COEditingContextUnloadingBehaviorManual;
+    
+    // FIXME: If we change the unloading behavior, then we must write the tests
+    // a bit differently.
+    // For example, in -testExceptionOnDeletedPersistentRootCreateBranch the
+    // commits in the check block always succeeds, since the referenced
+    // persistent root has been unloaded in the editing context. Which means we
+    // probably need to catch the persistent root invalidity earlier in
+    // -makeBranchWithLabel:.
+    // To cope with this, the check block could cover more cases:
+    // - valid/loaded deleted persistent root reference
+    // - invalid/unloaded deleted persistent root reference
+    ctx.unloadingBehavior = COEditingContextUnloadingBehaviorManual;
 
     persistentRoot =  [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-	rootObj = persistentRoot.rootObject;
+    rootObj = persistentRoot.rootObject;
     originalBranch =  persistentRoot.currentBranch;
     
-	[ctx commit];
-	r0 = persistentRoot.currentRevision;
-	
-	[persistentRoot.rootObject setLabel: @"hello"];
-	[ctx commit];
-	r1 = persistentRoot.currentRevision;
-	
+    [ctx commit];
+    r0 = persistentRoot.currentRevision;
+    
+    [persistentRoot.rootObject setLabel: @"hello"];
+    [ctx commit];
+    r1 = persistentRoot.currentRevision;
+    
     return self;
 }
 
 - (void)testExceptionOnInit
 {
-	UKRaisesException([[COPersistentRoot alloc] init]);
+    UKRaisesException([[COPersistentRoot alloc] init]);
 }
 
 - (void)testUncommittedPersistentRootCurrentRevision
 {
-	COPersistentRoot *newPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-	UKNil(newPersistentRoot.currentRevision);
+    COPersistentRoot *newPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    UKNil(newPersistentRoot.currentRevision);
 }
 
 - (void)testBranchCreation
 {
     [persistentRoot commit];
     
-	CORevision *rev1 = persistentRoot.currentBranch.currentRevision;
-	
-	COBranch *branch = [originalBranch makeBranchWithLabel: @"Sandbox"];
-	UKNotNil(branch);
-	UKObjectsNotEqual(branch.UUID, originalBranch.UUID);
+    CORevision *rev1 = persistentRoot.currentBranch.currentRevision;
+    
+    COBranch *branch = [originalBranch makeBranchWithLabel: @"Sandbox"];
+    UKNotNil(branch);
+    UKObjectsNotEqual(branch.UUID, originalBranch.UUID);
     
     /* Verify that the branch creation is not committed yet. */
     UKIntsEqual(1, [store persistentRootInfoForUUID: persistentRoot.UUID].branchForUUID.allKeys.count);
     
     [persistentRoot commit];
-	
-	[self checkBranchWithExistingAndNewContext: branch
-									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKIntsEqual(2, testProot.branches.count);
-		 UKStringsEqual(@"Sandbox", testBranch.label);
-		 UKObjectsEqual(originalBranch.UUID, testBranch.parentBranch.UUID);
-		 
-		 UKObjectsEqual(testProot, testBranch.persistentRoot);
-		 
-		 UKObjectsEqual(rev1, testBranch.currentRevision);
-	 }];
+    
+    [self checkBranchWithExistingAndNewContext: branch
+                                      inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKIntsEqual(2, testProot.branches.count);
+         UKStringsEqual(@"Sandbox", testBranch.label);
+         UKObjectsEqual(originalBranch.UUID, testBranch.parentBranch.UUID);
+         
+         UKObjectsEqual(testProot, testBranch.persistentRoot);
+         
+         UKObjectsEqual(rev1, testBranch.currentRevision);
+     }];
 
-	/* Branch creation doesn't switch the branch */
-	UKObjectsEqual(originalBranch, persistentRoot.currentBranch);
-	
-	/* Branch creation doesn't touch the current persistent root revision */
-	UKObjectsEqual(rev1, rootObj.revision);
-	UKObjectsEqual(rev1, originalBranch.currentRevision);
+    /* Branch creation doesn't switch the branch */
+    UKObjectsEqual(originalBranch, persistentRoot.currentBranch);
+    
+    /* Branch creation doesn't touch the current persistent root revision */
+    UKObjectsEqual(rev1, rootObj.revision);
+    UKObjectsEqual(rev1, originalBranch.currentRevision);
 }
 
 - (void)testBranchSwitch
 {
-	[rootObj setValue: @"Untitled" forProperty: @"label"];
-	[persistentRoot commit];
+    [rootObj setValue: @"Untitled" forProperty: @"label"];
+    [persistentRoot commit];
     
-	//CORevision *rev1 = persistentRoot.currentBranch.currentRevision;
-	
-	COBranch *branch = [originalBranch makeBranchWithLabel: @"Sandbox"];
+    //CORevision *rev1 = persistentRoot.currentBranch.currentRevision;
     
-	/* Switch to the Sandbox branch */
-	
-	persistentRoot.currentBranch = branch;
-	
+    COBranch *branch = [originalBranch makeBranchWithLabel: @"Sandbox"];
+    
+    /* Switch to the Sandbox branch */
+    
+    persistentRoot.currentBranch = branch;
+    
     UKObjectsEqual(originalBranch.UUID,
                    [store persistentRootInfoForUUID: persistentRoot.UUID].currentBranchUUID);
     
-	/* Commit some changes in the Sandbox branch */
-	
+    /* Commit some changes in the Sandbox branch */
+    
     COObject *sandboxRootObj = branch.objectGraphContext.rootObject;
     
-	[sandboxRootObj setValue: @"Todo" forProperty: @"label"];
+    [sandboxRootObj setValue: @"Todo" forProperty: @"label"];
     
-	[persistentRoot commit];
+    [persistentRoot commit];
 
-	UKObjectsEqual(@"Todo", [persistentRoot.rootObject valueForProperty: @"label"]);
-	
+    UKObjectsEqual(@"Todo", [persistentRoot.rootObject valueForProperty: @"label"]);
+    
     UKObjectsEqual(branch.UUID,
                    [store persistentRootInfoForUUID: persistentRoot.UUID].currentBranchUUID);
     
-	[sandboxRootObj setValue: @"Tidi" forProperty: @"label"];
-	
+    [sandboxRootObj setValue: @"Tidi" forProperty: @"label"];
+    
     [persistentRoot commit];
     
-	//CORevision *rev3 = branch.currentRevision;
+    //CORevision *rev3 = branch.currentRevision;
     
     UKObjectsEqual(@"Tidi", [persistentRoot.rootObject valueForProperty: @"label"]);
-	
-	/* Switch back to the main branch */
-	
-	persistentRoot.currentBranch = originalBranch;
+    
+    /* Switch back to the main branch */
+    
+    persistentRoot.currentBranch = originalBranch;
     
     UKObjectsEqual(@"Untitled", [persistentRoot.rootObject valueForProperty: @"label"]);
 }
 
 - (void) testBranchSwitchCommitted
 {
-	// photo1 <<persistent root, branchA>>
-	//  |
-	//  \--childA
-	//
-	// photo1 <<persistent root, branchB>>
-	//  |
-	//  \--childB
+    // photo1 <<persistent root, branchA>>
+    //  |
+    //  \--childA
+    //
+    // photo1 <<persistent root, branchB>>
+    //  |
+    //  \--childB
     
     COPersistentRoot *photo1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     COObject *photo1root = photo1.rootObject;
@@ -184,12 +184,12 @@
     
     // Test that the cross-persistent reference uses branchB when we reopen the store
         
-	[self checkPersistentRootWithExistingAndNewContext: photo1
-											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPhoto1, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKObjectsEqual(branchB.UUID, testPhoto1.currentBranch.UUID);
-		 UKObjectsEqual(A(@"childB"), [testPhoto1.rootObject valueForKeyPath: @"contents.label"]);
-	 }];
+    [self checkPersistentRootWithExistingAndNewContext: photo1
+                                              inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPhoto1, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsEqual(branchB.UUID, testPhoto1.currentBranch.UUID);
+         UKObjectsEqual(A(@"childB"), [testPhoto1.rootObject valueForKeyPath: @"contents.label"]);
+     }];
 }
 
 - (void) testBranchSwitchPersistent
@@ -204,13 +204,13 @@
     persistentRoot.currentBranch = secondBranch;
     [ctx commit];
     
-	[self checkBranchWithExistingAndNewContext: secondBranch
-									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testSecondBranch, BOOL isNewContext)
-	 {
-		 UKObjectsEqual(testSecondBranch, testProot.currentBranch);
-		 UKObjectsEqual(@"hello2", [testProot.rootObject label]);
-		 UKObjectsEqual(@"hello", [[[testProot branchForUUID: originalBranch.UUID] rootObject] label]);
-	 }];
+    [self checkBranchWithExistingAndNewContext: secondBranch
+                                      inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testSecondBranch, BOOL isNewContext)
+     {
+         UKObjectsEqual(testSecondBranch, testProot.currentBranch);
+         UKObjectsEqual(@"hello2", [testProot.rootObject label]);
+         UKObjectsEqual(@"hello", [[[testProot branchForUUID: originalBranch.UUID] rootObject] label]);
+     }];
 }
 
 - (void) testSetCurrentBranchAndDeleteBranch
@@ -236,125 +236,125 @@
     
     [persistentRoot commit];
     
-	CORevision *rev1 = originalBranch.currentRevision;
+    CORevision *rev1 = originalBranch.currentRevision;
     COPersistentRoot *copyRoot = [originalBranch makePersistentRootCopyFromRevision: rev1];
     UKNil([store persistentRootInfoForUUID: copyRoot.UUID]);
-	UKTrue([ctx.persistentRootsPendingInsertion containsObject: copyRoot]);
+    UKTrue([ctx.persistentRootsPendingInsertion containsObject: copyRoot]);
     
-	COBranch *copyRootBranch = copyRoot.currentBranch;
-	UKObjectsEqual(originalBranch, copyRootBranch.parentBranch);
-	UKObjectsEqual(persistentRoot, copyRoot.parentPersistentRoot);
-	UKFalse(persistentRoot.isCopy);
-	UKTrue(copyRoot.isCopy);
+    COBranch *copyRootBranch = copyRoot.currentBranch;
+    UKObjectsEqual(originalBranch, copyRootBranch.parentBranch);
+    UKObjectsEqual(persistentRoot, copyRoot.parentPersistentRoot);
+    UKFalse(persistentRoot.isCopy);
+    UKTrue(copyRoot.isCopy);
 
-	UKObjectsEqual(rootObj.UUID, [copyRoot.rootObject UUID]);
-	UKObjectsNotEqual(rootObj, copyRoot.rootObject);
+    UKObjectsEqual(rootObj.UUID, [copyRoot.rootObject UUID]);
+    UKObjectsNotEqual(rootObj, copyRoot.rootObject);
 
     [ctx commit];
-	
-	[self checkPersistentRootWithExistingAndNewContext: copyRoot
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKObjectsEqual(rev1, testProot.currentRevision);
-		 
-		 // FIXME: It might be cleaner if we could get rid of these -UUID calls
-		 // and have -[COBranch isEqual:]/-[COPersistentRoot isEqual:] work
-		 
-		 UKObjectsNotEqual(originalBranch.UUID, testBranch.UUID);
-		 UKObjectsNotEqual(persistentRoot.UUID, testProot.UUID);
-		 
-		 UKObjectsEqual(originalBranch.UUID, testBranch.parentBranch.UUID);
-		 UKObjectsEqual(persistentRoot.UUID, testProot.parentPersistentRoot.UUID);
-		 
-		 UKObjectsEqual(rev1, testBranch.initialRevision);
-		 UKObjectsEqual(rev1, testBranch.currentRevision);
-		 UKObjectsEqual(rev1, testBranch.headRevision);
-		 
-		 UKTrue(testProot.isCopy);
-	 }];
+    
+    [self checkPersistentRootWithExistingAndNewContext: copyRoot
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsEqual(rev1, testProot.currentRevision);
+         
+         // FIXME: It might be cleaner if we could get rid of these -UUID calls
+         // and have -[COBranch isEqual:]/-[COPersistentRoot isEqual:] work
+         
+         UKObjectsNotEqual(originalBranch.UUID, testBranch.UUID);
+         UKObjectsNotEqual(persistentRoot.UUID, testProot.UUID);
+         
+         UKObjectsEqual(originalBranch.UUID, testBranch.parentBranch.UUID);
+         UKObjectsEqual(persistentRoot.UUID, testProot.parentPersistentRoot.UUID);
+         
+         UKObjectsEqual(rev1, testBranch.initialRevision);
+         UKObjectsEqual(rev1, testBranch.currentRevision);
+         UKObjectsEqual(rev1, testBranch.headRevision);
+         
+         UKTrue(testProot.isCopy);
+     }];
 
     /* Make a commit in the cheap copy */
     
-   	[copyRoot.rootObject setValue: @"Todo" forProperty: @"label"];
-	
+    [copyRoot.rootObject setValue: @"Todo" forProperty: @"label"];
+    
     [ctx commit];
     
-	[self checkPersistentRootWithExistingAndNewContext: copyRoot
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKObjectsEqual(@"Todo", [testProot.rootObject label]);
-	 }];
-	
-	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 /* Cheap copy creation doesn't touch the current persistent root revision */
-		 UKObjectsEqual(rev1, testProot.currentRevision);
-		 /* Cheap copy creation doesn't switch the branch */
-		 UKObjectsEqual(originalBranch.UUID, testBranch.UUID);
-	 }];
+    [self checkPersistentRootWithExistingAndNewContext: copyRoot
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsEqual(@"Todo", [testProot.rootObject label]);
+     }];
+    
+    [self checkPersistentRootWithExistingAndNewContext: persistentRoot
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         /* Cheap copy creation doesn't touch the current persistent root revision */
+         UKObjectsEqual(rev1, testProot.currentRevision);
+         /* Cheap copy creation doesn't switch the branch */
+         UKObjectsEqual(originalBranch.UUID, testBranch.UUID);
+     }];
 }
 
 - (void)testCheapCopyCreationWithEdit
 {
-	ETAssert(!persistentRoot.hasChanges);
-	
+    ETAssert(!persistentRoot.hasChanges);
+    
     COPersistentRoot *copyRoot = [originalBranch makePersistentRootCopyFromRevision: r1];
-	UKObjectsEqual(r1, copyRoot.currentRevision);
-	[copyRoot.rootObject setLabel: @"a change"];
+    UKObjectsEqual(r1, copyRoot.currentRevision);
+    [copyRoot.rootObject setLabel: @"a change"];
     [ctx commit];
-	
-	[self checkPersistentRootWithExistingAndNewContext: copyRoot
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKObjectsNotEqual(r1, testBranch.initialRevision);
-		 UKObjectsNotEqual(r1, testProot.currentRevision);
-		 UKObjectsEqual(@"a change", [testProot.rootObject label]);
-	 }];
+    
+    [self checkPersistentRootWithExistingAndNewContext: copyRoot
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsNotEqual(r1, testBranch.initialRevision);
+         UKObjectsNotEqual(r1, testProot.currentRevision);
+         UKObjectsEqual(@"a change", [testProot.rootObject label]);
+     }];
 }
 
 - (void)testCheapCopyCreationWithEditInBranchObjectGraphContext
 {
-	ETAssert(!persistentRoot.hasChanges);
-	
+    ETAssert(!persistentRoot.hasChanges);
+    
     COPersistentRoot *copyRoot = [originalBranch makePersistentRootCopyFromRevision: r1];
-	UKObjectsEqual(r1, copyRoot.currentRevision);
-	[copyRoot.currentBranch.rootObject setLabel: @"a change"];
+    UKObjectsEqual(r1, copyRoot.currentRevision);
+    [copyRoot.currentBranch.rootObject setLabel: @"a change"];
     [ctx commit];
-	
-	[self checkPersistentRootWithExistingAndNewContext: copyRoot
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKObjectsNotEqual(r1, testBranch.initialRevision);
-		 UKObjectsNotEqual(r1, testProot.currentRevision);
-		 UKObjectsEqual(@"a change", [testProot.rootObject label]);
-	 }];
+    
+    [self checkPersistentRootWithExistingAndNewContext: copyRoot
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsNotEqual(r1, testBranch.initialRevision);
+         UKObjectsNotEqual(r1, testProot.currentRevision);
+         UKObjectsEqual(@"a change", [testProot.rootObject label]);
+     }];
 }
 
 
 - (void)testCheapCopyOfCheapCopy
 {
-	ETAssert(!persistentRoot.hasChanges);
-	
+    ETAssert(!persistentRoot.hasChanges);
+    
     COPersistentRoot *copy1 = [originalBranch makePersistentRootCopyFromRevision: r1];
     [ctx commit];
-	
-	COPersistentRoot *copy2 = [copy1.currentBranch makePersistentRootCopyFromRevision: r1];
+    
+    COPersistentRoot *copy2 = [copy1.currentBranch makePersistentRootCopyFromRevision: r1];
     [ctx commit];
-	
-	[self checkPersistentRootWithExistingAndNewContext: copy2
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKObjectsEqual(r1, testProot.currentRevision);
-	 }];
+    
+    [self checkPersistentRootWithExistingAndNewContext: copy2
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsEqual(r1, testProot.currentRevision);
+     }];
 }
 
 - (void) testCreateBranchInUncommittedCheapCopyDisallowed
 {
-	ETAssert(!persistentRoot.hasChanges);
-	
+    ETAssert(!persistentRoot.hasChanges);
+    
     COPersistentRoot *copy1 = [originalBranch makePersistentRootCopyFromRevision: r1];
-	UKRaisesException([copy1.currentBranch makeBranchWithLabel: @"hello"]);
+    UKRaisesException([copy1.currentBranch makeBranchWithLabel: @"hello"]);
 }
 
 - (void) testDeleteUncommittedBranch
@@ -370,7 +370,7 @@
     [ctx commit];
     
     UKObjectsEqual(S(originalBranch.UUID),
-	               SA([store persistentRootInfoForUUID: persistentRoot.UUID].branchForUUID.allKeys));
+                   SA([store persistentRootInfoForUUID: persistentRoot.UUID].branchForUUID.allKeys));
 }
 
 - (void) testDeleteCommittedBranch
@@ -378,7 +378,7 @@
     COBranch *branch = [originalBranch makeBranchWithLabel: @"branch"];
     
     UKObjectsEqual(S(branch, originalBranch), persistentRoot.branches);
-	
+    
     [ctx commit];
     
     UKObjectsEqual(S(originalBranch.UUID, branch.UUID),
@@ -393,16 +393,16 @@
     
     [ctx commit];
     
-	[self checkBranchWithExistingAndNewContext: branch
-									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 COBranch *testOriginalBranch = [testProot branchForUUID: originalBranch.UUID];
-		 
-		 UKObjectsEqual(S(testOriginalBranch), testProot.branches);
-		 UKTrue([testProot.branchesPendingDeletion isEmpty]);
-		 UKObjectsEqual(S(testBranch), testProot.deletedBranches);
-		 UKTrue(testBranch.deleted);
-	 }];
+    [self checkBranchWithExistingAndNewContext: branch
+                                      inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         COBranch *testOriginalBranch = [testProot branchForUUID: originalBranch.UUID];
+         
+         UKObjectsEqual(S(testOriginalBranch), testProot.branches);
+         UKTrue([testProot.branchesPendingDeletion isEmpty]);
+         UKObjectsEqual(S(testBranch), testProot.deletedBranches);
+         UKTrue(testBranch.deleted);
+     }];
 }
 
 - (void) testUndeleteUncommittedBranch
@@ -418,19 +418,19 @@
     [ctx commit];
     
     UKObjectsEqual(S(branch.UUID, originalBranch.UUID),
-	               SA([store persistentRootInfoForUUID: persistentRoot.UUID].branchForUUID.allKeys));
+                   SA([store persistentRootInfoForUUID: persistentRoot.UUID].branchForUUID.allKeys));
 }
 
 - (void) testUndeleteCommittedBranch
 {
     COBranch *branch = [originalBranch makeBranchWithLabel: @"branch"];
 
-	[ctx commit];
+    [ctx commit];
 
-	branch.deleted = YES;
+    branch.deleted = YES;
 
     UKObjectsEqual(S(originalBranch), persistentRoot.branches);
-	
+    
     [ctx commit];
     
     UKObjectsEqual(S(originalBranch.UUID, branch.UUID),
@@ -445,16 +445,16 @@
     
     [ctx commit];
     
-	[self checkBranchWithExistingAndNewContext: branch
-	                                   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	{
-		 COBranch *testOriginalBranch = [testProot branchForUUID: originalBranch.UUID];
-		 
-		 UKObjectsEqual(S(testBranch, testOriginalBranch), testProot.branches);
-		 UKTrue([testProot.branchesPendingUndeletion isEmpty]);
-		 UKTrue([testProot.deletedBranches isEmpty]);
-		 UKFalse(testBranch.deleted);
-	}];
+    [self checkBranchWithExistingAndNewContext: branch
+                                       inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+    {
+         COBranch *testOriginalBranch = [testProot branchForUUID: originalBranch.UUID];
+         
+         UKObjectsEqual(S(testBranch, testOriginalBranch), testProot.branches);
+         UKTrue([testProot.branchesPendingUndeletion isEmpty]);
+         UKTrue([testProot.deletedBranches isEmpty]);
+         UKFalse(testBranch.deleted);
+    }];
 }
 
 // Check that attempting to commit modifications to a deleted persistent root
@@ -462,90 +462,90 @@
 
 - (void) testExceptionOnDeletedPersistentRootSetRevision
 {
-	persistentRoot.deleted = YES;
-	[ctx commit];
-	
-	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
-											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 testProot.currentRevision = r0;
-		 UKRaisesException([testCtx commit]);
-	 }];
+    persistentRoot.deleted = YES;
+    [ctx commit];
+    
+    [self checkPersistentRootWithExistingAndNewContext: persistentRoot
+                                              inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         testProot.currentRevision = r0;
+         UKRaisesException([testCtx commit]);
+     }];
 }
 
 - (void) testExceptionOnDeletedPersistentRootModifyInnerObject
 {
-	persistentRoot.deleted = YES;
-	[ctx commit];
+    persistentRoot.deleted = YES;
+    [ctx commit];
 
-	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
-											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 [testProot.rootObject setLabel: @"hi"];
-		 UKRaisesException([testCtx commit]);
-	 }];
+    [self checkPersistentRootWithExistingAndNewContext: persistentRoot
+                                              inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         [testProot.rootObject setLabel: @"hi"];
+         UKRaisesException([testCtx commit]);
+     }];
 }
 
 - (void) testExceptionOnDeletedPersistentRootCreateBranch
 {
-	persistentRoot.deleted = YES;
-	[ctx commit];
-	
-	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
-									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 COBranch *shouldFailToCommit = [testBranch makeBranchWithLabel: @"shouldFailToCommit"];
-		 UKNotNil(shouldFailToCommit);
-		 UKRaisesException([testCtx commit]);
-	 }];
+    persistentRoot.deleted = YES;
+    [ctx commit];
+    
+    [self checkPersistentRootWithExistingAndNewContext: persistentRoot
+                                      inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         COBranch *shouldFailToCommit = [testBranch makeBranchWithLabel: @"shouldFailToCommit"];
+         UKNotNil(shouldFailToCommit);
+         UKRaisesException([testCtx commit]);
+     }];
 }
 
 - (void) testExceptionOnDeletedPersistentRootDeleteBranch
 {
-	COBranch *altBranch = [originalBranch makeBranchWithLabel: @"altBranch"];
-	[ctx commit];
+    COBranch *altBranch = [originalBranch makeBranchWithLabel: @"altBranch"];
+    [ctx commit];
 
-	persistentRoot.deleted = YES;
-	[ctx commit];
-	
-	[self checkBranchWithExistingAndNewContext: altBranch
-									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 testBranch.deleted = YES;
-		 UKRaisesException([testCtx commit]);
-	 }];
+    persistentRoot.deleted = YES;
+    [ctx commit];
+    
+    [self checkBranchWithExistingAndNewContext: altBranch
+                                      inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         testBranch.deleted = YES;
+         UKRaisesException([testCtx commit]);
+     }];
 }
 
 - (void) testExceptionOnDeletedPersistentRootUndeleteBranch
 {
-	COBranch *deletedBranch = [originalBranch makeBranchWithLabel: @"deletedBranch"];
-	[ctx commit];
-	
-	deletedBranch.deleted = YES;
-	[ctx commit];
-	
-	persistentRoot.deleted = YES;
-	[ctx commit];
-	
-	[self checkBranchWithExistingAndNewContext: deletedBranch
-									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 testBranch.deleted = NO;
-		 UKRaisesException([testCtx commit]);
-	 }];
+    COBranch *deletedBranch = [originalBranch makeBranchWithLabel: @"deletedBranch"];
+    [ctx commit];
+    
+    deletedBranch.deleted = YES;
+    [ctx commit];
+    
+    persistentRoot.deleted = YES;
+    [ctx commit];
+    
+    [self checkBranchWithExistingAndNewContext: deletedBranch
+                                      inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         testBranch.deleted = NO;
+         UKRaisesException([testCtx commit]);
+     }];
 }
 
 - (void) testExceptionOnDeletedPersistentRootSetBranchMetadata
 {
-	persistentRoot.deleted = YES;
-	[ctx commit];
-	
-	[self checkBranchWithExistingAndNewContext: originalBranch
-									  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	{
-		testBranch.metadata = @{@"hello" : @"world"};
-		UKRaisesException([testCtx commit]);
-	}];
+    persistentRoot.deleted = YES;
+    [ctx commit];
+    
+    [self checkBranchWithExistingAndNewContext: originalBranch
+                                      inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+    {
+        testBranch.metadata = @{@"hello" : @"world"};
+        UKRaisesException([testCtx commit]);
+    }];
 }
 
 // TODO: Test these behaviours during deleted->undeleted and undeleted->deleted
@@ -553,18 +553,18 @@
 
 - (void) testPersistentRootMetadata
 {
-	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
-									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKObjectsEqual(@{}, testProot.metadata);
-	 }];
+    [self checkPersistentRootWithExistingAndNewContext: persistentRoot
+                                       inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsEqual(@{}, testProot.metadata);
+     }];
     
     persistentRoot.metadata = @{@"key" : @"value"};
     
     UKObjectsEqual((@{@"key" : @"value"}), persistentRoot.metadata);
 
-	UKRaisesException([persistentRoot.metadata setValue: @"foo" forKey: @"bar"]);
-	
+    UKRaisesException([persistentRoot.metadata setValue: @"foo" forKey: @"bar"]);
+    
     UKTrue(ctx.hasChanges);
     UKTrue(persistentRoot.hasChanges);
     
@@ -582,12 +582,12 @@
     
     [ctx commit];
     
-	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKObjectsEqual((@{@"key" : @"value"}), testProot.metadata);
-		 UKFalse(testCtx.hasChanges);
-	 }];
+    [self checkPersistentRootWithExistingAndNewContext: persistentRoot
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsEqual((@{@"key" : @"value"}), testProot.metadata);
+         UKFalse(testCtx.hasChanges);
+     }];
     
     persistentRoot.metadata = @{@"key" : @"value2"};
     UKObjectsEqual((@{@"key" : @"value2"}), persistentRoot.metadata);
@@ -603,34 +603,34 @@
     persistentRoot2.metadata = @{@"hello" : @"world"};
     [ctx commit];
     
-	[self checkPersistentRootWithExistingAndNewContext: persistentRoot2
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKObjectsEqual((@{@"hello" : @"world"}), testProot.metadata);
-	 }];
+    [self checkPersistentRootWithExistingAndNewContext: persistentRoot2
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsEqual((@{@"hello" : @"world"}), testProot.metadata);
+     }];
 }
 
 - (void) testAttributesOnUncommittedPersistentRoot
 {
     COPersistentRoot *persistentRoot2 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-	UKNil([persistentRoot2 attributes]);
+    UKNil([persistentRoot2 attributes]);
 }
 
 - (void) testAttributes
 {
-	NSDictionary *attrs = persistentRoot.attributes;
-	UKIntsNotEqual(0, [attrs[COPersistentRootAttributeExportSize] longLongValue]);
+    NSDictionary *attrs = persistentRoot.attributes;
+    UKIntsNotEqual(0, [attrs[COPersistentRootAttributeExportSize] longLongValue]);
 }
 
 - (void) testMixingObjectsAmongObjectGraphsBelongingToSinglePersistentRoot
 {
-	COBranch *altBranch = [originalBranch makeBranchWithLabel: @"altBranch"];
-	[ctx commit];
-	
-	OutlineItem *child = [altBranch.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
-	[altBranch.rootObject insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-	
-	UKRaisesException([originalBranch.rootObject insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"]);
+    COBranch *altBranch = [originalBranch makeBranchWithLabel: @"altBranch"];
+    [ctx commit];
+    
+    OutlineItem *child = [altBranch.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
+    [altBranch.rootObject insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
+    
+    UKRaisesException([originalBranch.rootObject insertObject: child atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"]);
 }
 
 /**
@@ -638,7 +638,7 @@
  */
 - (void) testBranchesAccessors
 {
-	COBranch *current = persistentRoot.currentBranch;
+    COBranch *current = persistentRoot.currentBranch;
     COBranch *regular;
     COBranch *deletedOnDisk;
     COBranch *pendingInsertion;
@@ -648,7 +648,7 @@
     // 1. Setup the branches
     {
         regular = [persistentRoot.currentBranch makeBranchWithLabel: @"regular"];
-		[persistentRoot commit];
+        [persistentRoot commit];
 
         deletedOnDisk = [persistentRoot.currentBranch makeBranchWithLabel: @"deletedOnDisk"];
         [persistentRoot commit];
@@ -663,22 +663,22 @@
         pendingUndeletion.deleted = YES;
         [persistentRoot commit];
 
-		pendingInsertion = [persistentRoot.currentBranch makeBranchWithLabel: @"pendingInsertion"];
-		pendingDeletion.deleted = YES;
+        pendingInsertion = [persistentRoot.currentBranch makeBranchWithLabel: @"pendingInsertion"];
+        pendingDeletion.deleted = YES;
         pendingUndeletion.deleted = NO;
 
-		COPersistentRootInfo *persistentRootInfo = [store persistentRootInfoForUUID: persistentRoot.UUID];
+        COPersistentRootInfo *persistentRootInfo = [store persistentRootInfoForUUID: persistentRoot.UUID];
 
         // Check that the constraints we wanted to set up hold
-		
+        
         UKTrue([persistentRootInfo.branchUUIDs containsObject: regular.UUID]);
         UKTrue([persistentRootInfo.branchUUIDs containsObject: deletedOnDisk.UUID]);
-		UKNil([persistentRootInfo branchInfoForUUID: pendingInsertion.UUID]);
-		UKTrue([persistentRootInfo.branchUUIDs containsObject: pendingDeletion.UUID]);
+        UKNil([persistentRootInfo branchInfoForUUID: pendingInsertion.UUID]);
+        UKTrue([persistentRootInfo.branchUUIDs containsObject: pendingDeletion.UUID]);
         UKTrue([persistentRootInfo.branchUUIDs containsObject: pendingUndeletion.UUID]);
-		UKTrue(deletedOnDisk.deleted);
-		UKTrue(pendingDeletion.deleted);
-		UKFalse(pendingUndeletion.deleted);
+        UKTrue(deletedOnDisk.deleted);
+        UKTrue(pendingDeletion.deleted);
+        UKFalse(pendingUndeletion.deleted);
     }
     
     // 2. Test the accessors
@@ -689,48 +689,48 @@
     UKObjectsEqual(S(pendingDeletion), persistentRoot.branchesPendingDeletion);
     UKObjectsEqual(S(pendingUndeletion), persistentRoot.branchesPendingUndeletion);
 
-	UKObjectsEqual(regular, [persistentRoot branchForUUID: regular.UUID]);
-	UKObjectsEqual(deletedOnDisk, [persistentRoot branchForUUID: deletedOnDisk.UUID]);
-   	UKObjectsEqual(pendingInsertion, [persistentRoot branchForUUID: pendingInsertion.UUID]);
-	UKObjectsEqual(pendingDeletion, [persistentRoot branchForUUID: pendingDeletion.UUID]);
-   	UKObjectsEqual(pendingUndeletion, [persistentRoot branchForUUID: pendingUndeletion.UUID]);
+    UKObjectsEqual(regular, [persistentRoot branchForUUID: regular.UUID]);
+    UKObjectsEqual(deletedOnDisk, [persistentRoot branchForUUID: deletedOnDisk.UUID]);
+    UKObjectsEqual(pendingInsertion, [persistentRoot branchForUUID: pendingInsertion.UUID]);
+    UKObjectsEqual(pendingDeletion, [persistentRoot branchForUUID: pendingDeletion.UUID]);
+    UKObjectsEqual(pendingUndeletion, [persistentRoot branchForUUID: pendingUndeletion.UUID]);
 
     // 3. Test what happens when we commit (all pending changes are made and no longer pending)
     
     [ctx commit];
     
-	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
-											  inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 COBranch *testCurrent = [testPersistentRoot branchForUUID: current.UUID];
-		 COBranch *testRegular = [testPersistentRoot branchForUUID: regular.UUID];
-		 COBranch *testDeletedOnDisk = [testPersistentRoot branchForUUID: deletedOnDisk.UUID];
-		 COBranch *testPendingInsertion = [testPersistentRoot branchForUUID: pendingInsertion.UUID];
-		 COBranch *testPendingDeletion = [testPersistentRoot branchForUUID: pendingDeletion.UUID];
-		 COBranch *testPendingUndeletion = [testPersistentRoot branchForUUID: pendingUndeletion.UUID];
-		 
-		 UKObjectsEqual(S(testCurrent, testRegular, testPendingInsertion, testPendingUndeletion), testPersistentRoot.branches);
-		 UKObjectsEqual(S(testDeletedOnDisk, testPendingDeletion), testPersistentRoot.deletedBranches);
-		 UKObjectsEqual([NSSet set], testPersistentRoot.branchesPendingInsertion);
-		 UKObjectsEqual([NSSet set], testPersistentRoot.branchesPendingDeletion);
-		 UKObjectsEqual([NSSet set], testPersistentRoot.branchesPendingUndeletion);
-	 }];
+    [self checkPersistentRootWithExistingAndNewContext: persistentRoot
+                                              inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
+     {
+         COBranch *testCurrent = [testPersistentRoot branchForUUID: current.UUID];
+         COBranch *testRegular = [testPersistentRoot branchForUUID: regular.UUID];
+         COBranch *testDeletedOnDisk = [testPersistentRoot branchForUUID: deletedOnDisk.UUID];
+         COBranch *testPendingInsertion = [testPersistentRoot branchForUUID: pendingInsertion.UUID];
+         COBranch *testPendingDeletion = [testPersistentRoot branchForUUID: pendingDeletion.UUID];
+         COBranch *testPendingUndeletion = [testPersistentRoot branchForUUID: pendingUndeletion.UUID];
+         
+         UKObjectsEqual(S(testCurrent, testRegular, testPendingInsertion, testPendingUndeletion), testPersistentRoot.branches);
+         UKObjectsEqual(S(testDeletedOnDisk, testPendingDeletion), testPersistentRoot.deletedBranches);
+         UKObjectsEqual([NSSet set], testPersistentRoot.branchesPendingInsertion);
+         UKObjectsEqual([NSSet set], testPersistentRoot.branchesPendingDeletion);
+         UKObjectsEqual([NSSet set], testPersistentRoot.branchesPendingUndeletion);
+     }];
 }
 
 - (void) testNormalPersistentRootUsageDoesNotCreateBranchObjectGraphContext
 {
     COPersistentRoot *proot2 =  [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-	COBranch *branch = proot2.currentBranch;
-	[ctx commit];
-	
-	[proot2.rootObject setLabel: @"Hello"];
-	[ctx commit];
-	
-	[self checkBranchWithExistingAndNewContext: branch
-									   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKNil([testBranch objectGraphContextWithoutUnfaulting]);
-	 }];
+    COBranch *branch = proot2.currentBranch;
+    [ctx commit];
+    
+    [proot2.rootObject setLabel: @"Hello"];
+    [ctx commit];
+    
+    [self checkBranchWithExistingAndNewContext: branch
+                                       inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKNil([testBranch objectGraphContextWithoutUnfaulting]);
+     }];
 }
 
 - (void) testSaveCheckpointRevision
@@ -738,64 +738,64 @@
     // This should cause a new revision to be written, even though there
     // are no changes in the inner objects.
     persistentRoot.currentBranch.shouldMakeEmptyCommit = YES;
-	UKObjectsEqual(r1, persistentRoot.currentRevision);
-	UKTrue([ctx commitWithIdentifier: @"org.etoile.CoreObject.checkpoint"
-							metadata: @{}
-						   undoTrack: nil
-							   error: NULL]);
+    UKObjectsEqual(r1, persistentRoot.currentRevision);
+    UKTrue([ctx commitWithIdentifier: @"org.etoile.CoreObject.checkpoint"
+                            metadata: @{}
+                           undoTrack: nil
+                               error: NULL]);
     
-	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKObjectsNotEqual(r1, testProot.currentRevision);
-	 }];
+    [self checkPersistentRootWithExistingAndNewContext: persistentRoot
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsNotEqual(r1, testProot.currentRevision);
+     }];
 }
 
 - (void) testNameBasic
 {
-	UKNil(persistentRoot.name);
-	UKFalse(persistentRoot.hasChanges);
-	
-	persistentRoot.name = @"todo";
-	
-	UKObjectsEqual(@"todo", persistentRoot.name);
-	UKTrue(persistentRoot.hasChanges);
-	[persistentRoot commit];
-	
-	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKObjectsEqual(@"todo", persistentRoot.name);
-	 }];
+    UKNil(persistentRoot.name);
+    UKFalse(persistentRoot.hasChanges);
+    
+    persistentRoot.name = @"todo";
+    
+    UKObjectsEqual(@"todo", persistentRoot.name);
+    UKTrue(persistentRoot.hasChanges);
+    [persistentRoot commit];
+    
+    [self checkPersistentRootWithExistingAndNewContext: persistentRoot
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsEqual(@"todo", persistentRoot.name);
+     }];
 }
 
 - (void) testNameSetToNil
 {
-	persistentRoot.name = @"todo";
-	[persistentRoot commit];
-	
-	persistentRoot.name = nil;
-	UKNil(persistentRoot.name);
-	UKTrue(persistentRoot.hasChanges);
-	[persistentRoot commit];
-	
-	[self checkPersistentRootWithExistingAndNewContext: persistentRoot
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKNil(persistentRoot.name);
-	 }];
+    persistentRoot.name = @"todo";
+    [persistentRoot commit];
+    
+    persistentRoot.name = nil;
+    UKNil(persistentRoot.name);
+    UKTrue(persistentRoot.hasChanges);
+    [persistentRoot commit];
+    
+    [self checkPersistentRootWithExistingAndNewContext: persistentRoot
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKNil(persistentRoot.name);
+     }];
 }
 
 - (void) testNameCopies
 {
-	NSMutableString *ms = [NSMutableString new];
-	persistentRoot.name = ms;
-	
-	UKObjectsEqual(@"", persistentRoot.name);
-	UKRaisesException([(NSMutableString *)persistentRoot.name appendString: @"foo"]);
-	
-	[ms appendString: @"a"];
-	UKObjectsEqual(@"", persistentRoot.name);
+    NSMutableString *ms = [NSMutableString new];
+    persistentRoot.name = ms;
+    
+    UKObjectsEqual(@"", persistentRoot.name);
+    UKRaisesException([(NSMutableString *)persistentRoot.name appendString: @"foo"]);
+    
+    [ms appendString: @"a"];
+    UKObjectsEqual(@"", persistentRoot.name);
 }
 
 @end

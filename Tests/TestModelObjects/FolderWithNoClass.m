@@ -9,22 +9,22 @@
 
 void registerFolderWithNoClassEntityDescriptionIfNeeded()
 {
-	static BOOL registered;
-	if (registered)
-		return;
+    static BOOL registered;
+    if (registered)
+        return;
 
-	registered = YES;
-	
+    registered = YES;
+    
     ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"FolderWithNoClass"];
     entity.parentName = @"COObject";
-	
+    
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                  typeName: @"NSString"];
     labelProperty.persistent = YES;
-	
-	ETPropertyDescription *contentsProperty =
+    
+    ETPropertyDescription *contentsProperty =
     [ETPropertyDescription descriptionWithName: @"contents" typeName: @"FolderWithNoClass"];
-	
+    
     contentsProperty.persistent = YES;
     contentsProperty.multivalued = YES;
     contentsProperty.ordered = NO;
@@ -33,12 +33,12 @@ void registerFolderWithNoClassEntityDescriptionIfNeeded()
     [ETPropertyDescription descriptionWithName: @"parent" typeName: @"FolderWithNoClass"];
     
     parentProperty.multivalued = NO;
-	parentProperty.derived = YES;
+    parentProperty.derived = YES;
     parentProperty.oppositeName = @"FolderWithNoClass.contents";
     
     entity.propertyDescriptions = @[labelProperty, contentsProperty, parentProperty];
-	
-	ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
-	[repo addUnresolvedDescription: entity];
-	[repo resolveNamedObjectReferences];
+    
+    ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
+    [repo addUnresolvedDescription: entity];
+    [repo resolveNamedObjectReferences];
 }

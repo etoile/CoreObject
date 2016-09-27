@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  July 2013
-	License:  MIT  (see COPYING)
+    Date:  July 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <CoreObject/COBranch.h>

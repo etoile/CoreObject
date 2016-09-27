@@ -1,25 +1,25 @@
 /**
-	Copyright (C) 2012 Eric Wasylishen
+    Copyright (C) 2012 Eric Wasylishen
 
-	Date:  March 2012
-	License:  MIT  (see COPYING)
+    Date:  March 2012
+    License:  MIT  (see COPYING)
  */
 
 #import "COSequenceEdit.h"
 
 @interface COSequenceModification : COSequenceEdit
 {
-	COType type;
-	NSArray *objects;
+    COType type;
+    NSArray *objects;
 }
 @property (readonly, nonatomic) COType type;
 @property (readonly, nonatomic) NSArray *objects;
 
 - (instancetype) initWithUUID: (ETUUID *)aUUID
-		  attribute: (NSString *)anAttribute
+          attribute: (NSString *)anAttribute
    sourceIdentifier: (id)aSourceIdentifier
-			  range: (NSRange)aRange
-			   type: (COType)aType
-			objects: (NSArray *)anArray NS_DESIGNATED_INITIALIZER;
+              range: (NSRange)aRange
+               type: (COType)aType
+            objects: (NSArray *)anArray NS_DESIGNATED_INITIALIZER;
 @end
 

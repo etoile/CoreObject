@@ -82,15 +82,15 @@ static void DFSInsertRevisions(NSMutableSet *revisionUUIDsToHandle, ETUUID *revi
     
     ETUUID *parentRevid = RevisionUUIDFromString(parentString);
     ETUUID *mergeParentRevid = RevisionUUIDFromString(mergeParentString);
-	ETUUID *branchUUID = [ETUUID UUIDWithString: revDict[@"info"][@"branchUUID"]];
-	
-	[txn writeRevisionWithModifiedItems: graph
-						   revisionUUID: revisionUUID
-							   metadata: metadata
-					   parentRevisionID: parentRevid
-				  mergeParentRevisionID: mergeParentRevid
-					 persistentRootUUID: persistentRoot
-							 branchUUID: branchUUID];
+    ETUUID *branchUUID = [ETUUID UUIDWithString: revDict[@"info"][@"branchUUID"]];
+    
+    [txn writeRevisionWithModifiedItems: graph
+                           revisionUUID: revisionUUID
+                               metadata: metadata
+                       parentRevisionID: parentRevid
+                  mergeParentRevisionID: mergeParentRevid
+                     persistentRootUUID: persistentRoot
+                             branchUUID: branchUUID];
 }
 
 static void InsertRevisions(NSDictionary *revisionsPlist, COStoreTransaction *txn, ETUUID *persistentRoot)
@@ -116,7 +116,7 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COStoreTransaction *tx
 - (void) handleUpdateResponse: (NSDictionary *)aResponse
                         store: (COSQLiteStore *)aStore
 {
-	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
     
     NSString *serverID = aResponse[@"serverID"];
     ETUUID *persistentRoot = [ETUUID UUIDWithString: aResponse[@"persistentRoot"]];
@@ -128,10 +128,10 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COStoreTransaction *tx
     {
         // No: create it
         
-		[txn createPersistentRootWithUUID: persistentRoot persistentRootForCopy: nil];
-		
+        [txn createPersistentRootWithUUID: persistentRoot persistentRootForCopy: nil];
+        
         info = [[COPersistentRootInfo alloc] init];
-		info.UUID = persistentRoot;
+        info.UUID = persistentRoot;
     }
     
     // Insert the revisions the server sent us.
@@ -170,13 +170,13 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COStoreTransaction *tx
             branchUUID = [ETUUID UUID];
             
             [txn createBranchWithUUID: branchUUID
-						 parentBranch: nil
-					  initialRevision: currentRevisionID
-					forPersistentRoot: persistentRoot];
+                         parentBranch: nil
+                      initialRevision: currentRevisionID
+                    forPersistentRoot: persistentRoot];
             
             [txn setMetadata: @{ @"source" : serverID, @"replcatedBranch" : branchUUIDString }
-				   forBranch: branchUUID
-			ofPersistentRoot: persistentRoot];
+                   forBranch: branchUUID
+            ofPersistentRoot: persistentRoot];
         }
         else
         {
@@ -184,9 +184,9 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COStoreTransaction *tx
         }
         
         [txn setCurrentRevision: currentRevisionID
-				   headRevision: currentRevisionID
-					  forBranch: branchUUID
-			   ofPersistentRoot: persistentRoot];
+                   headRevision: currentRevisionID
+                      forBranch: branchUUID
+               ofPersistentRoot: persistentRoot];
         
         if ([branchUUIDString isEqualToString: aResponse[@"currentBranchUUID"]])
         {
@@ -199,19 +199,19 @@ static void InsertRevisions(NSDictionary *revisionsPlist, COStoreTransaction *tx
     if (info.currentBranchUUID == nil)
     {
         [txn createBranchWithUUID: currentBranchUUID
-					 parentBranch: nil
-				  initialRevision: replicatedServerCurrentRevision
-				forPersistentRoot: persistentRoot];
+                     parentBranch: nil
+                  initialRevision: replicatedServerCurrentRevision
+                forPersistentRoot: persistentRoot];
         
         [txn setCurrentBranch: currentBranchUUID
-			forPersistentRoot: persistentRoot];
+            forPersistentRoot: persistentRoot];
     }
     
-	[txn setOldTransactionID: info.transactionID forPersistentRoot: persistentRoot];
-	
+    [txn setOldTransactionID: info.transactionID forPersistentRoot: persistentRoot];
+    
     BOOL ok = [aStore commitStoreTransaction: txn];
-	
-	ETAssert(ok);
+    
+    ETAssert(ok);
 }
 
 @end

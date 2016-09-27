@@ -18,13 +18,13 @@
  * Returns an array of the new revision UUIDs.
  */
 + (NSArray *) rebaseRevision: (ETUUID *)source
-				ontoRevision: (ETUUID *)dest
-			  commonAncestor: (ETUUID *)lca
-		  persistentRootUUID: (ETUUID *)persistentRoot
-				  branchUUID: (ETUUID *)branch
-					   store: (COSQLiteStore *)store
-				 transaction: (COStoreTransaction *)txn
-			  editingContext: (COEditingContext *)ctx
+                ontoRevision: (ETUUID *)dest
+              commonAncestor: (ETUUID *)lca
+          persistentRootUUID: (ETUUID *)persistentRoot
+                  branchUUID: (ETUUID *)branch
+                       store: (COSQLiteStore *)store
+                 transaction: (COStoreTransaction *)txn
+              editingContext: (COEditingContext *)ctx
   modelDescriptionRepository: (ETModelDescriptionRepository *)repo;
 
 @end

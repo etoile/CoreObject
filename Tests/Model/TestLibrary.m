@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2014 Eric Wasylishen
+    Copyright (C) 2014 Eric Wasylishen
  
-	Date:  April 2014
-	License:  MIT  (see COPYING)
+    Date:  April 2014
+    License:  MIT  (see COPYING)
 */
 
 #import "TestCommon.h"
@@ -20,25 +20,25 @@
  */
 - (void)testIdentifierPersisted
 {
-	COLibrary *library = [ctx insertNewPersistentRootWithEntityName: @"COLibrary"].rootObject;
-	[ctx commit];
-	
-	[self checkPersistentRootWithExistingAndNewContext: library.persistentRoot
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKNil([testProot.rootObject identifier]);
-	 }];
-	
-	UKFalse(library.persistentRoot.hasChanges);
-	library.identifier = @"hello";
-	UKTrue(library.persistentRoot.hasChanges);
-	[ctx commit];
-	
-	[self checkPersistentRootWithExistingAndNewContext: library.persistentRoot
-											   inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-	 {
-		 UKObjectsEqual(@"hello", [testProot.rootObject identifier]);
-	 }];
+    COLibrary *library = [ctx insertNewPersistentRootWithEntityName: @"COLibrary"].rootObject;
+    [ctx commit];
+    
+    [self checkPersistentRootWithExistingAndNewContext: library.persistentRoot
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKNil([testProot.rootObject identifier]);
+     }];
+    
+    UKFalse(library.persistentRoot.hasChanges);
+    library.identifier = @"hello";
+    UKTrue(library.persistentRoot.hasChanges);
+    [ctx commit];
+    
+    [self checkPersistentRootWithExistingAndNewContext: library.persistentRoot
+                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
+     {
+         UKObjectsEqual(@"hello", [testProot.rootObject identifier]);
+     }];
 }
 
 @end

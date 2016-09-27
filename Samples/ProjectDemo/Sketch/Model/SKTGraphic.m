@@ -18,41 +18,41 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
     
     ETPropertyDescription *documentProperty = [ETPropertyDescription descriptionWithName: @"document"
                                                                                     type: (id)@"SKTDrawDocument"];
-	[documentProperty setDerived: YES];
+    [documentProperty setDerived: YES];
     [documentProperty setOpposite: (id)@"SKTDrawDocument.graphics"];
     
     ETPropertyDescription *originProperty = [ETPropertyDescription descriptionWithName: @"origin"
-																				  type: (id)@"NSPoint"];
-	originProperty.persistent = YES;
-	
+                                                                                  type: (id)@"NSPoint"];
+    originProperty.persistent = YES;
+    
     ETPropertyDescription *sizeProperty = [ETPropertyDescription descriptionWithName: @"size"
-																				  type: (id)@"NSSize"];
-	sizeProperty.persistent = YES;
-	
+                                                                                  type: (id)@"NSSize"];
+    sizeProperty.persistent = YES;
+    
     ETPropertyDescription *drawsFillProperty = [ETPropertyDescription descriptionWithName: @"drawsFill"
-																					 type: (id)@"NSNumber"];
-	drawsFillProperty.persistent = YES;
-	
+                                                                                     type: (id)@"NSNumber"];
+    drawsFillProperty.persistent = YES;
+    
     ETPropertyDescription *fillColorProperty = [ETPropertyDescription descriptionWithName: @"fillColor"
-																					 type: (id)@"NSColor"];
-	fillColorProperty.valueTransformerName = @"COColorToHTMLString";
-	fillColorProperty.persistentType = (id)@"NSString";
-	fillColorProperty.persistent = YES;
+                                                                                     type: (id)@"NSColor"];
+    fillColorProperty.valueTransformerName = @"COColorToHTMLString";
+    fillColorProperty.persistentType = (id)@"NSString";
+    fillColorProperty.persistent = YES;
 
     ETPropertyDescription *drawsStrokeProperty = [ETPropertyDescription descriptionWithName: @"drawsStroke"
-																					   type: (id)@"NSNumber"];
-	drawsStrokeProperty.persistent = YES;
-	
+                                                                                       type: (id)@"NSNumber"];
+    drawsStrokeProperty.persistent = YES;
+    
     ETPropertyDescription *strokeColorProperty = [ETPropertyDescription descriptionWithName: @"strokeColor"
-																					   type: (id)@"NSColor"];
-	strokeColorProperty.valueTransformerName = @"COColorToHTMLString";
-	strokeColorProperty.persistentType = (id)@"NSString";
-	strokeColorProperty.persistent = YES;
+                                                                                       type: (id)@"NSColor"];
+    strokeColorProperty.valueTransformerName = @"COColorToHTMLString";
+    strokeColorProperty.persistentType = (id)@"NSString";
+    strokeColorProperty.persistent = YES;
 
     ETPropertyDescription *strokeLineWidthProperty = [ETPropertyDescription descriptionWithName: @"strokeLineWidth"
-																						   type: (id)@"NSNumber"];
-	strokeLineWidthProperty.persistent = YES;
-	
+                                                                                           type: (id)@"NSNumber"];
+    strokeLineWidthProperty.persistent = YES;
+    
     [entity setPropertyDescriptions: A(documentProperty, originProperty, sizeProperty, drawsFillProperty, fillColorProperty, drawsStrokeProperty, strokeColorProperty, strokeLineWidthProperty)];
     
     return entity;
@@ -62,7 +62,7 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 // =================================== Initialization ===================================
 - (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
 {
-	self = [super initWithObjectGraphContext: aContext];
+    self = [super initWithObjectGraphContext: aContext];
     if (self) {
         [self setBounds:NSMakeRect(0.0, 0.0, 1.0, 1.0)];
         //[self setFillColor:[NSColor whiteColor]];
@@ -117,9 +117,9 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
         }
 
         self.origin = [NSValue valueWithPoint: bounds.origin];
-		self.size = [NSValue valueWithSize: bounds.size];
-		
-		if (!_gFlags.manipulatingBounds) {
+        self.size = [NSValue valueWithSize: bounds.size];
+        
+        if (!_gFlags.manipulatingBounds) {
             [self didChange];
         }
     }
@@ -127,17 +127,17 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 - (NSRect)bounds {
     NSRect result;
-	result.origin = [self.origin pointValue];
-	result.size = [self.size sizeValue];
-	return result;
+    result.origin = [self.origin pointValue];
+    result.size = [self.size sizeValue];
+    return result;
 }
 
 - (void)setDrawsFill:(BOOL)flag {
     if (_drawsFill != flag) {
         //[[[self undoManager] prepareWithInvocationTarget:self] setDrawsFill:_drawsFill];
-		[self willChangeValueForProperty: @"drawsFill"];
+        [self willChangeValueForProperty: @"drawsFill"];
         _drawsFill = (flag ? YES : NO);
-		[self didChangeValueForProperty: @"drawsFill"];
+        [self didChangeValueForProperty: @"drawsFill"];
         [self didChange];
     }
 }
@@ -148,11 +148,11 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 - (void)setFillColor:(NSColor *)fillColor {
 
-	//[[[self undoManager] prepareWithInvocationTarget:self] setFillColor:_fillColor];
-	[self willChangeValueForProperty: @"fillColor"];
-	_fillColor = fillColor;
-	[self didChangeValueForProperty:@"fillColor"];
-	[self didChange];
+    //[[[self undoManager] prepareWithInvocationTarget:self] setFillColor:_fillColor];
+    [self willChangeValueForProperty: @"fillColor"];
+    _fillColor = fillColor;
+    [self didChangeValueForProperty:@"fillColor"];
+    [self didChange];
 
     if (_fillColor) {
         [self setDrawsFill:YES];
@@ -168,9 +168,9 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 - (void)setDrawsStroke:(BOOL)flag {
     if (_drawsStroke != flag) {
         //[[[self undoManager] prepareWithInvocationTarget:self] setDrawsStroke:_drawsStroke];
-		[self willChangeValueForProperty: @"drawsStroke"];
+        [self willChangeValueForProperty: @"drawsStroke"];
         _drawsStroke = (flag ? YES : NO);
-		[self didChangeValueForProperty: @"drawsStroke"];
+        [self didChangeValueForProperty: @"drawsStroke"];
         [self didChange];
     }
 }
@@ -181,10 +181,10 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 - (void)setStrokeColor:(NSColor *)strokeColor {
         //[[[self undoManager] prepareWithInvocationTarget:self] setStrokeColor:_strokeColor];
-	[self willChangeValueForProperty: @"strokeColor"];
-	_strokeColor = strokeColor;
-	[self didChangeValueForProperty: @"strokeColor"];
-	[self didChange];
+    [self willChangeValueForProperty: @"strokeColor"];
+    _strokeColor = strokeColor;
+    [self didChangeValueForProperty: @"strokeColor"];
+    [self didChange];
     
     if (_strokeColor) {
         [self setDrawsStroke:YES];
@@ -200,17 +200,17 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 - (void)setStrokeLineWidth:(float)width {
     if (_strokeLineWidth != width) {
         //[[[self undoManager] prepareWithInvocationTarget:self] setStrokeLineWidth:_lineWidth];
-		
+        
         if (width >= 0.0) {
             [self setDrawsStroke:YES];
         } else {
             [self setDrawsStroke:NO];
-			width = 0;
+            width = 0;
         }
-		
-		[self willChangeValueForProperty: @"strokeLineWidth"];
-		_strokeLineWidth = width;
-		[self didChangeValueForProperty: @"strokeLineWidth"];
+        
+        [self willChangeValueForProperty: @"strokeLineWidth"];
+        _strokeLineWidth = width;
+        [self didChangeValueForProperty: @"strokeLineWidth"];
 
         [self didChange];
     }
@@ -379,8 +379,8 @@ NSString *SKTStrokeLineWidthKey = @"StrokeLineWidth";
 }
 
 + (id)graphicWithPropertyListRepresentation:(NSDictionary *)dict {
-	assert(0); // FIXME: What context do we use?
-	
+    assert(0); // FIXME: What context do we use?
+    
     Class theClass = NSClassFromString([dict objectForKey:SKTClassKey]);
     id theGraphic = nil;
     

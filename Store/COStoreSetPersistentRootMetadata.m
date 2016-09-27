@@ -18,7 +18,7 @@
     NSData *data = nil;
     if (meta != nil)
     {
-		NSError *error = nil;
+        NSError *error = nil;
 
         data = CODataWithJSONObject(meta, &error);
         if (data == nil)

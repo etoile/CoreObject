@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2014 Quentin Mathe
+    Copyright (C) 2014 Quentin Mathe
 
-	Date:  December 2014
-	License:  MIT  (see COPYING)
+    Date:  December 2014
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -36,9 +36,9 @@
  */
 @interface COSchemaMigrationDriver : NSObject
 {
-	@private
-	ETModelDescriptionRepository *_modelDescriptionRepository;
-	NSMutableDictionary *itemsToMigrate;
+    @private
+    ETModelDescriptionRepository *_modelDescriptionRepository;
+    NSMutableDictionary *itemsToMigrate;
 }
 
 

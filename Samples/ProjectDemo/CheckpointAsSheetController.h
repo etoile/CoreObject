@@ -2,9 +2,9 @@
 
 @interface CheckpointAsSheetController : NSObject
 {
-	IBOutlet NSWindow *sheet;
-	IBOutlet NSCell *formCell;
-	BOOL didSave;
+    IBOutlet NSWindow *sheet;
+    IBOutlet NSCell *formCell;
+    BOOL didSave;
 }
 
 /** Shows the sheet, returns the entered name, or nil if the user pressed cancel */

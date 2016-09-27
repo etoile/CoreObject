@@ -147,8 +147,8 @@ static inline
 void
 co_buffer_store_double(co_buffer_t *dest, double value)
 {
-	NSSwappedDouble swapped = NSConvertHostDoubleToSwapped(value);
-	WRTITE_TYPE("F");
+    NSSwappedDouble swapped = NSConvertHostDoubleToSwapped(value);
+    WRTITE_TYPE("F");
     WRITE(swapped);
 }
 

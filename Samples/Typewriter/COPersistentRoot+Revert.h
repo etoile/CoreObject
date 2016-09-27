@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2014 Eric Wasylishen
+    Copyright (C) 2014 Eric Wasylishen
  
-	Date:  April 2014
-	License:  MIT  (see COPYING)
+    Date:  April 2014
+    License:  MIT  (see COPYING)
  */
 
 #import <CoreObject/CoreObject.h>

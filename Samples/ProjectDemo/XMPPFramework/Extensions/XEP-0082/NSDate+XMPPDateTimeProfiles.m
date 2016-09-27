@@ -45,18 +45,18 @@
 #pragma mark Convert from NSDate to XMPP string
 
 
-- (NSString *)xmppDateString {	
-	return [self xmppStringWithDateFormat:@"yyyy-MM-dd"];
+- (NSString *)xmppDateString {  
+    return [self xmppStringWithDateFormat:@"yyyy-MM-dd"];
 }
 
 
 - (NSString *)xmppTimeString {
-	return [self xmppStringWithDateFormat:@"HH:mm:ss'Z'"];
+    return [self xmppStringWithDateFormat:@"HH:mm:ss'Z'"];
 }
 
 
 - (NSString *)xmppDateTimeString {
-	return [self xmppStringWithDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+    return [self xmppStringWithDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
 }
 
 
@@ -65,14 +65,14 @@
 
 - (NSString *)xmppStringWithDateFormat:(NSString *)dateFormat
 {
-	NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-	[dateFormatter setFormatterBehavior:NSDateFormatterBehavior10_4];
-	[dateFormatter setDateFormat:dateFormat];
-	[dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-	
-	NSString *str = [dateFormatter stringFromDate:self];
-	
-	return str;
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setFormatterBehavior:NSDateFormatterBehavior10_4];
+    [dateFormatter setDateFormat:dateFormat];
+    [dateFormatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+    
+    NSString *str = [dateFormatter stringFromDate:self];
+    
+    return str;
 }
 
 

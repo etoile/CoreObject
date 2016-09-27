@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen
+    Copyright (C) 2013 Eric Wasylishen
 
-	Date:  September 2013
-	License:  MIT  (see COPYING)
+    Date:  September 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -13,7 +13,7 @@
 
 @interface CORevisionCache : NSObject
 {
-	@private
+    @private
     COEditingContext __weak *_parentContext;
     NSMutableDictionary *_revisionForRevisionID;
 }
@@ -24,6 +24,6 @@
 
 - (instancetype) initWithParentEditingContext: (COEditingContext *)aCtx NS_DESIGNATED_INITIALIZER;
 - (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
-					  persistentRootUUID: (ETUUID *)aPersistentRoot;
+                      persistentRootUUID: (ETUUID *)aPersistentRoot;
 
 @end

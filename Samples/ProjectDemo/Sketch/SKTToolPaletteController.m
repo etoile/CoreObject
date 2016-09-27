@@ -47,7 +47,7 @@ NSString *SKTSelectedToolDidChangeNotification = @"SKTSelectedToolDidChange";
 
     for (i=0; i<c; i++) {
         [[cells objectAtIndex:i] setRefusesFirstResponder:YES];
-	[[cells objectAtIndex:i] setImagePosition:NSImageOnly];
+    [[cells objectAtIndex:i] setImagePosition:NSImageOnly];
     }
     [(NSPanel *)[self window] setFloatingPanel:YES];
     [(NSPanel *)[self window] setBecomesKeyOnlyIfNeeded:YES];

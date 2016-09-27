@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2014 Quentin Mathe
+    Copyright (C) 2014 Quentin Mathe
 
-	Date:  May 2014
-	License:  MIT  (see COPYING)
+    Date:  May 2014
+    License:  MIT  (see COPYING)
  */
 
 #import "COObjectToArchivedData.h"
@@ -11,24 +11,24 @@
 
 + (Class)transformedValueClass
 {
-	return [NSData class];
+    return [NSData class];
 }
 
 + (BOOL)allowsReverseTransformation
 {
-	return YES;
+    return YES;
 }
 
 - (id)transformedValue: (id)value
 {
-	return (value != nil ? [NSKeyedArchiver archivedDataWithRootObject: value] : nil);
+    return (value != nil ? [NSKeyedArchiver archivedDataWithRootObject: value] : nil);
 }
 
 - (id)reverseTransformedValue: (id)value
 {
-	NSParameterAssert(value == nil || [value isKindOfClass: [NSData class]]);
+    NSParameterAssert(value == nil || [value isKindOfClass: [NSData class]]);
 
-	return (value != nil ? [NSKeyedUnarchiver unarchiveObjectWithData: value] : nil);
+    return (value != nil ? [NSKeyedUnarchiver unarchiveObjectWithData: value] : nil);
 }
 
 @end

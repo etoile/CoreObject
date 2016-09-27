@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  January 2013
-	License:  MIT  (see COPYING)
+    Date:  January 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <CoreObject/COEditingContext.h>

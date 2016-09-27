@@ -11,22 +11,22 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-	ETEntityDescription *entity = [self newBasicEntityDescription];
-	
-	if (![entity.name isEqual: [OutlineItem className]])
-		return entity;
+    ETEntityDescription *entity = [self newBasicEntityDescription];
+    
+    if (![entity.name isEqual: [OutlineItem className]])
+        return entity;
 
-	ETPropertyDescription *isShared = [ETPropertyDescription descriptionWithName: @"isShared"
+    ETPropertyDescription *isShared = [ETPropertyDescription descriptionWithName: @"isShared"
                                                                                  typeName: @"BOOL"];
     isShared.persistent = YES;
-	
+    
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                  typeName: @"NSString"];
     labelProperty.persistent = YES;
     
     ETPropertyDescription *contentsProperty =
     [ETPropertyDescription descriptionWithName: @"contents" typeName: @"OutlineItem"];
-	
+    
     contentsProperty.persistent = YES;
     contentsProperty.multivalued = YES;
     contentsProperty.ordered = YES;
@@ -35,19 +35,19 @@
     [ETPropertyDescription descriptionWithName: @"parentContainer" typeName: @"OutlineItem"];
     
     parentContainerProperty.multivalued = NO;
-	parentContainerProperty.derived = YES;
+    parentContainerProperty.derived = YES;
     parentContainerProperty.oppositeName = @"OutlineItem.contents";
     
     ETPropertyDescription *parentCollectionsProperty =
     [ETPropertyDescription descriptionWithName: @"parentCollections" typeName: @"Tag"];
     
     parentCollectionsProperty.multivalued = YES;
-	parentCollectionsProperty.derived = YES;
+    parentCollectionsProperty.derived = YES;
     parentCollectionsProperty.oppositeName = @"Tag.contents";
-	
-	ETPropertyDescription *attachmentProperty =
+    
+    ETPropertyDescription *attachmentProperty =
     [ETPropertyDescription descriptionWithName: @"attachmentID" typeName: @"COAttachmentID"];
-	attachmentProperty.persistent = YES;
+    attachmentProperty.persistent = YES;
     
     entity.propertyDescriptions = @[isShared, labelProperty, contentsProperty, parentContainerProperty, parentCollectionsProperty, attachmentProperty];
 
@@ -56,19 +56,19 @@
 
 - (NSString *)contentKey
 {
-	return @"contents";
+    return @"contents";
 }
 
 - (BOOL)isShared
 {
-	return [[self valueForVariableStorageKey: @"isShared"] boolValue];
+    return [[self valueForVariableStorageKey: @"isShared"] boolValue];
 }
 
 - (void)setIsShared:(BOOL)isShared
 {
-	[self willChangeValueForProperty: @"isShared"];
-	[self setValue: @(isShared) forVariableStorageKey: @"isShared"];
-	[self didChangeValueForProperty: @"isShared"];
+    [self willChangeValueForProperty: @"isShared"];
+    [self setValue: @(isShared) forVariableStorageKey: @"isShared"];
+    [self didChangeValueForProperty: @"isShared"];
 }
 
 // FIXME: Fix COObject+Accessors to support overriding read-only properties as read-write
@@ -87,21 +87,21 @@
 
 + (ETEntityDescription *)newEntityDescription
 {
-	ETEntityDescription *entity = [self newBasicEntityDescription];
-	
-	if (![entity.name isEqual: [TransientOutlineItem className]])
-		return entity;
+    ETEntityDescription *entity = [self newBasicEntityDescription];
+    
+    if (![entity.name isEqual: [TransientOutlineItem className]])
+        return entity;
 
     ETPropertyDescription *contentsProperty =
-		[ETPropertyDescription descriptionWithName: @"contents" typeName: @"TransientOutlineItem"];
+        [ETPropertyDescription descriptionWithName: @"contents" typeName: @"TransientOutlineItem"];
 
     contentsProperty.multivalued = YES;
     contentsProperty.ordered = YES;
     
     ETPropertyDescription *parentContainerProperty =
-    	[ETPropertyDescription descriptionWithName: @"parentContainer" typeName: @"TransientOutlineItem"];
+        [ETPropertyDescription descriptionWithName: @"parentContainer" typeName: @"TransientOutlineItem"];
     
-	// NOTE: For a non-persistent relationship, 'container' doesn't necessarily imply 'derived'
+    // NOTE: For a non-persistent relationship, 'container' doesn't necessarily imply 'derived'
     parentContainerProperty.multivalued = NO;
     parentContainerProperty.oppositeName = @"TransientOutlineItem.contents";
        
@@ -112,7 +112,7 @@
 
 - (NSString *)contentKey
 {
-	return @"contents";
+    return @"contents";
 }
 
 @dynamic contents, parentContainer;

@@ -16,7 +16,7 @@
  */
 @interface COAttachmentID : NSObject <NSCopying>
 {
-	NSData *_data;
+    NSData *_data;
 }
 
 /**

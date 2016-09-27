@@ -7,11 +7,11 @@
 
 - (id)init
 {
-	self = [super initWithWindowNibName: @"Search"];
-	
-	if (self) {
-	}
-	return self;
+    self = [super initWithWindowNibName: @"Search"];
+    
+    if (self) {
+    }
+    return self;
 }
 
 - (void)dealloc
@@ -20,25 +20,25 @@
 
 - (void)awakeFromNib
 {
-	[table setTarget: self];
-	[table setDoubleAction: @selector(doubleClick:)];
+    [table setTarget: self];
+    [table setDoubleAction: @selector(doubleClick:)];
 }
 
 - (IBAction) search: (id)sender
 {
-	NSString *query = [(NSSearchField *)sender stringValue];
-	
-	COSQLiteStore *store = [[(ApplicationDelegate *)[NSApp delegate] editingContext] store];
-	NSArray *results = [store searchResultsForQuery: query];
-	
-	searchResults = [[NSMutableArray alloc] init];
-	
-	for (COSearchResult *result in results)
-	{
-		[(NSMutableArray *)searchResults addObject: [NSString stringWithFormat: @"Revision %@, persistent root %@", result.revision, result.persistentRoot]];
-	}
-	
-	[table reloadData];
+    NSString *query = [(NSSearchField *)sender stringValue];
+    
+    COSQLiteStore *store = [[(ApplicationDelegate *)[NSApp delegate] editingContext] store];
+    NSArray *results = [store searchResultsForQuery: query];
+    
+    searchResults = [[NSMutableArray alloc] init];
+    
+    for (COSearchResult *result in results)
+    {
+        [(NSMutableArray *)searchResults addObject: [NSString stringWithFormat: @"Revision %@, persistent root %@", result.revision, result.persistentRoot]];
+    }
+    
+    [table reloadData];
 }
 
 /* NSTableView Target/Action */
@@ -52,14 +52,14 @@
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-	return [searchResults count];;
+    return [searchResults count];;
 }
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-	id result = [searchResults objectAtIndex: row];
-	
-	return result;
-//	
+    id result = [searchResults objectAtIndex: row];
+    
+    return result;
+//  
 //    if ([[tableColumn identifier] isEqual: @"name"])
 //    {
 //        return [branch label];

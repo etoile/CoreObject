@@ -32,30 +32,30 @@
 
 - (void)testsDetectsStoreSetCurrentRevisionDistributedNotification
 {
-	// Load the revision history (to support testing it it is updated in reaction to a commit)
-	NSArray *revs = persistentRoot.currentBranch.nodes;
-	ETUUID *newRevID = nil;
+    // Load the revision history (to support testing it it is updated in reaction to a commit)
+    NSArray *revs = persistentRoot.currentBranch.nodes;
+    ETUUID *newRevID = nil;
 
     // Load in another context
     {
         COEditingContext *ctx2 = [COEditingContext contextWithURL: store.URL];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
-		UKIntsEqual(persistentRoot.lastTransactionID, ctx2persistentRoot.lastTransactionID);
+        UKIntsEqual(persistentRoot.lastTransactionID, ctx2persistentRoot.lastTransactionID);
         COObject *rootObj = ctx2persistentRoot.rootObject;
         
         [rootObj setValue: @"hello" forProperty: @"label"];
         
         //NSLog(@"Committing change to %@", persistentRoot.persistentRootUUID);
         [ctx2 commit];
-		newRevID = rootObj.revision.UUID;
+        newRevID = rootObj.revision.UUID;
     }
 
     // Wait a bit for a distributed notification to arrive to ctx
     [self wait];
 
-	CORevision *newRev = [ctx revisionForRevisionUUID: newRevID persistentRootUUID: persistentRoot.UUID];
+    CORevision *newRev = [ctx revisionForRevisionUUID: newRevID persistentRootUUID: persistentRoot.UUID];
 
-	UKObjectsEqual([revs arrayByAddingObject: newRev], persistentRoot.currentBranch.nodes);
+    UKObjectsEqual([revs arrayByAddingObject: newRev], persistentRoot.currentBranch.nodes);
     UKObjectsEqual(@"hello", [persistentRoot.rootObject valueForProperty: @"label"]);
     UKFalse(ctx.hasChanges);
 }
@@ -74,14 +74,14 @@
 
     // Revert persistentRoot back to the first revision using the store API
     COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-	
-	[txn setCurrentRevision: firstRevid
-			   headRevision: nil
-				  forBranch: persistentRoot.currentBranch.UUID
-		   ofPersistentRoot: persistentRoot.UUID];
     
-	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
-	
+    [txn setCurrentRevision: firstRevid
+               headRevision: nil
+                  forBranch: persistentRoot.currentBranch.UUID
+           ofPersistentRoot: persistentRoot.UUID];
+    
+    [txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
+    
     UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
@@ -95,14 +95,14 @@
 {
     ETUUID *secondbranchUUID = [ETUUID UUID];
     
-	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-	[txn createBranchWithUUID: secondbranchUUID
-				 parentBranch: nil
-			  initialRevision: persistentRoot.currentRevision.UUID
-			forPersistentRoot: persistentRoot.UUID];
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    [txn createBranchWithUUID: secondbranchUUID
+                 parentBranch: nil
+              initialRevision: persistentRoot.currentRevision.UUID
+            forPersistentRoot: persistentRoot.UUID];
 
-	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
-	
+    [txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
+    
     UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
@@ -118,15 +118,15 @@
 {
     COStoreTransaction *txn = [[COStoreTransaction alloc] init];
     [txn deleteBranch: testBranch.UUID
-	 ofPersistentRoot: persistentRoot.UUID];
-	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
+     ofPersistentRoot: persistentRoot.UUID];
+    [txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
     UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKTrue(testBranch.deleted);
-	UKTrue([persistentRoot.deletedBranches containsObject: testBranch]);
+    UKTrue([persistentRoot.deletedBranches containsObject: testBranch]);
     UKFalse(ctx.hasChanges);
 }
 
@@ -141,8 +141,8 @@
     
     COStoreTransaction *txn = [[COStoreTransaction alloc] init];
     [txn undeleteBranch: testBranch.UUID
-	   ofPersistentRoot: persistentRoot.UUID];
-	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
+       ofPersistentRoot: persistentRoot.UUID];
+    [txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
     UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
@@ -159,9 +159,9 @@
     
     COStoreTransaction *txn = [[COStoreTransaction alloc] init];
     [txn setMetadata: metadata
-		   forBranch: testBranch.UUID
-	ofPersistentRoot: persistentRoot.UUID];
-	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
+           forBranch: testBranch.UUID
+    ofPersistentRoot: persistentRoot.UUID];
+    [txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
     UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
@@ -173,10 +173,10 @@
 
 - (void) testsDetectsStoreSetCurrentBranch
 {
-	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
     [txn setCurrentBranch: testBranch.UUID
-		forPersistentRoot: persistentRoot.UUID];
-	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
+        forPersistentRoot: persistentRoot.UUID];
+    [txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
     UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
@@ -190,8 +190,8 @@
 {
     COStoreTransaction *txn = [[COStoreTransaction alloc] init];
     [txn setCurrentBranch: testBranch.UUID
-		forPersistentRoot: persistentRoot.UUID];
-	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
+        forPersistentRoot: persistentRoot.UUID];
+    [txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
     UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
@@ -204,8 +204,8 @@
 - (void) testsDetectsStoreDeletePersistentRoot
 {
     COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-	[txn deletePersistentRoot: persistentRoot.UUID];
-	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
+    [txn deletePersistentRoot: persistentRoot.UUID];
+    [txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
     UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
@@ -223,13 +223,13 @@
     
     COStoreTransaction *txn = [[COStoreTransaction alloc] init];
     [txn undeletePersistentRoot: persistentRoot.UUID];
-	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
-	UKTrue([store commitStoreTransaction: txn]);
+    [txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
+    UKTrue([store commitStoreTransaction: txn]);
     
     [self wait];
-	
-	// Reload the persistent root in case it was unloaded on deletion
-	persistentRoot = [ctx persistentRootForUUID: persistentRoot.UUID];
+    
+    // Reload the persistent root in case it was unloaded on deletion
+    persistentRoot = [ctx persistentRootForUUID: persistentRoot.UUID];
     
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKFalse(persistentRoot.deleted);
@@ -241,12 +241,12 @@
 {
     COStoreTransaction *txn = [[COStoreTransaction alloc] init];
     COPersistentRootInfo *info = [txn createPersistentRootCopyWithUUID: [ETUUID UUID]
-											  parentPersistentRootUUID: persistentRoot.UUID
-															branchUUID: [ETUUID UUID]
-													  parentBranchUUID: nil
-												   initialRevisionUUID: persistentRoot.currentRevision.UUID];
-	[txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
-	UKTrue([store commitStoreTransaction: txn]);
+                                              parentPersistentRootUUID: persistentRoot.UUID
+                                                            branchUUID: [ETUUID UUID]
+                                                      parentBranchUUID: nil
+                                                   initialRevisionUUID: persistentRoot.currentRevision.UUID];
+    [txn setOldTransactionID: persistentRoot.lastTransactionID forPersistentRoot: persistentRoot.UUID];
+    UKTrue([store commitStoreTransaction: txn]);
     UKNotNil(info);
     
     [self wait];

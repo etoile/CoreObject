@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Quentin Mathe, Eric Wasylishen
+    Copyright (C) 2013 Quentin Mathe, Eric Wasylishen
 
-	Date:  July 2013
-	License:  MIT  (see COPYING)
+    Date:  July 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -101,13 +101,13 @@
                         types: (NSMutableDictionary *)types
                        values: (NSMutableDictionary *)values
                    entityName: (NSString *)anEntityName
-		   packageDescription: (ETPackageDescription *)package;
+           packageDescription: (ETPackageDescription *)package;
 - (COItem *)additionalStoreItemForUUID: (ETUUID *)anItemUUID;
 
 /** @taskunit Deserialization */
 
 - (COObject *)objectForSerializedReference: (id)value
-									ofType: (COType)type
+                                    ofType: (COType)type
                        propertyDescription: (ETPropertyDescription *)aPropertyDesc;
 - (id)valueForSerializedValue: (id)value
                        ofType: (COType)type

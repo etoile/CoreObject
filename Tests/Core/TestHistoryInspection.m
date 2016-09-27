@@ -28,7 +28,7 @@
     COPersistentRoot *p1;
     COBranch *branch1A;
     COBranch *branch1B;
-	COBranch *branch1C;
+    COBranch *branch1C;
 
     COPersistentRoot *p2;
     COBranch *branch2A;
@@ -39,11 +39,11 @@
     CORevision *r3;
     CORevision *r4;
     CORevision *r5;
-	CORevision *r6;
+    CORevision *r6;
     CORevision *r7;
     CORevision *r8;
-	CORevision *r9;
-	CORevision *r10;
+    CORevision *r9;
+    CORevision *r10;
 }
 @end
 
@@ -53,14 +53,14 @@
                                                     -[7]-----------[9]         )
                                                    /                           }--  persistent root p1, branch 1C
                                                 --------------------------10   )       (current revision: r10)
-		                                       /
-		                        ---[5]        /   ------[8]    )
+                                               /
+                                ---[5]        /   ------[8]    )
                                /             /   /             }-- persistent root p1, branch 1B
-		   ------------3-----------------6-------              )      (current revision: r6)
-		  /
+           ------------3-----------------6-------              )      (current revision: r6)
+          /
   0------1------2    }-- persistent root p1, branch 1A (current revision: r2)
-				 \
-				  ------------4    <-- persistent root p2, branch 2A (current revision: r4)
+                 \
+                  ------------4    <-- persistent root p2, branch 2A (current revision: r4)
 
  
 
@@ -113,39 +113,39 @@
     [ctx commit];
     r4 = branch2A.currentRevision;
 
-	[branch1B.rootObject setLabel: @"5"];
+    [branch1B.rootObject setLabel: @"5"];
     [ctx commit];
     r5 = branch1B.currentRevision;
-	
+    
     branch1B.currentRevision = r3;
     [ctx commit];
-	
-	[branch1B.rootObject setLabel: @"6"];
+    
+    [branch1B.rootObject setLabel: @"6"];
     [ctx commit];
     r6 = branch1B.currentRevision;
 
-	branch1C = [branch1B makeBranchWithLabel: @"1C" atRevision: r6];
+    branch1C = [branch1B makeBranchWithLabel: @"1C" atRevision: r6];
 
     [branch1C.rootObject setLabel: @"7"];
     [ctx commit];
     r7 = branch1C.currentRevision;
 
-	[branch1B.rootObject setLabel: @"8"];
+    [branch1B.rootObject setLabel: @"8"];
     [ctx commit];
     r8 = branch1B.currentRevision;
 
-	[branch1C.rootObject setLabel: @"9"];
+    [branch1C.rootObject setLabel: @"9"];
     [ctx commit];
     r9 = branch1C.currentRevision;
 
-	branch1C.currentRevision = r6;
+    branch1C.currentRevision = r6;
     [ctx commit];
     
-	[branch1C.rootObject setLabel: @"10"];
+    [branch1C.rootObject setLabel: @"10"];
     [ctx commit];
     r10 = branch1C.currentRevision;
 
-	branch1B.currentRevision = r6;
+    branch1B.currentRevision = r6;
     [ctx commit];
 
     return self;
@@ -162,18 +162,18 @@
 
 - (void) testRevisionParentRevision
 {
-	UKNil(r0.parentRevision);
-	UKNil(r0.mergeParentRevision);
-	UKObjectsEqual(r0, r1.parentRevision);
-	UKObjectsEqual(r1, r2.parentRevision);
-	UKObjectsEqual(r1, r3.parentRevision);
-	UKObjectsEqual(r2, r4.parentRevision);
-	UKObjectsEqual(r3, r5.parentRevision);
-	UKObjectsEqual(r3, r6.parentRevision);
-	UKObjectsEqual(r6, r7.parentRevision);
-	UKObjectsEqual(r6, r8.parentRevision);
-	UKObjectsEqual(r7, r9.parentRevision);
-	UKObjectsEqual(r6, r10.parentRevision);
+    UKNil(r0.parentRevision);
+    UKNil(r0.mergeParentRevision);
+    UKObjectsEqual(r0, r1.parentRevision);
+    UKObjectsEqual(r1, r2.parentRevision);
+    UKObjectsEqual(r1, r3.parentRevision);
+    UKObjectsEqual(r2, r4.parentRevision);
+    UKObjectsEqual(r3, r5.parentRevision);
+    UKObjectsEqual(r3, r6.parentRevision);
+    UKObjectsEqual(r6, r7.parentRevision);
+    UKObjectsEqual(r6, r8.parentRevision);
+    UKObjectsEqual(r7, r9.parentRevision);
+    UKObjectsEqual(r6, r10.parentRevision);
 }
 
 - (void) testRevisionPersistentRootUUID
@@ -198,112 +198,112 @@
 {
     UKObjectsEqual(branch1A, branch1B.parentBranch);
     UKNil(branch1A.parentBranch);
-	{
-		COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: ctx.store];
-		UKObjectsEqual(branch1A.UUID, [[ctx2 persistentRootForUUID: p1.UUID]
-										   branchForUUID: branch1B.UUID].parentBranch.UUID);
-	}
-	
-	UKObjectsEqual(branch1A, branch2A.parentBranch);
-	{
-		COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: ctx.store];
-		UKObjectsEqual(branch1A.UUID, [ctx2 persistentRootForUUID: p2.UUID].currentBranch.parentBranch.UUID);
-	}
+    {
+        COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: ctx.store];
+        UKObjectsEqual(branch1A.UUID, [[ctx2 persistentRootForUUID: p1.UUID]
+                                           branchForUUID: branch1B.UUID].parentBranch.UUID);
+    }
+    
+    UKObjectsEqual(branch1A, branch2A.parentBranch);
+    {
+        COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: ctx.store];
+        UKObjectsEqual(branch1A.UUID, [ctx2 persistentRootForUUID: p2.UUID].currentBranch.parentBranch.UUID);
+    }
 }
 
 - (NSArray *)revisionsForBranch: (COBranch *)aBranch
                         options: (COBranchRevisionReadingOptions)options
 {
-	NSArray *revInfos = [ctx.store revisionInfosForBranchUUID: aBranch.UUID
-	                                                    options: options];
-	NSMutableArray *revs = [NSMutableArray array];
-	
-	for (CORevisionInfo *revInfo in revInfos)
-	{
-		[revs addObject: [ctx revisionForRevisionUUID: revInfo.revisionUUID persistentRootUUID: revInfo.persistentRootUUID]];
-	}
-	return revs;
+    NSArray *revInfos = [ctx.store revisionInfosForBranchUUID: aBranch.UUID
+                                                        options: options];
+    NSMutableArray *revs = [NSMutableArray array];
+    
+    for (CORevisionInfo *revInfo in revInfos)
+    {
+        [revs addObject: [ctx revisionForRevisionUUID: revInfo.revisionUUID persistentRootUUID: revInfo.persistentRootUUID]];
+    }
+    return revs;
 }
 
 - (void)testBasicBranchRevisions
 {
-	UKObjectsEqual(A(r0, r1, r2), [self revisionsForBranch: branch1A options: 0]);
-	UKObjectsEqual(A(r3, r6, r8), [self revisionsForBranch: branch1B options: 0]);
-	UKObjectsEqual(A(r10), [self revisionsForBranch: branch1C options: 0]);
-	UKObjectsEqual(A(r4), [self revisionsForBranch: branch2A options: 0]);
+    UKObjectsEqual(A(r0, r1, r2), [self revisionsForBranch: branch1A options: 0]);
+    UKObjectsEqual(A(r3, r6, r8), [self revisionsForBranch: branch1B options: 0]);
+    UKObjectsEqual(A(r10), [self revisionsForBranch: branch1C options: 0]);
+    UKObjectsEqual(A(r4), [self revisionsForBranch: branch2A options: 0]);
 }
 
 - (void)testBranchRevisionsIncludingParentBranches
 {
-	COBranchRevisionReadingOptions options = COBranchRevisionReadingParentBranches;
+    COBranchRevisionReadingOptions options = COBranchRevisionReadingParentBranches;
 
-	UKObjectsEqual(A(r0, r1, r2), [self revisionsForBranch: branch1A options: options]);
-	UKObjectsEqual(A(r0, r1, r3, r6, r8), [self revisionsForBranch: branch1B options: options]);
-	UKObjectsEqual(A(r0, r1, r3, r6, r10), [self revisionsForBranch: branch1C options: options]);
-	UKObjectsEqual(A(r0, r1, r2, r4), [self revisionsForBranch: branch2A options: options]);
+    UKObjectsEqual(A(r0, r1, r2), [self revisionsForBranch: branch1A options: options]);
+    UKObjectsEqual(A(r0, r1, r3, r6, r8), [self revisionsForBranch: branch1B options: options]);
+    UKObjectsEqual(A(r0, r1, r3, r6, r10), [self revisionsForBranch: branch1C options: options]);
+    UKObjectsEqual(A(r0, r1, r2, r4), [self revisionsForBranch: branch2A options: options]);
 }
 
 - (void)testBranchRevisionsIncludingParentBranchesAndDivergentRevisions
 {
-	COBranchRevisionReadingOptions options =
-		(COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions);
-	
-	UKObjectsEqual(A(r0, r1, r2), [self revisionsForBranch: branch1A options: options]);
-	UKObjectsEqual(A(r0, r1, r3, r5, r6, r8), [self revisionsForBranch: branch1B options: options]);
-	
-	// FIXME: For this next line, if r5 is included, r8 should also be (since they are both
-	// diverget revisions in branch 1B).
-	UKObjectsEqual(A(r0, r1, r3, r5, r6, r7, r9, r10), [self revisionsForBranch: branch1C options: options]);
-	UKObjectsEqual(A(r0, r1, r2, r4), [self revisionsForBranch: branch2A options: options]);
+    COBranchRevisionReadingOptions options =
+        (COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions);
+    
+    UKObjectsEqual(A(r0, r1, r2), [self revisionsForBranch: branch1A options: options]);
+    UKObjectsEqual(A(r0, r1, r3, r5, r6, r8), [self revisionsForBranch: branch1B options: options]);
+    
+    // FIXME: For this next line, if r5 is included, r8 should also be (since they are both
+    // diverget revisions in branch 1B).
+    UKObjectsEqual(A(r0, r1, r3, r5, r6, r7, r9, r10), [self revisionsForBranch: branch1C options: options]);
+    UKObjectsEqual(A(r0, r1, r2, r4), [self revisionsForBranch: branch2A options: options]);
 }
 
 - (void)testBranchRevisionsIncludingParentBranchesAndDivergentRevisionsForOldHeadRevision
 {
-	COBranchRevisionReadingOptions options =
-		(COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions);
+    COBranchRevisionReadingOptions options =
+        (COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions);
 
-	/* We set the head revision to a revision older than branch1C newest revision, 
-	   and we adjust the current revision to ensure: 
-	   
-	   'current revision' <= 'head revision' */
-	branch1C.currentRevision = r3;
-	branch1C.headRevision = r5;
-	[ctx commit];
+    /* We set the head revision to a revision older than branch1C newest revision, 
+       and we adjust the current revision to ensure: 
+       
+       'current revision' <= 'head revision' */
+    branch1C.currentRevision = r3;
+    branch1C.headRevision = r5;
+    [ctx commit];
 
-	COPersistentRootInfo *p1Info = [ctx.store persistentRootInfoForUUID: p1.UUID];
+    COPersistentRootInfo *p1Info = [ctx.store persistentRootInfoForUUID: p1.UUID];
 
-	UKObjectsEqual(r5.UUID, [p1Info branchInfoForUUID: branch1C.UUID].headRevisionUUID);
-	UKObjectsEqual(r3.UUID, [p1Info branchInfoForUUID: branch1C.UUID].currentRevisionUUID);
+    UKObjectsEqual(r5.UUID, [p1Info branchInfoForUUID: branch1C.UUID].headRevisionUUID);
+    UKObjectsEqual(r3.UUID, [p1Info branchInfoForUUID: branch1C.UUID].currentRevisionUUID);
 
-	UKObjectsEqual(A(r0, r1, r3, r5, r6, r7, r9, r10), [self revisionsForBranch: branch1C options: options]);
-	UKObjectsEqual(A(r0, r1, r3, r5, r6, r8), [self revisionsForBranch: branch1B options: options]);
+    UKObjectsEqual(A(r0, r1, r3, r5, r6, r7, r9, r10), [self revisionsForBranch: branch1C options: options]);
+    UKObjectsEqual(A(r0, r1, r3, r5, r6, r8), [self revisionsForBranch: branch1B options: options]);
 }
 
 - (void) wait
 {
-	NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
-	[runLoop runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+    NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
+    [runLoop runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 }
 
 - (void)testBranchNodes
 {
-	UKObjectsEqual((@[r0, r1, r2]), branch1A.nodes);
-	UKObjectsEqual((@[r0, r1, r3, r6, r8]), branch1B.nodes);
-	UKObjectsEqual((@[r0, r1, r3, r6, r10]), branch1C.nodes);
-	UKObjectsEqual((@[r0, r1, r2, r4]), branch2A.nodes);
+    UKObjectsEqual((@[r0, r1, r2]), branch1A.nodes);
+    UKObjectsEqual((@[r0, r1, r3, r6, r8]), branch1B.nodes);
+    UKObjectsEqual((@[r0, r1, r3, r6, r10]), branch1C.nodes);
+    UKObjectsEqual((@[r0, r1, r2, r4]), branch2A.nodes);
 }
 
 - (void)testBranchNodeUpdateForNewCommit
 {
-	/* Load the revision history (to support testing it it is updated in 
-	   reaction to a commit) */
-	[branch2A nodes];
+    /* Load the revision history (to support testing it it is updated in 
+       reaction to a commit) */
+    [branch2A nodes];
 
     [branch2A.rootObject setLabel: @"11"];
     [ctx commit];
     CORevision *r11 = branch2A.currentRevision;
 
-	UKObjectsEqual(A(r0, r1, r2, r4, r11), branch2A.nodes);
+    UKObjectsEqual(A(r0, r1, r2, r4, r11), branch2A.nodes);
 }
 
 // TODO: Test these things when reloading from a store
@@ -314,44 +314,44 @@
  */
 - (void) testRevisionCacheReturnsNilForUnknownRevision
 {
-	CORevision *rev = [ctx revisionForRevisionUUID: [ETUUID UUID]
-								persistentRootUUID: p1.UUID];
-	UKNil(rev);
+    CORevision *rev = [ctx revisionForRevisionUUID: [ETUUID UUID]
+                                persistentRootUUID: p1.UUID];
+    UKNil(rev);
 }
 
 - (void) testHeadRevisionAndCurrentRevision
 {
-	UKObjectsEqual(r2, branch1A.currentRevision);
-	UKObjectsEqual(r2, branch1A.headRevision);
-	UKObjectsEqual(r6, branch1B.currentRevision);
-	UKObjectsEqual(r8, branch1B.headRevision);
-	UKObjectsEqual(r10, branch1C.currentRevision);
-	UKObjectsEqual(r10, branch1C.headRevision);
-	UKObjectsEqual(r4, branch2A.currentRevision);
-	UKObjectsEqual(r4, branch2A.headRevision);
+    UKObjectsEqual(r2, branch1A.currentRevision);
+    UKObjectsEqual(r2, branch1A.headRevision);
+    UKObjectsEqual(r6, branch1B.currentRevision);
+    UKObjectsEqual(r8, branch1B.headRevision);
+    UKObjectsEqual(r10, branch1C.currentRevision);
+    UKObjectsEqual(r10, branch1C.headRevision);
+    UKObjectsEqual(r4, branch2A.currentRevision);
+    UKObjectsEqual(r4, branch2A.headRevision);
 }
 
 - (void) testSetCurrentRevisionToPastLeavesHeadRevisionUnchanged
 {
-	branch1B.currentRevision = r3;
-	UKObjectsEqual(r8, branch1B.headRevision);
+    branch1B.currentRevision = r3;
+    UKObjectsEqual(r8, branch1B.headRevision);
 }
 
 - (void) testSetCurrentRevisionToFutureUpdatesHeadRevision
 {
-	branch1B.currentRevision = r10;
-	UKObjectsEqual(r10, branch1B.headRevision);
+    branch1B.currentRevision = r10;
+    UKObjectsEqual(r10, branch1B.headRevision);
 }
 
 - (void) testNewCommitUpdatesHeadRevision
 {
-	[branch1B.rootObject setLabel: @"new commit"];
-	[p1 commit];
-	
-	CORevision *r11 = branch1B.currentRevision;
-	UKObjectsEqual(r6, r11.parentRevision);
-	
-	UKObjectsEqual(r11, branch1B.headRevision);
+    [branch1B.rootObject setLabel: @"new commit"];
+    [p1 commit];
+    
+    CORevision *r11 = branch1B.currentRevision;
+    UKObjectsEqual(r6, r11.parentRevision);
+    
+    UKObjectsEqual(r11, branch1B.headRevision);
 }
 
 @end

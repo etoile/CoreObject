@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2012 Eric Wasylishen
+    Copyright (C) 2012 Eric Wasylishen
  
-	Date:  October 2012
-	License:  MIT  (see COPYING)
+    Date:  October 2012
+    License:  MIT  (see COPYING)
  */
 
 #import "EWUndoManager.h"
@@ -11,31 +11,31 @@
 
 - (BOOL) canUndo
 {
-	return [self.delegate canUndo];
+    return [self.delegate canUndo];
 }
 
 - (BOOL) canRedo
 {
-	return [self.delegate canRedo];
+    return [self.delegate canRedo];
 }
 
 - (NSString *) undoMenuItemTitle
 {
-	return [self.delegate undoMenuItemTitle];
+    return [self.delegate undoMenuItemTitle];
 }
 - (NSString *) redoMenuItemTitle
 {
-	return [self.delegate redoMenuItemTitle];
+    return [self.delegate redoMenuItemTitle];
 }
 
 - (NSString *)undoMenuTitleForUndoActionName: (NSString *)action
 {
-	return nil;
+    return nil;
 }
 
 - (NSString *)redoMenuTitleForUndoActionName: (NSString *)action
 {
-	return nil;
+    return nil;
 }
 
 - (void) undo

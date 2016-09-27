@@ -3,10 +3,10 @@
 
 int main(int argc, char *argv[])
 {
-	// [[NSExceptionHandler defaultExceptionHandler]
-	//setExceptionHandlingMask:NSLogAndHandleEveryExceptionMask];
-	//[[NSExceptionHandler defaultExceptionHandler]
-	//setExceptionHangingMask: NSHangOnTopLevelExceptionMask | NSHangOnOtherExceptionMask];
-	
+    // [[NSExceptionHandler defaultExceptionHandler]
+    //setExceptionHandlingMask:NSLogAndHandleEveryExceptionMask];
+    //[[NSExceptionHandler defaultExceptionHandler]
+    //setExceptionHangingMask: NSHangOnTopLevelExceptionMask | NSHangOnOtherExceptionMask];
+    
     return NSApplicationMain(argc,  (const char **) argv);
 }

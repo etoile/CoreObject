@@ -39,7 +39,7 @@ COTypePrimitiveDescription(COType type)
         case kCOTypeReference: return @"kCOTypeReference";
         case kCOTypeCompositeReference: return @"kCOTypeCompositeReference";
         case kCOTypeAttachment: return @"kCOTypeAttachment";
-		default: return @"";
+        default: return @"";
     }
 }
 
@@ -74,7 +74,7 @@ COTypePrimitiveValidateObject(COType type, id anObject)
             || anObject == [NSNull null];
         case kCOTypeAttachment: return [anObject isKindOfClass: [COAttachmentID class]]
             || anObject == [NSNull null];
-		default: return NO;
+        default: return NO;
     }
 }
 

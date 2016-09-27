@@ -20,7 +20,7 @@
 
 - (instancetype) init
 {
-	return [self initWithItemForUUID: @{} rootItemUUID: nil];
+    return [self initWithItemForUUID: @{} rootItemUUID: nil];
 }
 
 - (instancetype) initWithItemForUUID: (NSDictionary *) itemForUUID
@@ -36,8 +36,8 @@
                   rootItemUUID: (ETUUID *)root
 {
     self = [self initWithItemForUUID: @{} rootItemUUID: root];
-	if (self == nil)
-		return nil;
+    if (self == nil)
+        return nil;
     
     for (COItem *item in items)
     {
@@ -89,21 +89,21 @@
 
 - (NSArray *) items
 {
-	return itemForUUID_.allValues;
+    return itemForUUID_.allValues;
 }
 
 - (NSString *)description
 {
-	NSMutableString *result = [NSMutableString string];
+    NSMutableString *result = [NSMutableString string];
     
-	[result appendFormat: @"[%@ root: %@\n", NSStringFromClass([self class]), rootItemUUID_];
-	for (COItem *item in itemForUUID_.allValues)
-	{
-		[result appendFormat: @"%@", item];
-	}
-	[result appendFormat: @"]"];
-	
-	return result;
+    [result appendFormat: @"[%@ root: %@\n", NSStringFromClass([self class]), rootItemUUID_];
+    for (COItem *item in itemForUUID_.allValues)
+    {
+        [result appendFormat: @"%@", item];
+    }
+    [result appendFormat: @"]"];
+    
+    return result;
 }
 
 - (void) insertOrUpdateItems: (NSArray *)items
@@ -144,12 +144,12 @@
 
 - (void)removeUnreachableItems
 {
-	NSSet *reachableUUIDs = COItemGraphReachableUUIDs(self);
+    NSSet *reachableUUIDs = COItemGraphReachableUUIDs(self);
 
-	NSMutableSet *unreachableUUIDs = [NSMutableSet setWithArray: itemForUUID_.allKeys];
-	[unreachableUUIDs minusSet: reachableUUIDs];
-	
-	[itemForUUID_ removeObjectsForKeys: unreachableUUIDs.allObjects];
+    NSMutableSet *unreachableUUIDs = [NSMutableSet setWithArray: itemForUUID_.allKeys];
+    [unreachableUUIDs minusSet: reachableUUIDs];
+    
+    [itemForUUID_ removeObjectsForKeys: unreachableUUIDs.allObjects];
 }
 
 @end
@@ -335,12 +335,12 @@ static BOOL COItemGraphEqualToItemGraphComparingItemUUID(id<COItemGraph> first, 
 {
     COItem *my = [first itemForUUID: aUUID];
     COItem *other = [second itemForUUID: aUUID];
-	if (my == nil && other == nil)
-	{
-		// both item graphs are missing the same item
-		return YES;
-	}
-	
+    if (my == nil && other == nil)
+    {
+        // both item graphs are missing the same item
+        return YES;
+    }
+    
     if (![my isEqual: other])
     {
         return NO;
@@ -374,16 +374,16 @@ BOOL COItemGraphEqualToItemGraph(id<COItemGraph> first, id<COItemGraph> second)
 static void
 COItemGraphReachableUUIDsInternal(id<COItemGraph> aGraph, ETUUID *aUUID, NSMutableSet *result)
 {
-	if (![aUUID isKindOfClass: [ETUUID class]])
-	{
-		[NSException raise: NSInvalidArgumentException format: @"Expected ETUUID argument to COItemGraphReachableUUIDsInternal, got %@", aUUID];
-	}
-	
-	if ([result containsObject: aUUID])
-		return;
-	
-	[result addObject: aUUID];
-	
+    if (![aUUID isKindOfClass: [ETUUID class]])
+    {
+        [NSException raise: NSInvalidArgumentException format: @"Expected ETUUID argument to COItemGraphReachableUUIDsInternal, got %@", aUUID];
+    }
+    
+    if ([result containsObject: aUUID])
+        return;
+    
+    [result addObject: aUUID];
+    
     COItem *item = [aGraph itemForUUID: aUUID];
     for (id aChild in item.allInnerReferencedItemUUIDs)
     {
@@ -395,9 +395,9 @@ NSSet *
 COItemGraphReachableUUIDs(id<COItemGraph> aGraph)
 {
     NSMutableSet *result = [NSMutableSet new];
-	if (aGraph.rootItemUUID != nil)
-	{
-		COItemGraphReachableUUIDsInternal(aGraph, aGraph.rootItemUUID, result);
-	}
-	return result;
+    if (aGraph.rootItemUUID != nil)
+    {
+        COItemGraphReachableUUIDsInternal(aGraph, aGraph.rootItemUUID, result);
+    }
+    return result;
 }

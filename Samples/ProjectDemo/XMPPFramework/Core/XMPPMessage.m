@@ -13,133 +13,133 @@
 
 + (void)initialize
 {
-	// We use the object_setClass method below to dynamically change the class from a standard NSXMLElement.
-	// The size of the two classes is expected to be the same.
-	// 
-	// If a developer adds instance methods to this class, bad things happen at runtime that are very hard to debug.
-	// This check is here to aid future developers who may make this mistake.
-	// 
-	// For Fearless And Experienced Objective-C Developers:
-	// It may be possible to support adding instance variables to this class if you seriously need it.
-	// To do so, try realloc'ing self after altering the class, and then initialize your variables.
-	
-	size_t superSize = class_getInstanceSize([NSXMLElement class]);
-	size_t ourSize   = class_getInstanceSize([XMPPMessage class]);
-	
-	if (superSize != ourSize)
-	{
-		NSLog(@"Adding instance variables to XMPPMessage is not currently supported!");
-		exit(15);
-	}
+    // We use the object_setClass method below to dynamically change the class from a standard NSXMLElement.
+    // The size of the two classes is expected to be the same.
+    // 
+    // If a developer adds instance methods to this class, bad things happen at runtime that are very hard to debug.
+    // This check is here to aid future developers who may make this mistake.
+    // 
+    // For Fearless And Experienced Objective-C Developers:
+    // It may be possible to support adding instance variables to this class if you seriously need it.
+    // To do so, try realloc'ing self after altering the class, and then initialize your variables.
+    
+    size_t superSize = class_getInstanceSize([NSXMLElement class]);
+    size_t ourSize   = class_getInstanceSize([XMPPMessage class]);
+    
+    if (superSize != ourSize)
+    {
+        NSLog(@"Adding instance variables to XMPPMessage is not currently supported!");
+        exit(15);
+    }
 }
 
 + (XMPPMessage *)messageFromElement:(NSXMLElement *)element
 {
-	object_setClass(element, [XMPPMessage class]);
-	
-	return (XMPPMessage *)element;
+    object_setClass(element, [XMPPMessage class]);
+    
+    return (XMPPMessage *)element;
 }
 
 + (XMPPMessage *)message
 {
-	return [[XMPPMessage alloc] init];
+    return [[XMPPMessage alloc] init];
 }
 
 + (XMPPMessage *)messageWithType:(NSString *)type
 {
-	return [[XMPPMessage alloc] initWithType:type to:nil];
+    return [[XMPPMessage alloc] initWithType:type to:nil];
 }
 
 + (XMPPMessage *)messageWithType:(NSString *)type to:(XMPPJID *)to
 {
-	return [[XMPPMessage alloc] initWithType:type to:to];
+    return [[XMPPMessage alloc] initWithType:type to:to];
 }
 
 + (XMPPMessage *)messageWithType:(NSString *)type to:(XMPPJID *)jid elementID:(NSString *)eid
 {
-	return [[XMPPMessage alloc] initWithType:type to:jid elementID:eid];
+    return [[XMPPMessage alloc] initWithType:type to:jid elementID:eid];
 }
 
 + (XMPPMessage *)messageWithType:(NSString *)type to:(XMPPJID *)jid elementID:(NSString *)eid child:(NSXMLElement *)childElement
 {
-	return [[XMPPMessage alloc] initWithType:type to:jid elementID:eid child:childElement];
+    return [[XMPPMessage alloc] initWithType:type to:jid elementID:eid child:childElement];
 }
 
 + (XMPPMessage *)messageWithType:(NSString *)type elementID:(NSString *)eid
 {
-	return [[XMPPMessage alloc] initWithType:type elementID:eid];
+    return [[XMPPMessage alloc] initWithType:type elementID:eid];
 }
 
 + (XMPPMessage *)messageWithType:(NSString *)type elementID:(NSString *)eid child:(NSXMLElement *)childElement
 {
-	return [[XMPPMessage alloc] initWithType:type elementID:eid child:childElement];
+    return [[XMPPMessage alloc] initWithType:type elementID:eid child:childElement];
 }
 
 + (XMPPMessage *)messageWithType:(NSString *)type child:(NSXMLElement *)childElement
 {
-	return [[XMPPMessage alloc] initWithType:type child:childElement];
+    return [[XMPPMessage alloc] initWithType:type child:childElement];
 }
 
 - (id)init
 {
-	return [self initWithType:nil to:nil elementID:nil child:nil];
+    return [self initWithType:nil to:nil elementID:nil child:nil];
 }
 
 - (id)initWithType:(NSString *)type
 {
-	return [self initWithType:type to:nil elementID:nil child:nil];
+    return [self initWithType:type to:nil elementID:nil child:nil];
 }
 
 - (id)initWithType:(NSString *)type to:(XMPPJID *)jid
 {
-	return [self initWithType:type to:jid elementID:nil child:nil];
+    return [self initWithType:type to:jid elementID:nil child:nil];
 }
 
 - (id)initWithType:(NSString *)type to:(XMPPJID *)jid elementID:(NSString *)eid
 {
-	return [self initWithType:type to:jid elementID:eid child:nil];
+    return [self initWithType:type to:jid elementID:eid child:nil];
 }
 
 - (id)initWithType:(NSString *)type to:(XMPPJID *)jid elementID:(NSString *)eid child:(NSXMLElement *)childElement
 {
-	if ((self = [super initWithName:@"message"]))
-	{
-		if (type)
-			[self addAttributeWithName:@"type" stringValue:type];
-		
-		if (jid)
-			[self addAttributeWithName:@"to" stringValue:[jid full]];
-		
-		if (eid)
-			[self addAttributeWithName:@"id" stringValue:eid];
-		
-		if (childElement)
-			[self addChild:childElement];
-	}
-	return self;
+    if ((self = [super initWithName:@"message"]))
+    {
+        if (type)
+            [self addAttributeWithName:@"type" stringValue:type];
+        
+        if (jid)
+            [self addAttributeWithName:@"to" stringValue:[jid full]];
+        
+        if (eid)
+            [self addAttributeWithName:@"id" stringValue:eid];
+        
+        if (childElement)
+            [self addChild:childElement];
+    }
+    return self;
 }
 
 - (id)initWithType:(NSString *)type elementID:(NSString *)eid
 {
-	return [self initWithType:type to:nil elementID:eid child:nil];
+    return [self initWithType:type to:nil elementID:eid child:nil];
 }
 
 - (id)initWithType:(NSString *)type elementID:(NSString *)eid child:(NSXMLElement *)childElement
 {
-	return [self initWithType:type to:nil elementID:eid child:childElement];
+    return [self initWithType:type to:nil elementID:eid child:childElement];
 }
 
 - (id)initWithType:(NSString *)type child:(NSXMLElement *)childElement
 {
-	return [self initWithType:type to:nil elementID:nil child:childElement];
+    return [self initWithType:type to:nil elementID:nil child:childElement];
 }
 
 - (id)initWithXMLString:(NSString *)string error:(NSError *__autoreleasing *)error
 {
-	if((self = [super initWithXMLString:string error:error])){
-		self = [XMPPMessage messageFromElement:self];
-	}	
-	return self;
+    if((self = [super initWithXMLString:string error:error])){
+        self = [XMPPMessage messageFromElement:self];
+    }   
+    return self;
 }
 
 - (id)copyWithZone:(NSZone *)zone
@@ -155,12 +155,12 @@
 
 - (NSString *)body
 {
-	return [[self elementForName:@"body"] stringValue];
+    return [[self elementForName:@"body"] stringValue];
 }
 
 - (NSString *)thread
 {
-	return [[self elementForName:@"thread"] stringValue];
+    return [[self elementForName:@"thread"] stringValue];
 }
 
 - (void)addBody:(NSString *)body
@@ -177,17 +177,17 @@
 
 - (BOOL)isChatMessage
 {
-	return [[[self attributeForName:@"type"] stringValue] isEqualToString:@"chat"];
+    return [[[self attributeForName:@"type"] stringValue] isEqualToString:@"chat"];
 }
 
 - (BOOL)isChatMessageWithBody
 {
-	if ([self isChatMessage])
-	{
-		return [self isMessageWithBody];
-	}
-	
-	return NO;
+    if ([self isChatMessage])
+    {
+        return [self isMessageWithBody];
+    }
+    
+    return NO;
 }
 
 - (BOOL)isErrorMessage
@@ -210,7 +210,7 @@
 
 - (BOOL)isMessageWithBody
 {
-	return ([self elementForName:@"body"] != nil);
+    return ([self elementForName:@"body"] != nil);
 }
 
 @end

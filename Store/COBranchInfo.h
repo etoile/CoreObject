@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen
+    Copyright (C) 2013 Eric Wasylishen
 
-	Date:  July 2013
-	License:  MIT  (see COPYING)
+    Date:  July 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>

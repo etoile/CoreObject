@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen
+    Copyright (C) 2013 Eric Wasylishen
  
-	Date:  December 2013
-	License:  MIT  (see COPYING)
+    Date:  December 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <CoreObject/CoreObject.h>
@@ -18,14 +18,14 @@
  */
 @interface COAttributedStringDiff : NSObject <CODiffAlgorithm>
 {
-	NSMutableArray *_operations;
+    NSMutableArray *_operations;
 }
 
 @property (nonatomic, readonly) NSMutableArray *operations;
 
 - (instancetype) initWithFirstAttributedString: (COAttributedString *)first
               secondAttributedString: (COAttributedString *)second
-							  source: (id)source NS_DESIGNATED_INITIALIZER;
+                              source: (id)source NS_DESIGNATED_INITIALIZER;
 
 - (void) addOperationsFromDiff: (COAttributedStringDiff *)aDiff;
 - (COAttributedStringDiff *) diffByMergingWithDiff: (COAttributedStringDiff *)aDiff;
@@ -35,9 +35,9 @@
 /* @taskunit CODiffAlgorithm Protocol */
 
 + (instancetype) diffItemUUIDs: (NSArray *)uuids
-					 fromGraph: (id <COItemGraph>)a
-					   toGraph: (id <COItemGraph>)b
-			  sourceIdentifier: (id)aSource;
+                     fromGraph: (id <COItemGraph>)a
+                       toGraph: (id <COItemGraph>)b
+              sourceIdentifier: (id)aSource;
 
 - (id<CODiffAlgorithm>) itemTreeDiffByMergingWithDiff: (id<CODiffAlgorithm>)aDiff;
 
@@ -64,9 +64,9 @@
 @interface COAttributedStringOperation : NSObject <COAttributedStringDiffOperation>
 {
 @protected;
-	ETUUID *attributedStringUUID;
-	NSRange range;
-	id source;
+    ETUUID *attributedStringUUID;
+    NSRange range;
+    id source;
 }
 @end
 

@@ -16,41 +16,41 @@ static int debug_total_connections_opened;
 
 + (int) countOfOpenDatabases
 {
-	__block int result = 0;
-	dispatch_sync(debug_sqliteconnections_queue, ^() {
-		result = (int)[debug_sqliteconnections count];
-	});
-	return result;
+    __block int result = 0;
+    dispatch_sync(debug_sqliteconnections_queue, ^() {
+        result = (int)[debug_sqliteconnections count];
+    });
+    return result;
 }
 
 + (void) logOpenDatabases
 {
-	dispatch_sync(debug_sqliteconnections_queue, ^() {
-		NSLog(@"%d sqlite connections are still open (%d were opened in total over the lifetime of this process):",
-			  (int) [debug_sqliteconnections count], debug_total_connections_opened);
-		for (NSArray *callStack in [debug_sqliteconnections objectEnumerator])
-		{
-			NSLog(@"    open connection: %@", callStack);
-		}
-	});
+    dispatch_sync(debug_sqliteconnections_queue, ^() {
+        NSLog(@"%d sqlite connections are still open (%d were opened in total over the lifetime of this process):",
+              (int) [debug_sqliteconnections count], debug_total_connections_opened);
+        for (NSArray *callStack in [debug_sqliteconnections objectEnumerator])
+        {
+            NSLog(@"    open connection: %@", callStack);
+        }
+    });
 }
 
 + (void) initialize
 {
-	static dispatch_once_t onceToken;
-	dispatch_once(&onceToken, ^{
-		debug_sqliteconnections_queue = dispatch_queue_create("debug_sqliteconnections", 0);
-		debug_sqliteconnections = [[NSMapTable alloc] initWithKeyOptions: NSPointerFunctionsOpaqueMemory | NSPointerFunctionsOpaquePersonality
-															valueOptions: NSMapTableStrongMemory | NSMapTableObjectPointerPersonality
-																capacity: 1000];
-	});
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        debug_sqliteconnections_queue = dispatch_queue_create("debug_sqliteconnections", 0);
+        debug_sqliteconnections = [[NSMapTable alloc] initWithKeyOptions: NSPointerFunctionsOpaqueMemory | NSPointerFunctionsOpaquePersonality
+                                                            valueOptions: NSMapTableStrongMemory | NSMapTableObjectPointerPersonality
+                                                                capacity: 1000];
+    });
 }
 
 #endif
 
 - (id)initWithPath:(NSString*)aPath {
     self = [super init];
-	
+    
     if (self) {
         databasePath        = [aPath copy];
         db                  = 0x00;
@@ -58,14 +58,14 @@ static int debug_total_connections_opened;
         crashOnErrors       = 0x00;
         busyRetryTimeout    = 0x00;
     }
-	
-	return self;
+    
+    return self;
 }
 
 - (void)dealloc {
-	[self close];
+    [self close];
     
-	
+    
 }
 
 + (NSString*)sqliteLibVersion {
@@ -81,30 +81,30 @@ static int debug_total_connections_opened;
 }
 
 - (BOOL)open {
-	int err = sqlite3_open([databasePath fileSystemRepresentation], &db );
-	if(err != SQLITE_OK) {
+    int err = sqlite3_open([databasePath fileSystemRepresentation], &db );
+    if(err != SQLITE_OK) {
         NSLog(@"error opening!: %d", err);
-		return NO;
-	}
-	
+        return NO;
+    }
+    
 #ifdef FMDatabase_DEBUG
-	dispatch_sync(debug_sqliteconnections_queue, ^() {
-		debug_total_connections_opened++;
-		[debug_sqliteconnections setObject: [NSThread callStackSymbols]
-									forKey: (__bridge id)db];
-	});
+    dispatch_sync(debug_sqliteconnections_queue, ^() {
+        debug_total_connections_opened++;
+        [debug_sqliteconnections setObject: [NSThread callStackSymbols]
+                                    forKey: (__bridge id)db];
+    });
 #endif
-	return YES;
+    return YES;
 }
 
 #if SQLITE_VERSION_NUMBER >= 3005000
 - (BOOL)openWithFlags:(int)flags {
     int err = sqlite3_open_v2([databasePath fileSystemRepresentation], &db, flags, NULL /* Name of VFS module to use */);
-	if(err != SQLITE_OK) {
-		NSLog(@"error opening!: %d", err);
-		return NO;
-	}
-	return YES;
+    if(err != SQLITE_OK) {
+        NSLog(@"error opening!: %d", err);
+        return NO;
+    }
+    return YES;
 }
 #endif
 
@@ -113,7 +113,7 @@ static int debug_total_connections_opened;
     
     [self clearCachedStatements];
     
-	if (!db) {
+    if (!db) {
         return YES;
     }
     
@@ -136,16 +136,16 @@ static int debug_total_connections_opened;
             NSLog(@"error closing!: %d", rc);
         }
 #ifdef FMDatabase_DEBUG
-		else if (SQLITE_OK == rc) {
-			dispatch_sync(debug_sqliteconnections_queue, ^() {
-				[debug_sqliteconnections removeObjectForKey: (__bridge id)db];
-			});
-		}
+        else if (SQLITE_OK == rc) {
+            dispatch_sync(debug_sqliteconnections_queue, ^() {
+                [debug_sqliteconnections removeObjectForKey: (__bridge id)db];
+            });
+        }
 #endif
     }
     while (retry);
     
-	db = NULL;
+    db = NULL;
     return YES;
 }
 
@@ -155,7 +155,7 @@ static int debug_total_connections_opened;
     FMStatement *cachedStmt;
 
     while ((cachedStmt = [e nextObject])) {
-    	[cachedStmt close];
+        [cachedStmt close];
     }
     
     [cachedStatements removeAllObjects];
@@ -747,7 +747,7 @@ static int debug_total_connections_opened;
 @implementation FMStatement
 
 - (void)dealloc {
-	[self close];
+    [self close];
 }
 
 

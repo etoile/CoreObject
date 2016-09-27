@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  September 2013
-	License:  MIT  (see COPYING)
+    Date:  September 2013
+    License:  MIT  (see COPYING)
  */
 
 #import "COCommandUndeleteBranch.h"
@@ -45,29 +45,29 @@ static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
 
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
 {
-	NILARG_EXCEPTION_TEST(aContext);
+    NILARG_EXCEPTION_TEST(aContext);
     return YES;
 }
 
 - (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
 {
-	[txn undeleteBranch: _branchUUID ofPersistentRoot: _persistentRootUUID];
+    [txn undeleteBranch: _branchUUID ofPersistentRoot: _persistentRootUUID];
 }
 
 - (void) applyToContext: (COEditingContext *)aContext
 {
-	NILARG_EXCEPTION_TEST(aContext);
+    NILARG_EXCEPTION_TEST(aContext);
 
     COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
     COBranch *branch = [proot branchForUUID: _branchUUID];
-	ETAssert(branch != nil);
+    ETAssert(branch != nil);
     
     [branch setDeleted: NO];
 }
 
 - (NSString *)kind
 {
-	return _(@"Branch Undeletion");
+    return _(@"Branch Undeletion");
 }
 
 - (id) copyWithZone:(NSZone *)zone

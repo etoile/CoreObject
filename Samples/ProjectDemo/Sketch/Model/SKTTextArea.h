@@ -8,7 +8,7 @@
 
 @interface SKTTextArea : SKTGraphic <NSTextViewDelegate>
 {
-	COAttributedStringWrapper *textStorage;
+    COAttributedStringWrapper *textStorage;
 }
 
 @end

@@ -12,22 +12,22 @@
 + (ETEntityDescription*)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-	
-	ETPropertyDescription *attrStrProperty = [ETPropertyDescription descriptionWithName: @"attrStr"
-																					  type: (id)@"COAttributedString"];
+    
+    ETPropertyDescription *attrStrProperty = [ETPropertyDescription descriptionWithName: @"attrStr"
+                                                                                      type: (id)@"COAttributedString"];
     [attrStrProperty setPersistent: YES];
     [entity setPropertyDescriptions: A(attrStrProperty)];
-	
+    
     return entity;
 }
 
 - (instancetype) initWithObjectGraphContext:(COObjectGraphContext *)aContext
 {
-	self = [super initWithObjectGraphContext: aContext];
-	
-	[self setAttrStr: [[COAttributedString alloc] initWithObjectGraphContext: aContext]];
-	
-	return self;
+    self = [super initWithObjectGraphContext: aContext];
+    
+    [self setAttrStr: [[COAttributedString alloc] initWithObjectGraphContext: aContext]];
+    
+    return self;
 }
 
 - (void)dealloc 
@@ -37,31 +37,31 @@
 
 - (COAttributedString *) attrStr
 {
-	return [self valueForVariableStorageKey: @"attrStr"];
+    return [self valueForVariableStorageKey: @"attrStr"];
 }
 
 - (void) setAttrStr: (COAttributedString *)attrStr
 {
-	// Set the value
-	[self willChangeValueForProperty: @"attrStr"];
-	[self setValue: attrStr forVariableStorageKey: @"attrStr"];
-	[self didChangeValueForProperty: @"attrStr"];
-	
-	// After
-	
-	[textStorage setBacking: attrStr];
+    // Set the value
+    [self willChangeValueForProperty: @"attrStr"];
+    [self setValue: attrStr forVariableStorageKey: @"attrStr"];
+    [self didChangeValueForProperty: @"attrStr"];
+    
+    // After
+    
+    [textStorage setBacking: attrStr];
 }
 
 - (NSTextStorage *) contents
 {
-	if (textStorage == nil)
-	{
-		textStorage = [[COAttributedStringWrapper alloc] initWithBacking: [self attrStr]];
-		
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(SKT_contentsChanged:) name:NSTextStorageDidProcessEditingNotification object:textStorage];
-	}
-	
-	return textStorage;
+    if (textStorage == nil)
+    {
+        textStorage = [[COAttributedStringWrapper alloc] initWithBacking: [self attrStr]];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(SKT_contentsChanged:) name:NSTextStorageDidProcessEditingNotification object:textStorage];
+    }
+    
+    return textStorage;
 }
 
 - (void)SKT_contentsChanged:(NSNotification *)notification 
@@ -84,12 +84,12 @@
 
 NSArray *makeLMAndTC()
 {
-	NSTextContainer *tc = [[NSTextContainer new] initWithContainerSize:NSMakeSize(1.0e6, 1.0e6)];
-	NSLayoutManager *lm = [[NSLayoutManager new] init];
+    NSTextContainer *tc = [[NSTextContainer new] initWithContainerSize:NSMakeSize(1.0e6, 1.0e6)];
+    NSLayoutManager *lm = [[NSLayoutManager new] init];
 
-	[tc setWidthTracksTextView:NO];
-	[tc setHeightTracksTextView:NO];
-	[lm addTextContainer:tc];
+    [tc setWidthTracksTextView:NO];
+    [tc setHeightTracksTextView:NO];
+    [lm addTextContainer:tc];
 
     return @[lm, tc];
 }
@@ -98,22 +98,22 @@ NSArray *makeLMAndTC()
 {
     NSRect bounds = [self bounds];
     if ([self drawsFill]) 
-	{
+    {
         [[self fillColor] set];
         NSRectFill(bounds);
     }
     if (([view editingGraphic] == self) || ([view creatingGraphic] == self))
-	{
+    {
         [[NSColor knobColor] set];
         NSFrameRect(NSInsetRect(bounds, -1.0, -1.0));
         // If we are creating we have no text.  If we are editing, the editor (ie NSTextView) will draw the text.
     }
-	else 
-	{
+    else 
+    {
         NSTextStorage *contents = [self contents];
         if ([contents length] > 0) 
-		{
-			NSArray *lmAndTc = makeLMAndTC();
+        {
+            NSArray *lmAndTc = makeLMAndTC();
             NSLayoutManager *lm = lmAndTc[0];
             NSTextContainer *tc = lmAndTc[1];
             NSRange glyphRange;
@@ -122,10 +122,10 @@ NSArray *makeLMAndTC()
             [contents addLayoutManager:lm];
             // Force layout of the text and find out how much of it fits in the container.
             glyphRange = [lm glyphRangeForTextContainer:tc];
-			//glyphRange.length  = 100;	
+            //glyphRange.length  = 100; 
 
             if (glyphRange.length > 0) 
-			{
+            {
                 [lm drawBackgroundForGlyphRange:glyphRange atPoint:bounds.origin];
                 [lm drawGlyphsForGlyphRange:glyphRange atPoint:bounds.origin];
             }
@@ -144,7 +144,7 @@ static const float SKTRightMargin = 36.0;
 
 - (NSSize)maxSize 
 {
-	return NSMakeSize(1.0e6, 1.0e6);
+    return NSMakeSize(1.0e6, 1.0e6);
 }
 
 - (NSSize)requiredSize:(float)maxWidth 
@@ -155,10 +155,10 @@ static const float SKTRightMargin = 36.0;
     unsigned len = [contents length];
     
     if (len > 0) 
-	{
-		NSArray *lmAndTc = makeLMAndTC();
-		NSLayoutManager *lm = lmAndTc[0];
-		NSTextContainer *tc = lmAndTc[1];
+    {
+        NSArray *lmAndTc = makeLMAndTC();
+        NSLayoutManager *lm = lmAndTc[0];
+        NSTextContainer *tc = lmAndTc[1];
         NSRange glyphRange;
         NSSize requiredSize;
         
@@ -171,19 +171,19 @@ static const float SKTRightMargin = 36.0;
         requiredSize.width += 1.0;
 
         if (requiredSize.width < minSize.width) 
-		{
+        {
             requiredSize.width = minSize.width;
         }
         if (requiredSize.height < minSize.height) 
-		{
+        {
             requiredSize.height = minSize.height;
         }
 
         [contents removeLayoutManager:lm];
         return requiredSize;
     }
-	else 
-	{
+    else 
+    {
         return minSize;
     }
 }
@@ -216,15 +216,15 @@ static const float SKTRightMargin = 36.0;
 
     // This constrains the size to be big enough for the text.  It is different from the constraining in -setBounds since it takes into account which corner or edge is moving to figure out which way to grow the bounds if necessary.
     if ((knob == UpperLeftKnob) || (knob == MiddleLeftKnob) || (knob == LowerLeftKnob)) 
-	{
+    {
         // Adjust left edge
         if ((NSMaxX(bounds) - point.x) < minSize.width) 
-		{
+        {
             point.x -= minSize.width - (NSMaxX(bounds) - point.x);
         }
     }
-	else if ((knob == UpperRightKnob) || (knob == MiddleRightKnob) || (knob == LowerRightKnob)) 
-	{
+    else if ((knob == UpperRightKnob) || (knob == MiddleRightKnob) || (knob == LowerRightKnob)) 
+    {
         // Adjust right edge
         if ((point.x - bounds.origin.x) < minSize.width) {
             point.x += minSize.width - (point.x - bounds.origin.x);
@@ -233,15 +233,15 @@ static const float SKTRightMargin = 36.0;
     if ((knob == UpperLeftKnob) || (knob == UpperMiddleKnob) || (knob == UpperRightKnob)) {
         // Adjust top edge
         if ((NSMaxY(bounds) - point.y) < minSize.height) 
-		{
+        {
             point.y -= minSize.height - (NSMaxY(bounds) - point.y);
         }
     }
-	else if ((knob == LowerLeftKnob) || (knob == LowerMiddleKnob) || (knob == LowerRightKnob)) 
-	{
+    else if ((knob == LowerLeftKnob) || (knob == LowerMiddleKnob) || (knob == LowerRightKnob)) 
+    {
         // Adjust bottom edge
         if ((point.y - bounds.origin.y) < minSize.height) 
-		{
+        {
             point.y += minSize.height - (point.y - bounds.origin.y);
         }
     }
@@ -267,36 +267,36 @@ static NSArray *makeLM_TC_TV()
     [tv setAllowsUndo:YES];
     [tc setTextView:tv];
 
-	assert([tv layoutManager] == lm);
-	assert([tv textContainer] == tc);
-	
+    assert([tv layoutManager] == lm);
+    assert([tv textContainer] == tc);
+    
     return @[lm, tc, tv];
 }
 
 - (void)startEditingWithEvent:(NSEvent *)event inView:(SKTGraphicView *)view 
 {
-	NSLayoutManager *lm;
-	NSTextContainer *tc;
-	NSTextView *editor;
+    NSLayoutManager *lm;
+    NSTextContainer *tc;
+    NSTextView *editor;
     NSTextStorage *contents = [self contents];
     NSSize maxSize = [self maxSize];
     NSSize minSize = [self minSize];
     NSRect bounds = [self bounds];
     
-	NSArray *lmTcTv = makeLM_TC_TV();
-	lm = lmTcTv[0];
-	tc = lmTcTv[1];
-	editor = lmTcTv[2];
-	
+    NSArray *lmTcTv = makeLM_TC_TV();
+    lm = lmTcTv[0];
+    tc = lmTcTv[1];
+    editor = lmTcTv[2];
+    
     [tc setWidthTracksTextView:NO];
     if (NSWidth(bounds) > minSize.width + 1.0) 
-	{
+    {
         // If we are bigger than the minimum width we assume that someone already edited this SKTTextArea or that they created it by dragging out a rect.  In either case, we figure the width should remain fixed.
         [tc setContainerSize:NSMakeSize(NSWidth(bounds), maxSize.height)];
         [editor setHorizontallyResizable:NO];
     }
-	else 
-	{
+    else 
+    {
         [tc setContainerSize:maxSize];
         [editor setHorizontallyResizable:YES];
     }
@@ -317,7 +317,7 @@ static NSArray *makeLM_TC_TV()
 
     [[view window] makeFirstResponder:editor];
     if (event) 
-	{
+    {
         [editor mouseDown:event];
     }
 }
@@ -325,15 +325,15 @@ static NSArray *makeLM_TC_TV()
 - (void)endEditingInView:(SKTGraphicView *)view 
 {
     if ([view editingGraphic] == self) 
-	{
+    {
         NSTextView *editor = (NSTextView *)[view editorView];
         [editor setDelegate:nil];
         [editor removeFromSuperview];
         [[self contents] removeLayoutManager:[editor layoutManager]];
-		
+        
         [view setEditingGraphic:nil editorView:nil];
-		
-		[[view drawingController] commitWithIdentifier: @"typing"];
+        
+        [[view drawingController] commitWithIdentifier: @"typing"];
     }
 }
 
@@ -346,7 +346,7 @@ static NSArray *makeLM_TC_TV()
     textSize = [self requiredSize:(fixedWidth ? NSWidth(myBounds) : 1.0e6)];
     
     if ((textSize.width > myBounds.size.width) || (textSize.height > myBounds.size.height)) 
-	{
+    {
         [self setBounds:NSMakeRect(myBounds.origin.x, myBounds.origin.y, ((!fixedWidth && (textSize.width > myBounds.size.width)) ? textSize.width : myBounds.size.width), ((textSize.height > myBounds.size.height) ? textSize.height : myBounds.size.height))];
         // MF: For multiple editors we must fix up the others...  but we don't support multiple views of a document yet, and that's the only way we'd ever have the potential for multiple editors.
     }

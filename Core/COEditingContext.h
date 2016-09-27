@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  July 2013
-	License:  MIT  (see COPYING)
+    Date:  July 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -15,11 +15,11 @@
 @class COError;
 
 #ifndef NS_ENUM
-#	if __has_feature(objc_fixed_enum)
-#		define NS_ENUM(type, name) enum name : type name; enum name : type
-#	else
-#		define NS_ENUM(type, name) type name; enum
-#	endif
+#   if __has_feature(objc_fixed_enum)
+#       define NS_ENUM(type, name) enum name : type name; enum name : type
+#   else
+#       define NS_ENUM(type, name) type name; enum
+#   endif
 #endif // NS_ENUM
 
 /**
@@ -30,20 +30,20 @@
  */
 typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
 {
-	/**
-	 * Persistent roots are never unloaded automatically, except uncommitted 
-	 * persistent roots on deletion.
-	 *
-	 * -unloadPersistentRoot: can still be used to unload persistent roots explicitly.
-	 */
-	  COEditingContextUnloadingBehaviorManual,
-	/**
-	 * Persistent roots are unloaded on deletion.
-	 *
+    /**
+     * Persistent roots are never unloaded automatically, except uncommitted 
+     * persistent roots on deletion.
+     *
+     * -unloadPersistentRoot: can still be used to unload persistent roots explicitly.
+     */
+      COEditingContextUnloadingBehaviorManual,
+    /**
+     * Persistent roots are unloaded on deletion.
+     *
      * For external deletions committed in other editing contexts, persistent
-	 * roots will be unloaded in the current one.
-	 */
-	  COEditingContextUnloadingBehaviorOnDeletion
+     * roots will be unloaded in the current one.
+     */
+      COEditingContextUnloadingBehaviorOnDeletion
 };
 
 /**
@@ -154,27 +154,27 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
 @interface COEditingContext : NSObject <COPersistentObjectContext>
 {
 @private
-	COSQLiteStore *_store;
-	ETModelDescriptionRepository *_modelDescriptionRepository;
-	Class _migrationDriverClass;
-	/** Loaded (or inserted) persistent roots by UUID */
-	NSMutableDictionary *_loadedPersistentRoots;
-	COEditingContextUnloadingBehavior _unloadingBehavior;
-	/** Set of persistent roots pending deletion */
-	NSMutableSet *_persistentRootsPendingDeletion;
-	/** Set of persistent roots pending undeletion */
-	NSMutableSet *_persistentRootsPendingUndeletion;
-	COCrossPersistentRootDeadRelationshipCache *_deadRelationshipCache;
-	/** Undo */
-	COUndoTrackStore *_undoTrackStore;
-	BOOL _recordingUndo;
-	COCommandGroup *_currentEditGroup;
-	CORevisionCache *_revisionCache;
-	/** Detect illegal recursive calls to commit */
-	BOOL _inCommit;
-	COObjectGraphContext *_internalTransientObjectGraphContext;
-	NSMutableDictionary *_lastTransactionIDForPersistentRootUUID;
-	BOOL _hasLoadedPersistentRootUUIDs;
+    COSQLiteStore *_store;
+    ETModelDescriptionRepository *_modelDescriptionRepository;
+    Class _migrationDriverClass;
+    /** Loaded (or inserted) persistent roots by UUID */
+    NSMutableDictionary *_loadedPersistentRoots;
+    COEditingContextUnloadingBehavior _unloadingBehavior;
+    /** Set of persistent roots pending deletion */
+    NSMutableSet *_persistentRootsPendingDeletion;
+    /** Set of persistent roots pending undeletion */
+    NSMutableSet *_persistentRootsPendingUndeletion;
+    COCrossPersistentRootDeadRelationshipCache *_deadRelationshipCache;
+    /** Undo */
+    COUndoTrackStore *_undoTrackStore;
+    BOOL _recordingUndo;
+    COCommandGroup *_currentEditGroup;
+    CORevisionCache *_revisionCache;
+    /** Detect illegal recursive calls to commit */
+    BOOL _inCommit;
+    COObjectGraphContext *_internalTransientObjectGraphContext;
+    NSMutableDictionary *_lastTransactionIDForPersistentRootUUID;
+    BOOL _hasLoadedPersistentRootUUIDs;
 }
 
 

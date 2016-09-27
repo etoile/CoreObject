@@ -12,38 +12,38 @@
 
 - (instancetype) init
 {
-	return [self initWithData: nil];
+    return [self initWithData: nil];
 }
 
 - (instancetype) initWithData:(NSData *)aData
 {
-	NILARG_EXCEPTION_TEST(aData);
-	SUPERINIT;
-	_data = [aData copy];
-	return self;
+    NILARG_EXCEPTION_TEST(aData);
+    SUPERINIT;
+    _data = [aData copy];
+    return self;
 }
 
 - (NSData *) dataValue
 {
-	return _data;
+    return _data;
 }
 
 - (NSUInteger) hash
 {
-	return _data.hash;
+    return _data.hash;
 }
 
 - (BOOL) isEqual:(id)object
 {
-	if (![object isKindOfClass: [COAttachmentID class]])
-		return NO;
-	
-	return [_data isEqual: [object dataValue]];
+    if (![object isKindOfClass: [COAttachmentID class]])
+        return NO;
+    
+    return [_data isEqual: [object dataValue]];
 }
 
 - (id) copyWithZone:(NSZone *)zone
 {
-	return self;
+    return self;
 }
 
 @end

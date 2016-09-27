@@ -21,8 +21,8 @@
     ETUUID *currentBranch_;
     NSMutableDictionary *branchForUUID_; // COUUID : COBranchInfo
     BOOL _deleted;
-	int64_t _transactionID;
-	NSDictionary *_metadata;
+    int64_t _transactionID;
+    NSDictionary *_metadata;
 }
 
 @property (nonatomic, readonly) NSSet *branchUUIDs;

@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2012 Eric Wasylishen
+    Copyright (C) 2012 Eric Wasylishen
 
-	Date:  March 2012
-	License:  MIT  (see COPYING)
+    Date:  March 2012
+    License:  MIT  (see COPYING)
  */
 
 #import "COSequenceEdit.h"

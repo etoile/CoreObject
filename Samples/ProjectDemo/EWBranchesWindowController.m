@@ -10,7 +10,7 @@ static EWBranchesWindowController *shared;
 
 - (id)init
 {
-	self = [super initWithWindowNibName: @"Branches"];
+    self = [super initWithWindowNibName: @"Branches"];
     if (self) {
         shared = self;
     }
@@ -36,21 +36,21 @@ static EWBranchesWindowController *shared;
 
 - (EWDocumentWindowController *) inspectedWindowController
 {
-	return inspectedWindowController;
+    return inspectedWindowController;
 }
 
 - (void) setInspectedWindowController: (EWDocumentWindowController *)aDoc
 {
-	if (![aDoc respondsToSelector: @selector(persistentRoot)])
-		return;
-	
+    if (![aDoc respondsToSelector: @selector(persistentRoot)])
+        return;
+    
     [[NSNotificationCenter defaultCenter] removeObserver: self
                                                     name: COPersistentRootDidChangeNotification
                                                   object: inspectedWindowController.persistentRoot];
-	
-	inspectedWindowController = aDoc;
-	
-	[[NSNotificationCenter defaultCenter] addObserver: self
+    
+    inspectedWindowController = aDoc;
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(storePersistentRootMetadataDidChange:)
                                                  name: COPersistentRootDidChangeNotification
                                                object: inspectedWindowController.persistentRoot];
@@ -60,7 +60,7 @@ static EWBranchesWindowController *shared;
 
 - (COPersistentRoot *) persistentRoot
 {
-	return inspectedWindowController.persistentRoot;
+    return inspectedWindowController.persistentRoot;
 }
 
 - (NSArray *) orderedBranches
@@ -80,20 +80,20 @@ static EWBranchesWindowController *shared;
 
 - (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args
 {
-	identifier = [@"org.etoile.ProjectDemo." stringByAppendingString: identifier];
-	
-	NSMutableDictionary *metadata = [NSMutableDictionary new];
-	if (args != nil)
-		metadata[kCOCommitMetadataShortDescriptionArguments] = args;
-		
-	[[self persistentRoot] commitWithIdentifier: identifier metadata: metadata undoTrack: inspectedWindowController.undoTrack error:NULL];
+    identifier = [@"org.etoile.ProjectDemo." stringByAppendingString: identifier];
+    
+    NSMutableDictionary *metadata = [NSMutableDictionary new];
+    if (args != nil)
+        metadata[kCOCommitMetadataShortDescriptionArguments] = args;
+        
+    [[self persistentRoot] commitWithIdentifier: identifier metadata: metadata undoTrack: inspectedWindowController.undoTrack error:NULL];
 }
 
 - (COBranch *)selectedBranch
 {
-	if ([table selectedRow] == -1)
-		return nil;
-	
+    if ([table selectedRow] == -1)
+        return nil;
+    
     COBranch *branch = [[self orderedBranches] objectAtIndex: [table selectedRow]];
     return branch;
 }
@@ -103,18 +103,18 @@ static EWBranchesWindowController *shared;
  */
 - (void)keyDown:(NSEvent *)theEvent
 {
-	[self interpretKeyEvents: [NSArray arrayWithObject:theEvent]];
+    [self interpretKeyEvents: [NSArray arrayWithObject:theEvent]];
 }
 
 #pragma mark - NSTableViewDataSource
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
 {
-	return [[self.persistentRoot branches] count];;
+    return [[self.persistentRoot branches] count];;
 }
 - (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
 {
-	COBranch *branch = [[self orderedBranches] objectAtIndex: row];
+    COBranch *branch = [[self orderedBranches] objectAtIndex: row];
     if ([[tableColumn identifier] isEqual: @"name"])
     {
         return [branch label];
@@ -135,7 +135,7 @@ static EWBranchesWindowController *shared;
     COBranch *branch = [[self orderedBranches] objectAtIndex: row];
     if ([[tableColumn identifier] isEqual: @"name"])
     {
-		NSString *oldLabel = branch.label;
+        NSString *oldLabel = branch.label;
         [branch setLabel: object];
         [self commitWithIdentifier: @"set-branch-label" descriptionArguments: @[ oldLabel, branch.label ] ];
     }
@@ -152,7 +152,7 @@ static EWBranchesWindowController *shared;
         if ([object boolValue])
         {
             [self.persistentRoot setCurrentBranch: branch];
-			[self commitWithIdentifier: @"set-branch" descriptionArguments: @[ branch.label ]];
+            [self commitWithIdentifier: @"set-branch" descriptionArguments: @[ branch.label ]];
         }
     }
 }
@@ -161,34 +161,34 @@ static EWBranchesWindowController *shared;
 
 - (IBAction)addBranch:(id)sender
 {
-	[inspectedWindowController branch: sender];
+    [inspectedWindowController branch: sender];
 }
 
 - (IBAction)deleteBranch:(id)sender
 {
-	COBranch *branch = [self selectedBranch];
-	if (branch.isCurrentBranch)
-	{
-		NSLog(@"Can't delete current branch (TODO: Gray out the button)");
-		return;
-	}
-	branch.deleted = YES;
-	[self commitWithIdentifier: @"delete-branch" descriptionArguments: @[ branch.label ]];
+    COBranch *branch = [self selectedBranch];
+    if (branch.isCurrentBranch)
+    {
+        NSLog(@"Can't delete current branch (TODO: Gray out the button)");
+        return;
+    }
+    branch.deleted = YES;
+    [self commitWithIdentifier: @"delete-branch" descriptionArguments: @[ branch.label ]];
 }
 
 - (void)deleteForward:(id)sender
 {
-	[self deleteBranch: sender];
+    [self deleteBranch: sender];
 }
 
 - (void)delete:(id)sender
 {
-	[self deleteForward: sender];
+    [self deleteForward: sender];
 }
 
 - (void)deleteBackward:(id)sender
 {
-	[self deleteForward: sender];
+    [self deleteForward: sender];
 }
 
 @end

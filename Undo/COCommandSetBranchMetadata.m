@@ -60,37 +60,37 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
 
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
 {
-	NILARG_EXCEPTION_TEST(aContext);
+    NILARG_EXCEPTION_TEST(aContext);
     return YES;
 }
 
 - (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
 {
-	[txn setMetadata: _newMetadata forBranch: _branchUUID ofPersistentRoot: _persistentRootUUID];
+    [txn setMetadata: _newMetadata forBranch: _branchUUID ofPersistentRoot: _persistentRootUUID];
 }
 
 - (void) applyToContext: (COEditingContext *)aContext
 {
-	NILARG_EXCEPTION_TEST(aContext);
+    NILARG_EXCEPTION_TEST(aContext);
 
     COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
     COBranch *branch = [proot branchForUUID: _branchUUID];
-   	ETAssert(branch != nil);
+    ETAssert(branch != nil);
 
     branch.metadata = _newMetadata;
 }
 
 - (NSString *)kind
 {
-	return _(@"Branch Metadata Update");
+    return _(@"Branch Metadata Update");
 }
 
 - (id) copyWithZone:(NSZone *)zone
 {
     COCommandSetBranchMetadata *aCopy = [super copyWithZone: zone];
     aCopy->_branchUUID = _branchUUID;
-	aCopy->_oldMetadata = _oldMetadata;
-	aCopy->_newMetadata = _newMetadata;
+    aCopy->_oldMetadata = _oldMetadata;
+    aCopy->_newMetadata = _newMetadata;
     return aCopy;
 }
 

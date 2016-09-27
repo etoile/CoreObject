@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2014 Eric Wasylishen
+    Copyright (C) 2014 Eric Wasylishen
  
-	Date:  February 2014
-	License:  MIT  (see COPYING)
+    Date:  February 2014
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -13,13 +13,13 @@
 
 @interface EWAppDelegate : NSObject <NSApplicationDelegate>
 {
-	COEditingContext *ctx;
-	COPersistentRoot *library;
-	
-	EWTypewriterWindowController *windowController;
-	
-	NSMutableArray *utilityWindowControllers;
-	PreferencesController *prefsController;
+    COEditingContext *ctx;
+    COPersistentRoot *library;
+    
+    EWTypewriterWindowController *windowController;
+    
+    NSMutableArray *utilityWindowControllers;
+    PreferencesController *prefsController;
 }
 
 @property (nonatomic, readonly) COEditingContext *editingContext;

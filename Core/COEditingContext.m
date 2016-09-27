@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  July 2013
-	License:  MIT  (see COPYING)
+    Date:  July 2013
+    License:  MIT  (see COPYING)
  */
 
 #import "COEditingContext.h"
@@ -41,8 +41,8 @@
 
 + (COEditingContext *)contextWithURL: (NSURL *)aURL
 {
-	// TODO: Look up the store class based on the URL scheme and path extension
-	return [[self alloc] initWithStore: [[COSQLiteStore alloc] initWithURL: aURL]];
+    // TODO: Look up the store class based on the URL scheme and path extension
+    return [[self alloc] initWithStore: [[COSQLiteStore alloc] initWithURL: aURL]];
 }
 
 - (instancetype)initWithStore: (COSQLiteStore *)store
@@ -50,166 +50,166 @@
          migrationDriverClass: (Class)aDriverClass
                undoTrackStore: (COUndoTrackStore *)anUndoTrackStore
 {
-	NILARG_EXCEPTION_TEST(store);
-	NILARG_EXCEPTION_TEST(aRepo);
-	INVALIDARG_EXCEPTION_TEST(aRepo, [aRepo entityDescriptionForClass: [COObject class]] != nil);
-	INVALIDARG_EXCEPTION_TEST(aDriverClass,
-	                          [aDriverClass isSubclassOfClass: [COSchemaMigrationDriver class]]);
-	NILARG_EXCEPTION_TEST(anUndoTrackStore);
+    NILARG_EXCEPTION_TEST(store);
+    NILARG_EXCEPTION_TEST(aRepo);
+    INVALIDARG_EXCEPTION_TEST(aRepo, [aRepo entityDescriptionForClass: [COObject class]] != nil);
+    INVALIDARG_EXCEPTION_TEST(aDriverClass,
+                              [aDriverClass isSubclassOfClass: [COSchemaMigrationDriver class]]);
+    NILARG_EXCEPTION_TEST(anUndoTrackStore);
 
-	SUPERINIT;
+    SUPERINIT;
 
-	_store = store;
-	_modelDescriptionRepository = aRepo;
-	_migrationDriverClass = aDriverClass;
-	_loadedPersistentRoots = [NSMutableDictionary new];
-	_unloadingBehavior = COEditingContextUnloadingBehaviorOnDeletion;
-	_persistentRootsPendingDeletion = [NSMutableSet new];
-	_persistentRootsPendingUndeletion = [NSMutableSet new];
-	_deadRelationshipCache = [COCrossPersistentRootDeadRelationshipCache new];
-	_undoTrackStore = anUndoTrackStore;
-	_recordingUndo = YES;
-	_revisionCache = [[CORevisionCache alloc] initWithParentEditingContext: self];
-	_internalTransientObjectGraphContext = [[COObjectGraphContext alloc]
-	  initWithModelDescriptionRepository: aRepo
-					migrationDriverClass: aDriverClass];
-	_lastTransactionIDForPersistentRootUUID = [NSMutableDictionary new];
-	CORegisterCoreObjectMetamodel(_modelDescriptionRepository);
+    _store = store;
+    _modelDescriptionRepository = aRepo;
+    _migrationDriverClass = aDriverClass;
+    _loadedPersistentRoots = [NSMutableDictionary new];
+    _unloadingBehavior = COEditingContextUnloadingBehaviorOnDeletion;
+    _persistentRootsPendingDeletion = [NSMutableSet new];
+    _persistentRootsPendingUndeletion = [NSMutableSet new];
+    _deadRelationshipCache = [COCrossPersistentRootDeadRelationshipCache new];
+    _undoTrackStore = anUndoTrackStore;
+    _recordingUndo = YES;
+    _revisionCache = [[CORevisionCache alloc] initWithParentEditingContext: self];
+    _internalTransientObjectGraphContext = [[COObjectGraphContext alloc]
+      initWithModelDescriptionRepository: aRepo
+                    migrationDriverClass: aDriverClass];
+    _lastTransactionIDForPersistentRootUUID = [NSMutableDictionary new];
+    CORegisterCoreObjectMetamodel(_modelDescriptionRepository);
 
-	[[NSNotificationCenter defaultCenter] addObserver: self
-	                                         selector: @selector(storePersistentRootsDidChange:)
-	                                             name: COStorePersistentRootsDidChangeNotification
-	                                           object: _store];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(storePersistentRootsDidChange:)
+                                                 name: COStorePersistentRootsDidChangeNotification
+                                               object: _store];
 
-	[[NSDistributedNotificationCenter defaultCenter]
-		addObserver: self
-		   selector: @selector(distributedStorePersistentRootsDidChange:)
-		       name: COStorePersistentRootsDidChangeNotification
-		     object: nil];
+    [[NSDistributedNotificationCenter defaultCenter]
+        addObserver: self
+           selector: @selector(distributedStorePersistentRootsDidChange:)
+               name: COStorePersistentRootsDidChangeNotification
+             object: nil];
 
-	return self;
+    return self;
 }
 
 - (instancetype)initWithStore: (COSQLiteStore *)store
    modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
 {
-	return [self initWithStore: store
-	modelDescriptionRepository: aRepo
-	      migrationDriverClass: [COSchemaMigrationDriver class]
-	            undoTrackStore: [COUndoTrackStore defaultStore]];
+    return [self initWithStore: store
+    modelDescriptionRepository: aRepo
+          migrationDriverClass: [COSchemaMigrationDriver class]
+                undoTrackStore: [COUndoTrackStore defaultStore]];
 }
 
 - (instancetype)initWithStore: (COSQLiteStore *)store
 {
-	return [self initWithStore: store
-	modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]];
+    return [self initWithStore: store
+    modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]];
 }
 
 - (instancetype)init
 {
-	return [self initWithStore: nil];
+    return [self initWithStore: nil];
 }
 
 - (void)dealloc
 {
-	[[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
-	[[NSNotificationCenter defaultCenter] removeObserver: self];
+    [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
 }
 
 - (NSString *)description
 {
-	return [NSString stringWithFormat: @"<%@ %p - store: %@ (%@)>",
-		NSStringFromClass([self class]), self, _store.UUID, _store.URL];
+    return [NSString stringWithFormat: @"<%@ %p - store: %@ (%@)>",
+        NSStringFromClass([self class]), self, _store.UUID, _store.URL];
 }
 
 - (NSString *)detailedDescription
 {
-	NSArray *properties = @[@"modelDescriptionRepository", @"hasChanges",
-		@"persistentRootsPendingInsertion", @"persistentRootsPendingUpdate",
-		@"persistentRootsPendingDeletion", @"persistentRootsPendingUndeletion",
-		@"persistentRoots"];
-	NSMutableDictionary *options =
-		[@{kETDescriptionOptionValuesForKeyPaths: properties,
-		   kETDescriptionOptionPropertyIndent: @"\t"} mutableCopy];
+    NSArray *properties = @[@"modelDescriptionRepository", @"hasChanges",
+        @"persistentRootsPendingInsertion", @"persistentRootsPendingUpdate",
+        @"persistentRootsPendingDeletion", @"persistentRootsPendingUndeletion",
+        @"persistentRoots"];
+    NSMutableDictionary *options =
+        [@{kETDescriptionOptionValuesForKeyPaths: properties,
+           kETDescriptionOptionPropertyIndent: @"\t"} mutableCopy];
 
-	return [self descriptionWithOptions: options];
+    return [self descriptionWithOptions: options];
 }
 
 - (NSString *)changeDescription
 {
-	NSMutableDictionary *changeSummary = [NSMutableDictionary dictionary];
+    NSMutableDictionary *changeSummary = [NSMutableDictionary dictionary];
 
-	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
-	{
-		if (!persistentRoot.hasChanges)
-			continue;
+    for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
+    {
+        if (!persistentRoot.hasChanges)
+            continue;
 
-		changeSummary[persistentRoot.UUID] = persistentRoot.description;
-	}
+        changeSummary[persistentRoot.UUID] = persistentRoot.description;
+    }
 
-	/* For Mac OS X, see http://www.cocoabuilder.com/archive/cocoa/197297-who-broke-nslog-on-leopard.html */
-	NSString *desc = changeSummary.description;
-	desc = [desc stringByReplacingOccurrencesOfString: @"\\n" withString: @"\n"];
-	desc = [desc stringByReplacingOccurrencesOfString: @"\\\"" withString: @""];
-	return desc;
+    /* For Mac OS X, see http://www.cocoabuilder.com/archive/cocoa/197297-who-broke-nslog-on-leopard.html */
+    NSString *desc = changeSummary.description;
+    desc = [desc stringByReplacingOccurrencesOfString: @"\\n" withString: @"\n"];
+    desc = [desc stringByReplacingOccurrencesOfString: @"\\\"" withString: @""];
+    return desc;
 }
 
 - (BOOL)isEditingContext
 {
-	return YES;
+    return YES;
 }
 
 - (COEditingContext *)editingContext
 {
-	return self;
+    return self;
 }
 
 #pragma mark Accessing All Persistent Roots -
 
 - (void)loadAllPersistentRootsIfNeeded
 {
-	if (!_hasLoadedPersistentRootUUIDs)
-	{
-		for (ETUUID *uuid in _store.persistentRootUUIDs)
-		{
-			[self persistentRootForUUID: uuid];
-		}
+    if (!_hasLoadedPersistentRootUUIDs)
+    {
+        for (ETUUID *uuid in _store.persistentRootUUIDs)
+        {
+            [self persistentRootForUUID: uuid];
+        }
 
-		_hasLoadedPersistentRootUUIDs = YES;
-	}
+        _hasLoadedPersistentRootUUIDs = YES;
+    }
 }
 
 - (NSSet *)persistentRoots
 {
-	[self loadAllPersistentRootsIfNeeded];
+    [self loadAllPersistentRootsIfNeeded];
 
-	return [NSSet setWithArray: [_loadedPersistentRoots.allValues filteredCollectionWithBlock: ^(
-	  COPersistentRoot *obj)
-	{
-		return (BOOL)!obj.deleted;
-	}]];
+    return [NSSet setWithArray: [_loadedPersistentRoots.allValues filteredCollectionWithBlock: ^(
+      COPersistentRoot *obj)
+    {
+        return (BOOL)!obj.deleted;
+    }]];
 }
 
 - (NSSet *)deletedPersistentRoots
 {
-	[self loadAllPersistentRootsIfNeeded];
+    [self loadAllPersistentRootsIfNeeded];
 
-	/* Force deleted persistent roots to be reloaded (see -unloadPersistentRoot:) */
-	for (ETUUID *persistentRootUUID in _store.deletedPersistentRootUUIDs)
-	{
-		[self persistentRootForUUID: persistentRootUUID];
-	}
+    /* Force deleted persistent roots to be reloaded (see -unloadPersistentRoot:) */
+    for (ETUUID *persistentRootUUID in _store.deletedPersistentRootUUIDs)
+    {
+        [self persistentRootForUUID: persistentRootUUID];
+    }
 
-	return [NSSet setWithArray: [_loadedPersistentRoots.allValues filteredCollectionWithBlock: ^(
-	  COPersistentRoot *obj)
-	{
-		return obj.deleted;
-	}]];
+    return [NSSet setWithArray: [_loadedPersistentRoots.allValues filteredCollectionWithBlock: ^(
+      COPersistentRoot *obj)
+    {
+        return obj.deleted;
+    }]];
 }
 
 - (NSSet *)loadedPersistentRoots
 {
-	return [NSSet setWithArray: _loadedPersistentRoots.allValues];
+    return [NSSet setWithArray: _loadedPersistentRoots.allValues];
 }
 
 #pragma mark Managing Persistent Roots -
@@ -223,182 +223,182 @@
  */
 - (COPersistentRoot *)persistentRootForUUID: (ETUUID *)persistentRootUUID
 {
-	COPersistentRoot *persistentRoot = _loadedPersistentRoots[persistentRootUUID];
+    COPersistentRoot *persistentRoot = _loadedPersistentRoots[persistentRootUUID];
 
-	if (persistentRoot != nil)
-		return persistentRoot;
+    if (persistentRoot != nil)
+        return persistentRoot;
 
-	COPersistentRootInfo *info = [_store persistentRootInfoForUUID: persistentRootUUID];
-	BOOL persistentRootFound = (info != nil);
+    COPersistentRootInfo *info = [_store persistentRootInfoForUUID: persistentRootUUID];
+    BOOL persistentRootFound = (info != nil);
 
-	if (!persistentRootFound)
-		return nil;
+    if (!persistentRootFound)
+        return nil;
 
-	persistentRoot = [self makePersistentRootWithInfo: info objectGraphContext: nil];
+    persistentRoot = [self makePersistentRootWithInfo: info objectGraphContext: nil];
 
-	return persistentRoot;
+    return persistentRoot;
 }
 
 - (COPersistentRoot *)loadedPersistentRootForUUID: (ETUUID *)aUUID
 {
-	return _loadedPersistentRoots[aUUID];
+    return _loadedPersistentRoots[aUUID];
 }
 
 - (COPersistentRoot *)makePersistentRootWithInfo: (COPersistentRootInfo *)info
                               objectGraphContext: (COObjectGraphContext *)anObjectGrapContext
 {
-	NSParameterAssert(info == nil || nil == _loadedPersistentRoots[info.UUID]);
+    NSParameterAssert(info == nil || nil == _loadedPersistentRoots[info.UUID]);
 
-	COPersistentRoot *persistentRoot = [[COPersistentRoot alloc] initWithInfo: info
-	                                                    cheapCopyRevisionUUID: nil
-	                                              cheapCopyPersistentRootUUID: nil
-	                                                         parentBranchUUID: nil
-	                                                       objectGraphContext: anObjectGrapContext
-	                                                            parentContext: self];
-	_loadedPersistentRoots[persistentRoot.UUID] = persistentRoot;
+    COPersistentRoot *persistentRoot = [[COPersistentRoot alloc] initWithInfo: info
+                                                        cheapCopyRevisionUUID: nil
+                                                  cheapCopyPersistentRootUUID: nil
+                                                             parentBranchUUID: nil
+                                                           objectGraphContext: anObjectGrapContext
+                                                                parentContext: self];
+    _loadedPersistentRoots[persistentRoot.UUID] = persistentRoot;
 
-	// Lazy loading support:
-	// Cause any faulted references to this newly loaded persistet root to be unfaulted
-	[self updateCrossPersistentRootReferencesToPersistentRoot: persistentRoot
-	                                                   branch: nil
-	                                                  isFault: persistentRoot.deleted];
-	return persistentRoot;
+    // Lazy loading support:
+    // Cause any faulted references to this newly loaded persistet root to be unfaulted
+    [self updateCrossPersistentRootReferencesToPersistentRoot: persistentRoot
+                                                       branch: nil
+                                                      isFault: persistentRoot.deleted];
+    return persistentRoot;
 }
 
 - (COPersistentRoot *)insertNewPersistentRootWithEntityName: (NSString *)anEntityName
 {
-	ETEntityDescription *desc = [_modelDescriptionRepository descriptionForName: anEntityName];
-	if (desc == nil)
-	{
-		[NSException raise: NSInvalidArgumentException
-		            format: @"Found not entity %@ in %@",
-		                    anEntityName, _modelDescriptionRepository];
-	}
-	COObjectGraphContext *graph = [COObjectGraphContext
-	  objectGraphContextWithModelDescriptionRepository: _modelDescriptionRepository];
+    ETEntityDescription *desc = [_modelDescriptionRepository descriptionForName: anEntityName];
+    if (desc == nil)
+    {
+        [NSException raise: NSInvalidArgumentException
+                    format: @"Found not entity %@ in %@",
+                            anEntityName, _modelDescriptionRepository];
+    }
+    COObjectGraphContext *graph = [COObjectGraphContext
+      objectGraphContextWithModelDescriptionRepository: _modelDescriptionRepository];
 
-	// TODO: For a nil class, fall back on COObject or some other class as we do in COObjectGraphContext
-	Class cls = [_modelDescriptionRepository classForEntityDescription: desc];
-	COObject *rootObject = [[cls alloc] initWithEntityDescription: desc
-	                                           objectGraphContext: graph];
-	graph.rootObject = rootObject;
+    // TODO: For a nil class, fall back on COObject or some other class as we do in COObjectGraphContext
+    Class cls = [_modelDescriptionRepository classForEntityDescription: desc];
+    COObject *rootObject = [[cls alloc] initWithEntityDescription: desc
+                                               objectGraphContext: graph];
+    graph.rootObject = rootObject;
 
-	COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil
-	                                                 objectGraphContext: graph];
+    COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil
+                                                     objectGraphContext: graph];
 
-	ETAssert(rootObject.objectGraphContext == persistentRoot.objectGraphContext);
-	ETAssert([persistentRoot.rootObject isRoot]);
+    ETAssert(rootObject.objectGraphContext == persistentRoot.objectGraphContext);
+    ETAssert([persistentRoot.rootObject isRoot]);
 
-	return persistentRoot;
+    return persistentRoot;
 }
 
 - (COPersistentRoot *)insertNewPersistentRootWithRevisionUUID: (ETUUID *)aRevid
                                                  parentBranch: (COBranch *)aParentBranch
 {
-	ETUUID *copiedPersistentRootUUID = aParentBranch.persistentRoot.UUID;
-	COPersistentRoot *persistentRoot = [[COPersistentRoot alloc] initWithInfo: nil
-	                                                    cheapCopyRevisionUUID: aRevid
-	                                              cheapCopyPersistentRootUUID: copiedPersistentRootUUID
-	                                                         parentBranchUUID: aParentBranch.UUID
-	                                                       objectGraphContext: nil
-	                                                            parentContext: self];
-	_loadedPersistentRoots[persistentRoot.UUID] = persistentRoot;
+    ETUUID *copiedPersistentRootUUID = aParentBranch.persistentRoot.UUID;
+    COPersistentRoot *persistentRoot = [[COPersistentRoot alloc] initWithInfo: nil
+                                                        cheapCopyRevisionUUID: aRevid
+                                                  cheapCopyPersistentRootUUID: copiedPersistentRootUUID
+                                                             parentBranchUUID: aParentBranch.UUID
+                                                           objectGraphContext: nil
+                                                                parentContext: self];
+    _loadedPersistentRoots[persistentRoot.UUID] = persistentRoot;
 
-	return persistentRoot;
+    return persistentRoot;
 }
 
 - (NSSet *)persistentRootsPendingInsertion
 {
-	NSMutableSet *insertedPersistentRoots = [NSMutableSet set];
+    NSMutableSet *insertedPersistentRoots = [NSMutableSet set];
 
-	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
-	{
-		if (persistentRoot.persistentRootUncommitted)
-		{
-			[insertedPersistentRoots addObject: persistentRoot];
-		}
-	}
-	return insertedPersistentRoots;
+    for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
+    {
+        if (persistentRoot.persistentRootUncommitted)
+        {
+            [insertedPersistentRoots addObject: persistentRoot];
+        }
+    }
+    return insertedPersistentRoots;
 }
 
 - (NSSet *)persistentRootsPendingUpdate
 {
-	NSMutableSet *updatedPersistentRoots = [NSMutableSet set];
+    NSMutableSet *updatedPersistentRoots = [NSMutableSet set];
 
-	for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
-	{
-		if (persistentRoot.hasChanges)
-		{
-			[updatedPersistentRoots addObject: persistentRoot];
-		}
-	}
-	return updatedPersistentRoots;
+    for (COPersistentRoot *persistentRoot in [_loadedPersistentRoots objectEnumerator])
+    {
+        if (persistentRoot.hasChanges)
+        {
+            [updatedPersistentRoots addObject: persistentRoot];
+        }
+    }
+    return updatedPersistentRoots;
 }
 
 - (COPersistentRoot *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject
 {
-	COObjectGraphContext *objectGraphContext = aRootObject.objectGraphContext;
+    COObjectGraphContext *objectGraphContext = aRootObject.objectGraphContext;
 
-	INVALIDARG_EXCEPTION_TEST(objectGraphContext, objectGraphContext.persistentRoot == nil);
-	INVALIDARG_EXCEPTION_TEST(objectGraphContext,
-	                          objectGraphContext.rootObject == nil || objectGraphContext.rootObject == aRootObject);
-	INVALIDARG_EXCEPTION_TEST(objectGraphContext,
-	                          objectGraphContext.modelDescriptionRepository == _modelDescriptionRepository)
+    INVALIDARG_EXCEPTION_TEST(objectGraphContext, objectGraphContext.persistentRoot == nil);
+    INVALIDARG_EXCEPTION_TEST(objectGraphContext,
+                              objectGraphContext.rootObject == nil || objectGraphContext.rootObject == aRootObject);
+    INVALIDARG_EXCEPTION_TEST(objectGraphContext,
+                              objectGraphContext.modelDescriptionRepository == _modelDescriptionRepository)
 
-	COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil
-	                                                 objectGraphContext: objectGraphContext];
+    COPersistentRoot *persistentRoot = [self makePersistentRootWithInfo: nil
+                                                     objectGraphContext: objectGraphContext];
 
-	objectGraphContext.rootObject = aRootObject;
+    objectGraphContext.rootObject = aRootObject;
 
-	return persistentRoot;
+    return persistentRoot;
 }
 
 - (void)deletePersistentRoot: (COPersistentRoot *)aPersistentRoot
 {
-	if ([_persistentRootsPendingUndeletion containsObject: aPersistentRoot])
-	{
-		ETAssert(!aPersistentRoot.persistentRootUncommitted);
-		[_persistentRootsPendingUndeletion removeObject: aPersistentRoot];
-	}
-	else
-	{
-		// NOTE: Deleted persistent roots are removed from the cache on commit.
-		[_persistentRootsPendingDeletion addObject: aPersistentRoot];
-	}
+    if ([_persistentRootsPendingUndeletion containsObject: aPersistentRoot])
+    {
+        ETAssert(!aPersistentRoot.persistentRootUncommitted);
+        [_persistentRootsPendingUndeletion removeObject: aPersistentRoot];
+    }
+    else
+    {
+        // NOTE: Deleted persistent roots are removed from the cache on commit.
+        [_persistentRootsPendingDeletion addObject: aPersistentRoot];
+    }
 
-	[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
-	                                                   branch: nil
-	                                                  isFault: YES];
+    [self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
+                                                       branch: nil
+                                                      isFault: YES];
 
-	if (aPersistentRoot.persistentRootUncommitted)
-	{
-		[_persistentRootsPendingDeletion removeObject: aPersistentRoot];
-		[self unloadPersistentRoot: aPersistentRoot
-		                 isDeleted: YES
-		                     force: NO];
-	}
+    if (aPersistentRoot.persistentRootUncommitted)
+    {
+        [_persistentRootsPendingDeletion removeObject: aPersistentRoot];
+        [self unloadPersistentRoot: aPersistentRoot
+                         isDeleted: YES
+                             force: NO];
+    }
 }
 
 - (void)undeletePersistentRoot: (COPersistentRoot *)aPersistentRoot
 {
-	if ([_persistentRootsPendingDeletion containsObject: aPersistentRoot])
-	{
-		ETAssert(!aPersistentRoot.persistentRootUncommitted);
-		[_persistentRootsPendingDeletion removeObject: aPersistentRoot];
-	}
-	else
-	{
-		[_persistentRootsPendingUndeletion addObject: aPersistentRoot];
-	}
+    if ([_persistentRootsPendingDeletion containsObject: aPersistentRoot])
+    {
+        ETAssert(!aPersistentRoot.persistentRootUncommitted);
+        [_persistentRootsPendingDeletion removeObject: aPersistentRoot];
+    }
+    else
+    {
+        [_persistentRootsPendingUndeletion addObject: aPersistentRoot];
+    }
 
-	[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
-	                                                   branch: nil
-	                                                  isFault: NO];
+    [self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
+                                                       branch: nil
+                                                      isFault: NO];
 
-	if (aPersistentRoot.persistentRootUncommitted)
-	{
-		[_persistentRootsPendingUndeletion removeObject: aPersistentRoot];
-	}
+    if (aPersistentRoot.persistentRootUncommitted)
+    {
+        [_persistentRootsPendingUndeletion removeObject: aPersistentRoot];
+    }
 }
 
 /**
@@ -431,217 +431,217 @@
                                                      branch: (COBranch *)aBranch
                                                     isFault: (BOOL)faulting
 {
-	NSParameterAssert(aPersistentRoot != nil);
+    NSParameterAssert(aPersistentRoot != nil);
 
-	// See documentation above
-	if (faulting)
-	{
-		BOOL isUnloaded = _loadedPersistentRoots[aPersistentRoot.UUID] == nil;
+    // See documentation above
+    if (faulting)
+    {
+        BOOL isUnloaded = _loadedPersistentRoots[aPersistentRoot.UUID] == nil;
 
-		ETAssert(aPersistentRoot.deleted || isUnloaded || (aBranch != nil && aBranch.deleted));
-	}
-	else
-	{
-		ETAssert(!aPersistentRoot.deleted && (aBranch == nil || !aBranch.deleted));
-	}
+        ETAssert(aPersistentRoot.deleted || isUnloaded || (aBranch != nil && aBranch.deleted));
+    }
+    else
+    {
+        ETAssert(!aPersistentRoot.deleted && (aBranch == nil || !aBranch.deleted));
+    }
 
-	/* Fix references pointing to any branch that belong to the deleted
-	   persistent root (the relationship target) */
-	NSSet *targetObjectGraphs = nil;
+    /* Fix references pointing to any branch that belong to the deleted
+       persistent root (the relationship target) */
+    NSSet *targetObjectGraphs = nil;
 
-	if (aBranch != nil)
-	{
-		targetObjectGraphs = [NSSet setWithObject: aBranch.objectGraphContext];
-	}
-	else
-	{
-		targetObjectGraphs = aPersistentRoot.allObjectGraphContexts;
-	}
+    if (aBranch != nil)
+    {
+        targetObjectGraphs = [NSSet setWithObject: aBranch.objectGraphContext];
+    }
+    else
+    {
+        targetObjectGraphs = aPersistentRoot.allObjectGraphContexts;
+    }
 
-	for (COObjectGraphContext *target in targetObjectGraphs)
-	{
-		/* When we are not deleting a persistent root or branch explicitly, but
-		   reloading persistent roots, we must take in account that branches can
-		   become deleted when their persistent root doesn't (isDeletion is NO) */
-		BOOL isTargetFaulting = faulting || target.branch.deleted;
-		/* Fix references in all branches that belong to persistent roots
-		   referencing the deleted persistent root (those are relationship sources) */
-		NSMutableSet *sourceObjectGraphs = [NSMutableSet new];
+    for (COObjectGraphContext *target in targetObjectGraphs)
+    {
+        /* When we are not deleting a persistent root or branch explicitly, but
+           reloading persistent roots, we must take in account that branches can
+           become deleted when their persistent root doesn't (isDeletion is NO) */
+        BOOL isTargetFaulting = faulting || target.branch.deleted;
+        /* Fix references in all branches that belong to persistent roots
+           referencing the deleted persistent root (those are relationship sources) */
+        NSMutableSet *sourceObjectGraphs = [NSMutableSet new];
 
-		// Quickly lookup the COObjects that have currently dead references that
-		// should point at `target`.
+        // Quickly lookup the COObjects that have currently dead references that
+        // should point at `target`.
 
-		// TODO: Factor out this object graph context -> COPath conversion.
-		COPath *targetPath;
-		if (target == aPersistentRoot.objectGraphContext)
-		{
-			targetPath = [COPath pathWithPersistentRoot: target.persistentRoot.UUID];
-		}
-		else
-		{
-			targetPath = [COPath pathWithPersistentRoot: target.persistentRoot.UUID
-			                                     branch: target.branch.UUID];
-		}
+        // TODO: Factor out this object graph context -> COPath conversion.
+        COPath *targetPath;
+        if (target == aPersistentRoot.objectGraphContext)
+        {
+            targetPath = [COPath pathWithPersistentRoot: target.persistentRoot.UUID];
+        }
+        else
+        {
+            targetPath = [COPath pathWithPersistentRoot: target.persistentRoot.UUID
+                                                 branch: target.branch.UUID];
+        }
 
-		NSHashTable *referrersWithDeadReferences = [_deadRelationshipCache referringObjectsForPath: targetPath];
-		for (COObject *sourceObject in referrersWithDeadReferences)
-		{
-			[sourceObjectGraphs addObject: sourceObject.objectGraphContext];
-		}
+        NSHashTable *referrersWithDeadReferences = [_deadRelationshipCache referringObjectsForPath: targetPath];
+        for (COObject *sourceObject in referrersWithDeadReferences)
+        {
+            [sourceObjectGraphs addObject: sourceObject.objectGraphContext];
+        }
 
-		// Quickly lookup COObjects with live references to `target`
-		NSSet *referrersWithLiveReferences = [target.rootObject referringObjects];
-		for (COObject *sourceObject in referrersWithLiveReferences)
-		{
-			[sourceObjectGraphs addObject: sourceObject.objectGraphContext];
-		}
+        // Quickly lookup COObjects with live references to `target`
+        NSSet *referrersWithLiveReferences = [target.rootObject referringObjects];
+        for (COObject *sourceObject in referrersWithLiveReferences)
+        {
+            [sourceObjectGraphs addObject: sourceObject.objectGraphContext];
+        }
 
-		// Fix up the references
-		for (COObjectGraphContext *source in sourceObjectGraphs)
-		{
-			if (source.persistentRoot == aPersistentRoot)
-				continue;
+        // Fix up the references
+        for (COObjectGraphContext *source in sourceObjectGraphs)
+        {
+            if (source.persistentRoot == aPersistentRoot)
+                continue;
 
-			// TODO: We could easily skip traversing all inner objects, since
-			// we already know which ones need fixing up.
-			[source replaceObject: (isTargetFaulting ? target.rootObject : nil)
-			           withObject: (isTargetFaulting ? nil : target.rootObject)];
-		}
-	}
+            // TODO: We could easily skip traversing all inner objects, since
+            // we already know which ones need fixing up.
+            [source replaceObject: (isTargetFaulting ? target.rootObject : nil)
+                       withObject: (isTargetFaulting ? nil : target.rootObject)];
+        }
+    }
 }
 
 - (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot
                    isDeleted: (BOOL)deleted
                        force: (BOOL)forced
 {
-	if (!forced && _unloadingBehavior == COEditingContextUnloadingBehaviorManual)
-		return;
+    if (!forced && _unloadingBehavior == COEditingContextUnloadingBehaviorManual)
+        return;
 
-	[_loadedPersistentRoots removeObjectForKey: aPersistentRoot.UUID];
+    [_loadedPersistentRoots removeObjectForKey: aPersistentRoot.UUID];
 
-	// For a deleted persistent root, references are fixed in -deletePersistentRoot:
-	if (!deleted)
-	{
-		// Turn faulted references to this persistent root back into faults
-		[self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
-		                                                   branch: nil
-		                                                  isFault: YES];
-	}
-	// Clear inner objects from both dead relationship cache and incoming relationship caches
-	// of other objects holding references to the discarded object graphs. If we wait until
-	// -[COObjectGraphContext dealloc], COObject.deadRelationshipCache will be nil.
-	[[aPersistentRoot.allObjectGraphContexts mappedCollection] discardAllObjects];
+    // For a deleted persistent root, references are fixed in -deletePersistentRoot:
+    if (!deleted)
+    {
+        // Turn faulted references to this persistent root back into faults
+        [self updateCrossPersistentRootReferencesToPersistentRoot: aPersistentRoot
+                                                           branch: nil
+                                                          isFault: YES];
+    }
+    // Clear inner objects from both dead relationship cache and incoming relationship caches
+    // of other objects holding references to the discarded object graphs. If we wait until
+    // -[COObjectGraphContext dealloc], COObject.deadRelationshipCache will be nil.
+    [[aPersistentRoot.allObjectGraphContexts mappedCollection] discardAllObjects];
 
-	if (aPersistentRoot.persistentRootUncommitted)
-	{
-		[aPersistentRoot makeZombie];
-	}
+    if (aPersistentRoot.persistentRootUncommitted)
+    {
+        [aPersistentRoot makeZombie];
+    }
 
-	[[NSNotificationCenter defaultCenter]
-		postNotificationName: COEditingContextDidUnloadPersistentRootsNotification
-		              object: self
-		            userInfo: @{kCOUnloadedPersistentRootsKey: S(aPersistentRoot)}];
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName: COEditingContextDidUnloadPersistentRootsNotification
+                      object: self
+                    userInfo: @{kCOUnloadedPersistentRootsKey: S(aPersistentRoot)}];
 }
 
 - (void)unloadPersistentRoot: (COPersistentRoot *)aPersistentRoot
 {
-	[self unloadPersistentRoot: aPersistentRoot isDeleted: aPersistentRoot.deleted force: YES];
+    [self unloadPersistentRoot: aPersistentRoot isDeleted: aPersistentRoot.deleted force: YES];
 }
 
 #pragma mark Referencing Other Persistent Roots -
 
 - (id)crossPersistentRootReferenceWithPath: (COPath *)aPath shouldLoad: (BOOL)shouldLoad
 {
-	ETUUID *persistentRootUUID = aPath.persistentRoot;
-	ETAssert(persistentRootUUID != nil);
+    ETUUID *persistentRootUUID = aPath.persistentRoot;
+    ETAssert(persistentRootUUID != nil);
 
-	ETUUID *branchUUID = aPath.branch;
+    ETUUID *branchUUID = aPath.branch;
 
-	COPersistentRoot *persistentRoot;
-	if (shouldLoad)
-	{
-		persistentRoot = [self persistentRootForUUID: persistentRootUUID];
-	}
-	else
-	{
-		persistentRoot = [self loadedPersistentRootForUUID: persistentRootUUID];
-	}
+    COPersistentRoot *persistentRoot;
+    if (shouldLoad)
+    {
+        persistentRoot = [self persistentRootForUUID: persistentRootUUID];
+    }
+    else
+    {
+        persistentRoot = [self loadedPersistentRootForUUID: persistentRootUUID];
+    }
 
-	if (persistentRoot == nil)
-	{
-		return nil;
-	}
-	if (persistentRoot.deleted)
-	{
-		return nil;
-	}
+    if (persistentRoot == nil)
+    {
+        return nil;
+    }
+    if (persistentRoot.deleted)
+    {
+        return nil;
+    }
 
-	if (branchUUID != nil)
-	{
-		COBranch *branch = [persistentRoot branchForUUID: branchUUID];
+    if (branchUUID != nil)
+    {
+        COBranch *branch = [persistentRoot branchForUUID: branchUUID];
 
-		if (branch.deleted)
-		{
-			return nil;
-		}
-		return branch.rootObject;
-	}
-	else
-	{
-		return persistentRoot.rootObject;
-	}
+        if (branch.deleted)
+        {
+            return nil;
+        }
+        return branch.rootObject;
+    }
+    else
+    {
+        return persistentRoot.rootObject;
+    }
 }
 
 #pragma mark Pending Changes -
 
 - (BOOL)hasChanges
 {
-	if (_persistentRootsPendingDeletion.count > 0)
-		return YES;
+    if (_persistentRootsPendingDeletion.count > 0)
+        return YES;
 
-	if (_persistentRootsPendingUndeletion.count > 0)
-		return YES;
+    if (_persistentRootsPendingUndeletion.count > 0)
+        return YES;
 
-	for (COPersistentRoot *context in [_loadedPersistentRoots objectEnumerator])
-	{
-		if (context.persistentRootUncommitted)
-			return YES;
+    for (COPersistentRoot *context in [_loadedPersistentRoots objectEnumerator])
+    {
+        if (context.persistentRootUncommitted)
+            return YES;
 
-		if (context.hasChanges)
-			return YES;
-	}
-	return NO;
+        if (context.hasChanges)
+            return YES;
+    }
+    return NO;
 }
 
 - (void)discardAllChanges
 {
-	/* Discard changes in persistent roots */
+    /* Discard changes in persistent roots */
 
-	for (ETUUID *uuid in _loadedPersistentRoots)
-	{
-		COPersistentRoot *persistentRoot = _loadedPersistentRoots[uuid];
-		BOOL isInserted = (persistentRoot.currentRevision == nil);
+    for (ETUUID *uuid in _loadedPersistentRoots)
+    {
+        COPersistentRoot *persistentRoot = _loadedPersistentRoots[uuid];
+        BOOL isInserted = (persistentRoot.currentRevision == nil);
 
-		if (isInserted)
-			continue;
+        if (isInserted)
+            continue;
 
-		[persistentRoot discardAllChanges];
-	}
+        [persistentRoot discardAllChanges];
+    }
 
-	/* Clear persistent roots pending insertion */
+    /* Clear persistent roots pending insertion */
 
-	NSArray *persistentRootsPendingInsertion = self.persistentRootsPendingInsertion.allObjects;
+    NSArray *persistentRootsPendingInsertion = self.persistentRootsPendingInsertion.allObjects;
 
-	[_loadedPersistentRoots removeObjectsForKeys:
-	                        (id)[[persistentRootsPendingInsertion mappedCollection] UUID]];
-	ETAssert([self.persistentRootsPendingInsertion isEmpty]);
+    [_loadedPersistentRoots removeObjectsForKeys:
+                            (id)[[persistentRootsPendingInsertion mappedCollection] UUID]];
+    ETAssert([self.persistentRootsPendingInsertion isEmpty]);
 
-	/* Clear other pending changes */
+    /* Clear other pending changes */
 
-	[_persistentRootsPendingDeletion removeAllObjects];
-	[_persistentRootsPendingUndeletion removeAllObjects];
+    [_persistentRootsPendingDeletion removeAllObjects];
+    [_persistentRootsPendingUndeletion removeAllObjects];
 
-	ETAssert(!self.hasChanges);
+    ETAssert(!self.hasChanges);
 }
 
 #pragma mark Validation -
@@ -649,19 +649,19 @@
 /* Both COPersistentRoot or COEditingContext objects are valid arguments. */
 - (BOOL)validateChangedObjectsForContext: (id)aContext error: (COError **)error
 {
-	NSMutableArray *validationErrors = [NSMutableArray array];
+    NSMutableArray *validationErrors = [NSMutableArray array];
 
-	for (COObject *object in [aContext changedObjects])
-	{
-		[validationErrors addObjectsFromArray: [object validate]];
-	}
-	ETAssert(![validationErrors containsObject: [NSNull null]]);
+    for (COObject *object in [aContext changedObjects])
+    {
+        [validationErrors addObjectsFromArray: [object validate]];
+    }
+    ETAssert(![validationErrors containsObject: [NSNull null]]);
 
-	if (error != NULL)
-	{
-		*error = [COError errorWithErrors: validationErrors];
-	}
-	return [validationErrors isEmpty];
+    if (error != NULL)
+    {
+        *error = [COError errorWithErrors: validationErrors];
+    }
+    return [validationErrors isEmpty];
 }
 
 #pragma mark Committing Changes -
@@ -670,10 +670,10 @@
                    undoTrack: (COUndoTrack *)undoTrack
                        error: (COError **)anError
 {
-	return [self commitWithIdentifier: aCommitDescriptorId
-	                         metadata: nil
-	                        undoTrack: undoTrack
-	                            error: anError];
+    return [self commitWithIdentifier: aCommitDescriptorId
+                             metadata: nil
+                            undoTrack: undoTrack
+                                error: anError];
 }
 
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
@@ -681,76 +681,76 @@
                    undoTrack: (COUndoTrack *)undoTrack
                        error: (COError **)anError
 {
-	NILARG_EXCEPTION_TEST(aCommitDescriptorId);
-	INVALIDARG_EXCEPTION_TEST(additionalMetadata,
-	                          ![additionalMetadata containsKey: aCommitDescriptorId]);
+    NILARG_EXCEPTION_TEST(aCommitDescriptorId);
+    INVALIDARG_EXCEPTION_TEST(additionalMetadata,
+                              ![additionalMetadata containsKey: aCommitDescriptorId]);
 
-	NSMutableDictionary *metadata =
-		[@{kCOCommitMetadataIdentifier: aCommitDescriptorId} mutableCopy];
+    NSMutableDictionary *metadata =
+        [@{kCOCommitMetadataIdentifier: aCommitDescriptorId} mutableCopy];
 
-	if (additionalMetadata != nil)
-	{
-		[metadata addEntriesFromDictionary: additionalMetadata];
-	}
-	return [self commitWithMetadata: metadata
-	    restrictedToPersistentRoots: _loadedPersistentRoots.allValues
-	                  withUndoTrack: undoTrack
-	                          error: anError];
+    if (additionalMetadata != nil)
+    {
+        [metadata addEntriesFromDictionary: additionalMetadata];
+    }
+    return [self commitWithMetadata: metadata
+        restrictedToPersistentRoots: _loadedPersistentRoots.allValues
+                      withUndoTrack: undoTrack
+                              error: anError];
 }
 
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
                  undoTrack: (COUndoTrack *)undoTrack
                      error: (COError **)anError
 {
-	return [self commitWithMetadata: metadata
-	    restrictedToPersistentRoots: _loadedPersistentRoots.allValues
-	                  withUndoTrack: undoTrack
-	                          error: anError];
+    return [self commitWithMetadata: metadata
+        restrictedToPersistentRoots: _loadedPersistentRoots.allValues
+                      withUndoTrack: undoTrack
+                              error: anError];
 }
 
 - (BOOL)commit
 {
-	return [self commitWithMetadata: @{}];
+    return [self commitWithMetadata: @{}];
 }
 
 - (void)didCommitWithCommand: (COCommandGroup *)command
              persistentRoots: (NSArray *)persistentRoots
 {
-	for (COPersistentRoot *ctxt in persistentRoots)
-	{
-		[ctxt didMakeNewCommit];
-	}
+    for (COPersistentRoot *ctxt in persistentRoots)
+    {
+        [ctxt didMakeNewCommit];
+    }
 
-	for (COPersistentRoot *ctxt in persistentRoots)
-	{
-		[ctxt sendChangeNotification];
-	}
+    for (COPersistentRoot *ctxt in persistentRoots)
+    {
+        [ctxt sendChangeNotification];
+    }
 
-	NSDictionary *userInfo = (command != nil ? @{kCOCommandKey: command} : @{});
+    NSDictionary *userInfo = (command != nil ? @{kCOCommandKey: command} : @{});
 
-	// NOTE: COEditingContextDidChangeNotification needs more testing.
-	// In particular, test that the changes are already committed (which they are)
-	[[NSNotificationCenter defaultCenter] postNotificationName: COEditingContextDidChangeNotification
-	                                                    object: self
-	                                                  userInfo: userInfo];
+    // NOTE: COEditingContextDidChangeNotification needs more testing.
+    // In particular, test that the changes are already committed (which they are)
+    [[NSNotificationCenter defaultCenter] postNotificationName: COEditingContextDidChangeNotification
+                                                        object: self
+                                                      userInfo: userInfo];
 }
 
 - (void)validateMetadata: (NSDictionary *)metadata
 {
-	INVALIDARG_EXCEPTION_TEST(metadata, metadata == nil
-		|| [NSJSONSerialization isValidJSONObject: metadata]);
-	
-	/* Validate short description related metadata */
+    INVALIDARG_EXCEPTION_TEST(metadata, metadata == nil
+        || [NSJSONSerialization isValidJSONObject: metadata]);
+    
+    /* Validate short description related metadata */
 
-	NSArray *shortDescriptionArgs = metadata[kCOCommitMetadataShortDescriptionArguments];
-	BOOL containsValidArgs = YES;
+    NSArray *shortDescriptionArgs = metadata[kCOCommitMetadataShortDescriptionArguments];
+    BOOL containsValidArgs = YES;
 
-	for (id obj in shortDescriptionArgs)
-	{
-		containsValidArgs &= [obj isString];
-	}
-	INVALIDARG_EXCEPTION_TEST(metadata, shortDescriptionArgs == nil
-		|| ([shortDescriptionArgs isKindOfClass: [NSArray class]] && containsValidArgs));
+    for (id obj in shortDescriptionArgs)
+    {
+        containsValidArgs &= [obj isString];
+    }
+    INVALIDARG_EXCEPTION_TEST(metadata, shortDescriptionArgs == nil
+        || ([shortDescriptionArgs isKindOfClass: [NSArray class]] && containsValidArgs));
 }
 
 - (BOOL) commitWithMetadata: (NSDictionary *)metadata
@@ -758,115 +758,115 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
               withUndoTrack: (COUndoTrack *)track
                       error: (COError **)anError
 {
-	if (_inCommit)
-	{
-		[NSException raise: NSGenericException
-		            format: @"%@ called recursively", NSStringFromSelector(_cmd)];
-	}
+    if (_inCommit)
+    {
+        [NSException raise: NSGenericException
+                    format: @"%@ called recursively", NSStringFromSelector(_cmd)];
+    }
 
-	@try
-	{
-		_inCommit = YES;
-		[self validateMetadata: metadata];
+    @try
+    {
+        _inCommit = YES;
+        [self validateMetadata: metadata];
 
-		// TODO: We could organize validation errors by persistent root. Each
-		// persistent root might result in a validation error that contains a
-		// suberror per inner object, then each suberror could in turn contain
-		// a suberror per validation result. For now, we just aggregate errors per
-		// inner object.
-		if (![self validateChangedObjectsForContext: self error: anError])
-			return NO;
+        // TODO: We could organize validation errors by persistent root. Each
+        // persistent root might result in a validation error that contains a
+        // suberror per inner object, then each suberror could in turn contain
+        // a suberror per validation result. For now, we just aggregate errors per
+        // inner object.
+        if (![self validateChangedObjectsForContext: self error: anError])
+            return NO;
 
-		/* Commit persistent root changes (deleted persistent roots included) */
+        /* Commit persistent root changes (deleted persistent roots included) */
 
-		COStoreTransaction *transaction = [[COStoreTransaction alloc] init];
-		[self recordBeginUndoGroupWithMetadata: metadata];
+        COStoreTransaction *transaction = [[COStoreTransaction alloc] init];
+        [self recordBeginUndoGroupWithMetadata: metadata];
 
-		for (COPersistentRoot *persistentRoot in persistentRoots)
-		{
-			[persistentRoot saveCommitWithMetadata: metadata transaction: transaction];
-		}
+        for (COPersistentRoot *persistentRoot in persistentRoots)
+        {
+            [persistentRoot saveCommitWithMetadata: metadata transaction: transaction];
+        }
 
-		/* Add persistent root deletions to the transaction */
+        /* Add persistent root deletions to the transaction */
 
-		for (COPersistentRoot *persistentRoot in persistentRoots)
-		{
-			ETUUID *uuid = persistentRoot.UUID;
+        for (COPersistentRoot *persistentRoot in persistentRoots)
+        {
+            ETUUID *uuid = persistentRoot.UUID;
 
-			if ([_persistentRootsPendingDeletion containsObject: persistentRoot])
-			{
-				[transaction deletePersistentRoot: uuid];
-				[self recordPersistentRootDeletion: persistentRoot];
-			}
-			else if ([_persistentRootsPendingUndeletion containsObject: persistentRoot])
-			{
-				[transaction undeletePersistentRoot: uuid];
-				[self recordPersistentRootUndeletion: persistentRoot];
-			}
-		}
+            if ([_persistentRootsPendingDeletion containsObject: persistentRoot])
+            {
+                [transaction deletePersistentRoot: uuid];
+                [self recordPersistentRootDeletion: persistentRoot];
+            }
+            else if ([_persistentRootsPendingUndeletion containsObject: persistentRoot])
+            {
+                [transaction undeletePersistentRoot: uuid];
+                [self recordPersistentRootUndeletion: persistentRoot];
+            }
+        }
 
-		/* Update transaction IDs (can't add to the transaction after this) */
+        /* Update transaction IDs (can't add to the transaction after this) */
 
-		for (ETUUID *uuid in transaction.persistentRootUUIDs)
-		{
-			COPersistentRoot *persistentRoot = [self persistentRootForUUID: uuid];
+        for (ETUUID *uuid in transaction.persistentRootUUIDs)
+        {
+            COPersistentRoot *persistentRoot = [self persistentRootForUUID: uuid];
 
-			persistentRoot.lastTransactionID = [transaction setOldTransactionID: persistentRoot.lastTransactionID
-			                                                  forPersistentRoot: uuid];
-		}
+            persistentRoot.lastTransactionID = [transaction setOldTransactionID: persistentRoot.lastTransactionID
+                                                              forPersistentRoot: uuid];
+        }
 
-		/* Update persistent roots and branches pending deletion and undeletion,
-		   and unload persistent roots */
+        /* Update persistent roots and branches pending deletion and undeletion,
+           and unload persistent roots */
 
-		for (COPersistentRoot *persistentRoot in persistentRoots)
-		{
-			if ([_persistentRootsPendingDeletion containsObject: persistentRoot])
-			{
-				[_persistentRootsPendingDeletion removeObject: persistentRoot];
+        for (COPersistentRoot *persistentRoot in persistentRoots)
+        {
+            if ([_persistentRootsPendingDeletion containsObject: persistentRoot])
+            {
+                [_persistentRootsPendingDeletion removeObject: persistentRoot];
 
-				[self unloadPersistentRoot: persistentRoot
-				                 isDeleted: YES
-				                     force: NO];
-			}
-			else if ([_persistentRootsPendingUndeletion containsObject: persistentRoot])
-			{
-				[_persistentRootsPendingUndeletion removeObject: persistentRoot];
-			}
-			[persistentRoot clearBranchesPendingDeletionAndUndeletion];
-		}
+                [self unloadPersistentRoot: persistentRoot
+                                 isDeleted: YES
+                                     force: NO];
+            }
+            else if ([_persistentRootsPendingUndeletion containsObject: persistentRoot])
+            {
+                [_persistentRootsPendingUndeletion removeObject: persistentRoot];
+            }
+            [persistentRoot clearBranchesPendingDeletionAndUndeletion];
+        }
 
-		ETAssert([_store commitStoreTransaction: transaction]);
-		COCommandGroup *command = [self recordEndUndoGroupWithUndoTrack: track];
+        ETAssert([_store commitStoreTransaction: transaction]);
+        COCommandGroup *command = [self recordEndUndoGroupWithUndoTrack: track];
 
-		/* For a commit triggered by undo/redo on a COUndoTrack, the command is nil */
-		[self didCommitWithCommand: command persistentRoots: persistentRoots];
+        /* For a commit triggered by undo/redo on a COUndoTrack, the command is nil */
+        [self didCommitWithCommand: command persistentRoots: persistentRoots];
 
-		if (anError != NULL)
-		{
-			*anError = nil;
-		}
-	}
-	@finally
-	{
-		_inCommit = NO;
-	}
-	return YES;
+        if (anError != NULL)
+        {
+            *anError = nil;
+        }
+    }
+    @finally
+    {
+        _inCommit = NO;
+    }
+    return YES;
 }
 
 - (BOOL)commitWithUndoTrack: (COUndoTrack *)aTrack
 {
-	return [self commitWithMetadata: nil
-	    restrictedToPersistentRoots: _loadedPersistentRoots.allValues
-	                  withUndoTrack: aTrack
-	                          error: NULL];
+    return [self commitWithMetadata: nil
+        restrictedToPersistentRoots: _loadedPersistentRoots.allValues
+                      withUndoTrack: aTrack
+                              error: NULL];
 }
 
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
 {
-	return [self commitWithMetadata: metadata
-	    restrictedToPersistentRoots: _loadedPersistentRoots.allValues
-	                  withUndoTrack: nil
-	                          error: NULL];
+    return [self commitWithMetadata: metadata
+        restrictedToPersistentRoots: _loadedPersistentRoots.allValues
+                      withUndoTrack: nil
+                              error: NULL];
 }
 
 #pragma mark Notification Handling -
@@ -878,21 +878,21 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
  */
 - (void)distributedStorePersistentRootsDidChange: (NSNotification *)notif
 {
-	// TODO: Write a test to ensure other store notifications are not handled
-	NSDictionary *userInfo = notif.userInfo;
-	NSString *storeURL = userInfo[kCOStoreURL];
-	NSString *storeUUID = userInfo[kCOStoreUUID];
+    // TODO: Write a test to ensure other store notifications are not handled
+    NSDictionary *userInfo = notif.userInfo;
+    NSString *storeURL = userInfo[kCOStoreURL];
+    NSString *storeUUID = userInfo[kCOStoreUUID];
 
-	if ([[_store.UUID stringValue] isEqual: storeUUID]
-	  && [_store.URL.absoluteString isEqual: storeURL])
-	{
-		[self storePersistentRootsDidChange: notif isDistributed: YES];
-	}
+    if ([[_store.UUID stringValue] isEqual: storeUUID]
+      && [_store.URL.absoluteString isEqual: storeURL])
+    {
+        [self storePersistentRootsDidChange: notif isDistributed: YES];
+    }
 }
 
 - (void)storePersistentRootsDidChange: (NSNotification *)notif
 {
-	[self storePersistentRootsDidChange: notif isDistributed: NO];
+    [self storePersistentRootsDidChange: notif isDistributed: NO];
 }
 
 /**
@@ -908,114 +908,114 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
  */
 - (void)storePersistentRootsDidChange: (NSNotification *)notif isDistributed: (BOOL)isDistributed
 {
-	NSDictionary *transactionIDs = notif.userInfo[kCOStorePersistentRootTransactionIDs];
-	NSArray *persistentRootUUIDs = [transactionIDs.allKeys
-		mappedCollectionWithBlock: ^(id uuidString)
-	{
-		return [ETUUID UUIDWithString: uuidString];
-	}];
-	NSArray *deletedPersistentRootUUIDs = [notif.userInfo[kCOStoreDeletedPersistentRoots]
-		mappedCollectionWithBlock: ^(id uuidString)
-	{
-		return [ETUUID UUIDWithString: uuidString];
-	}];
-	NSArray *compactedPersistentRootUUIDs = [notif.userInfo[kCOStoreCompactedPersistentRoots]
-		mappedCollectionWithBlock: ^(id uuidString)
-	{
-		return [ETUUID UUIDWithString: uuidString];
-	}];
-	NSArray *finalizedPersistentRootUUIDs = [notif.userInfo[kCOStoreFinalizedPersistentRoots]
-		mappedCollectionWithBlock: ^(id uuidString)
-	{
-		return [ETUUID UUIDWithString: uuidString];
-	}];
+    NSDictionary *transactionIDs = notif.userInfo[kCOStorePersistentRootTransactionIDs];
+    NSArray *persistentRootUUIDs = [transactionIDs.allKeys
+        mappedCollectionWithBlock: ^(id uuidString)
+    {
+        return [ETUUID UUIDWithString: uuidString];
+    }];
+    NSArray *deletedPersistentRootUUIDs = [notif.userInfo[kCOStoreDeletedPersistentRoots]
+        mappedCollectionWithBlock: ^(id uuidString)
+    {
+        return [ETUUID UUIDWithString: uuidString];
+    }];
+    NSArray *compactedPersistentRootUUIDs = [notif.userInfo[kCOStoreCompactedPersistentRoots]
+        mappedCollectionWithBlock: ^(id uuidString)
+    {
+        return [ETUUID UUIDWithString: uuidString];
+    }];
+    NSArray *finalizedPersistentRootUUIDs = [notif.userInfo[kCOStoreFinalizedPersistentRoots]
+        mappedCollectionWithBlock: ^(id uuidString)
+    {
+        return [ETUUID UUIDWithString: uuidString];
+    }];
 
-	ETAssert(transactionIDs.isEmpty
-		|| (finalizedPersistentRootUUIDs.isEmpty && compactedPersistentRootUUIDs.isEmpty));
+    ETAssert(transactionIDs.isEmpty
+        || (finalizedPersistentRootUUIDs.isEmpty && compactedPersistentRootUUIDs.isEmpty));
 
-	//NSLog(@"%@: Got change notif for persistent root: %@", self, persistentRootUUID);
+    //NSLog(@"%@: Got change notif for persistent root: %@", self, persistentRootUUID);
 
-	BOOL hadChanges = NO;
+    BOOL hadChanges = NO;
 
-	for (ETUUID *persistentRootUUID in persistentRootUUIDs)
-	{
-		COPersistentRoot *loaded = _loadedPersistentRoots[persistentRootUUID];
+    for (ETUUID *persistentRootUUID in persistentRootUUIDs)
+    {
+        COPersistentRoot *loaded = _loadedPersistentRoots[persistentRootUUID];
 
-		if (loaded != nil)
-		{
-			NSNumber *notifTransactionObj = transactionIDs[loaded.UUID.stringValue];
+        if (loaded != nil)
+        {
+            NSNumber *notifTransactionObj = transactionIDs[loaded.UUID.stringValue];
 
-			if (notifTransactionObj == nil)
-			{
-				NSLog(@"Warning, invalid nil transaction id");
-				return;
-			}
+            if (notifTransactionObj == nil)
+            {
+                NSLog(@"Warning, invalid nil transaction id");
+                return;
+            }
 
-			int64_t notifTransaction = notifTransactionObj.longLongValue;
+            int64_t notifTransaction = notifTransactionObj.longLongValue;
 
-			/* When we have committed the changes explicitly, we send
-			   COPersistentRootDidChangeNotification later with
-			   -didCommitWithCommand:persistentRoots: and not now. */
-			if (notifTransaction > loaded.lastTransactionID)
-			{
-				hadChanges = YES;
-				/* Will reload every branch info and ensure each one reports
-				   a correct deletion status (critical to update the cross
-				   persistent root references). Between
-				   -clearBranchesPendingDeletionAndUndeletion and this point,
-				   COBranch.deleted is always NO. */
-				[loaded storePersistentRootDidChange: notif isDistributed: isDistributed];
-				/* When -[COUndoTrack setCurrentNode:] is used or we receive
-				   another application commit notification, we must update other
-				   persistent root references pointing to the loaded one.
-				   However when we have committed the changes explicitly, the
-				   cross persistent root references have already been updated at
-				   commit time, so we have nothing to do (i.e.
-				   notifTransaction > loaded.lastTransactionID is NO). */
-				[self updateCrossPersistentRootReferencesToPersistentRoot: loaded
-				                                                   branch: nil
-				                                                  isFault: loaded.deleted];
-				// TODO: Unload the persistent root when deleted (this represents
-				// an external deletion)
-			}
-		}
-		else if (![deletedPersistentRootUUIDs containsObject: persistentRootUUID])
-		{
-			// The persistent root is not loaded, but it changed in the store.
-			// This occurs when the store is updated directly, usually on another
-			// app commit, synchronization or history navigation with COUndoTrack.
-			//
-			// Clear out any stored transaction ID.
-			[_lastTransactionIDForPersistentRootUUID removeObjectForKey: persistentRootUUID];
-		}
-	}
+            /* When we have committed the changes explicitly, we send
+               COPersistentRootDidChangeNotification later with
+               -didCommitWithCommand:persistentRoots: and not now. */
+            if (notifTransaction > loaded.lastTransactionID)
+            {
+                hadChanges = YES;
+                /* Will reload every branch info and ensure each one reports
+                   a correct deletion status (critical to update the cross
+                   persistent root references). Between
+                   -clearBranchesPendingDeletionAndUndeletion and this point,
+                   COBranch.deleted is always NO. */
+                [loaded storePersistentRootDidChange: notif isDistributed: isDistributed];
+                /* When -[COUndoTrack setCurrentNode:] is used or we receive
+                   another application commit notification, we must update other
+                   persistent root references pointing to the loaded one.
+                   However when we have committed the changes explicitly, the
+                   cross persistent root references have already been updated at
+                   commit time, so we have nothing to do (i.e.
+                   notifTransaction > loaded.lastTransactionID is NO). */
+                [self updateCrossPersistentRootReferencesToPersistentRoot: loaded
+                                                                   branch: nil
+                                                                  isFault: loaded.deleted];
+                // TODO: Unload the persistent root when deleted (this represents
+                // an external deletion)
+            }
+        }
+        else if (![deletedPersistentRootUUIDs containsObject: persistentRootUUID])
+        {
+            // The persistent root is not loaded, but it changed in the store.
+            // This occurs when the store is updated directly, usually on another
+            // app commit, synchronization or history navigation with COUndoTrack.
+            //
+            // Clear out any stored transaction ID.
+            [_lastTransactionIDForPersistentRootUUID removeObjectForKey: persistentRootUUID];
+        }
+    }
 
-	for (ETUUID *persistentRootUUID in compactedPersistentRootUUIDs)
-	{
-		COPersistentRoot *loaded = _loadedPersistentRoots[persistentRootUUID];
+    for (ETUUID *persistentRootUUID in compactedPersistentRootUUIDs)
+    {
+        COPersistentRoot *loaded = _loadedPersistentRoots[persistentRootUUID];
 
-		[loaded storePersistentRootDidChange: notif isDistributed: isDistributed];
-		hadChanges = YES;
-	}
+        [loaded storePersistentRootDidChange: notif isDistributed: isDistributed];
+        hadChanges = YES;
+    }
 
-	for (ETUUID *persistentRootUUID in finalizedPersistentRootUUIDs)
-	{
-		__unused COPersistentRoot *loaded = _loadedPersistentRoots[persistentRootUUID];
+    for (ETUUID *persistentRootUUID in finalizedPersistentRootUUIDs)
+    {
+        __unused COPersistentRoot *loaded = _loadedPersistentRoots[persistentRootUUID];
 
-		// TODO: [self unloadPersistentRoot: loaded]
-		// Temporary hack until we have -unloadPersistentRoot:
-		[_lastTransactionIDForPersistentRootUUID removeObjectForKey: persistentRootUUID];
+        // TODO: [self unloadPersistentRoot: loaded]
+        // Temporary hack until we have -unloadPersistentRoot:
+        [_lastTransactionIDForPersistentRootUUID removeObjectForKey: persistentRootUUID];
 
-		hadChanges = YES;
-	}
+        hadChanges = YES;
+    }
 
-	if (hadChanges)
-	{
-		[[NSNotificationCenter defaultCenter]
-			postNotificationName: COEditingContextDidChangeNotification
-			              object: self
-			            userInfo: nil];
-	}
+    if (hadChanges)
+    {
+        [[NSNotificationCenter defaultCenter]
+            postNotificationName: COEditingContextDidChangeNotification
+                          object: self
+                        userInfo: nil];
+    }
 }
 
 #pragma mark Private Conveniency -
@@ -1023,36 +1023,36 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 - (CORevision *)revisionForRevisionUUID: (ETUUID *)aRevid
                      persistentRootUUID: (ETUUID *)aPersistentRoot
 {
-	return [_revisionCache revisionForRevisionUUID: aRevid
-	                            persistentRootUUID: aPersistentRoot];
+    return [_revisionCache revisionForRevisionUUID: aRevid
+                                persistentRootUUID: aPersistentRoot];
 }
 
 - (COBranch *)branchForUUID: (ETUUID *)aBranch
 {
-	if (aBranch != nil)
-	{
-		ETUUID *prootUUID = [_store persistentRootUUIDForBranchUUID: aBranch];
-		COPersistentRoot *proot = [self persistentRootForUUID: prootUUID];
-		return [proot branchForUUID: aBranch];
-	}
-	return nil;
+    if (aBranch != nil)
+    {
+        ETUUID *prootUUID = [_store persistentRootUUIDForBranchUUID: aBranch];
+        COPersistentRoot *proot = [self persistentRootForUUID: prootUUID];
+        return [proot branchForUUID: aBranch];
+    }
+    return nil;
 }
 
 - (NSNumber *)lastTransactionIDForPersistentRootUUID: (ETUUID *)aUUID
 {
-	return _lastTransactionIDForPersistentRootUUID[aUUID];
+    return _lastTransactionIDForPersistentRootUUID[aUUID];
 }
 
 - (void)setLastTransactionID: (int64_t)lastTransactionID forPersistentRootUUID: (ETUUID *)aUUID
 {
-	_lastTransactionIDForPersistentRootUUID[aUUID] = @(lastTransactionID);
+    _lastTransactionIDForPersistentRootUUID[aUUID] = @(lastTransactionID);
 }
 
 @end
 
 
 NSString *const COEditingContextDidChangeNotification =
-	@"COEditingContextDidChangeNotification";
+    @"COEditingContextDidChangeNotification";
 NSString *const kCOCommandKey = @"kCOCommandKey";
 
 NSString *const COEditingContextDidUnloadPersistentRootsNotification = @"COEditingContextWillUnloadPersistentRootsNotification";

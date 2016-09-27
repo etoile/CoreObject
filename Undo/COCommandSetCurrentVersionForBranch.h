@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  September 2013
-	License:  MIT  (see COPYING)
+    Date:  September 2013
+    License:  MIT  (see COPYING)
  */
 
 #import "COCommand.h"
@@ -14,12 +14,12 @@
     ETUUID *_branchUUID;
     ETUUID *_oldRevisionUUID;
     ETUUID *_newRevisionUUID;
-	
-	ETUUID *_oldHeadRevisionUUID;
+    
+    ETUUID *_oldHeadRevisionUUID;
     ETUUID *_newHeadRevisionUUID;
-	
-	// Non-persistent
-	ETUUID *_currentRevisionBeforeSelectiveApply;
+    
+    // Non-persistent
+    ETUUID *_currentRevisionBeforeSelectiveApply;
 }
 
 

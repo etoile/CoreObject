@@ -15,8 +15,8 @@
 {
     COPersistentRootInfo *docProot;
     COPersistentRootInfo *tagProot;
-	int64_t docProotChangeCount;
-	int64_t tagProotChangeCount;
+    int64_t docProotChangeCount;
+    int64_t tagProotChangeCount;
 }
 @end
 
@@ -58,18 +58,18 @@ static ETUUID *tagUUID;
 {
     SUPERINIT;
     
-	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
     docProot = [txn createPersistentRootWithInitialItemGraph: [self docItemTree]
-														UUID: [ETUUID UUID]
-												  branchUUID: [ETUUID UUID]
-											revisionMetadata: nil];
+                                                        UUID: [ETUUID UUID]
+                                                  branchUUID: [ETUUID UUID]
+                                            revisionMetadata: nil];
     
     tagProot = [txn createPersistentRootWithInitialItemGraph: [self tagItemTreeWithDocProoUUID: docProot.UUID]
-														UUID: [ETUUID UUID]
-												  branchUUID: [ETUUID UUID]
-											revisionMetadata: nil];
-	docProotChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: docProot.UUID];
-	tagProotChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: tagProot.UUID];
+                                                        UUID: [ETUUID UUID]
+                                                  branchUUID: [ETUUID UUID]
+                                            revisionMetadata: nil];
+    docProotChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: docProot.UUID];
+    tagProotChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: tagProot.UUID];
 
     UKTrue([store commitStoreTransaction: txn]);
     
@@ -88,10 +88,10 @@ static ETUUID *tagUUID;
 
 - (void) testDeletion
 {
-	COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-	[txn deletePersistentRoot: docProot.UUID];
-	docProotChangeCount = [txn setOldTransactionID: docProotChangeCount forPersistentRoot: docProot.UUID];
-	UKTrue([store commitStoreTransaction: txn]);
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    [txn deletePersistentRoot: docProot.UUID];
+    docProotChangeCount = [txn setOldTransactionID: docProotChangeCount forPersistentRoot: docProot.UUID];
+    UKTrue([store commitStoreTransaction: txn]);
     
     UKTrue([store finalizeDeletionsForPersistentRoot: docProot.UUID
                                                error: NULL]);

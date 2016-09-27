@@ -90,16 +90,16 @@ static ETUUID *rootUUID;
         // At this point the SQLite database file in dir can be freely modified, but creating files in dir will
         // fail since it's readonly, so creating new persistent roots should fail.
         
-		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-		
-		[txn createPersistentRootWithInitialItemGraph: [self makeInitialItemGraph]
-												 UUID: [ETUUID UUID]
-										   branchUUID: [ETUUID UUID]
-									 revisionMetadata: nil];
+        COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+        
+        [txn createPersistentRootWithInitialItemGraph: [self makeInitialItemGraph]
+                                                 UUID: [ETUUID UUID]
+                                           branchUUID: [ETUUID UUID]
+                                     revisionMetadata: nil];
 #if BACKING_STORES_SHARE_SAME_SQLITE_DB == 1
-		UKTrue([store commitStoreTransaction: txn]);
+        UKTrue([store commitStoreTransaction: txn]);
 #else
-		UKFalse([store commitStoreTransaction: txn]);
+        UKFalse([store commitStoreTransaction: txn]);
 #endif
     }
 
@@ -121,7 +121,7 @@ static ETUUID *rootUUID;
     
     COPersistentRootInfo *info = nil;
     int64_t changeCount;
-	
+    
     @autoreleasepool {
         assert([[NSFileManager defaultManager] createDirectoryAtPath: dir
                                          withIntermediateDirectories: NO
@@ -133,10 +133,10 @@ static ETUUID *rootUUID;
         
         COStoreTransaction *txn = [[COStoreTransaction alloc] init];
         info = [txn createPersistentRootWithInitialItemGraph: [self makeInitialItemGraph]
-														UUID: [ETUUID UUID]
-												  branchUUID: [ETUUID UUID]
-										    revisionMetadata: nil];
-		changeCount = [txn setOldTransactionID: -1 forPersistentRoot: info.UUID];
+                                                        UUID: [ETUUID UUID]
+                                                  branchUUID: [ETUUID UUID]
+                                            revisionMetadata: nil];
+        changeCount = [txn setOldTransactionID: -1 forPersistentRoot: info.UUID];
         UKTrue([store commitStoreTransaction: txn]);
         
         UKNotNil(info);
@@ -163,14 +163,14 @@ static ETUUID *rootUUID;
         COSQLiteStore *store = [[COSQLiteStore alloc] initWithURL: [NSURL fileURLWithPath: dir]];
         
         {
-			COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+            COStoreTransaction *txn = [[COStoreTransaction alloc] init];
             [txn writeRevisionWithModifiedItems: [self makeChangedItemGraph]
-								   revisionUUID: [ETUUID UUID]
-									   metadata: nil
-							   parentRevisionID: info.currentRevisionUUID
-						  mergeParentRevisionID: nil
-							 persistentRootUUID: info.UUID
-									 branchUUID: info.currentBranchUUID];
+                                   revisionUUID: [ETUUID UUID]
+                                       metadata: nil
+                               parentRevisionID: info.currentRevisionUUID
+                          mergeParentRevisionID: nil
+                             persistentRootUUID: info.UUID
+                                     branchUUID: info.currentBranchUUID];
             UKFalse([store commitStoreTransaction: txn]);
         }
         

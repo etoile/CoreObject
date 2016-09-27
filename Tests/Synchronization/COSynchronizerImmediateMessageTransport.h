@@ -16,8 +16,8 @@
  */
 @interface ImmediateMessageTransport : NSObject <MessageTransport>
 {
-	COSynchronizerServer *server;
-	NSMutableDictionary *clientForID;
+    COSynchronizerServer *server;
+    NSMutableDictionary *clientForID;
 }
 
 @end

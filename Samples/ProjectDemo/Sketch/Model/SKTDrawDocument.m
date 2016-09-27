@@ -25,9 +25,9 @@ NSString *SKTDrawDocumentType = @"Apple Sketch Graphic Format";
 + (ETEntityDescription*)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-	
+    
     ETPropertyDescription *graphicsProperty = [ETPropertyDescription descriptionWithName: @"graphics"
-																					type: (id)@"SKTGraphic"];
+                                                                                    type: (id)@"SKTGraphic"];
     [graphicsProperty setMultivalued: YES];
     [graphicsProperty setOrdered: YES];
     [graphicsProperty setOpposite: (id)@"SKTGraphic.document"];
@@ -76,19 +76,19 @@ static int SKTCurrentDrawDocumentVersion = 1;
     NSDictionary *properties = [NSPropertyListSerialization propertyListFromData:data mutabilityOption:NSPropertyListImmutable format:NULL errorDescription:NULL];
     if (!properties && outError) {
 
-	// An NSError has a bunch of parameters that determine how it's presented to the user. We just specify two of them here.
-	NSDictionary *errorUserInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+    // An NSError has a bunch of parameters that determine how it's presented to the user. We just specify two of them here.
+    NSDictionary *errorUserInfo = [NSDictionary dictionaryWithObjectsAndKeys:
 
-	    // This localized description won't be presented to the user, except maybe by -[SKTGraphicView paste:]. It's a good idea to always provide a decent description that's a full sentence.
-	    NSLocalizedStringFromTable(@"Sketch document data could not be read for an unknown reason.", @"ErrorStrings", @"Description of can't-read-Sketch error."), NSLocalizedDescriptionKey,
+        // This localized description won't be presented to the user, except maybe by -[SKTGraphicView paste:]. It's a good idea to always provide a decent description that's a full sentence.
+        NSLocalizedStringFromTable(@"Sketch document data could not be read for an unknown reason.", @"ErrorStrings", @"Description of can't-read-Sketch error."), NSLocalizedDescriptionKey,
 
-	    // This localized failure reason will be presented to the user if we're trying to open a document. NSDocumentController will take it and tack it onto the end of a "The document "so-and-so" could not be opened." message and use the whole thing as an error description. Full sentence!
-	    NSLocalizedStringFromTable(@"An unknown error occured.", @"ErrorStrings", @"Reason for can't-read-Sketch error."), NSLocalizedFailureReasonErrorKey,
-	    
-	    nil];
+        // This localized failure reason will be presented to the user if we're trying to open a document. NSDocumentController will take it and tack it onto the end of a "The document "so-and-so" could not be opened." message and use the whole thing as an error description. Full sentence!
+        NSLocalizedStringFromTable(@"An unknown error occured.", @"ErrorStrings", @"Reason for can't-read-Sketch error."), NSLocalizedFailureReasonErrorKey,
+        
+        nil];
 
-	// In this simple example we know that no one's going to be paying attention to the domain and code that we use here, but don't just fill in junk here. Certainly don't just use NSCocoaErrorDomain and some random error code.
-	*outError = [NSError errorWithDomain:SKTErrorDomain code:SKTReadUnknownError userInfo:errorUserInfo];
+    // In this simple example we know that no one's going to be paying attention to the domain and code that we use here, but don't just fill in junk here. Certainly don't just use NSCocoaErrorDomain and some random error code.
+    *outError = [NSError errorWithDomain:SKTErrorDomain code:SKTReadUnknownError userInfo:errorUserInfo];
 
     }
     return properties;
@@ -135,7 +135,7 @@ static int SKTCurrentDrawDocumentVersion = 1;
 
 - (NSSize)documentSize
 {
-	return [self drawingBoundsForGraphics: [self graphics]].size;
+    return [self drawingBoundsForGraphics: [self graphics]].size;
 }
 
 - (NSData *)TIFFRepresentationForGraphics:(NSArray *)graphics error:(NSError **)outError {
@@ -145,58 +145,58 @@ static int SKTCurrentDrawDocumentVersion = 1;
     NSRect bounds = [self drawingBoundsForGraphics:graphics];
     if (!NSIsEmptyRect(bounds)) {
 
-	// Create a new image and prepare to draw in it. Get the graphics context for it after we lock focus, not before.
-	NSImage *image = [[NSImage alloc] initWithSize:bounds.size];
-	[image setFlipped:YES];
-	[image lockFocus];
-	NSGraphicsContext *currentContext = [NSGraphicsContext currentContext];
+    // Create a new image and prepare to draw in it. Get the graphics context for it after we lock focus, not before.
+    NSImage *image = [[NSImage alloc] initWithSize:bounds.size];
+    [image setFlipped:YES];
+    [image lockFocus];
+    NSGraphicsContext *currentContext = [NSGraphicsContext currentContext];
 
-	// We're not drawing a page image here, just the rectangle that contains the graphics being drawn, so make sure they get drawn in the right place.
-	NSAffineTransform *transform = [NSAffineTransform transform];
-	[transform translateXBy:(0.0f - bounds.origin.x) yBy:(0.0f - bounds.origin.y)];
-	[transform concat];
-	
-	// Draw the graphics back to front.
-	unsigned int graphicIndex = [graphics count];
-	while (graphicIndex-->0) {
+    // We're not drawing a page image here, just the rectangle that contains the graphics being drawn, so make sure they get drawn in the right place.
+    NSAffineTransform *transform = [NSAffineTransform transform];
+    [transform translateXBy:(0.0f - bounds.origin.x) yBy:(0.0f - bounds.origin.y)];
+    [transform concat];
+    
+    // Draw the graphics back to front.
+    unsigned int graphicIndex = [graphics count];
+    while (graphicIndex-->0) {
 
-	    // The only reason a Sketch graphic knows what view it is drawing in is so that it can draw differently when being created or edited or selected. Specify a nil view to tell it to draw in the standard way.
-	    SKTGraphic *graphic = [graphics objectAtIndex:graphicIndex];
-	    [currentContext saveGraphicsState];
-	    [NSBezierPath clipRect:[graphic drawingBounds]];
-	    [graphic drawInView:nil isSelected:NO];
-	    [currentContext restoreGraphicsState];
+        // The only reason a Sketch graphic knows what view it is drawing in is so that it can draw differently when being created or edited or selected. Specify a nil view to tell it to draw in the standard way.
+        SKTGraphic *graphic = [graphics objectAtIndex:graphicIndex];
+        [currentContext saveGraphicsState];
+        [NSBezierPath clipRect:[graphic drawingBounds]];
+        [graphic drawInView:nil isSelected:NO];
+        [currentContext restoreGraphicsState];
 
-	}
+    }
 
-	// We're done drawing.
-	[image unlockFocus];
-	tiffData = [image TIFFRepresentation];
+    // We're done drawing.
+    [image unlockFocus];
+    tiffData = [image TIFFRepresentation];
 
     } else {
 
-	// Regardless of what NSImage supports, Sketch doesn't support the creation of TIFFs that are 0 by 0 pixels. (We have to demonstrate a custom saving error somewhere, and this is an easy place to do it...)
-	tiffData = nil;
+    // Regardless of what NSImage supports, Sketch doesn't support the creation of TIFFs that are 0 by 0 pixels. (We have to demonstrate a custom saving error somewhere, and this is an easy place to do it...)
+    tiffData = nil;
 
-	// Return an error that will be presented to the user by NSDocument if the user was attempting to save to a TIFF file. Notice that we're not allowed to assume that outError!=NULL.
-	// There are lots of places to catch this situation earlier. For example, we could have overridden -writableTypesForSaveOperation: and made it not return NSTIFFPboardType, but then the user would have no idea why TIFF isn't showing up in the save panel's File Format popup. This way we can present a nice descriptive errror message.
-	if (outError) {
+    // Return an error that will be presented to the user by NSDocument if the user was attempting to save to a TIFF file. Notice that we're not allowed to assume that outError!=NULL.
+    // There are lots of places to catch this situation earlier. For example, we could have overridden -writableTypesForSaveOperation: and made it not return NSTIFFPboardType, but then the user would have no idea why TIFF isn't showing up in the save panel's File Format popup. This way we can present a nice descriptive errror message.
+    if (outError) {
 
-	    // An NSError has a bunch of parameters that determine how it's presented to the user. We just specify two of them here.
-	    NSDictionary *errorUserInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+        // An NSError has a bunch of parameters that determine how it's presented to the user. We just specify two of them here.
+        NSDictionary *errorUserInfo = [NSDictionary dictionaryWithObjectsAndKeys:
 
-		// This localized description won't be presented to the user. In code that's more reusable it might be though, so it's a good idea to always provide a decent one that's a full sentence.
-		NSLocalizedStringFromTable(@"A TIFF image could not be made because it would be empty.", @"ErrorStrings", @"Description of can't-make-TIFF error."), NSLocalizedDescriptionKey,
-		
-		// This localized failure reason _will_ be presented to the user. NSDocument will take it and tack it onto the end of a "The document "so-and-so" could not be saved." message and use the whole thing as an error description. Full sentence!
-		NSLocalizedStringFromTable(@"The TIFF image would be empty.", @"ErrorStrings", @"Reason for can't-make-TIFF error."), NSLocalizedFailureReasonErrorKey,
+        // This localized description won't be presented to the user. In code that's more reusable it might be though, so it's a good idea to always provide a decent one that's a full sentence.
+        NSLocalizedStringFromTable(@"A TIFF image could not be made because it would be empty.", @"ErrorStrings", @"Description of can't-make-TIFF error."), NSLocalizedDescriptionKey,
+        
+        // This localized failure reason _will_ be presented to the user. NSDocument will take it and tack it onto the end of a "The document "so-and-so" could not be saved." message and use the whole thing as an error description. Full sentence!
+        NSLocalizedStringFromTable(@"The TIFF image would be empty.", @"ErrorStrings", @"Reason for can't-make-TIFF error."), NSLocalizedFailureReasonErrorKey,
 
-		nil];
+        nil];
 
-	    // In this simple example we know that no one's going to be paying attention to the domain and code that we use here, but don't just fill in junk here. Certainly don't just use NSCocoaErrorDomain and some random error code.
-	    *outError = [NSError errorWithDomain:SKTErrorDomain code:SKTWriteCouldntMakeTIFFError userInfo:errorUserInfo];
+        // In this simple example we know that no one's going to be paying attention to the domain and code that we use here, but don't just fill in junk here. Certainly don't just use NSCocoaErrorDomain and some random error code.
+        *outError = [NSError errorWithDomain:SKTErrorDomain code:SKTWriteCouldntMakeTIFFError userInfo:errorUserInfo];
 
-	}
+    }
     }
     return tiffData;
 
@@ -230,11 +230,11 @@ static int SKTCurrentDrawDocumentVersion = 1;
     NSData *data;
     NSArray *graphics = [self graphics];
     if ([typeName isEqualToString:NSPDFPboardType]) {
-	data = [self PDFRepresentationForGraphics:graphics];
+    data = [self PDFRepresentationForGraphics:graphics];
     } else if ([typeName isEqualToString:NSTIFFPboardType]) {
         data = [self TIFFRepresentationForGraphics:graphics error:outError];
     } else {
-	NSParameterAssert([typeName isEqualToString:SKTDrawDocumentType]);
+    NSParameterAssert([typeName isEqualToString:SKTDrawDocumentType]);
         data = [self drawDocumentDataForGraphics:graphics];
     }
     return data;
@@ -243,7 +243,7 @@ static int SKTCurrentDrawDocumentVersion = 1;
 
 - (void)invalidateGraphic:(SKTGraphic *)graphic
 {
-	// FIXME: call invalidateGraphic: on the graphic view
+    // FIXME: call invalidateGraphic: on the graphic view
 }
 
 - (void)insertGraphic:(SKTGraphic *)graphic atIndex:(unsigned)index {

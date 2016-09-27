@@ -24,11 +24,11 @@
     ETUUID *_uuid;
     FMDatabase *db_;
     BOOL _shareDB;
-	
-	/**
-	 * Can be cached after being read for the first time, since it can never change
-	 */
-	ETUUID *_rootObjectUUID;
+    
+    /**
+     * Can be cached after being read for the first time, since it can never change
+     */
+    ETUUID *_rootObjectUUID;
 }
 
 /**
@@ -64,13 +64,13 @@
                         restrictToItemUUIDs: (NSSet *)itemSet;
 
 - (BOOL) writeItemGraph: (COItemGraph *)anItemTree
-		   revisionUUID: (ETUUID *)aRevisionUUID
-		   withMetadata: (NSDictionary *)metadata
-			 withParent: (int64_t)aParent
-		withMergeParent: (int64_t)aMergeParent
-			 branchUUID: (ETUUID *)aBranchUUID
-	 persistentrootUUID: (ETUUID *)aPersistentRootUUID
-				  error: (NSError **)error;
+           revisionUUID: (ETUUID *)aRevisionUUID
+           withMetadata: (NSDictionary *)metadata
+             withParent: (int64_t)aParent
+        withMergeParent: (int64_t)aMergeParent
+             branchUUID: (ETUUID *)aBranchUUID
+     persistentrootUUID: (ETUUID *)aPersistentRootUUID
+                  error: (NSError **)error;
 
 - (NSIndexSet *) revidsFromRevid: (int64_t)baseRevid toRevid: (int64_t)finalRevid;
 

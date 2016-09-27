@@ -87,9 +87,9 @@ extern NSString * const kCOBranchLabel;
  */
 @interface COBranch : NSObject <COTrack>
 {
-	@private
+    @private
     ETUUID *_UUID;
-	COPersistentRoot *__weak _persistentRoot;
+    COPersistentRoot *__weak _persistentRoot;
     BOOL _isCreated;
     /** 
      * If _isCreated is NO, this is the parent revision to use for the branch.
@@ -98,21 +98,21 @@ extern NSString * const kCOBranchLabel;
      * recorded in _persistentRoot's _savedState, it means the user has reverted
      * to a past revision.
      */
-	ETUUID *_currentRevisionUUID;
-	ETUUID *_headRevisionUUID;
+    ETUUID *_currentRevisionUUID;
+    ETUUID *_headRevisionUUID;
     /**
      * If different than the metadata for this branch in _persistentRoot's 
      * _savedState, then a metadata change is staged for commit.     
      */
     NSMutableDictionary *_metadata;
     BOOL _metadataChanged;
-	BOOL _supportsRevert;
+    BOOL _supportsRevert;
     COObjectGraphContext *_objectGraph;
-	BOOL _shouldMakeEmptyCommit;
+    BOOL _shouldMakeEmptyCommit;
     ETUUID *_parentBranchUUID;
-	NSMutableArray *_revisions;
-	COBranch *_mergingBranch;
-	CORevision *_mergingRevision;
+    NSMutableArray *_revisions;
+    COBranch *_mergingBranch;
+    CORevision *_mergingRevision;
 }
 
 

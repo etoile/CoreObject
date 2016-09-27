@@ -60,18 +60,18 @@ return ret;
 }
 
 - (NSArray*)arrayForQuery:(NSString*)query, ... {
-	va_list args;
-	va_start(args, query);
-	FMResultSet *resultSet = [self executeQuery:query withArgumentsInArray:0x00 orVAList:args];
-	va_end(args);
-	
-	NSMutableArray *result = [NSMutableArray new];
-	while ([resultSet next]) {
-		[result addObject: [resultSet objectForColumnIndex: 0]];
-	}
-	[resultSet close];
-	[resultSet setParentDB:nil];
-	return result;
+    va_list args;
+    va_start(args, query);
+    FMResultSet *resultSet = [self executeQuery:query withArgumentsInArray:0x00 orVAList:args];
+    va_end(args);
+    
+    NSMutableArray *result = [NSMutableArray new];
+    while ([resultSet next]) {
+        [result addObject: [resultSet objectForColumnIndex: 0]];
+    }
+    [resultSet close];
+    [resultSet setParentDB:nil];
+    return result;
 }
 
 //check if table exist in database (patch from OZLB)

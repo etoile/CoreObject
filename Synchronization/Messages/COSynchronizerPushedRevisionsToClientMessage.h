@@ -14,7 +14,7 @@
  */
 @interface COSynchronizerPushedRevisionsToClientMessage : NSObject
 {
-	NSArray *_revisions;
+    NSArray *_revisions;
 }
 
 /** Array of COSynchronizerRevision */

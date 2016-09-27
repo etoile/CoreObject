@@ -27,7 +27,7 @@
         [self setWindowFrameAutosaveName:@"Inspector"];
         needsUpdate = NO;
 #ifdef GNUSTEP
-		[self updateUI];
+        [self updateUI];
 #endif
     }
     return self;
@@ -38,12 +38,12 @@
 }
 
 - (void)setMainWindow:(NSWindow *)mainWindow {
-	// FIXME: get the view
-	_inspectingGraphicView = nil;
-	
+    // FIXME: get the view
+    _inspectingGraphicView = nil;
+    
     needsUpdate = YES;
 #ifdef GNUSTEP
-	[self updateUI];
+    [self updateUI];
 #endif
 }
 
@@ -73,7 +73,7 @@
  * will change to mixed status, which lead chaning of graphics,
  * which then changing the fields in inspector again.
  * So we don't updateUI here */
-//			[self updateUI];
+//          [self updateUI];
 #endif
         }
     }
@@ -83,7 +83,7 @@
     if ([notification object] == _inspectingGraphicView) {
         needsUpdate = YES;
 #ifdef GNUSTEP
-		[self updateUI];
+        [self updateUI];
 #endif
     }
 }
@@ -94,7 +94,7 @@
  * We use '#ifdef GNUSTEP' here to show the difference of implementation.
  */
 #ifndef GNUSTEP
-	[self updateUI];
+    [self updateUI];
 #endif
 }
 

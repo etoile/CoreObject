@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2013 Eric Wasylishen
+    Copyright (C) 2013 Eric Wasylishen
 
-	Date:  December 2013
-	License:  MIT  (see COPYING)
+    Date:  December 2013
+    License:  MIT  (see COPYING)
  */
 
 #import "CORectToString.h"
@@ -11,28 +11,28 @@
 
 + (Class)transformedValueClass
 {
-	return [NSString class];
+    return [NSString class];
 }
 
 + (BOOL)allowsReverseTransformation
 {
-	return YES;
+    return YES;
 }
 
 - (id)transformedValue: (id)value
 {
-	ETAssert([value isKindOfClass: [NSValue class]]);
-	NSValue *nsvalue = value;
+    ETAssert([value isKindOfClass: [NSValue class]]);
+    NSValue *nsvalue = value;
 
-	return NSStringFromRect(nsvalue.rectValue);
+    return NSStringFromRect(nsvalue.rectValue);
 }
 
 - (id)reverseTransformedValue: (id)value
 {
-	ETAssert([value isKindOfClass: [NSString class]]);
-	NSString *string = value;
-	
-	return [NSValue valueWithRect: NSRectFromString(string)];
+    ETAssert([value isKindOfClass: [NSString class]]);
+    NSString *string = value;
+    
+    return [NSValue valueWithRect: NSRectFromString(string)];
 }
 
 @end

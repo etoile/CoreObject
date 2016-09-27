@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  July 2013
-	License:  MIT  (see COPYING)
+    Date:  July 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -170,24 +170,24 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  */
 @interface COObjectGraphContext : NSObject <COItemGraph, COPersistentObjectContext>
 {
-	@private
-	ETModelDescriptionRepository *_modelDescriptionRepository;
-	Class _migrationDriverClass;
-	COBranch *__weak _branch;
-	COPersistentRoot *__weak _persistentRoot;
-	ETUUID *_futureBranchUUID;
+    @private
+    ETModelDescriptionRepository *_modelDescriptionRepository;
+    Class _migrationDriverClass;
+    COBranch *__weak _branch;
+    COPersistentRoot *__weak _persistentRoot;
+    ETUUID *_futureBranchUUID;
     ETUUID *_rootObjectUUID;
-	/** Loaded (or inserted) objects by UUID */
+    /** Loaded (or inserted) objects by UUID */
     NSMutableDictionary *_loadedObjects;
-	/** Item graph exposed during loading (nil once the loading is done) */
-	id <COItemGraph> _loadingItemGraph;
-	NSMutableDictionary *_objectsByAdditionalItemUUIDs;
+    /** Item graph exposed during loading (nil once the loading is done) */
+    id <COItemGraph> _loadingItemGraph;
+    NSMutableDictionary *_objectsByAdditionalItemUUIDs;
     NSMutableSet *_insertedObjectUUIDs;
     NSMutableSet *_updatedObjectUUIDs;
     NSMutableDictionary *_updatedPropertiesByUUID;
-	/** How many commits have been done since last garbage collection */
-	uint64_t _numberOfCommitsSinceLastGC;
-	int _ignoresChangeTrackingNotifications;
+    /** How many commits have been done since last garbage collection */
+    uint64_t _numberOfCommitsSinceLastGC;
+    int _ignoresChangeTrackingNotifications;
 }
 
 

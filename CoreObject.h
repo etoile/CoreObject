@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2012 Quentin Mathe
+    Copyright (C) 2012 Quentin Mathe
 
-	Date:  October 2012
-	License:  MIT  (see COPYING)
+    Date:  October 2012
+    License:  MIT  (see COPYING)
  */
 
 /* Core */

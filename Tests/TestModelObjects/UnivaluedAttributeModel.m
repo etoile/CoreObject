@@ -11,17 +11,17 @@
 
 + (ETEntityDescription*)newEntityDescription
 {
-	ETEntityDescription *entity = [self newBasicEntityDescription];
-	
-	if (![entity.name isEqual: [UnivaluedAttributeModel className]])
-		return entity;
-	
+    ETEntityDescription *entity = [self newBasicEntityDescription];
+    
+    if (![entity.name isEqual: [UnivaluedAttributeModel className]])
+        return entity;
+    
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                  typeName: @"NSString"];
     labelProperty.persistent = YES;
-	
-	entity.propertyDescriptions = @[labelProperty];
-	
+    
+    entity.propertyDescriptions = @[labelProperty];
+    
     return entity;
 }
 

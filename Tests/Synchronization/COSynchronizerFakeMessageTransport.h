@@ -17,11 +17,11 @@
  */
 @interface FakeMessageTransport : NSObject <MessageTransport>
 {
-	COSynchronizerServer *server;
-	NSMutableArray *serverMessages;
-	
-	NSMutableDictionary *clientForID;
-	NSMutableDictionary *clientMessagesForID;
+    COSynchronizerServer *server;
+    NSMutableArray *serverMessages;
+    
+    NSMutableDictionary *clientForID;
+    NSMutableDictionary *clientMessagesForID;
 }
 
 - (void) deliverMessages;

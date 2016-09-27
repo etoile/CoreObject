@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Quentin Mathe
+    Copyright (C) 2013 Quentin Mathe
 
-	Date:  May 2013
-	License:  MIT  (see COPYING)
+    Date:  May 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -51,18 +51,18 @@
  * // For dictionary keys declared with a placeholder element, this means the key-value 
  * // pair in the schema can be instantiated multiple times in the final JSON document.
  * {
- * 	"types" (string - required): 
- * 	{ 
- * 		$commit-type (string): $type-description (string), 
- * 	},
- * 	"descriptors" (string - required): 
- *	{
- *		$commit-name (string):
- * 		{
- *			"type" (string - required): $commit-type,
- * 			"shortDescription" (string - required) : $commit-description,
- *		},
- *	},
+ *  "types" (string - required): 
+ *  { 
+ *      $commit-type (string): $type-description (string), 
+ *  },
+ *  "descriptors" (string - required): 
+ *  {
+ *      $commit-name (string):
+ *      {
+ *          "type" (string - required): $commit-type,
+ *          "shortDescription" (string - required) : $commit-description,
+ *      },
+ *  },
  * }
  * </example>
  *
@@ -130,10 +130,10 @@
  */
 @interface COCommitDescriptor : NSObject
 {
-	@private
-	NSString *_identifier;
-	NSString *_type;
-	NSString *_shortDescription;
+    @private
+    NSString *_identifier;
+    NSString *_type;
+    NSString *_shortDescription;
 }
 
 

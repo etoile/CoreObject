@@ -33,7 +33,7 @@
 {
     SUPERINIT;
     self.operations = [NSMutableArray arrayWithCapacity: 16];
-	_oldTransactionIDForPersistentRootUUID = [[NSMutableDictionary alloc] init];
+    _oldTransactionIDForPersistentRootUUID = [[NSMutableDictionary alloc] init];
     return self;
 }
 
@@ -44,25 +44,25 @@
 
 - (NSArray *) persistentRootUUIDs
 {
-	NSMutableSet *results = [[NSMutableSet alloc] init];
-	for (id <COStoreAction> action in operations)
-	{
-		[results addObject: action.persistentRoot];
-	}
-	return results.allObjects;
+    NSMutableSet *results = [[NSMutableSet alloc] init];
+    for (id <COStoreAction> action in operations)
+    {
+        [results addObject: action.persistentRoot];
+    }
+    return results.allObjects;
 }
 
 - (BOOL) touchesMutableStateForPersistentRootUUID: (ETUUID *)aUUID
 {
-	for (id <COStoreAction> action in operations)
-	{
-		if ([action.persistentRoot isEqual: aUUID]
-			&& ![action isKindOfClass: [COStoreWriteRevision class]])
-		{
-			return YES;
-		}
-	}
-	return NO;
+    for (id <COStoreAction> action in operations)
+    {
+        if ([action.persistentRoot isEqual: aUUID]
+            && ![action isKindOfClass: [COStoreWriteRevision class]])
+        {
+            return YES;
+        }
+    }
+    return NO;
 }
 
 /** @taskunit Transaction ID */
@@ -74,13 +74,13 @@
 
 - (int64_t) oldTransactionIDForPersistentRoot: (ETUUID *)aPersistentRoot
 {
-	return [_oldTransactionIDForPersistentRootUUID[aPersistentRoot] longLongValue];
+    return [_oldTransactionIDForPersistentRootUUID[aPersistentRoot] longLongValue];
 }
 
 - (int64_t) setOldTransactionID: (int64_t)oldID forPersistentRoot: (ETUUID *)aPersistentRoot
 {
-	_oldTransactionIDForPersistentRootUUID[aPersistentRoot] = @(oldID);
-	return oldID + 1;
+    _oldTransactionIDForPersistentRootUUID[aPersistentRoot] = @(oldID);
+    return oldID + 1;
 }
 
 /** @taskunit Revision Writing */
@@ -97,7 +97,7 @@
     NILARG_EXCEPTION_TEST(anItemTree.rootItemUUID);
     NSParameterAssert([aRevisionUUID isKindOfClass: [ETUUID class]]);
     NSParameterAssert(aParent == nil || [aParent isKindOfClass: [ETUUID class]]);
-	NSParameterAssert(aMergeParent == nil || [aMergeParent isKindOfClass: [ETUUID class]]);
+    NSParameterAssert(aMergeParent == nil || [aMergeParent isKindOfClass: [ETUUID class]]);
     NSParameterAssert([aUUID isKindOfClass: [ETUUID class]]);
     NSParameterAssert([branch isKindOfClass: [ETUUID class]]);
     
@@ -129,22 +129,22 @@
  * Convenience method
  */
 - (COPersistentRootInfo *) createPersistentRootCopyWithUUID: (ETUUID *)uuid
-								   parentPersistentRootUUID: (ETUUID *)aParentPersistentRoot
-												 branchUUID: (ETUUID *)aBranchUUID
-										   parentBranchUUID: (ETUUID *)aParentBranch
-										initialRevisionUUID: (ETUUID *)aRevision
+                                   parentPersistentRootUUID: (ETUUID *)aParentPersistentRoot
+                                                 branchUUID: (ETUUID *)aBranchUUID
+                                           parentBranchUUID: (ETUUID *)aParentBranch
+                                        initialRevisionUUID: (ETUUID *)aRevision
 {
     [self createPersistentRootWithUUID: uuid
-				 persistentRootForCopy: aParentPersistentRoot];
+                 persistentRootForCopy: aParentPersistentRoot];
     
     [self createBranchWithUUID: aBranchUUID
-				  parentBranch: aParentBranch
-			   initialRevision: aRevision
-			 forPersistentRoot: uuid];
+                  parentBranch: aParentBranch
+               initialRevision: aRevision
+             forPersistentRoot: uuid];
     
     [self setCurrentBranch: aBranchUUID
-		 forPersistentRoot: uuid];
-	
+         forPersistentRoot: uuid];
+    
     COPersistentRootInfo *plist = [[COPersistentRootInfo alloc] init];
     plist.UUID = uuid;
     plist.deleted = NO;
@@ -158,7 +158,7 @@
         branch.metadata = nil;
         branch.deleted = NO;
         branch.parentBranchUUID = aParentBranch;
-		
+        
         plist.currentBranchUUID = aBranchUUID;
         plist.branchForUUID = @{aBranchUUID : branch};
     }
@@ -178,21 +178,21 @@
     NILARG_EXCEPTION_TEST(persistentRootUUID);
     NILARG_EXCEPTION_TEST(aBranchUUID);
     
-	ETUUID *revisionUUID = [ETUUID UUID];
-	
-	[self writeRevisionWithModifiedItems: contents
-							revisionUUID: revisionUUID
-								metadata: metadata
-						parentRevisionID: nil
-				   mergeParentRevisionID: nil
-					  persistentRootUUID: persistentRootUUID
-							  branchUUID: aBranchUUID];
+    ETUUID *revisionUUID = [ETUUID UUID];
+    
+    [self writeRevisionWithModifiedItems: contents
+                            revisionUUID: revisionUUID
+                                metadata: metadata
+                        parentRevisionID: nil
+                   mergeParentRevisionID: nil
+                      persistentRootUUID: persistentRootUUID
+                              branchUUID: aBranchUUID];
     
     return [self createPersistentRootCopyWithUUID: persistentRootUUID
-						 parentPersistentRootUUID: nil
-									   branchUUID: aBranchUUID
-								 parentBranchUUID: nil
-							  initialRevisionUUID: revisionUUID];
+                         parentPersistentRootUUID: nil
+                                       branchUUID: aBranchUUID
+                                 parentBranchUUID: nil
+                              initialRevisionUUID: revisionUUID];
 }
 
 /** @taskunit Persistent Root Modification */
@@ -210,7 +210,7 @@
 }
 
 - (void) createBranchWithUUID: (ETUUID *)branchUUID
-				 parentBranch: (ETUUID *)aParentBranch
+                 parentBranch: (ETUUID *)aParentBranch
               initialRevision: (ETUUID *)revId
             forPersistentRoot: (ETUUID *)aRoot
 {
@@ -221,7 +221,7 @@
     COStoreCreateBranch *op = [[COStoreCreateBranch alloc] init];
     op.persistentRoot = aRoot;
     op.branch = branchUUID;
-	op.parentBranch = aParentBranch;
+    op.parentBranch = aParentBranch;
     op.initialRevision = revId;
     [self addOperation: op];
 }
@@ -230,7 +230,7 @@
  * All-in-one method for updating the current revision of a persistent root.
  */
 - (void) setCurrentRevision: (ETUUID *)currentRev
-			   headRevision: (ETUUID *)headRev
+               headRevision: (ETUUID *)headRev
                   forBranch: (ETUUID *)aBranch
            ofPersistentRoot: (ETUUID *)aRoot
 {
@@ -240,7 +240,7 @@
     
     COStoreSetCurrentRevision *op = [[COStoreSetCurrentRevision alloc] init];
     op.currentRevision = currentRev;
-	op.headRevision = headRev;
+    op.headRevision = headRev;
     op.branch = aBranch;
     op.persistentRoot = aRoot;
     [self addOperation: op];
@@ -326,24 +326,24 @@
 }
 
 - (ETUUID *) lastSetCurrentRevisionInTransactionForBranch: (ETUUID *)aBranch
-										 ofPersistentRoot: (ETUUID *)aRoot
+                                         ofPersistentRoot: (ETUUID *)aRoot
 {
-	ETUUID *lastSetCurrentRevision = nil;
-	
-	for (id <COStoreAction> action in operations)
-	{
-		if ([action isKindOfClass: [COStoreSetCurrentRevision class]])
-		{
-			COStoreSetCurrentRevision *op = (COStoreSetCurrentRevision *)action;
-			if ([op.persistentRoot isEqual: aRoot]
-				&& [op.branch isEqual: aBranch])
-			{
-				lastSetCurrentRevision = op.currentRevision;
-			}
-		}
-	}
-	
-	return lastSetCurrentRevision;
+    ETUUID *lastSetCurrentRevision = nil;
+    
+    for (id <COStoreAction> action in operations)
+    {
+        if ([action isKindOfClass: [COStoreSetCurrentRevision class]])
+        {
+            COStoreSetCurrentRevision *op = (COStoreSetCurrentRevision *)action;
+            if ([op.persistentRoot isEqual: aRoot]
+                && [op.branch isEqual: aBranch])
+            {
+                lastSetCurrentRevision = op.currentRevision;
+            }
+        }
+    }
+    
+    return lastSetCurrentRevision;
 }
 
 @end

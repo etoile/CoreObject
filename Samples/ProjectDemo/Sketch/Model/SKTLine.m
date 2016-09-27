@@ -11,7 +11,7 @@
 + (ETEntityDescription*)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-	
+    
     ETPropertyDescription *startsAtLowerLeftProperty = [ETPropertyDescription descriptionWithName: @"startsAtLowerLeft"
                                                                                              type: (id)@"Anonymous.NSNumber"];
     [startsAtLowerLeftProperty setPersistent: YES];

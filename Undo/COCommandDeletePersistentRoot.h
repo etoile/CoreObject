@@ -1,15 +1,15 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  September 2013
-	License:  MIT  (see COPYING)
+    Date:  September 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <CoreObject/COCommand.h>
 
 @interface COCommandDeletePersistentRoot : COCommand
 {
-	@private
+    @private
     ETUUID *_initialRevisionID;
 }
 

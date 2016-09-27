@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  September 2013
-	License:  MIT  (see COPYING)
+    Date:  September 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -19,18 +19,18 @@
  */
 @interface COCommandGroup : NSObject <COTrackNode, ETCollection, NSCopying>
 {
-	@private
-	COUndoTrack __weak *_parentUndoTrack;
-	/**
-	 * Not equal to _parentUndoTrack.name if _parentUndoTrack is a pattern track
-	 */
-	NSString *_trackName;
-	NSMutableArray *_contents;
-	NSDictionary *_metadata;
-	ETUUID *_UUID;
-	ETUUID *_parentUUID;
+    @private
+    COUndoTrack __weak *_parentUndoTrack;
+    /**
+     * Not equal to _parentUndoTrack.name if _parentUndoTrack is a pattern track
+     */
+    NSString *_trackName;
+    NSMutableArray *_contents;
+    NSDictionary *_metadata;
+    ETUUID *_UUID;
+    ETUUID *_parentUUID;
     NSDate *_timestamp;
-	int64_t _sequenceNumber;
+    int64_t _sequenceNumber;
 }
 
 
@@ -146,7 +146,7 @@
  * Applies the receiver changes directly to a store transaction.
  */
 - (void) addToStoreTransaction: (COStoreTransaction *)txn
-		  withRevisionMetadata: (NSDictionary *)metadata
+          withRevisionMetadata: (NSDictionary *)metadata
    assumingEditingContextState: (COEditingContext *)ctx;
 
 
@@ -159,7 +159,7 @@
  * undo track.
  */
 - (instancetype) initWithSerializedCommand: (COUndoTrackSerializedCommand *)aCommand
-									 owner: (COUndoTrack *)anOwner NS_DESIGNATED_INITIALIZER;
+                                     owner: (COUndoTrack *)anOwner NS_DESIGNATED_INITIALIZER;
 /**
  * Returns a serialized represention.
  */

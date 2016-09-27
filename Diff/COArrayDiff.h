@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2012 Eric Wasylishen
+    Copyright (C) 2012 Eric Wasylishen
 
-	Date:  March 2012
-	License:  MIT  (see COPYING)
+    Date:  March 2012
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -10,15 +10,15 @@
 @protocol CODiffArraysDelegate
 
 - (void)recordInsertionWithLocation: (NSUInteger)aLocation
-					insertedObjects: (id)anArray
-						   userInfo: (id)info;
+                    insertedObjects: (id)anArray
+                           userInfo: (id)info;
 
 - (void)recordDeletionWithRange: (NSRange)aRange
-					   userInfo: (id)info;
+                       userInfo: (id)info;
 
 - (void)recordModificationWithRange: (NSRange)aRange
-					insertedObjects: (id)anArray
-						   userInfo: (id)info;
+                    insertedObjects: (id)anArray
+                           userInfo: (id)info;
 
 @end
 

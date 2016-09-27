@@ -21,9 +21,9 @@ static float SKTDefaultPasteCascadeDelta = 10.0;
 - (id)initWithFrame:(NSRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-		// HACK: Avoid a commit on every mouse event when the user is dragging the mouse across the color wheel
-		[[NSColorPanel sharedColorPanel] setContinuous: NO];
-		
+        // HACK: Avoid a commit on every mouse event when the user is dragging the mouse across the color wheel
+        [[NSColorPanel sharedColorPanel] setContinuous: NO];
+        
         NSMutableArray *dragTypes = [NSMutableArray arrayWithObjects:NSColorPboardType, NSFilenamesPboardType, nil];
         [dragTypes addObjectsFromArray:[NSImage imagePasteboardTypes]];
         [self registerForDraggedTypes:dragTypes];
@@ -49,43 +49,43 @@ static float SKTDefaultPasteCascadeDelta = 10.0;
 }
 
 - (void)dealloc {
-	[[NSNotificationCenter defaultCenter] removeObserver: self];
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
     [self endEditing];
 }
 
 - (DrawingController*)drawingController
 {
-	return _drawingController;
+    return _drawingController;
 }
 - (void)setDrawingController: (DrawingController*)c
 {
-	_drawingController = c;
-	
-	[self objectGraphContextDidSwitch];
+    _drawingController = c;
+    
+    [self objectGraphContextDidSwitch];
 }
 
 - (void) objectGraphContextDidSwitch
 {
-	[[NSNotificationCenter defaultCenter] removeObserver: self];
-	
-	[[NSNotificationCenter defaultCenter] addObserver: self
-											 selector: @selector(objectGraphContextDidRelinquishObjects:)
-												 name: COObjectGraphContextWillRelinquishObjectsNotification
-											   object: _drawingController.objectGraphContext];
-	
-	[self clearCachedObjects];
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(objectGraphContextDidRelinquishObjects:)
+                                                 name: COObjectGraphContextWillRelinquishObjectsNotification
+                                               object: _drawingController.objectGraphContext];
+    
+    [self clearCachedObjects];
 }
 
 - (void) objectGraphContextDidRelinquishObjects: (NSNotification *)notif
 {
-	[self clearCachedObjects];
+    [self clearCachedObjects];
 }
 
 - (void) clearCachedObjects
 {
-	_editingGraphic = nil;
-	_creatingGraphic = nil;
-	[_selectedGraphics removeAllObjects];
+    _editingGraphic = nil;
+    _creatingGraphic = nil;
+    [_selectedGraphics removeAllObjects];
 }
 
 - (SKTDrawDocument *)drawDocument {
@@ -368,28 +368,28 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
 
 - (NSArray *)descriptionArgsForGraphic: (SKTGraphic *)graphic
 {
-	NSString *localized = NSLocalizedString(NSStringFromClass([graphic class]), @"");
+    NSString *localized = NSLocalizedString(NSStringFromClass([graphic class]), @"");
 
-	if (localized == nil)
-		localized = @"Shape";
-	
-	return @[localized];
+    if (localized == nil)
+        localized = @"Shape";
+    
+    return @[localized];
 }
 
 - (NSArray *)descriptionArgsForGraphics: (NSArray *)graphics
 {
-	if ([graphics count] == 0)
-	{
-		return @[@"No Shapes"];
-	}
-	else if ([graphics count] == 1)
-	{
-		return [self descriptionArgsForGraphic: graphics[0]];
-	}
-	else
-	{
-		return @[@"Multiple Shapes"];
-	}
+    if ([graphics count] == 0)
+    {
+        return @[@"No Shapes"];
+    }
+    else if ([graphics count] == 1)
+    {
+        return [self descriptionArgsForGraphic: graphics[0]];
+    }
+    else
+    {
+        return @[@"Multiple Shapes"];
+    }
 }
 
 - (void)createGraphicOfClass:(Class)theClass withEvent:(NSEvent *)theEvent {
@@ -402,15 +402,15 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
             [self startEditingGraphic:_creatingGraphic withEvent:nil ];
         }
         [_drawingController commitWithIdentifier: @"draw-shape"
-							descriptionArguments: [self descriptionArgsForGraphic: _creatingGraphic]];
+                            descriptionArguments: [self descriptionArgsForGraphic: _creatingGraphic]];
     }
-	else
-	{
-		_creatingGraphic = nil;
-		
-		// This is necessary so the _creatingGraphic created above doesn't get persisted in the next commit
-		[_drawingController.objectGraphContext discardAllChanges];
-	}
+    else
+    {
+        _creatingGraphic = nil;
+        
+        // This is necessary so the _creatingGraphic created above doesn't get persisted in the next commit
+        [_drawingController.objectGraphContext discardAllChanges];
+    }
 }
 
 - (SKTGraphic *)creatingGraphic {
@@ -451,7 +451,7 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
     [graphic stopBoundsManipulation];
 
     [_drawingController commitWithIdentifier: @"resize-shape"
-						descriptionArguments: [self descriptionArgsForGraphic: graphic]];
+                        descriptionArguments: [self descriptionArgsForGraphic: graphic]];
 }
 
 - (void)rubberbandSelectWithEvent:(NSEvent *)theEvent {
@@ -578,7 +578,7 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
         if (didMove) {
             // Only if we really moved.
             [_drawingController commitWithIdentifier: @"move-shape"
-								descriptionArguments: [self descriptionArgsForGraphics: selGraphics]];
+                                descriptionArguments: [self descriptionArgsForGraphics: selGraphics]];
         }
     }
 }
@@ -841,7 +841,7 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
             [curGraphic setDrawsFill:YES];
         }
         [_drawingController commitWithIdentifier: @"change-shape-color"
-							descriptionArguments: [self descriptionArgsForGraphics: selGraphics]];
+                            descriptionArguments: [self descriptionArgsForGraphics: selGraphics]];
     }
 }
 
@@ -860,7 +860,7 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
         [[self drawDocument] performSelector:@selector(removeGraphic:) withEachObjectInArray:selCopy];
 
         [_drawingController commitWithIdentifier: @"delete-shape"
-							descriptionArguments: [self descriptionArgsForGraphics: selCopy]];
+                            descriptionArguments: [self descriptionArgsForGraphics: selCopy]];
     }
 }
 
@@ -1147,46 +1147,46 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
     if (type) {
         if ([type isEqualToString:SKTDrawDocumentType]) {
 
-	    // You can't trust anything that might have been put on the pasteboard by another application, so be ready for -[SKTDrawDocument drawDocumentDictionaryFromData:error:] to fail and return nil.
-	    NSError *error;
-	    SKTDrawDocument *document = [self drawDocument];
+        // You can't trust anything that might have been put on the pasteboard by another application, so be ready for -[SKTDrawDocument drawDocumentDictionaryFromData:error:] to fail and return nil.
+        NSError *error;
+        SKTDrawDocument *document = [self drawDocument];
             NSDictionary *docDict = [document drawDocumentDictionaryFromData:[pboard dataForType:type] error:&error];
-	    if (docDict) {
-		NSArray *array = [document graphicsFromDrawDocumentDictionary:docDict];
-		int i = [array count];
-		int currentChangeCount = [pboard changeCount];
-		
-		if (_pasteboardChangeCount != currentChangeCount) {
-		    _pasteboardChangeCount = currentChangeCount;
-		    _pasteCascadeNumber = 0;
-		    _pasteCascadeDelta = NSMakePoint(SKTDefaultPasteCascadeDelta, SKTDefaultPasteCascadeDelta);
-		}
+        if (docDict) {
+        NSArray *array = [document graphicsFromDrawDocumentDictionary:docDict];
+        int i = [array count];
+        int currentChangeCount = [pboard changeCount];
+        
+        if (_pasteboardChangeCount != currentChangeCount) {
+            _pasteboardChangeCount = currentChangeCount;
+            _pasteCascadeNumber = 0;
+            _pasteCascadeDelta = NSMakePoint(SKTDefaultPasteCascadeDelta, SKTDefaultPasteCascadeDelta);
+        }
 
-		if (i > 0) {
-		    id curGraphic;
-		    NSPoint savedPasteCascadeDelta = _pasteCascadeDelta;
-		    
-		    [self clearSelection];
-		    while (i-- > 0) {
-			curGraphic = [array objectAtIndex:i];
-			if (_pasteCascadeNumber > 0) {
-			    [curGraphic moveBy:NSMakePoint(_pasteCascadeNumber * savedPasteCascadeDelta.x, _pasteCascadeNumber * savedPasteCascadeDelta.y)];
-			}
-			[document insertGraphic:curGraphic atIndex:0];
-			[self selectGraphic:curGraphic];
-		    }
-		    _pasteCascadeNumber++;
-		    _pasteCascadeDelta = savedPasteCascadeDelta;
-		    //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Paste", @"UndoStrings", @"Action name for paste.")];
-		}
-	    } else {
+        if (i > 0) {
+            id curGraphic;
+            NSPoint savedPasteCascadeDelta = _pasteCascadeDelta;
+            
+            [self clearSelection];
+            while (i-- > 0) {
+            curGraphic = [array objectAtIndex:i];
+            if (_pasteCascadeNumber > 0) {
+                [curGraphic moveBy:NSMakePoint(_pasteCascadeNumber * savedPasteCascadeDelta.x, _pasteCascadeNumber * savedPasteCascadeDelta.y)];
+            }
+            [document insertGraphic:curGraphic atIndex:0];
+            [self selectGraphic:curGraphic];
+            }
+            _pasteCascadeNumber++;
+            _pasteCascadeDelta = savedPasteCascadeDelta;
+            //[[self undoManager] setActionName:NSLocalizedStringFromTable(@"Paste", @"UndoStrings", @"Action name for paste.")];
+        }
+        } else {
 
-		// Something went wrong? Present the error to the user in a sheet. It was entirely -[NSDocument drawDocumentDictionaryFromData:error:]'s responsibility to set error to something when it returned nil. It was also entirely responsible for not crashing if we had passed in error:NULL.
-		[self presentError:error modalForWindow:[self window] delegate:nil didPresentSelector:NULL contextInfo:NULL];
+        // Something went wrong? Present the error to the user in a sheet. It was entirely -[NSDocument drawDocumentDictionaryFromData:error:]'s responsibility to set error to something when it returned nil. It was also entirely responsible for not crashing if we had passed in error:NULL.
+        [self presentError:error modalForWindow:[self window] delegate:nil didPresentSelector:NULL contextInfo:NULL];
 
-	    }
+        }
 
-	} else if ([type isEqualToString:NSFilenamesPboardType]) {
+    } else if ([type isEqualToString:NSFilenamesPboardType]) {
             NSArray *filenames = [pboard propertyListForType:NSFilenamesPboardType];
             if ([filenames count] == 1) {
                 NSString *filename = [filenames objectAtIndex:0];
@@ -1319,8 +1319,8 @@ static NSInteger SKT_orderGraphicsFrontToBack(id graphic1, id graphic2, void *gA
 }
 
 - (void)setGridColor:(NSColor *)color {
-	_gridColor = color;
-	[self setNeedsDisplay:YES];
+    _gridColor = color;
+    [self setNeedsDisplay:YES];
 }
 
 @end

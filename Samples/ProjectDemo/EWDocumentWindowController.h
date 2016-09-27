@@ -9,39 +9,39 @@
 
 @interface EWDocumentWindowController : NSWindowController <NSWindowDelegate, EWUndoManagerDelegate>
 {
-	/**
-	 * Is this the primary window for the persistent root?
-	 * Only the primary window can track the current branch (UI decision).
-	 */
-	BOOL _isPrimaryWindow;
-	COPersistentRoot *_persistentRoot;
-	/**
-	 * If nil, track the current branch.
-	 */
-	COBranch *_pinnedBranch;
-	NSString *_windowID;
-	NSDrawer *_sharingDrawer;
-	SharingDrawerViewController *_sharingDrawerViewController;
-	
-	// UI stuff
-	
-	IBOutlet NSPopUpButton *branchesPopUpButton;
-	IBOutlet NSButton *defaultBranchCheckBox;
-	
-	COUndoTrack *_undoTrack;
-	
-	EWUndoManager *undoManagerBridge;
-	
-	ProjectDemoHistoryWindowController *historyWindowController;
+    /**
+     * Is this the primary window for the persistent root?
+     * Only the primary window can track the current branch (UI decision).
+     */
+    BOOL _isPrimaryWindow;
+    COPersistentRoot *_persistentRoot;
+    /**
+     * If nil, track the current branch.
+     */
+    COBranch *_pinnedBranch;
+    NSString *_windowID;
+    NSDrawer *_sharingDrawer;
+    SharingDrawerViewController *_sharingDrawerViewController;
+    
+    // UI stuff
+    
+    IBOutlet NSPopUpButton *branchesPopUpButton;
+    IBOutlet NSButton *defaultBranchCheckBox;
+    
+    COUndoTrack *_undoTrack;
+    
+    EWUndoManager *undoManagerBridge;
+    
+    ProjectDemoHistoryWindowController *historyWindowController;
 }
 
 - (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
-											 windowID: (NSString*)windowID
-										windowNibName: (NSString *)nibName;
+                                             windowID: (NSString*)windowID
+                                        windowNibName: (NSString *)nibName;
 
 - (instancetype) initPinnedToBranch: (COBranch *)aBranch
-						   windowID: (NSString*)windowID
-					  windowNibName: (NSString *)nibName;
+                           windowID: (NSString*)windowID
+                      windowNibName: (NSString *)nibName;
 
 /**
  * Unique identifier for this window

@@ -3,9 +3,9 @@
 @class DDListEnumerator;
 
 struct DDListNode {
-	void * element;
-	struct DDListNode * prev;
-	struct DDListNode * next;
+    void * element;
+    struct DDListNode * prev;
+    struct DDListNode * next;
 };
 typedef struct DDListNode DDListNode;
 
@@ -24,8 +24,8 @@ typedef struct DDListNode DDListNode;
 **/
 @interface DDList : NSObject <NSFastEnumeration>
 {
-	DDListNode *listHead;
-	DDListNode *listTail;
+    DDListNode *listHead;
+    DDListNode *listTail;
 }
 
 - (void)add:(void *)element;
@@ -48,9 +48,9 @@ typedef struct DDListNode DDListNode;
 
 @interface DDListEnumerator : NSObject
 {
-	NSUInteger numElements;
-	NSUInteger currentElementIndex;
-	void **elements;
+    NSUInteger numElements;
+    NSUInteger currentElementIndex;
+    void **elements;
 }
 
 - (NSUInteger)numTotal;

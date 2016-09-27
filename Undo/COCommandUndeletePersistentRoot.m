@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  September 2013
-	License:  MIT  (see COPYING)
+    Date:  September 2013
+    License:  MIT  (see COPYING)
  */
 
 #import "COCommandUndeletePersistentRoot.h"
@@ -29,7 +29,7 @@
 
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
 {
-	NILARG_EXCEPTION_TEST(aContext);
+    NILARG_EXCEPTION_TEST(aContext);
     if (nil == [aContext persistentRootForUUID: _persistentRootUUID])
     {
         return NO;
@@ -39,18 +39,18 @@
 
 - (void) applyToContext: (COEditingContext *)aContext
 {
-	NILARG_EXCEPTION_TEST(aContext);
+    NILARG_EXCEPTION_TEST(aContext);
     [[aContext persistentRootForUUID: _persistentRootUUID] setDeleted: NO];
 }
 
 - (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
 {
-	[txn undeletePersistentRoot: _persistentRootUUID];
+    [txn undeletePersistentRoot: _persistentRootUUID];
 }
 
 - (NSString *)kind
 {
-	return _(@"Persistent Root Undeletion");
+    return _(@"Persistent Root Undeletion");
 }
 
 @end
@@ -65,10 +65,10 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 - (instancetype) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
     self = [super initWithPropertyList: plist parentUndoTrack: aParent];
-	if (self == nil)
-		return nil;
+    if (self == nil)
+        return nil;
 
-   	_initialRevisionID = [ETUUID UUIDWithString: plist[kCOCommandInitialRevisionID]];
+    _initialRevisionID = [ETUUID UUIDWithString: plist[kCOCommandInitialRevisionID]];
     return self;
 }
 
@@ -82,19 +82,19 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 - (COCommand *) inverse
 {
     COCommandDeletePersistentRoot *inverse = (id)super.inverse;
-	inverse.initialRevisionID = _initialRevisionID;
+    inverse.initialRevisionID = _initialRevisionID;
     return inverse;
 }
 
 - (NSString *)kind
 {
-	return _(@"Persistent Root Creation");
+    return _(@"Persistent Root Creation");
 }
 
 - (CORevision *)revision
 {
-	return [_parentUndoTrack.editingContext revisionForRevisionUUID: _initialRevisionID
-												 persistentRootUUID: _persistentRootUUID];
+    return [_parentUndoTrack.editingContext revisionForRevisionUUID: _initialRevisionID
+                                                 persistentRootUUID: _persistentRootUUID];
 }
 
 #pragma mark -
@@ -102,23 +102,23 @@ static NSString * const kCOCommandInitialRevisionID = @"COCommandInitialRevision
 
 - (NSDictionary *)metadata
 {
-	return self.revision.metadata;
+    return self.revision.metadata;
 }
 
 - (NSDate *)date
 {
-	return self.revision.date;
+    return self.revision.date;
 }
 
 - (NSString *)localizedShortDescription
 {
-	return self.revision.localizedShortDescription;
+    return self.revision.localizedShortDescription;
 }
 
 - (id) copyWithZone:(NSZone *)zone
 {
     COCommandCreatePersistentRoot *aCopy = [super copyWithZone: zone];
-	aCopy->_initialRevisionID = _initialRevisionID;
+    aCopy->_initialRevisionID = _initialRevisionID;
     return aCopy;
 }
 

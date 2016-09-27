@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2012 Eric Wasylishen
+    Copyright (C) 2012 Eric Wasylishen
 
-	Date:  March 2012
-	License:  MIT  (see COPYING)
+    Date:  March 2012
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -15,9 +15,9 @@
 
 @interface COItemGraphEdit : NSObject <NSCopying>
 {
-	ETUUID *UUID;
-	NSString *attribute;
-	id sourceIdentifier;
+    ETUUID *UUID;
+    NSString *attribute;
+    id sourceIdentifier;
 }
 
 @property (readonly, nonatomic) ETUUID *UUID;
@@ -30,7 +30,7 @@
 - (BOOL) isEqualIgnoringSourceIdentifier: (id)other;
 
 - (instancetype) initWithUUID: (ETUUID *)aUUID
-		  attribute: (NSString *)anAttribute
+          attribute: (NSString *)anAttribute
    sourceIdentifier: (id)aSourceIdentifier NS_DESIGNATED_INITIALIZER;
 
 // information

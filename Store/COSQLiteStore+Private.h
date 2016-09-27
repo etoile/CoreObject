@@ -28,7 +28,7 @@
                              branchUUID: (ETUUID*)branch;
 
 - (COSQLiteStorePersistentRootBackingStore *) backingStoreForPersistentRootUUID: (ETUUID *)aUUID
-															 createIfNotPresent: (BOOL)createIfNotPresent;
+                                                             createIfNotPresent: (BOOL)createIfNotPresent;
 
 
 - (void) testingRunBlockInStoreQueue: (void (^)())aBlock;

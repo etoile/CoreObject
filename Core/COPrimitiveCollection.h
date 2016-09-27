@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen
+    Copyright (C) 2013 Eric Wasylishen
 
-	Date:  December 2013
-	License:  MIT  (see COPYING)
+    Date:  December 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -12,8 +12,8 @@
 
 @interface COWeakRef : NSObject
 {
-	@public
-	__weak COObject *_object;
+    @public
+    __weak COObject *_object;
 }
 
 - (instancetype)initWithObject: (COObject *)anObject NS_DESIGNATED_INITIALIZER;
@@ -30,11 +30,11 @@
 
 @interface COMutableSet : NSMutableSet <COPrimitiveCollection>
 {
-	@public
-	BOOL _permanentlyMutable;
-	int _temporaryMutable;
-	NSHashTable *_backing;
-	NSHashTable *_deadReferences;
+    @public
+    BOOL _permanentlyMutable;
+    int _temporaryMutable;
+    NSHashTable *_backing;
+    NSHashTable *_deadReferences;
 }
 - (void)addReference: (id)aReference;
 - (void)removeReference: (id)aReference;
@@ -61,14 +61,14 @@
 @interface COMutableArray : NSMutableArray <COPrimitiveCollection>
 {
 @public
-	BOOL _permanentlyMutable;
-	int _temporaryMutable;
-	NSPointerArray *_backing;
-	/**
-	 * Array of integers, the ith entry gives the backing index for
-	 * "external" index i.
-	 */
-	NSPointerArray *_externalIndexToBackingIndex;
+    BOOL _permanentlyMutable;
+    int _temporaryMutable;
+    NSPointerArray *_backing;
+    /**
+     * Array of integers, the ith entry gives the backing index for
+     * "external" index i.
+     */
+    NSPointerArray *_externalIndexToBackingIndex;
 }
 
 @property (nonatomic, readonly) NSPointerArray *backing;
@@ -91,20 +91,20 @@
 
 @interface COUnsafeRetainedMutableArray : COMutableArray
 {
-	// TODO: Replace with custom acquire/relinquish functions to retain/release
-	// COPath references as necessary
-	NSMutableSet *_deadReferences;
-	NSHashTable *_backingHashTable;
+    // TODO: Replace with custom acquire/relinquish functions to retain/release
+    // COPath references as necessary
+    NSMutableSet *_deadReferences;
+    NSHashTable *_backingHashTable;
 }
 @end
 
 @interface COMutableDictionary : NSMutableDictionary <COPrimitiveCollection>
 {
-	@public
-	BOOL _permanentlyMutable;
-	int _temporaryMutable;
-	NSMutableDictionary *_backing;
-	NSMutableSet *_deadKeys;
+    @public
+    BOOL _permanentlyMutable;
+    int _temporaryMutable;
+    NSMutableDictionary *_backing;
+    NSMutableSet *_deadKeys;
 }
 - (void)setReference: (id)aReference forKey: (id <NSCopying>)aKey;
 @end

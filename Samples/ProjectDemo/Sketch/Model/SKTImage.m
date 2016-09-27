@@ -9,7 +9,7 @@
 + (ETEntityDescription*)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-	
+    
     // FIXME: image data property    
     return entity;
 }
@@ -77,9 +77,9 @@
                 }
 
                 [image drawInRect: NSMakeRect(0.0, 0.0, bounds.size.width, bounds.size.height)
-				         fromRect: NSZeroRect
-				        operation: NSCompositeSourceOver
-				         fraction: 1.0];
+                         fromRect: NSZeroRect
+                        operation: NSCompositeSourceOver
+                         fraction: 1.0];
                 [_cachedImage unlockFocus];
             }
         }

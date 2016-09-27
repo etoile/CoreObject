@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2012 Quentin Mathe
+    Copyright (C) 2012 Quentin Mathe
 
-	Date:  May 2012
-	License:  MIT  (see COPYING)
+    Date:  May 2012
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -26,9 +26,9 @@
  */
 @interface COError : NSError
 {
-	@private
-	ETValidationResult *validationResult;
-	NSArray *errors;
+    @private
+    ETValidationResult *validationResult;
+    NSArray *errors;
 }
 
 

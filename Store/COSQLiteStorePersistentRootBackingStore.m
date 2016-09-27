@@ -22,10 +22,10 @@
 #import "CODateSerialization.h"
 #import "COJSONSerialization.h"
 #ifdef GNUSTEP
-#	include <openssl/sha.h>
+#   include <openssl/sha.h>
 #else
-#	include <CommonCrypto/CommonDigest.h>
-#	define SHA1 CC_SHA1
+#   include <CommonCrypto/CommonDigest.h>
+#   define SHA1 CC_SHA1
 #endif
 
 /**
@@ -74,8 +74,8 @@
                       useStoreDB: (BOOL)share
                            error: (NSError **)error
 {
-	NILARG_EXCEPTION_TEST(aUUID);
-	NILARG_EXCEPTION_TEST(store);
+    NILARG_EXCEPTION_TEST(aUUID);
+    NILARG_EXCEPTION_TEST(store);
     SUPERINIT;
     
     _shareDB = share;
@@ -111,47 +111,47 @@
             }
         }
     }
-	
-	[self beginTransaction];
-	
-	// N.B. UNIQUE constraint on uuid gives it an index automatically.
+    
+    [self beginTransaction];
+    
+    // N.B. UNIQUE constraint on uuid gives it an index automatically.
     [db_ executeUpdate: [NSString stringWithFormat:
                          @"CREATE TABLE IF NOT EXISTS %@ (revid INTEGER PRIMARY KEY ASC, "
                          "contents BLOB, hash BLOB, metadata BLOB, timestamp INTEGER, parent INTEGER, mergeparent INTEGER, branchuuid BLOB, persistentrootuuid BLOB, deltabase INTEGER, "
                          "bytesInDeltaRun INTEGER, garbage BOOLEAN, uuid BLOB NOT NULL UNIQUE)", [self tableName]]];
 
-	// This table always contains exactly one row
-	[db_ executeUpdate: [NSString stringWithFormat:
-						 @"CREATE TABLE IF NOT EXISTS %@ (root BLOB NOT NULL CHECK (length(root) = 16))", [self metadataTableName]]];
-	
-	[self commit];
-	
-	// FIXME: -hadError only looks at the success of the last statement.
+    // This table always contains exactly one row
+    [db_ executeUpdate: [NSString stringWithFormat:
+                         @"CREATE TABLE IF NOT EXISTS %@ (root BLOB NOT NULL CHECK (length(root) = 16))", [self metadataTableName]]];
+    
+    [self commit];
+    
+    // FIXME: -hadError only looks at the success of the last statement.
     if ([db_ hadError])
     {
-		NSLog(@"Error %d: %@", [db_ lastErrorCode], [db_ lastErrorMessage]);
-		return nil;
-	}
+        NSLog(@"Error %d: %@", [db_ lastErrorCode], [db_ lastErrorMessage]);
+        return nil;
+    }
 
-	return self;
+    return self;
 }
 
 - (instancetype)init
 {
-	return [self initWithPersistentRootUUID: nil store: nil useStoreDB: NO error: NULL];
+    return [self initWithPersistentRootUUID: nil store: nil useStoreDB: NO error: NULL];
 }
 
 - (void) clearBackingStore
 {
-	[self beginTransaction];
-	[db_ executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@", [self tableName]]];
-	[db_ executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@", [self metadataTableName]]];
-	ETAssert([self commit]);
+    [self beginTransaction];
+    [db_ executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@", [self tableName]]];
+    [db_ executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@", [self metadataTableName]]];
+    ETAssert([self commit]);
 }
 
 - (ETUUID *) UUID
 {
-	return _uuid;
+    return _uuid;
 }
 
 - (BOOL)close
@@ -209,8 +209,8 @@
 - (ETUUID *) revisionUUIDForRevid: (int64_t)aRevid
 {
     NSData *revUUID = [db_ dataForQuery:
-					   [NSString stringWithFormat: @"SELECT uuid FROM %@ WHERE revid = ?", [self tableName]],
-					   @(aRevid)];
+                       [NSString stringWithFormat: @"SELECT uuid FROM %@ WHERE revid = ?", [self tableName]],
+                       @(aRevid)];
     
     if (revUUID != nil)
     {
@@ -228,8 +228,8 @@
     FMResultSet *rs = [db_ executeQuery:
                        [NSString stringWithFormat: @"SELECT parent, mergeparent, branchuuid, persistentrootuuid, metadata, timestamp FROM %@ WHERE uuid = ?", [self tableName]],
                        [aRevisionUUID dataValue]];
-	if ([rs next])
-	{
+    if ([rs next])
+    {
         // N.B.: Watch for null being returned as 0
         int64_t parent = [rs longLongIntForColumnIndex: 0];
         int64_t mergeparent = [rs longLongIntForColumnIndex: 1];
@@ -238,18 +238,18 @@
         result.revisionUUID = aRevisionUUID;
         result.parentRevisionUUID = [self revisionUUIDForRevid: parent];
         result.mergeParentRevisionUUID = [self revisionUUIDForRevid: mergeparent];
-		result.branchUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]];
-		result.persistentRootUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 3]];
+        result.branchUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 2]];
+        result.persistentRootUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 3]];
         NSData *data = [rs dataForColumnIndex: 4];
         if (data != nil)
         {
             result.metadata = COJSONObjectWithData(data, NULL);
         }
         result.date = CODateFromJavaTimestamp([rs numberForColumnIndex: 5]);
-	}
+    }
     [rs close];
     
-	return result;
+    return result;
 }
 
 - (int64_t) revidForUUID: (ETUUID *)aUUID
@@ -265,35 +265,35 @@
 
 - (NSIndexSet *)revidsForUUIDs: (NSArray *)UUIDs
 {
-	NSSet *UUIDDataValues = (id)[[[NSSet setWithArray: UUIDs] mappedCollection] dataValue];
-	NSMutableIndexSet *revids = [NSMutableIndexSet new];
-	FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
-		@"SELECT revid, uuid FROM %@", [self tableName]]];
+    NSSet *UUIDDataValues = (id)[[[NSSet setWithArray: UUIDs] mappedCollection] dataValue];
+    NSMutableIndexSet *revids = [NSMutableIndexSet new];
+    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
+        @"SELECT revid, uuid FROM %@", [self tableName]]];
 
-	while ([rs next])
-	{
-		if ([UUIDDataValues containsObject: [rs dataForColumnIndex: 1]])
-		{
-			[revids addIndex: [rs int64ForColumnIndex: 0]];
-		}
-	}
-	[rs close];
+    while ([rs next])
+    {
+        if ([UUIDDataValues containsObject: [rs dataForColumnIndex: 1]])
+        {
+            [revids addIndex: [rs int64ForColumnIndex: 0]];
+        }
+    }
+    [rs close];
 
-	return revids;
+    return revids;
 }
 
 - (ETUUID *) rootUUID
 {
-	if (_rootObjectUUID == nil)
-	{
-		FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat: @"SELECT root FROM %@", [self metadataTableName]]];
-		if ([rs next])
-		{
-			_rootObjectUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
-		}
-		[rs close];
+    if (_rootObjectUUID == nil)
+    {
+        FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat: @"SELECT root FROM %@", [self metadataTableName]]];
+        if ([rs next])
+        {
+            _rootObjectUUID = [ETUUID UUIDWithData: [rs dataForColumnIndex: 0]];
+        }
+        [rs close];
     }
-	return _rootObjectUUID;
+    return _rootObjectUUID;
 }
 
 
@@ -330,15 +330,15 @@
         
         const int64_t revid = [rs longLongIntForColumnIndex: 0];
         NSData *contentsData = [rs dataForColumnIndex: 1];
-		NSData *hashData = [rs dataForColumnIndex: 2];
+        NSData *hashData = [rs dataForColumnIndex: 2];
         const int64_t parent = [rs longLongIntForColumnIndex: 3];
         const int64_t deltabase = [rs boolForColumnIndex: 4];
         
         if (revid == nextRevId || nextRevId == -1)
         {
-			NSData *actualHash = Sha1Data(contentsData);
-			ETAssert([hashData isEqual: actualHash]);
-			
+            NSData *actualHash = Sha1Data(contentsData);
+            ETAssert([hashData isEqual: actualHash]);
+            
             ParseCombinedCommitDataInToUUIDToItemDataDictionary(dataForUUID, contentsData, NO, itemSet);
             
             // TODO: If we are filtering to a known set of items, we can break out once we have all of them.
@@ -361,7 +361,7 @@
             assert([rs hasAnotherRow]);
         }
     }
-	
+    
     [rs close];
     
     if (wasEmpty)
@@ -416,17 +416,17 @@ NSData *contentsBLOBWithItemTree(id<COItemGraph> itemGraph)
 {
     NSMutableData *result = [NSMutableData dataWithCapacity: 64536];
     
-	NSArray *sortedUUIDs = [itemGraph.itemUUIDs sortedArrayUsingComparator: ^(id obj1, id obj2){
-		ETUUID *uuid1 = (ETUUID *)obj1;
-		ETUUID *uuid2 = (ETUUID *)obj2;
-		int result = memcmp([uuid1 UUIDValue], [uuid2 UUIDValue], 16);
-		return (result < 0)
-			? NSOrderedAscending
-			: ((result == 0)
-			   ? NSOrderedSame
-			   : NSOrderedDescending);
-	}];
-	
+    NSArray *sortedUUIDs = [itemGraph.itemUUIDs sortedArrayUsingComparator: ^(id obj1, id obj2){
+        ETUUID *uuid1 = (ETUUID *)obj1;
+        ETUUID *uuid2 = (ETUUID *)obj2;
+        int result = memcmp([uuid1 UUIDValue], [uuid2 UUIDValue], 16);
+        return (result < 0)
+            ? NSOrderedAscending
+            : ((result == 0)
+               ? NSOrderedSame
+               : NSOrderedDescending);
+    }];
+    
     for (ETUUID *uuid in sortedUUIDs)
     {
         COItem *item = [itemGraph itemForUUID: uuid];
@@ -442,16 +442,16 @@ NSData *contentsBLOBWithItemTree(id<COItemGraph> itemGraph)
 {
     int64_t result = 0;
     FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat: @"SELECT MAX(rowid) FROM %@", [self tableName]]];
-	if ([rs next])
-	{
+    if ([rs next])
+    {
         if (![rs columnIndexIsNull: 0])
         {
             result = [rs longLongIntForColumnIndex: 0] + 1;
         }
-	}
+    }
     [rs close];
     
-	return result;
+    return result;
 }
 
 - (int64_t) deltabaseForRowid: (int64_t)aRowid
@@ -486,9 +486,9 @@ NSData *contentsBLOBWithItemTree(id<COItemGraph> itemGraph)
 
 static NSData *Sha1Data(NSData *data)
 {
-	unsigned char buffer[20];
-	SHA1(data.bytes, data.length, buffer);
-	return [NSData dataWithBytes: buffer length: 20];
+    unsigned char buffer[20];
+    SHA1(data.bytes, data.length, buffer);
+    return [NSData dataWithBytes: buffer length: 20];
 }
 
 /**
@@ -505,16 +505,16 @@ static NSData *Sha1Data(NSData *data)
                             error: (NSError **)error
 {
 #ifdef VALIDATE_ITEM_GRAPHS
-	if (aParent == -1)
-	{
-		COValidateItemGraph(anItemTree);
-	}
-	else
-	{
-		COItemGraph *combinedGraph = [self itemGraphForRevid: aParent];
-		[combinedGraph addItemGraph: anItemTree];
-		COValidateItemGraph(combinedGraph);
-	}
+    if (aParent == -1)
+    {
+        COValidateItemGraph(anItemTree);
+    }
+    else
+    {
+        COItemGraph *combinedGraph = [self itemGraphForRevid: aParent];
+        [combinedGraph addItemGraph: anItemTree];
+        COValidateItemGraph(combinedGraph);
+    }
 #endif
 
     NSParameterAssert(aParent >= -1);
@@ -523,7 +523,7 @@ static NSData *Sha1Data(NSData *data)
     NSParameterAssert(aBranchUUID != nil);
     NSParameterAssert(aPersistentRootUUID != nil);
     NSParameterAssert(anItemTree.rootItemUUID != nil);
-	
+    
     [self beginTransaction];
     
     const int64_t parent_deltabase = [self deltabaseForRowid: aParent];
@@ -565,10 +565,10 @@ static NSData *Sha1Data(NSData *data)
         {
             combinedGraph = [[COItemGraph alloc] initWithItemGraph: anItemTree];
         }
-		
-		// GC before doing a full save so garbage isn't written to the snapshot
-		[combinedGraph removeUnreachableItems];
-		
+        
+        // GC before doing a full save so garbage isn't written to the snapshot
+        [combinedGraph removeUnreachableItems];
+        
         contentsBlob = contentsBLOBWithItemTree(combinedGraph);
         bytesInDeltaRun = contentsBlob.length;
     }
@@ -584,33 +584,33 @@ static NSData *Sha1Data(NSData *data)
         "bytesInDeltaRun, garbage, uuid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)", [self tableName]],
         @(rowid),
         contentsBlob,
-		Sha1Data(contentsBlob),
+        Sha1Data(contentsBlob),
         metadataBlob,
         CODateToJavaTimestamp([NSDate date]),
         @(aParent),
         @(aMergeParent),
-		[aBranchUUID dataValue],
-		[aPersistentRootUUID dataValue],
+        [aBranchUUID dataValue],
+        [aPersistentRootUUID dataValue],
         @(deltabase),
         @(bytesInDeltaRun),
         [aRevisionUUID dataValue]];
-	
-	
-	// Update the root object UUID
-	ETUUID *currentRoot = self.rootUUID;
-	
-	if (currentRoot == nil)
-	{
-		ok = ok && [db_ executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (root) VALUES (?)", [self metadataTableName]],
-		 [anItemTree.rootItemUUID dataValue]];
-	}
-	else if (![currentRoot isEqual: anItemTree.rootItemUUID])
-	{
-		[self rollback];
-		return NO;
-	}
-	
-	[self commit];
+    
+    
+    // Update the root object UUID
+    ETUUID *currentRoot = self.rootUUID;
+    
+    if (currentRoot == nil)
+    {
+        ok = ok && [db_ executeUpdate: [NSString stringWithFormat: @"INSERT INTO %@ (root) VALUES (?)", [self metadataTableName]],
+         [anItemTree.rootItemUUID dataValue]];
+    }
+    else if (![currentRoot isEqual: anItemTree.rootItemUUID])
+    {
+        [self rollback];
+        return NO;
+    }
+    
+    [self commit];
     
     return ok;
 }
@@ -653,8 +653,8 @@ static NSData *Sha1Data(NSData *data)
     }
     [rs close];
 
-	NSAssert([result containsIndex: baseRevid] && [result containsIndex: revid],
-		@"-revidsFromRevid:toRevid: given invalid arguments");
+    NSAssert([result containsIndex: baseRevid] && [result containsIndex: revid],
+        @"-revidsFromRevid:toRevid: given invalid arguments");
 
     return result;
 }
@@ -670,7 +670,7 @@ static NSData *Sha1Data(NSData *data)
     }
 
     // Debugging:
-	
+    
     // Example which can be pasted in the sqlite3 prompt to experiment with this query:
     
     /*
@@ -691,57 +691,57 @@ static NSData *Sha1Data(NSData *data)
      insert into c values(7,6,6,1); -- marked as garbage, will be selected for deletion
      insert into c values(8,6,7,0); -- will be rebuit because it's not a full snapshot, but its parent is being deleted
      
-	 
-	 -- Identifies the revisions that need to be rebuilt:
-	 
-	 SELECT revid
-	 FROM c
-	 LEFT OUTER JOIN (SELECT garbage AS parentgarbage, revid AS parentrevid FROM c)
-	 ON (parent = parentrevid)
-	 WHERE garbage = 0 AND parentgarbage = 1 AND deltabase != revid;
-	 
+     
+     -- Identifies the revisions that need to be rebuilt:
+     
+     SELECT revid
+     FROM c
+     LEFT OUTER JOIN (SELECT garbage AS parentgarbage, revid AS parentrevid FROM c)
+     ON (parent = parentrevid)
+     WHERE garbage = 0 AND parentgarbage = 1 AND deltabase != revid;
+     
      */
-	
-	// Gather the set of revids that need to be rebuilt
-	NSMutableIndexSet *rebuildRevids = [NSMutableIndexSet indexSet];
-	FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
-										  @"SELECT revid "
-										  "FROM %@ "
-										  "LEFT OUTER JOIN (SELECT garbage AS parentgarbage, revid AS parentrevid FROM %@) "
-										  "ON (parent = parentrevid) "
-										  "WHERE garbage = 0 AND parentgarbage = 1 AND deltabase != revid", [self tableName], [self tableName]]];
-	while ([rs next])
-	{
-		[rebuildRevids addIndex: [rs longLongIntForColumnIndex: 0]];
-	}
-	[rs close];
-	
-	// Rebuild each revision that needs it
-	[rebuildRevids enumerateIndexesUsingBlock: ^(NSUInteger revid, BOOL *stop) {
-		COItemGraph *graph = [self itemGraphForRevid: revid];
-		
-		// GC unreachable items in graph
-		[graph removeUnreachableItems];
-		
-		NSData *contentsBlob = contentsBLOBWithItemTree(graph);
-		NSNumber *deltabase = @(revid);
-		NSNumber *bytesInDeltaRun = @(contentsBlob.length);
-		
-		BOOL ok = [db_ executeUpdate: [NSString stringWithFormat: @"UPDATE %@ SET contents = ?, hash = ?, deltabase = ?, bytesInDeltaRun = ? WHERE revid = ?", [self tableName]],
-				   contentsBlob,
-				   Sha1Data(contentsBlob),
-				   deltabase,
-				   bytesInDeltaRun,
-				   @(revid)];
+    
+    // Gather the set of revids that need to be rebuilt
+    NSMutableIndexSet *rebuildRevids = [NSMutableIndexSet indexSet];
+    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
+                                          @"SELECT revid "
+                                          "FROM %@ "
+                                          "LEFT OUTER JOIN (SELECT garbage AS parentgarbage, revid AS parentrevid FROM %@) "
+                                          "ON (parent = parentrevid) "
+                                          "WHERE garbage = 0 AND parentgarbage = 1 AND deltabase != revid", [self tableName], [self tableName]]];
+    while ([rs next])
+    {
+        [rebuildRevids addIndex: [rs longLongIntForColumnIndex: 0]];
+    }
+    [rs close];
+    
+    // Rebuild each revision that needs it
+    [rebuildRevids enumerateIndexesUsingBlock: ^(NSUInteger revid, BOOL *stop) {
+        COItemGraph *graph = [self itemGraphForRevid: revid];
+        
+        // GC unreachable items in graph
+        [graph removeUnreachableItems];
+        
+        NSData *contentsBlob = contentsBLOBWithItemTree(graph);
+        NSNumber *deltabase = @(revid);
+        NSNumber *bytesInDeltaRun = @(contentsBlob.length);
+        
+        BOOL ok = [db_ executeUpdate: [NSString stringWithFormat: @"UPDATE %@ SET contents = ?, hash = ?, deltabase = ?, bytesInDeltaRun = ? WHERE revid = ?", [self tableName]],
+                   contentsBlob,
+                   Sha1Data(contentsBlob),
+                   deltabase,
+                   bytesInDeltaRun,
+                   @(revid)];
 
-		if (!ok)
-		{
-			[db_ rollback];
-			ETAssertUnreachable();
-		}
-	}];
-	
-	// Delete _all_ revisions marked as garbage.
+        if (!ok)
+        {
+            [db_ rollback];
+            ETAssertUnreachable();
+        }
+    }];
+    
+    // Delete _all_ revisions marked as garbage.
     [db_ executeUpdate: [NSString stringWithFormat: @"DELETE FROM %@ WHERE garbage = 1", [self tableName]]];
 
     [self commit];
@@ -751,163 +751,163 @@ static NSData *Sha1Data(NSData *data)
 
 - (NSIndexSet *) revidsUsedRange
 {
-	// NOTE: For performance, we use two distinct queries, see
-	// http://stackoverflow.com/questions/11515165/sqlite3-select-min-max-together-is-much-slower-than-select-them-separately
+    // NOTE: For performance, we use two distinct queries, see
+    // http://stackoverflow.com/questions/11515165/sqlite3-select-min-max-together-is-much-slower-than-select-them-separately
     NSNumber *min = [db_ numberForQuery: [NSString stringWithFormat: @"SELECT MIN(rowid) FROM %@", [self tableName]]];
     NSNumber *max = [db_ numberForQuery: [NSString stringWithFormat: @"SELECT MAX(rowid) FROM %@", [self tableName]]];
 
-	if (min == nil && max == nil)
-	{
-		return [NSIndexSet new];
-	}
-	NSAssert(min != nil && max != nil, @"The backing store database is returning incoherent results");
+    if (min == nil && max == nil)
+    {
+        return [NSIndexSet new];
+    }
+    NSAssert(min != nil && max != nil, @"The backing store database is returning incoherent results");
 
-	NSUInteger length = max.longLongValue - min.longLongValue + 1;
+    NSUInteger length = max.longLongValue - min.longLongValue + 1;
 
-	return [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(min.longLongValue, length)];
+    return [NSIndexSet indexSetWithIndexesInRange: NSMakeRange(min.longLongValue, length)];
 }
 
 - (CORevisionInfo *)revisionInfoWithResultSet: (FMResultSet *)rs revisionIDs: (NSMutableDictionary *)revIDs
 {
-	ETUUID *uuid = [ETUUID UUIDWithData: [rs dataForColumn: @"uuid"]];
-	// N.B.: Watch for null being returned as 0
-	int64_t parent = [rs longLongIntForColumn: @"parent"];
-	int64_t mergeparent = [rs longLongIntForColumn: @"mergeParent"];
-	NSData *data = [rs dataForColumn: @"metadata"];
-	NSDictionary *metadata = nil;
+    ETUUID *uuid = [ETUUID UUIDWithData: [rs dataForColumn: @"uuid"]];
+    // N.B.: Watch for null being returned as 0
+    int64_t parent = [rs longLongIntForColumn: @"parent"];
+    int64_t mergeparent = [rs longLongIntForColumn: @"mergeParent"];
+    NSData *data = [rs dataForColumn: @"metadata"];
+    NSDictionary *metadata = nil;
 
-	if (data != nil)
-	{
-		metadata = COJSONObjectWithData(data, NULL);
-	}
-	
-	CORevisionInfo *rev = [CORevisionInfo new];
+    if (data != nil)
+    {
+        metadata = COJSONObjectWithData(data, NULL);
+    }
+    
+    CORevisionInfo *rev = [CORevisionInfo new];
 
-	rev.revisionUUID = uuid;
-	rev.parentRevisionUUID = (id)@(parent);
-	rev.mergeParentRevisionUUID = (id)@(mergeparent);
-	rev.persistentRootUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"persistentrootuuid"]];
-	rev.branchUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"branchuuid"]];
-	rev.metadata = metadata;
-	rev.date = CODateFromJavaTimestamp([rs numberForColumn: @"timestamp"]);
-	
-	int64_t revid = [rs longLongIntForColumn: @"revid"];
+    rev.revisionUUID = uuid;
+    rev.parentRevisionUUID = (id)@(parent);
+    rev.mergeParentRevisionUUID = (id)@(mergeparent);
+    rev.persistentRootUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"persistentrootuuid"]];
+    rev.branchUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"branchuuid"]];
+    rev.metadata = metadata;
+    rev.date = CODateFromJavaTimestamp([rs numberForColumn: @"timestamp"]);
+    
+    int64_t revid = [rs longLongIntForColumn: @"revid"];
 
-	/* Memorize the revision ID to support resolving parent and merge parent 
-	   revision IDs once revIDs contains all the revisions */
+    /* Memorize the revision ID to support resolving parent and merge parent 
+       revision IDs once revIDs contains all the revisions */
 
-	revIDs[@(revid)] = rev.revisionUUID;
+    revIDs[@(revid)] = rev.revisionUUID;
 
-	 return rev;
+     return rev;
 }
 
 - (void)resolveRevisionIDsInRevisionsInfos: (NSArray *)revInfos
                           usingRevisionIDs: (NSDictionary *)revIDs
 {
-	for (CORevisionInfo *revInfo in revInfos)
-	{
-		revInfo.parentRevisionUUID = revIDs[revInfo.parentRevisionUUID];
-		revInfo.mergeParentRevisionUUID = revIDs[revInfo.mergeParentRevisionUUID];
+    for (CORevisionInfo *revInfo in revInfos)
+    {
+        revInfo.parentRevisionUUID = revIDs[revInfo.parentRevisionUUID];
+        revInfo.mergeParentRevisionUUID = revIDs[revInfo.mergeParentRevisionUUID];
 
-		ETAssert(revInfo.parentRevisionUUID != nil || [revInfo isEqual: revInfos.firstObject]);
-	}
+        ETAssert(revInfo.parentRevisionUUID != nil || [revInfo isEqual: revInfos.firstObject]);
+    }
 }
 
 - (NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
                        headRevisionUUID: (ETUUID *)aHeadRevUUID
                                 options: (COBranchRevisionReadingOptions)options
 {
-	NILARG_EXCEPTION_TEST(aBranchUUID);
-	FMResultSet *rs = nil;
+    NILARG_EXCEPTION_TEST(aBranchUUID);
+    FMResultSet *rs = nil;
 
-	if (options & COBranchRevisionReadingDivergentRevisions)
-	{
-		rs = [db_ executeQuery: [NSString stringWithFormat:
-			@"SELECT revid, parent, branchuuid, persistentrootuuid, metadata, timestamp, mergeparent, uuid "
-		 	 "FROM %@ WHERE revid BETWEEN 0 AND (SELECT MAX(revid) FROM %@ WHERE branchuuid = ?) "
-			 "ORDER BY revid DESC", [self tableName], [self tableName]], [aBranchUUID dataValue]];
-	}
-	else
-	{
-		int64_t headRevid = [self revidForUUID: aHeadRevUUID];
-
-		rs = [db_ executeQuery: [NSString stringWithFormat:
-			@"SELECT revid, parent, branchuuid, persistentrootuuid, metadata, timestamp, mergeparent, uuid "
-			 "FROM %@ WHERE revid BETWEEN 0 AND ? ORDER BY revid DESC",
-			 [self tableName]], @(headRevid)];
-	}
-
-	NSUInteger suggestedMaxRevCount = 50000;
-	NSMutableArray *revInfos = [NSMutableArray arrayWithCapacity: suggestedMaxRevCount];
-	NSMutableDictionary *revIDs = [NSMutableDictionary dictionaryWithCapacity: suggestedMaxRevCount];
-	/* Represents a branch in the path leading to the end branch, while 
-	   navigating the history backwards to collect branch revisions. */
-	NSData *visitedBranchUUIDData = [aBranchUUID dataValue];
-	int64_t parentRevid = -1;
-	BOOL isFirstResult = YES;
-
-	while ([rs next])
-	{
-		NSData *branchUUIDData = [rs dataForColumnIndex: 2];
-		BOOL isValidBranch = ([branchUUIDData isEqualToData: visitedBranchUUIDData]);
-		int64_t revid = [rs longLongIntForColumnIndex: 0];
-		BOOL isParentRev = (revid == parentRevid);
-		BOOL skippingUnrelatedBranchRevisions = (!isValidBranch && !isParentRev);
-		
-		if (skippingUnrelatedBranchRevisions)
-			continue;
-	
-		if (!isValidBranch && !(options & COBranchRevisionReadingParentBranches))
-			break;
-
-		if (isFirstResult || isParentRev || (options & COBranchRevisionReadingDivergentRevisions))
-		{
-			[revInfos insertObject: [self revisionInfoWithResultSet: rs revisionIDs: revIDs]
-			               atIndex: 0];
-			parentRevid = [rs longLongIntForColumnIndex: 1];
-			visitedBranchUUIDData = branchUUIDData;
-		}
-
-		isFirstResult = NO;
+    if (options & COBranchRevisionReadingDivergentRevisions)
+    {
+        rs = [db_ executeQuery: [NSString stringWithFormat:
+            @"SELECT revid, parent, branchuuid, persistentrootuuid, metadata, timestamp, mergeparent, uuid "
+             "FROM %@ WHERE revid BETWEEN 0 AND (SELECT MAX(revid) FROM %@ WHERE branchuuid = ?) "
+             "ORDER BY revid DESC", [self tableName], [self tableName]], [aBranchUUID dataValue]];
     }
-	[rs close];
+    else
+    {
+        int64_t headRevid = [self revidForUUID: aHeadRevUUID];
 
-	[self resolveRevisionIDsInRevisionsInfos: revInfos
-							usingRevisionIDs: revIDs];
+        rs = [db_ executeQuery: [NSString stringWithFormat:
+            @"SELECT revid, parent, branchuuid, persistentrootuuid, metadata, timestamp, mergeparent, uuid "
+             "FROM %@ WHERE revid BETWEEN 0 AND ? ORDER BY revid DESC",
+             [self tableName]], @(headRevid)];
+    }
 
-	return revInfos;
+    NSUInteger suggestedMaxRevCount = 50000;
+    NSMutableArray *revInfos = [NSMutableArray arrayWithCapacity: suggestedMaxRevCount];
+    NSMutableDictionary *revIDs = [NSMutableDictionary dictionaryWithCapacity: suggestedMaxRevCount];
+    /* Represents a branch in the path leading to the end branch, while 
+       navigating the history backwards to collect branch revisions. */
+    NSData *visitedBranchUUIDData = [aBranchUUID dataValue];
+    int64_t parentRevid = -1;
+    BOOL isFirstResult = YES;
+
+    while ([rs next])
+    {
+        NSData *branchUUIDData = [rs dataForColumnIndex: 2];
+        BOOL isValidBranch = ([branchUUIDData isEqualToData: visitedBranchUUIDData]);
+        int64_t revid = [rs longLongIntForColumnIndex: 0];
+        BOOL isParentRev = (revid == parentRevid);
+        BOOL skippingUnrelatedBranchRevisions = (!isValidBranch && !isParentRev);
+        
+        if (skippingUnrelatedBranchRevisions)
+            continue;
+    
+        if (!isValidBranch && !(options & COBranchRevisionReadingParentBranches))
+            break;
+
+        if (isFirstResult || isParentRev || (options & COBranchRevisionReadingDivergentRevisions))
+        {
+            [revInfos insertObject: [self revisionInfoWithResultSet: rs revisionIDs: revIDs]
+                           atIndex: 0];
+            parentRevid = [rs longLongIntForColumnIndex: 1];
+            visitedBranchUUIDData = branchUUIDData;
+        }
+
+        isFirstResult = NO;
+    }
+    [rs close];
+
+    [self resolveRevisionIDsInRevisionsInfos: revInfos
+                            usingRevisionIDs: revIDs];
+
+    return revInfos;
 }
 
 - (NSArray *)revisionInfos
 {
-	FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
-										  @"SELECT revid, parent, branchuuid, persistentrootuuid, metadata, timestamp, mergeparent, uuid "
-										  "FROM %@ ORDER BY revid DESC",
-										  [self tableName]]];
-	
-	NSUInteger suggestedMaxRevCount = 50000;
-	NSMutableArray *revInfos = [NSMutableArray arrayWithCapacity: suggestedMaxRevCount];
-	NSMutableDictionary *revIDs = [NSMutableDictionary dictionaryWithCapacity: suggestedMaxRevCount];
-	
-	while ([rs next])
-	{
-		[revInfos insertObject: [self revisionInfoWithResultSet: rs revisionIDs: revIDs]
-					   atIndex: 0];
+    FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
+                                          @"SELECT revid, parent, branchuuid, persistentrootuuid, metadata, timestamp, mergeparent, uuid "
+                                          "FROM %@ ORDER BY revid DESC",
+                                          [self tableName]]];
+    
+    NSUInteger suggestedMaxRevCount = 50000;
+    NSMutableArray *revInfos = [NSMutableArray arrayWithCapacity: suggestedMaxRevCount];
+    NSMutableDictionary *revIDs = [NSMutableDictionary dictionaryWithCapacity: suggestedMaxRevCount];
+    
+    while ([rs next])
+    {
+        [revInfos insertObject: [self revisionInfoWithResultSet: rs revisionIDs: revIDs]
+                       atIndex: 0];
     }
-	[rs close];
-	
-	[self resolveRevisionIDsInRevisionsInfos: revInfos
-							usingRevisionIDs: revIDs];
-	
-	return revInfos;
+    [rs close];
+    
+    [self resolveRevisionIDsInRevisionsInfos: revInfos
+                            usingRevisionIDs: revIDs];
+    
+    return revInfos;
 }
 
 - (uint64_t) fileSize
 {
-	NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfItemAtPath: [db_ databasePath]
-																		   error: NULL];
-	
-	return [attrs[NSFileSize] unsignedLongLongValue];
+    NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfItemAtPath: [db_ databasePath]
+                                                                           error: NULL];
+    
+    return [attrs[NSFileSize] unsignedLongLongValue];
 }
 
 @end

@@ -13,33 +13,33 @@ static NSUInteger DeallocCalls;
 
 + (NSUInteger) countOfDeallocCalls
 {
-	return DeallocCalls;
+    return DeallocCalls;
 }
 
 - (void) dealloc
 {
-	DeallocCalls++;
+    DeallocCalls++;
 }
 
 + (ETEntityDescription*)newEntityDescription
 {
-	ETEntityDescription *entity = [self newBasicEntityDescription];
-	
-	if (![entity.name isEqual: [UnorderedGroupNoOpposite className]])
-		return entity;
+    ETEntityDescription *entity = [self newBasicEntityDescription];
+    
+    if (![entity.name isEqual: [UnorderedGroupNoOpposite className]])
+        return entity;
 
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                  typeName: @"NSString"];
     labelProperty.persistent = YES;
-	
-	ETPropertyDescription *contentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
-																					typeName: @"COObject"];
+    
+    ETPropertyDescription *contentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
+                                                                                    typeName: @"COObject"];
     contentsProperty.persistent = YES;
     contentsProperty.multivalued = YES;
     contentsProperty.ordered = NO;
-	
-	entity.propertyDescriptions = @[labelProperty, contentsProperty];
-	
+    
+    entity.propertyDescriptions = @[labelProperty, contentsProperty];
+    
     return entity;
 }
 

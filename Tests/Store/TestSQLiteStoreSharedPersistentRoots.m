@@ -17,9 +17,9 @@
 {
     COPersistentRootInfo *prootA;
     COPersistentRootInfo *prootB;
-	
-	int64_t prootAChangeCount;
-	int64_t prootBChangeCount;
+    
+    int64_t prootAChangeCount;
+    int64_t prootBChangeCount;
 }
 @end
 
@@ -58,40 +58,40 @@ static ETUUID *rootUUID;
     
     COStoreTransaction *txn = [[COStoreTransaction alloc] init];
     prootA = [txn createPersistentRootWithInitialItemGraph: [self prootAitemTree]
-													  UUID: [ETUUID UUID]
-												branchUUID: [ETUUID UUID]
-										  revisionMetadata: nil];
+                                                      UUID: [ETUUID UUID]
+                                                branchUUID: [ETUUID UUID]
+                                          revisionMetadata: nil];
 
-	ETUUID *prootBBranchUUID = [ETUUID UUID];
-	
-	prootB = [txn createPersistentRootCopyWithUUID: [ETUUID UUID]
-						  parentPersistentRootUUID: prootA.UUID
-										branchUUID: [ETUUID UUID]
-								  parentBranchUUID: nil
-							   initialRevisionUUID: prootA.currentRevisionUUID];
+    ETUUID *prootBBranchUUID = [ETUUID UUID];
+    
+    prootB = [txn createPersistentRootCopyWithUUID: [ETUUID UUID]
+                          parentPersistentRootUUID: prootA.UUID
+                                        branchUUID: [ETUUID UUID]
+                                  parentBranchUUID: nil
+                               initialRevisionUUID: prootA.currentRevisionUUID];
     
     ETUUID *prootBRev = [ETUUID UUID];
-	
-	[txn writeRevisionWithModifiedItems: [self prooBitemTree]
-						   revisionUUID: prootBRev
-							   metadata: nil
-					   parentRevisionID: prootA.currentRevisionUUID
-				  mergeParentRevisionID: nil
-					 persistentRootUUID: prootB.UUID
-							 branchUUID: prootBBranchUUID];
+    
+    [txn writeRevisionWithModifiedItems: [self prooBitemTree]
+                           revisionUUID: prootBRev
+                               metadata: nil
+                       parentRevisionID: prootA.currentRevisionUUID
+                  mergeParentRevisionID: nil
+                     persistentRootUUID: prootB.UUID
+                             branchUUID: prootBBranchUUID];
 
     [txn setCurrentRevision: prootBRev
-				 headRevision: prootBRev
-	                forBranch: prootB.currentBranchUUID
-	         ofPersistentRoot: prootB.UUID];
+                 headRevision: prootBRev
+                    forBranch: prootB.currentBranchUUID
+             ofPersistentRoot: prootB.UUID];
 
     prootB.currentBranchInfo.currentRevisionUUID = prootBRev;
     
-	prootAChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: prootA.UUID];
-	prootBChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: prootB.UUID];
-	
+    prootAChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: prootA.UUID];
+    prootBChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: prootB.UUID];
+    
     UKTrue([store commitStoreTransaction: txn]);
-	
+    
     return self;
 }
 
@@ -112,31 +112,31 @@ static ETUUID *rootUUID;
     
     UKObjectsEqual([self prootAitemTree], [self currentItemGraphForPersistentRoot: prootA.UUID]);
     UKObjectsEqual([self prooBitemTree], [self currentItemGraphForPersistentRoot: prootB.UUID]);
-	
-	NSDictionary *prootAAttrs = [store attributesForPersistentRootWithUUID: prootA.UUID];
-	NSDictionary *prootBAttrs = [store attributesForPersistentRootWithUUID: prootB.UUID];
-	
-	// For the original (non cheap copy)
-	
-	UKIntsNotEqual(0, [prootAAttrs[COPersistentRootAttributeExportSize] longLongValue]);
-	UKIntsNotEqual(0, [prootAAttrs[COPersistentRootAttributeUsedSize] longLongValue]);
-	UKIntsEqual([prootAAttrs[COPersistentRootAttributeExportSize] longLongValue],
-				[prootAAttrs[COPersistentRootAttributeUsedSize] longLongValue]);
-	
-	// For the cheap copy
-	
-	UKTrue([prootBAttrs[COPersistentRootAttributeUsedSize] longLongValue] <
-		   [prootBAttrs[COPersistentRootAttributeExportSize] longLongValue]);
+    
+    NSDictionary *prootAAttrs = [store attributesForPersistentRootWithUUID: prootA.UUID];
+    NSDictionary *prootBAttrs = [store attributesForPersistentRootWithUUID: prootB.UUID];
+    
+    // For the original (non cheap copy)
+    
+    UKIntsNotEqual(0, [prootAAttrs[COPersistentRootAttributeExportSize] longLongValue]);
+    UKIntsNotEqual(0, [prootAAttrs[COPersistentRootAttributeUsedSize] longLongValue]);
+    UKIntsEqual([prootAAttrs[COPersistentRootAttributeExportSize] longLongValue],
+                [prootAAttrs[COPersistentRootAttributeUsedSize] longLongValue]);
+    
+    // For the cheap copy
+    
+    UKTrue([prootBAttrs[COPersistentRootAttributeUsedSize] longLongValue] <
+           [prootBAttrs[COPersistentRootAttributeExportSize] longLongValue]);
 }
 
 - (void) testDeleteOriginalPersistentRoot
 {
-	{
-		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-		[txn deletePersistentRoot: prootA.UUID];
-		prootAChangeCount = [txn setOldTransactionID: prootAChangeCount forPersistentRoot: prootA.UUID];
-		UKTrue([store commitStoreTransaction: txn]);
-	}
+    {
+        COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+        [txn deletePersistentRoot: prootA.UUID];
+        prootAChangeCount = [txn setOldTransactionID: prootAChangeCount forPersistentRoot: prootA.UUID];
+        UKTrue([store commitStoreTransaction: txn]);
+    }
 
     UKTrue([store finalizeDeletionsForPersistentRoot: prootA.UUID error: NULL]);
 
@@ -152,12 +152,12 @@ static ETUUID *rootUUID;
 
 - (void) testDeleteCopiedPersistentRoot
 {
-	{
-		COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-		[txn deletePersistentRoot: prootB.UUID];
-		prootBChangeCount = [txn setOldTransactionID: prootBChangeCount forPersistentRoot: prootB.UUID];
-		UKTrue([store commitStoreTransaction: txn]);
-	}
+    {
+        COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+        [txn deletePersistentRoot: prootB.UUID];
+        prootBChangeCount = [txn setOldTransactionID: prootBChangeCount forPersistentRoot: prootB.UUID];
+        UKTrue([store commitStoreTransaction: txn]);
+    }
 
     UKTrue([store finalizeDeletionsForPersistentRoot: prootB.UUID error: NULL]);
     

@@ -8,65 +8,65 @@
 
 - (id)init
 {
-	self = [super initWithWindowNibName: @"Preferences"];
-	
-	if (self) {
-		[[NSNotificationCenter defaultCenter] addObserver: self
-												 selector: @selector(defaultsChanged:)
-													 name: NSUserDefaultsDidChangeNotification
-												   object: nil];
-	}
-	return self;
+    self = [super initWithWindowNibName: @"Preferences"];
+    
+    if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver: self
+                                                 selector: @selector(defaultsChanged:)
+                                                     name: NSUserDefaultsDidChangeNotification
+                                                   object: nil];
+    }
+    return self;
 }
 
 - (void) dealloc
 {
-	[[NSNotificationCenter defaultCenter] removeObserver: self];
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
 }
 
 - (void) defaultsChanged: (NSNotification*)notif
 {
-	NSString *mode = [[NSUserDefaults standardUserDefaults] stringForKey: @"UndoMode"];
-	if ([mode isEqual: @"Project"] || mode == nil)
-	{
-		[undoMode selectCellWithTag: PER_PROJECT];
-	}
-	else if ([mode isEqual: @"Document"])
-	{
-		[undoMode selectCellWithTag: PER_DOCUMENT];
-	}
+    NSString *mode = [[NSUserDefaults standardUserDefaults] stringForKey: @"UndoMode"];
+    if ([mode isEqual: @"Project"] || mode == nil)
+    {
+        [undoMode selectCellWithTag: PER_PROJECT];
+    }
+    else if ([mode isEqual: @"Document"])
+    {
+        [undoMode selectCellWithTag: PER_DOCUMENT];
+    }
 }
 
 - (void)awakeFromNib
 {
-	[self defaultsChanged: nil];
+    [self defaultsChanged: nil];
 }
 
 - (IBAction) undoModeChanged: (id)sender
 {
-	NSInteger tag = [((NSMatrix *)sender) selectedTag];
-	NSString *value = nil;
-	
-	if (tag == PER_PROJECT)
-	{
-		value = @"Project";
-		[[COUndoTrack trackForName: @"org.etoile.projectdemo" withEditingContext: nil] clear];
-		NSLog(@"Cleared project stack");
- 	}
-	else if (tag == PER_DOCUMENT)
-	{
-		value = @"Document";
-		// FIXME: Doesn't work
-		[[COUndoTrack trackForPattern: @"org.etoile.projectdemo*" withEditingContext: nil] clear];
-		NSLog(@"Cleared document stacks");
-	}
-	
-	[[NSUserDefaults standardUserDefaults] setValue: value forKey: @"UndoMode"];
-	NSLog(@"changed to %@", value);
-	
-	// Clear the undo stacks
-	
-	
+    NSInteger tag = [((NSMatrix *)sender) selectedTag];
+    NSString *value = nil;
+    
+    if (tag == PER_PROJECT)
+    {
+        value = @"Project";
+        [[COUndoTrack trackForName: @"org.etoile.projectdemo" withEditingContext: nil] clear];
+        NSLog(@"Cleared project stack");
+    }
+    else if (tag == PER_DOCUMENT)
+    {
+        value = @"Document";
+        // FIXME: Doesn't work
+        [[COUndoTrack trackForPattern: @"org.etoile.projectdemo*" withEditingContext: nil] clear];
+        NSLog(@"Cleared document stacks");
+    }
+    
+    [[NSUserDefaults standardUserDefaults] setValue: value forKey: @"UndoMode"];
+    NSLog(@"changed to %@", value);
+    
+    // Clear the undo stacks
+    
+    
 }
 
 @end

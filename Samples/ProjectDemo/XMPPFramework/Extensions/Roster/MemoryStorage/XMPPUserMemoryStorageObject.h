@@ -11,21 +11,21 @@
 
 @interface XMPPUserMemoryStorageObject : NSObject <XMPPUser, NSCopying, NSCoding>
 {
-	XMPPJID *jid;
-	NSMutableDictionary *itemAttributes;
-	
-	NSMutableDictionary *resources;
-	XMPPResourceMemoryStorageObject *primaryResource;
-	
+    XMPPJID *jid;
+    NSMutableDictionary *itemAttributes;
+    
+    NSMutableDictionary *resources;
+    XMPPResourceMemoryStorageObject *primaryResource;
+    
 #if TARGET_OS_IPHONE
-	UIImage *photo;
+    UIImage *photo;
 #else
-	NSImage *photo;
+    NSImage *photo;
 #endif
 }
 
-/*	From the XMPPUser protocol
-	
+/*  From the XMPPUser protocol
+    
 - (XMPPJID *)jid;
 - (NSString *)nickname;
 

@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2014 Eric Wasylishen
+    Copyright (C) 2014 Eric Wasylishen
  
-	Date:  July 2014
-	License:  MIT  (see COPYING)
+    Date:  July 2014
+    License:  MIT  (see COPYING)
  */
 
 #import "TestCommon.h"
@@ -18,18 +18,18 @@
 
 - (void)testCoreObjectPrimitiveEntities
 {
-	ETModelDescriptionRepository *repo = ctx.modelDescriptionRepository;
-	ETEntityDescription *data = [repo descriptionForName: @"NSData"];
-	ETEntityDescription *attachmentID = [repo descriptionForName: @"COAttachmentID"];
+    ETModelDescriptionRepository *repo = ctx.modelDescriptionRepository;
+    ETEntityDescription *data = [repo descriptionForName: @"NSData"];
+    ETEntityDescription *attachmentID = [repo descriptionForName: @"COAttachmentID"];
 
-	UKObjectKindOf(data, ETPrimitiveEntityDescription);
-	UKObjectKindOf(attachmentID, ETPrimitiveEntityDescription);
+    UKObjectKindOf(data, ETPrimitiveEntityDescription);
+    UKObjectKindOf(attachmentID, ETPrimitiveEntityDescription);
 
-	UKTrue([data isPrimitive]);
-	UKTrue([attachmentID isPrimitive]);
-	
-	UKObjectsSame(data, [repo entityDescriptionForClass: [NSData class]]);
-	UKObjectsSame(attachmentID, [repo entityDescriptionForClass: [COAttachmentID class]]);
+    UKTrue([data isPrimitive]);
+    UKTrue([attachmentID isPrimitive]);
+    
+    UKObjectsSame(data, [repo entityDescriptionForClass: [NSData class]]);
+    UKObjectsSame(attachmentID, [repo entityDescriptionForClass: [COAttachmentID class]]);
 }
 
 /**
@@ -52,9 +52,9 @@
  */
 - (void) testNoAggregate
 {
-	ETPropertyDescription *testProp = [ETPropertyDescription descriptionWithName: @"contents"
-																			typeName: @"COObject"];
-	UKFalse([testProp respondsToSelector: @selector(setAggregate:)]);
+    ETPropertyDescription *testProp = [ETPropertyDescription descriptionWithName: @"contents"
+                                                                            typeName: @"COObject"];
+    UKFalse([testProp respondsToSelector: @selector(setAggregate:)]);
 }
 
 #pragma mark -
@@ -63,21 +63,21 @@
 {
     ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"NonCompositeOneToManyWithOpposite"];
     entity.parentName = @"COObject";
-	
-	ETPropertyDescription *contentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
-																					typeName: @"NonCompositeOneToManyWithOpposite"];
+    
+    ETPropertyDescription *contentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
+                                                                                    typeName: @"NonCompositeOneToManyWithOpposite"];
     contentsProperty.persistent = YES;
     contentsProperty.multivalued = YES;
-	contentsProperty.oppositeName = @"NonCompositeOneToManyWithOpposite.parent";
-	
-	ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
-																				  typeName: @"NonCompositeOneToManyWithOpposite"];
+    contentsProperty.oppositeName = @"NonCompositeOneToManyWithOpposite.parent";
+    
+    ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
+                                                                                  typeName: @"NonCompositeOneToManyWithOpposite"];
     parentProperty.multivalued = NO;
-	parentProperty.oppositeName = @"NonCompositeOneToManyWithOpposite.contents";
-	parentProperty.derived = YES;
-	
-	entity.propertyDescriptions = @[contentsProperty, parentProperty];
-	
+    parentProperty.oppositeName = @"NonCompositeOneToManyWithOpposite.contents";
+    parentProperty.derived = YES;
+    
+    entity.propertyDescriptions = @[contentsProperty, parentProperty];
+    
     return entity;
 }
 
@@ -92,14 +92,14 @@
  */
 - (void) testOneToManyWithOppositeNotComposite
 {
-	ETEntityDescription *entity = [self nonCompositeOneToManyWithOppositeEntityDescription];
-	
-	ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
-	[repo addUnresolvedDescription: entity];
-	[repo resolveNamedObjectReferences];
+    ETEntityDescription *entity = [self nonCompositeOneToManyWithOppositeEntityDescription];
+    
+    ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
+    [repo addUnresolvedDescription: entity];
+    [repo resolveNamedObjectReferences];
 
-	UKTrue([[entity propertyDescriptionForName: @"contents"] isComposite]);
-	UKTrue([[entity propertyDescriptionForName: @"parent"] isContainer]);
+    UKTrue([[entity propertyDescriptionForName: @"contents"] isComposite]);
+    UKTrue([[entity propertyDescriptionForName: @"parent"] isContainer]);
 }
 
 
@@ -111,7 +111,7 @@
  */
 - (void) testUnidirectionalCompositeUnsupported
 {
-	
+    
 }
 
 /**
@@ -127,7 +127,7 @@
  */
 - (void) testOnlyOneContainerPropertyAllowed
 {
-	
+    
 }
 
 /**
@@ -140,7 +140,7 @@
  */
 - (void) testMultipleInheritance
 {
-	
+    
 }
 
 @end

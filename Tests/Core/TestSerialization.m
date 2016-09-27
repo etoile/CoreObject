@@ -30,7 +30,7 @@
     [fakeAttachment1 writeToFile: path1
                       atomically: YES
                         encoding: NSUTF8StringEncoding
-						   error: NULL];
+                           error: NULL];
 
     COAttachmentID *hash1 = [store importAttachmentFromURL: [NSURL fileURLWithPath: path1]];
     return hash1;
@@ -38,41 +38,41 @@
 
 - (void) testAttachment
 {
-	COAttachmentID *attachmentID = [self createAttachment];
-	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-	OutlineItem *item = proot.rootObject;
-	item.attachmentID = attachmentID;
-	
-	// Test writing to COItem
-	
-	COItem *itemValue = item.storeItem;
-	UKIntsEqual(kCOTypeAttachment, [itemValue typeForAttribute: @"attachmentID"]);
-	UKObjectsEqual(attachmentID, [itemValue valueForAttribute: @"attachmentID"]);
-	
-	// Test reading COItem into a COObjectGraphContext
-	
-	COObjectGraphContext *tempGraph = [COObjectGraphContext new];
-	[tempGraph insertOrUpdateItems: @[itemValue]];
-	COObject *deserializedObject = [tempGraph loadedObjectForUUID: itemValue.UUID];
-	
-	UKObjectsEqual(attachmentID, [deserializedObject valueForKey: @"attachmentID"]);
-	UKObjectsEqual(@"COAttachmentID", [deserializedObject.entityDescription propertyDescriptionForName: @"attachmentID"].type.name);
+    COAttachmentID *attachmentID = [self createAttachment];
+    COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    OutlineItem *item = proot.rootObject;
+    item.attachmentID = attachmentID;
+    
+    // Test writing to COItem
+    
+    COItem *itemValue = item.storeItem;
+    UKIntsEqual(kCOTypeAttachment, [itemValue typeForAttribute: @"attachmentID"]);
+    UKObjectsEqual(attachmentID, [itemValue valueForAttribute: @"attachmentID"]);
+    
+    // Test reading COItem into a COObjectGraphContext
+    
+    COObjectGraphContext *tempGraph = [COObjectGraphContext new];
+    [tempGraph insertOrUpdateItems: @[itemValue]];
+    COObject *deserializedObject = [tempGraph loadedObjectForUUID: itemValue.UUID];
+    
+    UKObjectsEqual(attachmentID, [deserializedObject valueForKey: @"attachmentID"]);
+    UKObjectsEqual(@"COAttachmentID", [deserializedObject.entityDescription propertyDescriptionForName: @"attachmentID"].type.name);
 }
 
 - (void) testUnknowItemAttributes
 {
-	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-	COObject *rootObject = proot.rootObject;
-	COMutableItem *item = [rootObject.storeItem mutableCopy];
-	
-	[item setValue: @"foo" forAttribute: @"bar" type: kCOTypeString];
-	
-	COItemGraph *itemGr = [[COItemGraph alloc] initWithItems: @[item] rootItemUUID: item.UUID];
-	COObjectGraphContext *newCtx = [COObjectGraphContext new];
-	
-	// @"foo" : @"bar" should not cause a problem, it should be ignored
-	// during deserialization
-	UKDoesNotRaiseException([newCtx setItemGraph: itemGr]);
+    COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    COObject *rootObject = proot.rootObject;
+    COMutableItem *item = [rootObject.storeItem mutableCopy];
+    
+    [item setValue: @"foo" forAttribute: @"bar" type: kCOTypeString];
+    
+    COItemGraph *itemGr = [[COItemGraph alloc] initWithItems: @[item] rootItemUUID: item.UUID];
+    COObjectGraphContext *newCtx = [COObjectGraphContext new];
+    
+    // @"foo" : @"bar" should not cause a problem, it should be ignored
+    // during deserialization
+    UKDoesNotRaiseException([newCtx setItemGraph: itemGr]);
 }
 
 @end

@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2014 Eric Wasylishen
+    Copyright (C) 2014 Eric Wasylishen
  
-	Date:  March 2014
-	License:  MIT  (see COPYING)
+    Date:  March 2014
+    License:  MIT  (see COPYING)
  */
 
 #import <Cocoa/Cocoa.h>
@@ -15,16 +15,16 @@
 
 @interface EWGraphRenderer : NSObject
 {
-	NSSet *uuids;
-	NSArray *trackNodesChronological;
-	NSMutableDictionary *rowIndexForUUID;
-	NSMutableDictionary *revisionInfoForUUID;
-	NSMutableDictionary *childrenForUUID;
-	NSMutableDictionary *levelForUUID;
-	NSMutableSet *currentUUIDAndAncestors;
-	NSMutableArray *graphRows;
-	
-	id<COTrack> track;
+    NSSet *uuids;
+    NSArray *trackNodesChronological;
+    NSMutableDictionary *rowIndexForUUID;
+    NSMutableDictionary *revisionInfoForUUID;
+    NSMutableDictionary *childrenForUUID;
+    NSMutableDictionary *levelForUUID;
+    NSMutableSet *currentUUIDAndAncestors;
+    NSMutableArray *graphRows;
+    
+    id<COTrack> track;
 }
 
 - (void) updateWithTrack: (id<COTrack>)aTrack;

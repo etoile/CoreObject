@@ -28,9 +28,9 @@ void ParseCombinedCommitDataInToUUIDToItemDataDictionary(NSMutableDictionary *de
         length = NSSwapLittleIntToHost(length);
         offset += 4;
         
-		assert('#' == bytes[offset]);
-		ETUUID *uuid = [[ETUUID alloc] initWithUUID: bytes + offset + 1];
-		
+        assert('#' == bytes[offset]);
+        ETUUID *uuid = [[ETUUID alloc] initWithUUID: bytes + offset + 1];
+        
         if ((replaceExisting
              || nil == dest[uuid])
             && (nil == restrictToItemUUIDs
@@ -58,6 +58,6 @@ void AddCommitUUIDAndDataToCombinedCommitData(NSMutableData *combinedCommitData,
     
     [combinedCommitData appendData: dataToAdd];
 
-	assert('#' == ((const unsigned char *)[dataToAdd bytes])[0]);
-	assert(0 == memcmp([uuidToAdd UUIDValue], ((const unsigned char *)[dataToAdd bytes]) + 1, 16));
+    assert('#' == ((const unsigned char *)[dataToAdd bytes])[0]);
+    assert(0 == memcmp([uuidToAdd UUIDValue], ((const unsigned char *)[dataToAdd bytes]) + 1, 16));
 }

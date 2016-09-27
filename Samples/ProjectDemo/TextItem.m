@@ -16,9 +16,9 @@
 
 - (instancetype) initWithObjectGraphContext:(COObjectGraphContext *)aContext
 {
-	self = [super initWithObjectGraphContext: aContext];
-	self.attrString = [[COAttributedString alloc] initWithObjectGraphContext: aContext];
-	return self;
+    self = [super initWithObjectGraphContext: aContext];
+    self.attrString = [[COAttributedString alloc] initWithObjectGraphContext: aContext];
+    return self;
 }
 
 /* Accessor Methods */

@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  September 2013
-	License:  MIT  (see COPYING)
+    Date:  September 2013
+    License:  MIT  (see COPYING)
  */
 
 #import "COCommandSetCurrentBranch.h"
@@ -51,35 +51,35 @@ static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
 
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
 {
-	NILARG_EXCEPTION_TEST(aContext);
+    NILARG_EXCEPTION_TEST(aContext);
     return YES;
 }
 - (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
 {
-	[txn setCurrentBranch: _newBranchUUID forPersistentRoot: _persistentRootUUID];
+    [txn setCurrentBranch: _newBranchUUID forPersistentRoot: _persistentRootUUID];
 }
 
 - (void) applyToContext: (COEditingContext *)aContext
 {
-	NILARG_EXCEPTION_TEST(aContext);
-	
+    NILARG_EXCEPTION_TEST(aContext);
+    
     COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
     COBranch *branch = [proot branchForUUID: _newBranchUUID];
     ETAssert(branch != nil);
-	
+    
     proot.currentBranch = branch;
 }
 
 - (NSString *)kind
 {
-	return _(@"Branch Switch");
+    return _(@"Branch Switch");
 }
 
 - (id) copyWithZone:(NSZone *)zone
 {
     COCommandSetCurrentBranch *aCopy = [super copyWithZone: zone];
-	aCopy->_oldBranchUUID = _oldBranchUUID;
-	aCopy->_newBranchUUID = _newBranchUUID;
+    aCopy->_oldBranchUUID = _oldBranchUUID;
+    aCopy->_newBranchUUID = _newBranchUUID;
     return aCopy;
 }
 

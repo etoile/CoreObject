@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2011 Quentin Mathe
+    Copyright (C) 2011 Quentin Mathe
 
-	Date:  December 2011
-	License:  MIT  (see COPYING)
+    Date:  December 2011
+    License:  MIT  (see COPYING)
  */
 
 #import "COCollection.h"
@@ -15,47 +15,47 @@
 
 + (void)initialize
 {
-	if (self != [COCollection class])
-		return;
+    if (self != [COCollection class])
+        return;
 
-	[self applyTraitFromClass: [ETCollectionTrait class]];
-	[self applyTraitFromClass: [ETMutableCollectionTrait class]];
+    [self applyTraitFromClass: [ETCollectionTrait class]];
+    [self applyTraitFromClass: [ETMutableCollectionTrait class]];
 }
 
 + (ETPropertyDescription *)contentPropertyDescriptionWithName: (NSString *)aName
                                                          type: (NSString *)aType
                                                      opposite: (NSString *)oppositeType
 {
-	ETPropertyDescription *contentProperty = 
-		[ETPropertyDescription descriptionWithName: aName typeName: aType];
-	contentProperty.multivalued = YES;
-	contentProperty.opposite = (id)oppositeType;
-	contentProperty.ordered = YES;
-	contentProperty.persistent = YES;
-	return contentProperty;
+    ETPropertyDescription *contentProperty = 
+        [ETPropertyDescription descriptionWithName: aName typeName: aType];
+    contentProperty.multivalued = YES;
+    contentProperty.opposite = (id)oppositeType;
+    contentProperty.ordered = YES;
+    contentProperty.persistent = YES;
+    return contentProperty;
 }
 
 + (ETEntityDescription *) newEntityDescription
 {
-	ETEntityDescription *collection = [self newBasicEntityDescription];
+    ETEntityDescription *collection = [self newBasicEntityDescription];
 
-	// For subclasses that don't override -newEntityDescription, we must not add the 
-	// property descriptions that we will inherit through the parent
-	if (![collection.name isEqual: [COCollection className]]) 
-		return collection;
+    // For subclasses that don't override -newEntityDescription, we must not add the 
+    // property descriptions that we will inherit through the parent
+    if (![collection.name isEqual: [COCollection className]]) 
+        return collection;
 
-	return collection;	
+    return collection;  
 }
 
 - (instancetype)initWithObjectGraphContext: (COObjectGraphContext *)aContext
 {
-	if ([[self class] isEqual: [COCollection class]])
-	{
-		[NSException raise: NSGenericException
-		            format: @"Attempt to initialize abstract class %@", [self class]];
-	}
+    if ([[self class] isEqual: [COCollection class]])
+    {
+        [NSException raise: NSGenericException
+                    format: @"Attempt to initialize abstract class %@", [self class]];
+    }
 
-	self = [super initWithObjectGraphContext: aContext];
+    self = [super initWithObjectGraphContext: aContext];
     if (self == nil)
         return nil;
 
@@ -75,112 +75,112 @@
 
 - (ETUTI *)objectType
 {
-	ETPropertyDescription *propertyDesc =
-		[self.entityDescription propertyDescriptionForName: self.contentKey];
-	ETModelDescriptionRepository *repo = self.persistentRoot.parentContext.modelDescriptionRepository;
+    ETPropertyDescription *propertyDesc =
+        [self.entityDescription propertyDescriptionForName: self.contentKey];
+    ETModelDescriptionRepository *repo = self.persistentRoot.parentContext.modelDescriptionRepository;
 
-	return [ETUTI typeWithClass: [repo classForEntityDescription: propertyDesc.type]];
+    return [ETUTI typeWithClass: [repo classForEntityDescription: propertyDesc.type]];
 }
 
 - (void)addObjects: (NSArray *)anArray
 {
-	for (id object in anArray)
-	{
-		[self addObject: object];
-	}
+    for (id object in anArray)
+    {
+        [self addObject: object];
+    }
 }
 
 - (void)didLoadObjectGraph
 {
-	[self didUpdate];
+    [self didUpdate];
 }
 
 - (void)didUpdate
 {
-	[[NSNotificationCenter defaultCenter] 
-		postNotificationName: ETCollectionDidUpdateNotification object: self];
+    [[NSNotificationCenter defaultCenter] 
+        postNotificationName: ETCollectionDidUpdateNotification object: self];
 }
 
 - (NSString *)contentKey
 {
-	return @"objects";
+    return @"objects";
 }
 
 - (BOOL)isOrdered
 {
-	// TODO: If too slow, return the boolean directly.
-	return [self.entityDescription propertyDescriptionForName: self.contentKey].ordered;
+    // TODO: If too slow, return the boolean directly.
+    return [self.entityDescription propertyDescriptionForName: self.contentKey].ordered;
 }
 
 - (id)content
 {
-	return [self valueForVariableStorageKey: self.contentKey];
+    return [self valueForVariableStorageKey: self.contentKey];
 }
 
 - (NSArray *)contentArray
 {
-	return [[self valueForProperty: self.contentKey] contentArray];
+    return [[self valueForProperty: self.contentKey] contentArray];
 }
 
 - (void)insertObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints
 {
-	id collection = [self collectionForProperty: self.contentKey mutationIndexes: indexes];
+    id collection = [self collectionForProperty: self.contentKey mutationIndexes: indexes];
 
-	[self willChangeValueForProperty: self.contentKey
-	                       atIndexes: indexes
-	                     withObjects: objects
-	                    mutationKind: ETCollectionMutationKindInsertion];
+    [self willChangeValueForProperty: self.contentKey
+                           atIndexes: indexes
+                         withObjects: objects
+                        mutationKind: ETCollectionMutationKindInsertion];
 
-	[collection insertObjects: objects atIndexes: indexes hints: hints];
+    [collection insertObjects: objects atIndexes: indexes hints: hints];
 
-	[self didChangeValueForProperty: self.contentKey
-	                      atIndexes: indexes
-	                    withObjects: objects
-	                   mutationKind: ETCollectionMutationKindInsertion];
+    [self didChangeValueForProperty: self.contentKey
+                          atIndexes: indexes
+                        withObjects: objects
+                       mutationKind: ETCollectionMutationKindInsertion];
 }
 
 - (void)removeObjects: (NSArray *)objects atIndexes: (NSIndexSet *)indexes hints: (NSArray *)hints
 {
-	id collection = [self collectionForProperty: self.contentKey mutationIndexes: indexes];
+    id collection = [self collectionForProperty: self.contentKey mutationIndexes: indexes];
 
-	[self willChangeValueForProperty: self.contentKey
-	                       atIndexes: indexes
-	                     withObjects: objects
-	                    mutationKind: ETCollectionMutationKindRemoval];
+    [self willChangeValueForProperty: self.contentKey
+                           atIndexes: indexes
+                         withObjects: objects
+                        mutationKind: ETCollectionMutationKindRemoval];
 
-	[collection removeObjects: objects atIndexes: indexes hints: hints];
+    [collection removeObjects: objects atIndexes: indexes hints: hints];
 
-	[self didChangeValueForProperty: self.contentKey
-	                      atIndexes: indexes
-	                    withObjects: objects
-	                   mutationKind: ETCollectionMutationKindRemoval];
+    [self didChangeValueForProperty: self.contentKey
+                          atIndexes: indexes
+                        withObjects: objects
+                       mutationKind: ETCollectionMutationKindRemoval];
 }
 
 - (id)objectForIdentifier: (NSString *)anId
 {
-	for (id object in self.content)
-	{
-		if ([[object identifier] isEqualToString: anId])
-		{
-			return object;
-		}
-	}
-	return nil;
+    for (id object in self.content)
+    {
+        if ([[object identifier] isEqualToString: anId])
+        {
+            return object;
+        }
+    }
+    return nil;
 }
 
 - (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
 {
-	NSMutableArray *result = [NSMutableArray array];
+    NSMutableArray *result = [NSMutableArray array];
 
-	for (COObject *object in self.content)
-	{
-		if ([aQuery.predicate evaluateWithObject: object])
-		{
-			[result addObject: object];
-		}
-	}
+    for (COObject *object in self.content)
+    {
+        if ([aQuery.predicate evaluateWithObject: object])
+        {
+            [result addObject: object];
+        }
+    }
 
-	return result;
+    return result;
 }
 
 @end
@@ -190,22 +190,22 @@
 
 - (BOOL)isGroup
 {
-	return NO;
+    return NO;
 }
 
 - (BOOL)isTag
 {
-	return NO;
+    return NO;
 }
 
 - (BOOL)isContainer
 {
-	return NO;
+    return NO;
 }
 
 - (BOOL)isLibrary
 {
-	return NO;
+    return NO;
 }
 
 @end

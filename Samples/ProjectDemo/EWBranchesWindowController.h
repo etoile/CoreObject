@@ -6,8 +6,8 @@
 
 @interface EWBranchesWindowController : EWUtilityWindowController <NSTableViewDelegate, NSTableViewDataSource>
 {
-	IBOutlet NSTableView *table;
-	EWDocumentWindowController *inspectedWindowController;
+    IBOutlet NSTableView *table;
+    EWDocumentWindowController *inspectedWindowController;
 }
 
 + (EWBranchesWindowController *) sharedController;

@@ -18,30 +18,30 @@
 @protocol COSynchronizerServerDelegate <NSObject>
 
 - (void) sendResponseMessage: (COSynchronizerResponseToClientForSentRevisionsMessage *)aPropertyList
-					toClient: (NSString *)aJID;
+                    toClient: (NSString *)aJID;
 - (void) sendPushedRevisions: (COSynchronizerPushedRevisionsToClientMessage *)aMessage
-				   toClients: (NSArray *)clients;
+                   toClients: (NSArray *)clients;
 - (void) sendPersistentRootInfoMessage: (COSynchronizerPersistentRootInfoToClientMessage *)aMessage
-							  toClient: (NSString *)aClient;
+                              toClient: (NSString *)aClient;
 
 @end
 
 @interface COSynchronizerServer : NSObject
 {
-	COBranch *branch;
+    COBranch *branch;
 
-	/**
-	 * Keys in this dictionary determine the active set of clients
-	 */
-	NSMutableDictionary *lastSentRevisionForClientID;
-	
-	id<COSynchronizerServerDelegate> __weak delegate;
-	
-	// HACK: These two are used to pass info between two methods in
-	// COSynchronizerServer where one calls the other via a commit notification
-	
-	ETUUID *currentlyHandlingLastSentRevision;
-	NSString *currentlyRespondingToClient;
+    /**
+     * Keys in this dictionary determine the active set of clients
+     */
+    NSMutableDictionary *lastSentRevisionForClientID;
+    
+    id<COSynchronizerServerDelegate> __weak delegate;
+    
+    // HACK: These two are used to pass info between two methods in
+    // COSynchronizerServer where one calls the other via a commit notification
+    
+    ETUUID *currentlyHandlingLastSentRevision;
+    NSString *currentlyRespondingToClient;
 }
 
 - (instancetype) initWithBranch: (COBranch *)aBranch NS_DESIGNATED_INITIALIZER;

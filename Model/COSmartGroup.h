@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2010 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2010 Eric Wasylishen, Quentin Mathe
 
-	Date:  November 2010
-	License:  MIT  (see COPYING)
+    Date:  November 2010
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -23,11 +23,11 @@ typedef NSArray *(^COContentBlock)(void);
  */
 @interface COSmartGroup : COObject <ETCollection>
 {
-	@private
-	id <ETCollection> targetCollection;
-	COQuery *query;
-	COContentBlock contentBlock;
-	NSArray *content;
+    @private
+    id <ETCollection> targetCollection;
+    COQuery *query;
+    COContentBlock contentBlock;
+    NSArray *content;
 }
 
 

@@ -21,11 +21,11 @@
 @implementation RFImageToDataTransformer
 
 + (BOOL)allowsReverseTransformation {
-	return YES;
+    return YES;
 }
 
 + (Class)transformedValueClass {
-	return [NSData class];
+    return [NSData class];
 }
 
 - (id)transformedValue:(id)value {
@@ -38,9 +38,9 @@
 
 - (id)reverseTransformedValue:(id)value {
 #if TARGET_OS_IPHONE
-	return [[UIImage alloc] initWithData:value];
+    return [[UIImage alloc] initWithData:value];
 #else
-	return [[NSImage alloc] initWithData:value];
+    return [[NSImage alloc] initWithData:value];
 #endif
 }
 

@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2015 Quentin Mathe
+    Copyright (C) 2015 Quentin Mathe
 
-	Date:  January 2015
-	License:  MIT  (see COPYING)
+    Date:  January 2015
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -13,11 +13,11 @@
 
 @interface COTrackViewController : UITableViewController <UITableViewDataSource, UITableViewDelegate>
 {
-	@private
-	id <COTrack> _track;
-	UIColor *_pastColor;
-	UIColor *_futureColor;
-	NSIndexPath *_checkedIndexPath;
+    @private
+    id <COTrack> _track;
+    UIColor *_pastColor;
+    UIColor *_futureColor;
+    NSIndexPath *_checkedIndexPath;
 }
 
 

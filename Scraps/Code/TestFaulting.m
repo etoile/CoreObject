@@ -1,12 +1,12 @@
 - (void) testAsyncFaulting
 {
     // library1 <<persistent root>>
-	//  |
-	//  \--photo1 // cross-persistent-root link, default branch
-	//
-	// photo1 <<persistent root>>
-	//  |
-	//  \--child1 (pretend there are a lot of child objects)
+    //  |
+    //  \--photo1 // cross-persistent-root link, default branch
+    //
+    // photo1 <<persistent root>>
+    //  |
+    //  \--child1 (pretend there are a lot of child objects)
     
     
     // 1. Set it up in memory

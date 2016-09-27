@@ -17,33 +17,33 @@
 
 typedef NS_OPTIONS(NSUInteger, COBranchRevisionReadingOptions)
 {
-	/**
-	 * Return revisions between the branch's initial revision and head revision, inclusive
-	 */
-	COBranchRevisionReadingDefault = 0,
-	/**
-	 * Return all parent revisions of the branch's head revision, including those in
-	 * parent branches, as well as those in parent persistent roots.
-	 *
-	 * Revisions on branches merged into the branch, or on branches merged into
-	 * parent branches are not included.
-	 */
-	COBranchRevisionReadingParentBranches = 2,
-	/**
-	 * Finds the revisions which have the same branch UUID as the one being queried,
-	 * but are located on anonymous/implicit branches.
-	 *
-	 * These divergent revisions are usually created by undo/redo actions.
-	 *
-	 * Although no branch creation was requested, a divergent revision sequence
-	 * form a "branch" in the history graph, this is why we call these branches implicit or anonymous.
-	 *
-	 * If combined with COBranchRevisionReadingParentBranches, also includes divergent
-	 * revisions belonging to the parent of the branch being queried, and its parent, etc.
-	 *
-	 * See "lost head" example in COSQLiteStore documentation.
-	 */
-	COBranchRevisionReadingDivergentRevisions = 4
+    /**
+     * Return revisions between the branch's initial revision and head revision, inclusive
+     */
+    COBranchRevisionReadingDefault = 0,
+    /**
+     * Return all parent revisions of the branch's head revision, including those in
+     * parent branches, as well as those in parent persistent roots.
+     *
+     * Revisions on branches merged into the branch, or on branches merged into
+     * parent branches are not included.
+     */
+    COBranchRevisionReadingParentBranches = 2,
+    /**
+     * Finds the revisions which have the same branch UUID as the one being queried,
+     * but are located on anonymous/implicit branches.
+     *
+     * These divergent revisions are usually created by undo/redo actions.
+     *
+     * Although no branch creation was requested, a divergent revision sequence
+     * form a "branch" in the history graph, this is why we call these branches implicit or anonymous.
+     *
+     * If combined with COBranchRevisionReadingParentBranches, also includes divergent
+     * revisions belonging to the parent of the branch being queried, and its parent, etc.
+     *
+     * See "lost head" example in COSQLiteStore documentation.
+     */
+    COBranchRevisionReadingDivergentRevisions = 4
 };
 
 /**
@@ -343,14 +343,14 @@ extern NSString * const COPersistentRootAttributeUsedSize;
 @interface COSQLiteStore : NSObject
 {
 @private
-	NSURL *url_;
+    NSURL *url_;
     ETUUID *_uuid;    
     FMDatabase *db_;
     NSMutableDictionary *backingStores_; // COUUID (backing store UUID => COCQLiteStorePersistentRootBackingStore)
     NSMutableDictionary *backingStoreUUIDForPersistentRootUUID_;
     
     dispatch_queue_t queue_;
-	NSUInteger _maxNumberOfDeltaCommits;
+    NSUInteger _maxNumberOfDeltaCommits;
 }
 
 /**
@@ -377,7 +377,7 @@ extern NSString * const COPersistentRootAttributeUsedSize;
  * Adding an in-memory cache for this will probably imporant.
  */
 - (CORevisionInfo *) revisionInfoForRevisionUUID: (ETUUID *)aRevision
-							  persistentRootUUID: (ETUUID *)aPersistentRoot;
+                              persistentRootUUID: (ETUUID *)aPersistentRoot;
 
 
 /**
@@ -409,13 +409,13 @@ extern NSString * const COPersistentRootAttributeUsedSize;
  */
 - (COItemGraph *) partialItemGraphFromRevisionUUID: (ETUUID *)baseRevid
                                     toRevisionUUID: (ETUUID *)finalRevid
-									persistentRoot: (ETUUID *)aPersistentRoot;
+                                    persistentRoot: (ETUUID *)aPersistentRoot;
 
 /**
  * Returns the state the inner object graph at a given revision.
  */
 - (COItemGraph *) itemGraphForRevisionUUID: (ETUUID *)aRevisionUUID
-							persistentRoot: (ETUUID *)aPersistentRoot;
+                            persistentRoot: (ETUUID *)aPersistentRoot;
 
 /**
  * Returns the UUID of the root object of the given persistent root.

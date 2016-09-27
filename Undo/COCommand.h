@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  September 2013
-	License:  MIT  (see COPYING)
+    Date:  September 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -27,8 +27,8 @@
  */
 @interface COCommand : NSObject <COTrackNode>
 {
-	COUndoTrack __weak *_parentUndoTrack;
-	ETUUID *_storeUUID;
+    COUndoTrack __weak *_parentUndoTrack;
+    ETUUID *_storeUUID;
     ETUUID *_persistentRootUUID;
 }
 
@@ -110,7 +110,7 @@
  * Applies the receiver changes directly to a store transaction.
  */
 - (void) addToStoreTransaction: (COStoreTransaction *)txn
-		  withRevisionMetadata: (NSDictionary *)metadata
+          withRevisionMetadata: (NSDictionary *)metadata
    assumingEditingContextState: (COEditingContext *)ctx;
 
 /** @taskunit Framework Private */

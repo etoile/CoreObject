@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2014 Eric Wasylishen
+    Copyright (C) 2014 Eric Wasylishen
  
-	Date:  February 2014
-	License:  MIT  (see COPYING)
+    Date:  February 2014
+    License:  MIT  (see COPYING)
  */
 
 #import <Cocoa/Cocoa.h>
@@ -24,36 +24,36 @@ NSString * EWTagDragType;
 @interface EWTypewriterWindowController : NSWindowController <NSWindowDelegate, NSTextViewDelegate, NSTextStorageDelegate, EWUndoManagerDelegate>
 {
     IBOutlet EWTextView *textView;
-	IBOutlet NSTableView *notesTable;
-	IBOutlet NSOutlineView *tagsOutline;
-	IBOutlet NSSearchField *searchfield;
-	IBOutlet NSSplitView *splitView;
-	
-	IBOutlet NSButton *addTagButton;
-	IBOutlet NSButton *addNoteButton;
-	
-	PrioritySplitViewDelegate *splitViewDelegate;
-	COAttributedStringWrapper *textStorage;
-	COPersistentRoot *selectedNote;
-	COUndoTrack *undoTrack;
-	EWUndoManager *undoManagerBridge;
-	
-	EWTagListDataSource *tagListDataSource;
-	EWNoteListDataSource *noteListDataSource;
-	
-	EWDiffWindowController *diffWindowController;
-	
-	// Tracking text changes
-	BOOL changedByUser;
-	NSTimer *coalescingTimer;
-	BOOL isDeleting;
-	COObjectGraphContext *selectedNoteCommittedState;
-	CORevision *selectedNoteCommittedStateRevision;
-	
-	// Navigation history
-	NSMutableArray *navigationHistory;
-	NSInteger navigationHistoryPosition;
-	BOOL isNavigating;
+    IBOutlet NSTableView *notesTable;
+    IBOutlet NSOutlineView *tagsOutline;
+    IBOutlet NSSearchField *searchfield;
+    IBOutlet NSSplitView *splitView;
+    
+    IBOutlet NSButton *addTagButton;
+    IBOutlet NSButton *addNoteButton;
+    
+    PrioritySplitViewDelegate *splitViewDelegate;
+    COAttributedStringWrapper *textStorage;
+    COPersistentRoot *selectedNote;
+    COUndoTrack *undoTrack;
+    EWUndoManager *undoManagerBridge;
+    
+    EWTagListDataSource *tagListDataSource;
+    EWNoteListDataSource *noteListDataSource;
+    
+    EWDiffWindowController *diffWindowController;
+    
+    // Tracking text changes
+    BOOL changedByUser;
+    NSTimer *coalescingTimer;
+    BOOL isDeleting;
+    COObjectGraphContext *selectedNoteCommittedState;
+    CORevision *selectedNoteCommittedStateRevision;
+    
+    // Navigation history
+    NSMutableArray *navigationHistory;
+    NSInteger navigationHistoryPosition;
+    BOOL isNavigating;
 }
 
 @property (nonatomic, readonly) NSTableView *notesTable;

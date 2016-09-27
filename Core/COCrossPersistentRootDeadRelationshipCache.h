@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2015 Quentin Mathe
+    Copyright (C) 2015 Quentin Mathe
 
-	Date:  May 2015
-	License:  MIT  (see COPYING)
+    Date:  May 2015
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -27,9 +27,9 @@
  */
 @interface COCrossPersistentRootDeadRelationshipCache : NSObject
 {
-	@private
-	NSMutableDictionary *_pathToReferringObjects;
-	NSMapTable *_referringObjectToPaths;
+    @private
+    NSMutableDictionary *_pathToReferringObjects;
+    NSMapTable *_referringObjectToPaths;
 }
 
 - (void)addReferringObject: (COObject *)aReferrer

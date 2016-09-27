@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  September 2013
-	License:  MIT  (see COPYING)
+    Date:  September 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -90,15 +90,15 @@ extern NSString * const kCOUndoTrackName;
  */
 @interface COUndoTrack : NSObject <COTrack>
 {
-	@private
+    @private
     NSString *_name;
-	NSMutableArray *_nodesOnCurrentUndoBranch;
-	NSMutableDictionary *_commandsByUUID;
-	COEditingContext *_editingContext;
-	NSMutableDictionary *_trackStateForName;
-	
-	BOOL _coalescing;
-	ETUUID *_lastCoalescedCommandUUID;
+    NSMutableArray *_nodesOnCurrentUndoBranch;
+    NSMutableDictionary *_commandsByUUID;
+    COEditingContext *_editingContext;
+    NSMutableDictionary *_trackStateForName;
+    
+    BOOL _coalescing;
+    ETUUID *_lastCoalescedCommandUUID;
 }
 
 /** @taskunit Track Access and Creation */

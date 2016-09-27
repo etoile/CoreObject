@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2010 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2010 Eric Wasylishen, Quentin Mathe
 
-	Date:  November 2010
-	License:  MIT  (see COPYING)
+    Date:  November 2010
+    License:  MIT  (see COPYING)
  */
 
 #import "COGroup.h"
@@ -11,34 +11,34 @@
 
 + (ETEntityDescription *)newEntityDescription
 {
-	ETEntityDescription *collection = [self newBasicEntityDescription];
+    ETEntityDescription *collection = [self newBasicEntityDescription];
 
-	// For subclasses that don't override -newEntityDescription, we must not add the 
-	// property descriptions that we will inherit through the parent
-	if (![collection.name isEqual: [COGroup className]]) 
-		return collection;
+    // For subclasses that don't override -newEntityDescription, we must not add the 
+    // property descriptions that we will inherit through the parent
+    if (![collection.name isEqual: [COGroup className]]) 
+        return collection;
 
-	ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COGroup"
-	                               description: @"Core Object Group"
-	                          supertypeStrings: @[]
-	                                  typeTags: @{}];
-	ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
+    ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COGroup"
+                                   description: @"Core Object Group"
+                              supertypeStrings: @[]
+                                      typeTags: @{}];
+    ETAssert([[ETUTI typeWithClass: [self class]] isEqual: uti]);
 
-	[collection setLocalizedDescription: _(@"Group")];
+    [collection setLocalizedDescription: _(@"Group")];
 
-	ETPropertyDescription *objects =
-		[self contentPropertyDescriptionWithName: @"objects"
-		                                    type: @"COObject"
-		                                opposite: nil];
+    ETPropertyDescription *objects =
+        [self contentPropertyDescriptionWithName: @"objects"
+                                            type: @"COObject"
+                                        opposite: nil];
 
-	collection.propertyDescriptions = @[objects];
+    collection.propertyDescriptions = @[objects];
 
-	return collection;
+    return collection;
 }
 
 - (BOOL)isGroup
 {
-	return YES;
+    return YES;
 }
 
 @end

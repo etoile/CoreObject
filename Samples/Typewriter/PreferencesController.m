@@ -6,16 +6,16 @@
 
 - (id)init
 {
-	self = [super initWithWindowNibName: @"Preferences"];
-	
-	if (self) {
-	}
-	return self;
+    self = [super initWithWindowNibName: @"Preferences"];
+    
+    if (self) {
+    }
+    return self;
 }
 
 - (IBAction) clearUndoHistory: (id)sender
 {
-	[(EWAppDelegate *)[NSApp delegate] clearUndo];
+    [(EWAppDelegate *)[NSApp delegate] clearUndo];
 }
 
 @end

@@ -8,12 +8,12 @@
 
 - (void) show
 {
-	[self.currentRevision show];
+    [self.currentRevision show];
 }
 
 - (void) showHistory
 {
-	[self.persistentRoot showHistory];
+    [self.persistentRoot showHistory];
 }
 
 @end

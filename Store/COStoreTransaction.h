@@ -23,7 +23,7 @@
  */
 @interface COStoreTransaction : NSObject
 {
-	NSMutableDictionary *_oldTransactionIDForPersistentRootUUID;
+    NSMutableDictionary *_oldTransactionIDForPersistentRootUUID;
 }
 
 @property (nonatomic, readonly, strong) NSMutableArray *operations;
@@ -72,10 +72,10 @@
  * Convenience method
  */
 - (COPersistentRootInfo *) createPersistentRootCopyWithUUID: (ETUUID *)uuid
-								   parentPersistentRootUUID: (ETUUID *)aParentPersistentRoot
-												 branchUUID: (ETUUID *)aBranchUUID
-										   parentBranchUUID: (ETUUID *)aParentBranch
-										initialRevisionUUID: (ETUUID *)aRevision;
+                                   parentPersistentRootUUID: (ETUUID *)aParentPersistentRoot
+                                                 branchUUID: (ETUUID *)aBranchUUID
+                                           parentBranchUUID: (ETUUID *)aParentBranch
+                                        initialRevisionUUID: (ETUUID *)aRevision;
 
 /**
  * Convenience method
@@ -95,7 +95,7 @@
         forPersistentRoot: (ETUUID *)aRoot;
 
 - (void) createBranchWithUUID: (ETUUID *)branchUUID
-				 parentBranch: (ETUUID *)aParentBranch
+                 parentBranch: (ETUUID *)aParentBranch
               initialRevision: (ETUUID *)revId
             forPersistentRoot: (ETUUID *)aRoot;
 
@@ -104,7 +104,7 @@
  * You can pass nil for headRev to not change the headRev.
  */
 - (void) setCurrentRevision: (ETUUID *)currentRev
-			   headRevision: (ETUUID *)headRev
+               headRevision: (ETUUID *)headRev
                   forBranch: (ETUUID *)aBranch
            ofPersistentRoot: (ETUUID *)aRoot;
 
@@ -152,6 +152,6 @@
  * Returns nil if the branch's current revision is not modified in this transaction.
  */
 - (ETUUID *) lastSetCurrentRevisionInTransactionForBranch: (ETUUID *)aBranch
-										 ofPersistentRoot: (ETUUID *)aRoot;
+                                         ofPersistentRoot: (ETUUID *)aRoot;
 
 @end

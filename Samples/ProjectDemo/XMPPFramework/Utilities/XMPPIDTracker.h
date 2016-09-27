@@ -85,9 +85,9 @@ extern const NSTimeInterval XMPPIDTrackerTimeoutNone;
 **/
 @interface XMPPIDTracker : NSObject
 {
-	dispatch_queue_t queue;
-	
-	NSMutableDictionary *dict;
+    dispatch_queue_t queue;
+    
+    NSMutableDictionary *dict;
 }
 
 - (id)initWithDispatchQueue:(dispatch_queue_t)queue;
@@ -142,15 +142,15 @@ extern const NSTimeInterval XMPPIDTrackerTimeoutNone;
 
 @interface XMPPBasicTrackingInfo : NSObject <XMPPTrackingInfo>
 {
-	id target;
-	SEL selector;
-	
-	void (^block)(id obj, id <XMPPTrackingInfo> info);
-	
-	NSTimeInterval timeout;
-	
-	NSString *elementID;
-	dispatch_source_t timer;
+    id target;
+    SEL selector;
+    
+    void (^block)(id obj, id <XMPPTrackingInfo> info);
+    
+    NSTimeInterval timeout;
+    
+    NSString *elementID;
+    dispatch_source_t timer;
 }
 
 - (id)initWithTarget:(id)target selector:(SEL)selector timeout:(NSTimeInterval)timeout;

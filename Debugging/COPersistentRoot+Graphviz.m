@@ -8,12 +8,12 @@
 
 - (void) show
 {
-	[self.currentRevision show];
+    [self.currentRevision show];
 }
 
 - (void) showHistory
 {
-	[self.store showGraphForPersistentRootUUID: self.UUID];
+    [self.store showGraphForPersistentRootUUID: self.UUID];
 }
 
 @end

@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2014 Eric Wasylishen
+    Copyright (C) 2014 Eric Wasylishen
  
-	Date:  February 2014
-	License:  MIT  (see COPYING)
+    Date:  February 2014
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -17,11 +17,11 @@
 
 @interface EWTagListDataSource : NSObject <NSOutlineViewDataSource, NSOutlineViewDelegate>
 {
-	NSTreeNode *rootTreeNode;
-	NSTreeNode *allNotesTreeNode;
-	NSMutableSet *oldSelection;
-	EWTagGroupTagPair *nextSelection;
-	BOOL ignoreSelectionChanges;
+    NSTreeNode *rootTreeNode;
+    NSTreeNode *allNotesTreeNode;
+    NSMutableSet *oldSelection;
+    EWTagGroupTagPair *nextSelection;
+    BOOL ignoreSelectionChanges;
 }
 
 @property (nonatomic, unsafe_unretained) EWTypewriterWindowController *owner;

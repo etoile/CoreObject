@@ -97,7 +97,7 @@ extern NSString * const kCOParent;
  * COObjectGraphContext instane, and re-run the tests in the block.
  */
 - (void) checkObjectGraphBeforeAndAfterSerializationRoundtrip: (COObjectGraphContext *)anObjectGraph
-													  inBlock: (void (^)(COObjectGraphContext *testGraph, COObject *testRootObject, BOOL isObjectGraphCopy))block;
+                                                      inBlock: (void (^)(COObjectGraphContext *testGraph, COObject *testRootObject, BOOL isObjectGraphCopy))block;
 /**
  * Executes the provided block, and tests that the given notification type
  * is posted exactly count times from sender as a result.
@@ -105,13 +105,13 @@ extern NSString * const kCOParent;
  * If expectedUserInfo is non-nil, test that each key/value pair in the dictionary
  * is also in [notif userInfo].
  */
-- (void)	checkBlock: (void (^)(void))block
+- (void)    checkBlock: (void (^)(void))block
   postsNotification: (NSString *)notif
-		  withCount: (NSUInteger)count
-		 fromObject: (id)sender
-	   withUserInfo: (NSDictionary *)expectedUserInfo;
+          withCount: (NSUInteger)count
+         fromObject: (id)sender
+       withUserInfo: (NSDictionary *)expectedUserInfo;
 
-- (void)	checkBlock: (void (^)(void))block
+- (void)    checkBlock: (void (^)(void))block
 doesNotPostNotification: (NSString *)notif;
 
 @end
@@ -154,22 +154,22 @@ doesNotPostNotification: (NSString *)notif;
 + (void)deleteStores;
 
 - (void) checkPersistentRoot: (ETUUID *)aPersistentRoot
-					 current: (ETUUID *)expectedCurrent
-						head: (ETUUID *)expectedHead;
+                     current: (ETUUID *)expectedCurrent
+                        head: (ETUUID *)expectedHead;
 
 - (void) checkBranch: (ETUUID *)aBranch
-			 current: (ETUUID *)expectedCurrent
-				head: (ETUUID *)expectedHead;
+             current: (ETUUID *)expectedCurrent
+                head: (ETUUID *)expectedHead;
 
 - (COItemGraph *) currentItemGraphForBranch: (ETUUID *)aBranch;
 
 - (COItemGraph *) currentItemGraphForBranch: (ETUUID *)aBranch
-									  store: (COSQLiteStore *)aStore;
+                                      store: (COSQLiteStore *)aStore;
 
 - (COItemGraph *) currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot;
 
 - (COItemGraph *) currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot
-											  store: (COSQLiteStore *)aStore;
+                                              store: (COSQLiteStore *)aStore;
 
 @end
 
@@ -178,7 +178,7 @@ doesNotPostNotification: (NSString *)notif;
  */
 @interface EditingContextTestCase : SQLiteStoreTestCase
 {
-	COEditingContext *ctx;
+    COEditingContext *ctx;
 }
 
 /**
@@ -195,13 +195,13 @@ doesNotPostNotification: (NSString *)notif;
  * context/store, and YES when the block is executing with the reloaded context.
  */
 - (void) checkBranchWithExistingAndNewContext: (COBranch *)aBranch
-									  inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block;
+                                      inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block;
 
 /**
  * Same as above but uses the provided persistent root's current branch
  */
 - (void) checkPersistentRootWithExistingAndNewContext: (COPersistentRoot *)aPersistentRoot
-											  inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block;
+                                              inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block;
 
 
 /**

@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2014 Eric Wasylishen
+    Copyright (C) 2014 Eric Wasylishen
  
-	Date:  February 2014
-	License:  MIT  (see COPYING)
+    Date:  February 2014
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -11,8 +11,8 @@
 
 @interface EWNoteListDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate>
 {
-	NSMutableSet *oldSelection;
-	ETUUID *nextSelection;
+    NSMutableSet *oldSelection;
+    ETUUID *nextSelection;
 }
 
 @property (nonatomic, unsafe_unretained) EWTypewriterWindowController *owner;

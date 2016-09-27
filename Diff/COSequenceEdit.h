@@ -1,15 +1,15 @@
 /**
-	Copyright (C) 2012 Eric Wasylishen
+    Copyright (C) 2012 Eric Wasylishen
 
-	Date:  March 2012
-	License:  MIT  (see COPYING)
+    Date:  March 2012
+    License:  MIT  (see COPYING)
  */
 
 #import "COItemGraphEdit.h"
 
 @interface COSequenceEdit : COItemGraphEdit
 {
-	NSRange range;
+    NSRange range;
 }
 @property (readonly, nonatomic) NSRange range;
 
@@ -18,8 +18,8 @@
 - (BOOL) touches: (COSequenceEdit *)other;
 
 - (instancetype) initWithUUID: (ETUUID *)aUUID
-		  attribute: (NSString *)anAttribute
+          attribute: (NSString *)anAttribute
    sourceIdentifier: (id)aSourceIdentifier
-			  range: (NSRange)aRange NS_DESIGNATED_INITIALIZER;
+              range: (NSRange)aRange NS_DESIGNATED_INITIALIZER;
 
 @end

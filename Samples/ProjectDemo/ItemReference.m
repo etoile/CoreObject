@@ -15,7 +15,7 @@
     
     ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
                                                                                   type: (id)@"Anonymous.OutlineItem"];
-	[parentProperty setDerived: YES];
+    [parentProperty setDerived: YES];
     
     ETPropertyDescription *referencedItemProperty = [ETPropertyDescription descriptionWithName: @"referencedItem"
                                                                                           type: (id)@"Anonymous.OutlineItem"];
@@ -27,10 +27,10 @@
 
 - (id)initWithParent: (OutlineItem*)p referencedItem: (OutlineItem*)ref context: (COObjectGraphContext*)ctx
 {
-	self = [super initWithObjectGraphContext: ctx];
-	[self setParent: p];
+    self = [super initWithObjectGraphContext: ctx];
+    [self setParent: p];
     [self setReferencedItem: ref];
-	return self;
+    return self;
 }
 
 /* Accessor Methods */
@@ -40,17 +40,17 @@
 
 - (OutlineItem*)root
 {
-	id root = self;
-	while ([root parent] != nil)
-	{
-		root = [root parent];
-	}
-	return root;
+    id root = self;
+    while ([root parent] != nil)
+    {
+        root = [root parent];
+    }
+    return root;
 }
 
 - (NSString*)label
 {
-	return [NSString stringWithFormat: @"Link to %@", [[self referencedItem] UUID]];
+    return [NSString stringWithFormat: @"Link to %@", [[self referencedItem] UUID]];
 }
 
 @end

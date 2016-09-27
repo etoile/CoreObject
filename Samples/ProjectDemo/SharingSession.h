@@ -12,32 +12,32 @@
  */
 @interface SharingSession : NSObject <COSynchronizerJSONClientDelegate, COSynchronizerJSONServerDelegate>
 {
-	ETUUID *_persistentRootUUID;
-	ETUUID *_branchUUID;
-	
-	XMPPStream *_xmppStream;
-	BOOL _isServer;
-	
-	// Only for server object
-	
-	COSynchronizerJSONServer *_JSONServer;
-	COSynchronizerServer *_server;
-	
-	// Only for client object
-	
-	COSynchronizerClient *_client;
-	COSynchronizerJSONClient *_JSONClient;
-	XMPPJID *_serverJID;
+    ETUUID *_persistentRootUUID;
+    ETUUID *_branchUUID;
+    
+    XMPPStream *_xmppStream;
+    BOOL _isServer;
+    
+    // Only for server object
+    
+    COSynchronizerJSONServer *_JSONServer;
+    COSynchronizerServer *_server;
+    
+    // Only for client object
+    
+    COSynchronizerClient *_client;
+    COSynchronizerJSONClient *_JSONClient;
+    XMPPJID *_serverJID;
 }
 
 - (id)initAsClientWithEditingContext: (COEditingContext *)ctx
-				  persistentRootUUID: (ETUUID *)persistentRootUUID
-						  branchUUID: (ETUUID *)branchUUID
-						   serverJID: (XMPPJID *)peerJID
-						  xmppStream: (XMPPStream *)xmppStream;
+                  persistentRootUUID: (ETUUID *)persistentRootUUID
+                          branchUUID: (ETUUID *)branchUUID
+                           serverJID: (XMPPJID *)peerJID
+                          xmppStream: (XMPPStream *)xmppStream;
 
 - (id)initAsServerWithBranch: (COBranch *)aBranch
-				  xmppStream: (XMPPStream *)xmppStream;
+                  xmppStream: (XMPPStream *)xmppStream;
 
 @property (nonatomic, readonly) ETUUID *persistentRootUUID;
 @property (nonatomic, readonly) ETUUID *branchUUID;

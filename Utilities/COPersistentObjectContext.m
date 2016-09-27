@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2013 Quentin Mathe
+    Copyright (C) 2013 Quentin Mathe
 
-	Date:  March 2013
-	License:  MIT  (see COPYING)
+    Date:  March 2013
+    License:  MIT  (see COPYING)
  */
 
 #import "COPersistentObjectContext.h"
@@ -11,17 +11,17 @@
 
 - (BOOL)isEditingContext
 {
-	return NO;
+    return NO;
 }
 
 - (BOOL)isPersistentRoot
 {
-	return NO;
+    return NO;
 }
 
 - (BOOL)isObjectGraphContext
 {
-	return NO;
+    return NO;
 }
 
 @end

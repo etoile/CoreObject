@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
  
-	Date:  July 2013
-	License:  MIT  (see COPYING)
+    Date:  July 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -152,13 +152,13 @@ extern NSString * const COPersistentRootDidChangeNotification;
  */
 @interface COPersistentRoot : NSObject <COPersistentObjectContext>
 {
-	@private
+    @private
     ETUUID *_UUID;
-	COEditingContext *__weak _parentContext;
+    COEditingContext *__weak _parentContext;
     /**
      * State of the persistent root and its branches as loaded from the store.
      * We don't modify this as changes are being staged in-memory (class should 
-	 * be immutable), but it is updaded when we make a commit or read from disk.
+     * be immutable), but it is updaded when we make a commit or read from disk.
      *
      * If nil, this is a newly created persistent root.
      */
@@ -167,8 +167,8 @@ extern NSString * const COPersistentRootDidChangeNotification;
      * COBranch objects indexed by ETUUID
      */
     NSMutableDictionary *_branchForUUID;
-	NSMutableSet *_branchesPendingDeletion;
-	NSMutableSet *_branchesPendingUndeletion;
+    NSMutableSet *_branchesPendingDeletion;
+    NSMutableSet *_branchesPendingUndeletion;
     /**
      * Used to stage a change to the current branch.
      */
@@ -181,9 +181,9 @@ extern NSString * const COPersistentRootDidChangeNotification;
      * Only used when creating a persistent root as a cheap copy.
      */
     ETUUID *_cheapCopyPersistentRootUUID;
-	NSDictionary *_metadata;    
+    NSDictionary *_metadata;    
     BOOL _metadataChanged;
-	COObjectGraphContext *_currentBranchObjectGraph;
+    COObjectGraphContext *_currentBranchObjectGraph;
 }
 
 
@@ -483,7 +483,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  */
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
                     metadata: (NSDictionary *)additionalMetadata
-				   undoTrack: (COUndoTrack *)undoTrack
+                   undoTrack: (COUndoTrack *)undoTrack
                        error: (COError **)anError;
 /**
  * Commits this persistent root changes to the store and returns whether it 

@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen
+    Copyright (C) 2013 Eric Wasylishen
 
-	Date:  May 2013
-	License:  MIT  (see COPYING)
+    Date:  May 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -36,8 +36,8 @@
                      toGraph: (id<COItemGraph>)dest NS_RETURNS_NOT_RETAINED;
 
 - (NSArray*) copyItemsWithUUIDs: (NSArray*)uuids
-					  fromGraph: (id<COItemGraph>)source
-						toGraph: (id<COItemGraph>)dest NS_RETURNS_NOT_RETAINED;
+                      fromGraph: (id<COItemGraph>)source
+                        toGraph: (id<COItemGraph>)dest NS_RETURNS_NOT_RETAINED;
 
 
 @end

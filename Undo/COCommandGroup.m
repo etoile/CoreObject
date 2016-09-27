@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  September 2013
-	License:  MIT  (see COPYING)
+    Date:  September 2013
+    License:  MIT  (see COPYING)
  */
 
 #import "COCommandGroup.h"
@@ -36,120 +36,120 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 + (void) initialize
 {
-	if (self != [COCommandGroup class])
-		return;
-	
-	[self applyTraitFromClass: [ETCollectionTrait class]];
+    if (self != [COCommandGroup class])
+        return;
+    
+    [self applyTraitFromClass: [ETCollectionTrait class]];
 }
 
 - (instancetype)init
 {
-	COUndoTrackSerializedCommand *command = [COUndoTrackSerializedCommand new];
-	
-	command.UUID = [ETUUID UUID];
-	command.timestamp = [NSDate date];
+    COUndoTrackSerializedCommand *command = [COUndoTrackSerializedCommand new];
+    
+    command.UUID = [ETUUID UUID];
+    command.timestamp = [NSDate date];
 
     return [self initWithSerializedCommand: command owner: nil];
 }
 
 - (instancetype) initWithSerializedCommand: (COUndoTrackSerializedCommand *)aCommand
-									 owner: (COUndoTrack *)anOwner
+                                     owner: (COUndoTrack *)anOwner
 {
-	NILARG_EXCEPTION_TEST(aCommand);
-	SUPERINIT;
-	_parentUndoTrack = anOwner;
-	_contents = [self commandsFromPropertyList: aCommand.JSONData
-							   parentUndoTrack: anOwner];
-	_metadata = aCommand.metadata;
-	_UUID = aCommand.UUID;
-	if (aCommand.parentUUID == nil)
-	{
-		_parentUUID = [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID;
-	}
-	else
-	{
-		_parentUUID = aCommand.parentUUID;
-	}
-	_timestamp = aCommand.timestamp;
-	_sequenceNumber = aCommand.sequenceNumber;
-	_trackName = aCommand.trackName;
-	return self;
+    NILARG_EXCEPTION_TEST(aCommand);
+    SUPERINIT;
+    _parentUndoTrack = anOwner;
+    _contents = [self commandsFromPropertyList: aCommand.JSONData
+                               parentUndoTrack: anOwner];
+    _metadata = aCommand.metadata;
+    _UUID = aCommand.UUID;
+    if (aCommand.parentUUID == nil)
+    {
+        _parentUUID = [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID;
+    }
+    else
+    {
+        _parentUUID = aCommand.parentUUID;
+    }
+    _timestamp = aCommand.timestamp;
+    _sequenceNumber = aCommand.sequenceNumber;
+    _trackName = aCommand.trackName;
+    return self;
 }
 
 - (COUndoTrackSerializedCommand *) serializedCommand
 {
-	COUndoTrackSerializedCommand *cmd = [COUndoTrackSerializedCommand new];
-	cmd.JSONData = [self commandsPropertyList];
-	cmd.metadata = _metadata;
-	cmd.UUID = _UUID;
-	if ([_parentUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID])
-	{
-		cmd.parentUUID = nil;
-	}
-	else
-	{
-		cmd.parentUUID = _parentUUID;
-	}
-	cmd.trackName = _trackName;
-	cmd.timestamp = _timestamp;
-	cmd.sequenceNumber = _sequenceNumber;
-	return cmd;
+    COUndoTrackSerializedCommand *cmd = [COUndoTrackSerializedCommand new];
+    cmd.JSONData = [self commandsPropertyList];
+    cmd.metadata = _metadata;
+    cmd.UUID = _UUID;
+    if ([_parentUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID])
+    {
+        cmd.parentUUID = nil;
+    }
+    else
+    {
+        cmd.parentUUID = _parentUUID;
+    }
+    cmd.trackName = _trackName;
+    cmd.timestamp = _timestamp;
+    cmd.sequenceNumber = _sequenceNumber;
+    return cmd;
 }
 
 - (id) commandsPropertyList
 {
-	return @{kCOCommandContents : [[_contents mappedCollection] propertyList]};
+    return @{kCOCommandContents : [[_contents mappedCollection] propertyList]};
 }
 
 - (NSMutableArray *)commandsFromPropertyList: (NSDictionary *)plist parentUndoTrack: (COUndoTrack *)aParent
 {
-	NSMutableArray *commands = [NSMutableArray array];
+    NSMutableArray *commands = [NSMutableArray array];
 
     for (id subplist in plist[kCOCommandContents])
     {
         COCommand *command = [COCommand commandWithPropertyList: subplist
-												parentUndoTrack: aParent];
+                                                parentUndoTrack: aParent];
         [commands addObject: command];
     }
 
-	return commands;
+    return commands;
 }
 
 - (BOOL)isEqual: (id)object
 {
-	if (![object isKindOfClass: [COCommandGroup class]])
-		return NO;
+    if (![object isKindOfClass: [COCommandGroup class]])
+        return NO;
 
-	return ([((COCommandGroup *)object)->_UUID isEqual: _UUID]);
+    return ([((COCommandGroup *)object)->_UUID isEqual: _UUID]);
 }
 
 - (NSUInteger) hash
 {
-	return _UUID.hash;
+    return _UUID.hash;
 }
 
 - (NSMutableArray *)inversedCommands
 {
-	NSMutableArray *inversedCommands = [NSMutableArray array];
-	
+    NSMutableArray *inversedCommands = [NSMutableArray array];
+    
     for (COCommand *command in _contents)
     {
-		// Insert the inverses back to front, so the inverse of the most recent
-		// action will be first.
+        // Insert the inverses back to front, so the inverse of the most recent
+        // action will be first.
         [inversedCommands insertObject: command.inverse atIndex: 0];
     }
 
-	return inversedCommands;
+    return inversedCommands;
 }
 
 - (NSMutableArray *)copiedCommands
 {
-	NSMutableArray *commands = [NSMutableArray array];
+    NSMutableArray *commands = [NSMutableArray array];
     for (COCommand *command in _contents)
     {
-		[commands addObject: [command copy]];
+        [commands addObject: [command copy]];
     }
-	return commands;
+    return commands;
 }
 
 - (COCommandGroup *) inverse
@@ -168,7 +168,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
 {
-	NILARG_EXCEPTION_TEST(aContext);
+    NILARG_EXCEPTION_TEST(aContext);
 
     for (COCommand *command in _contents)
     {
@@ -182,7 +182,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (void) applyToContext: (COEditingContext *)aContext
 {
-	NILARG_EXCEPTION_TEST(aContext);
+    NILARG_EXCEPTION_TEST(aContext);
 
     for (COCommand *command in _contents)
     {
@@ -192,9 +192,9 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
 {
-	NILARG_EXCEPTION_TEST(ctx);
-	NILARG_EXCEPTION_TEST(txn);
-	
+    NILARG_EXCEPTION_TEST(ctx);
+    NILARG_EXCEPTION_TEST(txn);
+    
     for (COCommand *command in _contents)
     {
         [command addToStoreTransaction: txn withRevisionMetadata: metadata assumingEditingContextState: ctx];
@@ -203,21 +203,21 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (NSString *)kind
 {
-	return _(@"Change Group");
+    return _(@"Change Group");
 }
 
 - (COUndoTrack *)parentUndoTrack
 {
-	return _parentUndoTrack;
+    return _parentUndoTrack;
 }
 
 - (void)setParentUndoTrack:(COUndoTrack *)parentUndoTrack
 {
-	_parentUndoTrack = parentUndoTrack;
-	for (COCommand *childCommand in self.contents)
-	{
-		childCommand.parentUndoTrack = parentUndoTrack;
-	}
+    _parentUndoTrack = parentUndoTrack;
+    for (COCommand *childCommand in self.contents)
+    {
+        childCommand.parentUndoTrack = parentUndoTrack;
+    }
 }
 
 #pragma mark -
@@ -225,64 +225,64 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (ETUUID *)persistentRootUUID
 {
-	// This is kind of a hack
-	for (COCommand *command in [_contents reverseObjectEnumerator])
-	{
-		if (command.persistentRootUUID != nil)
-			return command.persistentRootUUID;
-	}
-	return nil;
+    // This is kind of a hack
+    for (COCommand *command in [_contents reverseObjectEnumerator])
+    {
+        if (command.persistentRootUUID != nil)
+            return command.persistentRootUUID;
+    }
+    return nil;
 }
 
 - (ETUUID *)branchUUID
 {
-	return nil;
+    return nil;
 }
 
 - (NSDate *)date
 {
-	return _timestamp;
+    return _timestamp;
 }
 
 - (COCommitDescriptor *)commitDescriptor
 {
-	NSString *commitDescriptorId =
-		self.metadata[kCOCommitMetadataIdentifier];
+    NSString *commitDescriptorId =
+        self.metadata[kCOCommitMetadataIdentifier];
 
-	if (commitDescriptorId == nil)
-		return nil;
+    if (commitDescriptorId == nil)
+        return nil;
 
-	return [COCommitDescriptor registeredDescriptorForIdentifier: commitDescriptorId];
+    return [COCommitDescriptor registeredDescriptorForIdentifier: commitDescriptorId];
 }
 
 - (NSString *)localizedTypeDescription
 {
-	COCommitDescriptor *descriptor = self.commitDescriptor;
+    COCommitDescriptor *descriptor = self.commitDescriptor;
 
-	if (descriptor == nil)
-		return self.metadata[kCOCommitMetadataTypeDescription];
+    if (descriptor == nil)
+        return self.metadata[kCOCommitMetadataTypeDescription];
 
-	return descriptor.localizedTypeDescription;
+    return descriptor.localizedTypeDescription;
 }
 
 - (NSString *)localizedShortDescription
 {
-	return [COCommitDescriptor localizedShortDescriptionFromMetadata: self.metadata];
+    return [COCommitDescriptor localizedShortDescriptionFromMetadata: self.metadata];
 }
 
 - (id<COTrackNode>)parentNode
 {
-	ETAssert(self.parentUUID != nil);
-	
-	if ([self.parentUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID])
-		return [COEndOfUndoTrackPlaceholderNode sharedInstance];
-	
-	return [_parentUndoTrack commandForUUID: self.parentUUID];
+    ETAssert(self.parentUUID != nil);
+    
+    if ([self.parentUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID])
+        return [COEndOfUndoTrackPlaceholderNode sharedInstance];
+    
+    return [_parentUndoTrack commandForUUID: self.parentUUID];
 }
 
 - (id<COTrackNode>)mergeParentNode
 {
-	return nil;
+    return nil;
 }
 
 #pragma mark -
@@ -290,29 +290,29 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 
 - (BOOL)isOrdered
 {
-	return YES;
+    return YES;
 }
 
 - (id)content
 {
-	return _contents;
+    return _contents;
 }
 
 - (NSArray *)contentArray
 {
-	return [NSArray arrayWithArray: self.content];
+    return [NSArray arrayWithArray: self.content];
 }
 
 #pragma mark -
 
 - (COCommandGroup *) parentCommand
 {
-	return nil;// [_owner commandForUUID: _parentCommandUUID];
+    return nil;// [_owner commandForUUID: _parentCommandUUID];
 }
 
 - (NSString *) description
 {
-	return [NSString stringWithFormat: @"COCommandGroup %@\n\t%@", _UUID, self.localizedShortDescription];
+    return [NSString stringWithFormat: @"COCommandGroup %@\n\t%@", _UUID, self.localizedShortDescription];
 }
 
 @end

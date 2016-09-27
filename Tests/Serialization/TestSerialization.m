@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2014 Quentin Mathé
+    Copyright (C) 2014 Quentin Mathé
 
-	Date:  June 2014
-	License:  MIT  (see COPYING)
+    Date:  June 2014
+    License:  MIT  (see COPYING)
  */
 
 #import <UnitKit/UnitKit.h>
@@ -11,7 +11,7 @@
 
 @interface TestSerialization : TestCase <UKTest>
 {
-	COObjectGraphContext *ctx;
+    COObjectGraphContext *ctx;
 }
 @end
 

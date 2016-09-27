@@ -39,29 +39,29 @@
 
 - (void)testCreate
 {
-	COObjectGraphContext *emptyContext = [COObjectGraphContext objectGraphContext];
-	UKNotNil(emptyContext);
+    COObjectGraphContext *emptyContext = [COObjectGraphContext objectGraphContext];
+    UKNotNil(emptyContext);
     //UKNil(emptyContext.rootObject);
 }
 
 - (void)testCustomModelDescriptionRepository
 {
-	ETModelDescriptionRepository *repo = [ETModelDescriptionRepository new];
+    ETModelDescriptionRepository *repo = [ETModelDescriptionRepository new];
 
-	ctx1 = [COObjectGraphContext objectGraphContextWithModelDescriptionRepository: repo];
-	ctx1.rootObject = [self addObjectWithLabel: @"root" toContext: ctx1];
+    ctx1 = [COObjectGraphContext objectGraphContextWithModelDescriptionRepository: repo];
+    ctx1.rootObject = [self addObjectWithLabel: @"root" toContext: ctx1];
 
-	UKRaisesException([ctx insertNewPersistentRootWithRootObject: ctx1.rootObject]);
-	
-	ctx = [[COEditingContext alloc] initWithStore: store modelDescriptionRepository: repo];
+    UKRaisesException([ctx insertNewPersistentRootWithRootObject: ctx1.rootObject]);
+    
+    ctx = [[COEditingContext alloc] initWithStore: store modelDescriptionRepository: repo];
 
-	UKDoesNotRaiseException([ctx insertNewPersistentRootWithRootObject: ctx1.rootObject]);
+    UKDoesNotRaiseException([ctx insertNewPersistentRootWithRootObject: ctx1.rootObject]);
 }
 
 - (OutlineItem *) addObjectWithLabel: (NSString *)label toContext: (COObjectGraphContext *)aCtx
 {
     OutlineItem *obj = [aCtx insertObjectWithEntityName: @"OutlineItem"];
-	obj.label = label;
+    obj.label = label;
     return obj;
 }
 
@@ -75,14 +75,14 @@
 
 - (void)testCopyingBetweenContextsWithNoStoreAdvanced
 {
-	COObjectGraphContext *ctx2 = [COObjectGraphContext objectGraphContext];
+    COObjectGraphContext *ctx2 = [COObjectGraphContext objectGraphContext];
    
     OutlineItem *root2 = [self addObjectWithLabel: @"root2" toContext: ctx2];
     ctx2.rootObject = root2;
         
-	OutlineItem *parent = [self addObjectWithLabel: @"Shopping" toObject: root1];
-	OutlineItem *child = [self addObjectWithLabel: @"Groceries" toObject: parent];
-	OutlineItem *subchild = [self addObjectWithLabel: @"Pizza" toObject: child];
+    OutlineItem *parent = [self addObjectWithLabel: @"Shopping" toObject: root1];
+    OutlineItem *child = [self addObjectWithLabel: @"Groceries" toObject: parent];
+    OutlineItem *subchild = [self addObjectWithLabel: @"Pizza" toObject: child];
     
     UKObjectsEqual(S([ctx1.rootObject UUID], parent.UUID, child.UUID, subchild.UUID),
                    [NSSet setWithArray: ctx1.itemUUIDs]);
@@ -107,13 +107,13 @@
 
 - (void)testCopyingBetweenContextsCornerCases
 {
-	COObjectGraphContext *ctx2 = [COObjectGraphContext objectGraphContext];
+    COObjectGraphContext *ctx2 = [COObjectGraphContext objectGraphContext];
    
     OutlineItem *root2 = [self addObjectWithLabel: @"root2" toContext: ctx2];
     ctx2.rootObject = root2;
     
     OutlineItem *o1 = [self addObjectWithLabel: @"Shopping" toObject: root1];
-	OutlineItem *o2 = [self addObjectWithLabel: @"Gift" toObject: o1];
+    OutlineItem *o2 = [self addObjectWithLabel: @"Gift" toObject: o1];
     UKNotNil(o1);
     
     ETUUID *o1copyUUID = [copier copyItemWithUUID: o1.UUID
@@ -130,7 +130,7 @@
     OutlineItem *o1copy2 = [ctx2 loadedObjectForUUID: o1copy2UUID];
     
     OutlineItem *o2copy = [[o1copy valueForKey: @"contents"] firstObject];
-	OutlineItem *o2copy2 = [[o1copy2 valueForKey: @"contents"] firstObject];
+    OutlineItem *o2copy2 = [[o1copy2 valueForKey: @"contents"] firstObject];
     
     UKObjectsNotEqual(o1.UUID, o1copy.UUID);
     UKObjectsNotEqual(o2.UUID, o2copy.UUID);
@@ -156,53 +156,53 @@
 
 - (void) testItemUUIDsWithInsertedObject
 {
-	UKObjectsEqual(S(root1.UUID), SA(ctx1.itemUUIDs));
-	
+    UKObjectsEqual(S(root1.UUID), SA(ctx1.itemUUIDs));
+    
     OutlineItem *tag1 = [ctx1 insertObjectWithEntityName: @"Tag"];
-	
-	UKObjectsEqual(S(root1.UUID, tag1.UUID), SA(ctx1.itemUUIDs));
-	UKNotNil([ctx1 itemForUUID: tag1.UUID]);
+    
+    UKObjectsEqual(S(root1.UUID, tag1.UUID), SA(ctx1.itemUUIDs));
+    UKNotNil([ctx1 itemForUUID: tag1.UUID]);
 }
 
 #pragma mark - -insertOrUpdateItems: and -setItemGraph:
 
 - (void) testSetItemGraphOnEmptyContextDoesNotCopyGarbage
 {
-	OutlineItem *child = [self addObjectWithLabel: @"child" toObject: root1];
-	OutlineItem *garbage = [self addObjectWithLabel: @"garbage" toContext: ctx1];
-	
-	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
-	UKFalse(ctx2.hasChanges);
-	
-	[ctx2 setItemGraph: ctx1];
-	UKObjectsEqual(S(root1.UUID, child.UUID), SA(ctx2.itemUUIDs));
-	UKObjectsEqual(@"root1", [[ctx2 loadedObjectForUUID: root1.UUID] label]);
-	UKObjectsEqual(@"child", [[ctx2 loadedObjectForUUID: child.UUID] label]);
-	UKNil([ctx2 loadedObjectForUUID: garbage.UUID]);
-	UKFalse(ctx2.hasChanges);
+    OutlineItem *child = [self addObjectWithLabel: @"child" toObject: root1];
+    OutlineItem *garbage = [self addObjectWithLabel: @"garbage" toContext: ctx1];
+    
+    COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+    UKFalse(ctx2.hasChanges);
+    
+    [ctx2 setItemGraph: ctx1];
+    UKObjectsEqual(S(root1.UUID, child.UUID), SA(ctx2.itemUUIDs));
+    UKObjectsEqual(@"root1", [[ctx2 loadedObjectForUUID: root1.UUID] label]);
+    UKObjectsEqual(@"child", [[ctx2 loadedObjectForUUID: child.UUID] label]);
+    UKNil([ctx2 loadedObjectForUUID: garbage.UUID]);
+    UKFalse(ctx2.hasChanges);
 }
 
 - (void) testSetItemGraphLackingRootItem
 {
-	
+    
 }
 
 - (void)testInsertItemWithInsertOrUpdateItems
 {
-	[ctx1 acceptAllChanges]; // TODO: Move to test -init
-	UKFalse(ctx1.hasChanges);
-	
-	ETEntityDescription *entity = [ctx1.modelDescriptionRepository descriptionForName: @"OutlineItem"];
-	COMutableItem *mutableItem = [COMutableItem item];
+    [ctx1 acceptAllChanges]; // TODO: Move to test -init
+    UKFalse(ctx1.hasChanges);
+    
+    ETEntityDescription *entity = [ctx1.modelDescriptionRepository descriptionForName: @"OutlineItem"];
+    COMutableItem *mutableItem = [COMutableItem item];
     mutableItem.entityName = entity.name;
-	mutableItem.packageName = entity.owner.name;
-	mutableItem.packageVersion = entity.owner.version;
+    mutableItem.packageName = entity.owner.name;
+    mutableItem.packageVersion = entity.owner.version;
     [ctx1 insertOrUpdateItems: @[mutableItem]];
-	
-	UKTrue(ctx1.hasChanges);
-	UKObjectsEqual(S(mutableItem.UUID), ctx1.insertedObjectUUIDs);
-	UKObjectsEqual(S(), ctx1.updatedObjectUUIDs);
-	
+    
+    UKTrue(ctx1.hasChanges);
+    UKObjectsEqual(S(mutableItem.UUID), ctx1.insertedObjectUUIDs);
+    UKObjectsEqual(S(), ctx1.updatedObjectUUIDs);
+    
     OutlineItem *object = [ctx1 loadedObjectForUUID: mutableItem.UUID];
     
     [mutableItem setValue: @"hello" forAttribute: kCOLabel type: kCOTypeString];
@@ -215,17 +215,17 @@
 
 - (void)testUpdateItemWithInsertOrUpdateItems
 {
-	[ctx1 acceptAllChanges]; // TODO: Move to test -init
-	UKFalse(ctx1.hasChanges);
-	
-	COMutableItem *mutableItem = [[ctx1 itemForUUID: root1.UUID] mutableCopy];
+    [ctx1 acceptAllChanges]; // TODO: Move to test -init
+    UKFalse(ctx1.hasChanges);
+    
+    COMutableItem *mutableItem = [[ctx1 itemForUUID: root1.UUID] mutableCopy];
     [mutableItem setValue: @"test" forAttribute: kCOLabel type: kCOTypeString];
     [ctx1 insertOrUpdateItems: @[mutableItem]];
-	
-	UKTrue(ctx1.hasChanges);
-	UKObjectsEqual(S(), ctx1.insertedObjectUUIDs);
-	UKObjectsEqual(S(root1.UUID), ctx1.updatedObjectUUIDs);
-	
+    
+    UKTrue(ctx1.hasChanges);
+    UKObjectsEqual(S(), ctx1.insertedObjectUUIDs);
+    UKObjectsEqual(S(root1.UUID), ctx1.updatedObjectUUIDs);
+    
     UKObjectsSame(root1, [ctx1 loadedObjectForUUID: mutableItem.UUID]);
 }
 
@@ -233,9 +233,9 @@
 
 - (void)testChangeTrackingBasic
 {
-	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
+    COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
     ctx2.rootObject = [ctx2 insertObjectWithEntityName: @"OutlineItem"];
-	OutlineItem *root = ctx2.rootObject;
+    OutlineItem *root = ctx2.rootObject;
 
     UKObjectsEqual(S(root.UUID), ctx2.insertedObjectUUIDs);
     UKObjectsEqual([NSSet set], ctx2.updatedObjectUUIDs);
@@ -267,49 +267,49 @@
 
 - (void)testShoppingList
 {
-	OutlineItem *workspace = [self addObjectWithLabel: @"Workspace" toObject: root1];
-	OutlineItem *document1 = [self addObjectWithLabel: @"Document1" toObject: workspace];
-	OutlineItem *group1 = [self addObjectWithLabel: @"Group1" toObject: document1];
-	OutlineItem *leaf1 = [self addObjectWithLabel: @"Leaf1" toObject: group1];
-	OutlineItem *leaf2 = [self addObjectWithLabel: @"Leaf2" toObject: group1];
-	OutlineItem *group2 = [self addObjectWithLabel: @"Group2" toObject: document1];
-	OutlineItem *leaf3 = [self addObjectWithLabel: @"Leaf3" toObject: group2];
-	
-	OutlineItem *document2 = [self addObjectWithLabel: @"Document2" toObject: workspace];
+    OutlineItem *workspace = [self addObjectWithLabel: @"Workspace" toObject: root1];
+    OutlineItem *document1 = [self addObjectWithLabel: @"Document1" toObject: workspace];
+    OutlineItem *group1 = [self addObjectWithLabel: @"Group1" toObject: document1];
+    OutlineItem *leaf1 = [self addObjectWithLabel: @"Leaf1" toObject: group1];
+    OutlineItem *leaf2 = [self addObjectWithLabel: @"Leaf2" toObject: group1];
+    OutlineItem *group2 = [self addObjectWithLabel: @"Group2" toObject: document1];
+    OutlineItem *leaf3 = [self addObjectWithLabel: @"Leaf3" toObject: group2];
+    
+    OutlineItem *document2 = [self addObjectWithLabel: @"Document2" toObject: workspace];
 
     UKNil([root1 valueForKey: kCOParent]);
     UKObjectsSame(root1, [workspace valueForKey: kCOParent]);
     UKObjectsSame(workspace, [document1 valueForKey: kCOParent]);
-	UKObjectsSame(document1, [group1 valueForKey: kCOParent]);
+    UKObjectsSame(document1, [group1 valueForKey: kCOParent]);
     UKObjectsSame(group1, [leaf1 valueForKey: kCOParent]);
     UKObjectsSame(group1, [leaf2 valueForKey: kCOParent]);
     UKObjectsSame(document1, [group2 valueForKey: kCOParent]);
     UKObjectsSame(group2, [leaf3 valueForKey: kCOParent]);
-	UKObjectsSame(workspace, [document2 valueForKey: kCOParent]);
+    UKObjectsSame(workspace, [document2 valueForKey: kCOParent]);
 
-	UKObjectsEqual(A(document1, document2), [workspace valueForKey: kCOContents]);
-	UKObjectsEqual(A(group1, group2), [document1 valueForKey: kCOContents]);
-	UKObjectsEqual(@[], [document2 valueForKey: kCOContents]);
-	UKObjectsEqual(A(leaf1, leaf2), [group1 valueForKey: kCOContents]);
-	UKObjectsEqual(A(leaf3), [group2 valueForKey: kCOContents]);
+    UKObjectsEqual(A(document1, document2), [workspace valueForKey: kCOContents]);
+    UKObjectsEqual(A(group1, group2), [document1 valueForKey: kCOContents]);
+    UKObjectsEqual(@[], [document2 valueForKey: kCOContents]);
+    UKObjectsEqual(A(leaf1, leaf2), [group1 valueForKey: kCOContents]);
+    UKObjectsEqual(A(leaf3), [group2 valueForKey: kCOContents]);
     
-	// Now make some changes
+    // Now make some changes
     
     [group2 insertObject: leaf2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
     [document2 insertObject: group2 atIndex: ETUndeterminedIndex hint: nil forProperty: @"contents"];
-		
-	UKObjectsSame(workspace, [document1 valueForKey: kCOParent]);
-	UKObjectsSame(workspace, [document2 valueForKey: kCOParent]);
-	UKObjectsSame(document1, [group1 valueForKey: kCOParent]);
-	UKObjectsSame(document2, [group2 valueForKey: kCOParent]);
-	UKObjectsSame(group1, [leaf1 valueForKey: kCOParent]);
-	UKObjectsSame(group2, [leaf2 valueForKey: kCOParent]);
-	UKObjectsSame(group2, [leaf3 valueForKey: kCOParent]);
-	UKObjectsEqual(A(document1, document2), [workspace valueForKey: kCOContents]);
-	UKObjectsEqual(A(group1), [document1 valueForKey: kCOContents]);
-	UKObjectsEqual(A(group2), [document2 valueForKey: kCOContents]);
-	UKObjectsEqual(A(leaf1), [group1 valueForKey: kCOContents]);
-	UKObjectsEqual(A(leaf3, leaf2), [group2 valueForKey: kCOContents]);
+        
+    UKObjectsSame(workspace, [document1 valueForKey: kCOParent]);
+    UKObjectsSame(workspace, [document2 valueForKey: kCOParent]);
+    UKObjectsSame(document1, [group1 valueForKey: kCOParent]);
+    UKObjectsSame(document2, [group2 valueForKey: kCOParent]);
+    UKObjectsSame(group1, [leaf1 valueForKey: kCOParent]);
+    UKObjectsSame(group2, [leaf2 valueForKey: kCOParent]);
+    UKObjectsSame(group2, [leaf3 valueForKey: kCOParent]);
+    UKObjectsEqual(A(document1, document2), [workspace valueForKey: kCOContents]);
+    UKObjectsEqual(A(group1), [document1 valueForKey: kCOContents]);
+    UKObjectsEqual(A(group2), [document2 valueForKey: kCOContents]);
+    UKObjectsEqual(A(leaf1), [group1 valueForKey: kCOContents]);
+    UKObjectsEqual(A(leaf3, leaf2), [group2 valueForKey: kCOContents]);
     
     // Test JSON roundtrip
     
@@ -361,17 +361,17 @@
 
 - (void) testRootObjectIsSetOnceOnly
 {
-	UKObjectsEqual(root1, ctx1.rootObject);
-	
-	OutlineItem *root2 = [self addObjectWithLabel: @"root1" toContext: ctx1];
+    UKObjectsEqual(root1, ctx1.rootObject);
+    
+    OutlineItem *root2 = [self addObjectWithLabel: @"root1" toContext: ctx1];
     UKRaisesException([ctx1 setRootObject: root2]);
-	
-	// Test changing through -setItemGraph:
-	
-	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
-	OutlineItem *root3 = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
-	
-	UKRaisesException([ctx1 setItemGraph: ctx2]);
+    
+    // Test changing through -setItemGraph:
+    
+    COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+    OutlineItem *root3 = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
+    
+    UKRaisesException([ctx1 setItemGraph: ctx2]);
 }
 
 /**
@@ -380,12 +380,12 @@
  */
 - (void) addGarbageToObjectGraphContext
 {
-	OrderedGroupWithOpposite *parent1 = [[OrderedGroupWithOpposite alloc] initWithObjectGraphContext: ctx1];
-	OrderedGroupContent *child1 = [[OrderedGroupContent alloc] initWithObjectGraphContext: ctx1];
-	OrderedGroupContent *child2 = [[OrderedGroupContent alloc] initWithObjectGraphContext: ctx1];
-	OrderedGroupWithOpposite *parent2 = [[OrderedGroupWithOpposite alloc] initWithObjectGraphContext: ctx1];
-	parent1.contents = @[child1];
-	parent2.contents = @[child2];
+    OrderedGroupWithOpposite *parent1 = [[OrderedGroupWithOpposite alloc] initWithObjectGraphContext: ctx1];
+    OrderedGroupContent *child1 = [[OrderedGroupContent alloc] initWithObjectGraphContext: ctx1];
+    OrderedGroupContent *child2 = [[OrderedGroupContent alloc] initWithObjectGraphContext: ctx1];
+    OrderedGroupWithOpposite *parent2 = [[OrderedGroupWithOpposite alloc] initWithObjectGraphContext: ctx1];
+    parent1.contents = @[child1];
+    parent2.contents = @[child2];
 }
 
 /**
@@ -394,267 +394,267 @@
  */
 - (void) doTestGarbageCollection
 {
-	@autoreleasepool {
-		UKIntsEqual(1, [ctx1 loadedObjects].count);
-		
-		[self addGarbageToObjectGraphContext];
-		
-		UKTrue([ctx1 loadedObjects].count > 1);
-	}
-	
-	[ctx1 removeUnreachableObjects];
+    @autoreleasepool {
+        UKIntsEqual(1, [ctx1 loadedObjects].count);
+        
+        [self addGarbageToObjectGraphContext];
+        
+        UKTrue([ctx1 loadedObjects].count > 1);
+    }
+    
+    [ctx1 removeUnreachableObjects];
 
-	@autoreleasepool {
-		UKIntsEqual(1, [ctx1 loadedObjects].count);
-	}
+    @autoreleasepool {
+        UKIntsEqual(1, [ctx1 loadedObjects].count);
+    }
 }
 
 - (void) testGarbageCollection
 {
-	for (NSUInteger i = 0; i<10; i++)
-	{
-		[self doTestGarbageCollection];
-	}
+    for (NSUInteger i = 0; i<10; i++)
+    {
+        [self doTestGarbageCollection];
+    }
 }
 
 #pragma mark - COObjectGraphContextObjectsDidChangeNotification
 
 - (void) testObjectsDidChangeNotificationNotPostedAfterInsert
 {
-	[ctx1 acceptAllChanges]; // TODO: Move to test -init
-	
-	__block OutlineItem *child1;
-	[self checkBlock: ^{
-		child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
-	} doesNotPostNotification: COObjectGraphContextObjectsDidChangeNotification];
+    [ctx1 acceptAllChanges]; // TODO: Move to test -init
+    
+    __block OutlineItem *child1;
+    [self checkBlock: ^{
+        child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+    } doesNotPostNotification: COObjectGraphContextObjectsDidChangeNotification];
 }
 
 - (void) testObjectsDidChangeNotificationNotPostedAfterEdit
 {
-	[ctx1 acceptAllChanges]; // TODO: Move to test -init
-	
-	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
-	[self checkBlock: ^{
-		root1.label = @"Test";
-		root1.contents = @[child1];
-		child1.label = @"Hello world";
-	} doesNotPostNotification: COObjectGraphContextObjectsDidChangeNotification];
+    [ctx1 acceptAllChanges]; // TODO: Move to test -init
+    
+    OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+    [self checkBlock: ^{
+        root1.label = @"Test";
+        root1.contents = @[child1];
+        child1.label = @"Hello world";
+    } doesNotPostNotification: COObjectGraphContextObjectsDidChangeNotification];
 }
 
 - (void) testObjectsDidChangeNotificationPostedAfterInsert
 {
-	[ctx1 acceptAllChanges]; // TODO: Move to test -init
-	
-	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
-	
-	[self checkBlock: ^{
-		[ctx1 acceptAllChanges];
-	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
-		   withCount: 1
-		  fromObject: ctx1
-		withUserInfo: @{ COInsertedObjectsKey : S(child1.UUID),
-						 COUpdatedObjectsKey : S() }];
+    [ctx1 acceptAllChanges]; // TODO: Move to test -init
+    
+    OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+    
+    [self checkBlock: ^{
+        [ctx1 acceptAllChanges];
+    } postsNotification: COObjectGraphContextObjectsDidChangeNotification
+           withCount: 1
+          fromObject: ctx1
+        withUserInfo: @{ COInsertedObjectsKey : S(child1.UUID),
+                         COUpdatedObjectsKey : S() }];
 }
 
 - (void) testObjectsDidChangeNotificationPostedAfterUpdate
 {
-	[ctx1 acceptAllChanges]; // TODO: Move to test -init
-	
-	root1.label = @"Root item";
-	
-	[self checkBlock: ^{
-		[ctx1 acceptAllChanges];
-	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
-		   withCount: 1
-		  fromObject: ctx1
-		withUserInfo: @{ COInsertedObjectsKey : S(),
-						 COUpdatedObjectsKey : S(root1.UUID) }];
+    [ctx1 acceptAllChanges]; // TODO: Move to test -init
+    
+    root1.label = @"Root item";
+    
+    [self checkBlock: ^{
+        [ctx1 acceptAllChanges];
+    } postsNotification: COObjectGraphContextObjectsDidChangeNotification
+           withCount: 1
+          fromObject: ctx1
+        withUserInfo: @{ COInsertedObjectsKey : S(),
+                         COUpdatedObjectsKey : S(root1.UUID) }];
 }
 
 - (void) testObjectsDidChangeNotificationPostedAfterInsertAndUpdate
 {
-	[ctx1 acceptAllChanges]; // TODO: Move to test -init
-	
-	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
-	child1.label = @"child1";
-	root1.contents = @[child1];
-	
-	[self checkBlock: ^{
-		[ctx1 acceptAllChanges];
-	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
-		   withCount: 1
-		  fromObject: ctx1
-		withUserInfo: @{ COInsertedObjectsKey : S(child1.UUID),
-						 COUpdatedObjectsKey : S(root1.UUID) }]; /* N.B. child1.UUID is not in the updated set */
+    [ctx1 acceptAllChanges]; // TODO: Move to test -init
+    
+    OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+    child1.label = @"child1";
+    root1.contents = @[child1];
+    
+    [self checkBlock: ^{
+        [ctx1 acceptAllChanges];
+    } postsNotification: COObjectGraphContextObjectsDidChangeNotification
+           withCount: 1
+          fromObject: ctx1
+        withUserInfo: @{ COInsertedObjectsKey : S(child1.UUID),
+                         COUpdatedObjectsKey : S(root1.UUID) }]; /* N.B. child1.UUID is not in the updated set */
 }
 
 - (void) testNotificationAfterDiscardForTransientContext
 {
-	[ctx1 acceptAllChanges]; // TODO: Move to test -init
-	
-	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
-	child1.label = @"child1";
-	root1.contents = @[child1];
-	
-	[self checkBlock: ^{
-		[ctx1 discardAllChanges];
-	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
-		   withCount: 1
-		  fromObject: ctx1
-		withUserInfo: @{ COInsertedObjectsKey : S(),
-						 COUpdatedObjectsKey : S() }];
-	
-	// TODO: See comment in -testNotificationAfterDiscardForPersistentContext
+    [ctx1 acceptAllChanges]; // TODO: Move to test -init
+    
+    OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+    child1.label = @"child1";
+    root1.contents = @[child1];
+    
+    [self checkBlock: ^{
+        [ctx1 discardAllChanges];
+    } postsNotification: COObjectGraphContextObjectsDidChangeNotification
+           withCount: 1
+          fromObject: ctx1
+        withUserInfo: @{ COInsertedObjectsKey : S(),
+                         COUpdatedObjectsKey : S() }];
+    
+    // TODO: See comment in -testNotificationAfterDiscardForPersistentContext
 }
 
 - (void) testNotificationAfterDiscardForPersistentContext
 {
-	COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-	[proot commit];
-	
-	COObjectGraphContext *persistentCtx = proot.objectGraphContext;
-	OutlineItem *persistentCtxRoot = persistentCtx.rootObject;
-	UKFalse(persistentCtx.hasChanges);
-	
-	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: persistentCtx];
-	child1.label = @"child1";
-	persistentCtxRoot.contents = @[child1];
-	
-	[self checkBlock: ^{
-		[ctx1 discardAllChanges];
-	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
-		   withCount: 1
-		  fromObject: ctx1
-		withUserInfo: @{ COInsertedObjectsKey : S(),
-						 COUpdatedObjectsKey : S() }];
+    COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
+    [proot commit];
+    
+    COObjectGraphContext *persistentCtx = proot.objectGraphContext;
+    OutlineItem *persistentCtxRoot = persistentCtx.rootObject;
+    UKFalse(persistentCtx.hasChanges);
+    
+    OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: persistentCtx];
+    child1.label = @"child1";
+    persistentCtxRoot.contents = @[child1];
+    
+    [self checkBlock: ^{
+        [ctx1 discardAllChanges];
+    } postsNotification: COObjectGraphContextObjectsDidChangeNotification
+           withCount: 1
+          fromObject: ctx1
+        withUserInfo: @{ COInsertedObjectsKey : S(),
+                         COUpdatedObjectsKey : S() }];
 
-	// TODO: Not sure what is best:
-	// a) the above (COObjectGraphContextObjectsDidChangeNotification, object sets are empty)
-	// b) a new notification COObjectGraphContextObjectsDidDiscardChangesNotification
-	// c) no notification
-	//
-	// In a way we don't need to send a notification, since we're just reverting
-	// to the state when the last notification was sent.
+    // TODO: Not sure what is best:
+    // a) the above (COObjectGraphContextObjectsDidChangeNotification, object sets are empty)
+    // b) a new notification COObjectGraphContextObjectsDidDiscardChangesNotification
+    // c) no notification
+    //
+    // In a way we don't need to send a notification, since we're just reverting
+    // to the state when the last notification was sent.
 }
 
 - (void) testNotificationAfterSetItemGraph
 {
-	[ctx1 acceptAllChanges]; // TODO: Move to test -init
+    [ctx1 acceptAllChanges]; // TODO: Move to test -init
 
-	// Make some changes in a copy of ctx1
-	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
-	[ctx2 setItemGraph: ctx1];
-	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
-	child1.label = @"child1";
-	((OutlineItem *)ctx2.rootObject).contents = @[child1];
-	
-	[self checkBlock: ^{
-		// Load those changes into ctx1. Should post a notifcation.
-		[ctx1 setItemGraph: ctx2];
-	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
-		   withCount: 1
-		  fromObject: ctx1
-		withUserInfo: @{ COInsertedObjectsKey : S(child1.UUID),
-						 COUpdatedObjectsKey : S(root1.UUID) }];
+    // Make some changes in a copy of ctx1
+    COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
+    [ctx2 setItemGraph: ctx1];
+    OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
+    child1.label = @"child1";
+    ((OutlineItem *)ctx2.rootObject).contents = @[child1];
+    
+    [self checkBlock: ^{
+        // Load those changes into ctx1. Should post a notifcation.
+        [ctx1 setItemGraph: ctx2];
+    } postsNotification: COObjectGraphContextObjectsDidChangeNotification
+           withCount: 1
+          fromObject: ctx1
+        withUserInfo: @{ COInsertedObjectsKey : S(child1.UUID),
+                         COUpdatedObjectsKey : S(root1.UUID) }];
 }
 
 - (void) testNotificationAfterInsertOrUpdateItems
 {
-	[ctx1 acceptAllChanges]; // TODO: Move to test -init
-	
-	// Make some changes in a copy of ctx1
-	COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
-	[ctx2 setItemGraph: ctx1];
-	OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
-	child1.label = @"child1";
-	((OutlineItem *)ctx2.rootObject).contents = @[child1];
-	
-	NSArray *exportedItems = @[[ctx2 itemForUUID: ctx2.rootItemUUID],
-							   [ctx2 itemForUUID: child1.UUID]];
-	
-	[self checkBlock: ^{
-		// Load those changes into ctx1 using -insertOrUpdateItems:. Should not post a notifcation.
-		[ctx1 insertOrUpdateItems: exportedItems];
-	} doesNotPostNotification: COObjectGraphContextObjectsDidChangeNotification];
-	
-	[self checkBlock: ^{
-		[ctx1 acceptAllChanges];
-	} postsNotification: COObjectGraphContextObjectsDidChangeNotification
-		   withCount: 1
-		  fromObject: ctx1
-		withUserInfo: @{ COInsertedObjectsKey : S(child1.UUID),
-						 COUpdatedObjectsKey : S(root1.UUID) }];
+    [ctx1 acceptAllChanges]; // TODO: Move to test -init
+    
+    // Make some changes in a copy of ctx1
+    COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
+    [ctx2 setItemGraph: ctx1];
+    OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
+    child1.label = @"child1";
+    ((OutlineItem *)ctx2.rootObject).contents = @[child1];
+    
+    NSArray *exportedItems = @[[ctx2 itemForUUID: ctx2.rootItemUUID],
+                               [ctx2 itemForUUID: child1.UUID]];
+    
+    [self checkBlock: ^{
+        // Load those changes into ctx1 using -insertOrUpdateItems:. Should not post a notifcation.
+        [ctx1 insertOrUpdateItems: exportedItems];
+    } doesNotPostNotification: COObjectGraphContextObjectsDidChangeNotification];
+    
+    [self checkBlock: ^{
+        [ctx1 acceptAllChanges];
+    } postsNotification: COObjectGraphContextObjectsDidChangeNotification
+           withCount: 1
+          fromObject: ctx1
+        withUserInfo: @{ COInsertedObjectsKey : S(child1.UUID),
+                         COUpdatedObjectsKey : S(root1.UUID) }];
 }
 
 #pragma mark - COObjectGraphContextWillRelinquishObjectsNotification
 
 - (void) testWillRelinquishObjectsNotification
 {
-	OutlineItem *garbage = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
-	
-	[self checkBlock: ^{
-		[ctx1 removeUnreachableObjects];
-	} postsNotification: COObjectGraphContextWillRelinquishObjectsNotification
-		   withCount: 1
-		  fromObject: ctx1
-		withUserInfo: @{ CORelinquishedObjectsKey : @[garbage] }];
+    OutlineItem *garbage = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+    
+    [self checkBlock: ^{
+        [ctx1 removeUnreachableObjects];
+    } postsNotification: COObjectGraphContextWillRelinquishObjectsNotification
+           withCount: 1
+          fromObject: ctx1
+        withUserInfo: @{ CORelinquishedObjectsKey : @[garbage] }];
 }
 
 - (void) testRelinquishOnDealloc
 {
-	[self checkBlock: ^{
-		@autoreleasepool {
-			COObjectGraphContext *testCtx = [COObjectGraphContext new];
-			OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: testCtx];
-			child1.label = @"child1";
-			testCtx.rootObject = child1;
-		}
-	} postsNotification: COObjectGraphContextWillRelinquishObjectsNotification
-			  withCount: 1
-			 fromObject: nil
-		   withUserInfo: nil];
+    [self checkBlock: ^{
+        @autoreleasepool {
+            COObjectGraphContext *testCtx = [COObjectGraphContext new];
+            OutlineItem *child1 = [[OutlineItem alloc] initWithObjectGraphContext: testCtx];
+            child1.label = @"child1";
+            testCtx.rootObject = child1;
+        }
+    } postsNotification: COObjectGraphContextWillRelinquishObjectsNotification
+              withCount: 1
+             fromObject: nil
+           withUserInfo: nil];
 }
 
 #pragma mark - COObjectGraphContextWillRelinquishObjectsNotification
 
 - (void) testBeginEndBatchNotification
 {
-	COObjectGraphContext *altCtx = [COObjectGraphContext new];
-	[altCtx setItemGraph: ctx1];
-	OutlineItem *obj1 = [[OutlineItem alloc] initWithObjectGraphContext: altCtx];
-	OutlineItem *obj2 = [[OutlineItem alloc] initWithObjectGraphContext: altCtx];
-	((OutlineItem *)altCtx.rootObject).contents = @[obj1];
-	obj1.contents = @[obj2];
-		
-	// FIXME: These are not very good tests
-	
-	[self checkBlock: ^{
-		[ctx1 setItemGraph: altCtx];
-	} postsNotification: COObjectGraphContextBeginBatchChangeNotification
-		   withCount: 1
-		  fromObject: ctx1
-		withUserInfo: nil];
-	
-	[self checkBlock: ^{
-		[ctx1 setItemGraph: altCtx];
-	} postsNotification: COObjectGraphContextEndBatchChangeNotification
-		   withCount: 1
-		  fromObject: ctx1
-		withUserInfo: nil];
+    COObjectGraphContext *altCtx = [COObjectGraphContext new];
+    [altCtx setItemGraph: ctx1];
+    OutlineItem *obj1 = [[OutlineItem alloc] initWithObjectGraphContext: altCtx];
+    OutlineItem *obj2 = [[OutlineItem alloc] initWithObjectGraphContext: altCtx];
+    ((OutlineItem *)altCtx.rootObject).contents = @[obj1];
+    obj1.contents = @[obj2];
+        
+    // FIXME: These are not very good tests
+    
+    [self checkBlock: ^{
+        [ctx1 setItemGraph: altCtx];
+    } postsNotification: COObjectGraphContextBeginBatchChangeNotification
+           withCount: 1
+          fromObject: ctx1
+        withUserInfo: nil];
+    
+    [self checkBlock: ^{
+        [ctx1 setItemGraph: altCtx];
+    } postsNotification: COObjectGraphContextEndBatchChangeNotification
+           withCount: 1
+          fromObject: ctx1
+        withUserInfo: nil];
 }
 
 - (void) testAddUnchangedItem
 {
-	[ctx1 acceptAllChanges];
-	UKFalse(ctx1.hasChanges);
-	
-	COItem *rootItem = [ctx1 itemForUUID: ctx1.rootItemUUID];
-	
-	// Should be a no-op
-	[ctx1 insertOrUpdateItems: @[rootItem]];
-	
+    [ctx1 acceptAllChanges];
+    UKFalse(ctx1.hasChanges);
+    
+    COItem *rootItem = [ctx1 itemForUUID: ctx1.rootItemUUID];
+    
+    // Should be a no-op
+    [ctx1 insertOrUpdateItems: @[rootItem]];
+    
 #if 0
-	UKFalse(ctx1.hasChanges);
+    UKFalse(ctx1.hasChanges);
 #endif
 }
 
@@ -677,92 +677,92 @@
 
 - (void) testCrossContextReferencedObjectGraphContextDeallocated
 {
-	@autoreleasepool {
-		COObjectGraphContext *ctx2 = [COObjectGraphContext new];
-		
-		OutlineItem *ctx2root = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
-		ctx2root.label = @"ctx2root";
-		ctx2.rootObject = ctx2root;
+    @autoreleasepool {
+        COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+        
+        OutlineItem *ctx2root = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
+        ctx2root.label = @"ctx2root";
+        ctx2.rootObject = ctx2root;
 
-		// create a link from ctx1 to ctx2
-		[root1 addObject: ctx2root];
-		
-		UKObjectsNotSame(ctx1, ctx2root.objectGraphContext);
-		UKObjectsEqual(ctx2root, root1.contents[0]);
-		
-		NSLog(@"%@", ctx1.items);
-	}
-	
-	// check that ctx1 is still valid?
-	
-	UKTrue([root1.contents isEmpty]);
-	
-	NSLog(@"%@", ctx1.detailedDescription);
+        // create a link from ctx1 to ctx2
+        [root1 addObject: ctx2root];
+        
+        UKObjectsNotSame(ctx1, ctx2root.objectGraphContext);
+        UKObjectsEqual(ctx2root, root1.contents[0]);
+        
+        NSLog(@"%@", ctx1.items);
+    }
+    
+    // check that ctx1 is still valid?
+    
+    UKTrue([root1.contents isEmpty]);
+    
+    NSLog(@"%@", ctx1.detailedDescription);
 }
 
 - (void) testCrossContextReferencedObjectDeallocatedWithTwoReferences
 {
-	// add a child in ctx1
-	OutlineItem *ctx1obj = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
-	ctx1obj.label = @"ctx1obj";
-	
-	// create a ctx2
-	
-	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
-	OutlineItem *ctx2root = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
-	ctx2root.label = @"ctx2root";
-	ctx2.rootObject = ctx2root;
-	
-	// create a ctx3
-	
-	COObjectGraphContext *ctx3 = [COObjectGraphContext new];
-	OutlineItem *ctx3root = [[OutlineItem alloc] initWithObjectGraphContext: ctx3];
-	ctx3root.label = @"ctx3root";
-	ctx3.rootObject = ctx3root;
-	
-	// create a link from ctx1 to ctx2 and 3
-	[ctx1obj addObject: ctx2root];
-	[ctx1obj addObject: ctx3root];
+    // add a child in ctx1
+    OutlineItem *ctx1obj = [[OutlineItem alloc] initWithObjectGraphContext: ctx1];
+    ctx1obj.label = @"ctx1obj";
+    
+    // create a ctx2
+    
+    COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+    OutlineItem *ctx2root = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
+    ctx2root.label = @"ctx2root";
+    ctx2.rootObject = ctx2root;
+    
+    // create a ctx3
+    
+    COObjectGraphContext *ctx3 = [COObjectGraphContext new];
+    OutlineItem *ctx3root = [[OutlineItem alloc] initWithObjectGraphContext: ctx3];
+    ctx3root.label = @"ctx3root";
+    ctx3.rootObject = ctx3root;
+    
+    // create a link from ctx1 to ctx2 and 3
+    [ctx1obj addObject: ctx2root];
+    [ctx1obj addObject: ctx3root];
 
-	UKObjectsSame(ctx1obj, ctx2root.parentContainer);
-	UKObjectsSame(ctx1obj, ctx3root.parentContainer);
-	
-	[ctx1 removeUnreachableObjects];
-	
-	UKNil(ctx2root.parentContainer);
-	UKNil(ctx3root.parentContainer);
+    UKObjectsSame(ctx1obj, ctx2root.parentContainer);
+    UKObjectsSame(ctx1obj, ctx3root.parentContainer);
+    
+    [ctx1 removeUnreachableObjects];
+    
+    UKNil(ctx2root.parentContainer);
+    UKNil(ctx3root.parentContainer);
 }
 
 - (void) testCrossContextReferencedObjectDeallocated
 {
-	COObjectGraphContext *ctx2 = [COObjectGraphContext new];
-	
-	OutlineItem *ctx2root = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
-	ctx2root.label = @"ctx2root";
-	ctx2.rootObject = ctx2root;
-	
-	OutlineItem *ctx2obj = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
-	ctx2obj.label = @"ctx2obj";
+    COObjectGraphContext *ctx2 = [COObjectGraphContext new];
+    
+    OutlineItem *ctx2root = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
+    ctx2root.label = @"ctx2root";
+    ctx2.rootObject = ctx2root;
+    
+    OutlineItem *ctx2obj = [[OutlineItem alloc] initWithObjectGraphContext: ctx2];
+    ctx2obj.label = @"ctx2obj";
 
-	// create a link from ctx1 to ctx2
-	[root1 addObject: ctx2obj];
-	
-	NSArray *ctx1ig = ctx1.items;
-	UKFalse([root1.contents isEmpty]);
-	
-	// GC ctx2obj (it's not set as the root object)
-	UKFalse(ctx2obj.isZombie);
-	[ctx2 removeUnreachableObjects];
-	UKTrue(ctx2obj.isZombie);
-	
-	// check that ctx1 is still valid?
-	UKTrue([root1.contents isEmpty]);
-	
-	// It should serialize to COBrokenPath
-	COItem *item = root1.storeItem;
-	NSArray *itemContentsArray = [item valueForAttribute: @"contents"];
-	UKIntsEqual(1, itemContentsArray.count);
-	UKTrue([itemContentsArray[0] isBroken]);
+    // create a link from ctx1 to ctx2
+    [root1 addObject: ctx2obj];
+    
+    NSArray *ctx1ig = ctx1.items;
+    UKFalse([root1.contents isEmpty]);
+    
+    // GC ctx2obj (it's not set as the root object)
+    UKFalse(ctx2obj.isZombie);
+    [ctx2 removeUnreachableObjects];
+    UKTrue(ctx2obj.isZombie);
+    
+    // check that ctx1 is still valid?
+    UKTrue([root1.contents isEmpty]);
+    
+    // It should serialize to COBrokenPath
+    COItem *item = root1.storeItem;
+    NSArray *itemContentsArray = [item valueForAttribute: @"contents"];
+    UKIntsEqual(1, itemContentsArray.count);
+    UKTrue([itemContentsArray[0] isBroken]);
 }
 
 @end

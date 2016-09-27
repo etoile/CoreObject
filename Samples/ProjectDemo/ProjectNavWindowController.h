@@ -2,7 +2,7 @@
 
 
 @interface ProjectNavWindowController : NSWindowController {
-	IBOutlet NSOutlineView *outline;
+    IBOutlet NSOutlineView *outline;
 }
 
 @end

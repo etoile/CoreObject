@@ -11,8 +11,8 @@
 
 @interface DrawingController : EWDocumentWindowController
 {
-	Class toolClass;
-	IBOutlet SKTGraphicView *graphicView;
+    Class toolClass;
+    IBOutlet SKTGraphicView *graphicView;
 }
 
 - (IBAction) selectTool: (id)sender;

@@ -19,8 +19,8 @@
 
 @interface COSynchronizerJSONClient : NSObject <COSynchronizerClientDelegate>
 {
-	NSMutableArray *queuedMessages;
-	BOOL paused;
+    NSMutableArray *queuedMessages;
+    BOOL paused;
 }
 
 @property (nonatomic, readwrite, strong) id<COSynchronizerJSONClientDelegate> delegate;

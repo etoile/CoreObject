@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2013 Eric Wasylishen
+    Copyright (C) 2013 Eric Wasylishen
 
-	Date:  September 2013
-	License:  MIT  (see COPYING)
+    Date:  September 2013
+    License:  MIT  (see COPYING)
  */
 
 #import <CoreObject/COEditingContext.h>
@@ -68,16 +68,16 @@
              setCurrentBranch: (COBranch *)aBranch
                     oldBranch: (COBranch *)oldBranch;
 - (void) recordPersistentRootSetMetadata: (COPersistentRoot *)aPersistentRoot
-							 oldMetadata: (id)oldMetadata;
+                             oldMetadata: (id)oldMetadata;
 
 // Called from COBranch
 
 - (void) recordBranchCreation: (COBranch *)aBranch;
 - (void) recordBranchSetCurrentRevisionUUID: (ETUUID *)current
                             oldRevisionUUID: (ETUUID *)old
-						   headRevisionUUID: (ETUUID *)head
+                           headRevisionUUID: (ETUUID *)head
                         oldHeadRevisionUUID: (ETUUID *)oldHead
-								   ofBranch: (COBranch *)aBranch;
+                                   ofBranch: (COBranch *)aBranch;
 - (void) recordBranchSetMetadata: (COBranch *)aBranch
                      oldMetadata: (id)oldMetadata;
 - (void) recordBranchDeletion: (COBranch *)aBranch;

@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2014 Quentin Mathe
+    Copyright (C) 2014 Quentin Mathe
 
-	Date:  December 2014
-	License:  MIT  (see COPYING)
+    Date:  December 2014
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -295,12 +295,12 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  */
 @interface COSchemaMigration : NSObject
 {
-	@private
-	NSString *_packageName;
-	int64_t _destinationVersion;
-	COMigrationBlock _migrationBlock;
-	__weak COSchemaMigrationDriver *migrationDriver;
-	NSDictionary *_dependentSourceVersionsByPackageName;
+    @private
+    NSString *_packageName;
+    int64_t _destinationVersion;
+    COMigrationBlock _migrationBlock;
+    __weak COSchemaMigrationDriver *migrationDriver;
+    NSDictionary *_dependentSourceVersionsByPackageName;
 }
 
 

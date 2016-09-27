@@ -28,7 +28,7 @@
 
 @interface DDASLLogger : DDAbstractLogger <DDLogger>
 {
-	aslclient client;
+    aslclient client;
 }
 
 + (DDASLLogger *)sharedInstance;

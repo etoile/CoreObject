@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2010 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2010 Eric Wasylishen, Quentin Mathe
 
-	Date:  November 2010
-	License:  MIT  (see COPYING)
+    Date:  November 2010
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -30,17 +30,17 @@
  */
 @interface COStore : NSObject
 {
-	@package
-	NSURL *url;
-	FMDatabase *db;
-	NSMutableDictionary *commitObjectForID;
-	
-	NSNumber *commitInProgress;
-	NSNumber *rootInProgress;
-	NSNumber *trackInProgress;
-	ETUUID *objectInProgress;
+    @package
+    NSURL *url;
+    FMDatabase *db;
+    NSMutableDictionary *commitObjectForID;
+    
+    NSNumber *commitInProgress;
+    NSNumber *rootInProgress;
+    NSNumber *trackInProgress;
+    ETUUID *objectInProgress;
 
-	BOOL hasPushedChanges;
+    BOOL hasPushedChanges;
 }
 
 /** @taskunit Initialization */
@@ -183,8 +183,8 @@
  * The UUID set must not be nil, otherwise NSInvalidArgumentException is raised.
  */
 - (void)insertPersistentRootUUID: (ETUUID *)aPersistentRootUUID
-				 commitTrackUUID: (ETUUID *)aMainBranchUUID
-				  rootObjectUUID: (ETUUID *)aRootObjectUUID;
+                 commitTrackUUID: (ETUUID *)aMainBranchUUID
+                  rootObjectUUID: (ETUUID *)aRootObjectUUID;
 /**
  * <override-subclass />
  * Marks the persistent root as deleted and returns the resulting revision.
@@ -207,17 +207,17 @@
 /** @taskunit Committing Changes */
 
 - (void)beginCommitWithMetadata: (NSDictionary *)metadata
-			 persistentRootUUID: (ETUUID *)aPersistentRootUUID
-				commitTrackUUID: (ETUUID *)aTrackUUID
+             persistentRootUUID: (ETUUID *)aPersistentRootUUID
+                commitTrackUUID: (ETUUID *)aTrackUUID
                    baseRevision: (CORevision *)baseRevision;
 - (void)beginChangesForObjectUUID: (ETUUID *)object;
 /**
  * <override-subclass />
  */
 - (void)setValue: (id)value
-	 forProperty: (NSString *)property
-		ofObject: (ETUUID *)object
-	 shouldIndex: (BOOL)shouldIndex;
+     forProperty: (NSString *)property
+        ofObject: (ETUUID *)object
+     shouldIndex: (BOOL)shouldIndex;
 - (void)finishChangesForObjectUUID: (ETUUID *)object;
 - (CORevision *)finishCommit;
 
@@ -257,9 +257,9 @@
  * doesn't appear in the commit track itself.
  */
 - (CORevision *)createCommitTrackWithUUID: (ETUUID *)aBranchUUID
-							         name: (NSString *)aBranchName
+                                     name: (NSString *)aBranchName
                            parentRevision: (CORevision *)aRevision
-				           rootObjectUUID: (ETUUID *)aRootObjectUUID
+                           rootObjectUUID: (ETUUID *)aRootObjectUUID
                        persistentRootUUID: (ETUUID *)aPersistentRootUUID
                       isNewPersistentRoot: (BOOL)isNewPersistentRoot;
 /**
@@ -481,7 +481,7 @@ extern NSString *kCOStoreUUIDStringKey;
 Should be provided by SQLClient or moved to EtoileFoundation. */
 @interface CORecord : NSObject
 {
-	NSDictionary *dictionary;
+    NSDictionary *dictionary;
 }
 
 - (id) initWithDictionary: (NSDictionary *)aDict;

@@ -87,489 +87,489 @@
 
 namespace ManagedFusion
 {
-	class Range
-	{
-	public:
-		size_t location;
-		size_t length; 
-		
-		Range(size_t p, size_t l) : location(p), length(l) {}
-		bool contains(size_t p) const
-		{
-			return p >= location && p <= (location + length);
-		}
-		bool intersects(Range const& r) const
-		{
-			return contains(r.location) || r.contains(location);
-		}
-	};
-	
-	/// <summary>Data on one input file being compared.</summary>
-	template <class T>
-	class DiffData
-	{
-	public:
-		/// <summary>Number of elements (lines).</summary>
-		size_t Length;
-		
-		/// <summary>Refence to collection of elements that will be compared.</summary>
-		T &data;
-		
-		/// <summary>
-		/// Vector of ranges that flag for modified data.
-		/// This is the result of the diff.
-		/// This means deleted in the first Data or inserted in the second Data.
-		/// </summary>
-		std::vector<Range> modified;
-		
-		/// <summary>
-		/// Add a range to the modified vector. 
-		/// If the range being added touches the last range in the vector,
-		/// simply extend the last range.
-		/// </summary>
-		void addRange(Range const& r)
-		{
-			size_t l = modified.size();
-			if (l > 0)
-			{
-				Range last = modified[l-1];
-				if (last.location + last.length == r.location)
-				{
-					modified[l-1].length += r.length;
-					return;
-				}
-			}
-			modified.push_back(r);
-		}
-		
-		/// <summary>
-		/// Initialize the Diff-Data buffer.
-		/// </summary>
-		/// <param name="data">reference to the buffer</param>
-		DiffData(T &initData, int size) : Length(size), data(initData)
-		 {}
-	};
-	
-	enum DifferenceType {
-		INSERTION,
-		DELETION,
-		MODIFICATION,
-		COPY
-	};
-	
-	/// <summary>details of one difference.</summary>
-	class DifferenceItem
-	{
-	public:
-		enum DifferenceType type;
-		Range rangeInA;
-		Range rangeInB;
-		DifferenceItem(DifferenceType t, Range a, Range b) :
-		type(t), rangeInA(a), rangeInB(b) {}
-	};
-	
-	/// <summary>
-	/// Shortest Middle Snake Return Data
-	/// </summary>
-	class SMSRD
-	{
-	public:
-		int x, y;
-		// int u, v;  // 2002.09.20: no need for 2 points 
-	};
-	
-	
-	/// <summary>
-	/// If a sequence of modified lines starts with a line that contains the same content
-	/// as the line that appends the changes, the difference sequence is modified so that the
-	/// appended line and not the starting line is marked as modified.
-	/// This leads to more readable diff sequences when comparing text files.
-	/// </summary>
-	/// <param name="Data">A Diff data buffer containing the identified changes.</param>
-	template <class T>
-	void Optimize(DiffData<T> &Data)
-	{
-		int StartPos, EndPos;
-		
-		StartPos = 0;
-		for (size_t i=0; i<Data.modified.length(); i++)
-		{
-			StartPos = Data.modified[i].location;
-			EndPos = Data.modified[i].location + Data.modified[i].length;
-			if ((EndPos < Data.Length) && (Data.data.equal(StartPos, EndPos)))
-			{
-				Data.modified[i].location++;
-			}
-		}
-	}
-	
-	
-	/// <summary>
-	/// Find the difference in 2 arrays of integers.
-	/// </summary>
-	/// <param name="ArrayA">A-version of the numbers (usualy the old one)</param>
-	/// <param name="ArrayB">B-version of the numbers (usualy the new one)</param>
-	/// <returns>Returns a array of Items that describe the differences.</returns>
-	template <class T>
-	std::vector<ManagedFusion::DifferenceItem> Diff(T &Arrays, size_t sizeA, size_t sizeB)
-	{
-		// The A-Version of the data (original data) to be compared.
-		DiffData<T> DataA(Arrays, sizeA);
-		
-		// The B-Version of the data (modified data) to be compared.
-		DiffData<T> DataB(Arrays, sizeB);
-		
-		size_t MAX = DataA.Length + DataB.Length + 1;
-		/// vector for the (0,0) to (x,y) search
-		std::vector<int> DownVector(2 * MAX + 2);
-		/// vector for the (u,v) to (N,M) search
-		std::vector<int> UpVector(2 * MAX + 2);
-		
-		LCS(DataA, 0, DataA.Length, DataB, 0, DataB.Length, DownVector, UpVector);
-		return CreateDiffs(DataA, DataB);
-	}
-	
-	
-	/// <summary>
-	/// This is the algorithm to find the Shortest Middle Snake (SMS).
-	/// </summary>
-	/// <param name="DataA">sequence A</param>
-	/// <param name="LowerA">lower bound of the actual range in DataA</param>
-	/// <param name="UpperA">upper bound of the actual range in DataA (exclusive)</param>
-	/// <param name="DataB">sequence B</param>
-	/// <param name="LowerB">lower bound of the actual range in DataB</param>
-	/// <param name="UpperB">upper bound of the actual range in DataB (exclusive)</param>
-	/// <param name="DownVector">a vector for the (0,0) to (x,y) search. Passed as a parameter for speed reasons.</param>
-	/// <param name="UpVector">a vector for the (u,v) to (N,M) search. Passed as a parameter for speed reasons.</param>
-	/// <returns>a MiddleSnakeData record containing x,y and u,v</returns>
-	template <class T>
-	SMSRD SMS(DiffData<T> &DataA, int LowerA, int UpperA, DiffData<T> &DataB, int LowerB, int UpperB,
-			  std::vector<int> &DownVector, std::vector<int> &UpVector)
-	{
-		
-		SMSRD ret;
-		int MAX = DataA.Length + DataB.Length + 1;
-		
-		int DownK = LowerA - LowerB; // the k-line to start the forward search
-		int UpK = UpperA - UpperB; // the k-line to start the reverse search
-		
-		int Delta = (UpperA - LowerA) - (UpperB - LowerB);
-		bool oddDelta = (Delta & 1) != 0;
-		
-		// The vectors in the publication accepts negative indexes. the vectors implemented here are 0-based
-		// and are access using a specific offset: UpOffset UpVector and DownOffset for DownVektor
-		int DownOffset = MAX - DownK;
-		int UpOffset = MAX - UpK;
-		
-		int MaxD = ((UpperA - LowerA + UpperB - LowerB) / 2) + 1;
-		
-		// Debug.Write(2, "SMS", String.Format("Search the box: A[{0}-{1}] to B[{2}-{3}]", LowerA, UpperA, LowerB, UpperB));
-		
-		// init vectors
-		DownVector[DownOffset + DownK + 1] = LowerA;
-		UpVector[UpOffset + UpK - 1] = UpperA;
-		
-		for (int D = 0; D <= MaxD; D++)
-		{
-			
-			// Extend the forward path.
-			for (int k = DownK - D; k <= DownK + D; k += 2)
-			{
-				// Debug.Write(0, "SMS", "extend forward path " + k.ToString());
-				
-				// find the only or better starting point
-				int x, y;
-				if (k == DownK - D)
-				{
-					x = DownVector[DownOffset + k + 1]; // down
-				}
-				else
-				{
-					x = DownVector[DownOffset + k - 1] + 1; // a step to the right
-					if ((k < DownK + D) && (DownVector[DownOffset + k + 1] >= x))
-						x = DownVector[DownOffset + k + 1]; // down
-				}
-				y = x - k;
-				
-				// find the end of the furthest reaching forward D-path in diagonal k.
-				while ((x < UpperA) && (y < UpperB) && (DataA.data.equal(x, y)))
-				{
-					x++;
-					y++;
-				}
-				DownVector[DownOffset + k] = x;
-				
-				// overlap ?
-				if (oddDelta && (UpK - D < k) && (k < UpK + D))
-				{
-					if (UpVector[UpOffset + k] <= DownVector[DownOffset + k])
-					{
-						ret.x = DownVector[DownOffset + k];
-						ret.y = DownVector[DownOffset + k] - k;
-						// ret.u = UpVector[UpOffset + k];      // 2002.09.20: no need for 2 points 
-						// ret.v = UpVector[UpOffset + k] - k;
-						return (ret);
-					} // if
-				} // if
-				
-			} // for k
-			
-			// Extend the reverse path.
-			for (int k = UpK - D; k <= UpK + D; k += 2)
-			{
-				// Debug.Write(0, "SMS", "extend reverse path " + k.ToString());
-				
-				// find the only or better starting point
-				int x, y;
-				if (k == UpK + D)
-				{
-					x = UpVector[UpOffset + k - 1]; // up
-				}
-				else
-				{
-					x = UpVector[UpOffset + k + 1] - 1; // left
-					if ((k > UpK - D) && (UpVector[UpOffset + k - 1] < x))
-						x = UpVector[UpOffset + k - 1]; // up
-				} // if
-				y = x - k;
-				
-				while ((x > LowerA) && (y > LowerB) && (DataA.data.equal(x - 1, y - 1)))
-				{
-					x--;
-					y--; // diagonal
-				}
-				UpVector[UpOffset + k] = x;
-				
-				// overlap ?
-				if (!oddDelta && (DownK - D <= k) && (k <= DownK + D))
-				{
-					if (UpVector[UpOffset + k] <= DownVector[DownOffset + k])
-					{
-						ret.x = DownVector[DownOffset + k];
-						ret.y = DownVector[DownOffset + k] - k;
-						// ret.u = UpVector[UpOffset + k];     // 2002.09.20: no need for 2 points 
-						// ret.v = UpVector[UpOffset + k] - k;
-						return (ret);
-					} // if
-				} // if
-				
-			} // for k
-			
-		} // for D
-		
-		throw "the algorithm should never come here.";
-	} // SMS
-	
-	/// <summary>
-	/// This is the divide-and-conquer implementation of the longes common-subsequence (LCS) 
-	/// algorithm.
-	/// The published algorithm passes recursively parts of the A and B sequences.
-	/// To avoid copying these arrays the lower and upper bounds are passed while the sequences stay constant.
-	/// </summary>
-	/// <param name="DataA">sequence A</param>
-	/// <param name="LowerA">lower bound of the actual range in DataA</param>
-	/// <param name="UpperA">upper bound of the actual range in DataA (exclusive)</param>
-	/// <param name="DataB">sequence B</param>
-	/// <param name="LowerB">lower bound of the actual range in DataB</param>
-	/// <param name="UpperB">upper bound of the actual range in DataB (exclusive)</param>
-	/// <param name="DownVector">a vector for the (0,0) to (x,y) search. Passed as a parameter for speed reasons.</param>
-	/// <param name="UpVector">a vector for the (u,v) to (N,M) search. Passed as a parameter for speed reasons.</param>
-	template <class T>
-	void LCS(DiffData<T> &DataA, int LowerA, int UpperA, DiffData<T> &DataB, int LowerB, int UpperB, std::vector<int> &DownVector, std::vector<int> &UpVector)
-	{
-		// Debug.Write(2, "LCS", String.Format("Analyse the box: A[{0}-{1}] to B[{2}-{3}]", LowerA, UpperA, LowerB, UpperB));
-		
-		// Fast walkthrough equal lines at the start
-		while (LowerA < UpperA && LowerB < UpperB && DataA.data.equal(LowerA, LowerB))
-		{
-			LowerA++;
-			LowerB++;
-		}
-		
-		// Fast walkthrough equal lines at the end
-		while (LowerA < UpperA && LowerB < UpperB && DataA.data.equal(UpperA - 1, UpperB - 1))
-		{
-			--UpperA;
-			--UpperB;
-		}
-		
-		if (LowerA == UpperA)
-		{
-			// mark as inserted lines.
-			//while (LowerB < UpperB)
-			//  DataB.modified[LowerB++] = true;
-			if (UpperB > LowerB)
-				DataB.addRange(Range(LowerB, UpperB-LowerB)); // FIXME: off by 1?
-			
-		}
-		else if (LowerB == UpperB)
-		{
-			// mark as deleted lines.
-			//while (LowerA < UpperA)
-			//  DataA.modified[LowerA++] = true;
-			if (UpperA > LowerA)
-				DataA.addRange(Range(LowerA, UpperA-LowerA)); // FIXME: off by 1?  
-		}
-		else
-		{
-			// Find the middle snakea and length of an optimal path for A and B
-			SMSRD smsrd = SMS<T>(DataA, LowerA, UpperA, DataB, LowerB, UpperB, DownVector, UpVector);
-			// Debug.Write(2, "MiddleSnakeData", String.Format("{0},{1}", smsrd.x, smsrd.y));
-			
-			// The path is from LowerX to (x,y) and (x,y) to UpperX
-			LCS<T>(DataA, LowerA, smsrd.x, DataB, LowerB, smsrd.y, DownVector, UpVector);
-			LCS<T>(DataA, smsrd.x, UpperA, DataB, smsrd.y, UpperB, DownVector, UpVector);  // 2002.09.20: no need for 2 points 
-		}
-	} // LCS()
-	
-	static int canEmitCopy(int posA, int posB, Range *modifiedRangeA, Range *modifiedRangeB)
-	{
-		assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
-		if (modifiedRangeA != NULL && modifiedRangeB == NULL)
-		{
-			if (modifiedRangeA->location > posA)
-			{
-				return modifiedRangeA->location - posA;
-			}
-			return 0;
-		}
-		else if (modifiedRangeA == NULL && modifiedRangeB != NULL)
-		{
-			if (modifiedRangeB->location > posB)
-			{
-				return modifiedRangeB->location - posB;
-			}
-			return 0;
-		}
-		else
-		{
-			if (modifiedRangeB->location > posB && modifiedRangeA->location > posA)
-			{
-				return std::min(modifiedRangeB->location - posB,
-								modifiedRangeA->location - posA);
-			}
-			return 0;
-		}
-	}
-	
-	static bool canEmitModification(int posA, int posB, Range *modifiedRangeA, Range *modifiedRangeB)
-	{
-		assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
-		if (modifiedRangeA != NULL && modifiedRangeB != NULL)
-		{
-			return modifiedRangeA->location == posA && modifiedRangeB->location == posB;
-		}
-		return false;
-	}
-	
-	static bool canEmitDeletion(int posA, int posB, Range *modifiedRangeA, Range *modifiedRangeB)
-	{
-		assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
-		
-		if (modifiedRangeB == NULL)
-			return true;
-		
-		if (modifiedRangeA == NULL)
-			return false;
-		
-		if (modifiedRangeA->location == posA && modifiedRangeB->location > posB)
-			return true;
+    class Range
+    {
+    public:
+        size_t location;
+        size_t length; 
+        
+        Range(size_t p, size_t l) : location(p), length(l) {}
+        bool contains(size_t p) const
+        {
+            return p >= location && p <= (location + length);
+        }
+        bool intersects(Range const& r) const
+        {
+            return contains(r.location) || r.contains(location);
+        }
+    };
+    
+    /// <summary>Data on one input file being compared.</summary>
+    template <class T>
+    class DiffData
+    {
+    public:
+        /// <summary>Number of elements (lines).</summary>
+        size_t Length;
+        
+        /// <summary>Refence to collection of elements that will be compared.</summary>
+        T &data;
+        
+        /// <summary>
+        /// Vector of ranges that flag for modified data.
+        /// This is the result of the diff.
+        /// This means deleted in the first Data or inserted in the second Data.
+        /// </summary>
+        std::vector<Range> modified;
+        
+        /// <summary>
+        /// Add a range to the modified vector. 
+        /// If the range being added touches the last range in the vector,
+        /// simply extend the last range.
+        /// </summary>
+        void addRange(Range const& r)
+        {
+            size_t l = modified.size();
+            if (l > 0)
+            {
+                Range last = modified[l-1];
+                if (last.location + last.length == r.location)
+                {
+                    modified[l-1].length += r.length;
+                    return;
+                }
+            }
+            modified.push_back(r);
+        }
+        
+        /// <summary>
+        /// Initialize the Diff-Data buffer.
+        /// </summary>
+        /// <param name="data">reference to the buffer</param>
+        DiffData(T &initData, int size) : Length(size), data(initData)
+         {}
+    };
+    
+    enum DifferenceType {
+        INSERTION,
+        DELETION,
+        MODIFICATION,
+        COPY
+    };
+    
+    /// <summary>details of one difference.</summary>
+    class DifferenceItem
+    {
+    public:
+        enum DifferenceType type;
+        Range rangeInA;
+        Range rangeInB;
+        DifferenceItem(DifferenceType t, Range a, Range b) :
+        type(t), rangeInA(a), rangeInB(b) {}
+    };
+    
+    /// <summary>
+    /// Shortest Middle Snake Return Data
+    /// </summary>
+    class SMSRD
+    {
+    public:
+        int x, y;
+        // int u, v;  // 2002.09.20: no need for 2 points 
+    };
+    
+    
+    /// <summary>
+    /// If a sequence of modified lines starts with a line that contains the same content
+    /// as the line that appends the changes, the difference sequence is modified so that the
+    /// appended line and not the starting line is marked as modified.
+    /// This leads to more readable diff sequences when comparing text files.
+    /// </summary>
+    /// <param name="Data">A Diff data buffer containing the identified changes.</param>
+    template <class T>
+    void Optimize(DiffData<T> &Data)
+    {
+        int StartPos, EndPos;
+        
+        StartPos = 0;
+        for (size_t i=0; i<Data.modified.length(); i++)
+        {
+            StartPos = Data.modified[i].location;
+            EndPos = Data.modified[i].location + Data.modified[i].length;
+            if ((EndPos < Data.Length) && (Data.data.equal(StartPos, EndPos)))
+            {
+                Data.modified[i].location++;
+            }
+        }
+    }
+    
+    
+    /// <summary>
+    /// Find the difference in 2 arrays of integers.
+    /// </summary>
+    /// <param name="ArrayA">A-version of the numbers (usualy the old one)</param>
+    /// <param name="ArrayB">B-version of the numbers (usualy the new one)</param>
+    /// <returns>Returns a array of Items that describe the differences.</returns>
+    template <class T>
+    std::vector<ManagedFusion::DifferenceItem> Diff(T &Arrays, size_t sizeA, size_t sizeB)
+    {
+        // The A-Version of the data (original data) to be compared.
+        DiffData<T> DataA(Arrays, sizeA);
+        
+        // The B-Version of the data (modified data) to be compared.
+        DiffData<T> DataB(Arrays, sizeB);
+        
+        size_t MAX = DataA.Length + DataB.Length + 1;
+        /// vector for the (0,0) to (x,y) search
+        std::vector<int> DownVector(2 * MAX + 2);
+        /// vector for the (u,v) to (N,M) search
+        std::vector<int> UpVector(2 * MAX + 2);
+        
+        LCS(DataA, 0, DataA.Length, DataB, 0, DataB.Length, DownVector, UpVector);
+        return CreateDiffs(DataA, DataB);
+    }
+    
+    
+    /// <summary>
+    /// This is the algorithm to find the Shortest Middle Snake (SMS).
+    /// </summary>
+    /// <param name="DataA">sequence A</param>
+    /// <param name="LowerA">lower bound of the actual range in DataA</param>
+    /// <param name="UpperA">upper bound of the actual range in DataA (exclusive)</param>
+    /// <param name="DataB">sequence B</param>
+    /// <param name="LowerB">lower bound of the actual range in DataB</param>
+    /// <param name="UpperB">upper bound of the actual range in DataB (exclusive)</param>
+    /// <param name="DownVector">a vector for the (0,0) to (x,y) search. Passed as a parameter for speed reasons.</param>
+    /// <param name="UpVector">a vector for the (u,v) to (N,M) search. Passed as a parameter for speed reasons.</param>
+    /// <returns>a MiddleSnakeData record containing x,y and u,v</returns>
+    template <class T>
+    SMSRD SMS(DiffData<T> &DataA, int LowerA, int UpperA, DiffData<T> &DataB, int LowerB, int UpperB,
+              std::vector<int> &DownVector, std::vector<int> &UpVector)
+    {
+        
+        SMSRD ret;
+        int MAX = DataA.Length + DataB.Length + 1;
+        
+        int DownK = LowerA - LowerB; // the k-line to start the forward search
+        int UpK = UpperA - UpperB; // the k-line to start the reverse search
+        
+        int Delta = (UpperA - LowerA) - (UpperB - LowerB);
+        bool oddDelta = (Delta & 1) != 0;
+        
+        // The vectors in the publication accepts negative indexes. the vectors implemented here are 0-based
+        // and are access using a specific offset: UpOffset UpVector and DownOffset for DownVektor
+        int DownOffset = MAX - DownK;
+        int UpOffset = MAX - UpK;
+        
+        int MaxD = ((UpperA - LowerA + UpperB - LowerB) / 2) + 1;
+        
+        // Debug.Write(2, "SMS", String.Format("Search the box: A[{0}-{1}] to B[{2}-{3}]", LowerA, UpperA, LowerB, UpperB));
+        
+        // init vectors
+        DownVector[DownOffset + DownK + 1] = LowerA;
+        UpVector[UpOffset + UpK - 1] = UpperA;
+        
+        for (int D = 0; D <= MaxD; D++)
+        {
+            
+            // Extend the forward path.
+            for (int k = DownK - D; k <= DownK + D; k += 2)
+            {
+                // Debug.Write(0, "SMS", "extend forward path " + k.ToString());
+                
+                // find the only or better starting point
+                int x, y;
+                if (k == DownK - D)
+                {
+                    x = DownVector[DownOffset + k + 1]; // down
+                }
+                else
+                {
+                    x = DownVector[DownOffset + k - 1] + 1; // a step to the right
+                    if ((k < DownK + D) && (DownVector[DownOffset + k + 1] >= x))
+                        x = DownVector[DownOffset + k + 1]; // down
+                }
+                y = x - k;
+                
+                // find the end of the furthest reaching forward D-path in diagonal k.
+                while ((x < UpperA) && (y < UpperB) && (DataA.data.equal(x, y)))
+                {
+                    x++;
+                    y++;
+                }
+                DownVector[DownOffset + k] = x;
+                
+                // overlap ?
+                if (oddDelta && (UpK - D < k) && (k < UpK + D))
+                {
+                    if (UpVector[UpOffset + k] <= DownVector[DownOffset + k])
+                    {
+                        ret.x = DownVector[DownOffset + k];
+                        ret.y = DownVector[DownOffset + k] - k;
+                        // ret.u = UpVector[UpOffset + k];      // 2002.09.20: no need for 2 points 
+                        // ret.v = UpVector[UpOffset + k] - k;
+                        return (ret);
+                    } // if
+                } // if
+                
+            } // for k
+            
+            // Extend the reverse path.
+            for (int k = UpK - D; k <= UpK + D; k += 2)
+            {
+                // Debug.Write(0, "SMS", "extend reverse path " + k.ToString());
+                
+                // find the only or better starting point
+                int x, y;
+                if (k == UpK + D)
+                {
+                    x = UpVector[UpOffset + k - 1]; // up
+                }
+                else
+                {
+                    x = UpVector[UpOffset + k + 1] - 1; // left
+                    if ((k > UpK - D) && (UpVector[UpOffset + k - 1] < x))
+                        x = UpVector[UpOffset + k - 1]; // up
+                } // if
+                y = x - k;
+                
+                while ((x > LowerA) && (y > LowerB) && (DataA.data.equal(x - 1, y - 1)))
+                {
+                    x--;
+                    y--; // diagonal
+                }
+                UpVector[UpOffset + k] = x;
+                
+                // overlap ?
+                if (!oddDelta && (DownK - D <= k) && (k <= DownK + D))
+                {
+                    if (UpVector[UpOffset + k] <= DownVector[DownOffset + k])
+                    {
+                        ret.x = DownVector[DownOffset + k];
+                        ret.y = DownVector[DownOffset + k] - k;
+                        // ret.u = UpVector[UpOffset + k];     // 2002.09.20: no need for 2 points 
+                        // ret.v = UpVector[UpOffset + k] - k;
+                        return (ret);
+                    } // if
+                } // if
+                
+            } // for k
+            
+        } // for D
+        
+        throw "the algorithm should never come here.";
+    } // SMS
+    
+    /// <summary>
+    /// This is the divide-and-conquer implementation of the longes common-subsequence (LCS) 
+    /// algorithm.
+    /// The published algorithm passes recursively parts of the A and B sequences.
+    /// To avoid copying these arrays the lower and upper bounds are passed while the sequences stay constant.
+    /// </summary>
+    /// <param name="DataA">sequence A</param>
+    /// <param name="LowerA">lower bound of the actual range in DataA</param>
+    /// <param name="UpperA">upper bound of the actual range in DataA (exclusive)</param>
+    /// <param name="DataB">sequence B</param>
+    /// <param name="LowerB">lower bound of the actual range in DataB</param>
+    /// <param name="UpperB">upper bound of the actual range in DataB (exclusive)</param>
+    /// <param name="DownVector">a vector for the (0,0) to (x,y) search. Passed as a parameter for speed reasons.</param>
+    /// <param name="UpVector">a vector for the (u,v) to (N,M) search. Passed as a parameter for speed reasons.</param>
+    template <class T>
+    void LCS(DiffData<T> &DataA, int LowerA, int UpperA, DiffData<T> &DataB, int LowerB, int UpperB, std::vector<int> &DownVector, std::vector<int> &UpVector)
+    {
+        // Debug.Write(2, "LCS", String.Format("Analyse the box: A[{0}-{1}] to B[{2}-{3}]", LowerA, UpperA, LowerB, UpperB));
+        
+        // Fast walkthrough equal lines at the start
+        while (LowerA < UpperA && LowerB < UpperB && DataA.data.equal(LowerA, LowerB))
+        {
+            LowerA++;
+            LowerB++;
+        }
+        
+        // Fast walkthrough equal lines at the end
+        while (LowerA < UpperA && LowerB < UpperB && DataA.data.equal(UpperA - 1, UpperB - 1))
+        {
+            --UpperA;
+            --UpperB;
+        }
+        
+        if (LowerA == UpperA)
+        {
+            // mark as inserted lines.
+            //while (LowerB < UpperB)
+            //  DataB.modified[LowerB++] = true;
+            if (UpperB > LowerB)
+                DataB.addRange(Range(LowerB, UpperB-LowerB)); // FIXME: off by 1?
+            
+        }
+        else if (LowerB == UpperB)
+        {
+            // mark as deleted lines.
+            //while (LowerA < UpperA)
+            //  DataA.modified[LowerA++] = true;
+            if (UpperA > LowerA)
+                DataA.addRange(Range(LowerA, UpperA-LowerA)); // FIXME: off by 1?  
+        }
+        else
+        {
+            // Find the middle snakea and length of an optimal path for A and B
+            SMSRD smsrd = SMS<T>(DataA, LowerA, UpperA, DataB, LowerB, UpperB, DownVector, UpVector);
+            // Debug.Write(2, "MiddleSnakeData", String.Format("{0},{1}", smsrd.x, smsrd.y));
+            
+            // The path is from LowerX to (x,y) and (x,y) to UpperX
+            LCS<T>(DataA, LowerA, smsrd.x, DataB, LowerB, smsrd.y, DownVector, UpVector);
+            LCS<T>(DataA, smsrd.x, UpperA, DataB, smsrd.y, UpperB, DownVector, UpVector);  // 2002.09.20: no need for 2 points 
+        }
+    } // LCS()
+    
+    static int canEmitCopy(int posA, int posB, Range *modifiedRangeA, Range *modifiedRangeB)
+    {
+        assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
+        if (modifiedRangeA != NULL && modifiedRangeB == NULL)
+        {
+            if (modifiedRangeA->location > posA)
+            {
+                return modifiedRangeA->location - posA;
+            }
+            return 0;
+        }
+        else if (modifiedRangeA == NULL && modifiedRangeB != NULL)
+        {
+            if (modifiedRangeB->location > posB)
+            {
+                return modifiedRangeB->location - posB;
+            }
+            return 0;
+        }
+        else
+        {
+            if (modifiedRangeB->location > posB && modifiedRangeA->location > posA)
+            {
+                return std::min(modifiedRangeB->location - posB,
+                                modifiedRangeA->location - posA);
+            }
+            return 0;
+        }
+    }
+    
+    static bool canEmitModification(int posA, int posB, Range *modifiedRangeA, Range *modifiedRangeB)
+    {
+        assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
+        if (modifiedRangeA != NULL && modifiedRangeB != NULL)
+        {
+            return modifiedRangeA->location == posA && modifiedRangeB->location == posB;
+        }
+        return false;
+    }
+    
+    static bool canEmitDeletion(int posA, int posB, Range *modifiedRangeA, Range *modifiedRangeB)
+    {
+        assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
+        
+        if (modifiedRangeB == NULL)
+            return true;
+        
+        if (modifiedRangeA == NULL)
+            return false;
+        
+        if (modifiedRangeA->location == posA && modifiedRangeB->location > posB)
+            return true;
 
-		return false;
-	}
-	
-	static bool canEmitInsertion(int posA, int posB, Range *modifiedRangeA, Range *modifiedRangeB)
-	{
-		assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
-		
-		if (modifiedRangeA == NULL)
-			return true;
-		
-		if (modifiedRangeB == NULL)
-			return false;
+        return false;
+    }
+    
+    static bool canEmitInsertion(int posA, int posB, Range *modifiedRangeA, Range *modifiedRangeB)
+    {
+        assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
+        
+        if (modifiedRangeA == NULL)
+            return true;
+        
+        if (modifiedRangeB == NULL)
+            return false;
 
-		if (modifiedRangeB->location == posB)
-			return true;
+        if (modifiedRangeB->location == posB)
+            return true;
 
-		return false;
-	}
-	
-	/// <summary>Scan the tables of which lines are inserted and deleted,
-	/// producing an edit script in forward order.  
-	/// </summary>
-	/// dynamic array
-	template <class T>
-	std::vector<DifferenceItem> CreateDiffs(DiffData<T> &DataA, DiffData<T> &DataB)
-	{
-		std::vector<DifferenceItem> result;
-		
-		// Indexes into the DataA.modified and DataB.modified vectors
-		// (the vectors of modified (non-matching) ranges in A and B)
-		// that we are currently looking at
-		int i=0, j=0;
-		
-		// Position in the input arrays that we have written out edits for
-		// all characters to the left of.
-		int posA=0, posB=0;
-				
-		while (i < DataA.modified.size() || j < DataB.modified.size())
-		{
-			Range *modifiedRangeA = (i < DataA.modified.size()) ? &(DataA.modified[i]) : (Range *)0;
-			Range *modifiedRangeB = (j < DataB.modified.size()) ? &(DataB.modified[j]) : (Range *)0;
-			
-			assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
-			
-			int charsToCopy = canEmitCopy(posA, posB, modifiedRangeA, modifiedRangeB);
-			if (charsToCopy > 0)
-			{
-				DifferenceItem it(COPY, Range(posA, charsToCopy), Range(posB, charsToCopy));
-				result.push_back(it);
-				posA += charsToCopy;
-				posB += charsToCopy;
-			}
-			
-			if (canEmitModification(posA, posB, modifiedRangeA, modifiedRangeB))
-			{
-				DifferenceItem it(MODIFICATION, *modifiedRangeA, *modifiedRangeB);
-				result.push_back(it);
-				posA += modifiedRangeA->length;
-				posB += modifiedRangeB->length;
-				i++;
-				j++;
-			}
-			else if (canEmitDeletion(posA, posB, modifiedRangeA, modifiedRangeB))
-			{
-				DifferenceItem it(DELETION, *modifiedRangeA, Range(0,0));
-				result.push_back(it);
-				posA += modifiedRangeA->length;
-				i++;
-			}
-			else if (canEmitInsertion(posA, posB, modifiedRangeA, modifiedRangeB))
-			{
-				DifferenceItem it(INSERTION, Range(posA, 0), *modifiedRangeB);
-				result.push_back(it);
-				posB += modifiedRangeB->length;
-				j++;
-			}
-			else
-			{
-				assert(0);
-			}
-		}
-		
-		// Possibly push a final copy edit
-		
-		if (posA < DataA.Length)
-		{
-			assert(posB < DataB.Length);
-			assert((DataA.Length - posA) == (DataB.Length - posB));
-			
-			DifferenceItem it(COPY, Range(posA, (DataA.Length - posA)), Range(posB, (DataB.Length - posB)));
-			result.push_back(it);
-		}
-		
-		return result;
-	}
+        return false;
+    }
+    
+    /// <summary>Scan the tables of which lines are inserted and deleted,
+    /// producing an edit script in forward order.  
+    /// </summary>
+    /// dynamic array
+    template <class T>
+    std::vector<DifferenceItem> CreateDiffs(DiffData<T> &DataA, DiffData<T> &DataB)
+    {
+        std::vector<DifferenceItem> result;
+        
+        // Indexes into the DataA.modified and DataB.modified vectors
+        // (the vectors of modified (non-matching) ranges in A and B)
+        // that we are currently looking at
+        int i=0, j=0;
+        
+        // Position in the input arrays that we have written out edits for
+        // all characters to the left of.
+        int posA=0, posB=0;
+                
+        while (i < DataA.modified.size() || j < DataB.modified.size())
+        {
+            Range *modifiedRangeA = (i < DataA.modified.size()) ? &(DataA.modified[i]) : (Range *)0;
+            Range *modifiedRangeB = (j < DataB.modified.size()) ? &(DataB.modified[j]) : (Range *)0;
+            
+            assert(modifiedRangeA != NULL || modifiedRangeB != NULL);
+            
+            int charsToCopy = canEmitCopy(posA, posB, modifiedRangeA, modifiedRangeB);
+            if (charsToCopy > 0)
+            {
+                DifferenceItem it(COPY, Range(posA, charsToCopy), Range(posB, charsToCopy));
+                result.push_back(it);
+                posA += charsToCopy;
+                posB += charsToCopy;
+            }
+            
+            if (canEmitModification(posA, posB, modifiedRangeA, modifiedRangeB))
+            {
+                DifferenceItem it(MODIFICATION, *modifiedRangeA, *modifiedRangeB);
+                result.push_back(it);
+                posA += modifiedRangeA->length;
+                posB += modifiedRangeB->length;
+                i++;
+                j++;
+            }
+            else if (canEmitDeletion(posA, posB, modifiedRangeA, modifiedRangeB))
+            {
+                DifferenceItem it(DELETION, *modifiedRangeA, Range(0,0));
+                result.push_back(it);
+                posA += modifiedRangeA->length;
+                i++;
+            }
+            else if (canEmitInsertion(posA, posB, modifiedRangeA, modifiedRangeB))
+            {
+                DifferenceItem it(INSERTION, Range(posA, 0), *modifiedRangeB);
+                result.push_back(it);
+                posB += modifiedRangeB->length;
+                j++;
+            }
+            else
+            {
+                assert(0);
+            }
+        }
+        
+        // Possibly push a final copy edit
+        
+        if (posA < DataA.Length)
+        {
+            assert(posB < DataB.Length);
+            assert((DataA.Length - posA) == (DataB.Length - posB));
+            
+            DifferenceItem it(COPY, Range(posA, (DataA.Length - posA)), Range(posB, (DataB.Length - posB)));
+            result.push_back(it);
+        }
+        
+        return result;
+    }
 } // namespace ManagedFusion
 
 #endif

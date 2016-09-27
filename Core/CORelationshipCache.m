@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2013 Eric Wasylishen
+    Copyright (C) 2013 Eric Wasylishen
 
-	Date:  July 2013
-	License:  MIT  (see COPYING)
+    Date:  July 2013
+    License:  MIT  (see COPYING)
  */
 
 #import "CORelationshipCache.h"
@@ -23,28 +23,28 @@
 
 - (NSDictionary *)descriptionDictionary
 {
-	return @{ @"property": _targetProperty != nil ? _targetProperty : @"nil",
-	         @"opposite property": _sourceProperty,
-	        @"opposite object": _sourceObject.UUID };
+    return @{ @"property": _targetProperty != nil ? _targetProperty : @"nil",
+             @"opposite property": _sourceProperty,
+            @"opposite object": _sourceObject.UUID };
 }
 
 - (NSString *)description
 {
-	return self.descriptionDictionary.description;
+    return self.descriptionDictionary.description;
 }
 
 - (BOOL) isSourceObjectTrackingSpecificBranchForTargetObject: (COObject *)aTargetObject
 {
-	if (_sourceObject.objectGraphContext == aTargetObject.objectGraphContext)
-	{
-		return NO;
-	}
-	return _sourceObject.objectGraphContext.trackingSpecificBranch;
+    if (_sourceObject.objectGraphContext == aTargetObject.objectGraphContext)
+    {
+        return NO;
+    }
+    return _sourceObject.objectGraphContext.trackingSpecificBranch;
 }
 
 - (BOOL)isSourceObjectBranchDeleted
 {
-	return _sourceObject.persistentRoot.deleted || _sourceObject.branch.deleted;
+    return _sourceObject.persistentRoot.deleted || _sourceObject.branch.deleted;
 }
 
 @end
@@ -55,7 +55,7 @@
 
 - (instancetype) initWithOwner: (COObject *)owner
 {
-	NILARG_EXCEPTION_TEST(owner);
+    NILARG_EXCEPTION_TEST(owner);
     SUPERINIT;
     _cachedRelationships = [[NSMutableArray alloc] initWithCapacity: INITIAL_ARRAY_CAPACITY];
     _owner = owner;
@@ -64,14 +64,14 @@
 
 - (instancetype)init
 {
-	return [self initWithOwner: nil];
+    return [self initWithOwner: nil];
 }
 
 - (NSString *)description
 {
-	NSArray *relationships =
-		(id)[[_cachedRelationships mappedCollection] descriptionDictionary];
-	return @{ @"owner": _owner.UUID, @"relationships": relationships }.description;
+    NSArray *relationships =
+        (id)[[_cachedRelationships mappedCollection] descriptionDictionary];
+    return @{ @"owner": _owner.UUID, @"relationships": relationships }.description;
 }
 
 - (NSSet *) referringObjectsForPropertyInTarget: (NSString *)aProperty
@@ -79,37 +79,37 @@
     NSMutableSet *result = [NSMutableSet set];
     for (COCachedRelationship *entry in _cachedRelationships)
     {
-		/* i.e., hide incoming references that _come from_ specific (non-current) branches
-		   (regardless of whether they are specifc-branch or current-branch references) 
-		 
-		   On slide 1 of 'cross persistent root reference semantics.key',
-		   this corresponds to John (A) and Lucy (A) hiding the dotted incoming references from
-		   Group (B). */
-		if ([entry isSourceObjectTrackingSpecificBranchForTargetObject: _owner])
-			continue;
+        /* i.e., hide incoming references that _come from_ specific (non-current) branches
+           (regardless of whether they are specifc-branch or current-branch references) 
+         
+           On slide 1 of 'cross persistent root reference semantics.key',
+           this corresponds to John (A) and Lucy (A) hiding the dotted incoming references from
+           Group (B). */
+        if ([entry isSourceObjectTrackingSpecificBranchForTargetObject: _owner])
+            continue;
 
-		if (entry.sourceObjectBranchDeleted)
-			continue;
-		
+        if (entry.sourceObjectBranchDeleted)
+            continue;
+        
         if ([aProperty isEqualToString: entry->_targetProperty])
         {
             [result addObject: entry->_sourceObject];
         }
     }
-	
-	/* If this is an object on a specific branch, pretend that incoming references
-	   for the root objcet on the current branch graph are pointing at us.
+    
+    /* If this is an object on a specific branch, pretend that incoming references
+       for the root objcet on the current branch graph are pointing at us.
 
-	   On slide 2 of 'cross persistent root reference semantics.key',
-	   this corresponds to the non-current branch Lucy (A) viewing the dotted incoming references from
-	   Group (A). */
-	if (_owner.objectGraphContext.trackingSpecificBranch)
-	{
-		COObject *currentBranchRootObject = _owner.persistentRoot.rootObject;
-		NSSet *referringObjectsToCurrentBranch = [currentBranchRootObject.incomingRelationshipCache referringObjectsForPropertyInTarget: aProperty];		
-		[result unionSet: referringObjectsToCurrentBranch];
-	}
-	
+       On slide 2 of 'cross persistent root reference semantics.key',
+       this corresponds to the non-current branch Lucy (A) viewing the dotted incoming references from
+       Group (A). */
+    if (_owner.objectGraphContext.trackingSpecificBranch)
+    {
+        COObject *currentBranchRootObject = _owner.persistentRoot.rootObject;
+        NSSet *referringObjectsToCurrentBranch = [currentBranchRootObject.incomingRelationshipCache referringObjectsForPropertyInTarget: aProperty];        
+        [result unionSet: referringObjectsToCurrentBranch];
+    }
+    
     return result;
 }
 
@@ -118,14 +118,14 @@
     NSMutableSet *result = [NSMutableSet set];
     for (COCachedRelationship *entry in _cachedRelationships)
     {
-		/* When deallocating an object graph and replacing references to its
-		   inner objects with -[COPath brokenPath], some of them might be 
-		   already deallocated. */
-		if (entry->_sourceObject == nil)
-			continue;
+        /* When deallocating an object graph and replacing references to its
+           inner objects with -[COPath brokenPath], some of them might be 
+           already deallocated. */
+        if (entry->_sourceObject == nil)
+            continue;
 
-		// N.B.: Don't filter by !isSourceObjectTrackingSpecificBranch as the other methods do
-		[result addObject: entry->_sourceObject];
+        // N.B.: Don't filter by !isSourceObjectTrackingSpecificBranch as the other methods do
+        [result addObject: entry->_sourceObject];
     }
     return result;
 }
@@ -136,8 +136,8 @@
     
     for (COCachedRelationship *entry in _cachedRelationships)
     {
-		if ([entry isSourceObjectTrackingSpecificBranchForTargetObject: _owner])
-			continue;
+        if ([entry isSourceObjectTrackingSpecificBranchForTargetObject: _owner])
+            continue;
 
         if ([aProperty isEqualToString: entry->_targetProperty])
         {
@@ -162,7 +162,7 @@
 
 - (NSArray *) allEntries
 {
-	return _cachedRelationships;
+    return _cachedRelationships;
 }
 
 - (void) removeReferencesForPropertyInSource: (NSString *)aTargetProperty

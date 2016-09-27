@@ -7,14 +7,14 @@
 {
     ETEntityDescription *docEntity = [self newBasicEntityDescription];
     
-	ETPropertyDescription *projectsProperty = [ETPropertyDescription descriptionWithName: @"projects"
+    ETPropertyDescription *projectsProperty = [ETPropertyDescription descriptionWithName: @"projects"
                                                                                   type: (id)@"Project"];
-	[projectsProperty setOpposite: (id)@"Project.documents"];
-	[projectsProperty setMultivalued: YES];
-	[projectsProperty setOrdered: NO];
-	[projectsProperty setDerived: YES];
+    [projectsProperty setOpposite: (id)@"Project.documents"];
+    [projectsProperty setMultivalued: YES];
+    [projectsProperty setOrdered: NO];
+    [projectsProperty setDerived: YES];
     [projectsProperty setPersistent: NO];
-	
+    
     ETPropertyDescription *screenRectProperty = [ETPropertyDescription descriptionWithName: @"screenRect"
                                                                                       type: (id)@"NSRect"];
     [screenRectProperty setPersistent: YES];
@@ -49,26 +49,26 @@
 
 - (NSRect) screenRect
 {
-	// FIXME: -valueForStorageKey: is private, either it should be public, or I'm doing something wrong here
-	
-	return [[self valueForStorageKey: @"screenRect"] rectValue];
+    // FIXME: -valueForStorageKey: is private, either it should be public, or I'm doing something wrong here
+    
+    return [[self valueForStorageKey: @"screenRect"] rectValue];
 }
 - (void) setScreenRect:(NSRect)r
 {
     [self willChangeValueForProperty: @"screenRect"];
     [self setValue: [NSValue valueWithRect: r] forStorageKey: @"screenRect"];
-	[self didChangeValueForProperty: @"screenRect"];
+    [self didChangeValueForProperty: @"screenRect"];
 }
 
 - (BOOL) isOpen
 {
-	return [[self valueForStorageKey: @"isOpen"] boolValue];
+    return [[self valueForStorageKey: @"isOpen"] boolValue];
 }
 - (void) setIsOpen:(BOOL)i
 {
-	[self willChangeValueForProperty: @"isOpen"];
+    [self willChangeValueForProperty: @"isOpen"];
     [self setValue: @(i) forStorageKey: @"isOpen"];
-	[self didChangeValueForProperty: @"isOpen"];
+    [self didChangeValueForProperty: @"isOpen"];
 }
 
 @dynamic projects;

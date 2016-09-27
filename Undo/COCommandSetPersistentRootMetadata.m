@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  September 2013
-	License:  MIT  (see COPYING)
+    Date:  September 2013
+    License:  MIT  (see COPYING)
  */
 
 #import "COCommandSetPersistentRootMetadata.h"
@@ -55,35 +55,35 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
 
 - (BOOL) canApplyToContext: (COEditingContext *)aContext
 {
-	NILARG_EXCEPTION_TEST(aContext);
+    NILARG_EXCEPTION_TEST(aContext);
     return YES;
 }
 
 - (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
 {
-	[txn setMetadata: _newMetadata forPersistentRoot: _persistentRootUUID];
+    [txn setMetadata: _newMetadata forPersistentRoot: _persistentRootUUID];
 }
 
 - (void) applyToContext: (COEditingContext *)aContext
 {
-	NILARG_EXCEPTION_TEST(aContext);
-	
+    NILARG_EXCEPTION_TEST(aContext);
+    
     COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
-   	ETAssert(proot != nil);
-	
+    ETAssert(proot != nil);
+    
     proot.metadata = _newMetadata;
 }
 
 - (NSString *)kind
 {
-	return _(@"Persistent Root Metadata Update");
+    return _(@"Persistent Root Metadata Update");
 }
 
 - (id) copyWithZone:(NSZone *)zone
 {
     COCommandSetPersistentRootMetadata *aCopy = [super copyWithZone: zone];
-	aCopy->_oldMetadata = _oldMetadata;
-	aCopy->_newMetadata = _newMetadata;
+    aCopy->_oldMetadata = _oldMetadata;
+    aCopy->_newMetadata = _newMetadata;
     return aCopy;
 }
 

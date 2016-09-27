@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
+    Copyright (C) 2013 Eric Wasylishen, Quentin Mathe
 
-	Date:  October 2013
-	License:  MIT  (see COPYING)
+    Date:  October 2013
+    License:  MIT  (see COPYING)
 
  */
 
@@ -19,36 +19,36 @@
  */
 static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject, COObjectGraphContext *restrictToObjectGraph)
 {
-	NSMutableArray *result = [NSMutableArray array];
-	for (ETPropertyDescription *propDesc in anObject.entityDescription.allPropertyDescriptions)
-	{
-		if (!propDesc.persistent)
-		{
-			continue;
-		}
-		
-		NSString *propertyName = propDesc.name;
-		id value = [anObject valueForProperty: propertyName shouldLoad: NO];
-		
+    NSMutableArray *result = [NSMutableArray array];
+    for (ETPropertyDescription *propDesc in anObject.entityDescription.allPropertyDescriptions)
+    {
+        if (!propDesc.persistent)
+        {
+            continue;
+        }
+        
+        NSString *propertyName = propDesc.name;
+        id value = [anObject valueForProperty: propertyName shouldLoad: NO];
+        
         if (propDesc.multivalued)
         {
-			if (propDesc.keyed)
-			{
-				assert([value isKindOfClass: [NSDictionary class]]);
-			}
-			else
-			{
-				assert([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]]);
-				
-			}
-			
-			/* We use -objectEnumerator, because subvalue can be a  CODictionary
-			 or a NSDictionary (if a getter exists to expose the CODictionary
-			 as a NSDictionary for UI editing) */
+            if (propDesc.keyed)
+            {
+                assert([value isKindOfClass: [NSDictionary class]]);
+            }
+            else
+            {
+                assert([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]]);
+                
+            }
+            
+            /* We use -objectEnumerator, because subvalue can be a  CODictionary
+             or a NSDictionary (if a getter exists to expose the CODictionary
+             as a NSDictionary for UI editing) */
             for (id subvalue in [value objectEnumerator])
             {
                 if ([subvalue isKindOfClass: [COObject class]]
-					&& [subvalue objectGraphContext] == restrictToObjectGraph)
+                    && [subvalue objectGraphContext] == restrictToObjectGraph)
                 {
                     [result addObject: subvalue];
                 }
@@ -57,14 +57,14 @@ static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject, COObjectG
         else
         {
             if ([value isKindOfClass: [COObject class]]
-				&& [value objectGraphContext] == restrictToObjectGraph)
+                && [value objectGraphContext] == restrictToObjectGraph)
             {
                 [result addObject: value];
             }
             // Ignore non-COObject objects
         }
-	}
-	return result;
+    }
+    return result;
 }
 
 static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *collectedUUIDSet, COObjectGraphContext *restrictToObjectGraph)
@@ -85,49 +85,49 @@ static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *col
 
 - (NSSet *) allReachableObjectUUIDs
 {
-	NSParameterAssert(self.rootObject != nil);
-	
-	NSMutableSet *result = [[NSMutableSet alloc] initWithCapacity: _loadedObjects.count];
-	FindReachableObjectsFromObject(self.rootObject, result, self);
-	return result;
+    NSParameterAssert(self.rootObject != nil);
+    
+    NSMutableSet *result = [[NSMutableSet alloc] initWithCapacity: _loadedObjects.count];
+    FindReachableObjectsFromObject(self.rootObject, result, self);
+    return result;
 }
 
 #pragma mark - cycle detection
 
 static void FindCyclesInContainersOfObject(COObject *currentObject, COObject *objectBeingSearchedFor)
 {
-	for (ETPropertyDescription *propDesc in currentObject.entityDescription.allPropertyDescriptions)
-	{
-		if (propDesc.isContainer)
-		{
-			NSString *propertyName = propDesc.name;
-			COObject *container = [currentObject valueForKey: propertyName];
-			
-			if (container == objectBeingSearchedFor)
-				[NSException raise: NSGenericException format: @"Cycle detected"];
-			
-			if (container != nil)
-				FindCyclesInContainersOfObject(container, objectBeingSearchedFor);
-		}
-	}
+    for (ETPropertyDescription *propDesc in currentObject.entityDescription.allPropertyDescriptions)
+    {
+        if (propDesc.isContainer)
+        {
+            NSString *propertyName = propDesc.name;
+            COObject *container = [currentObject valueForKey: propertyName];
+            
+            if (container == objectBeingSearchedFor)
+                [NSException raise: NSGenericException format: @"Cycle detected"];
+            
+            if (container != nil)
+                FindCyclesInContainersOfObject(container, objectBeingSearchedFor);
+        }
+    }
 }
 
 - (void) checkForCyclesInCompositeRelationshipsFromObject: (COObject*)anObject
 {
-	FindCyclesInContainersOfObject(anObject, anObject);
+    FindCyclesInContainersOfObject(anObject, anObject);
 }
 
 - (void) checkForCyclesInCompositeRelationshipsInObjects: (NSArray *)objects
 {
-	for (COObject *object in objects)
-	{
-		[self checkForCyclesInCompositeRelationshipsFromObject: object];
-	}
+    for (COObject *object in objects)
+    {
+        [self checkForCyclesInCompositeRelationshipsFromObject: object];
+    }
 }
 
 - (void) checkForCyclesInCompositeRelationshipsInChangedObjects
 {
-	[self checkForCyclesInCompositeRelationshipsInObjects: self.changedObjects];
+    [self checkForCyclesInCompositeRelationshipsInObjects: self.changedObjects];
 }
 
 @end

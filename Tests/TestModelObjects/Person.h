@@ -1,8 +1,8 @@
 /*
-	Copyright (C) 2016 Quentin Mathe
+    Copyright (C) 2016 Quentin Mathe
 
-	Date:  January 2016
-	License:  MIT  (nonatomic, see COPYING)
+    Date:  January 2016
+    License:  MIT  (nonatomic, see COPYING)
  */
 
 #import <Foundation/Foundation.h>

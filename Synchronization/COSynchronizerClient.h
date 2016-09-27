@@ -69,20 +69,20 @@
  */
 @interface COSynchronizerClient : NSObject
 {
-	COEditingContext *_ctx;
-	COBranch *_branch;
-	NSString *_clientID;
-	
-	ETUUID *_lastRevisionUUIDFromServer;
-	ETUUID *_lastRevisionUUIDInTransitToServer;
-	/** Just for benchmarking */
-	NSDate *_lastRevisionUUIDInTransitToServerTimestamp;
-	
-	id<COSynchronizerClientDelegate> __weak _delegate;
+    COEditingContext *_ctx;
+    COBranch *_branch;
+    NSString *_clientID;
+    
+    ETUUID *_lastRevisionUUIDFromServer;
+    ETUUID *_lastRevisionUUIDInTransitToServer;
+    /** Just for benchmarking */
+    NSDate *_lastRevisionUUIDInTransitToServerTimestamp;
+    
+    id<COSynchronizerClientDelegate> __weak _delegate;
 }
 
 - (instancetype) initWithClientID: (NSString *)clientID
-		 editingContext: (COEditingContext *)ctx NS_DESIGNATED_INITIALIZER;
+         editingContext: (COEditingContext *)ctx NS_DESIGNATED_INITIALIZER;
 
 
 @property (nonatomic, readonly, strong) NSString *clientID;

@@ -488,8 +488,8 @@ NSString *DDExtractFileNameWithoutExtension(const char *filePath, BOOL copy);
 **/
 
 enum {
-	DDLogMessageCopyFile     = 1 << 0,
-	DDLogMessageCopyFunction = 1 << 1
+    DDLogMessageCopyFile     = 1 << 0,
+    DDLogMessageCopyFunction = 1 << 1
 };
 typedef int DDLogMessageOptions;
 
@@ -498,25 +498,25 @@ typedef int DDLogMessageOptions;
 
 // The public variables below can be accessed directly (for speed).
 // For example: logMessage->logLevel
-	
+    
 @public
-	int logLevel;
-	int logFlag;
-	int logContext;
-	NSString *logMsg;
-	NSDate *timestamp;
-	char *file;
-	char *function;
-	int lineNumber;
-	mach_port_t machThreadID;
+    int logLevel;
+    int logFlag;
+    int logContext;
+    NSString *logMsg;
+    NSDate *timestamp;
+    char *file;
+    char *function;
+    int lineNumber;
+    mach_port_t machThreadID;
     char *queueLabel;
-	NSString *threadName;
-	
-	// For 3rd party extensions to the framework, where flags and contexts aren't enough.
-	id tag;
-	
-	// For 3rd party extensions that manually create DDLogMessage instances.
-	DDLogMessageOptions options;
+    NSString *threadName;
+    
+    // For 3rd party extensions to the framework, where flags and contexts aren't enough.
+    id tag;
+    
+    // For 3rd party extensions that manually create DDLogMessage instances.
+    DDLogMessageOptions options;
 }
 
 /**
@@ -586,9 +586,9 @@ typedef int DDLogMessageOptions;
 
 @interface DDAbstractLogger : NSObject <DDLogger>
 {
-	id <DDLogFormatter> formatter;
-	
-	dispatch_queue_t loggerQueue;
+    id <DDLogFormatter> formatter;
+    
+    dispatch_queue_t loggerQueue;
 }
 
 - (id <DDLogFormatter>)logFormatter;

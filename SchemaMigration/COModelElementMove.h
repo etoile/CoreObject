@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2014 Quentin Mathe
+    Copyright (C) 2014 Quentin Mathe
 
-	Date:  January 2014
-	License:  MIT  (see COPYING)
+    Date:  January 2014
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -17,11 +17,11 @@
  */
 @interface COModelElementMove : NSObject
 {
-	@private
-	NSString *_name;
-	NSString *_ownerName;
-	NSString *_packageName;
-	int64_t _packageVersion;
+    @private
+    NSString *_name;
+    NSString *_ownerName;
+    NSString *_packageName;
+    int64_t _packageVersion;
 }
 
 

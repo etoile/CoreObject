@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2012 Eric Wasylishen
+    Copyright (C) 2012 Eric Wasylishen
 
-	Date:  March 2012
-	License:  MIT  (see COPYING)
+    Date:  March 2012
+    License:  MIT  (see COPYING)
  */
 
 #import <Foundation/Foundation.h>
@@ -23,9 +23,9 @@
 
 @interface COItemGraphConflict : NSObject // not publically copyable.
 {
-	@public
-	COItemGraphDiff *__weak parentDiff; /* weak reference */
-	NSMutableDictionary *editsForSourceIdentifier; /* id => NSMutableSet of COSubtreeEdit*/
+    @public
+    COItemGraphDiff *__weak parentDiff; /* weak reference */
+    NSMutableDictionary *editsForSourceIdentifier; /* id => NSMutableSet of COSubtreeEdit*/
 }
 
 @property (nonatomic, readonly, weak) COItemGraphDiff *parentDiff;
@@ -60,20 +60,20 @@
  */
 @interface COItemGraphDiff : NSObject <NSCopying, CODiffArraysDelegate, CODiffAlgorithm>
 {
-	ETUUID *oldRoot;
-	ETUUID *newRoot;
-	CODiffDictionary *diffDict;
-	
-	// right now, the conflicts are purely derived from the set of edits.
-	// it could be conceivably useful to be able to insert conflicts
-	// that weren't auto-detected by COSubtreeDiff from looking at the edits, 
-	// but that is not currently supported.
-	
-	NSMutableSet *embeddedItemInsertionConflicts; // insert item uuid X at two different places
-	NSMutableSet *equalEditConflicts; // e.g. set [4:2] to ("h", "i") and [4:2] to ("h", "i")
-	NSMutableSet *sequenceEditConflicts; // e.g. set [4:5] and [4:3]. doesn't include equal sequence edit conflicts
-	NSMutableSet *editTypeConflicts; // e.g. set-value and delete-attribute
-	NSMutableSet *valueConflicts; // e.g. set attr to "x" and set attr to "y"
+    ETUUID *oldRoot;
+    ETUUID *newRoot;
+    CODiffDictionary *diffDict;
+    
+    // right now, the conflicts are purely derived from the set of edits.
+    // it could be conceivably useful to be able to insert conflicts
+    // that weren't auto-detected by COSubtreeDiff from looking at the edits, 
+    // but that is not currently supported.
+    
+    NSMutableSet *embeddedItemInsertionConflicts; // insert item uuid X at two different places
+    NSMutableSet *equalEditConflicts; // e.g. set [4:2] to ("h", "i") and [4:2] to ("h", "i")
+    NSMutableSet *sequenceEditConflicts; // e.g. set [4:5] and [4:3]. doesn't include equal sequence edit conflicts
+    NSMutableSet *editTypeConflicts; // e.g. set-value and delete-attribute
+    NSMutableSet *valueConflicts; // e.g. set attr to "x" and set attr to "y"
 }
 
 + (COItemGraphDiff *) diffItemTree: (id <COItemGraph>)a
@@ -81,9 +81,9 @@
                  sourceIdentifier: (id)aSource;
 
 + (instancetype) diffItemUUIDs: (NSArray *)uuids
-					 fromGraph: (id <COItemGraph>)a
-					   toGraph: (id <COItemGraph>)b
-			  sourceIdentifier: (id)aSource;
+                     fromGraph: (id <COItemGraph>)a
+                       toGraph: (id <COItemGraph>)b
+              sourceIdentifier: (id)aSource;
 
 /**
  * Applies the diff to the destination item graph, and returns whether the

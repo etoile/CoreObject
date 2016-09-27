@@ -20,7 +20,7 @@
     ETUUID *_parentRevisionID;
     ETUUID *_mergeParentRevisionID;
     ETUUID *_persistentRootUUID;
-	ETUUID *_branchUUID;
+    ETUUID *_branchUUID;
     NSDictionary *_metadata;
     NSDate *_date;
 }

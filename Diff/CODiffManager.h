@@ -1,8 +1,8 @@
 /**
-	Copyright (C) 2014 Eric Wasylishen
+    Copyright (C) 2014 Eric Wasylishen
 
-	Date:  January 2014
-	License:  MIT  (see COPYING)
+    Date:  January 2014
+    License:  MIT  (see COPYING)
  */
 
 #import <CoreObject/COItemGraph.h>
@@ -11,9 +11,9 @@
 @protocol CODiffAlgorithm <NSObject>
 
 + (instancetype) diffItemUUIDs: (NSArray *)uuids
-					 fromGraph: (id <COItemGraph>)a
-					   toGraph: (id <COItemGraph>)b
-			  sourceIdentifier: (id)aSource;
+                     fromGraph: (id <COItemGraph>)a
+                       toGraph: (id <COItemGraph>)b
+              sourceIdentifier: (id)aSource;
 
 - (id<CODiffAlgorithm>) itemTreeDiffByMergingWithDiff: (id<CODiffAlgorithm>)aDiff;
 
@@ -43,17 +43,17 @@
  */
 @interface CODiffManager : NSObject
 {
-	/**
-	 * e.g. { @"COItemGraphDiff" : <COItemGraphDiff>,
-	 *        @"COAttributedStringDiff" : <COAttributedStringDiff> }
-	 */
-	NSMutableDictionary *subDiffsByAlgorithmName;
+    /**
+     * e.g. { @"COItemGraphDiff" : <COItemGraphDiff>,
+     *        @"COAttributedStringDiff" : <COAttributedStringDiff> }
+     */
+    NSMutableDictionary *subDiffsByAlgorithmName;
 }
 
 + (CODiffManager *) diffItemGraph: (id <COItemGraph>)a
-					withItemGraph: (id <COItemGraph>)b
-	   modelDescriptionRepository: (ETModelDescriptionRepository *)aRepository
-				 sourceIdentifier: (id)aSource;
+                    withItemGraph: (id <COItemGraph>)b
+       modelDescriptionRepository: (ETModelDescriptionRepository *)aRepository
+                 sourceIdentifier: (id)aSource;
 
 - (CODiffManager *) diffByMergingWithDiff: (CODiffManager *)otherDiff;
 
