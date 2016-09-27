@@ -435,26 +435,13 @@ namespace ManagedFusion
         else
         {
             // Find the middle snakea and length of an optimal path for A and B
-            SMSRD smsrd = SMS<T>(DataA,
-                                 LowerA,
-                                 UpperA,
-                                 DataB,
-                                 LowerB,
-                                 UpperB,
-                                 DownVector,
-                                 UpVector);
+            SMSRD smsrd = SMS<T>(DataA, LowerA, UpperA, DataB, LowerB, UpperB, DownVector, UpVector);
             // Debug.Write(2, "MiddleSnakeData", String.Format("{0},{1}", smsrd.x, smsrd.y));
 
             // The path is from LowerX to (x,y) and (x,y) to UpperX
             LCS<T>(DataA, LowerA, smsrd.x, DataB, LowerB, smsrd.y, DownVector, UpVector);
-            LCS<T>(DataA,
-                   smsrd.x,
-                   UpperA,
-                   DataB,
-                   smsrd.y,
-                   UpperB,
-                   DownVector,
-                   UpVector);  // 2002.09.20: no need for 2 points
+            // 2002.09.20: no need for 2 points
+            LCS<T>(DataA, smsrd.x, UpperA, DataB, smsrd.y, UpperB, DownVector, UpVector);
         }
     } // LCS()
 
