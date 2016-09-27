@@ -54,7 +54,7 @@
  *
  * See -setItemGraph: and -insertAndUpdateItems:.
  */
-@property (nonatomic, readonly, strong) id<COItemGraph> loadingItemGraph;
+@property (nonatomic, readonly, strong) id <COItemGraph> loadingItemGraph;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -77,11 +77,11 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (void) removeUnreachableObjects;
+- (void)removeUnreachableObjects;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (void) discardAllObjects;
+- (void)discardAllObjects;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */

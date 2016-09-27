@@ -17,19 +17,19 @@
  * Given a COObject, returns an array of all of the COObjects directly reachable
  * from that COObject.
  */
-static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject, COObjectGraphContext *restrictToObjectGraph)
+static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject,
+                                                   COObjectGraphContext *restrictToObjectGraph)
 {
     NSMutableArray *result = [NSMutableArray array];
+
     for (ETPropertyDescription *propDesc in anObject.entityDescription.allPropertyDescriptions)
     {
         if (!propDesc.persistent)
-        {
             continue;
-        }
-        
+
         NSString *propertyName = propDesc.name;
         id value = [anObject valueForProperty: propertyName shouldLoad: NO];
-        
+
         if (propDesc.multivalued)
         {
             if (propDesc.keyed)
@@ -39,12 +39,11 @@ static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject, COObjectG
             else
             {
                 assert([value isKindOfClass: [NSArray class]] || [value isKindOfClass: [NSSet class]]);
-                
             }
-            
+
             /* We use -objectEnumerator, because subvalue can be a  CODictionary
-             or a NSDictionary (if a getter exists to expose the CODictionary
-             as a NSDictionary for UI editing) */
+               or a NSDictionary (if a getter exists to expose the CODictionary
+               as a NSDictionary for UI editing) */
             for (id subvalue in [value objectEnumerator])
             {
                 if ([subvalue isKindOfClass: [COObject class]]
@@ -64,18 +63,20 @@ static NSArray *DirectlyReachableObjectsFromObject(COObject *anObject, COObjectG
             // Ignore non-COObject objects
         }
     }
+
     return result;
 }
 
-static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *collectedUUIDSet, COObjectGraphContext *restrictToObjectGraph)
+static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *collectedUUIDSet,
+    COObjectGraphContext *restrictToObjectGraph)
 {
     ETUUID *uuid = anObject.UUID;
+
     if ([collectedUUIDSet containsObject: uuid])
-    {
         return;
-    }
+
     [collectedUUIDSet addObject: uuid];
-    
+
     // Call recursively on all composite and referenced objects
     for (COObject *obj in DirectlyReachableObjectsFromObject(anObject, restrictToObjectGraph))
     {
@@ -83,10 +84,10 @@ static void FindReachableObjectsFromObject(COObject *anObject, NSMutableSet *col
     }
 }
 
-- (NSSet *) allReachableObjectUUIDs
+- (NSSet *)allReachableObjectUUIDs
 {
     NSParameterAssert(self.rootObject != nil);
-    
+
     NSMutableSet *result = [[NSMutableSet alloc] initWithCapacity: _loadedObjects.count];
     FindReachableObjectsFromObject(self.rootObject, result, self);
     return result;
@@ -102,22 +103,25 @@ static void FindCyclesInContainersOfObject(COObject *currentObject, COObject *ob
         {
             NSString *propertyName = propDesc.name;
             COObject *container = [currentObject valueForKey: propertyName];
-            
+
             if (container == objectBeingSearchedFor)
+            {
                 [NSException raise: NSGenericException format: @"Cycle detected"];
-            
+            }
             if (container != nil)
+            {
                 FindCyclesInContainersOfObject(container, objectBeingSearchedFor);
+            }
         }
     }
 }
 
-- (void) checkForCyclesInCompositeRelationshipsFromObject: (COObject*)anObject
+- (void)checkForCyclesInCompositeRelationshipsFromObject: (COObject *)anObject
 {
     FindCyclesInContainersOfObject(anObject, anObject);
 }
 
-- (void) checkForCyclesInCompositeRelationshipsInObjects: (NSArray *)objects
+- (void)checkForCyclesInCompositeRelationshipsInObjects: (NSArray *)objects
 {
     for (COObject *object in objects)
     {
@@ -125,7 +129,7 @@ static void FindCyclesInContainersOfObject(COObject *currentObject, COObject *ob
     }
 }
 
-- (void) checkForCyclesInCompositeRelationshipsInChangedObjects
+- (void)checkForCyclesInCompositeRelationshipsInChangedObjects
 {
     [self checkForCyclesInCompositeRelationshipsInObjects: self.changedObjects];
 }

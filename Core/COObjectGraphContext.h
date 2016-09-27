@@ -36,19 +36,19 @@
  *
  * See also COObjectGraphContextWillRelinquishObjectsNotification.
  */
-extern NSString * const COObjectGraphContextObjectsDidChangeNotification;
+extern NSString *const COObjectGraphContextObjectsDidChangeNotification;
 /**
  * User info dictionary key for COObjectGraphContextObjectsDidChangeNotification.
  *
  * The value is an NSSet of ETUUID objects.
  */
-extern NSString * const COInsertedObjectsKey;
+extern NSString *const COInsertedObjectsKey;
 /**
  * User info dictionary key for COObjectGraphContextObjectsDidChangeNotification.
  *
  * The value is an NSSet of ETUUID objects.
  */
-extern NSString * const COUpdatedObjectsKey;
+extern NSString *const COUpdatedObjectsKey;
 
 /**
  * Posted when a garbage collection phase is run by COObjectGraphContext.
@@ -64,7 +64,7 @@ extern NSString * const COUpdatedObjectsKey;
  * COObjectGraphContextDidChangeNotification can result in objects to be 
  * relinquished, on the next garbage collection phase.
  */
-extern NSString * const COObjectGraphContextWillRelinquishObjectsNotification;
+extern NSString *const COObjectGraphContextWillRelinquishObjectsNotification;
 /**
  * User info dictionary key for COObjectGraphContextWillRelinquishObjectsNotification.
  *
@@ -74,10 +74,10 @@ extern NSString * const COObjectGraphContextWillRelinquishObjectsNotification;
  * context, during a garbage collection phase, because they are not referenced 
  * in a persistent relationship for the current state.
  */
-extern NSString * const CORelinquishedObjectsKey;
+extern NSString *const CORelinquishedObjectsKey;
 
-extern NSString * const COObjectGraphContextBeginBatchChangeNotification;
-extern NSString * const COObjectGraphContextEndBatchChangeNotification;
+extern NSString *const COObjectGraphContextBeginBatchChangeNotification;
+extern NSString *const COObjectGraphContextEndBatchChangeNotification;
 
 /**
  * @group Core
@@ -170,7 +170,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  */
 @interface COObjectGraphContext : NSObject <COItemGraph, COPersistentObjectContext>
 {
-    @private
+@private
     ETModelDescriptionRepository *_modelDescriptionRepository;
     Class _migrationDriverClass;
     COBranch *__weak _branch;
@@ -230,7 +230,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  * COSchemaMigrationDriver, raises a NSInvalidArgumentException.
  */
 - (instancetype)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
-                    migrationDriverClass: (Class)aDriverClass;
+                              migrationDriverClass: (Class)aDriverClass;
 /**
  * Returns a new transient object graph context using the main model description 
  * repository.
@@ -295,7 +295,7 @@ extern NSString * const COObjectGraphContextEndBatchChangeNotification;
  *
  * For a transient object graph context, returns nil.
  */
-@property (nonatomic, readonly, weak)  COPersistentRoot *persistentRoot;
+@property (nonatomic, readonly, weak) COPersistentRoot *persistentRoot;
 /**
  * The editing context owing the persistent root.
  *
