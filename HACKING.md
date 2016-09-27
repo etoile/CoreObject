@@ -39,6 +39,9 @@ after.
 
 - Don't use blank lines between ivars.
 
+- Use 2 blank lines between `@end` and `@implementation` when there are multiple
+classes or categories in a single `.m` file.
+
 Control Flow
 ------------
 
