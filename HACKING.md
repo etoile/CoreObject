@@ -37,6 +37,8 @@ property declarations in headers.
 - `@end`, `@interface`, `@implementation` always have one blank line before and 
 after.
 
+- Don't use blank lines between ivars.
+
 Control Flow
 ------------
 
