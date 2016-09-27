@@ -16,7 +16,7 @@
  *
  * See also -[COBranch name].
  */
-extern NSString * const kCOBranchLabel;
+extern NSString *const kCOBranchLabel;
 
 /**
  * @group Core
@@ -87,7 +87,7 @@ extern NSString * const kCOBranchLabel;
  */
 @interface COBranch : NSObject <COTrack>
 {
-    @private
+@private
     ETUUID *_UUID;
     COPersistentRoot *__weak _persistentRoot;
     BOOL _isCreated;
@@ -460,7 +460,7 @@ extern NSString * const kCOBranchLabel;
  *
  * See also -mergeInfoForMergingBranch:.
  */
-- (COMergeInfo *)mergeInfoForMergingRevision:(CORevision *)aRevision;
+- (COMergeInfo *)mergeInfoForMergingRevision: (CORevision *)aRevision;
 
 
 /** @taskunit Description */

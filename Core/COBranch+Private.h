@@ -12,10 +12,10 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (instancetype)        initWithUUID: (ETUUID *)aUUID
-            persistentRoot: (COPersistentRoot *)aPersistentRoot
-          parentBranchUUID: (ETUUID *)aParentBranchUUID
-parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
+- (instancetype)initWithUUID: (ETUUID *)aUUID
+              persistentRoot: (COPersistentRoot *)aPersistentRoot
+            parentBranchUUID: (ETUUID *)aParentBranchUUID
+  parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
 @property (nonatomic, readonly) COSQLiteStore *store;
 /**
  * This method is only exposed to be used internally by CoreObject.
@@ -46,8 +46,8 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (void) saveCommitWithMetadata: (NSDictionary *)metadata
-                    transaction: (COStoreTransaction *)txn;
+- (void)saveCommitWithMetadata: (NSDictionary *)metadata
+                   transaction: (COStoreTransaction *)txn;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
@@ -79,6 +79,6 @@ parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
  *
  * The public API -setCurrentRevision: uses this method.
  */
-- (void)setCurrentRevisionSkipSupportsRevertCheck:(CORevision *)currentRevision;
+- (void)setCurrentRevisionSkipSupportsRevertCheck: (CORevision *)currentRevision;
 
 @end
