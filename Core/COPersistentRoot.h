@@ -20,7 +20,7 @@
  * The userInfo dictionary is nil. The sender is the affected COPersistentRoot
  * object.
  */
-extern NSString * const COPersistentRootDidChangeNotification;
+extern NSString *const COPersistentRootDidChangeNotification;
 
 /**
  * @group Core
@@ -152,7 +152,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
  */
 @interface COPersistentRoot : NSObject <COPersistentObjectContext>
 {
-    @private
+@private
     ETUUID *_UUID;
     COEditingContext *__weak _parentContext;
     /**
@@ -181,7 +181,7 @@ extern NSString * const COPersistentRootDidChangeNotification;
      * Only used when creating a persistent root as a cheap copy.
      */
     ETUUID *_cheapCopyPersistentRootUUID;
-    NSDictionary *_metadata;    
+    NSDictionary *_metadata;
     BOOL _metadataChanged;
     COObjectGraphContext *_currentBranchObjectGraph;
 }
@@ -498,8 +498,8 @@ extern NSString * const COPersistentRootDidChangeNotification;
 
 
 /** @taskunit Previewing Old Revision */
- 
- 
+
+
 /**
  * Returns a read-only object graph context of the contents of a revision.
  *
