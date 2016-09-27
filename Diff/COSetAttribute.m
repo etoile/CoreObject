@@ -13,23 +13,23 @@
 @synthesize type;
 @synthesize value;
 
-- (BOOL) isEqualIgnoringSourceIdentifier: (id)other
+- (BOOL)isEqualIgnoringSourceIdentifier: (id)other
 {
     return [super isEqualIgnoringSourceIdentifier: other]
-    &&  type == ((COSetAttribute*)other).type
-    &&  [value isEqual: ((COSetAttribute*)other).value];
+           && type == ((COSetAttribute *)other).type
+           && [value isEqual: ((COSetAttribute *)other).value];
 }
 
-- (NSUInteger) hash
+- (NSUInteger)hash
 {
     return 4265092495078449026ULL ^ super.hash ^ type ^ [value hash];
 }
 
-- (instancetype) initWithUUID: (ETUUID *)aUUID
-                    attribute: (NSString *)anAttribute
-             sourceIdentifier: (id)aSourceIdentifier
-                         type: (COType)aType
-                        value: (id)aValue
+- (instancetype)initWithUUID: (ETUUID *)aUUID
+                   attribute: (NSString *)anAttribute
+            sourceIdentifier: (id)aSourceIdentifier
+                        type: (COType)aType
+                       value: (id)aValue
 {
     NILARG_EXCEPTION_TEST(aUUID);
     NILARG_EXCEPTION_TEST(anAttribute);
@@ -44,9 +44,9 @@
     return self;
 }
 
-- (instancetype) initWithUUID: (ETUUID *)aUUID
-                    attribute: (NSString *)anAttribute
-             sourceIdentifier: (id)aSourceIdentifier
+- (instancetype)initWithUUID: (ETUUID *)aUUID
+                   attribute: (NSString *)anAttribute
+            sourceIdentifier: (id)aSourceIdentifier
 {
     return [self initWithUUID: nil
                     attribute: nil
@@ -65,12 +65,16 @@
 }
 
 
-- (NSString *) description
+- (NSString *)description
 {
-    return [NSString stringWithFormat: @"set %@.%@ = %@ (%@)", UUID, attribute, value, sourceIdentifier];
+    return [NSString stringWithFormat: @"set %@.%@ = %@ (%@)",
+                                       UUID,
+                                       attribute,
+                                       value,
+                                       sourceIdentifier];
 }
 
-- (NSSet *) insertedInnerItemUUIDs
+- (NSSet *)insertedInnerItemUUIDs
 {
     if (COTypePrimitivePart(type) == kCOTypeCompositeReference)
     {

@@ -6,7 +6,6 @@
  */
 
 #import <CoreObject/CoreObject.h>
-#import "COMergeInfo.h"
 
 @interface COMergeInfo ()
 @end

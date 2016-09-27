@@ -10,24 +10,25 @@
 
 @protocol CODiffAlgorithm <NSObject>
 
-+ (instancetype) diffItemUUIDs: (NSArray *)uuids
-                     fromGraph: (id <COItemGraph>)a
-                       toGraph: (id <COItemGraph>)b
-              sourceIdentifier: (id)aSource;
++ (instancetype)diffItemUUIDs: (NSArray *)uuids
+                    fromGraph: (id <COItemGraph>)a
+                      toGraph: (id <COItemGraph>)b
+             sourceIdentifier: (id)aSource;
 
-- (id<CODiffAlgorithm>) itemTreeDiffByMergingWithDiff: (id<CODiffAlgorithm>)aDiff;
+- (id <CODiffAlgorithm>)itemTreeDiffByMergingWithDiff: (id <CODiffAlgorithm>)aDiff;
 
 /**
  * Returns ETUUID : COItem dictionary
  */
-- (NSDictionary *) addedOrUpdatedItemsForApplyingTo: (id<COItemGraph>)dest;
+- (NSDictionary *)addedOrUpdatedItemsForApplyingTo: (id <COItemGraph>)dest;
 /**
  * Returns whether the diff contains any edits.
  */
 @property (nonatomic, readonly, getter=isEmpty) BOOL empty;
 
 @property (nonatomic, readonly) BOOL hasConflicts;
-- (void) resolveConflictsFavoringSourceIdentifier: (id)aSource;
+
+- (void)resolveConflictsFavoringSourceIdentifier: (id)aSource;
 
 @end
 
@@ -50,12 +51,12 @@
     NSMutableDictionary *subDiffsByAlgorithmName;
 }
 
-+ (CODiffManager *) diffItemGraph: (id <COItemGraph>)a
-                    withItemGraph: (id <COItemGraph>)b
-       modelDescriptionRepository: (ETModelDescriptionRepository *)aRepository
-                 sourceIdentifier: (id)aSource;
++ (CODiffManager *)diffItemGraph: (id <COItemGraph>)a
+                   withItemGraph: (id <COItemGraph>)b
+      modelDescriptionRepository: (ETModelDescriptionRepository *)aRepository
+                sourceIdentifier: (id)aSource;
 
-- (CODiffManager *) diffByMergingWithDiff: (CODiffManager *)otherDiff;
+- (CODiffManager *)diffByMergingWithDiff: (CODiffManager *)otherDiff;
 
 
 /** @taskunit Accessing Subdiffs */
@@ -81,13 +82,14 @@
  * Applies the diff to the destination item graph, and returns whether the
  * item graph was changed.
  */
-- (BOOL) applyTo: (id<COItemGraph>)dest;
+- (BOOL)applyTo: (id <COItemGraph>)dest;
 /**
  * Returns whether the diff contains any edits.
  */
 @property (nonatomic, readonly, getter=isEmpty) BOOL empty;
 
 @property (nonatomic, readonly) BOOL hasConflicts;
-- (void) resolveConflictsFavoringSourceIdentifier: (id)aSource;
+
+- (void)resolveConflictsFavoringSourceIdentifier: (id)aSource;
 
 @end

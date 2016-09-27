@@ -9,12 +9,12 @@
 
 @implementation CODeleteAttribute
 
-- (NSUInteger) hash
+- (NSUInteger)hash
 {
     return 10002940502939600064ULL ^ super.hash;
 }
 
-- (NSString *) description
+- (NSString *)description
 {
     return [NSString stringWithFormat: @"delete %@.%@ (%@)", UUID, attribute, sourceIdentifier];
 }

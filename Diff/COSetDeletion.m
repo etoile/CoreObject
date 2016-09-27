@@ -9,17 +9,21 @@
 
 @implementation COSetDeletion
 
-- (NSUInteger) hash
+- (NSUInteger)hash
 {
     return 1310827214389984141ULL ^ super.hash;
 }
 
-- (NSString *) description
+- (NSString *)description
 {
-    return [NSString stringWithFormat: @"delete from set %@.%@ value %@ (%@)", UUID, attribute, object, sourceIdentifier];
+    return [NSString stringWithFormat: @"delete from set %@.%@ value %@ (%@)",
+                                       UUID,
+                                       attribute,
+                                       object,
+                                       sourceIdentifier];
 }
 
-- (NSSet *) insertedInnerItemUUIDs
+- (NSSet *)insertedInnerItemUUIDs
 {
     return [NSSet set];
 }

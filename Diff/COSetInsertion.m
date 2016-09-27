@@ -13,11 +13,11 @@
 @synthesize type;
 @synthesize object;
 
-- (instancetype) initWithUUID: (ETUUID *)aUUID
-                    attribute: (NSString *)anAttribute
-             sourceIdentifier: (id)aSourceIdentifier
-                         type: (COType)aType
-                       object: (id)anObject
+- (instancetype)initWithUUID: (ETUUID *)aUUID
+                   attribute: (NSString *)anAttribute
+            sourceIdentifier: (id)aSourceIdentifier
+                        type: (COType)aType
+                      object: (id)anObject
 {
     NILARG_EXCEPTION_TEST(aUUID);
     NILARG_EXCEPTION_TEST(anAttribute);
@@ -32,9 +32,9 @@
     return self;
 }
 
-- (instancetype) initWithUUID: (ETUUID *)aUUID
-                    attribute: (NSString *)anAttribute
-             sourceIdentifier: (id)aSourceIdentifier
+- (instancetype)initWithUUID: (ETUUID *)aUUID
+                   attribute: (NSString *)anAttribute
+            sourceIdentifier: (id)aSourceIdentifier
 {
     return [self initWithUUID: nil
                     attribute: nil
@@ -52,24 +52,28 @@
                        object: nil];
 }
 
-- (BOOL) isEqualIgnoringSourceIdentifier: (id)other
+- (BOOL)isEqualIgnoringSourceIdentifier: (id)other
 {
     return [super isEqualIgnoringSourceIdentifier: other]
-    && type == ((COSetInsertion*)other).type
-    && [object isEqual: ((COSetInsertion*)other).object];
+           && type == ((COSetInsertion *)other).type
+           && [object isEqual: ((COSetInsertion *)other).object];
 }
 
-- (NSUInteger) hash
+- (NSUInteger)hash
 {
     return 595258568559201742ULL ^ super.hash ^ type ^ [object hash];
 }
 
-- (NSString *) description
+- (NSString *)description
 {
-    return [NSString stringWithFormat: @"insert into set %@.%@ value %@ (%@)", UUID, attribute, object, sourceIdentifier];
+    return [NSString stringWithFormat: @"insert into set %@.%@ value %@ (%@)",
+                                       UUID,
+                                       attribute,
+                                       object,
+                                       sourceIdentifier];
 }
 
-- (NSSet *) insertedInnerItemUUIDs
+- (NSSet *)insertedInnerItemUUIDs
 {
     if (COTypePrimitivePart(type) == kCOTypeCompositeReference)
     {
@@ -81,7 +85,7 @@
     }
 }
 
-- (BOOL) isSameKindOfEdit: (COItemGraphEdit*)anEdit
+- (BOOL)isSameKindOfEdit: (COItemGraphEdit *)anEdit
 {
     return [anEdit isKindOfClass: [COSetInsertion class]]; // COSetDeletion is a subclass
 }

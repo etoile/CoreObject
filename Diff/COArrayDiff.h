@@ -22,7 +22,10 @@
 
 @end
 
-void CODiffArrays(NSArray *arrayA, NSArray *arrayB, id<CODiffArraysDelegate>delegate, id userInfo);
+void CODiffArrays(NSArray *arrayA,
+                  NSArray *arrayB,
+                  id <CODiffArraysDelegate> delegate,
+                  id userInfo);
 
 void COApplyEditsToArray(NSMutableArray *array, NSArray *edits);
 

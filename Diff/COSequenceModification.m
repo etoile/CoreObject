@@ -13,18 +13,21 @@
 @synthesize type;
 @synthesize objects;
 
-- (instancetype) initWithUUID: (ETUUID *)aUUID
-                    attribute: (NSString *)anAttribute
-             sourceIdentifier: (id)aSourceIdentifier
-                        range: (NSRange)aRange
-                         type: (COType)aType
-                      objects: (NSArray *)anArray
+- (instancetype)initWithUUID: (ETUUID *)aUUID
+                   attribute: (NSString *)anAttribute
+            sourceIdentifier: (id)aSourceIdentifier
+                       range: (NSRange)aRange
+                        type: (COType)aType
+                     objects: (NSArray *)anArray
 {
     NILARG_EXCEPTION_TEST(aUUID);
     NILARG_EXCEPTION_TEST(anAttribute);
     NILARG_EXCEPTION_TEST(anArray);
 
-    self = [super initWithUUID: aUUID attribute: anAttribute sourceIdentifier: aSourceIdentifier range: aRange];
+    self = [super initWithUUID: aUUID
+                     attribute: anAttribute
+              sourceIdentifier: aSourceIdentifier
+                         range: aRange];
     if (self == nil)
         return nil;
 
@@ -33,10 +36,10 @@
     return self;
 }
 
-- (instancetype) initWithUUID: (ETUUID *)aUUID
-                    attribute: (NSString *)anAttribute
-             sourceIdentifier: (id)aSourceIdentifier
-                        range: (NSRange)aRange
+- (instancetype)initWithUUID: (ETUUID *)aUUID
+                   attribute: (NSString *)anAttribute
+            sourceIdentifier: (id)aSourceIdentifier
+                       range: (NSRange)aRange
 {
     return [self initWithUUID: nil
                     attribute: nil
@@ -56,24 +59,30 @@
                       objects: nil];
 }
 
-- (BOOL) isEqualIgnoringSourceIdentifier: (id)other
+- (BOOL)isEqualIgnoringSourceIdentifier: (id)other
 {
     return [super isEqualIgnoringSourceIdentifier: other]
-    && type == ((COSequenceModification*)other).type
-    && [objects isEqual: ((COSequenceModification*)other).objects];
+           && type == ((COSequenceModification *)other).type
+           && [objects isEqual: ((COSequenceModification *)other).objects];
 }
 
-- (NSUInteger) hash
+- (NSUInteger)hash
 {
     return 11773746616539821587ULL ^ super.hash ^ type ^ objects.hash;
 }
 
-- (NSString *) description
+- (NSString *)description
 {
-    return [NSString stringWithFormat: @"replace %@.%@[%d:%d] with %@ (%@)", UUID, attribute, (int)range.location, (int)range.length, objects, sourceIdentifier];
+    return [NSString stringWithFormat: @"replace %@.%@[%d:%d] with %@ (%@)",
+                                       UUID,
+                                       attribute,
+                                       (int)range.location,
+                                       (int)range.length,
+                                       objects,
+                                       sourceIdentifier];
 }
 
-- (NSSet *) insertedInnerItemUUIDs
+- (NSSet *)insertedInnerItemUUIDs
 {
     if (COTypePrimitivePart(type) == kCOTypeCompositeReference)
     {

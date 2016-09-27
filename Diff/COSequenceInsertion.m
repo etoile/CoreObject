@@ -9,12 +9,12 @@
 
 @implementation COSequenceInsertion
 
-- (instancetype) initWithUUID: (ETUUID *)aUUID
-                    attribute: (NSString *)anAttribute
-             sourceIdentifier: (id)aSourceIdentifier
-                     location: (NSUInteger)aLocation
-                         type: (COType)aType
-                      objects: (NSArray *)anArray
+- (instancetype)initWithUUID: (ETUUID *)aUUID
+                   attribute: (NSString *)anAttribute
+            sourceIdentifier: (id)aSourceIdentifier
+                    location: (NSUInteger)aLocation
+                        type: (COType)aType
+                     objects: (NSArray *)anArray
 {
     return [super initWithUUID: aUUID
                      attribute: anAttribute
@@ -24,12 +24,12 @@
                        objects: anArray];
 }
 
-- (instancetype) initWithUUID: (ETUUID *)aUUID
-                    attribute: (NSString *)anAttribute
-             sourceIdentifier: (id)aSourceIdentifier
-                        range: (NSRange)aRange
-                         type: (COType)aType
-                      objects: (NSArray *)anArray
+- (instancetype)initWithUUID: (ETUUID *)aUUID
+                   attribute: (NSString *)anAttribute
+            sourceIdentifier: (id)aSourceIdentifier
+                       range: (NSRange)aRange
+                        type: (COType)aType
+                     objects: (NSArray *)anArray
 {
     return [self initWithUUID: nil
                     attribute: nil
@@ -49,14 +49,19 @@
                       objects: nil];
 }
 
-- (NSUInteger) hash
+- (NSUInteger)hash
 {
     return 14584168390782580871ULL ^ super.hash;
 }
 
-- (NSString *) description
+- (NSString *)description
 {
-    return [NSString stringWithFormat: @"insert at %@.%@[%d] value %@ (%@)", UUID, attribute, (int)range.location, objects, sourceIdentifier];
+    return [NSString stringWithFormat: @"insert at %@.%@[%d] value %@ (%@)",
+                                       UUID,
+                                       attribute,
+                                       (int)range.location,
+                                       objects,
+                                       sourceIdentifier];
 }
 
 @end

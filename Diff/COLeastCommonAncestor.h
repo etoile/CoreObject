@@ -16,15 +16,15 @@
                           andCommit: (ETUUID *)commitB
                      persistentRoot: (ETUUID *)persistentRoot;
 
-- (BOOL)        isRevision: (ETUUID *)commitA
- equalToOrParentOfRevision: (ETUUID *)commitB
-            persistentRoot: (ETUUID *)persistentRoot;
+- (BOOL)       isRevision: (ETUUID *)commitA
+equalToOrParentOfRevision: (ETUUID *)commitB
+           persistentRoot: (ETUUID *)persistentRoot;
 
 /**
  * As a sepecial case if [start isEqual: end] returns the empty array
  */
-- (NSArray *) revisionUUIDsFromRevisionUUIDExclusive: (ETUUID *)start
-                             toRevisionUUIDInclusive: (ETUUID *)end
-                                      persistentRoot: (ETUUID *)persistentRoot;
+- (NSArray *)revisionUUIDsFromRevisionUUIDExclusive: (ETUUID *)start
+                            toRevisionUUIDInclusive: (ETUUID *)end
+                                     persistentRoot: (ETUUID *)persistentRoot;
 
 @end

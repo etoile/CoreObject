@@ -12,14 +12,15 @@
     COType type;
     NSArray *objects;
 }
+
 @property (readonly, nonatomic) COType type;
 @property (readonly, nonatomic) NSArray *objects;
 
-- (instancetype) initWithUUID: (ETUUID *)aUUID
-          attribute: (NSString *)anAttribute
-   sourceIdentifier: (id)aSourceIdentifier
-              range: (NSRange)aRange
-               type: (COType)aType
-            objects: (NSArray *)anArray NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithUUID: (ETUUID *)aUUID
+                   attribute: (NSString *)anAttribute
+            sourceIdentifier: (id)aSourceIdentifier
+                       range: (NSRange)aRange
+                        type: (COType)aType
+                     objects: (NSArray *)anArray NS_DESIGNATED_INITIALIZER;
 @end
 

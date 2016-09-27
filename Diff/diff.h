@@ -17,14 +17,14 @@ extern "C" {
 #include <stdbool.h>
 
 // types    
-    
+
 typedef struct
 {
     size_t location;
-    size_t length; 
+    size_t length;
 } diffrange_t;
 
-typedef enum 
+typedef enum
 {
     difftype_insertion,
     difftype_deletion,
@@ -44,7 +44,10 @@ typedef void diffresult_t;
 /**
  * return true if array_a[i] is equal to array_b[j]
  */
-typedef bool (*diff_arraycomparefn_t)(size_t i, size_t j, const void *userdata1, const void *userdata2);
+typedef bool (*diff_arraycomparefn_t)(size_t i,
+                                      size_t j,
+                                      const void *userdata1,
+                                      const void *userdata2);
 
 // functions    
 
@@ -54,7 +57,7 @@ typedef bool (*diff_arraycomparefn_t)(size_t i, size_t j, const void *userdata1,
  * caller provides the lengths of the arrays and a pointer to a function which
  * checks elements at two indices for equality.
  */
-diffresult_t *diff_arrays(size_t alength, size_t blength, diff_arraycomparefn_t comparefn, 
+diffresult_t *diff_arrays(size_t alength, size_t blength, diff_arraycomparefn_t comparefn,
                           const void *userdata1, const void *userdata2);
 /**
  * returns the number of edits in the diff
@@ -64,11 +67,11 @@ size_t diff_editcount(diffresult_t *result);
  * returns the ith edit, starting at 0
  */
 diffedit_t diff_edit_at_index(diffresult_t *result, size_t i);
-    
+
 void diff_free(diffresult_t *result);
 
 #endif /* nestedversioning_diff_h */
-    
+
 #ifdef __cplusplus
 }
 #endif
