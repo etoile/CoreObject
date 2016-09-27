@@ -24,6 +24,7 @@
  * Garbage collection is not covered by this protocol.
  */
 @protocol COItemGraph <NSObject>
+
 /**
  * Returns the entry point UUID.
  */
@@ -31,7 +32,7 @@
 /**
  * Returns an immutable item for the UUID.
  */
-- (COItem *) itemForUUID: (ETUUID *)aUUID;
+- (COItem *)itemForUUID: (ETUUID *)aUUID;
 /**
  * Returns all the item UUIDs in the graph, including -rootItemUUID.
  */
@@ -50,7 +51,7 @@
  *
  * May broadcast a change notification, up to the subclass.
  */
-- (void) insertOrUpdateItems: (NSArray *)items;
+- (void)insertOrUpdateItems: (NSArray *)items;
 @end
 
 /**
@@ -71,22 +72,21 @@
     NSMutableDictionary *itemForUUID_;
 }
 
-
 /** @taskunit Initialization */
 
 
-+ (COItemGraph *)itemGraphWithItemsRootFirst: (NSArray*)items;
++ (COItemGraph *)itemGraphWithItemsRootFirst: (NSArray *)items;
 /**
  * N.B. items doesn't need to contain rootItemUUID.
  */
-- (instancetype) initWithItemForUUID: (NSDictionary *)itemForUUID
-                        rootItemUUID: (ETUUID *)root NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithItemForUUID: (NSDictionary *)itemForUUID
+                       rootItemUUID: (ETUUID *)root NS_DESIGNATED_INITIALIZER;
 /**
  * N.B. items doesn't need to contain rootItemUUID.
  */
-- (instancetype) initWithItems: (NSArray *)items
-                  rootItemUUID: (ETUUID *)root;
-- (instancetype) initWithItemGraph: (id<COItemGraph>)aGraph;
+- (instancetype)initWithItems: (NSArray *)items
+                 rootItemUUID: (ETUUID *)root;
+- (instancetype)initWithItemGraph: (id <COItemGraph>)aGraph;
 
 
 /** @taskunit Item Graph Protocol and Additionss */
@@ -98,7 +98,7 @@
 /**
  * See -[COItemGraph itemForUUID:].
  */
-- (COMutableItem *) itemForUUID: (ETUUID *)aUUID;
+- (COMutableItem *)itemForUUID: (ETUUID *)aUUID;
 /**
  * See -[COItemGraph itemUUIDs].
  */
@@ -112,14 +112,14 @@
 /**
  * See -[COItemGraph insertOrUpdateItems:].
  */
-- (void) insertOrUpdateItems: (NSArray *)items;
+- (void)insertOrUpdateItems: (NSArray *)items;
 /**
  * Adds the items from the given item graph to the receiver.
  *
  * If two items have the same UUID, the added item replaces the one in the 
  * receiver.
  */
-- (void) addItemGraph: (id<COItemGraph>)aGraph;
+- (void)addItemGraph: (id <COItemGraph>)aGraph;
 /**
  * Removes all unreachable items.
  */
@@ -130,20 +130,20 @@
 /**
  * For debugging.
  */
-void COValidateItemGraph(id<COItemGraph> aGraph);
+void COValidateItemGraph(id <COItemGraph> aGraph);
 
-id COItemGraphToJSONPropertyList(id<COItemGraph> aGraph);
-NSData *COItemGraphToJSONData(id<COItemGraph> aGraph);
+id COItemGraphToJSONPropertyList(id <COItemGraph> aGraph);
+NSData *COItemGraphToJSONData(id <COItemGraph> aGraph);
 
 COItemGraph *COItemGraphFromJSONPropertyLisy(id plist);
 COItemGraph *COItemGraphFromJSONData(NSData *json);
 
-NSData *COItemGraphToBinaryData(id<COItemGraph> aGraph);
+NSData *COItemGraphToBinaryData(id <COItemGraph> aGraph);
 COItemGraph *COItemGraphFromBinaryData(NSData *binarydata);
 
-BOOL COItemGraphEqualToItemGraph(id<COItemGraph> first, id<COItemGraph> second);
+BOOL COItemGraphEqualToItemGraph(id <COItemGraph> first, id <COItemGraph> second);
 
 /**
  * If <code>aGraph.rootItemUUID</code> is nil, returns the empty set.
  */
-NSSet *COItemGraphReachableUUIDs(id<COItemGraph> aGraph);
+NSSet *COItemGraphReachableUUIDs(id <COItemGraph> aGraph);

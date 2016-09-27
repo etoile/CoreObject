@@ -26,24 +26,25 @@
  * <item>plist import/export of ObjC objects of a known COType</item>
  * </list>
  */
-typedef NS_OPTIONS(uint32_t, COType) {
+typedef NS_OPTIONS(uint32_t, COType)
+{
 #pragma mark Primitive types
-    
+
     /**
      * Represented as NSNumber
      */
     kCOTypeInt64 = 0x01,
-    
+
     /**
      * Represented as NSNumber
      */
     kCOTypeDouble = 0x02,
-    
+
     /**
      * Represented as NSString
      */
     kCOTypeString = 0x03,
-    
+
     /**
      * A byte array. Represented as NSData
      */
@@ -57,7 +58,7 @@ typedef NS_OPTIONS(uint32_t, COType) {
      * to other persistent roots.
      */
     kCOTypeReference = 0x05,
-    
+
     /**
      * A composite reference from a parent to a child. The reference is stored
      * in the parent.
@@ -78,19 +79,19 @@ typedef NS_OPTIONS(uint32_t, COType) {
      * Represented as COAttachmentID (a hash of the attached file's contents).
      */
     kCOTypeAttachment = 0x07,
-   
+
 #pragma mark Multivalued types
-    
+
     /**
      * Represented as NSSet.
      */
     kCOTypeSet = 0x10,
-    
+
     /**
      * Represented as NSArray
      */
     kCOTypeArray = 0x20,
-    
+
     kCOTypePrimitiveMask = 0x0f,
     kCOTypeMultivaluedMask = 0xf0
 };
@@ -145,19 +146,19 @@ BOOL COTypeIsValid(COType type)
     {
         return NO;
     }
-    
+
     if (!(COTypeMultivaluedPart(type) == 0
           || COTypeMultivaluedPart(type) == kCOTypeArray
           || COTypeMultivaluedPart(type) == kCOTypeSet))
     {
         return NO;
     }
-    
+
     if (0 != (type & (~(kCOTypeMultivaluedMask | kCOTypePrimitiveMask))))
     {
         return NO;
     }
-    
+
     return YES;
 }
 

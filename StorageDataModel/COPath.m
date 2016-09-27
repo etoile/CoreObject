@@ -9,7 +9,6 @@
 #import <EtoileFoundation/Macros.h>
 #import <EtoileFoundation/ETUUID.h>
 
-
 @interface COBrokenPath : COPath
 @end
 
@@ -19,39 +18,39 @@
 @synthesize persistentRoot = _persistentRoot;
 @synthesize branch = _branch;
 
-- (COPath *) initWithPersistentRoot: (ETUUID *)aRoot
-                             branch: (ETUUID*)aBranch
-{   
+- (COPath *)initWithPersistentRoot: (ETUUID *)aRoot
+                            branch: (ETUUID *)aBranch
+{
     SUPERINIT;
     NILARG_EXCEPTION_TEST(aRoot);
     _persistentRoot = aRoot;
-    _branch =  aBranch;
+    _branch = aBranch;
     return self;
 }
 
-+ (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot
++ (COPath *)pathWithPersistentRoot: (ETUUID *)aRoot
 {
     return [[self alloc] initWithPersistentRoot: aRoot branch: nil];
 }
 
-+ (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot
-                             branch: (ETUUID*)aBranch
++ (COPath *)pathWithPersistentRoot: (ETUUID *)aRoot
+                            branch: (ETUUID *)aBranch
 {
     return [[self alloc] initWithPersistentRoot: aRoot branch: aBranch];
 }
 
-+ (COPath *) brokenPath
++ (COPath *)brokenPath
 {
     return [COBrokenPath new];
 }
 
-+ (COPath *) pathWithString: (NSString*) pathString
++ (COPath *)pathWithString: (NSString *)pathString
 {
     NILARG_EXCEPTION_TEST(pathString);
-    
+
     ETUUID *branch = nil;
     ETUUID *persistentRoot = nil;
-    
+
     if (pathString.length > 0)
     {
         NSArray *components = [pathString componentsSeparatedByString: @":"];
@@ -63,23 +62,25 @@
                 persistentRoot = [ETUUID UUIDWithString: components[0]];
                 break;
             default:
-                [NSException raise: NSInvalidArgumentException format: @"unsupported COPath string '%@'", pathString];
+                [NSException raise: NSInvalidArgumentException
+                            format: @"unsupported COPath string '%@'",
+                                    pathString];
         }
     }
     return [COPath pathWithPersistentRoot: persistentRoot branch: branch];
 }
 
-- (id) copyWithZone: (NSZone *)zone
+- (id)copyWithZone: (NSZone *)zone
 {
     return self;
 }
 
-- (BOOL) isBroken
+- (BOOL)isBroken
 {
     return NO;
 }
 
-- (NSString *) stringValue
+- (NSString *)stringValue
 {
     if (_branch == nil)
     {
@@ -91,31 +92,31 @@
     }
 }
 
-- (NSUInteger) hash
+- (NSUInteger)hash
 {
     return _branch.hash ^ _persistentRoot.hash;
 }
 
-- (BOOL) isEqual: (id)anObject
+- (BOOL)isEqual: (id)anObject
 {
     if (anObject == self)
         return YES;
-    
+
     if (![anObject isKindOfClass: [COPath class]])
         return NO;
-    
+
     COPath *otherPath = anObject;
     if (![_persistentRoot isEqual: otherPath->_persistentRoot])
         return NO;
-    
+
     if (!((_branch == nil && otherPath->_branch == nil)
           || [_branch isEqual: otherPath->_branch]))
         return NO;
-    
+
     return YES;
 }
 
-- (NSString *) description
+- (NSString *)description
 {
     return self.stringValue;
 }
@@ -125,32 +126,32 @@
 
 @implementation COBrokenPath
 
-- (BOOL) isBroken
+- (BOOL)isBroken
 {
     return YES;
 }
 
-- (id) copyWithZone: (NSZone *)zone
+- (id)copyWithZone: (NSZone *)zone
 {
     return self;
 }
 
-- (NSString *) stringValue
+- (NSString *)stringValue
 {
     return @"COBrokenPath";
 }
 
-- (NSUInteger) hash
+- (NSUInteger)hash
 {
     return (NSUInteger)self;
 }
 
-- (BOOL) isEqual: (id)anObject
+- (BOOL)isEqual: (id)anObject
 {
     return NO;
 }
 
-- (NSString *) description
+- (NSString *)description
 {
     return self.stringValue;
 }

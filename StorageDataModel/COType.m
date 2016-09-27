@@ -32,14 +32,22 @@ COTypePrimitiveDescription(COType type)
 {
     switch (COTypePrimitivePart(type))
     {
-        case kCOTypeInt64: return @"kCOTypeInt64";
-        case kCOTypeDouble: return @"kCOTypeDouble";
-        case kCOTypeString: return @"kCOTypeString";
-        case kCOTypeBlob: return @"kCOTypeBlob";
-        case kCOTypeReference: return @"kCOTypeReference";
-        case kCOTypeCompositeReference: return @"kCOTypeCompositeReference";
-        case kCOTypeAttachment: return @"kCOTypeAttachment";
-        default: return @"";
+        case kCOTypeInt64:
+            return @"kCOTypeInt64";
+        case kCOTypeDouble:
+            return @"kCOTypeDouble";
+        case kCOTypeString:
+            return @"kCOTypeString";
+        case kCOTypeBlob:
+            return @"kCOTypeBlob";
+        case kCOTypeReference:
+            return @"kCOTypeReference";
+        case kCOTypeCompositeReference:
+            return @"kCOTypeCompositeReference";
+        case kCOTypeAttachment:
+            return @"kCOTypeAttachment";
+        default:
+            return @"";
     }
 }
 
@@ -51,8 +59,9 @@ COTypeDescription(COType type)
     {
         return @"invalid type";
     }
-    
-    return [COTypeMultivalueDescription(type) stringByAppendingString: COTypePrimitiveDescription(type)];
+
+    return [COTypeMultivalueDescription(type) stringByAppendingString: COTypePrimitiveDescription(
+        type)];
 }
 
 
@@ -62,19 +71,25 @@ COTypePrimitiveValidateObject(COType type, id anObject)
     switch (COTypePrimitivePart(type))
     {
         case kCOTypeInt64:
-        case kCOTypeDouble: return [anObject isKindOfClass: [NSNumber class]]
-            || anObject == [NSNull null];
-        case kCOTypeString: return [anObject isKindOfClass: [NSString class]]
-            || anObject == [NSNull null];
-        case kCOTypeBlob: return [anObject isKindOfClass: [NSData class]]
-            || anObject == [NSNull null];
+        case kCOTypeDouble:
+            return [anObject isKindOfClass: [NSNumber class]]
+                   || anObject == [NSNull null];
+        case kCOTypeString:
+            return [anObject isKindOfClass: [NSString class]]
+                   || anObject == [NSNull null];
+        case kCOTypeBlob:
+            return [anObject isKindOfClass: [NSData class]]
+                   || anObject == [NSNull null];
         case kCOTypeReference:
-        case kCOTypeCompositeReference: return [anObject isKindOfClass: [ETUUID class]]
-            || [anObject isKindOfClass: [COPath class]]
-            || anObject == [NSNull null];
-        case kCOTypeAttachment: return [anObject isKindOfClass: [COAttachmentID class]]
-            || anObject == [NSNull null];
-        default: return NO;
+        case kCOTypeCompositeReference:
+            return [anObject isKindOfClass: [ETUUID class]]
+                   || [anObject isKindOfClass: [COPath class]]
+                   || anObject == [NSNull null];
+        case kCOTypeAttachment:
+            return [anObject isKindOfClass: [COAttachmentID class]]
+                   || anObject == [NSNull null];
+        default:
+            return NO;
     }
 }
 
@@ -86,7 +101,7 @@ COTypeValidateObject(COType type, id anObject)
     {
         return NO;
     }
-    
+
     if (COTypeIsMultivalued(type))
     {
         if (![anObject isKindOfClass: COTypeIsOrdered(type) ? [NSArray class] : [NSSet class]])
@@ -103,7 +118,7 @@ COTypeValidateObject(COType type, id anObject)
         }
         return YES;
     }
-    
+
     if (!COTypePrimitiveValidateObject(type, anObject))
     {
         return NO;

@@ -10,12 +10,12 @@
 
 @implementation COAttachmentID
 
-- (instancetype) init
+- (instancetype)init
 {
     return [self initWithData: nil];
 }
 
-- (instancetype) initWithData:(NSData *)aData
+- (instancetype)initWithData: (NSData *)aData
 {
     NILARG_EXCEPTION_TEST(aData);
     SUPERINIT;
@@ -23,25 +23,25 @@
     return self;
 }
 
-- (NSData *) dataValue
+- (NSData *)dataValue
 {
     return _data;
 }
 
-- (NSUInteger) hash
+- (NSUInteger)hash
 {
     return _data.hash;
 }
 
-- (BOOL) isEqual:(id)object
+- (BOOL)isEqual: (id)object
 {
     if (![object isKindOfClass: [COAttachmentID class]])
         return NO;
-    
+
     return [_data isEqual: [object dataValue]];
 }
 
-- (id) copyWithZone:(NSZone *)zone
+- (id)copyWithZone: (NSZone *)zone
 {
     return self;
 }

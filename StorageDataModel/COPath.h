@@ -35,14 +35,14 @@
  * Returns a new path that implicitly points to the root object of the current 
  * branch.
  */
-+ (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot;
++ (COPath *)pathWithPersistentRoot: (ETUUID *)aRoot;
 /**
  * Returns a new path that implicitly points to the root object.
  */
-+ (COPath *) pathWithPersistentRoot: (ETUUID *)aRoot
-                             branch: (ETUUID*)aBranch;
++ (COPath *)pathWithPersistentRoot: (ETUUID *)aRoot
+                            branch: (ETUUID *)aBranch;
 
-+ (COPath *) brokenPath;
++ (COPath *)brokenPath;
 
 /** @taskunit Reference Properties */
 
@@ -72,7 +72,7 @@
 /**
  * Returns a new path from a string representation such as -stringValue.
  */
-+ (COPath *) pathWithString: (NSString*) pathString;
++ (COPath *)pathWithString: (NSString *)pathString;
 /**
  * Returns a string representation of the path.
  */

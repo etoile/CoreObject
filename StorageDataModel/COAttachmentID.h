@@ -30,7 +30,7 @@
  *
  * For nil data, raises a NSInvalidArgumentException.
  */
-- (instancetype) initWithData: (NSData *)aData NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithData: (NSData *)aData NS_DESIGNATED_INITIALIZER;
 /**
  * Returns the attachment hash.
  *
