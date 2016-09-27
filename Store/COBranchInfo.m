@@ -19,7 +19,7 @@
 @synthesize headRevisionUUID = _headRevisionUUID;
 @synthesize currentRevisionUUID = _currentRevisionUUID;
 
-- (ETUUID *) remoteMirror
+- (ETUUID *)remoteMirror
 {
     NSString *value = metadata_[@"remoteMirror"];
     if (value != nil)
@@ -29,7 +29,7 @@
     return nil;
 }
 
-- (ETUUID *) replcatedBranch
+- (ETUUID *)replcatedBranch
 {
     NSString *value = metadata_[@"replcatedBranch"];
     if (value != nil)
@@ -39,9 +39,12 @@
     return nil;
 }
 
-- (NSString *) description
+- (NSString *)description
 {
-    return [NSString stringWithFormat: @"<Branch %@ <curr. rev.: %@> %@>", uuid_, _currentRevisionUUID, metadata_];
+    return [NSString stringWithFormat: @"<Branch %@ <curr. rev.: %@> %@>",
+                                       uuid_,
+                                       _currentRevisionUUID,
+                                       metadata_];
 }
 
 @end

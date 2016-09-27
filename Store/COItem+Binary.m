@@ -12,7 +12,8 @@
 #import "COAttachmentID.h"
 #import <EtoileFoundation/Macros.h>
 
-typedef NS_ENUM(unsigned int, reader_state) {
+typedef NS_ENUM(unsigned int, reader_state)
+{
     co_reader_expect_object_uuid,
     co_reader_expect_property,
     co_reader_expect_type,
@@ -36,7 +37,7 @@ typedef NS_ENUM(unsigned int, reader_state) {
 
 @implementation COReaderState
 
-- (instancetype) init
+- (instancetype)init
 {
     SUPERINIT;
     values = [[NSMutableDictionary alloc] init];
@@ -50,10 +51,9 @@ typedef NS_ENUM(unsigned int, reader_state) {
 
 @implementation COItem (Binary)
 
-
 static NSNull *NSNullCached;
 
-+ (void) initialize
++ (void)initialize
 {
     if (self == [COItem class])
     {
@@ -68,7 +68,7 @@ static inline void writePrimitiveValue(co_buffer_t *dest, id aValue, COType aTyp
         co_buffer_store_null(dest);
         return;
     }
-    
+
     switch (COTypePrimitivePart(aType))
     {
         case kCOTypeInt64:
@@ -113,7 +113,7 @@ static int comparePointersToBinaryWriterTokens(const void *ptrA, const void *ptr
 {
     const unsigned char **tokenA = (const unsigned char **)ptrA;
     const unsigned char **tokenB = (const unsigned char **)ptrB;
-    
+
     size_t tokenALength = co_reader_length_of_token(*tokenA);
     size_t tokenBLength = co_reader_length_of_token(*tokenB);
     assert(tokenALength > 0 && tokenBLength > 0);
@@ -140,10 +140,13 @@ static int comparePointersToBinaryWriterTokens(const void *ptrA, const void *ptr
     }
 }
 
-static inline void writeArrayContents(co_buffer_t *dest, NSArray *anArray, COType aType, co_buffer_t *temp)
+static inline void writeArrayContents(co_buffer_t *dest,
+                                      NSArray *anArray,
+                                      COType aType,
+                                      co_buffer_t *temp)
 {
     assert([anArray isKindOfClass: [NSArray class]]);
-    
+
     for (id obj in anArray)
     {
         writePrimitiveValue(dest, obj, aType);
@@ -154,13 +157,13 @@ static inline void writeSetContents(co_buffer_t *dest, NSSet *aSet, COType aType
 {
     assert([aSet isKindOfClass: [NSSet class]]);
     const size_t setCount = aSet.count;
-    
+
     // We need to sort the serialized values since NSSet has no order.
-    
+
     co_buffer_clear(temp);
-    
+
     const unsigned char **tokenPointers = malloc(sizeof(const unsigned char *) * setCount);
-    
+
     // First, write each primitive value to the temporary byte buffer 'temp',
     // also storing the pointer to the start of each token in the tokenPointers array
     {
@@ -168,26 +171,29 @@ static inline void writeSetContents(co_buffer_t *dest, NSSet *aSet, COType aType
         for (id obj in aSet)
         {
             tokenPointers[i++] = co_buffer_get_data(temp) + co_buffer_get_length(temp);
-            
+
             writePrimitiveValue(temp, obj, aType);
         }
     }
-    
+
     // Sort the tokenPointers using a simple comparison function that
     // uses the length of the token and the byte-for-byte values of the tokens
-    
-    qsort(tokenPointers, setCount, sizeof(const unsigned char *), comparePointersToBinaryWriterTokens);
-    
+
+    qsort(tokenPointers,
+          setCount,
+          sizeof(const unsigned char *),
+          comparePointersToBinaryWriterTokens);
+
     // Copy the sorted tokens into the dest buffer
-    
-    for (size_t i=0; i<setCount; i++)
+
+    for (size_t i = 0; i < setCount; i++)
     {
         const unsigned char *tokenPointer = tokenPointers[i];
         const size_t tokenLength = co_reader_length_of_token(tokenPointer);
-        
+
         co_buffer_write(dest, tokenPointer, tokenLength);
     }
-    
+
     free(tokenPointers);
 }
 
@@ -201,7 +207,7 @@ static inline void writeValue(co_buffer_t *dest, id aValue, COType aType, co_buf
     else
     {
         co_buffer_begin_array(dest);
-                
+
         if (COTypeIsOrdered(aType))
         {
             writeArrayContents(dest, aValue, aType, temp);
@@ -215,38 +221,38 @@ static inline void writeValue(co_buffer_t *dest, id aValue, COType aType, co_buf
     }
 }
 
-- (NSData *) dataValue
+- (NSData *)dataValue
 {
     /** Parts of the serialization process need temporary storage */
     co_buffer_t temp;
     co_buffer_init(&temp);
-    
+
     co_buffer_t buf;
     co_buffer_init(&buf);
     co_buffer_store_uuid(&buf, self.UUID);
     co_buffer_begin_object(&buf);
-    
+
     // TODO: For safety we should probaly serialize the attribute names to UTF-8 and compare
     // them there. Although, I believe compare: should be the same as comparing Unicode character numbers
     // which is the same as comparing UTF-8 byte sequences (mentiomed in the RFC.)
     NSArray *propsSorted = [self.attributeNames sortedArrayUsingSelector: @selector(compare:)];
-    
+
     for (NSString *prop in propsSorted)
     {
         COType type = [self typeForAttribute: prop];
         id val = [self valueForAttribute: prop];
-        
+
         co_buffer_store_string(&buf, prop);
         co_buffer_store_integer(&buf, type);
         writeValue(&buf, val, type, &temp);
     }
 
     co_buffer_free(&temp);
-    
+
     co_buffer_end_object(&buf);
 
-    NSData *result = [NSData dataWithBytes:co_buffer_get_data(&buf)
-                                    length:co_buffer_get_length(&buf)];
+    NSData *result = [NSData dataWithBytes: co_buffer_get_data(&buf)
+                                    length: co_buffer_get_length(&buf)];
     co_buffer_free(&buf);
     return result;
 }
@@ -254,7 +260,8 @@ static inline void writeValue(co_buffer_t *dest, id aValue, COType aType, co_buf
 
 // Read
 
-static void co_read_object_value(COReaderState *state, id obj) {
+static void co_read_object_value(COReaderState *state, id obj)
+{
     if (state->isReadingMultivalue)
     {
         [state->multivalue addObject: obj];
@@ -285,6 +292,7 @@ static void co_read_int64(void *ctx, int64_t val)
             break;
     }
 }
+
 static void co_read_double(void *ctx, double val)
 {
     COReaderState *state = (__bridge COReaderState *)ctx;
@@ -319,7 +327,7 @@ static void co_read_string(void *ctx, NSString *val)
             }
             break;
         case co_reader_expect_property:
-            state->currentProperty =  val;
+            state->currentProperty = val;
             state->state = co_reader_expect_type;
             break;
         default:
@@ -337,7 +345,7 @@ static void co_read_uuid(void *ctx, ETUUID *uuid)
             co_read_object_value(state, uuid);
             break;
         case co_reader_expect_object_uuid:
-            state->uuid =  uuid;
+            state->uuid = uuid;
             state->state = co_reader_expect_property;
             break;
         default:
@@ -373,6 +381,7 @@ static void co_read_bytes(void *ctx, const unsigned char *val, size_t size)
 static void co_read_begin_object(void *ctx)
 {
 }
+
 static void co_read_end_object(void *ctx)
 {
 }
@@ -381,9 +390,9 @@ static void co_read_begin_array(void *ctx)
 {
     COReaderState *state = (__bridge COReaderState *)ctx;
     state->isReadingMultivalue = YES;
-    
+
     assert(COTypeIsMultivalued(state->currentType));
-    
+
     if (COTypeIsOrdered(state->currentType))
     {
         state->multivalue = [[NSMutableArray alloc] init];
@@ -393,18 +402,20 @@ static void co_read_begin_array(void *ctx)
         state->multivalue = [[NSMutableSet alloc] init];
     }
 }
+
 static void co_read_end_array(void *ctx)
 {
     COReaderState *state = (__bridge COReaderState *)ctx;
     state->isReadingMultivalue = NO;
-    
+
     // Save the value
     state->values[state->currentProperty] = state->multivalue;
-    state->multivalue =  nil;
-    
+    state->multivalue = nil;
+
     // Do state transition
     state->state = co_reader_expect_property;
 }
+
 static void co_read_null(void *ctx)
 {
     COReaderState *state = (__bridge COReaderState *)ctx;
@@ -412,7 +423,7 @@ static void co_read_null(void *ctx)
     {
         case co_reader_expect_value:
             co_read_object_value(state, NSNullCached);
-            break;            
+            break;
         default:
             state->state = co_reader_error;
             break;
@@ -422,10 +433,10 @@ static void co_read_null(void *ctx)
 /* Initializers in categories cannot be marked with NS_DESIGNATED_INITIALIZER */
 #pragma clang diagnostic ignored "-Wobjc-designated-initializers"
 
-- (instancetype) initWithData: (NSData *)aData
+- (instancetype)initWithData: (NSData *)aData
 {
     COReaderState *state = [[COReaderState alloc] init];
-    
+
     co_reader_callback_t cb = {
         co_read_int64,
         co_read_double,
@@ -442,12 +453,12 @@ static void co_read_null(void *ctx)
                    aData.length,
                    (__bridge void *)state,
                    cb);
-    
+
     SUPERINIT;
-    uuid =  state->uuid;
-    types =  state->types;
-    values =  state->values;
-    
+    uuid = state->uuid;
+    types = state->types;
+    values = state->values;
+
     return self;
 }
 

@@ -1,404 +1,493 @@
 #import "FMResultSet.h"
 #import "FMDatabase.h"
-#import "unistd.h"
 
 @interface FMResultSet (Private)
+
 - (NSMutableDictionary *)columnNameToIndexMap;
-- (void)setColumnNameToIndexMap:(NSMutableDictionary *)value;
+- (void)setColumnNameToIndexMap: (NSMutableDictionary *)value;
 @end
 
 @implementation FMResultSet
 
-+ (id)resultSetWithStatement:(FMStatement *)statement usingParentDatabase:(FMDatabase*)aDB {
-    
++ (id)resultSetWithStatement: (FMStatement *)statement usingParentDatabase: (FMDatabase *)aDB
+{
+
     FMResultSet *rs = [[FMResultSet alloc] init];
-    
-    [rs setStatement:statement];
-    [rs setParentDB:aDB];
-    
+
+    [rs setStatement: statement];
+    [rs setParentDB: aDB];
+
     return rs;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     [self close];
-    
+
     query = nil;
-    
+
     columnNameToIndexMap = nil;
-    
+
 }
 
-- (void)close {
-    
+- (void)close
+{
+
     [statement reset];
     statement = nil;
-    
+
     // we don't need this anymore... (i think)
     //[parentDB setInUse:NO];
     parentDB = nil;
 }
 
-- (void)setupColumnNames {
-    
-    if (!columnNameToIndexMap) {
-        [self setColumnNameToIndexMap:[NSMutableDictionary dictionary]];
-    }    
-    
+- (void)setupColumnNames
+{
+
+    if (!columnNameToIndexMap)
+    {
+        [self setColumnNameToIndexMap: [NSMutableDictionary dictionary]];
+    }
+
     int columnCount = sqlite3_column_count(statement.statement);
-    
+
     int columnIdx = 0;
-    for (columnIdx = 0; columnIdx < columnCount; columnIdx++) {
-        [columnNameToIndexMap setObject:[NSNumber numberWithInt:columnIdx]
-                                 forKey:[[NSString stringWithUTF8String:sqlite3_column_name(statement.statement, columnIdx)] lowercaseString]];
+    for (columnIdx = 0; columnIdx < columnCount; columnIdx++)
+    {
+        [columnNameToIndexMap setObject: [NSNumber numberWithInt: columnIdx]
+                                 forKey: [[NSString stringWithUTF8String: sqlite3_column_name(
+                                     statement.statement,
+                                     columnIdx)] lowercaseString]];
     }
     columnNamesSetup = YES;
 }
 
-- (void)kvcMagic:(id)object {
-    
+- (void)kvcMagic: (id)object
+{
+
     int columnCount = sqlite3_column_count(statement.statement);
-    
+
     int columnIdx = 0;
-    for (columnIdx = 0; columnIdx < columnCount; columnIdx++) {
-        
+    for (columnIdx = 0; columnIdx < columnCount; columnIdx++)
+    {
+
         const char *c = (const char *)sqlite3_column_text(statement.statement, columnIdx);
-        
+
         // check for a null row
-        if (c) {
-            NSString *s = [NSString stringWithUTF8String:c];
-            
-            [object setValue:s forKey:[NSString stringWithUTF8String:sqlite3_column_name(statement.statement, columnIdx)]];
+        if (c)
+        {
+            NSString *s = [NSString stringWithUTF8String: c];
+
+            [object setValue: s
+                      forKey: [NSString stringWithUTF8String: sqlite3_column_name(statement.statement,
+                                                                                  columnIdx)]];
         }
     }
 }
 
-- (id)objectForColumnIndex:(int)columnIdx {
+- (id)objectForColumnIndex: (int)columnIdx
+{
     int columnType = sqlite3_column_type(statement.statement, columnIdx);
-    
+
     id returnValue = nil;
-    
-    if (columnType == SQLITE_INTEGER) {
-        returnValue = [NSNumber numberWithLongLong:[self longLongIntForColumnIndex:columnIdx]];
+
+    if (columnType == SQLITE_INTEGER)
+    {
+        returnValue = [NSNumber numberWithLongLong: [self longLongIntForColumnIndex: columnIdx]];
     }
-    else if (columnType == SQLITE_FLOAT) {
-        returnValue = [NSNumber numberWithDouble:[self doubleForColumnIndex:columnIdx]];
+    else if (columnType == SQLITE_FLOAT)
+    {
+        returnValue = [NSNumber numberWithDouble: [self doubleForColumnIndex: columnIdx]];
     }
-    else if (columnType == SQLITE_BLOB) {
-        returnValue = [self dataForColumnIndex:columnIdx];
+    else if (columnType == SQLITE_BLOB)
+    {
+        returnValue = [self dataForColumnIndex: columnIdx];
     }
-    else {
+    else
+    {
         //default to a string for everything else
-        returnValue = [self stringForColumnIndex:columnIdx];
+        returnValue = [self stringForColumnIndex: columnIdx];
     }
-    
-    if (returnValue == nil) {
+
+    if (returnValue == nil)
+    {
         returnValue = [NSNull null];
     }
-    
+
     return returnValue;
 }
 
-- (id)objectForColumnName:(NSString*)columnName {
-    return [self objectForColumnIndex:[self columnIndexForName:columnName]];
+- (id)objectForColumnName: (NSString *)columnName
+{
+    return [self objectForColumnIndex: [self columnIndexForName: columnName]];
 }
 
-- (NSDictionary *)resultDict {
-    
+- (NSDictionary *)resultDict
+{
+
     NSInteger num_cols = sqlite3_data_count(statement.statement);
-    
-    if (num_cols > 0) {
-        NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity:num_cols];
-        
+
+    if (num_cols > 0)
+    {
+        NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity: num_cols];
+
         NSUInteger i;
-        for (i = 0; i < num_cols; i++) {
-            
+        for (i = 0; i < num_cols; i++)
+        {
+
             const char *col_name = sqlite3_column_name(statement.statement, i);
-            
-            if (col_name) {
-                NSString *colName = [NSString stringWithUTF8String:col_name];
+
+            if (col_name)
+            {
+                NSString *colName = [NSString stringWithUTF8String: col_name];
                 id value = [self objectForColumnName: colName];
-                
+
                 // save to dict
-                if (value) {
-                    [dict setObject:value forKey:colName];
+                if (value)
+                {
+                    [dict setObject: value forKey: colName];
                 }
             }
         }
-        
+
         return [dict copy];
     }
-    else {
+    else
+    {
         NSLog(@"Warning: There seem to be no columns in this set.");
     }
-    
+
     return nil;
 }
 
-- (BOOL)next {
-    
+- (BOOL)next
+{
+
     int rc;
     BOOL retry;
     int numberOfRetries = 0;
-    do {
+    do
+    {
         retry = NO;
-        
+
         rc = sqlite3_step(statement.statement);
-        
-        if (SQLITE_BUSY == rc) {
+
+        if (SQLITE_BUSY == rc)
+        {
             // this will happen if the db is locked, like if we are doing an update or insert.
             // in that case, retry the step... and maybe wait just 10 milliseconds.
             retry = YES;
             usleep(20);
-            
-            if ([parentDB busyRetryTimeout] && (numberOfRetries++ > [parentDB busyRetryTimeout])) {
-                
+
+            if ([parentDB busyRetryTimeout] && (numberOfRetries++ > [parentDB busyRetryTimeout]))
+            {
+
                 NSLog(@"%s:%d Database busy (%@)", __FUNCTION__, __LINE__, [parentDB databasePath]);
                 NSLog(@"Database busy");
                 break;
             }
         }
-        else if (SQLITE_DONE == rc || SQLITE_ROW == rc) {
+        else if (SQLITE_DONE == rc || SQLITE_ROW == rc)
+        {
             // all is well, let's return.
         }
-        else if (SQLITE_ERROR == rc) {
-            NSLog(@"Error calling sqlite3_step (%d: %s) rs", rc, sqlite3_errmsg([parentDB sqliteHandle]));
+        else if (SQLITE_ERROR == rc)
+        {
+            NSLog(@"Error calling sqlite3_step (%d: %s) rs",
+                  rc,
+                  sqlite3_errmsg([parentDB sqliteHandle]));
             break;
-        } 
-        else if (SQLITE_MISUSE == rc) {
+        }
+        else if (SQLITE_MISUSE == rc)
+        {
             // uh oh.
-            NSLog(@"Error calling sqlite3_step (%d: %s) rs", rc, sqlite3_errmsg([parentDB sqliteHandle]));
+            NSLog(@"Error calling sqlite3_step (%d: %s) rs",
+                  rc,
+                  sqlite3_errmsg([parentDB sqliteHandle]));
             break;
         }
-        else {
+        else
+        {
             // wtf?
-            NSLog(@"Unknown error calling sqlite3_step (%d: %s) rs", rc, sqlite3_errmsg([parentDB sqliteHandle]));
+            NSLog(@"Unknown error calling sqlite3_step (%d: %s) rs",
+                  rc,
+                  sqlite3_errmsg([parentDB sqliteHandle]));
             break;
         }
-        
+
     } while (retry);
-    
-    
-    if (rc != SQLITE_ROW) {
+
+    if (rc != SQLITE_ROW)
+    {
         [self close];
     }
-    
+
     return (rc == SQLITE_ROW);
 }
 
-- (BOOL)hasAnotherRow {
+- (BOOL)hasAnotherRow
+{
     return sqlite3_errcode([parentDB sqliteHandle]) == SQLITE_ROW;
 }
 
-- (int)columnIndexForName:(NSString*)columnName {
-    
-    if (!columnNamesSetup) {
+- (int)columnIndexForName: (NSString *)columnName
+{
+
+    if (!columnNamesSetup)
+    {
         [self setupColumnNames];
     }
-    
+
     columnName = [columnName lowercaseString];
-    
-    NSNumber *n = [columnNameToIndexMap objectForKey:columnName];
-    
-    if (n) {
+
+    NSNumber *n = [columnNameToIndexMap objectForKey: columnName];
+
+    if (n)
+    {
         return [n intValue];
     }
-    
+
     NSLog(@"Warning: I could not find the column named '%@'.", columnName);
-    
+
     return -1;
 }
 
 
-
-- (int)intForColumn:(NSString*)columnName {
-    return [self intForColumnIndex:[self columnIndexForName:columnName]];
+- (int)intForColumn: (NSString *)columnName
+{
+    return [self intForColumnIndex: [self columnIndexForName: columnName]];
 }
 
-- (int)intForColumnIndex:(int)columnIdx {
+- (int)intForColumnIndex: (int)columnIdx
+{
     return sqlite3_column_int(statement.statement, columnIdx);
 }
 
-- (long)longForColumn:(NSString*)columnName {
-    return [self longForColumnIndex:[self columnIndexForName:columnName]];
+- (long)longForColumn: (NSString *)columnName
+{
+    return [self longForColumnIndex: [self columnIndexForName: columnName]];
 }
 
-- (long)longForColumnIndex:(int)columnIdx {
+- (long)longForColumnIndex: (int)columnIdx
+{
     return (long)sqlite3_column_int64(statement.statement, columnIdx);
 }
 
-- (int64_t)int64ForColumn:(NSString*)columnName {
-    return [self int64ForColumnIndex:[self columnIndexForName:columnName]];
+- (int64_t)int64ForColumn: (NSString *)columnName
+{
+    return [self int64ForColumnIndex: [self columnIndexForName: columnName]];
 }
-- (int64_t)int64ForColumnIndex:(int)columnIdx {
+
+- (int64_t)int64ForColumnIndex: (int)columnIdx
+{
     return sqlite3_column_int64(statement.statement, columnIdx);
 }
 
-- (long long int)longLongIntForColumn:(NSString*)columnName {
-    return [self longLongIntForColumnIndex:[self columnIndexForName:columnName]];
+- (long long int)longLongIntForColumn: (NSString *)columnName
+{
+    return [self longLongIntForColumnIndex: [self columnIndexForName: columnName]];
 }
 
-- (long long int)longLongIntForColumnIndex:(int)columnIdx {
+- (long long int)longLongIntForColumnIndex: (int)columnIdx
+{
     return sqlite3_column_int64(statement.statement, columnIdx);
 }
 
-- (BOOL)boolForColumn:(NSString*)columnName {
-    return [self boolForColumnIndex:[self columnIndexForName:columnName]];
+- (BOOL)boolForColumn: (NSString *)columnName
+{
+    return [self boolForColumnIndex: [self columnIndexForName: columnName]];
 }
 
-- (BOOL)boolForColumnIndex:(int)columnIdx {
+- (BOOL)boolForColumnIndex: (int)columnIdx
+{
     return sqlite3_column_int64(statement.statement, columnIdx) != 0;
 }
 
-- (double)doubleForColumn:(NSString*)columnName {
-    return [self doubleForColumnIndex:[self columnIndexForName:columnName]];
+- (double)doubleForColumn: (NSString *)columnName
+{
+    return [self doubleForColumnIndex: [self columnIndexForName: columnName]];
 }
 
-- (double)doubleForColumnIndex:(int)columnIdx {
+- (double)doubleForColumnIndex: (int)columnIdx
+{
     return sqlite3_column_double(statement.statement, columnIdx);
 }
 
-- (NSString*)stringForColumnIndex:(int)columnIdx {
-    
-    if (sqlite3_column_type(statement.statement, columnIdx) == SQLITE_NULL || (columnIdx < 0)) {
+- (NSString *)stringForColumnIndex: (int)columnIdx
+{
+
+    if (sqlite3_column_type(statement.statement, columnIdx) == SQLITE_NULL || (columnIdx < 0))
+    {
         return nil;
     }
-    
+
     const char *c = (const char *)sqlite3_column_text(statement.statement, columnIdx);
-    
-    if (!c) {
+
+    if (!c)
+    {
         // null row.
         return nil;
     }
-    
-    return [NSString stringWithUTF8String:c];
+
+    return [NSString stringWithUTF8String: c];
 }
 
-- (NSString*)stringForColumn:(NSString*)columnName {
-    return [self stringForColumnIndex:[self columnIndexForName:columnName]];
+- (NSString *)stringForColumn: (NSString *)columnName
+{
+    return [self stringForColumnIndex: [self columnIndexForName: columnName]];
 }
 
-- (NSDate*)dateForColumn:(NSString*)columnName {
-    return [self dateForColumnIndex:[self columnIndexForName:columnName]];
+- (NSDate *)dateForColumn: (NSString *)columnName
+{
+    return [self dateForColumnIndex: [self columnIndexForName: columnName]];
 }
 
-- (NSDate*)dateForColumnIndex:(int)columnIdx {
-    
-    if (sqlite3_column_type(statement.statement, columnIdx) == SQLITE_NULL || (columnIdx < 0)) {
+- (NSDate *)dateForColumnIndex: (int)columnIdx
+{
+
+    if (sqlite3_column_type(statement.statement, columnIdx) == SQLITE_NULL || (columnIdx < 0))
+    {
         return nil;
     }
-    
-    return [NSDate dateWithTimeIntervalSince1970:[self doubleForColumnIndex:columnIdx]];
+
+    return [NSDate dateWithTimeIntervalSince1970: [self doubleForColumnIndex: columnIdx]];
 }
 
 
-- (NSData*)dataForColumn:(NSString*)columnName {
-    return [self dataForColumnIndex:[self columnIndexForName:columnName]];
+- (NSData *)dataForColumn: (NSString *)columnName
+{
+    return [self dataForColumnIndex: [self columnIndexForName: columnName]];
 }
 
-- (NSData*)dataForColumnIndex:(int)columnIdx {
-    
-    if (sqlite3_column_type(statement.statement, columnIdx) == SQLITE_NULL || (columnIdx < 0)) {
+- (NSData *)dataForColumnIndex: (int)columnIdx
+{
+
+    if (sqlite3_column_type(statement.statement, columnIdx) == SQLITE_NULL || (columnIdx < 0))
+    {
         return nil;
     }
-    
+
     int dataSize = sqlite3_column_bytes(statement.statement, columnIdx);
-    
-    NSMutableData *data = [NSMutableData dataWithLength:dataSize];
-    
+
+    NSMutableData *data = [NSMutableData dataWithLength: dataSize];
+
     memcpy([data mutableBytes], sqlite3_column_blob(statement.statement, columnIdx), dataSize);
-    
+
     return data;
 }
 
-- (NSNumber*)numberForColumn:(NSString*)columnName
+- (NSNumber *)numberForColumn: (NSString *)columnName
 {
-    return [self numberForColumnIndex:[self columnIndexForName:columnName]];
+    return [self numberForColumnIndex: [self columnIndexForName: columnName]];
 }
-- (NSNumber*)numberForColumnIndex:(int)columnIdx
+
+- (NSNumber *)numberForColumnIndex: (int)columnIdx
 {
-    if (sqlite3_column_type(statement.statement, columnIdx) == SQLITE_FLOAT) {
+    if (sqlite3_column_type(statement.statement, columnIdx) == SQLITE_FLOAT)
+    {
         return [NSNumber numberWithDouble: sqlite3_column_double(statement.statement, columnIdx)];
-    } else {
+    }
+    else
+    {
         return [NSNumber numberWithLongLong: sqlite3_column_int64(statement.statement, columnIdx)];
     }
 }
 
-- (NSData*)dataNoCopyForColumn:(NSString*)columnName {
-    return [self dataNoCopyForColumnIndex:[self columnIndexForName:columnName]];
+- (NSData *)dataNoCopyForColumn: (NSString *)columnName
+{
+    return [self dataNoCopyForColumnIndex: [self columnIndexForName: columnName]];
 }
 
-- (NSData*)dataNoCopyForColumnIndex:(int)columnIdx {
-    
-    if (sqlite3_column_type(statement.statement, columnIdx) == SQLITE_NULL || (columnIdx < 0)) {
+- (NSData *)dataNoCopyForColumnIndex: (int)columnIdx
+{
+
+    if (sqlite3_column_type(statement.statement, columnIdx) == SQLITE_NULL || (columnIdx < 0))
+    {
         return nil;
     }
-    
+
     int dataSize = sqlite3_column_bytes(statement.statement, columnIdx);
-    
-    NSData *data = [NSData dataWithBytesNoCopy:(void *)sqlite3_column_blob(statement.statement, columnIdx) length:dataSize freeWhenDone:NO];
-    
+
+    NSData *data = [NSData dataWithBytesNoCopy: (void *)sqlite3_column_blob(statement.statement,
+                                                                            columnIdx)
+                                        length: dataSize
+                                  freeWhenDone: NO];
+
     return data;
 }
 
 
-- (BOOL)columnIndexIsNull:(int)columnIdx {
+- (BOOL)columnIndexIsNull: (int)columnIdx
+{
     return sqlite3_column_type(statement.statement, columnIdx) == SQLITE_NULL;
 }
 
-- (BOOL)columnIsNull:(NSString*)columnName {
-    return [self columnIndexIsNull:[self columnIndexForName:columnName]];
+- (BOOL)columnIsNull: (NSString *)columnName
+{
+    return [self columnIndexIsNull: [self columnIndexForName: columnName]];
 }
 
-- (const unsigned char *)UTF8StringForColumnIndex:(int)columnIdx {
-    
-    if (sqlite3_column_type(statement.statement, columnIdx) == SQLITE_NULL || (columnIdx < 0)) {
+- (const unsigned char *)UTF8StringForColumnIndex: (int)columnIdx
+{
+
+    if (sqlite3_column_type(statement.statement, columnIdx) == SQLITE_NULL || (columnIdx < 0))
+    {
         return NULL;
     }
-    
+
     return sqlite3_column_text(statement.statement, columnIdx);
 }
 
-- (const unsigned char *)UTF8StringForColumnName:(NSString*)columnName {
-    return [self UTF8StringForColumnIndex:[self columnIndexForName:columnName]];
+- (const unsigned char *)UTF8StringForColumnName: (NSString *)columnName
+{
+    return [self UTF8StringForColumnIndex: [self columnIndexForName: columnName]];
 }
 
 
 // returns autoreleased NSString containing the name of the column in the result set
-- (NSString*)columnNameForIndex:(int)columnIdx {
+- (NSString *)columnNameForIndex: (int)columnIdx
+{
     return [NSString stringWithUTF8String: sqlite3_column_name(statement.statement, columnIdx)];
 }
 
-- (void)setParentDB:(FMDatabase *)newDb {
+- (void)setParentDB: (FMDatabase *)newDb
+{
     parentDB = newDb;
 }
 
 
-- (NSString *)query {
+- (NSString *)query
+{
     return query;
 }
 
-- (void)setQuery:(NSString *)value {
+- (void)setQuery: (NSString *)value
+{
     query = value;
 }
 
-- (NSMutableDictionary *)columnNameToIndexMap {
+- (NSMutableDictionary *)columnNameToIndexMap
+{
     return columnNameToIndexMap;
 }
 
-- (void)setColumnNameToIndexMap:(NSMutableDictionary *)value {
+- (void)setColumnNameToIndexMap: (NSMutableDictionary *)value
+{
     columnNameToIndexMap = value;
 }
 
-- (FMStatement *)statement {
+- (FMStatement *)statement
+{
     return statement;
 }
 
-- (void)setStatement:(FMStatement *)value {
-    if (statement != value) {
+- (void)setStatement: (FMStatement *)value
+{
+    if (statement != value)
+    {
         statement = value;
     }
 }
-
 
 
 @end

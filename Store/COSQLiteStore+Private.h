@@ -19,18 +19,17 @@
 
 @property (nonatomic, readwrite, assign) NSUInteger maxNumberOfDeltaCommits;
 
-- (BOOL) writeRevisionWithModifiedItems: (COItemGraph *)anItemTree
-                           revisionUUID: (ETUUID *)aRevisionUUID
-                               metadata: (NSDictionary *)metadata
-                       parentRevisionID: (ETUUID *)aParent
-                  mergeParentRevisionID: (ETUUID *)aMergeParent
-                     persistentRootUUID: (ETUUID *)aUUID
-                             branchUUID: (ETUUID*)branch;
+- (BOOL)writeRevisionWithModifiedItems: (COItemGraph *)anItemTree
+                          revisionUUID: (ETUUID *)aRevisionUUID
+                              metadata: (NSDictionary *)metadata
+                      parentRevisionID: (ETUUID *)aParent
+                 mergeParentRevisionID: (ETUUID *)aMergeParent
+                    persistentRootUUID: (ETUUID *)aUUID
+                            branchUUID: (ETUUID *)branch;
 
-- (COSQLiteStorePersistentRootBackingStore *) backingStoreForPersistentRootUUID: (ETUUID *)aUUID
-                                                             createIfNotPresent: (BOOL)createIfNotPresent;
+- (COSQLiteStorePersistentRootBackingStore *)backingStoreForPersistentRootUUID: (ETUUID *)aUUID
+                                                            createIfNotPresent: (BOOL)createIfNotPresent;
 
-
-- (void) testingRunBlockInStoreQueue: (void (^)())aBlock;
+- (void)testingRunBlockInStoreQueue: (void (^)())aBlock;
 
 @end

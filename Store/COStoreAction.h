@@ -13,6 +13,6 @@
 
 @property (nonatomic, readwrite, copy) ETUUID *persistentRoot;
 
-- (BOOL) execute: (COSQLiteStore *)store inTransaction: (COStoreTransaction *)aTransaction;
+- (BOOL)execute: (COSQLiteStore *)store inTransaction: (COStoreTransaction *)aTransaction;
 
 @end

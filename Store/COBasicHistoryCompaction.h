@@ -18,7 +18,7 @@
  */
 @interface COBasicHistoryCompaction : NSObject <COHistoryCompaction>
 {
-    @private
+@private
     NSSet *_finalizablePersistentRootUUIDs;
     NSSet *_compactablePersistentRootUUIDs;
     NSSet *_finalizableBranchUUIDs;

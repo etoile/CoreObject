@@ -9,10 +9,7 @@
 
 @implementation COBasicHistoryCompaction
 
-@synthesize finalizablePersistentRootUUIDs = _finalizablePersistentRootUUIDs,
-    compactablePersistentRootUUIDs = _compactablePersistentRootUUIDs,
-    finalizableBranchUUIDs = _finalizableBranchUUIDs,
-    compactableBranchUUIDs = _compactableBranchUUIDs;
+@synthesize finalizablePersistentRootUUIDs = _finalizablePersistentRootUUIDs, compactablePersistentRootUUIDs = _compactablePersistentRootUUIDs, finalizableBranchUUIDs = _finalizableBranchUUIDs, compactableBranchUUIDs = _compactableBranchUUIDs;
 
 - (instancetype)init
 {

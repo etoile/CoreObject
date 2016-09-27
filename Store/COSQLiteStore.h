@@ -20,7 +20,7 @@ typedef NS_OPTIONS(NSUInteger, COBranchRevisionReadingOptions)
     /**
      * Return revisions between the branch's initial revision and head revision, inclusive
      */
-    COBranchRevisionReadingDefault = 0,
+        COBranchRevisionReadingDefault = 0,
     /**
      * Return all parent revisions of the branch's head revision, including those in
      * parent branches, as well as those in parent persistent roots.
@@ -28,7 +28,7 @@ typedef NS_OPTIONS(NSUInteger, COBranchRevisionReadingOptions)
      * Revisions on branches merged into the branch, or on branches merged into
      * parent branches are not included.
      */
-    COBranchRevisionReadingParentBranches = 2,
+        COBranchRevisionReadingParentBranches = 2,
     /**
      * Finds the revisions which have the same branch UUID as the one being queried,
      * but are located on anonymous/implicit branches.
@@ -43,26 +43,26 @@ typedef NS_OPTIONS(NSUInteger, COBranchRevisionReadingOptions)
      *
      * See "lost head" example in COSQLiteStore documentation.
      */
-    COBranchRevisionReadingDivergentRevisions = 4
+        COBranchRevisionReadingDivergentRevisions = 4
 };
 
 /**
  * Semi-private notification name posted by COSQLiteStore. Only intended for
  * use by COEditingContext or clients using COSQLiteStore directly.
  */
-extern NSString * const COStorePersistentRootsDidChangeNotification;
+extern NSString *const COStorePersistentRootsDidChangeNotification;
 
 /* userInfo dictionary keys for COStorePersistentRootsDidChangeNotification */
 
-extern NSString * const kCOStorePersistentRootTransactionIDs;
+extern NSString *const kCOStorePersistentRootTransactionIDs;
 /**
  * The persistent root UUIDs inserted with the last commit.
  */
-extern NSString * const kCOStoreInsertedPersistentRoots;
+extern NSString *const kCOStoreInsertedPersistentRoots;
 /**
  * The persistent root UUIDs deleted with the last commit.
  */
-extern NSString * const kCOStoreDeletedPersistentRoots;
+extern NSString *const kCOStoreDeletedPersistentRoots;
 /**
  * The persistent root UUIDs compacted with -compactHistory: or
  * -finalizeDeletionsForPersistentRoot:error:.
@@ -74,7 +74,7 @@ extern NSString * const kCOStoreDeletedPersistentRoots;
  * Can include persistent roots which have not been compacted (but were just 
  * candidates for compaction).
  */
-extern NSString * const kCOStoreCompactedPersistentRoots;
+extern NSString *const kCOStoreCompactedPersistentRoots;
 /**
  * The persistent root UUIDs finalized with -compactHistory: or
  * -finalizeDeletionsForPersistentRoot:error:.
@@ -84,21 +84,21 @@ extern NSString * const kCOStoreCompactedPersistentRoots;
  * to decide whether we can finalize the persistent roots. Moreover the 
  * transaction ID that exist per persistent root erased with the finalization.
  */
-extern NSString * const kCOStoreFinalizedPersistentRoots;
-extern NSString * const kCOStoreUUID;
-extern NSString * const kCOStoreURL;
+extern NSString *const kCOStoreFinalizedPersistentRoots;
+extern NSString *const kCOStoreUUID;
+extern NSString *const kCOStoreURL;
 
 /**
  * Size in bytes that this persistent root would occupy if exported,
  * including all history.
  */
-extern NSString * const COPersistentRootAttributeExportSize;
+extern NSString *const COPersistentRootAttributeExportSize;
 /**
  * Size in bytes used by this persistent root, including all history.
  * For cheap copies, this excludes the size of the parent (will
  * currently just return 0).
  */
-extern NSString * const COPersistentRootAttributeUsedSize;
+extern NSString *const COPersistentRootAttributeUsedSize;
 
 /**
  * This class implements a Core Object store using SQLite databases.
@@ -185,8 +185,6 @@ extern NSString * const COPersistentRootAttributeUsedSize;
  *    * Read back the inner object graph at an old revision using -itemTreeForRevisionID:
  *
  * - Note that there is no deliberatly no support for copying persistent roots.
- *
- *
  *
  *
  * Garbage collection / deletion semantics
@@ -344,11 +342,11 @@ extern NSString * const COPersistentRootAttributeUsedSize;
 {
 @private
     NSURL *url_;
-    ETUUID *_uuid;    
+    ETUUID *_uuid;
     FMDatabase *db_;
     NSMutableDictionary *backingStores_; // COUUID (backing store UUID => COCQLiteStorePersistentRootBackingStore)
     NSMutableDictionary *backingStoreUUIDForPersistentRootUUID_;
-    
+
     dispatch_queue_t queue_;
     NSUInteger _maxNumberOfDeltaCommits;
 }
@@ -356,17 +354,16 @@ extern NSString * const COPersistentRootAttributeUsedSize;
 /**
  * Opens an exisiting, or creates a new CoreObject store at the given file:// URL.
  */
-- (instancetype)initWithURL: (NSURL*)aURL NS_DESIGNATED_INITIALIZER;
-
+- (instancetype)initWithURL: (NSURL *)aURL NS_DESIGNATED_INITIALIZER;
 /**
  * Returns the file:// URL the receiver was created with.
  */
 @property (nonatomic, readonly, strong) NSURL *URL;
-
 @property (nonatomic, readonly, strong) ETUUID *UUID;
 
 
 /** @taskunit Revision Reading */
+
 
 /**
  * Read revision metadata for a given revision ID.
@@ -376,10 +373,8 @@ extern NSString * const COPersistentRootAttributeUsedSize;
  * 
  * Adding an in-memory cache for this will probably imporant.
  */
-- (CORevisionInfo *) revisionInfoForRevisionUUID: (ETUUID *)aRevision
-                              persistentRootUUID: (ETUUID *)aPersistentRoot;
-
-
+- (CORevisionInfo *)revisionInfoForRevisionUUID: (ETUUID *)aRevision
+                             persistentRootUUID: (ETUUID *)aPersistentRoot;
 /**
  * N.B. This is the only API for discovering divergent revisions
  * (revisions which aren't ancestors of the current revision of a branch)
@@ -388,7 +383,6 @@ extern NSString * const COPersistentRootAttributeUsedSize;
  */
 - (NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
                                 options: (COBranchRevisionReadingOptions)options;
-
 /**
  * Returns all revision infos of the backing store where the given persistent
  * root is stored
@@ -396,8 +390,6 @@ extern NSString * const COPersistentRootAttributeUsedSize;
  * NOTE: Unstable API
  */
 - (NSArray *)revisionInfosForBackingStoreOfPersistentRootUUID: (ETUUID *)aPersistentRoot;
-
-
 /**
  * Returns a delta between the given revision IDs.
  * The delta is uses the granularity of single inner objects, but not individual properties.
@@ -407,51 +399,47 @@ extern NSString * const COPersistentRootAttributeUsedSize;
  * In the future if we add an internal in-memory revision cache to COSQLiteStore, this may
  * no longer be of much use.
  */
-- (COItemGraph *) partialItemGraphFromRevisionUUID: (ETUUID *)baseRevid
-                                    toRevisionUUID: (ETUUID *)finalRevid
-                                    persistentRoot: (ETUUID *)aPersistentRoot;
-
+- (COItemGraph *)partialItemGraphFromRevisionUUID: (ETUUID *)baseRevid
+                                   toRevisionUUID: (ETUUID *)finalRevid
+                                   persistentRoot: (ETUUID *)aPersistentRoot;
 /**
  * Returns the state the inner object graph at a given revision.
  */
-- (COItemGraph *) itemGraphForRevisionUUID: (ETUUID *)aRevisionUUID
-                            persistentRoot: (ETUUID *)aPersistentRoot;
-
+- (COItemGraph *)itemGraphForRevisionUUID: (ETUUID *)aRevisionUUID
+                           persistentRoot: (ETUUID *)aPersistentRoot;
 /**
  * Returns the UUID of the root object of the given persistent root.
  */
-- (ETUUID *) rootObjectUUIDForPersistentRoot: (ETUUID *)aPersistentRoot;
-
+- (ETUUID *)rootObjectUUIDForPersistentRoot: (ETUUID *)aPersistentRoot;
 
 
 /** @taskunit Persistent Root Reading */
+
 
 /**
  * Only returns non-deleted persistent root UUIDs.
  */
 @property (nonatomic, readonly) NSArray *persistentRootUUIDs;
 @property (nonatomic, readonly) NSArray *deletedPersistentRootUUIDs;
-
 /**
  * @return  a snapshot of the state of a persistent root, or nil if
  *          the persistent root does not exist.
  */
-- (COPersistentRootInfo *) persistentRootInfoForUUID: (ETUUID *)aUUID;
+- (COPersistentRootInfo *)persistentRootInfoForUUID: (ETUUID *)aUUID;
 - (ETUUID *)persistentRootUUIDForBranchUUID: (ETUUID *)aBranchUUID;
+
 
 /** @taskunit Search. API not final. */
 
-/**
- * @returns an array of COSearchResult
- */
-- (NSArray *) searchResultsForQuery: (NSString *)aQuery;
 
 /**
  * @returns an array of COSearchResult
  */
-- (NSArray *) referencesToPersistentRoot: (ETUUID *)aUUID;
-
-
+- (NSArray *)searchResultsForQuery: (NSString *)aQuery;
+/**
+ * @returns an array of COSearchResult
+ */
+- (NSArray *)referencesToPersistentRoot: (ETUUID *)aUUID;
 /**
  * Finalizes the deletion of any unreachable commits (whether due to -setInitialRevision:... moving the initial pointer,
  * or branches being deleted), any deleted branches, or the persistent root itself, as well as all unreachable
@@ -459,8 +447,8 @@ extern NSString * const COPersistentRootAttributeUsedSize;
  *
  * NOTE: This method is still under development
  */
-- (BOOL) finalizeDeletionsForPersistentRoot: (ETUUID *)aRoot
-                                      error: (NSError **)error;
+- (BOOL)finalizeDeletionsForPersistentRoot: (ETUUID *)aRoot
+                                     error: (NSError **)error;
 /**
  * Compacts the database by rebuilding it.
  *
@@ -498,17 +486,19 @@ extern NSString * const COPersistentRootAttributeUsedSize;
 
 /** @taskunit Transactions */
 
-- (BOOL) commitStoreTransaction: (COStoreTransaction *)aTransaction;
 
-- (void) clearStore;
+- (BOOL)commitStoreTransaction: (COStoreTransaction *)aTransaction;
+- (void)clearStore;
+
 
 /** @taskunit Attributes */
+
 
 /**
  * Returns a dictionary of attributes describing the persistent root
  * such as COPersistentRootAttributeExportSize and COPersistentRootAttributeUsedSize
  */
-- (NSDictionary *) attributesForPersistentRootWithUUID: (ETUUID *)aUUID;
+- (NSDictionary *)attributesForPersistentRootWithUUID: (ETUUID *)aUUID;
 
 
 /** @taskunit Description */

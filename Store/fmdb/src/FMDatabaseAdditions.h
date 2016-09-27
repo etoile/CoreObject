@@ -7,27 +7,28 @@
 //
 
 #import <Foundation/Foundation.h>
+
 @interface FMDatabase (FMDatabaseAdditions)
 
-- (int64_t)int64ForQuery:(NSString*)query, ...;
-- (int)intForQuery:(NSString*)objs, ...;
-- (long)longForQuery:(NSString*)objs, ...; 
-- (BOOL)boolForQuery:(NSString*)objs, ...;
-- (double)doubleForQuery:(NSString*)objs, ...;
-- (NSString*)stringForQuery:(NSString*)objs, ...; 
-- (NSData*)dataForQuery:(NSString*)objs, ...;
-- (NSDate*)dateForQuery:(NSString*)objs, ...;
-- (NSNumber*)numberForQuery:(NSString*)query, ...;
-- (NSArray*)arrayForQuery:(NSString*)query, ...;
+- (int64_t)int64ForQuery: (NSString *)query, ...;
+- (int)intForQuery: (NSString *)objs, ...;
+- (long)longForQuery: (NSString *)objs, ...;
+- (BOOL)boolForQuery: (NSString *)objs, ...;
+- (double)doubleForQuery: (NSString *)objs, ...;
+- (NSString *)stringForQuery: (NSString *)objs, ...;
+- (NSData *)dataForQuery: (NSString *)objs, ...;
+- (NSDate *)dateForQuery: (NSString *)objs, ...;
+- (NSNumber *)numberForQuery: (NSString *)query, ...;
+- (NSArray *)arrayForQuery: (NSString *)query, ...;
 
 // Notice that there's no dataNoCopyForQuery:.
 // That would be a bad idea, because we close out the result set, and then what
 // happens to the data that we just didn't copy?  Who knows, not I.
 
 
-- (BOOL)tableExists:(NSString*)tableName;
-- (FMResultSet*)getSchema;
-- (FMResultSet*)getTableSchema:(NSString*)tableName;
-- (BOOL)columnExists:(NSString*)tableName columnName:(NSString*)columnName;
+- (BOOL)tableExists: (NSString *)tableName;
+- (FMResultSet *)getSchema;
+- (FMResultSet *)getTableSchema: (NSString *)tableName;
+- (BOOL)columnExists: (NSString *)tableName columnName: (NSString *)columnName;
 
 @end

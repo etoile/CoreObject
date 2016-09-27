@@ -11,6 +11,6 @@
 @interface COItem (Binary)
 
 @property (nonatomic, readonly) NSData *dataValue;
-- (instancetype) initWithData: (NSData *)aData;
+- (instancetype)initWithData: (NSData *)aData;
 
 @end

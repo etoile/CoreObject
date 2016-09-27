@@ -37,7 +37,7 @@ static inline uint64_t readUint64(const unsigned char *bytes)
 size_t co_reader_length_of_token(const unsigned char *bytes)
 {
     const char type = bytes[0];
-    
+
     switch (type)
     {
         case 'B':
@@ -72,15 +72,18 @@ size_t co_reader_length_of_token(const unsigned char *bytes)
     return 0;
 }
 
-void co_reader_read(const unsigned char *bytes, size_t length, void *context, co_reader_callback_t callbacks)
+void co_reader_read(const unsigned char *bytes,
+                    size_t length,
+                    void *context,
+                    co_reader_callback_t callbacks)
 {
     size_t pos = 0;
-    
+
     while (pos < length)
     {
         const char type = bytes[pos];
         pos++;
-        
+
         switch (type)
         {
             case 'B':
@@ -112,7 +115,7 @@ void co_reader_read(const unsigned char *bytes, size_t length, void *context, co
             {
                 uint8_t dataLen = readUint8(&bytes[pos]);
                 pos++;
-                
+
                 NSString *str = [[NSString alloc] initWithBytes: bytes + pos
                                                          length: dataLen
                                                        encoding: NSUTF8StringEncoding];

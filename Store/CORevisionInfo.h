@@ -8,14 +8,13 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/ETUUID.h>
 
-
 /**
  *  Info about a commit. Parent revision (maybe nil), metadata, etc.
  *  There's a 1:1 mapping between a CORevisionID and CORevision per store.
  */
 @interface CORevisionInfo : NSObject
 {
-    @private
+@private
     ETUUID *_revisionID;
     ETUUID *_parentRevisionID;
     ETUUID *_mergeParentRevisionID;
@@ -35,6 +34,6 @@
 @property (nonatomic, readwrite, copy) NSDate *date;
 
 @property (nonatomic, readonly, strong) id plist;
-+ (CORevisionInfo *) revisionInfoWithPlist: (id)aPlist;
++ (CORevisionInfo *)revisionInfoWithPlist: (id)aPlist;
 
 @end

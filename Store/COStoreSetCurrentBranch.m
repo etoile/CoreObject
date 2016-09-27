@@ -12,10 +12,10 @@
 
 @synthesize branch, persistentRoot;
 
-- (BOOL) execute: (COSQLiteStore *)store inTransaction: (COStoreTransaction *)aTransaction
+- (BOOL)execute: (COSQLiteStore *)store inTransaction: (COStoreTransaction *)aTransaction
 {
     return [store.database executeUpdate: @"UPDATE persistentroots SET currentbranch = ? WHERE uuid = ?",
-            [branch dataValue], [persistentRoot dataValue]];
+                                          [branch dataValue], [persistentRoot dataValue]];
 }
 
 @end

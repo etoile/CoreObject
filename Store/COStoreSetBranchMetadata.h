@@ -13,5 +13,4 @@
 @property (nonatomic, retain, readwrite) ETUUID *branch;
 @property (nonatomic, retain, readwrite) NSDictionary *metadata;
 
-
 @end

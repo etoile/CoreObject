@@ -37,12 +37,9 @@
  * state of the persistent root with the given UUID. i.e., an action other
  * than writing a revision. Otherwise, returns NO.
  */
-- (BOOL) touchesMutableStateForPersistentRootUUID: (ETUUID *)aUUID;
-
-- (int64_t) oldTransactionIDForPersistentRoot: (ETUUID *)aPersistentRoot;
-
-- (BOOL) hasOldTransactionIDForPersistentRoot: (ETUUID *)aPersistentRoot;
-
+- (BOOL)touchesMutableStateForPersistentRootUUID: (ETUUID *)aUUID;
+- (int64_t)oldTransactionIDForPersistentRoot: (ETUUID *)aPersistentRoot;
+- (BOOL)hasOldTransactionIDForPersistentRoot: (ETUUID *)aPersistentRoot;
 /**
  * The value oldID MUST be one that was previously a committed state of the
  * persistent root. In particular, it is illegal to pass an oldID value 
@@ -50,99 +47,98 @@
  * submitted transaction that you have not yet received confirmation from the
  * store as being committed.
  */
-- (int64_t) setOldTransactionID: (int64_t)oldID forPersistentRoot: (ETUUID *)aPersistentRoot;
+- (int64_t)setOldTransactionID: (int64_t)oldID forPersistentRoot: (ETUUID *)aPersistentRoot;
+
 
 /** @taskunit Revision Writing */
 
-- (void) writeRevisionWithModifiedItems: (COItemGraph *)anItemTree
-                           revisionUUID: (ETUUID *)aRevisionUUID
-                               metadata: (NSDictionary *)metadata
-                       parentRevisionID: (ETUUID *)aParent
-                  mergeParentRevisionID: (ETUUID *)aMergeParent
-                     persistentRootUUID: (ETUUID *)aUUID
-                             branchUUID: (ETUUID*)branch;
+
+- (void)writeRevisionWithModifiedItems: (COItemGraph *)anItemTree
+                          revisionUUID: (ETUUID *)aRevisionUUID
+                              metadata: (NSDictionary *)metadata
+                      parentRevisionID: (ETUUID *)aParent
+                 mergeParentRevisionID: (ETUUID *)aMergeParent
+                    persistentRootUUID: (ETUUID *)aUUID
+                            branchUUID: (ETUUID *)branch;
+
 
 /** @taskunit Persistent Root Creation */
 
-- (void) createPersistentRootWithUUID: (ETUUID *)persistentRootUUID
-                persistentRootForCopy: (ETUUID *)persistentRootForCopyUUID;
 
-
+- (void)createPersistentRootWithUUID: (ETUUID *)persistentRootUUID
+               persistentRootForCopy: (ETUUID *)persistentRootForCopyUUID;
 /**
  * Convenience method
  */
-- (COPersistentRootInfo *) createPersistentRootCopyWithUUID: (ETUUID *)uuid
-                                   parentPersistentRootUUID: (ETUUID *)aParentPersistentRoot
-                                                 branchUUID: (ETUUID *)aBranchUUID
-                                           parentBranchUUID: (ETUUID *)aParentBranch
-                                        initialRevisionUUID: (ETUUID *)aRevision;
-
+- (COPersistentRootInfo *)createPersistentRootCopyWithUUID: (ETUUID *)uuid
+                                  parentPersistentRootUUID: (ETUUID *)aParentPersistentRoot
+                                                branchUUID: (ETUUID *)aBranchUUID
+                                          parentBranchUUID: (ETUUID *)aParentBranch
+                                       initialRevisionUUID: (ETUUID *)aRevision;
 /**
  * Convenience method
  */
-- (COPersistentRootInfo *) createPersistentRootWithInitialItemGraph: (COItemGraph *)contents
-                                                               UUID: (ETUUID *)persistentRootUUID
-                                                         branchUUID: (ETUUID *)aBranchUUID
-                                                   revisionMetadata: (NSDictionary *)metadata;
+- (COPersistentRootInfo *)createPersistentRootWithInitialItemGraph: (COItemGraph *)contents
+                                                              UUID: (ETUUID *)persistentRootUUID
+                                                        branchUUID: (ETUUID *)aBranchUUID
+                                                  revisionMetadata: (NSDictionary *)metadata;
+
 
 /** @taskunit Persistent Root Modification */
+
 
 /**
  * Sets the current branch. The current branch is used to resolve inter-persistent-root references
  * when no explicit branch is named.
  */
-- (void) setCurrentBranch: (ETUUID *)aBranch
-        forPersistentRoot: (ETUUID *)aRoot;
-
-- (void) createBranchWithUUID: (ETUUID *)branchUUID
-                 parentBranch: (ETUUID *)aParentBranch
-              initialRevision: (ETUUID *)revId
-            forPersistentRoot: (ETUUID *)aRoot;
-
+- (void)setCurrentBranch: (ETUUID *)aBranch
+       forPersistentRoot: (ETUUID *)aRoot;
+- (void)createBranchWithUUID: (ETUUID *)branchUUID
+                parentBranch: (ETUUID *)aParentBranch
+             initialRevision: (ETUUID *)revId
+           forPersistentRoot: (ETUUID *)aRoot;
 /**
  * All-in-one method for updating the current revision of a persistent root.
  * You can pass nil for headRev to not change the headRev.
  */
-- (void) setCurrentRevision: (ETUUID *)currentRev
-               headRevision: (ETUUID *)headRev
-                  forBranch: (ETUUID *)aBranch
-           ofPersistentRoot: (ETUUID *)aRoot;
+- (void)setCurrentRevision: (ETUUID *)currentRev
+              headRevision: (ETUUID *)headRev
+                 forBranch: (ETUUID *)aBranch
+          ofPersistentRoot: (ETUUID *)aRoot;
+- (void)setMetadata: (NSDictionary *)metadata
+          forBranch: (ETUUID *)aBranch
+   ofPersistentRoot: (ETUUID *)aRoot;
+- (void)setMetadata: (NSDictionary *)metadata
+  forPersistentRoot: (ETUUID *)aRoot;
 
-- (void) setMetadata: (NSDictionary *)metadata
-           forBranch: (ETUUID *)aBranch
-    ofPersistentRoot: (ETUUID *)aRoot;
-
-- (void) setMetadata: (NSDictionary *)metadata
-   forPersistentRoot: (ETUUID *)aRoot;
 
 /** @taskunit Persistent Root Deletion */
+
 
 /**
  * Marks the given persistent root as deleted, can be reverted by -undeletePersistentRoot:.
  * Will be permanently removed when -finalizeDeletionsForPersistentRoot: is called.
  */
-- (void) deletePersistentRoot: (ETUUID *)aRoot;
-
+- (void)deletePersistentRoot: (ETUUID *)aRoot;
 /**
  * Unmarks the given persistent root as deleted
  */
-- (void) undeletePersistentRoot: (ETUUID *)aRoot;
-
+- (void)undeletePersistentRoot: (ETUUID *)aRoot;
 /**
  * Marks the given branch of the persistent root as deleted, can be reverted by -undeleteBranch:ofPersistentRoot:.
  * Will be permanently removed when -finalizeDeletionsForPersistentRoot: is called.
  */
-- (void) deleteBranch: (ETUUID *)aBranch
-     ofPersistentRoot: (ETUUID *)aRoot;
-
+- (void)deleteBranch: (ETUUID *)aBranch
+    ofPersistentRoot: (ETUUID *)aRoot;
 /**
  * Unmarks the given branch of a persistent root as deleted
  */
-- (void) undeleteBranch: (ETUUID *)aBranch
-       ofPersistentRoot: (ETUUID *)aRoot;
+- (void)undeleteBranch: (ETUUID *)aBranch
+      ofPersistentRoot: (ETUUID *)aRoot;
 
 
 /** @taskunit Querying For Changes in the Transaction */
+
 
 /**
  * Returns the last current revision set for a branch in the transaction.
@@ -151,7 +147,7 @@
  *
  * Returns nil if the branch's current revision is not modified in this transaction.
  */
-- (ETUUID *) lastSetCurrentRevisionInTransactionForBranch: (ETUUID *)aBranch
-                                         ofPersistentRoot: (ETUUID *)aRoot;
+- (ETUUID *)lastSetCurrentRevisionInTransactionForBranch: (ETUUID *)aBranch
+                                        ofPersistentRoot: (ETUUID *)aRoot;
 
 @end

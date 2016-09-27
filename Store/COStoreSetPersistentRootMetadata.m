@@ -13,7 +13,7 @@
 
 @synthesize persistentRoot, metadata;
 
-- (NSData *) writeMetadata: (NSDictionary *)meta
+- (NSData *)writeMetadata: (NSDictionary *)meta
 {
     NSData *data = nil;
     if (meta != nil)
@@ -29,11 +29,11 @@
     return data;
 }
 
-- (BOOL) execute: (COSQLiteStore *)store inTransaction: (COStoreTransaction *)aTransaction
+- (BOOL)execute: (COSQLiteStore *)store inTransaction: (COStoreTransaction *)aTransaction
 {
     return [store.database executeUpdate: @"UPDATE persistentroots SET metadata = ? WHERE uuid = ?",
-            [self writeMetadata: metadata],
-            [persistentRoot dataValue]];
+                                          [self writeMetadata: metadata],
+                                          [persistentRoot dataValue]];
 }
 
 @end

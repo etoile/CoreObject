@@ -7,11 +7,13 @@
 
 #import "COSQLiteStore.h"
 #import "COSQLiteStore+Attachments.h"
-#import "COAttachmentID.h"
+
 #ifdef GNUSTEP
 #   include <openssl/sha.h>
 #else
+
 #   include <CommonCrypto/CommonDigest.h>
+
 #   define SHA_CTX CC_SHA1_CTX
 #   define SHA_DIGEST_LENGTH CC_SHA1_DIGEST_LENGTH
 #   define SHA1_Init CC_SHA1_Init
@@ -22,7 +24,7 @@
 
 @implementation COSQLiteStore (Attachments)
 
-- (NSURL *) attachmentsURL
+- (NSURL *)attachmentsURL
 {
 #ifdef GNUSTEP
     return [url_ URLByAppendingPathComponent: @"attachments/"];
@@ -45,15 +47,15 @@ static NSData *hashItemAtURL(NSURL *aURL)
     NSFileHandle *fh = [NSFileHandle fileHandleForReadingFromURL: aURL
                                                            error: NULL];
 #endif
-    
+
     int fd = fh.fileDescriptor;
-    
+
     unsigned char buf[4096];
-    
+
     while (1)
     {
         ssize_t bytesread = read(fd, buf, sizeof(buf));
-        
+
         if (bytesread == 0)
         {
             [fh closeFile];
@@ -70,7 +72,7 @@ static NSData *hashItemAtURL(NSURL *aURL)
             return nil;
         }
     }
-    
+
     unsigned char digest[SHA_DIGEST_LENGTH];
     if (1 != SHA1_Final(digest, &shactx))
     {
@@ -98,11 +100,11 @@ static NSString *hexString(NSData *aData)
         return @"";
     }
     const unsigned char *bytes = (const unsigned char *)aData.bytes;
-    
+
     NSMutableString *result = [NSMutableString stringWithCapacity: len * 2];
     for (NSUInteger i = 0; i < len; i++)
     {
-        [result appendFormat:@"%02x", (int)bytes[i]];
+        [result appendFormat: @"%02x", (int)bytes[i]];
     }
     return result;
 }
@@ -111,7 +113,7 @@ static NSData *dataFromHexString(NSString *hexString)
 {
     NSMutableData *result = [NSMutableData dataWithCapacity: hexString.length / 2];
     const char *cstring = hexString.UTF8String;
-    
+
     unsigned byteAsInt;
     while (1 == sscanf(cstring, "%2x", &byteAsInt))
     {
@@ -119,49 +121,49 @@ static NSData *dataFromHexString(NSString *hexString)
         [result appendBytes: &byte length: 1];
         cstring += 2;
     }
-    
+
     return result;
 }
 
-- (NSURL *) URLForAttachmentID: (COAttachmentID *)aHash
+- (NSURL *)URLForAttachmentID: (COAttachmentID *)aHash
 {
     NSData *data = aHash.dataValue;
-    
+
     NSParameterAssert([data length] == SHA_DIGEST_LENGTH);
     return [[[self attachmentsURL] URLByAppendingPathComponent: hexString(data)]
-            URLByAppendingPathExtension: @"attachment"];
+        URLByAppendingPathExtension: @"attachment"];
 }
 
-- (COAttachmentID *) importAttachmentFromURL: (NSURL *)aURL
+- (COAttachmentID *)importAttachmentFromURL: (NSURL *)aURL
 {
     NILARG_EXCEPTION_TEST(aURL)
     return [self importAttachmentFromData: nil orURL: aURL];
 }
 
-- (COAttachmentID *) importAttachmentFromData: (NSData *)data
+- (COAttachmentID *)importAttachmentFromData: (NSData *)data
 {
     NILARG_EXCEPTION_TEST(data);
     return [self importAttachmentFromData: data orURL: nil];
 }
 
-- (COAttachmentID *) importAttachmentFromData: (NSData *)data orURL: (NSURL *)sourceURL
+- (COAttachmentID *)importAttachmentFromData: (NSData *)data orURL: (NSURL *)sourceURL
 {
     NSFileManager *fm = [NSFileManager defaultManager];
-    
+
     [fm createDirectoryAtURL: [self attachmentsURL]
  withIntermediateDirectories: NO
                   attributes: nil
                        error: NULL];
 
-    NSData *hash = (sourceURL == nil ?  hashItemWithData(data) : hashItemAtURL(sourceURL));
+    NSData *hash = (sourceURL == nil ? hashItemWithData(data) : hashItemAtURL(sourceURL));
     COAttachmentID *attachmentID = [[COAttachmentID alloc] initWithData: hash];
     NSURL *attachmentURL = [self URLForAttachmentID: attachmentID];
-    
+
     if ([fm fileExistsAtPath: attachmentURL.path])
         return attachmentID;
 
     NSError *error = nil;
-        
+
     if (sourceURL == nil)
     {
         if (![data writeToURL: attachmentURL options: NSDataWritingAtomic error: &error])
@@ -182,16 +184,16 @@ static NSData *dataFromHexString(NSString *hexString)
     return attachmentID;
 }
 
-- (NSArray *) attachments
+- (NSArray *)attachments
 {
     NSMutableArray *result = [NSMutableArray array];
     NSString *path = [self attachmentsURL].path;
-    
+
     if (![[NSFileManager defaultManager] fileExistsAtPath: path])
     {
         return result;
     }
-    
+
     NSError *error = nil;
     NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtPath: path error: &error];
     // TODO: Implement some recovery strategy and error reporting
@@ -206,7 +208,7 @@ static NSData *dataFromHexString(NSString *hexString)
     return result;
 }
 
-- (BOOL) deleteAttachment: (COAttachmentID *)hash
+- (BOOL)deleteAttachment: (COAttachmentID *)hash
 {
     return [[NSFileManager defaultManager] removeItemAtPath: [self URLForAttachmentID: hash].path
                                                       error: NULL];

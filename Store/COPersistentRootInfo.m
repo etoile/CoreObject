@@ -18,12 +18,12 @@
 @synthesize transactionID = _transactionID;
 @synthesize metadata = _metadata;
 
-- (NSSet *) branchUUIDs
+- (NSSet *)branchUUIDs
 {
     return [NSSet setWithArray: branchForUUID_.allKeys];
 }
 
-- (NSArray *) branches
+- (NSArray *)branches
 {
     return branchForUUID_.allValues;
 }
@@ -32,10 +32,12 @@
 {
     return branchForUUID_[aUUID];
 }
+
 - (COBranchInfo *)currentBranchInfo
 {
     return [self branchInfoForUUID: self.currentBranchUUID];
 }
+
 - (ETUUID *)currentRevisionUUID
 {
     return self.currentBranchInfo.currentRevisionUUID;

@@ -8,8 +8,8 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/ETUUID.h>
 
-
-typedef struct {
+typedef struct
+{
     unsigned char *data;
     size_t length;
     size_t allocated_length;
@@ -18,7 +18,6 @@ typedef struct {
 static inline
 void
 co_buffer_store_null(co_buffer_t *dest);
-
 
 #define CO_BUFFER_INITIAL_LENGTH 4096
 
@@ -190,6 +189,7 @@ co_buffer_store_string(co_buffer_t *dest, NSString *value)
     dest->length += length;
 }
 #else
+
 static inline
 void
 co_buffer_store_string(co_buffer_t *dest, NSString *value)
@@ -199,7 +199,7 @@ co_buffer_store_string(co_buffer_t *dest, NSString *value)
         co_buffer_store_null(dest);
         return;
     }
-    
+
     const NSUInteger numChars = value.length;
     NSUInteger length = 0;
     [value getBytes: NULL
@@ -209,7 +209,7 @@ co_buffer_store_string(co_buffer_t *dest, NSString *value)
             options: 0
               range: NSMakeRange(0, numChars)
      remainingRange: NULL];
-    
+
     if (length <= UINT8_MAX)
     {
         WRTITE_TYPE("s");
@@ -225,9 +225,9 @@ co_buffer_store_string(co_buffer_t *dest, NSString *value)
         [NSException raise: NSInvalidArgumentException
                     format: @"Strings longer than 2^32-1 not supported."];
     }
-    
+
     co_buffer_ensure_available(dest, length);
-    
+
     [value getBytes: dest->data + dest->length
           maxLength: length
          usedLength: NULL
@@ -235,9 +235,10 @@ co_buffer_store_string(co_buffer_t *dest, NSString *value)
             options: 0
               range: NSMakeRange(0, numChars)
      remainingRange: NULL];
-    
+
     dest->length += length;
 }
+
 #endif
 
 static inline
@@ -259,7 +260,7 @@ co_buffer_store_bytes(co_buffer_t *dest, const unsigned char *bytes, size_t leng
         [NSException raise: NSInvalidArgumentException
                     format: @"Data longer than 2^32-1 not supported."];
     }
-    
+
     co_buffer_write(dest, bytes, length);
 }
 
@@ -272,7 +273,7 @@ co_buffer_store_uuid(co_buffer_t *dest, ETUUID *uuid)
         co_buffer_store_null(dest);
         return;
     }
-    
+
     WRTITE_TYPE("#");
 
     // TODO: Benchmark, access UUID bytes directly via a pointer?

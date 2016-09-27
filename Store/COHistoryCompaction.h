@@ -144,6 +144,7 @@
  * COHistoryCompaction object providing hints about what to delete and finalize.
  */
 @interface COSQLiteStore (COHistoryCompaction)
+
 /**
  * Compacts the history with the given strategy.
  *
@@ -159,4 +160,5 @@
  * the history.
  */
 - (BOOL)compactHistory: (id <COHistoryCompaction>)aCompactionStrategy;
+
 @end
