@@ -28,7 +28,8 @@
 @property (readwrite, nonatomic, copy) NSString *sourceProperty;
 @property (readwrite, nonatomic, copy) NSString *targetProperty;
 
-- (BOOL) isSourceObjectTrackingSpecificBranchForTargetObject: (COObject *)aTargetObject;
+- (BOOL)isSourceObjectTrackingSpecificBranchForTargetObject: (COObject *)aTargetObject;
+
 @property (nonatomic, readonly, getter=isSourceObjectBranchDeleted) BOOL sourceObjectBranchDeleted;
 
 @end
@@ -39,12 +40,12 @@
  */
 @interface CORelationshipCache : NSObject
 {
-    @private
+@private
     NSMutableArray *_cachedRelationships;
     COObject *__weak _owner;
 }
 
-- (instancetype) initWithOwner: (COObject *)owner NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithOwner: (COObject *)owner NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readonly) NSSet *referringObjects;
 
@@ -52,19 +53,19 @@
  * Returns an array of COObject which have a reference to the
  * owning COObject through the given property in the owning COObject.
  */
-- (NSSet *) referringObjectsForPropertyInTarget: (NSString *)aProperty;
+- (NSSet *)referringObjectsForPropertyInTarget: (NSString *)aProperty;
 
-- (COObject *) referringObjectForPropertyInTarget: (NSString *)aProperty;
+- (COObject *)referringObjectForPropertyInTarget: (NSString *)aProperty;
 
-- (void) removeAllEntries;
+- (void)removeAllEntries;
 
 @property (nonatomic, readonly) NSArray *allEntries;
 
-- (void) removeReferencesForPropertyInSource: (NSString *)aTargetProperty
-                                sourceObject: (COObject *)anObject;
+- (void)removeReferencesForPropertyInSource: (NSString *)aTargetProperty
+                               sourceObject: (COObject *)anObject;
 
-- (void) addReferenceFromSourceObject: (COObject *)aReferrer
-                       sourceProperty: (NSString *)aSource
-                       targetProperty: (NSString *)aTarget;
+- (void)addReferenceFromSourceObject: (COObject *)aReferrer
+                      sourceProperty: (NSString *)aSource
+                      targetProperty: (NSString *)aTarget;
 
 @end

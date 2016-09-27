@@ -13,7 +13,7 @@
 
 @interface CORevisionCache : NSObject
 {
-    @private
+@private
     COEditingContext __weak *_parentContext;
     NSMutableDictionary *_revisionForRevisionID;
 }
@@ -22,8 +22,8 @@
 
 @property (nonatomic, readonly, weak) COEditingContext *parentEditingContext;
 
-- (instancetype) initWithParentEditingContext: (COEditingContext *)aCtx NS_DESIGNATED_INITIALIZER;
-- (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
-                      persistentRootUUID: (ETUUID *)aPersistentRoot;
+- (instancetype)initWithParentEditingContext: (COEditingContext *)aCtx NS_DESIGNATED_INITIALIZER;
+- (CORevision *)revisionForRevisionUUID: (ETUUID *)aRevid
+                     persistentRootUUID: (ETUUID *)aPersistentRoot;
 
 @end

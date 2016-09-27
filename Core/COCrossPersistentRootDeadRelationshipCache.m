@@ -7,7 +7,6 @@
 
 #import "COCrossPersistentRootDeadRelationshipCache.h"
 #import "COPath.h"
-#import "COPersistentRoot.h"
 
 //#define MISSING_ZEROING_WEAK_REF
 
@@ -41,7 +40,7 @@
 #else
         referringObjects = [NSHashTable hashTableWithWeakObjects];
 #endif
- 
+
         _pathToReferringObjects[aPath] = referringObjects;
     }
     if (paths == nil)
@@ -62,7 +61,7 @@
 - (void)removeObjectFromPathsToReferringObjects: (COObject *)aReferrer forPath: (COPath *)path
 {
     NSHashTable *referringObjects = _pathToReferringObjects[path];
-        
+
     [referringObjects removeObject: aReferrer];
 
     if (referringObjects.count == 0)

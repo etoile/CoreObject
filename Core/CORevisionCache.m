@@ -8,13 +8,12 @@
 #import "CORevisionCache.h"
 #import "CORevision.h"
 #import "COEditingContext.h"
-#import "COSQLiteStore.h"
 
 @implementation CORevisionCache
 
 @synthesize parentEditingContext = _parentContext;
 
-- (instancetype) initWithParentEditingContext: (COEditingContext *)aCtx
+- (instancetype)initWithParentEditingContext: (COEditingContext *)aCtx
 {
     NILARG_EXCEPTION_TEST(aCtx);
     SUPERINIT;
@@ -28,25 +27,23 @@
     return [self initWithParentEditingContext: nil];
 }
 
-- (CORevision *) revisionForRevisionUUID: (ETUUID *)aRevid
-                      persistentRootUUID: (ETUUID *)aPersistentRoot
+- (CORevision *)revisionForRevisionUUID: (ETUUID *)aRevid
+                     persistentRootUUID: (ETUUID *)aPersistentRoot
 {
     ETAssert(_parentContext != nil);
-    
     CORevision *cached = _revisionForRevisionID[aRevid];
+
     if (cached == nil)
     {
         COSQLiteStore *store = _parentContext.store;
         ETAssert(store != nil);
-        
         CORevisionInfo *info = [store revisionInfoForRevisionUUID: aRevid
                                                persistentRootUUID: aPersistentRoot];
-        
+
         if (info == nil)
             return nil;
 
         cached = [[CORevision alloc] initWithCache: self revisionInfo: info];
-        
         _revisionForRevisionID[aRevid] = cached;
     }
     return cached;

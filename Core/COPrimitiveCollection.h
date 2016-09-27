@@ -12,7 +12,7 @@
 
 @interface COWeakRef : NSObject
 {
-    @public
+@public
     __weak COObject *_object;
 }
 
@@ -22,20 +22,24 @@
 
 
 @protocol COPrimitiveCollection <NSObject>
-- (void) beginMutation;
-- (void) endMutation;
+
+- (void)beginMutation;
+- (void)endMutation;
+
 @property (nonatomic, readonly, getter=isMutable) BOOL mutable;
 @property (nonatomic, readonly) id <NSFastEnumeration> enumerableReferences;
+
 @end
+
 
 @interface COMutableSet : NSMutableSet <COPrimitiveCollection>
 {
-    @public
     BOOL _permanentlyMutable;
     int _temporaryMutable;
     NSHashTable *_backing;
     NSHashTable *_deadReferences;
 }
+
 - (void)addReference: (id)aReference;
 - (void)removeReference: (id)aReference;
 - (BOOL)containsReference: (id)aReference;
@@ -45,10 +49,8 @@
 @end
 
 @interface COMutableSet (TestPrimitiveCollection)
-
 @property (nonatomic, readonly) NSSet *deadReferences;
 @property (nonatomic, readonly) NSSet *allReferences;
-
 @end
 
 
@@ -60,7 +62,6 @@
  */
 @interface COMutableArray : NSMutableArray <COPrimitiveCollection>
 {
-@public
     BOOL _permanentlyMutable;
     int _temporaryMutable;
     NSPointerArray *_backing;
@@ -76,18 +77,19 @@
 - (id)referenceAtIndex: (NSUInteger)index;
 - (void)addReference: (id)aReference;
 - (void)replaceReferenceAtIndex: (NSUInteger)index withReference: (id)aReference;
+
 @end
 
 @interface COMutableArray (TestPrimitiveCollection)
-
 @property (nonatomic, readonly) NSIndexSet *deadIndexes;
 @property (nonatomic, readonly) NSArray *deadReferences;
 @property (nonatomic, readonly) NSArray *allReferences;
-
 @end
+
 
 @interface COUnsafeRetainedMutableSet : COMutableSet
 @end
+
 
 @interface COUnsafeRetainedMutableArray : COMutableArray
 {
@@ -96,15 +98,18 @@
     NSMutableSet *_deadReferences;
     NSHashTable *_backingHashTable;
 }
+
 @end
+
 
 @interface COMutableDictionary : NSMutableDictionary <COPrimitiveCollection>
 {
-    @public
     BOOL _permanentlyMutable;
     int _temporaryMutable;
     NSMutableDictionary *_backing;
     NSMutableSet *_deadKeys;
 }
+
 - (void)setReference: (id)aReference forKey: (id <NSCopying>)aKey;
+
 @end

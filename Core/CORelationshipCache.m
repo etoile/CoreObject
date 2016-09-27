@@ -7,8 +7,6 @@
 
 #import "CORelationshipCache.h"
 #import <EtoileFoundation/EtoileFoundation.h>
-#import "COType.h"
-#import "COItem.h"
 #import "COObject.h"
 #import "COObject+Private.h"
 #import "COObjectGraphContext+Private.h"
@@ -23,9 +21,9 @@
 
 - (NSDictionary *)descriptionDictionary
 {
-    return @{ @"property": _targetProperty != nil ? _targetProperty : @"nil",
+    return @{@"property": _targetProperty != nil ? _targetProperty : @"nil",
              @"opposite property": _sourceProperty,
-            @"opposite object": _sourceObject.UUID };
+             @"opposite object": _sourceObject.UUID};
 }
 
 - (NSString *)description
@@ -33,12 +31,11 @@
     return self.descriptionDictionary.description;
 }
 
-- (BOOL) isSourceObjectTrackingSpecificBranchForTargetObject: (COObject *)aTargetObject
+- (BOOL)isSourceObjectTrackingSpecificBranchForTargetObject: (COObject *)aTargetObject
 {
     if (_sourceObject.objectGraphContext == aTargetObject.objectGraphContext)
-    {
         return NO;
-    }
+
     return _sourceObject.objectGraphContext.trackingSpecificBranch;
 }
 
@@ -53,7 +50,7 @@
 
 #define INITIAL_ARRAY_CAPACITY 8
 
-- (instancetype) initWithOwner: (COObject *)owner
+- (instancetype)initWithOwner: (COObject *)owner
 {
     NILARG_EXCEPTION_TEST(owner);
     SUPERINIT;
@@ -71,12 +68,13 @@
 {
     NSArray *relationships =
         (id)[[_cachedRelationships mappedCollection] descriptionDictionary];
-    return @{ @"owner": _owner.UUID, @"relationships": relationships }.description;
+    return @{@"owner": _owner.UUID, @"relationships": relationships}.description;
 }
 
-- (NSSet *) referringObjectsForPropertyInTarget: (NSString *)aProperty
+- (NSSet *)referringObjectsForPropertyInTarget: (NSString *)aProperty
 {
     NSMutableSet *result = [NSMutableSet set];
+
     for (COCachedRelationship *entry in _cachedRelationships)
     {
         /* i.e., hide incoming references that _come from_ specific (non-current) branches
@@ -90,13 +88,13 @@
 
         if (entry.sourceObjectBranchDeleted)
             continue;
-        
+
         if ([aProperty isEqualToString: entry->_targetProperty])
         {
             [result addObject: entry->_sourceObject];
         }
     }
-    
+
     /* If this is an object on a specific branch, pretend that incoming references
        for the root objcet on the current branch graph are pointing at us.
 
@@ -106,16 +104,19 @@
     if (_owner.objectGraphContext.trackingSpecificBranch)
     {
         COObject *currentBranchRootObject = _owner.persistentRoot.rootObject;
-        NSSet *referringObjectsToCurrentBranch = [currentBranchRootObject.incomingRelationshipCache referringObjectsForPropertyInTarget: aProperty];        
+        NSSet *referringObjectsToCurrentBranch =
+            [currentBranchRootObject.incomingRelationshipCache referringObjectsForPropertyInTarget: aProperty];
+
         [result unionSet: referringObjectsToCurrentBranch];
     }
-    
+
     return result;
 }
 
-- (NSSet *) referringObjects
+- (NSSet *)referringObjects
 {
     NSMutableSet *result = [NSMutableSet set];
+
     for (COCachedRelationship *entry in _cachedRelationships)
     {
         /* When deallocating an object graph and replacing references to its
@@ -130,10 +131,10 @@
     return result;
 }
 
-- (COObject *) referringObjectForPropertyInTarget: (NSString *)aProperty
+- (COObject *)referringObjectForPropertyInTarget: (NSString *)aProperty
 {
     NSMutableArray *results = [NSMutableArray array];
-    
+
     for (COCachedRelationship *entry in _cachedRelationships)
     {
         if ([entry isSourceObjectTrackingSpecificBranchForTargetObject: _owner])
@@ -144,36 +145,35 @@
             [results addObject: entry->_sourceObject];
         }
     }
-    
-    assert(results.count == 0
-           || results.count == 1);
-    
+
+    assert(results.count == 0 || results.count == 1);
+
     if (results.count == 0)
-    {
         return nil;
-    }
+
     return results.firstObject;
 }
 
-- (void) removeAllEntries
+- (void)removeAllEntries
 {
     [_cachedRelationships removeAllObjects];
 }
 
-- (NSArray *) allEntries
+- (NSArray *)allEntries
 {
     return _cachedRelationships;
 }
 
-- (void) removeReferencesForPropertyInSource: (NSString *)aTargetProperty
-                                sourceObject: (COObject *)anObject
+- (void)removeReferencesForPropertyInSource: (NSString *)aTargetProperty
+                               sourceObject: (COObject *)anObject
 {
     // FIXME: Ugly, rewrite
-    
     NSUInteger i = 0;
+
     while (i < _cachedRelationships.count)
     {
         COCachedRelationship *entry = _cachedRelationships[i];
+
         if ([aTargetProperty isEqualToString: entry->_sourceProperty]
             && entry.sourceObject == anObject)
         {
@@ -186,16 +186,17 @@
     }
 }
 
-- (void) addReferenceFromSourceObject: (COObject *)aReferrer
-                       sourceProperty: (NSString *)aSource
-                       targetProperty: (NSString *)aTarget
+- (void)addReferenceFromSourceObject: (COObject *)aReferrer
+                      sourceProperty: (NSString *)aSource
+                      targetProperty: (NSString *)aTarget
 {
     ETPropertyDescription *prop = [_owner.entityDescription propertyDescriptionForName: aTarget];
+
     if (!prop.multivalued)
     {
         // We are setting the value of a non-multivalued property, so assert
         // that it is currently not already set.
-        
+
         // HACK: The assertion fails when code uses -didChangeValueForProperty:
         // instead of -didChangeValueForProperty:oldValue:, because we can't clear the old
         // relationships from the cache if -didChangeValueForProperty: is used.
@@ -210,11 +211,13 @@
             }
         }
     }
-    
+
     COCachedRelationship *record = [[COCachedRelationship alloc] init];
+
     record.sourceObject = aReferrer;
     record.sourceProperty = aSource;
     record.targetProperty = aTarget;
+
     [_cachedRelationships addObject: record];
 }
 

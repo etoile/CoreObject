@@ -27,7 +27,7 @@
  */
 @interface COCrossPersistentRootDeadRelationshipCache : NSObject
 {
-    @private
+@private
     NSMutableDictionary *_pathToReferringObjects;
     NSMapTable *_referringObjectToPaths;
 }

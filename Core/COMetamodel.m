@@ -24,7 +24,7 @@ void CORegisterPrimitiveEntityDescriptions(ETModelDescriptionRepository *repo)
 
     [repo addUnresolvedDescription: dataEntity];
     [repo addUnresolvedDescription: attachmentIDEntity];
-    
+
     [repo setEntityDescription: dataEntity forClass: [NSData class]];
     [repo setEntityDescription: attachmentIDEntity forClass: [COAttachmentID class]];
 }
@@ -37,7 +37,7 @@ void CORegisterAdditionalEntityDescriptions(ETModelDescriptionRepository *repo)
     {
         if ([repo descriptionForName: entity.fullName] != nil)
             continue;
-            
+
         [repo addUnresolvedDescription: entity];
     }
 }
@@ -59,7 +59,7 @@ void CORegisterCoreObjectMetamodel(ETModelDescriptionRepository *repo)
     NSMutableArray *warnings = [NSMutableArray array];
 
     [repo checkConstraints: warnings];
-        
+
     if (![warnings isEmpty])
     {
         [NSException raise: NSInternalInconsistencyException
