@@ -553,10 +553,9 @@
 {
     ETUUID *persistentRootUUID = aPath.persistentRoot;
     ETAssert(persistentRootUUID != nil);
-
     ETUUID *branchUUID = aPath.branch;
-
     COPersistentRoot *persistentRoot;
+
     if (shouldLoad)
     {
         persistentRoot = [self persistentRootForUUID: persistentRootUUID];
@@ -566,23 +565,16 @@
         persistentRoot = [self loadedPersistentRootForUUID: persistentRootUUID];
     }
 
-    if (persistentRoot == nil)
-    {
+    if (persistentRoot == nil || persistentRoot.deleted)
         return nil;
-    }
-    if (persistentRoot.deleted)
-    {
-        return nil;
-    }
 
     if (branchUUID != nil)
     {
         COBranch *branch = [persistentRoot branchForUUID: branchUUID];
 
         if (branch.deleted)
-        {
             return nil;
-        }
+
         return branch.rootObject;
     }
     else
