@@ -10,18 +10,32 @@
 @interface BenchmarkItem : NSObject <UKTest>
 @end
 
-
 @implementation BenchmarkItem
 
 #define ITERATIONS 1000000
-
 #define ATTRIBUTES 10
 
-static NSString *attributes[ATTRIBUTES] = { @"name", @"age", @"location", @"tags",
-    @"lat", @"lon", @"photo", @"friends", @"firstname", @"lastname"};
+static NSString *attributes[ATTRIBUTES] = {@"name",
+                                           @"age",
+                                           @"location",
+                                           @"tags",
+                                           @"lat",
+                                           @"lon",
+                                           @"photo",
+                                           @"friends",
+                                           @"firstname",
+                                           @"lastname"};
 
-static COType types[ATTRIBUTES] = { kCOTypeString, kCOTypeInt64, kCOTypeString, kCOTypeArray | kCOTypeReference,
-    kCOTypeDouble, kCOTypeDouble, kCOTypeBlob, kCOTypeSet | kCOTypeString, kCOTypeString, kCOTypeString };
+static COType types[ATTRIBUTES] = {kCOTypeString,
+                                   kCOTypeInt64,
+                                   kCOTypeString,
+                                   kCOTypeArray | kCOTypeReference,
+                                   kCOTypeDouble,
+                                   kCOTypeDouble,
+                                   kCOTypeBlob,
+                                   kCOTypeSet | kCOTypeString,
+                                   kCOTypeString,
+                                   kCOTypeString};
 
 static id values[ATTRIBUTES];
 
@@ -42,43 +56,47 @@ static id values[ATTRIBUTES];
     }
 }
 
-- (void) testWrite
+- (void)testWrite
 {
     NSDate *startDate = [NSDate date];
     COMutableItem *item = [[COMutableItem alloc] init];
-    
-    for (NSUInteger i=0; i<ITERATIONS; i++)
+
+    for (NSUInteger i = 0; i < ITERATIONS; i++)
     {
         [item setValue: values[i % ATTRIBUTES]
           forAttribute: attributes[i % ATTRIBUTES]
                   type: types[i % ATTRIBUTES]];
     }
-    
-    NSLog(@"writing %d attributes in COMutableItem took %lf ms", ITERATIONS, 1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
+
+    NSLog(@"writing %d attributes in COMutableItem took %lf ms",
+          ITERATIONS,
+          1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
 }
 
-- (void) testRead
+- (void)testRead
 {
     NSDate *startDate = [NSDate date];
     COMutableItem *item = [[COMutableItem alloc] init];
-    
-    for (NSUInteger i=0; i<10; i++)
+
+    for (NSUInteger i = 0; i < 10; i++)
     {
         [item setValue: values[i]
           forAttribute: attributes[i]
                   type: types[i]];
     }
-    
+
     BOOL ok = YES;
-    for (NSUInteger i=0; i<ITERATIONS; i++)
+    for (NSUInteger i = 0; i < ITERATIONS; i++)
     {
         // N.B. These could be UKObjectsEqual checks, but this test case would become about 100x slower
         ok = ok && [values[i % ATTRIBUTES] isEqual: [item valueForAttribute: attributes[i % ATTRIBUTES]]];
         ok = ok && (types[i % ATTRIBUTES] == [item typeForAttribute: attributes[i % ATTRIBUTES]]);
     }
     UKTrue(ok);
-    
-    NSLog(@"reading %d attributes in COItem took %lf ms", ITERATIONS, 1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
+
+    NSLog(@"reading %d attributes in COItem took %lf ms",
+          ITERATIONS,
+          1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
 }
 
 @end

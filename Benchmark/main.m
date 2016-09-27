@@ -11,19 +11,20 @@
 #import <UnitKit/UKTestHandler.h>
 #import "TestCommon.h"
 
-int main (int argc, const char *argv[])
+int main(int argc, const char *argv[])
 {
-    @autoreleasepool {
+    @autoreleasepool
+    {
         NSLog(@"Store URL: %@", [EditingContextTestCase storeURL]);
-        
+
         UKRunner *runner = [UKRunner new];
-        
+
         UKTestHandler *handler = [UKTestHandler handler];
         [handler setQuiet: YES];
-        
+
         [runner runTestsWithClassNames: nil principalClass: [EditingContextTestCase class]];
         [runner reportTestResults];
-        
+
         if ([handler exceptionsReported] > 0 || [handler testsFailed] > 0)
         {
             return 1;

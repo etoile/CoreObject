@@ -13,6 +13,6 @@
  *
  * The result is cached after the first time it is calculated.
  */
-+ (NSTimeInterval) timeToCommit1KUsingSQLite;
++ (NSTimeInterval)timeToCommit1KUsingSQLite;
 
 @end

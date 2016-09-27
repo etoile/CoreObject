@@ -6,11 +6,11 @@
  */
 
 #import "TestCommon.h"
-#import <UnitKit/UnitKit.h>
 #import "COBinaryReader.h"
 #import "COBinaryWriter.h"
 
 #define WRITE_ITERATIONS 10000LL
+
 #define READ_ITERATIONS 10000LL
 
 @interface TestBinaryReadWrite : NSObject <UKTest>
@@ -26,53 +26,62 @@ static NSString *endObject = @"<<end object>>";
 static NSString *beginArray = @"<<begin array>>";
 static NSString *endArray = @"<<end array>>";
 
-- (void) readObject: (id)anObject
+- (void)readObject: (id)anObject
 {
     [readObjects addObject: anObject];
 }
 
 static void test_read_int64(void *ctx, int64_t val)
 {
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: @(val)];
-}
-static void test_read_double(void *ctx, double val)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: @(val)];
-}
-static void test_read_string(void *ctx, NSString *val)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: val];
-}
-static void test_read_uuid(void *ctx, ETUUID *uuid)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: uuid];
-}
-static void test_read_bytes(void *ctx, const unsigned char *val, size_t size)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: [NSData dataWithBytes: val length: size]];
-}
-static void test_read_begin_object(void *ctx)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: beginObject];
-}
-static void test_read_end_object(void *ctx)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: endObject];
-}
-static void test_read_begin_array(void *ctx)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: beginArray];
-}
-static void test_read_end_array(void *ctx)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: endArray];
-}
-static void test_read_null(void *ctx)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: [NSNull null]];
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: @(val)];
 }
 
-- (instancetype) init
+static void test_read_double(void *ctx, double val)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: @(val)];
+}
+
+static void test_read_string(void *ctx, NSString *val)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: val];
+}
+
+static void test_read_uuid(void *ctx, ETUUID *uuid)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: uuid];
+}
+
+static void test_read_bytes(void *ctx, const unsigned char *val, size_t size)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: [NSData dataWithBytes: val length: size]];
+}
+
+static void test_read_begin_object(void *ctx)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: beginObject];
+}
+
+static void test_read_end_object(void *ctx)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: endObject];
+}
+
+static void test_read_begin_array(void *ctx)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: beginArray];
+}
+
+static void test_read_end_array(void *ctx)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: endArray];
+}
+
+static void test_read_null(void *ctx)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: [NSNull null]];
+}
+
+- (instancetype)init
 {
     SUPERINIT;
     readObjects = [[NSMutableArray alloc] init];
@@ -82,9 +91,9 @@ static void test_read_null(void *ctx)
 - (void)testBasic
 {
     NSDate *startDate = [NSDate date];
-    
+
     ETUUID *uuid = [ETUUID UUID];
-    
+
     co_buffer_t buf;
     co_buffer_init(&buf);
     co_buffer_begin_object(&buf);
@@ -107,7 +116,7 @@ static void test_read_null(void *ctx)
     co_buffer_store_null(&buf);
     co_buffer_end_array(&buf);
     co_buffer_end_object(&buf);
-    
+
     NSArray *expected = @[beginObject,
                           beginArray,
                           @(0),
@@ -128,7 +137,7 @@ static void test_read_null(void *ctx)
                           [NSNull null],
                           endArray,
                           endObject];
-    
+
     co_reader_callback_t cb = {
         test_read_int64,
         test_read_double,
@@ -141,34 +150,36 @@ static void test_read_null(void *ctx)
         test_read_end_array,
         test_read_null
     };
-    
-    for (NSUInteger i=0; i<READ_ITERATIONS; i++)
+
+    for (NSUInteger i = 0; i < READ_ITERATIONS; i++)
     {
         [readObjects removeAllObjects];
         co_reader_read(co_buffer_get_data(&buf),
                        co_buffer_get_length(&buf),
                        (__bridge void *)(self),
                        cb);
-        
-        if (i==0)
+
+        if (i == 0)
         {
             UKObjectsEqual(expected, readObjects);
         }
     }
     co_buffer_free(&buf);
-    
-    NSLog(@"reading %lld iterations of the reading test took %lf ms", READ_ITERATIONS, 1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
+
+    NSLog(@"reading %lld iterations of the reading test took %lf ms",
+          READ_ITERATIONS,
+          1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
 }
 
 
 static volatile char dest[2048];
 
-- (void) testWritePerf
+- (void)testWritePerf
 {
     ETUUID *uuid = [ETUUID UUID];
     NSDate *startDate = [NSDate date];
     int64_t iter = 0;
-    for (int64_t i=0; i<WRITE_ITERATIONS; i++)
+    for (int64_t i = 0; i < WRITE_ITERATIONS; i++)
     {
         co_buffer_t buf;
         co_buffer_init(&buf);
@@ -190,15 +201,17 @@ static volatile char dest[2048];
         co_buffer_store_uuid(&buf, uuid);
         co_buffer_end_array(&buf);
         co_buffer_end_object(&buf);
-        
+
         memcpy((void *)dest, co_buffer_get_data(&buf), co_buffer_get_length(&buf));
-        
+
         co_buffer_free(&buf);
-        
+
         iter++;
     }
-    
-    NSLog(@"writing %lld iterations of the writing test took %lf ms", iter, 1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
+
+    NSLog(@"writing %lld iterations of the writing test took %lf ms",
+          iter,
+          1000.0 * [[NSDate date] timeIntervalSinceDate: startDate]);
 }
 
 @end
