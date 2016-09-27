@@ -10,7 +10,7 @@
 
 @class ETUUID;
 
-#pragma mark base class
+#pragma mark base class -
 
 @interface COItemGraphEdit : NSObject <NSCopying>
 {
@@ -27,7 +27,6 @@
 // NO doesntConflictWith: (checking a set of array edits for conflicts requires a special procedure)
 
 - (BOOL)isEqualIgnoringSourceIdentifier: (id)other;
-
 - (instancetype)initWithUUID: (ETUUID *)aUUID
                    attribute: (NSString *)anAttribute
             sourceIdentifier: (id)aSourceIdentifier NS_DESIGNATED_INITIALIZER;

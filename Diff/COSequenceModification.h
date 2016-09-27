@@ -22,5 +22,5 @@
                        range: (NSRange)aRange
                         type: (COType)aType
                      objects: (NSArray *)anArray NS_DESIGNATED_INITIALIZER;
-@end
 
+@end

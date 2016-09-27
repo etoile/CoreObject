@@ -18,7 +18,6 @@
 @property (nonatomic, readwrite, strong) CORevision *baseRevision;
 @property (nonatomic, readwrite, strong) CORevision *mergeSourceRevision;
 @property (nonatomic, readwrite, strong) CORevision *mergeDestinationRevision;
-
 @property (nonatomic, readwrite, strong) CODiffManager *diff;
 
 @end

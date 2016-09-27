@@ -12,7 +12,9 @@
 @interface CODiffManager ()
 
 @property (nonatomic, readwrite, strong) NSMutableDictionary *subDiffsByAlgorithmName;
+
 @end
+
 
 @implementation CODiffManager
 

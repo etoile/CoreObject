@@ -15,11 +15,9 @@
 - (ETUUID *)commonAncestorForCommit: (ETUUID *)commitA
                           andCommit: (ETUUID *)commitB
                      persistentRoot: (ETUUID *)persistentRoot;
-
 - (BOOL)       isRevision: (ETUUID *)commitA
 equalToOrParentOfRevision: (ETUUID *)commitB
            persistentRoot: (ETUUID *)persistentRoot;
-
 /**
  * As a sepecial case if [start isEqual: end] returns the empty array
  */

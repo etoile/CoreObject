@@ -9,7 +9,7 @@
 #import "COItem.h"
 #import <CoreObject/CoreObject.h>
 
-#pragma mark diff dictionary
+#pragma mark diff dictionary -
 
 /**
  * abstracts the storage of edits... currently just an NSSet.
@@ -25,6 +25,7 @@
 - (NSSet *)editsForUUID: (ETUUID *)aUUID attribute: (NSString *)aString;
 - (void)addEdit: (COItemGraphEdit *)anEdit;
 - (void)removeEdit: (COItemGraphEdit *)anEdit;
+
 @property (nonatomic, readonly) NSSet *allEditedUUIDs;
 @property (nonatomic, readonly) NSSet *allEdits;
 
@@ -151,7 +152,6 @@
     return aCopy;
 }
 
-
 - (COItemGraphDiff *)parentDiff
 {
     return parentDiff;
@@ -246,7 +246,9 @@
 
 @implementation COItemGraphDiff
 
-#pragma mark other stuff
+
+#pragma mark other stuff -
+
 
 - (instancetype)initWithOldRootUUID: (ETUUID *)anOldRoot
                         newRootUUID: (ETUUID *)aNewRoot
@@ -262,7 +264,6 @@
     valueConflicts = [[NSMutableSet alloc] init];
     return self;
 }
-
 
 - (id)copyWithZone: (NSZone *)zone
 {
@@ -333,7 +334,6 @@
         [dest release];
     }
     */
-
 
     return result;
 }
@@ -825,7 +825,9 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
     return NO;
 }
 
-#pragma mark access (sub-objects may be mutated by caller)
+
+#pragma mark access (sub-objects may be mutated by caller) -
+
 
 - (NSSet *)allEdits
 {
@@ -846,7 +848,9 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
     return [NSSet setWithSet: result];
 }
 
-#pragma mark access
+
+#pragma mark access -
+
 
 - (NSSet *)modifiedItemUUIDs
 {
@@ -868,7 +872,9 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
     return [diffDict editsForUUID: aUUID attribute: aString];
 }
 
-#pragma mark mutation
+
+#pragma mark mutation -
+
 
 /**
  * removes conflict (by extension, all the conflicting changes)... 
@@ -917,7 +923,6 @@ static void COApplyEditsToMutableItem(NSSet *edits, COMutableItem *anItem)
 
     return conflict;
 }
-
 
 - (NSSet *)embeddedItemInsertionConflicts // insert item uuid X at two different places
 {

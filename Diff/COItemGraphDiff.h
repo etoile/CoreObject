@@ -18,7 +18,6 @@
 @class COItemGraphConflict;
 @class COItemGraphDiff;
 @class COSetDiff, COArrayDiff;
-
 @class CODiffDictionary;
 
 @interface COItemGraphConflict : NSObject // not publically copyable.
@@ -29,7 +28,6 @@
 }
 
 @property (nonatomic, readonly, weak) COItemGraphDiff *parentDiff;
-
 @property (nonatomic, readonly) NSSet *sourceIdentifiers;
 
 /**
@@ -40,7 +38,6 @@
 - (NSSet *)editsForSourceIdentifier: (id)anIdentifier;
 
 @property (nonatomic, readonly) NSSet *allEdits;
-
 @property (nonatomic, readonly, getter=isNonconflicting) BOOL nonconflicting;
 
 // private
@@ -77,43 +74,44 @@
 + (COItemGraphDiff *)diffItemTree: (id <COItemGraph>)a
                      withItemTree: (id <COItemGraph>)b
                  sourceIdentifier: (id)aSource;
-
 + (instancetype)diffItemUUIDs: (NSArray *)uuids
                     fromGraph: (id <COItemGraph>)a
                       toGraph: (id <COItemGraph>)b
              sourceIdentifier: (id)aSource;
-
 /**
  * Applies the diff to the destination item graph, and returns whether the
  * item graph was changed.
  */
 - (BOOL)applyTo: (id <COItemGraph>)dest;
+
 /**
  * Returns whether the diff contains any edits.
  */
 @property (nonatomic, readonly, getter=isEmpty) BOOL empty;
 
 - (COItemGraph *)itemTreeWithDiffAppliedToItemGraph: (id <COItemGraph>)aSubtree;
-
 - (COItemGraphDiff *)itemTreeDiffByMergingWithDiff: (COItemGraphDiff *)other;
 
 @property (nonatomic, readonly) BOOL hasConflicts;
 
-#pragma mark access (sub-objects may be mutated by caller)
+
+/** @taskunit access (sub-objects may be mutated by caller) */
+
 
 @property (nonatomic, readonly) NSSet *allEdits;
 /**
  * FIXME: Should this return "equal edit" conflicts?
  */
 @property (nonatomic, readonly) NSSet *conflicts;
-
 @property (nonatomic, readonly) NSSet *embeddedItemInsertionConflicts; // insert item uuid X at two different places
 @property (nonatomic, readonly) NSSet *equalEditConflicts; // e.g. set [4:2] to ("h", "i") and [4:2] to ("h", "i")
 @property (nonatomic, readonly) NSSet *sequenceEditConflicts; // e.g. set [4:5] and [4:3]. doesn't include equal sequence edit conflicts
 @property (nonatomic, readonly) NSSet *editTypeConflicts; // e.g. delete + set
 @property (nonatomic, readonly) NSSet *valueConflicts; // e.g. set attr to 'x' + set attr to 'y'
 
-#pragma mark access
+
+/** @taskunit access */
+
 
 @property (nonatomic, readonly) NSSet *modifiedItemUUIDs;
 
@@ -121,7 +119,9 @@
 - (NSSet *)editsForUUID: (ETUUID *)aUUID;
 - (NSSet *)editsForUUID: (ETUUID *)aUUID attribute: (NSString *)aString;
 
-#pragma mark mutation
+
+/** @taskunit mutation */
+
 
 /**
  * removes conflict (by extension, all the conflicting changes)... 
@@ -131,8 +131,6 @@
 - (void)removeConflict: (COItemGraphConflict *)aConflict;
 - (void)addEdit: (COItemGraphEdit *)anEdit;
 - (void)removeEdit: (COItemGraphEdit *)anEdit;
-
 - (void)resolveConflictsFavoringSourceIdentifier: (NSString *)anIdentifier;
 
 @end
-
