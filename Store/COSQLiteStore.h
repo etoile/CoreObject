@@ -20,7 +20,7 @@ typedef NS_OPTIONS(NSUInteger, COBranchRevisionReadingOptions)
     /**
      * Return revisions between the branch's initial revision and head revision, inclusive
      */
-        COBranchRevisionReadingDefault = 0,
+    COBranchRevisionReadingDefault = 0,
     /**
      * Return all parent revisions of the branch's head revision, including those in
      * parent branches, as well as those in parent persistent roots.
@@ -28,7 +28,7 @@ typedef NS_OPTIONS(NSUInteger, COBranchRevisionReadingOptions)
      * Revisions on branches merged into the branch, or on branches merged into
      * parent branches are not included.
      */
-        COBranchRevisionReadingParentBranches = 2,
+    COBranchRevisionReadingParentBranches = 2,
     /**
      * Finds the revisions which have the same branch UUID as the one being queried,
      * but are located on anonymous/implicit branches.
@@ -43,7 +43,7 @@ typedef NS_OPTIONS(NSUInteger, COBranchRevisionReadingOptions)
      *
      * See "lost head" example in COSQLiteStore documentation.
      */
-        COBranchRevisionReadingDivergentRevisions = 4
+    COBranchRevisionReadingDivergentRevisions = 4
 };
 
 /**
@@ -355,6 +355,7 @@ extern NSString *const COPersistentRootAttributeUsedSize;
  * Opens an exisiting, or creates a new CoreObject store at the given file:// URL.
  */
 - (instancetype)initWithURL: (NSURL *)aURL NS_DESIGNATED_INITIALIZER;
+
 /**
  * Returns the file:// URL the receiver was created with.
  */
@@ -421,6 +422,7 @@ extern NSString *const COPersistentRootAttributeUsedSize;
  */
 @property (nonatomic, readonly) NSArray *persistentRootUUIDs;
 @property (nonatomic, readonly) NSArray *deletedPersistentRootUUIDs;
+
 /**
  * @return  a snapshot of the state of a persistent root, or nil if
  *          the persistent root does not exist.

@@ -29,12 +29,12 @@
 @property (nonatomic, readonly) NSArray *branches;
 
 - (COBranchInfo *)branchInfoForUUID: (ETUUID *)aUUID;
+
 @property (nonatomic, readonly, strong) COBranchInfo *currentBranchInfo;
 /**
  * Convenience method that returns the current branch's current revision ID
  */
 @property (nonatomic, readonly) ETUUID *currentRevisionUUID;
-
 @property (nonatomic, readwrite, copy) ETUUID *UUID;
 @property (nonatomic, readwrite, copy) ETUUID *currentBranchUUID;
 @property (nonatomic, readwrite, copy) NSDictionary *branchForUUID;

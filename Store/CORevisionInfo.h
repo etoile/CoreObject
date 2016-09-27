@@ -27,13 +27,12 @@
 @property (nonatomic, readwrite, copy) ETUUID *revisionUUID;
 @property (nonatomic, readwrite, copy) ETUUID *parentRevisionUUID;
 @property (nonatomic, readwrite, copy) ETUUID *mergeParentRevisionUUID;
-
 @property (nonatomic, readwrite, copy) ETUUID *persistentRootUUID;
 @property (nonatomic, readwrite, copy) ETUUID *branchUUID;
 @property (readwrite, nonatomic, copy) NSDictionary *metadata;
 @property (nonatomic, readwrite, copy) NSDate *date;
-
 @property (nonatomic, readonly, strong) id plist;
+
 + (CORevisionInfo *)revisionInfoWithPlist: (id)aPlist;
 
 @end

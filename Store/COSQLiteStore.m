@@ -52,6 +52,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
 @end
 
+
 @implementation COSQLiteStore
 
 @synthesize maxNumberOfDeltaCommits = _maxNumberOfDeltaCommits;
@@ -216,7 +217,9 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
 @synthesize UUID = _uuid;
 
+
 #pragma mark Transactions -
+
 
 - (BOOL)commitStoreTransaction: (COStoreTransaction *)aTransaction
 {

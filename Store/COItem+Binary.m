@@ -33,6 +33,7 @@ typedef NS_ENUM(unsigned int, reader_state)
     id multivalue;
     reader_state state;
 }
+
 @end
 
 @implementation COReaderState
@@ -45,7 +46,6 @@ typedef NS_ENUM(unsigned int, reader_state)
     state = co_reader_expect_object_uuid;
     return self;
 }
-
 
 @end
 
@@ -257,7 +257,6 @@ static inline void writeValue(co_buffer_t *dest, id aValue, COType aType, co_buf
     return result;
 }
 
-
 // Read
 
 static void co_read_object_value(COReaderState *state, id obj)
@@ -272,7 +271,6 @@ static void co_read_object_value(COReaderState *state, id obj)
         state->state = co_reader_expect_property;
     }
 }
-
 
 static void co_read_int64(void *ctx, int64_t val)
 {

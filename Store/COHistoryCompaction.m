@@ -26,7 +26,9 @@
                                                deletedPersistentRoots: (NSArray *)deletedUUIDs
                                              compactedPersistentRoots: (NSArray *)compactedUUIDs
                                              finalizedPersistentRoots: (NSArray *)finalizedUUIDs;
+
 @end
+
 
 @implementation COSQLiteStore (COHistoryCompaction)
 
@@ -151,11 +153,11 @@
             // Find reachable revisions
 
             FMResultSet *rs = [db_ executeQuery: @"SELECT "
-                                                     "branches.head_revid "
-                                                     "FROM persistentroots "
-                                                     "INNER JOIN branches ON persistentroots.uuid = branches.proot "
-                                                     "INNER JOIN persistentroot_backingstores ON persistentroots.uuid = persistentroot_backingstores.uuid "
-                                                     "WHERE persistentroot_backingstores.backingstore = ?",
+                                                  "branches.head_revid "
+                                                  "FROM persistentroots "
+                                                  "INNER JOIN branches ON persistentroots.uuid = branches.proot "
+                                                  "INNER JOIN persistentroot_backingstores ON persistentroots.uuid = persistentroot_backingstores.uuid "
+                                                  "WHERE persistentroot_backingstores.backingstore = ?",
                                                  backingUUIDData];
 
             while ([rs next])

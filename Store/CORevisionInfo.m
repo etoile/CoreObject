@@ -57,8 +57,25 @@
 {
     CORevisionInfo *info = [[CORevisionInfo alloc] init];
     info.revisionUUID = [ETUUID UUIDWithString: aPlist[@"revisionID"]];
-    info.parentRevisionUUID = (aPlist[@"parentRevisionID"] != [NSNull null]) ? [ETUUID UUIDWithString: aPlist[@"parentRevisionID"]] : nil;
-    info.mergeParentRevisionUUID = (aPlist[@"mergeParentRevisionID"] != [NSNull null]) ? [ETUUID UUIDWithString: aPlist[@"mergeParentRevisionID"]] : nil;
+
+    if (aPlist[@"parentRevisionID"] != [NSNull null])
+    {
+        info.parentRevisionUUID = [ETUUID UUIDWithString: aPlist[@"parentRevisionID"]];
+    }
+    else
+    {
+        info.parentRevisionUUID = nil;
+    }
+
+    if (aPlist[@"mergeParentRevisionID"] != [NSNull null])
+    {
+        info.mergeParentRevisionUUID = [ETUUID UUIDWithString: aPlist[@"mergeParentRevisionID"]];
+    }
+    else
+    {
+        info.mergeParentRevisionUUID = nil;
+    }
+
     info.branchUUID = [ETUUID UUIDWithString: aPlist[@"branchUUID"]];
     info.metadata = (aPlist[@"metadata"] != [NSNull null]) ? aPlist[@"metadata"] : nil;
     info.date = [[[NSDateFormatter alloc] init] dateFromString: aPlist[@"date"]];

@@ -16,7 +16,6 @@
 @interface COSQLiteStore ()
 
 @property (nonatomic, readonly, strong) FMDatabase *database;
-
 @property (nonatomic, readwrite, assign) NSUInteger maxNumberOfDeltaCommits;
 
 - (BOOL)writeRevisionWithModifiedItems: (COItemGraph *)anItemTree
@@ -26,10 +25,8 @@
                  mergeParentRevisionID: (ETUUID *)aMergeParent
                     persistentRootUUID: (ETUUID *)aUUID
                             branchUUID: (ETUUID *)branch;
-
 - (COSQLiteStorePersistentRootBackingStore *)backingStoreForPersistentRootUUID: (ETUUID *)aUUID
                                                             createIfNotPresent: (BOOL)createIfNotPresent;
-
 - (void)testingRunBlockInStoreQueue: (void (^)())aBlock;
 
 @end

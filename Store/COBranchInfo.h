@@ -22,9 +22,7 @@
 }
 
 @property (nonatomic, readwrite, copy) ETUUID *UUID;
-
 @property (nonatomic, readwrite, copy) ETUUID *persistentRootUUID;
-
 /**
  * The newest revision on the branch.
  *
@@ -51,7 +49,6 @@
  * The current revision of this branch.
  */
 @property (nonatomic, readwrite, copy) ETUUID *currentRevisionUUID;
-
 /**
  * Metadata, like the user-facing name of the branch.
  * Note that branches have metadata while persistent roots do not. Persistent
@@ -61,15 +58,12 @@
  */
 @property (nonatomic, readwrite, copy) NSDictionary *metadata;
 @property (nonatomic, readwrite, getter=isDeleted) BOOL deleted;
-
 @property (nonatomic, readwrite, copy) ETUUID *parentBranchUUID;
-
 /**
  * In git terminology, if the receiver is "master", returns "origin/master", or
  * nil if there is no corresponding "origin/master"
  */
 @property (nonatomic, readonly) ETUUID *remoteMirror;
-
 /**
  * In git terminology, if the receiver is "origin/master", returns the UUID
  * of the "master" branch in the remote store "origin". Otherwise, returns nil.

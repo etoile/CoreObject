@@ -108,6 +108,7 @@
 
 /** @taskunit Reacting to Compaction Progresses */
 
+
 /**
  * Tells the receiver the store is going to be compacted according to the 
  * receiver rules.

@@ -22,6 +22,7 @@
 @interface COStoreTransaction ()
 
 @property (nonatomic, readwrite, strong) NSMutableArray *operations;
+
 @end
 
 
@@ -112,7 +113,9 @@
     [self addOperation: op];
 }
 
-/** @taskunit Persistent Root Creation */
+
+#pragma mark Persistent Root Creation -
+
 
 - (void)createPersistentRootWithUUID: (ETUUID *)persistentRootUUID
                persistentRootForCopy: (ETUUID *)persistentRootForCopyUUID
