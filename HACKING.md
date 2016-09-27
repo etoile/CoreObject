@@ -26,6 +26,10 @@ Code Organization
 - Use /** @taskunit Accessing All Persistent Roots */ in @interface (put two 
 blank lines before and two other ones after)
 
+- Don't use a blank line between method declarations in headers, or between
+property declarations in headers.
+
+- Add 1 blank line between properties and method declarations in headers.
 
 Control Flow
 ------------
