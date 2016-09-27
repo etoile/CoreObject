@@ -399,7 +399,7 @@
  */
 @interface COObject : NSObject <COObjectMatching>
 {
-    @private
+@private
     ETEntityDescription *_entityDescription;
     ETUUID *_UUID;
     COObjectGraphContext *__weak _objectGraphContext;
@@ -474,10 +474,10 @@
  * being called.
  */
 - (instancetype)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
-             objectGraphContext: (COObjectGraphContext *)aContext;
+                       objectGraphContext: (COObjectGraphContext *)aContext;
 - (instancetype)initWithEntityDescription: (ETEntityDescription *)anEntityDesc
-                           UUID: (ETUUID *)aUUID
-             objectGraphContext: (COObjectGraphContext *)aContext;
+                                     UUID: (ETUUID *)aUUID
+                       objectGraphContext: (COObjectGraphContext *)aContext;
 
 
 /** @taskunit Persistency Attributes */

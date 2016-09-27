@@ -54,14 +54,14 @@ static void genericSetter(id self, SEL theCmd, id value)
     const char *selname = sel_getName(theCmd);
     size_t sellen = strlen(selname);
     char propname[sellen];
-    
+
     if (sellen < 4)
     {
         return;
     }
-    
+
     SetterToProperty(selname, sellen, propname);
-    
+
     NSString *key = @(propname);
 
     [self willChangeValueForProperty: key];
@@ -69,16 +69,16 @@ static void genericSetter(id self, SEL theCmd, id value)
     [self didChangeValueForProperty: key];
 }
 
-+ (BOOL)resolveInstanceMethod:(SEL)sel
++ (BOOL)resolveInstanceMethod: (SEL)sel
 {
     //NSLog(@"Resolving %@", NSStringFromSelector(sel));
-    
+
     const char *selname = sel_getName(sel);
     const size_t sellen = strlen(selname);
     const BOOL isSetter = IsSetter(selname, sellen);
-    
+
     // Get the property name
-    
+
     char propname[sellen + 1];
     if (isSetter)
     {
@@ -89,19 +89,19 @@ static void genericSetter(id self, SEL theCmd, id value)
         memcpy(propname, selname, sellen + 1);
         assert(propname[sellen] == '\0');
     }
-    
+
     // Get the property
-    
+
     objc_property_t property = class_getProperty(self, propname);
     if (property != NULL)
     {
         const char *attributes = property_getAttributes(property);
         BOOL isDynamic = (strchr(attributes, 'D') != NULL);
-        
+
         // FIXME: Check other property attributes are correct e.g. readwrite and not readonly
         if (!isDynamic)
             return NO;
-        
+
         if (!isSetter)
         {
             class_addMethod(self, sel, (IMP)&genericGetter, "@@:");

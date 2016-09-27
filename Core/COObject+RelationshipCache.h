@@ -10,21 +10,17 @@
 
 @interface COObject (RelationshipCache)
 
-- (void) updateCachedOutgoingRelationshipsForOldValue: (id)oldVal
-                                             newValue: (id)newVal
-                            ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
-- (void) removeCachedOutgoingRelationships;
-
-- (void) removeCachedOutgoingRelationshipsForCollectionValue: (id)obj
-                                   ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
-
-- (void) addCachedOutgoingRelationshipsForCollectionValue: (id)obj
-                                ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
-
-- (void) removeCachedOutgoingRelationshipsForValue: (id)aValue
-                         ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
-
-- (void) addCachedOutgoingRelationshipsForValue: (id)aValue
-                      ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
+- (void)updateCachedOutgoingRelationshipsForOldValue: (id)oldVal
+                                            newValue: (id)newVal
+                           ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
+- (void)removeCachedOutgoingRelationships;
+- (void)removeCachedOutgoingRelationshipsForCollectionValue: (id)obj
+                                  ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
+- (void)addCachedOutgoingRelationshipsForCollectionValue: (id)obj
+                               ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
+- (void)removeCachedOutgoingRelationshipsForValue: (id)aValue
+                        ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
+- (void)addCachedOutgoingRelationshipsForValue: (id)aValue
+                     ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
 
 @end

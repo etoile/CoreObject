@@ -6,11 +6,9 @@
  */
 
 #import "COObject+RelationshipCache.h"
-#import "COObject.h"
 #import "COObject+Private.h"
 #import "CORelationshipCache.h"
 #import "COObjectGraphContext.h"
-#import "COEditingContext.h"
 #import "COEditingContext+Private.h"
 #import "COCrossPersistentRootDeadRelationshipCache.h"
 #import "COPath.h"
@@ -26,17 +24,17 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
     return prop.isPersistentRelationship && !prop.keyed;
 }
 
-- (void) removeCachedOutgoingRelationshipsForCollectionValue: (id)obj
-                                   ofPropertyWithDescription: (ETPropertyDescription *)aProperty
+- (void)removeCachedOutgoingRelationshipsForCollectionValue: (id)obj
+                                  ofPropertyWithDescription: (ETPropertyDescription *)aProperty
 {
     if (isPersistentCoreObjectReferencePropertyDescription(aProperty))
     {
         COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
-        self.editingContext.deadRelationshipCache;
-        
-    
+            self.editingContext.deadRelationshipCache;
+
+
         BOOL isDeadReference = [obj isKindOfClass: [COPath class]];
-        
+
         if (isDeadReference)
         {
             [deadRelationshipCache removeReferringObject: self
@@ -52,18 +50,19 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
                 // This is a hack so that -[COObjectGraphContext dealloc] can complete
                 // without throwing an exception below, because the invalid object doesn't respond
                 // to -incomingRelationshipCache.
-                NSLog(@"%@ - note - ignoring non-COObject instance %@ in %@ of %@", NSStringFromSelector(_cmd), obj, aProperty.name, self);
+                NSLog(@"%@ - note - ignoring non-COObject instance %@ in %@ of %@",
+                      NSStringFromSelector(_cmd), obj, aProperty.name, self);
                 return;
             }
-            
+
             [[obj incomingRelationshipCache] removeReferencesForPropertyInSource: aProperty.name
                                                                     sourceObject: self];
         }
     }
 }
 
-- (void) removeCachedOutgoingRelationshipsForValue: (id)aValue
-                         ofPropertyWithDescription: (ETPropertyDescription *)aProperty
+- (void)removeCachedOutgoingRelationshipsForValue: (id)aValue
+                        ofPropertyWithDescription: (ETPropertyDescription *)aProperty
 {
     if (aValue != nil)
     {
@@ -86,28 +85,30 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
     }
 }
 
-- (void) addCachedOutgoingRelationshipsForCollectionValue: (id)obj
-                                ofPropertyWithDescription: (ETPropertyDescription *)aProperty
-
+- (void)addCachedOutgoingRelationshipsForCollectionValue: (id)obj
+                               ofPropertyWithDescription: (ETPropertyDescription *)aProperty
 {
     ETAssert(obj != nil);
 
     if (isPersistentCoreObjectReferencePropertyDescription(aProperty))
     {
         COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
-        self.editingContext.deadRelationshipCache;
+            self.editingContext.deadRelationshipCache;
         ETPropertyDescription *propertyInTarget = aProperty.opposite; // May be nil
-        
+
         // Metamodel sanity check
         ETAssert(!aProperty.derived);
         if (propertyInTarget != nil)
         {
-            NSAssert2(propertyInTarget.derived, @"Your metamodel is invalid - the property %@ (opposite of %@) should be marked as derived.", propertyInTarget.fullName, aProperty.fullName);
+            NSAssert2(propertyInTarget.derived,
+                      @"Your metamodel is invalid - the property %@ (opposite of %@) should be marked as derived.",
+                      propertyInTarget.fullName,
+                      aProperty.fullName);
             ETAssert(!propertyInTarget.persistent);
         }
-        
+
         BOOL isDeadReference = [obj isKindOfClass: [COPath class]];
-        
+
         if (isDeadReference)
         {
             [deadRelationshipCache addReferringObject: self
@@ -123,9 +124,8 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
 
 }
 
-- (void) addCachedOutgoingRelationshipsForValue: (id)aValue
-                      ofPropertyWithDescription: (ETPropertyDescription *)aProperty
-
+- (void)addCachedOutgoingRelationshipsForValue: (id)aValue
+                     ofPropertyWithDescription: (ETPropertyDescription *)aProperty
 {
     if (aValue != nil)
     {
@@ -137,10 +137,13 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
             ETAssert(!aProperty.derived);
             if (propertyInTarget != nil)
             {
-                NSAssert2(propertyInTarget.derived, @"Your metamodel is invalid - the property %@ (opposite of %@) should be marked as derived.", propertyInTarget.fullName, aProperty.fullName);
+                NSAssert2(propertyInTarget.derived,
+                          @"Your metamodel is invalid - the property %@ (opposite of %@) should be marked as derived.",
+                          propertyInTarget.fullName,
+                          aProperty.fullName);
                 ETAssert(!propertyInTarget.persistent);
             }
-            
+
             if (aProperty.multivalued)
             {
                 for (id obj in [aValue enumerableReferences])
@@ -158,28 +161,27 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
     }
 }
 
-- (void) updateCachedOutgoingRelationshipsForOldValue: (id)oldVal
-                                             newValue: (id)newVal
-                            ofPropertyWithDescription: (ETPropertyDescription *)aProperty
+- (void)updateCachedOutgoingRelationshipsForOldValue: (id)oldVal
+                                            newValue: (id)newVal
+                           ofPropertyWithDescription: (ETPropertyDescription *)aProperty
 {
     if (isPersistentCoreObjectReferencePropertyDescription(aProperty))
     {
         [self removeCachedOutgoingRelationshipsForValue: oldVal
                               ofPropertyWithDescription: aProperty];
-        
         [self addCachedOutgoingRelationshipsForValue: newVal
                            ofPropertyWithDescription: aProperty];
     }
 }
 
-- (void) removeCachedOutgoingRelationships
+- (void)removeCachedOutgoingRelationships
 {
     for (ETPropertyDescription *prop in self.entityDescription.propertyDescriptions)
     {
         if (isPersistentCoreObjectReferencePropertyDescription(prop))
         {
             id value = [self valueForStorageKey: prop.name shouldLoad: NO];
-            
+
             [self removeCachedOutgoingRelationshipsForValue: value
                                   ofPropertyWithDescription: prop];
         }

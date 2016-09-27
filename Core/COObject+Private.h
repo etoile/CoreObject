@@ -20,6 +20,7 @@ BOOL isSerializableScalarValue(id value);
 ETEntityDescription *entityDescriptionForObjectInRepository();
 
 @interface COObject ()
+
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
@@ -64,7 +65,7 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (void) markAsRemovedFromContext;
+- (void)markAsRemovedFromContext;
 
 @property (nonatomic, readonly, getter=isLoadingEnabled) BOOL loadingEnabled;
 
@@ -87,7 +88,7 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (id) valueForProperty: (NSString *)key shouldLoad: (BOOL)shouldLoad;
+- (id)valueForProperty: (NSString *)key shouldLoad: (BOOL)shouldLoad;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -110,10 +111,10 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
  *
  * See also ETCollectionMutation. 
  */
-- (void) insertObjects: (NSArray *)objects
-             atIndexes: (NSIndexSet *)indexes
-                 hints: (NSArray *)hints
-           forProperty: (NSString *)key;
+- (void)insertObjects: (NSArray *)objects
+            atIndexes: (NSIndexSet *)indexes
+                hints: (NSArray *)hints
+          forProperty: (NSString *)key;
 /** 
  * This method is only exposed to be used internally by COObject e.g. 
  * -updateCompositeRelationshipForPropertyDescription: (don't use in subclasses).
@@ -127,10 +128,10 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
  *
  * See also ETCollectionMutation. 
  */
-- (void) removeObjects: (NSArray *)objects
-             atIndexes: (NSIndexSet *)indexes
-                 hints: (NSArray *)hints
-           forProperty: (NSString *)key;
+- (void)removeObjects: (NSArray *)objects
+            atIndexes: (NSIndexSet *)indexes
+                hints: (NSArray *)hints
+          forProperty: (NSString *)key;
 /**
  * This method is only exposed to be used in the CoreObject tests.
  */
@@ -138,5 +139,7 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (void) replaceReferencesToObjectIdenticalTo: (COObject *)anObject withObject: (COObject *)aReplacement;
+- (void)replaceReferencesToObjectIdenticalTo: (COObject *)anObject
+                                  withObject: (COObject *)aReplacement;
+
 @end
