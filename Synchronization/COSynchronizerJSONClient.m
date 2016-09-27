@@ -18,18 +18,19 @@
 
 @synthesize delegate, client, paused;
 
-- (instancetype) init
+- (instancetype)init
 {
     SUPERINIT;
     queuedMessages = [NSMutableArray new];
     return self;
 }
-- (void) sendPropertyListToServer: (id)aPropertyList
+
+- (void)sendPropertyListToServer: (id)aPropertyList
 {
     NSString *text = [COSynchronizerJSONUtils serializePropertyList: aPropertyList];
     if (paused)
     {
-        [queuedMessages addObject: @{ @"text" : text, @"type" : @"outgoing" }];
+        [queuedMessages addObject: @{@"text": text, @"type": @"outgoing"}];
     }
     else
     {
@@ -37,17 +38,17 @@
     }
 }
 
-- (void) sendPushToServer: (COSynchronizerPushedRevisionsFromClientMessage *)message
+- (void)sendPushToServer: (COSynchronizerPushedRevisionsFromClientMessage *)message
 {
     id plist = [NSMutableDictionary new];
     plist[@"clientID"] = message.clientID;
-    plist[@"revisions"] = [COSynchronizerJSONUtils propertyListForRevisionsArray:message.revisions];
+    plist[@"revisions"] = [COSynchronizerJSONUtils propertyListForRevisionsArray: message.revisions];
     plist[@"lastRevisionUUIDSentByServer"] = [message.lastRevisionUUIDSentByServer stringValue];
     plist[@"class"] = @"COSynchronizerPushedRevisionsFromClientMessage";
     [self sendPropertyListToServer: plist];
 }
 
-- (void) handleResponsePropertyList: (id)plist
+- (void)handleResponsePropertyList: (id)plist
 {
     COSynchronizerResponseToClientForSentRevisionsMessage *message = [COSynchronizerResponseToClientForSentRevisionsMessage new];
     message.lastRevisionUUIDSentByClient = [ETUUID UUIDWithString: plist[@"lastRevisionUUIDSentByClient"]];
@@ -55,14 +56,14 @@
     [client handleResponseMessage: message];
 }
 
-- (void) handlePushPropertyList: (id)plist
+- (void)handlePushPropertyList: (id)plist
 {
     COSynchronizerPushedRevisionsToClientMessage *message = [COSynchronizerPushedRevisionsToClientMessage new];
     message.revisions = [COSynchronizerJSONUtils revisionsArrayForPropertyList: plist[@"revisions"]];
     [client handlePushMessage: message];
 }
 
-- (void) handleSetupPropertyList: (id)plist
+- (void)handleSetupPropertyList: (id)plist
 {
     COSynchronizerPersistentRootInfoToClientMessage *message = [COSynchronizerPersistentRootInfoToClientMessage new];
     message.persistentRootUUID = [ETUUID UUIDWithString: plist[@"persistentRootUUID"]];
@@ -71,16 +72,16 @@
     message.branchMetadata = plist[@"branchMetadata"];
     message.currentRevision = [[COSynchronizerRevision alloc] initWithPropertyList: plist[@"currentRevision"]];
     [client handleSetupMessage: message];
-    
+
     ETAssert(client.branch != nil);
     [self.delegate JSONClient: self didStartSharingOnBranch: client.branch];
 }
 
-- (void) receiveTextFromServer:(NSString *)text
+- (void)receiveTextFromServer: (NSString *)text
 {
     if (paused)
     {
-        [queuedMessages addObject: @{ @"text" : text, @"type" : @"incoming" }];
+        [queuedMessages addObject: @{@"text": text, @"type": @"incoming"}];
     }
     else
     {
@@ -88,10 +89,10 @@
     }
 }
 
-- (void) processIncomingText: (NSString *)text
+- (void)processIncomingText: (NSString *)text
 {
     id propertyList = [COSynchronizerJSONUtils deserializePropertyList: text];
-    
+
     NSString *type = propertyList[@"class"];
     if ([type isEqual: @"COSynchronizerResponseToClientForSentRevisionsMessage"])
     {
@@ -111,12 +112,12 @@
     }
 }
 
-- (void) processOutgoingText: (NSString *)text
+- (void)processOutgoingText: (NSString *)text
 {
     [delegate JSONClient: self sendTextToServer: text];
 }
 
-- (void) processQueuedMessages
+- (void)processQueuedMessages
 {
     NSArray *messages = [NSArray arrayWithArray: queuedMessages];
     [queuedMessages removeAllObjects];

@@ -11,9 +11,8 @@
 
 @protocol COSynchronizerJSONClientDelegate <NSObject>
 
-- (void) JSONClient: (COSynchronizerJSONClient *)client sendTextToServer: (NSString *)text;
-
-- (void) JSONClient: (COSynchronizerJSONClient *)client didStartSharingOnBranch: (COBranch *)aBranch;
+- (void)JSONClient: (COSynchronizerJSONClient *)client sendTextToServer: (NSString *)text;
+- (void)JSONClient: (COSynchronizerJSONClient *)client didStartSharingOnBranch: (COBranch *)aBranch;
 
 @end
 
@@ -23,10 +22,10 @@
     BOOL paused;
 }
 
-@property (nonatomic, readwrite, strong) id<COSynchronizerJSONClientDelegate> delegate;
+@property (nonatomic, readwrite, strong) id <COSynchronizerJSONClientDelegate> delegate;
 @property (nonatomic, readwrite, weak) COSynchronizerClient *client;
 
-- (void) receiveTextFromServer: (NSString *)text;
+- (void)receiveTextFromServer: (NSString *)text;
 
 @property (nonatomic, readwrite, assign, getter=isPaused) BOOL paused;
 

@@ -18,6 +18,7 @@
  * in response to this message.
  */
 @interface COSynchronizerResponseToClientForSentRevisionsMessage : NSObject
+
 /**
  * To identify this message, the UUID of the last revision in the revisions
  * array of the COSynchronizerPushedRevisionsFromClientMessage that this
@@ -26,4 +27,5 @@
 @property (nonatomic, readwrite, copy) ETUUID *lastRevisionUUIDSentByClient;
 /** Array of COSynchronizerRevision */
 @property (nonatomic, readwrite, copy) NSArray *revisions;
+
 @end

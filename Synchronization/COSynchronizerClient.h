@@ -16,7 +16,7 @@
 
 @protocol COSynchronizerClientDelegate <NSObject>
 
-- (void) sendPushToServer: (COSynchronizerPushedRevisionsFromClientMessage *)message;
+- (void)sendPushToServer: (COSynchronizerPushedRevisionsFromClientMessage *)message;
 
 @end
 
@@ -72,28 +72,26 @@
     COEditingContext *_ctx;
     COBranch *_branch;
     NSString *_clientID;
-    
+
     ETUUID *_lastRevisionUUIDFromServer;
     ETUUID *_lastRevisionUUIDInTransitToServer;
     /** Just for benchmarking */
     NSDate *_lastRevisionUUIDInTransitToServerTimestamp;
-    
-    id<COSynchronizerClientDelegate> __weak _delegate;
+
+    id <COSynchronizerClientDelegate> __weak _delegate;
 }
 
-- (instancetype) initWithClientID: (NSString *)clientID
-         editingContext: (COEditingContext *)ctx NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithClientID: (NSString *)clientID
+                  editingContext: (COEditingContext *)ctx NS_DESIGNATED_INITIALIZER;
 
 
 @property (nonatomic, readonly, strong) NSString *clientID;
-
 @property (nonatomic, readonly, strong) COPersistentRoot *persistentRoot;
 @property (nonatomic, readonly, strong) COBranch *branch;
+@property (nonatomic, readwrite, weak) id <COSynchronizerClientDelegate> delegate;
 
-@property (nonatomic, readwrite, weak) id<COSynchronizerClientDelegate> delegate;
-
-- (void) handleSetupMessage: (COSynchronizerPersistentRootInfoToClientMessage *)message;
-- (void) handlePushMessage: (COSynchronizerPushedRevisionsToClientMessage *)aMessage;
-- (void) handleResponseMessage: (COSynchronizerResponseToClientForSentRevisionsMessage *)aMessage;
+- (void)handleSetupMessage: (COSynchronizerPersistentRootInfoToClientMessage *)message;
+- (void)handlePushMessage: (COSynchronizerPushedRevisionsToClientMessage *)aMessage;
+- (void)handleResponseMessage: (COSynchronizerResponseToClientForSentRevisionsMessage *)aMessage;
 
 @end

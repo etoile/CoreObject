@@ -20,10 +20,11 @@
  */
 @interface COSynchronizationClient : NSObject
 
-- (NSDictionary *) updateRequestForPersistentRoot: (ETUUID *)aRoot
-                                         serverID: (NSString*)anID
-                                            store: (COSQLiteStore *)aStore;
+- (NSDictionary *)updateRequestForPersistentRoot: (ETUUID *)aRoot
+                                        serverID: (NSString *)anID
+                                           store: (COSQLiteStore *)aStore;
 
-- (void) handleUpdateResponse: (NSDictionary *)aResponse
-                        store: (COSQLiteStore *)aStore;
+- (void)handleUpdateResponse: (NSDictionary *)aResponse
+                       store: (COSQLiteStore *)aStore;
+
 @end

@@ -11,7 +11,7 @@
 
 @interface COSynchronizationServer : NSObject
 
-- (NSDictionary *) handleUpdateRequest: (NSDictionary *)aRequest
-                                 store: (COSQLiteStore *)aStore;
+- (NSDictionary *)handleUpdateRequest: (NSDictionary *)aRequest
+                                store: (COSQLiteStore *)aStore;
 
 @end

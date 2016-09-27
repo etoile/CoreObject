@@ -16,19 +16,23 @@
  * protocol.
  */
 @interface COSynchronizerRevision : NSObject
+
 @property (nonatomic, readwrite, strong) COItemGraph *modifiedItems;
 @property (nonatomic, readwrite, copy) ETUUID *revisionUUID;
 @property (nonatomic, readwrite, copy) ETUUID *parentRevisionUUID;
 @property (nonatomic, readwrite, copy) NSDictionary *metadata;
 @property (nonatomic, readwrite, copy) NSDate *date;
 
-- (void) writeToTransaction: (COStoreTransaction *)txn
-         persistentRootUUID: (ETUUID *)persistentRoot
-                 branchUUID: (ETUUID *)branch;
-
-- (instancetype) initWithUUID: (ETUUID *)aUUID persistentRoot: (ETUUID *)aPersistentRoot store: (COSQLiteStore *)store recordAsDeltaAgainstParent: (BOOL)delta NS_DESIGNATED_INITIALIZER;
+- (void)writeToTransaction: (COStoreTransaction *)txn
+        persistentRootUUID: (ETUUID *)persistentRoot
+                branchUUID: (ETUUID *)branch;
+- (instancetype)initWithUUID: (ETUUID *)aUUID
+              persistentRoot: (ETUUID *)aPersistentRoot
+                       store: (COSQLiteStore *)store
+  recordAsDeltaAgainstParent: (BOOL)delta NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readonly, strong) id propertyList;
-- (instancetype) initWithPropertyList: (id)aPropertyList NS_DESIGNATED_INITIALIZER;
+
+- (instancetype)initWithPropertyList: (id)aPropertyList NS_DESIGNATED_INITIALIZER;
 
 @end

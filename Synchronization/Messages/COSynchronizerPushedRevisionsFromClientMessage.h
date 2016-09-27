@@ -14,6 +14,7 @@
  * in response
  */
 @interface COSynchronizerPushedRevisionsFromClientMessage : NSObject
+
 @property (nonatomic, readwrite, copy) NSString *clientID;
 /** 
  * Array of COSynchronizerRevision

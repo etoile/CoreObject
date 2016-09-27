@@ -19,4 +19,5 @@
 
 /** Array of COSynchronizerRevision */
 @property (nonatomic, readwrite, copy) NSArray *revisions;
+
 @end

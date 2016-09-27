@@ -8,13 +8,14 @@
 #import "COSynchronizerRevision.h"
 #import "COStoreTransaction.h"
 #import "CODateSerialization.h"
+
 @implementation COSynchronizerRevision
 
 @synthesize modifiedItems, revisionUUID, parentRevisionUUID, metadata, date;
 
-- (void) writeToTransaction: (COStoreTransaction *)txn
-         persistentRootUUID: (ETUUID *)persistentRoot
-                 branchUUID: (ETUUID *)branch
+- (void)writeToTransaction: (COStoreTransaction *)txn
+        persistentRootUUID: (ETUUID *)persistentRoot
+                branchUUID: (ETUUID *)branch
 {
     [txn writeRevisionWithModifiedItems: self.modifiedItems
                            revisionUUID: self.revisionUUID
@@ -25,30 +26,37 @@
                              branchUUID: branch];
 }
 
-- (instancetype) initWithUUID: (ETUUID *)aUUID persistentRoot: (ETUUID *)aPersistentRoot store: (COSQLiteStore *)store recordAsDeltaAgainstParent: (BOOL)delta
+- (instancetype)initWithUUID: (ETUUID *)aUUID
+              persistentRoot: (ETUUID *)aPersistentRoot
+                       store: (COSQLiteStore *)store
+  recordAsDeltaAgainstParent: (BOOL)delta
 {
     SUPERINIT;
-    
-    CORevisionInfo *info = [store revisionInfoForRevisionUUID: aUUID persistentRootUUID: aPersistentRoot];
+
+    CORevisionInfo *info = [store revisionInfoForRevisionUUID: aUUID
+                                           persistentRootUUID: aPersistentRoot];
 
     if (delta)
     {
-        self.modifiedItems = [store partialItemGraphFromRevisionUUID: info.parentRevisionUUID toRevisionUUID: aUUID persistentRoot: aPersistentRoot];
+        self.modifiedItems = [store partialItemGraphFromRevisionUUID: info.parentRevisionUUID
+                                                      toRevisionUUID: aUUID
+                                                      persistentRoot: aPersistentRoot];
     }
     else
     {
-        self.modifiedItems = [store itemGraphForRevisionUUID: aUUID persistentRoot: aPersistentRoot];
+        self.modifiedItems = [store itemGraphForRevisionUUID: aUUID
+                                              persistentRoot: aPersistentRoot];
     }
-    
+
     self.revisionUUID = aUUID;
     self.parentRevisionUUID = info.parentRevisionUUID;
     self.metadata = info.metadata;
     self.date = info.date;
-    
+
     return self;
 }
 
-- (id) propertyList
+- (id)propertyList
 {
     NSMutableDictionary *result = [NSMutableDictionary dictionary];
     result[@"modifiedItems"] = COItemGraphToJSONPropertyList(self.modifiedItems);
@@ -65,14 +73,13 @@
     return result;
 }
 
-- (instancetype) initWithPropertyList: (id)aPropertyList
+- (instancetype)initWithPropertyList: (id)aPropertyList
 {
     NILARG_EXCEPTION_TEST(aPropertyList);
     SUPERINIT;
     self.modifiedItems = COItemGraphFromJSONPropertyLisy(aPropertyList[@"modifiedItems"]);
     self.revisionUUID = [ETUUID UUIDWithString: aPropertyList[@"revisionUUID"]];
-    self.parentRevisionUUID = aPropertyList[@"parentRevisionUUID"] != nil
-        ? [ETUUID UUIDWithString: aPropertyList[@"parentRevisionUUID"]] : nil;
+    self.parentRevisionUUID = aPropertyList[@"parentRevisionUUID"] != nil ? [ETUUID UUIDWithString: aPropertyList[@"parentRevisionUUID"]] : nil;
     self.metadata = aPropertyList[@"metadata"];
     self.date = CODateFromJavaTimestamp(aPropertyList[@"date"]);
     return self;

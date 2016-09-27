@@ -11,19 +11,19 @@
 
 @implementation COSynchronizerJSONUtils
 
-+ (NSString *) serializePropertyList: (id)plist
++ (NSString *)serializePropertyList: (id)plist
 {
     NSData *data = CODataWithJSONObject(plist, NULL);
     return [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
 }
 
-+ (id) deserializePropertyList: (NSString *)aString
++ (id)deserializePropertyList: (NSString *)aString
 {
     NSData *data = [aString dataUsingEncoding: NSUTF8StringEncoding];
     return COJSONObjectWithData(data, NULL);
 }
 
-+ (id) propertyListForRevisionsArray: (NSArray *)revs
++ (id)propertyListForRevisionsArray: (NSArray *)revs
 {
     NSMutableArray *array = [NSMutableArray array];
     for (COSynchronizerRevision *revision in revs)
@@ -34,7 +34,7 @@
     return array;
 }
 
-+ (NSArray *) revisionsArrayForPropertyList: (id)aPropertylist
++ (NSArray *)revisionsArrayForPropertyList: (id)aPropertylist
 {
     NSMutableArray *array = [NSMutableArray array];
     for (id revisionPropertyList in aPropertylist)
@@ -45,7 +45,8 @@
     return array;
 }
 
-+ (COAttachmentID *) searchForFirstMissingAttachmentIDInGraph: (id<COItemGraph>)aGraph store: (COSQLiteStore *)aStore
++ (COAttachmentID *)searchForFirstMissingAttachmentIDInGraph: (id <COItemGraph>)aGraph
+                                                       store: (COSQLiteStore *)aStore
 {
     for (ETUUID *uuid in aGraph.itemUUIDs)
     {
@@ -53,7 +54,7 @@
         for (COAttachmentID *attachmentID in item.attachments)
         {
             NSURL *url = [aStore URLForAttachmentID: attachmentID];
-            
+
             if (![[NSFileManager defaultManager] fileExistsAtPath: url.path])
             {
                 return attachmentID;
