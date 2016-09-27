@@ -1271,7 +1271,7 @@ See +[NSObject typePrefix]. */
 {
     // Use the fast path
     [self commonWillChangeValueForProperty: property
-                                 iatIndexes: indexes
+                                 atIndexes: indexes
                                withObjects: objects
                               mutationKind: mutationKind];
     [self willChangeValueForKey: property
