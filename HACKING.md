@@ -216,16 +216,33 @@ Blocks
 - Blocks in argument should be written be split on several lines:
 
         return [collection filteredCollectionWithBlock: ^(id obj)
-        {
-            return (BOOL)![obj isDeleted];
-        }];
-    
+                                                        {
+                                                            return (BOOL)![obj isDeleted];
+                                                        }
+                                                sorted: YES];
+
 Take note that the opening brace must be on a newline.
+If a block is the last argument, it can either be indented to line up with the colon:
+
+        return [collection filteredCollectionWithBlock: ^(id obj)
+                                                        {
+                                                            return (BOOL)![obj isDeleted];
+                                                        }];
+
+Or, to make the lines shorter, it can be moved down to the next line:
+
+        return [collection filteredCollectionWithBlock: 
+                    ^(id obj)
+                    {
+                        return (BOOL)![obj isDeleted];
+                    }];
 
 - For the block signature, there is a space just after the return type:
 
     - Return Type + space + caret + Argument List
     
+- Blocks with no arguments should still get empty parens: `^()`
+
 ### Formatting Examples
 
 - Block variable
