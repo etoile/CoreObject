@@ -36,14 +36,14 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
      *
      * -unloadPersistentRoot: can still be used to unload persistent roots explicitly.
      */
-      COEditingContextUnloadingBehaviorManual,
+    COEditingContextUnloadingBehaviorManual,
     /**
      * Persistent roots are unloaded on deletion.
      *
      * For external deletions committed in other editing contexts, persistent
      * roots will be unloaded in the current one.
      */
-      COEditingContextUnloadingBehaviorOnDeletion
+    COEditingContextUnloadingBehaviorOnDeletion
 };
 
 /**
