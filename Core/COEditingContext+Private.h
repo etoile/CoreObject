@@ -10,6 +10,8 @@
 
 @class COCrossPersistentRootDeadRelationshipCache, COPath, COUndoTrack;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COEditingContext ()
 
 /**
@@ -32,15 +34,15 @@
  * In addition, a past revision can be passed to prevent loading the persistent
  * root at the latest revision.
  */
-- (COPersistentRoot *)makePersistentRootWithInfo: (COPersistentRootInfo *)info
-                              objectGraphContext: (COObjectGraphContext *)anObjectGraphContext;
+- (COPersistentRoot *)makePersistentRootWithInfo: (nullable COPersistentRootInfo *)info
+                              objectGraphContext: (nullable COObjectGraphContext *)anObjectGraphContext;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
  * Commits the current changes to the store with the provided metadatas and
  * returns the resulting revisions.
  */
-- (BOOL)commitWithMetadata: (NSDictionary *)metadata;
+- (BOOL)commitWithMetadata: (nullable NSDictionary *)metadata;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -50,10 +52,10 @@
  * Changes must belong to the given persistent root subset, otherwise they
  * won't be committed. -hasChanges can still be YES on return.
  */
-- (BOOL) commitWithMetadata: (NSDictionary *)metadata
-restrictedToPersistentRoots: (NSArray *)persistentRoots
-              withUndoTrack: (COUndoTrack *)track
-                      error: (COError **)anError;
+- (BOOL) commitWithMetadata: (nullable NSDictionary *)metadata
+restrictedToPersistentRoots: (nullable NSArray *)persistentRoots
+              withUndoTrack: (nullable COUndoTrack *)track
+                      error: (COError *_Nullable *_Nullable)anError;
 /**
  * This property is only exposed to be used internally by CoreObject.
  */
@@ -66,7 +68,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
  * This method is only exposed to be used internally by CoreObject.
  */
 - (void)updateCrossPersistentRootReferencesToPersistentRoot: (COPersistentRoot *)aPersistentRoot
-                                                     branch: (COBranch *)aBranch
+                                                     branch: (nullable COBranch *)aBranch
                                                     isFault: (BOOL)faulting;
 /**
  * This method is only exposed to be used internally by CoreObject.
@@ -79,19 +81,21 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (CORevision *)revisionForRevisionUUID: (ETUUID *)aRevid
-                     persistentRootUUID: (ETUUID *)aPersistentRoot;
+- (nullable CORevision *)revisionForRevisionUUID: (ETUUID *)aRevid
+                              persistentRootUUID: (ETUUID *)aPersistentRoot;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (COBranch *)branchForUUID: (ETUUID *)aBranch;
+- (nullable COBranch *)branchForUUID: (ETUUID *)aBranch;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (NSNumber *)lastTransactionIDForPersistentRootUUID: (ETUUID *)aUUID;
+- (nullable NSNumber *)lastTransactionIDForPersistentRootUUID: (ETUUID *)aUUID;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
 - (void)setLastTransactionID: (int64_t)lastTransactionID forPersistentRootUUID: (ETUUID *)aUUID;
 
 @end
+
+NS_ASSUME_NONNULL_END

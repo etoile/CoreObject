@@ -105,10 +105,15 @@
     modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+
 - (instancetype)init
 {
     return [self initWithStore: nil];
 }
+
+#pragma clang diagnostic pop
 
 - (void)dealloc
 {

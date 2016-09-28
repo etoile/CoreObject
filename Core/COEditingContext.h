@@ -22,6 +22,8 @@
 #   endif
 #endif // NS_ENUM
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * The behavior to decide when the editing context should unload persistent 
  * roots.
@@ -251,12 +253,12 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
  * deleted on disk), plus those pending insertion and undeletion (and minus 
  * those pending deletion).
  */
-@property (nonatomic, readonly) NSSet *persistentRoots;
+@property (nonatomic, readonly) NSSet<COPersistentRoot *> *persistentRoots;
 /**
  * Returns persistent roots marked as deleted on disk, excluding those that
  * are pending undeletion, plus those pending deletion.
  */
-@property (nonatomic, readonly) NSSet *deletedPersistentRoots;
+@property (nonatomic, readonly) NSSet<COPersistentRoot *> *deletedPersistentRoots;
 /**
  * Returns all persistent roots loaded in memory.
  *
@@ -264,7 +266,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
  * deletion, and deleted ones (explicitly loaded with -persistentRootForUUID: or 
  * when using COEditingContextUnloadingBehaviorManual).
  */
-@property (nonatomic, readonly) NSSet *loadedPersistentRoots;
+@property (nonatomic, readonly) NSSet<COPersistentRoot *> *loadedPersistentRoots;
 
 
 /** @taskunit Store and Metamodel Access */
@@ -307,11 +309,11 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
  * -deletedPersistentRoots (including those pending deletion and undeletion), 
  * but the loading is restricted to the requested persistent root.
  */
-- (COPersistentRoot *)persistentRootForUUID: (ETUUID *)aUUID;
+- (nullable COPersistentRoot *)persistentRootForUUID: (ETUUID *)aUUID;
 /**
  * Same as -persistentRootForUUID: but doesn't cause loading.
  */
-- (COPersistentRoot *)loadedPersistentRootForUUID: (ETUUID *)aUUID;
+- (nullable COPersistentRoot *)loadedPersistentRootForUUID: (ETUUID *)aUUID;
 /**
  * Unloads the persistent root including its branches, object graphs and inner
  * objects.
@@ -362,19 +364,19 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
 /**
  * The new persistent roots to be saved in the store on the next commit.
  */
-@property (nonatomic, readonly) NSSet *persistentRootsPendingInsertion;
+@property (nonatomic, readonly) NSSet<COPersistentRoot *> *persistentRootsPendingInsertion;
 /**
  * The persistent roots to be deleted in the store on the next commit.
  */
-@property (nonatomic, readonly) NSSet *persistentRootsPendingDeletion;
+@property (nonatomic, readonly) NSSet<COPersistentRoot *> *persistentRootsPendingDeletion;
 /**
  * The persistent roots to be undeleted in the store on the next commit.
  */
-@property (nonatomic, readonly) NSSet *persistentRootsPendingUndeletion;
+@property (nonatomic, readonly) NSSet<COPersistentRoot *> *persistentRootsPendingUndeletion;
 /**
  * The persistent roots to be updated in the store on the next commit.
  */
-@property (nonatomic, readonly) NSSet *persistentRootsPendingUpdate;
+@property (nonatomic, readonly) NSSet<COPersistentRoot *> *persistentRootsPendingUpdate;
 /**
  * Returns whether the context contains uncommitted changes.
  *
@@ -413,9 +415,9 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
  *
  * See -commitWithIdentitifer:metadata:undoTrack:error.
  */
-- (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
-                   undoTrack: (COUndoTrack *)undoTrack
-                       error: (COError **)anError;
+- (BOOL)commitWithIdentifier: (nullable NSString *)aCommitDescriptorId
+                   undoTrack: (nullable COUndoTrack *)undoTrack
+                       error: (COError *_Nullable *_Nullable)anError;
 /**
  * Commits the current changes to the store, bound to a commit descriptor 
  * identifier along the additional metadatas, and returns whether it 
@@ -441,10 +443,10 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
  *
  * See COCommitDescriptor to understand how the localization works.
  */
-- (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
-                    metadata: (NSDictionary *)additionalMetadata
-                   undoTrack: (COUndoTrack *)undoTrack
-                       error: (COError **)anError;
+- (BOOL)commitWithIdentifier: (nullable NSString *)aCommitDescriptorId
+                    metadata: (nullable NSDictionary<NSString *, id> *)additionalMetadata
+                   undoTrack: (nullable COUndoTrack *)undoTrack
+                       error: (COError *_Nullable *_Nullable)anError;
 /**
  * Commits the current changes to the store along the metadatas and returns 
  * whether it succeeds.
@@ -461,9 +463,9 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
  * -commitWithIdentifier:undoTrack:error: that both support history 
  * localization through COCommitDescriptor.
  */
-- (BOOL)commitWithMetadata: (NSDictionary *)metadata
-                 undoTrack: (COUndoTrack *)undoTrack
-                     error: (COError **)anError;
+- (BOOL)commitWithMetadata: (nullable NSDictionary<NSString *, id> *)metadata
+                 undoTrack: (nullable COUndoTrack *)undoTrack
+                     error: (COError *_Nullable *_Nullable)anError;
 /**
  * Commits the current changes to the store and returns whether it succeeds.
  *
@@ -482,7 +484,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
  *
  * See also -commitWithMetadata:undoTrack:error:.
  */
-- (BOOL)commitWithUndoTrack: (COUndoTrack *)aTrack;
+- (BOOL)commitWithUndoTrack: (nullable COUndoTrack *)aTrack;
 
 
 /** @taskunit Description */
@@ -554,3 +556,5 @@ extern NSString *const COEditingContextDidUnloadPersistentRootsNotification;
  * The unloaded COPersistentRoot set.
  */
 extern NSString *const kCOUnloadedPersistentRootsKey;
+
+NS_ASSUME_NONNULL_END
