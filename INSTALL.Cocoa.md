@@ -15,8 +15,8 @@ CoreObject requires the following:
 You can either get CoreObject and its dependencies from git:
 
     git clone https://github.com/etoile/CoreObject.git
-	git clone https://github.com/etoile/EtoileFoundation.git
-	git clone https://github.com/etoile/UnitKit.git
+    git clone https://github.com/etoile/EtoileFoundation.git
+    git clone https://github.com/etoile/UnitKit.git
 
 (The Xcode projects require that these three repos are cloned into the same directory.)
 
@@ -45,7 +45,7 @@ Framework Installation
 We don't recommend installing frameworks on OS X, but if you want to,
 the following shell command will install CoreObject.framework in /Library/Frameworks:
 
-	sudo xcodebuild -scheme CoreObject -configuration Release clean install DSTROOT=/Library INSTALL_PATH=/Frameworks
+    sudo xcodebuild -scheme CoreObject -configuration Release clean install DSTROOT=/Library INSTALL_PATH=/Frameworks
 
 **Note:** By default, INSTALL_PATH is set to @rpath and DSTROOT to the project 
 directory.

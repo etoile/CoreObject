@@ -64,8 +64,8 @@ supported on GNUstep), but use NSAssert1(), NSAssert2() etc.
 
 - Add argument related exceptions to ensure all argument values are handled correctly
 
-	- Use INVALIDARG_EXCEPTION_TEST() and NILARG_EXCEPTION_TEST() when possible
-	
+    - Use INVALIDARG_EXCEPTION_TEST() and NILARG_EXCEPTION_TEST() when possible
+    
 - Document every argument values which is not valid and related exceptions (e.g. 
 For a nil name, raises a NSInvalidArgumentException.) 
 
@@ -91,24 +91,24 @@ Initialization
 - Use SUPERINIT macro (for calling the superclass -init), otherwise use this 
 pattern:
 
-		self = [super designedInitializedWithArgument: arg];
-		if (self == nil)
-			return nil;
+        self = [super designedInitializedWithArgument: arg];
+        if (self == nil)
+            return nil;
 
 - Always override -init to call the designated initializer (raising an exception 
 is better than returning an invalid object if -init is unsupported)
 
 - Keep all basic object management related methods together and close to the top 
 
-	- this applies to methods declared in NSObject and some basic protocols such 
+    - this applies to methods declared in NSObject and some basic protocols such 
 as NSCopying e.g. -init, -dealloc, -copyWithZone:, -description etc. 
 
 // NOTE: We could cut the rule below, it's bit overboard probably.
 
 - For instantiation, prefer -new to both:
 
-	- alloc/init
-	- a factory method such as +[NSArray array] that dates back from before ARC
+    - alloc/init
+    - a factory method such as +[NSArray array] that dates back from before ARC
 
 
 Instance Variables
@@ -138,13 +138,13 @@ get an idea about the object state)
 
 - Use the dot syntax to read and write properties
 
-	- this applies to implicit properties not formally declared with @property
-	
-	- Valid: [COObjectGraphContext new].UUID, [NSArray new].count and [NSObject new].description 
+    - this applies to implicit properties not formally declared with @property
+    
+    - Valid: [COObjectGraphContext new].UUID, [NSArray new].count and [NSObject new].description 
 
-	- this doesn't apply to class methods even when they model an implicit property
+    - this doesn't apply to class methods even when they model an implicit property
 
-	- Invalid:  NSFileManager.defaultManager and NSImage.imageTypes
+    - Invalid:  NSFileManager.defaultManager and NSImage.imageTypes
 
 
 Property Attributes
@@ -169,42 +169,42 @@ retain attributes
 
 ### Examples
 
-	@interface COExample
-	{
-		@private
-		id __weak _owner;
-		id _owned;
-		NSMutableSet *_collection;
-		NSMutableSet *_container
-		NSString *_name;
-		NSDictionary *_elementsByName;
-		id relatedObject;
-	}
+    @interface COExample
+    {
+        @private
+        id __weak _owner;
+        id _owned;
+        NSMutableSet *_collection;
+        NSMutableSet *_container
+        NSString *_name;
+        NSDictionary *_elementsByName;
+        id relatedObject;
+    }
 
-	@property (nonatomic, readonly, weak) id owner;
-	@property (nonatomic, readonly) id derivedOwner;
-	@property (nonatomic, readonly, strong) id owned;
+    @property (nonatomic, readonly, weak) id owner;
+    @property (nonatomic, readonly) id derivedOwner;
+    @property (nonatomic, readonly, strong) id owned;
 
-	@property (nonatomic, readonly) NSSet *collection;
-	@property (nonatomic, readonly, strong) NSMutableSet *container;
+    @property (nonatomic, readonly) NSSet *collection;
+    @property (nonatomic, readonly, strong) NSMutableSet *container;
 
-	@property (nonatomic, readwrite, copy) NSString *name;
-	@property (nonatomic, readwrite, copy) NSDictionary *elementsByName;
-	@property (nonatomic, readwrite, strong) id relatedObject;
+    @property (nonatomic, readwrite, copy) NSString *name;
+    @property (nonatomic, readwrite, copy) NSDictionary *elementsByName;
+    @property (nonatomic, readwrite, strong) id relatedObject;
 
-	@property (nonatomic, readwrite, assign, getter=isEmpty) BOOL empty;
+    @property (nonatomic, readwrite, assign, getter=isEmpty) BOOL empty;
 
 - Invalid: @property (nonatomic, readonly, weak) id derivedOwner
 
-	- don't declare a weak or strong property when there is no _derivedOwner ivar
+    - don't declare a weak or strong property when there is no _derivedOwner ivar
 
 - Invalid: @property (nonatomic, readonly, strong) NSSet *collection
 
-	- don't declare a readonly property as strong when the returned value is a defensive copy or might be (if ivar and property types are not identical, this is usually the case)
+    - don't declare a readonly property as strong when the returned value is a defensive copy or might be (if ivar and property types are not identical, this is usually the case)
 
 - Invalid: @property (nonatomic, readonly, copy) NSDictionary *elementsByName;
 
-	- don't declare a readonly property as copy (copy only describes if the 
+    - don't declare a readonly property as copy (copy only describes if the 
 object is copied by the setter), unless you are overriding a (readwrite, copy) property
 
 Note: for overriden properties, sometimes we have to break these rules to ensure the code compile without warnings or disable -Wproperty-attribute-mismatch with clang diagnostic pragma. For instance, NSObject.description is marked with copy, this implies COObject.description has to be marked as copy too, although copy is useless when no setter exists.
@@ -215,30 +215,30 @@ Blocks
 
 - Blocks in argument should be written be split on several lines:
 
-		return [collection filteredCollectionWithBlock: ^(id obj)
-		{
-			return (BOOL)![obj isDeleted];
-		}];
-	
+        return [collection filteredCollectionWithBlock: ^(id obj)
+        {
+            return (BOOL)![obj isDeleted];
+        }];
+    
 Take note that the opening brace must be on a newline.
 
 - For the block signature, there is a space just after the return type:
 
-	- Return Type + space + caret + Argument List
-	
+    - Return Type + space + caret + Argument List
+    
 ### Formatting Examples
 
 - Block variable
 
-		NSObject * (^blockVar)(id, NSDictionary *) = ^(id object, NSDictionary *bindings) 
-		{
-			// whatever
-		};
+        NSObject * (^blockVar)(id, NSDictionary *) = ^(id object, NSDictionary *bindings) 
+        {
+            // whatever
+        };
 
 - Block typedef
 
-		typedef NSArray * (^COContentBlock)(void);
+        typedef NSArray * (^COContentBlock)(void);
 
 - Block type used as argument type (but it's better to use a block typedef usually)
 
-		+ (id)actionWithBlock: (NSObject * (^)(id object, NSDictionary *bindings))aBlock;
+        + (id)actionWithBlock: (NSObject * (^)(id object, NSDictionary *bindings))aBlock;

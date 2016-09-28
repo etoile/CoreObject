@@ -33,9 +33,9 @@ Square brackets "[ ]" are used to indicate optional parameters.
 
 To build and install the CoreObject framework (use gmake on non-GNU systems):
 
-	make
-	
-	[sudo [-E]] make install
+    make
+    
+    [sudo [-E]] make install
 
 
 Test suite
@@ -50,16 +50,16 @@ Square brackets "[ ]" are used to indicate optional parameters.
 
 To produce a test bundle and run the test suite:
 
-	make test=yes 
-	
-	ukrun [-q]
-	
+    make test=yes 
+    
+    ukrun [-q]
+    
 In addition, the project includes a benchmark suite built as a test bundle. To 
 build and run it:
 
-	make benchmark=yes
-	
-	ukrun [-q] BenchmarkCoreObject.bundle
+    make benchmark=yes
+    
+    ukrun [-q] BenchmarkCoreObject.bundle
 
 
 Trouble
