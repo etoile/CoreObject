@@ -6,7 +6,7 @@
 {
     IBOutlet NSTextField *xmppAccountLabel;
     IBOutlet NSTableView *table;
-    
+
     NSArray *users;
     EWDocumentWindowController *parent;
 }

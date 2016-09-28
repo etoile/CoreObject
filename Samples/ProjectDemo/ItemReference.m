@@ -6,26 +6,28 @@
 
 @implementation ItemReference
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *itemReference = [self newBasicEntityDescription];
-    
+
     // FIXME: Hack; we need a common superclass for OutlineItem and ItemReference, or make
     // ItemReference a subclass of OutlineItem
-    
+
     ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
                                                                                   type: (id)@"Anonymous.OutlineItem"];
     [parentProperty setDerived: YES];
-    
+
     ETPropertyDescription *referencedItemProperty = [ETPropertyDescription descriptionWithName: @"referencedItem"
                                                                                           type: (id)@"Anonymous.OutlineItem"];
     [referencedItemProperty setPersistent: YES];
-    
+
     [itemReference setPropertyDescriptions: A(parentProperty, referencedItemProperty)];
     return itemReference;
 }
 
-- (id)initWithParent: (OutlineItem*)p referencedItem: (OutlineItem*)ref context: (COObjectGraphContext*)ctx
+- (id)initWithParent: (OutlineItem *)p
+      referencedItem: (OutlineItem *)ref
+             context: (COObjectGraphContext *)ctx
 {
     self = [super initWithObjectGraphContext: ctx];
     [self setParent: p];
@@ -38,7 +40,7 @@
 @dynamic parent;
 @dynamic referencedItem;
 
-- (OutlineItem*)root
+- (OutlineItem *)root
 {
     id root = self;
     while ([root parent] != nil)
@@ -48,7 +50,7 @@
     return root;
 }
 
-- (NSString*)label
+- (NSString *)label
 {
     return [NSString stringWithFormat: @"Link to %@", [[self referencedItem] UUID]];
 }

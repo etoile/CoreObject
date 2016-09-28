@@ -5,12 +5,13 @@
 #import <AppKit/AppKit.h>
 #import "SKTGraphic.h"
 
-@interface SKTLine : SKTGraphic {
-    @private
+@interface SKTLine : SKTGraphic
+{
+@private
     BOOL _startsAtLowerLeft;
 }
 
-- (void)setStartsAtLowerLeft:(BOOL)flag;
+- (void)setStartsAtLowerLeft: (BOOL)flag;
 - (BOOL)startsAtLowerLeft;
 
 @end

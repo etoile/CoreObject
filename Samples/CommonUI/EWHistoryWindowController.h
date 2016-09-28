@@ -24,16 +24,17 @@
     IBOutlet NSButton *redo;
     IBOutlet NSButton *selectiveUndo;
     IBOutlet NSButton *selectiveRedo;
-    
+
     IBOutlet EWGraphRenderer *graphRenderer;
-    
+
     COPersistentRoot *inspectedPersistentRoot;
     COBranch *inspectedBranch;
-    
+
     COUndoTrack *undoTrackToCommitTo;
 }
 
-- (instancetype) initWithInspectedPersistentRoot: (COPersistentRoot *)aPersistentRoot undoTrack: (COUndoTrack *)aTrack;
+- (instancetype)initWithInspectedPersistentRoot: (COPersistentRoot *)aPersistentRoot
+                                      undoTrack: (COUndoTrack *)aTrack;
 
 - (IBAction) undo: (id)sender;
 - (IBAction) redo: (id)sender;
@@ -41,6 +42,6 @@
 - (IBAction) selectiveUndo: (id)sender;
 - (IBAction) selectiveRedo: (id)sender;
 
-- (NSDictionary *) customRevisionMetadata;
+- (NSDictionary *)customRevisionMetadata;
 
 @end

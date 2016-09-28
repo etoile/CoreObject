@@ -4,14 +4,14 @@
 
 @implementation Tag
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *tag = [self newBasicEntityDescription];
-    
+
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                  type: (id)@"Anonymous.NSString"];
     [labelProperty setPersistent: YES];
-    
+
     [tag setPropertyDescriptions: A(labelProperty)];
     return tag;
 }

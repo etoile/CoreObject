@@ -9,12 +9,12 @@
     return self;
 }
 
--(void)windowDidLoad
+- (void)windowDidLoad
 {
     NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
     [jidBox setStringValue: [defs stringForKey: @"XMPPJID"]];
     [passwordBox setStringValue: [defs stringForKey: @"XMPPPassword"]];
-    [serverBox setStringValue: [defs  stringForKey: @"XMPPServer"]];
+    [serverBox setStringValue: [defs stringForKey: @"XMPPServer"]];
 }
 
 - (IBAction) yes: (id)sender
@@ -23,9 +23,9 @@
     [defs setObject: [jidBox stringValue] forKey: @"XMPPJID"];
     [defs setObject: [passwordBox stringValue] forKey: @"XMPPPassword"];
     [defs setObject: [serverBox stringValue] forKey: @"XMPPServer"];
-    
+
     [[XMPPController sharedInstance] reconnect];
-    
+
     [self close];
 }
 

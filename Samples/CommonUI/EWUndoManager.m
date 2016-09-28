@@ -9,21 +9,22 @@
 
 @implementation EWUndoManager
 
-- (BOOL) canUndo
+- (BOOL)canUndo
 {
     return [self.delegate canUndo];
 }
 
-- (BOOL) canRedo
+- (BOOL)canRedo
 {
     return [self.delegate canRedo];
 }
 
-- (NSString *) undoMenuItemTitle
+- (NSString *)undoMenuItemTitle
 {
     return [self.delegate undoMenuItemTitle];
 }
-- (NSString *) redoMenuItemTitle
+
+- (NSString *)redoMenuItemTitle
 {
     return [self.delegate redoMenuItemTitle];
 }
@@ -38,30 +39,31 @@
     return nil;
 }
 
-- (void) undo
+- (void)undo
 {
     [self.delegate undo];
 }
 
-- (void) redo
+- (void)redo
 {
     [self.delegate redo];
 }
 
-- (void)forwardInvocation:(NSInvocation *)invocation {
+- (void)forwardInvocation: (NSInvocation *)invocation
+{
 }
 
-- (id)prepareWithInvocationTarget:(id) target
+- (id)prepareWithInvocationTarget: (id)target
 {
     return self;
 }
 
-- (void)registerUndoWithTarget:(id)target selector:(SEL)aSelector object:(id)anObject
+- (void)registerUndoWithTarget: (id)target selector: (SEL)aSelector object: (id)anObject
 {
 }
 
-- (void)setActionName:(NSString*) actionName
-{    
+- (void)setActionName: (NSString *)actionName
+{
 }
 
 @end

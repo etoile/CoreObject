@@ -3,8 +3,8 @@
 
 @implementation DrawingController
 
-- (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
-                                             windowID: (NSString*)windowID
+- (instancetype)initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
+                                            windowID: (NSString *)windowID
 {
     self = [super initAsPrimaryWindowForPersistentRoot: aPersistentRoot
                                               windowID: windowID
@@ -12,8 +12,8 @@
     return self;
 }
 
-- (instancetype) initPinnedToBranch: (COBranch *)aBranch
-                           windowID: (NSString*)windowID
+- (instancetype)initPinnedToBranch: (COBranch *)aBranch
+                          windowID: (NSString *)windowID
 {
     self = [super initPinnedToBranch: aBranch
                             windowID: windowID
@@ -28,7 +28,7 @@
     [graphicView setDrawingController: self];
 }
 
-- (void) setToolClass: (Class)class
+- (void)setToolClass: (Class)class
 {
     toolClass = class;
     NSLog(@"Tool class: %@", NSStringFromClass(toolClass));
@@ -40,18 +40,22 @@
 {
     [self setToolClass: Nil];
 }
+
 - (IBAction) circleTool: (id)sender
 {
     [self setToolClass: [SKTCircle class]];
 }
+
 - (IBAction) lineTool: (id)sender
 {
     [self setToolClass: [SKTLine class]];
 }
+
 - (IBAction) rectangleTool: (id)sender
 {
     [self setToolClass: [SKTRectangle class]];
 }
+
 - (IBAction) textTool: (id)sender
 {
     [self setToolClass: [SKTTextArea class]];
@@ -64,22 +68,23 @@
 
 - (SKTDrawDocument *)drawDocument
 {
-    SKTDrawDocument *drawDoc = (SKTDrawDocument *)[[self projectDocument] rootDocObject];
+    SKTDrawDocument * drawDoc = (SKTDrawDocument * )
+    [[self projectDocument] rootDocObject];
     assert([drawDoc isKindOfClass: [SKTDrawDocument class]]);
     return drawDoc;
 }
 
-- (Document*)projectDocument
+- (Document *)projectDocument
 {
     return [self.objectGraphContext rootObject];
 }
 
-- (void) objectGraphDidChange
+- (void)objectGraphDidChange
 {
     [graphicView setNeedsDisplay: YES];
 }
 
-- (void) objectGraphContextDidSwitch
+- (void)objectGraphContextDidSwitch
 {
     [graphicView objectGraphContextDidSwitch];
     [graphicView setNeedsDisplay: YES];

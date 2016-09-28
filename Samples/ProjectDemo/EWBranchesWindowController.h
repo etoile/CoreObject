@@ -10,9 +10,9 @@
     EWDocumentWindowController *inspectedWindowController;
 }
 
-+ (EWBranchesWindowController *) sharedController;
++ (EWBranchesWindowController *)sharedController;
 
-- (IBAction)addBranch:(id)sender;
-- (IBAction)deleteBranch:(id)sender;
+- (IBAction)addBranch: (id)sender;
+- (IBAction)deleteBranch: (id)sender;
 
 @end

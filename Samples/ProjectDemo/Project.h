@@ -8,8 +8,8 @@
 @property (readwrite, nonatomic, retain) NSSet *documents;
 @property (readwrite, nonatomic, retain) NSSet *tags;
 
-- (NSArray *) documentsSorted;
+- (NSArray *)documentsSorted;
 
-- (void) addDocument_hack: (Document *)document;
+- (void)addDocument_hack: (Document *)document;
 
 @end

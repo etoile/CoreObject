@@ -13,14 +13,16 @@
 
 @implementation ProjectDemoHistoryWindowController
 
-- (NSString *) windowNibName
+- (NSString *)windowNibName
 {
     return @"ProjectDemoHistory";
 }
 
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+- (id)          tableView: (NSTableView *)tableView
+objectValueForTableColumn: (NSTableColumn *)tableColumn
+                      row: (NSInteger)row
 {
-    id<COTrackNode> node = [graphRenderer revisionAtIndex: row];
+    id <COTrackNode> node = [graphRenderer revisionAtIndex: row];
     if ([[tableColumn identifier] isEqualToString: @"user"])
     {
         return node.metadata[@"username"];
@@ -28,9 +30,9 @@
     return [super tableView: tableView objectValueForTableColumn: tableColumn row: row];
 }
 
-- (NSDictionary *) customRevisionMetadata
+- (NSDictionary *)customRevisionMetadata
 {
-    return @{ @"username" : NSFullUserName() };
+    return @{@"username": NSFullUserName()};
 }
 
 @end

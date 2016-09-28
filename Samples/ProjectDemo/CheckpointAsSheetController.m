@@ -2,21 +2,21 @@
 
 @implementation CheckpointAsSheetController
 
-- (NSString*) showSheet
+- (NSString *)showSheet
 {
     didSave = NO;
-    
+
     [NSApp beginSheet: sheet
        modalForWindow: nil
         modalDelegate: nil
        didEndSelector: NULL
           contextInfo: nil];
-    
+
     [NSApp runModalForWindow: sheet];
     [NSApp endSheet: sheet];
     [sheet orderOut: self];
-    
-    if (didSave)  
+
+    if (didSave)
     {
         return [formCell stringValue];
     }

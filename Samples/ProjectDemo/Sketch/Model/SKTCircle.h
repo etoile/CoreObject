@@ -5,7 +5,8 @@
 #import <AppKit/AppKit.h>
 #import "SKTGraphic.h"
 
-@interface SKTCircle : SKTGraphic {}
+@interface SKTCircle : SKTGraphic
+{ }
 
 @end
 

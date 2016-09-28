@@ -6,8 +6,9 @@
 
 @class SKTGraphicView;
 
-@interface SKTInspectorController : NSWindowController {
-    @private
+@interface SKTInspectorController : NSWindowController
+{
+@private
     IBOutlet NSButton *fillCheckbox;
     IBOutlet NSColorWell *fillColorWell;
     IBOutlet NSButton *lineCheckbox;
@@ -25,13 +26,13 @@
 
 + (id)sharedInspectorController;
 
-- (IBAction)fillCheckboxAction:(id)sender;
-- (IBAction)fillColorWellAction:(id)sender;
-- (IBAction)lineCheckboxAction:(id)sender;
-- (IBAction)lineColorWellAction:(id)sender;
-- (IBAction)lineWidthSliderAction:(id)sender;
-- (IBAction)lineWidthTextFieldAction:(id)sender;
-- (IBAction)dimensionTextFieldAction:(id)sender;
+- (IBAction)fillCheckboxAction: (id)sender;
+- (IBAction)fillColorWellAction: (id)sender;
+- (IBAction)lineCheckboxAction: (id)sender;
+- (IBAction)lineColorWellAction: (id)sender;
+- (IBAction)lineWidthSliderAction: (id)sender;
+- (IBAction)lineWidthTextFieldAction: (id)sender;
+- (IBAction)dimensionTextFieldAction: (id)sender;
 
 @end
 

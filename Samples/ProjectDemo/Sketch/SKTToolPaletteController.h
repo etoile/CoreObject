@@ -4,13 +4,14 @@
 
 #import <AppKit/AppKit.h>
 
-@interface SKTToolPaletteController : NSWindowController {
+@interface SKTToolPaletteController : NSWindowController
+{
     IBOutlet NSMatrix *toolButtons;
 }
 
 + (id)sharedToolPaletteController;
 
-- (IBAction)selectToolAction:(id)sender;
+- (IBAction)selectToolAction: (id)sender;
 - (Class)currentGraphicClass;
 
 - (void)selectArrowTool;

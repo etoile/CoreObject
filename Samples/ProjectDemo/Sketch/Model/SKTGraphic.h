@@ -8,7 +8,8 @@
 @class SKTGraphicView;
 @class SKTDrawDocument;
 
-enum {
+enum
+{
     NoKnob = 0,
     UpperLeftKnob,
     UpperMiddleKnob,
@@ -20,7 +21,8 @@ enum {
     LowerRightKnob,
 };
 
-enum {
+enum
+{
     NoKnobsMask = 0,
     UpperLeftKnobMask = 1 << UpperLeftKnob,
     UpperMiddleKnobMask = 1 << UpperMiddleKnob,
@@ -35,8 +37,9 @@ enum {
 
 extern NSString *SKTGraphicDidChangeNotification;
 
-@interface SKTGraphic : COObject <NSCopying> {
-    @private
+@interface SKTGraphic : COObject <NSCopying>
+{
+@private
     /**
      * Temporary variable used to store the bounds at the start of a bounds manipulation
      */
@@ -48,7 +51,8 @@ extern NSString *SKTGraphicDidChangeNotification;
     BOOL _drawsFill;
     BOOL _drawsStroke;
 
-    struct __gFlags {
+    struct __gFlags
+    {
         unsigned int manipulatingBounds:1;
         unsigned int _pad:29;
     } _gFlags;
@@ -60,31 +64,31 @@ extern NSString *SKTGraphicDidChangeNotification;
 
 // =================================== Primitives ===================================
 - (void)didChange;
-    // This sends the did change notification.  All change primitives should call it.
+// This sends the did change notification.  All change primitives should call it.
 
 @property NSValue *origin;
 @property NSValue *size;
 
-- (void)setBounds:(NSRect)bounds;
+- (void)setBounds: (NSRect)bounds;
 - (NSRect)bounds;
-- (void)setDrawsFill:(BOOL)flag;
+- (void)setDrawsFill: (BOOL)flag;
 - (BOOL)drawsFill;
-- (void)setFillColor:(NSColor *)fillColor;
+- (void)setFillColor: (NSColor *)fillColor;
 - (NSColor *)fillColor;
-- (void)setDrawsStroke:(BOOL)flag;
+- (void)setDrawsStroke: (BOOL)flag;
 - (BOOL)drawsStroke;
-- (void)setStrokeColor:(NSColor *)strokeColor;
+- (void)setStrokeColor: (NSColor *)strokeColor;
 - (NSColor *)strokeColor;
-- (void)setStrokeLineWidth:(float)width;
+- (void)setStrokeLineWidth: (float)width;
 - (float)strokeLineWidth;
 
 // =================================== Extended mutation ===================================
 - (void)startBoundsManipulation;
 - (void)stopBoundsManipulation;
-- (void)moveBy:(NSPoint)vector;
+- (void)moveBy: (NSPoint)vector;
 - (void)flipHorizontally;
 - (void)flipVertically;
-- (int)resizeByMovingKnob:(int)knob toPoint:(NSPoint)point;
+- (int)resizeByMovingKnob: (int)knob toPoint: (NSPoint)point;
 - (void)makeNaturalSize;
 
 // =================================== Subclass capabilities ===================================
@@ -94,8 +98,8 @@ extern NSString *SKTGraphicDidChangeNotification;
 
 // =================================== Persistence ===================================
 - (NSMutableDictionary *)propertyListRepresentation;
-+ (id)graphicWithPropertyListRepresentation:(NSDictionary *)dict;
-- (void)loadPropertyListRepresentation:(NSDictionary *)dict;
++ (id)graphicWithPropertyListRepresentation: (NSDictionary *)dict;
+- (void)loadPropertyListRepresentation: (NSDictionary *)dict;
 
 @end
 
@@ -103,11 +107,11 @@ extern NSString *SKTGraphicDidChangeNotification;
 
 - (NSRect)drawingBounds;
 - (NSBezierPath *)bezierPath;
-- (void)drawInView:(SKTGraphicView *)view isSelected:(BOOL)flag;
+- (void)drawInView: (SKTGraphicView *)view isSelected: (BOOL)flag;
 - (unsigned)knobMask;
-- (int)knobUnderPoint:(NSPoint)point;
-- (void)drawHandleAtPoint:(NSPoint)point inView:(SKTGraphicView *)view;
-- (void)drawHandlesInView:(SKTGraphicView *)view;
+- (int)knobUnderPoint: (NSPoint)point;
+- (void)drawHandleAtPoint: (NSPoint)point inView: (SKTGraphicView *)view;
+- (void)drawHandlesInView: (SKTGraphicView *)view;
 
 @end
 
@@ -115,13 +119,13 @@ extern NSString *SKTGraphicDidChangeNotification;
 
 + (NSCursor *)creationCursor;
 
-- (BOOL)createWithEvent:(NSEvent *)theEvent inView:(SKTGraphicView *)view;
+- (BOOL)createWithEvent: (NSEvent *)theEvent inView: (SKTGraphicView *)view;
 
 - (BOOL)isEditable;
-- (void)startEditingWithEvent:(NSEvent *)event inView:(SKTGraphicView *)view;
-- (void)endEditingInView:(SKTGraphicView *)view;
+- (void)startEditingWithEvent: (NSEvent *)event inView: (SKTGraphicView *)view;
+- (void)endEditingInView: (SKTGraphicView *)view;
 
-- (BOOL)hitTest:(NSPoint)point isSelected:(BOOL)isSelected;
+- (BOOL)hitTest: (NSPoint)point isSelected: (BOOL)isSelected;
 
 @end
 

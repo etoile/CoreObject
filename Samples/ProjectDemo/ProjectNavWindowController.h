@@ -1,7 +1,7 @@
 #import <Cocoa/Cocoa.h>
 
-
-@interface ProjectNavWindowController : NSWindowController {
+@interface ProjectNavWindowController : NSWindowController
+{
     IBOutlet NSOutlineView *outline;
 }
 

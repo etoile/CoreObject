@@ -5,14 +5,14 @@
 
 @implementation OutlineItem
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *outlineEntity = [self newBasicEntityDescription];
-    
+
     ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
                                                                                   type: outlineEntity];
     [parentProperty setDerived: YES];
-        
+
     ETPropertyDescription *contentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
                                                                                     type: outlineEntity];
     [contentsProperty setMultivalued: YES];
@@ -20,23 +20,27 @@
     [contentsProperty setOrdered: YES];
     [contentsProperty setPersistent: YES];
     assert([contentsProperty isComposite]);
-    
+
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
                                                                                  type: [[ETModelDescriptionRepository mainRepository] descriptionForName: @"Anonymous.NSString"]];
     [labelProperty setPersistent: YES];
-    
+
     ETPropertyDescription *attachmentProperty =
-        [ETPropertyDescription descriptionWithName: @"attachmentID" type: (id)@"Anonymous.COAttachmentID"];
+        [ETPropertyDescription descriptionWithName: @"attachmentID"
+                                              type: (id)@"Anonymous.COAttachmentID"];
     [attachmentProperty setPersistent: YES];
-    
-    [outlineEntity setPropertyDescriptions: A(parentProperty, contentsProperty, labelProperty, attachmentProperty)];
+
+    [outlineEntity setPropertyDescriptions: A(parentProperty,
+                                              contentsProperty,
+                                              labelProperty,
+                                              attachmentProperty)];
     return outlineEntity;
 }
 
-- (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
+- (id)initWithObjectGraphContext: (COObjectGraphContext *)aContext
 {
     self = [super initWithObjectGraphContext: aContext];
-    [self setLabel:@"Untitled Item"];
+    [self setLabel: @"Untitled Item"];
     return self;
 }
 
@@ -46,7 +50,8 @@
 @dynamic parent;
 @dynamic contents;
 @dynamic attachmentID;
-- (OutlineItem*)root
+
+- (OutlineItem *)root
 {
     id root = self;
     while ([root parent] != nil)
@@ -66,18 +71,19 @@
     return [all allObjects];
 }
 
-- (void) addItem: (OutlineItem*)item
+- (void)addItem: (OutlineItem *)item
 {
     [self addItem: item atIndex: [[self contents] count]];
 }
 
-- (void) addItem: (OutlineItem*)item atIndex: (NSUInteger)index
+- (void)addItem: (OutlineItem *)item atIndex: (NSUInteger)index
 {
     [[self mutableArrayValueForKey: @"contents"] insertObject: item atIndex: index];
 }
 
-- (void) removeItemAtIndex: (NSUInteger)index
+- (void)removeItemAtIndex: (NSUInteger)index
 {
-    [[self mutableArrayValueForKey: @"contents"] removeObjectAtIndex: index];}
+    [[self mutableArrayValueForKey: @"contents"] removeObjectAtIndex: index];
+}
 
 @end

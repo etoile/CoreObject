@@ -6,39 +6,45 @@
 
 @implementation SKTImage
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-    
+
     // FIXME: image data property    
     return entity;
 }
 
-- (id)init {
+- (id)init
+{
     self = [super init];
-    if (self) {
+    if (self)
+    {
         _image = nil;
         _cachedImage = nil;
     }
     return self;
 }
 
-- (id)copyWithZone:(NSZone *)zone {
-    id newObj = [super copyWithZone:zone];
+- (id)copyWithZone: (NSZone *)zone
+{
+    id newObj = [super copyWithZone: zone];
 
-    [newObj setImage:[self image]];
-    [newObj setFlippedHorizontally:[self flippedHorizontally]];
-    [newObj setFlippedVertically:[self flippedVertically]];
+    [newObj setImage: [self image]];
+    [newObj setFlippedHorizontally: [self flippedHorizontally]];
+    [newObj setFlippedVertically: [self flippedVertically]];
 
     return newObj;
 }
 
-- (void)SKT_clearCachedImage {
+- (void)SKT_clearCachedImage
+{
     _cachedImage = nil;
 }
 
-- (void)setImage:(NSImage *)image {
-    if (image != _image) {
+- (void)setImage: (NSImage *)image
+{
+    if (image != _image)
+    {
         //[[[self undoManager] prepareWithInvocationTarget:self] setImage:_image];
 
         _image = image;
@@ -47,32 +53,42 @@
     }
 }
 
-- (NSImage *)image {
+- (NSImage *)image
+{
     return _image;
 }
 
-- (NSImage *)transformedImage {
-    if (!_cachedImage) {
+- (NSImage *)transformedImage
+{
+    if (!_cachedImage)
+    {
         NSRect bounds = [self bounds];
         NSImage *image = [self image];
         NSSize imageSize = [image size];
-        
-        if (NSEqualSizes(bounds.size, imageSize)) {
+
+        if (NSEqualSizes(bounds.size, imageSize))
+        {
             _cachedImage = _image;
-        } else if (!NSIsEmptyRect(bounds)) {
+        }
+        else if (!NSIsEmptyRect(bounds))
+        {
             BOOL flippedHorizontally = [self flippedHorizontally];
             BOOL flippedVertically = [self flippedVertically];
-            
-            _cachedImage = [[NSImage alloc] initWithSize:bounds.size];
-            if (!NSIsEmptyRect(bounds)) {
+
+            _cachedImage = [[NSImage alloc] initWithSize: bounds.size];
+            if (!NSIsEmptyRect(bounds))
+            {
                 // Only draw in the image if it has any content.
                 [_cachedImage lockFocus];
 
-                if (flippedHorizontally || flippedVertically) {
+                if (flippedHorizontally || flippedVertically)
+                {
                     // If the image needs flipping, we need to play some games with the transform matrix
                     NSAffineTransform *transform = [NSAffineTransform transform];
-                    [transform scaleXBy:([self flippedHorizontally] ? -1.0 : 1.0) yBy:([self flippedVertically] ? -1.0 : 1.0)];
-                    [transform translateXBy:([self flippedHorizontally] ? -bounds.size.width : 0.0) yBy:([self flippedVertically] ? -bounds.size.height : 0.0)];
+                    [transform scaleXBy: ([self flippedHorizontally] ? -1.0 : 1.0)
+                                    yBy: ([self flippedVertically] ? -1.0 : 1.0)];
+                    [transform translateXBy: ([self flippedHorizontally] ? -bounds.size.width : 0.0)
+                                        yBy: ([self flippedVertically] ? -bounds.size.height : 0.0)];
                     [transform concat];
                 }
 
@@ -87,8 +103,10 @@
     return _cachedImage;
 }
 
-- (void)setFlippedHorizontally:(BOOL)flag {
-    if (_flippedHorizontally != flag) {
+- (void)setFlippedHorizontally: (BOOL)flag
+{
+    if (_flippedHorizontally != flag)
+    {
         //[[[self undoManager] prepareWithInvocationTarget:self] setFlippedHorizontally:_flippedHorizontally];
         _flippedHorizontally = flag;
         [self SKT_clearCachedImage];
@@ -96,12 +114,15 @@
     }
 }
 
-- (BOOL)flippedHorizontally {
+- (BOOL)flippedHorizontally
+{
     return _flippedHorizontally;
 }
 
-- (void)setFlippedVertically:(BOOL)flag {
-    if (_flippedVertically != flag) {
+- (void)setFlippedVertically: (BOOL)flag
+{
+    if (_flippedVertically != flag)
+    {
         //[[[self undoManager] prepareWithInvocationTarget:self] setFlippedVertically:_flippedVertically];
         _flippedVertically = flag;
         [self SKT_clearCachedImage];
@@ -109,104 +130,126 @@
     }
 }
 
-- (BOOL)flippedVertically {
+- (BOOL)flippedVertically
+{
     return _flippedVertically;
 }
 
-- (void)flipHorizontally {
-    [self setFlippedHorizontally:([self flippedHorizontally] ? NO : YES)];
+- (void)flipHorizontally
+{
+    [self setFlippedHorizontally: ([self flippedHorizontally] ? NO : YES)];
 }
 
-- (void)flipVertically {
-    [self setFlippedVertically:([self flippedVertically] ? NO : YES)];
+- (void)flipVertically
+{
+    [self setFlippedVertically: ([self flippedVertically] ? NO : YES)];
 }
 
-- (void)setBounds:(NSRect)bounds {
-    if (!NSEqualSizes([self bounds].size, bounds.size)) {
+- (void)setBounds: (NSRect)bounds
+{
+    if (!NSEqualSizes([self bounds].size, bounds.size))
+    {
         [self SKT_clearCachedImage];
     }
-    [super setBounds:bounds];
+    [super setBounds: bounds];
 }
 
-- (BOOL)drawsStroke {
+- (BOOL)drawsStroke
+{
     // Never draw stroke.
     return NO;
 }
 
-- (BOOL)canDrawStroke {
+- (BOOL)canDrawStroke
+{
     // Never draw stroke.
     return NO;
 }
 
-- (void)drawInView:(SKTGraphicView *)view isSelected:(BOOL)flag {
+- (void)drawInView: (SKTGraphicView *)view isSelected: (BOOL)flag
+{
     NSRect bounds = [self bounds];
     NSImage *image;
-    
-    if ([self drawsFill]) {
+
+    if ([self drawsFill])
+    {
         [[self fillColor] set];
         NSRectFill(bounds);
     }
     image = [self transformedImage];
-    if (image) {
-        [image compositeToPoint:NSMakePoint(NSMinX(bounds), NSMaxY(bounds)) operation:NSCompositeSourceOver];
+    if (image)
+    {
+        [image compositeToPoint: NSMakePoint(NSMinX(bounds), NSMaxY(bounds))
+                      operation: NSCompositeSourceOver];
     }
-    [super drawInView:view isSelected:flag];
+    [super drawInView: view isSelected: flag];
 }
 
-- (void)makeNaturalSize {
+- (void)makeNaturalSize
+{
     NSRect bounds = [self bounds];
     NSImage *image = [self image];
     NSSize requiredSize = (image ? [image size] : NSMakeSize(10.0, 10.0));
 
     bounds.size = requiredSize;
-    [self setBounds:bounds];
-    [self setFlippedHorizontally:NO];
-    [self setFlippedVertically:NO];
+    [self setBounds: bounds];
+    [self setFlippedHorizontally: NO];
+    [self setFlippedVertically: NO];
 }
 
 NSString *SKTImageContentsKey = @"Image";
 NSString *SKTFlippedHorizontallyKey = @"FlippedHorizontally";
 NSString *SKTFlippedVerticallyKey = @"FlippedVertically";
 
-- (NSMutableDictionary *)propertyListRepresentation {
+- (NSMutableDictionary *)propertyListRepresentation
+{
     NSMutableDictionary *dict = [super propertyListRepresentation];
-    [dict setObject:[NSArchiver archivedDataWithRootObject:[self image]] forKey:SKTImageContentsKey];
-    [dict setObject:([self flippedHorizontally] ? @"YES" : @"NO") forKey:SKTFlippedHorizontallyKey];
-    [dict setObject:([self flippedVertically] ? @"YES" : @"NO") forKey:SKTFlippedVerticallyKey];
+    [dict setObject: [NSArchiver archivedDataWithRootObject: [self image]]
+             forKey: SKTImageContentsKey];
+    [dict setObject: ([self flippedHorizontally] ? @"YES" : @"NO")
+             forKey: SKTFlippedHorizontallyKey];
+    [dict setObject: ([self flippedVertically] ? @"YES" : @"NO") forKey: SKTFlippedVerticallyKey];
     return dict;
 }
 
-- (void)loadPropertyListRepresentation:(NSDictionary *)dict {
+- (void)loadPropertyListRepresentation: (NSDictionary *)dict
+{
     id obj;
 
-    [super loadPropertyListRepresentation:dict];
+    [super loadPropertyListRepresentation: dict];
 
-    obj = [dict objectForKey:SKTImageContentsKey];
-    if (obj) {
-        [self setImage:[NSUnarchiver unarchiveObjectWithData:obj]];
+    obj = [dict objectForKey: SKTImageContentsKey];
+    if (obj)
+    {
+        [self setImage: [NSUnarchiver unarchiveObjectWithData: obj]];
     }
-    obj = [dict objectForKey:SKTFlippedHorizontallyKey];
-    if (obj) {
-        [self setFlippedHorizontally:[obj isEqualToString:@"YES"]];
+    obj = [dict objectForKey: SKTFlippedHorizontallyKey];
+    if (obj)
+    {
+        [self setFlippedHorizontally: [obj isEqualToString: @"YES"]];
     }
-    obj = [dict objectForKey:SKTFlippedVerticallyKey];
-    if (obj) {
-        [self setFlippedVertically:[obj isEqualToString:@"YES"]];
+    obj = [dict objectForKey: SKTFlippedVerticallyKey];
+    if (obj)
+    {
+        [self setFlippedVertically: [obj isEqualToString: @"YES"]];
     }
     _cachedImage = nil;
 }
 
-- (void)setImageFile:(NSString *)filePath {
+- (void)setImageFile: (NSString *)filePath
+{
     NSImage *newImage;
     filePath = [filePath stringByStandardizingPath];
     filePath = [filePath stringByExpandingTildeInPath];
-    newImage = [[NSImage alloc] initWithContentsOfFile:filePath];
-    if (newImage) {
-        [self setImage:newImage];
+    newImage = [[NSImage alloc] initWithContentsOfFile: filePath];
+    if (newImage)
+    {
+        [self setImage: newImage];
     }
 }
 
-- (NSString *)imageFile {
+- (NSString *)imageFile
+{
     // This is really a "write-only" attribute used for setting the image for an SKTImage shape from a script.  We don't remember the path so the accessor just returns an empty string.
     return @"";
 }

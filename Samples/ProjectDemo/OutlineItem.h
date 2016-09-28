@@ -9,12 +9,12 @@
 @property (readwrite, nonatomic, retain) NSArray *contents;
 @property (readwrite, strong, nonatomic) COAttachmentID *attachmentID;
 
-- (OutlineItem*)root;
+- (OutlineItem *)root;
 
 - (NSArray *)allContents;
 
-- (void) addItem: (OutlineItem*)item;
-- (void) addItem: (OutlineItem*)item atIndex: (NSUInteger)index;
-- (void) removeItemAtIndex: (NSUInteger)index;
+- (void)addItem: (OutlineItem *)item;
+- (void)addItem: (OutlineItem *)item atIndex: (NSUInteger)index;
+- (void)removeItemAtIndex: (NSUInteger)index;
 
 @end

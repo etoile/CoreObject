@@ -6,13 +6,13 @@
 {
     IBOutlet NSTextView *textView;
     COAttributedStringWrapper *textStorage;
-    
+
     // Hack to save text being changed for the commit label
     NSString *affectedText;
     NSString *replacementText;
-    
+
     NSTimer *coalescingTimer;
-    
+
     BOOL changedByUser;
 }
 

@@ -14,17 +14,17 @@
 {
     ETUUID *_persistentRootUUID;
     ETUUID *_branchUUID;
-    
+
     XMPPStream *_xmppStream;
     BOOL _isServer;
-    
+
     // Only for server object
-    
+
     COSynchronizerJSONServer *_JSONServer;
     COSynchronizerServer *_server;
-    
+
     // Only for client object
-    
+
     COSynchronizerClient *_client;
     COSynchronizerJSONClient *_JSONClient;
     XMPPJID *_serverJID;
@@ -46,9 +46,9 @@
 
 @property (nonatomic, readonly, strong) NSString *ourName;
 
-- (BOOL) isJIDClient: (XMPPJID *)peerJID;
+- (BOOL)isJIDClient: (XMPPJID *)peerJID;
 
-- (void) addClientJID: (XMPPJID *)peerJID;
+- (void)addClientJID: (XMPPJID *)peerJID;
 
 @property (nonatomic, readwrite, assign) BOOL paused;
 

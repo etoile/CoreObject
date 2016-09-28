@@ -3,10 +3,10 @@
 
 @implementation TextItem
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-    
+
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"attrString"
                                                                                  type: (id)@"COAttributedString"];
     [labelProperty setPersistent: YES];
@@ -14,7 +14,7 @@
     return entity;
 }
 
-- (instancetype) initWithObjectGraphContext:(COObjectGraphContext *)aContext
+- (instancetype)initWithObjectGraphContext: (COObjectGraphContext *)aContext
 {
     self = [super initWithObjectGraphContext: aContext];
     self.attrString = [[COAttributedString alloc] initWithObjectGraphContext: aContext];

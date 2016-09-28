@@ -7,15 +7,18 @@
 
 @implementation SKTRenderingView
 
-- (id)initWithFrame:(NSRect)frame graphics:(NSArray *)graphics {
-    self = [super initWithFrame:frame];
-    if (self) {
+- (id)initWithFrame: (NSRect)frame graphics: (NSArray *)graphics
+{
+    self = [super initWithFrame: frame];
+    if (self)
+    {
         _graphics = graphics;
     }
     return self;
 }
 
-- (void)drawRect:(NSRect)rect {
+- (void)drawRect: (NSRect)rect
+{
     unsigned i;
     SKTGraphic *curGraphic;
     NSRect drawingBounds;
@@ -25,23 +28,27 @@
     NSRectFill(rect);
 
     i = [_graphics count];
-    while (i-- > 0) {
-        curGraphic = [_graphics objectAtIndex:i];
+    while (i-- > 0)
+    {
+        curGraphic = [_graphics objectAtIndex: i];
         drawingBounds = [curGraphic drawingBounds];
-        if (NSIntersectsRect(rect, drawingBounds)) {
+        if (NSIntersectsRect(rect, drawingBounds))
+        {
             [currentContext saveGraphicsState];
-            [NSBezierPath clipRect:drawingBounds];
-            [curGraphic drawInView:nil isSelected:NO];
+            [NSBezierPath clipRect: drawingBounds];
+            [curGraphic drawInView: nil isSelected: NO];
             [currentContext restoreGraphicsState];
         }
     }
 }
 
-- (BOOL)isOpaque {
+- (BOOL)isOpaque
+{
     return YES;
 }
 
-- (BOOL)isFlipped {
+- (BOOL)isFlipped
+{
     return YES;
 }
 

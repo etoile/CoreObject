@@ -11,14 +11,14 @@
     BOOL preventCommits;
 }
 
-- (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
-                                             windowID: (NSString*)windowID;
+- (instancetype)initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
+                                            windowID: (NSString *)windowID;
 
-- (instancetype) initPinnedToBranch: (COBranch *)aBranch
-                           windowID: (NSString*)windowID;
+- (instancetype)initPinnedToBranch: (COBranch *)aBranch
+                          windowID: (NSString *)windowID;
 
-- (Document*)projectDocument;
-- (OutlineItem*)rootObject;
+- (Document *)projectDocument;
+- (OutlineItem *)rootObject;
 
 - (IBAction) addItem: (id)sender;
 - (IBAction) addChildItem: (id)sender;

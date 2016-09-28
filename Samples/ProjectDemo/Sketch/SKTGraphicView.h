@@ -11,11 +11,11 @@
 #define SKT_HALF_HANDLE_WIDTH 3.0
 #define SKT_HANDLE_WIDTH (SKT_HALF_HANDLE_WIDTH * 2.0)
 
-
-@interface SKTGraphicView : NSView {
-    @private
+@interface SKTGraphicView : NSView
+{
+@private
     DrawingController *_drawingController;
-    
+
     NSMutableArray *_selectedGraphics;
     SKTGraphic *_creatingGraphic;
     NSRect _rubberbandRect;
@@ -28,7 +28,8 @@
     float _gridSpacing;
     NSColor *_gridColor;
     NSTimer *_unhideKnobsTimer;
-    struct __gvFlags {
+    struct __gvFlags
+    {
         unsigned int rubberbandIsDeselecting:1;
         unsigned int initedRulers:1;
         unsigned int snapsToGrid:1;
@@ -43,95 +44,97 @@
 - (SKTDrawDocument *)drawDocument;
 - (NSArray *)graphics;
 
-- (DrawingController*)drawingController;
-- (void)setDrawingController: (DrawingController*)c;
+- (DrawingController *)drawingController;
+- (void)setDrawingController: (DrawingController *)c;
 
-- (void) objectGraphContextDidSwitch;
+- (void)objectGraphContextDidSwitch;
 
 // Display invalidation
-- (void)invalidateGraphic:(SKTGraphic *)graphic;
+- (void)invalidateGraphic: (SKTGraphic *)graphic;
 
 // Selection primitives
 - (NSArray *)selectedGraphics;
 - (NSArray *)orderedSelectedGraphics;
-- (BOOL)graphicIsSelected:(SKTGraphic *)graphic;
-- (void)selectGraphic:(SKTGraphic *)graphic;
-- (void)deselectGraphic:(SKTGraphic *)graphic;
+- (BOOL)graphicIsSelected: (SKTGraphic *)graphic;
+- (void)selectGraphic: (SKTGraphic *)graphic;
+- (void)deselectGraphic: (SKTGraphic *)graphic;
 - (void)clearSelection;
 
 // Managing editoring graphics
-- (void)setEditingGraphic:(SKTGraphic *)graphic editorView:(NSView *)editorView;
+- (void)setEditingGraphic: (SKTGraphic *)graphic editorView: (NSView *)editorView;
 - (SKTGraphic *)editingGraphic;
 - (NSView *)editorView;
-- (void)startEditingGraphic:(SKTGraphic *)graphic withEvent:(NSEvent *)event;
+- (void)startEditingGraphic: (SKTGraphic *)graphic withEvent: (NSEvent *)event;
 - (void)endEditing;
 
 // Geometry calculations
-- (SKTGraphic *)graphicUnderPoint:(NSPoint)point;
-- (NSSet *)graphicsIntersectingRect:(NSRect)rect;
+- (SKTGraphic *)graphicUnderPoint: (NSPoint)point;
+- (NSSet *)graphicsIntersectingRect: (NSRect)rect;
 
 // Drawing and mouse tracking
-- (void)drawRect:(NSRect)rect;
+- (void)drawRect: (NSRect)rect;
 
-- (void)beginEchoingMoveToRulers:(NSRect)echoRect;
-- (void)continueEchoingMoveToRulers:(NSRect)echoRect;
+- (void)beginEchoingMoveToRulers: (NSRect)echoRect;
+- (void)continueEchoingMoveToRulers: (NSRect)echoRect;
 - (void)stopEchoingMoveToRulers;
 
-- (void)createGraphicOfClass:(Class)theClass withEvent:(NSEvent *)theEvent;
+- (void)createGraphicOfClass: (Class)theClass withEvent: (NSEvent *)theEvent;
 - (SKTGraphic *)creatingGraphic;
-- (void)trackKnob:(int)knob ofGraphic:(SKTGraphic *)graphic withEvent:(NSEvent *)theEvent;
-- (void)rubberbandSelectWithEvent:(NSEvent *)theEvent;
-- (void)moveSelectedGraphicsWithEvent:(NSEvent *)theEvent;
-- (void)selectAndTrackMouseWithEvent:(NSEvent *)theEvent;
-- (void)mouseDown:(NSEvent *)theEvent;
+- (void)trackKnob: (int)knob ofGraphic: (SKTGraphic *)graphic withEvent: (NSEvent *)theEvent;
+- (void)rubberbandSelectWithEvent: (NSEvent *)theEvent;
+- (void)moveSelectedGraphicsWithEvent: (NSEvent *)theEvent;
+- (void)selectAndTrackMouseWithEvent: (NSEvent *)theEvent;
+- (void)mouseDown: (NSEvent *)theEvent;
 
 // Dragging
-- (unsigned int)dragOperationForDraggingInfo:(id <NSDraggingInfo>)sender;
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender;
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender;
-- (void)draggingExited:(id <NSDraggingInfo>)sender;
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender;
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
-- (void)concludeDragOperation:(id <NSDraggingInfo>)sender;
+- (unsigned int)dragOperationForDraggingInfo: (id <NSDraggingInfo>)sender;
+- (unsigned int)draggingEntered: (id <NSDraggingInfo>)sender;
+- (unsigned int)draggingUpdated: (id <NSDraggingInfo>)sender;
+- (void)draggingExited: (id <NSDraggingInfo>)sender;
+- (BOOL)prepareForDragOperation: (id <NSDraggingInfo>)sender;
+- (BOOL)performDragOperation: (id <NSDraggingInfo>)sender;
+- (void)concludeDragOperation: (id <NSDraggingInfo>)sender;
 
 // Ruler support
 - (void)updateRulers;
-- (BOOL)rulerView:(NSRulerView *)ruler shouldMoveMarker:(NSRulerMarker *)marker;
-- (float)rulerView:(NSRulerView *)ruler willMoveMarker:(NSRulerMarker *)marker toLocation:(float)location;
-- (void)rulerView:(NSRulerView *)ruler didMoveMarker:(NSRulerMarker *)marker;
-- (BOOL)rulerView:(NSRulerView *)ruler shouldRemoveMarker:(NSRulerMarker *)marker;
+- (BOOL)rulerView: (NSRulerView *)ruler shouldMoveMarker: (NSRulerMarker *)marker;
+- (float)rulerView: (NSRulerView *)ruler
+    willMoveMarker: (NSRulerMarker *)marker
+        toLocation: (float)location;
+- (void)rulerView: (NSRulerView *)ruler didMoveMarker: (NSRulerMarker *)marker;
+- (BOOL)rulerView: (NSRulerView *)ruler shouldRemoveMarker: (NSRulerMarker *)marker;
 
 // Action methods and other UI entry points
-- (void)changeColor:(id)sender;
+- (void)changeColor: (id)sender;
 
-- (IBAction)selectAll:(id)sender;
-- (IBAction)deselectAll:(id)sender;
+- (IBAction)selectAll: (id)sender;
+- (IBAction)deselectAll: (id)sender;
 
-- (IBAction)delete:(id)sender;
-- (IBAction)bringToFront:(id)sender;
-- (IBAction)sendToBack:(id)sender;
-- (IBAction)alignLeftEdges:(id)sender;
-- (IBAction)alignRightEdges:(id)sender;
-- (IBAction)alignTopEdges:(id)sender;
-- (IBAction)alignBottomEdges:(id)sender;
-- (IBAction)alignHorizontalCenters:(id)sender;
-- (IBAction)alignVerticalCenters:(id)sender;
-- (IBAction)makeSameWidth:(id)sender;
-- (IBAction)makeSameHeight:(id)sender;
-- (IBAction)makeNaturalSize:(id)sender;
-- (IBAction)snapsToGridMenuAction:(id)sender;
-- (IBAction)showsGridMenuAction:(id)sender;
-- (IBAction)gridSelectedGraphicsAction:(id)sender;
+- (IBAction)delete: (id)sender;
+- (IBAction)bringToFront: (id)sender;
+- (IBAction)sendToBack: (id)sender;
+- (IBAction)alignLeftEdges: (id)sender;
+- (IBAction)alignRightEdges: (id)sender;
+- (IBAction)alignTopEdges: (id)sender;
+- (IBAction)alignBottomEdges: (id)sender;
+- (IBAction)alignHorizontalCenters: (id)sender;
+- (IBAction)alignVerticalCenters: (id)sender;
+- (IBAction)makeSameWidth: (id)sender;
+- (IBAction)makeSameHeight: (id)sender;
+- (IBAction)makeNaturalSize: (id)sender;
+- (IBAction)snapsToGridMenuAction: (id)sender;
+- (IBAction)showsGridMenuAction: (id)sender;
+- (IBAction)gridSelectedGraphicsAction: (id)sender;
 
 // Grid settings
 - (BOOL)snapsToGrid;
-- (void)setSnapsToGrid:(BOOL)flag;
+- (void)setSnapsToGrid: (BOOL)flag;
 - (BOOL)showsGrid;
-- (void)setShowsGrid:(BOOL)flag;
+- (void)setShowsGrid: (BOOL)flag;
 - (float)gridSpacing;
-- (void)setGridSpacing:(float)spacing;
+- (void)setGridSpacing: (float)spacing;
 - (NSColor *)gridColor;
-- (void)setGridColor:(NSColor *)color;
+- (void)setGridColor: (NSColor *)color;
 
 @end
 

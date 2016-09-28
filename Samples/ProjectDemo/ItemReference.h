@@ -11,7 +11,9 @@
  */
 @interface ItemReference : DocumentItem
 
-- (id)initWithParent: (OutlineItem*)p referencedItem: (OutlineItem*)ref context: (COObjectGraphContext*)ctx;
+- (id)initWithParent: (OutlineItem *)p
+      referencedItem: (OutlineItem *)ref
+             context: (COObjectGraphContext *)ctx;
 
 @property (readwrite, nonatomic, retain) OutlineItem *parent;
 @property (readwrite, nonatomic, retain) OutlineItem *referencedItem;

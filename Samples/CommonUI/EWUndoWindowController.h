@@ -24,9 +24,9 @@
     IBOutlet NSButton *redo;
     IBOutlet NSButton *selectiveUndo;
     IBOutlet NSButton *selectiveRedo;
-    
+
     IBOutlet EWGraphRenderer *graphRenderer;
-    
+
     NSWindowController *wc;
     COUndoTrack *_track;
 }

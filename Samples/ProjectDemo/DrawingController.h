@@ -8,7 +8,6 @@
 #import "SKTTextArea.h"
 #import "SKTGraphicView.h"
 
-
 @interface DrawingController : EWDocumentWindowController
 {
     Class toolClass;

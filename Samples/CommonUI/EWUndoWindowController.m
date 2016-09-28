@@ -18,7 +18,8 @@
 - (id)init
 {
     self = [super initWithWindowNibName: @"Undo"];
-    if (self) {
+    if (self)
+    {
         [[NSNotificationCenter defaultCenter] addObserver: self
                                                  selector: @selector(undoTrackDidChange:)
                                                      name: COUndoTrackDidChangeNotification
@@ -27,26 +28,26 @@
     return self;
 }
 
-- (void) dealloc
+- (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 }
 
-- (void) awakeFromNib
+- (void)awakeFromNib
 {
     [table setDoubleAction: @selector(doubleClick:)];
     [table setTarget: self];
     graphRenderer.delegate = self;
-    
+
     [self update];
 }
 
-- (void) update
+- (void)update
 {
     [graphRenderer updateWithTrack: _track];
     [table reloadData];
     [self validateButtons];
-        
+
     if ([table numberOfRows] > 0)
     {
 //      NSUInteger idx = [[_track nodes] indexOfObject: [_track currentNode]];
@@ -66,7 +67,7 @@
     return _track;
 }
 
-- (void) setInspectedWindowController: (NSWindowController *)aDoc
+- (void)setInspectedWindowController: (NSWindowController *)aDoc
 {
     NSLog(@"UndoWindow: set inspected document");
 
@@ -80,36 +81,36 @@
         wc = nil;
         _track = nil;
     }
-    
+
     [self update];
 }
 
-- (void) undoTrackDidChange: (NSNotification *)notif
+- (void)undoTrackDidChange: (NSNotification *)notif
 {
     NSLog(@"undo track did change: %@", [notif userInfo]);
-    
+
     [self update];
 }
 
-- (void) validateButtons
+- (void)validateButtons
 {
     [undo setEnabled: [_track canUndo]];
     [redo setEnabled: [_track canRedo]];
-    
-    id<COTrackNode> highlightedNode = [self selectedNode];
-        
+
+    id <COTrackNode> highlightedNode = [self selectedNode];
+
     const NSUInteger highlightedNodeIndex = [[_track nodes] indexOfObject: highlightedNode];
     const NSUInteger currentNodeIndex = [[_track nodes] indexOfObject: [_track currentNode]];
     const BOOL canSelectiveUndo = (highlightedNode != nil
                                    && highlightedNode != [COEndOfUndoTrackPlaceholderNode sharedInstance]
                                    && highlightedNodeIndex != NSNotFound
                                    && highlightedNodeIndex < currentNodeIndex);
-    
+
     const BOOL canSelectiveRedo = (!canSelectiveUndo
                                    && highlightedNode != nil
                                    && highlightedNode != [COEndOfUndoTrackPlaceholderNode sharedInstance]
                                    && highlightedNodeIndex != currentNodeIndex);
-    
+
     if (canSelectiveUndo)
     {
         [selectiveUndo setEnabled: YES];
@@ -130,9 +131,9 @@
 
 /* Target/action */
 
-- (void) doubleClick: (id)sender
+- (void)doubleClick: (id)sender
 {
-    id<COTrackNode> node = [self selectedNode];
+    id <COTrackNode> node = [self selectedNode];
     if (node != nil)
     {
         [_track setCurrentNode: node];
@@ -141,7 +142,7 @@
 
 - (IBAction) selectiveUndo: (id)sender
 {
-    id<COTrackNode> node = [self selectedNode];
+    id <COTrackNode> node = [self selectedNode];
     if (node != nil)
     {
         [_track undoNode: node];
@@ -150,7 +151,7 @@
 
 - (IBAction) selectiveRedo: (id)sender
 {
-    id<COTrackNode> node = [self selectedNode];
+    id <COTrackNode> node = [self selectedNode];
     if (node != nil)
     {
         [_track redoNode: node];
@@ -159,13 +160,13 @@
 
 /* Convenience */
 
-- (id<COTrackNode>) selectedNode
+- (id <COTrackNode>)selectedNode
 {
     const NSInteger row = [table selectedRow];
     if (row == -1)
         return nil;
-    
-    id<COTrackNode> node = [graphRenderer revisionAtIndex: row];
+
+    id <COTrackNode> node = [graphRenderer revisionAtIndex: row];
     return node;
 }
 
@@ -212,13 +213,16 @@
 
 /* NSTableViewDataSource */
 
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger)numberOfRowsInTableView: (NSTableView *)tableView
 {
     return [graphRenderer count];
 }
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+
+- (id)          tableView: (NSTableView *)tableView
+objectValueForTableColumn: (NSTableColumn *)tableColumn
+                      row: (NSInteger)row
 {
-    id<COTrackNode> node = [graphRenderer revisionAtIndex: row];
+    id <COTrackNode> node = [graphRenderer revisionAtIndex: row];
     if ([[tableColumn identifier] isEqualToString: @"document"])
     {
         if (node.persistentRootUUID != nil)
@@ -242,13 +246,16 @@
     }
 }
 
-- (void)tableView:(NSTableView *)tableView setObjectValue:(id)object forTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+- (void)tableView: (NSTableView *)tableView
+   setObjectValue: (id)object
+   forTableColumn: (NSTableColumn *)tableColumn
+              row: (NSInteger)row
 {
 }
 
 /* NSTableViewDelegate */
 
-- (void)tableViewSelectionDidChange:(NSNotification *)notification
+- (void)tableViewSelectionDidChange: (NSNotification *)notification
 {
     [self validateButtons];
 }
@@ -257,7 +264,8 @@
 
 static NSArray *sortTrackNodes(NSArray *commits)
 {
-    return [commits sortedArrayUsingComparator: ^(id obj1, id obj2) {
+    return [commits sortedArrayUsingComparator: ^(id obj1, id obj2)
+    {
         COCommandGroup *obj1Info = obj1;
         COCommandGroup *obj2Info = obj2;
 
@@ -270,15 +278,15 @@ static NSArray *sortTrackNodes(NSArray *commits)
     }];
 }
 
-- (NSArray *) allOrderedNodesToDisplayForTrack: (id<COTrack>)aTrack
+- (NSArray *)allOrderedNodesToDisplayForTrack: (id <COTrack>)aTrack
 {
     NSArray *allCommands = [_track allCommands];
     NSArray *allCommandsSorted = sortTrackNodes(allCommands);
-    
+
     return [allCommandsSorted arrayByAddingObject: [COEndOfUndoTrackPlaceholderNode sharedInstance]];
 }
 
-- (NSColor *) colorForNode: (id<COTrack>)aTrack isCurrentOrAncestorOfCurrent: (BOOL)current
+- (NSColor *)colorForNode: (id <COTrack>)aTrack isCurrentOrAncestorOfCurrent: (BOOL)current
 {
     if (current)
     {

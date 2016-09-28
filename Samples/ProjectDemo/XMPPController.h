@@ -9,21 +9,21 @@
     XMPPStream *xmppStream;
     XMPPRosterMemoryStorage *xmppRosterStorage;
     XMPPRoster *xmppRoster;
-    
+
     NSMutableDictionary *sharingSessionsByBranchUUID;
 }
 
-+ (XMPPController *) sharedInstance;
++ (XMPPController *)sharedInstance;
 
 @property (readonly, strong) XMPPStream *xmppStream;
 
-- (void) reconnect;
+- (void)reconnect;
 
-- (XMPPRoster *) roster;
+- (XMPPRoster *)roster;
 
-- (SharingSession *) sharingSessionForBranch: (COBranch *)aBranch;
+- (SharingSession *)sharingSessionForBranch: (COBranch *)aBranch;
 
-- (void) shareBranch: (COBranch*)aBranch withJID: (XMPPJID *)jid;
+- (void)shareBranch: (COBranch *)aBranch withJID: (XMPPJID *)jid;
 
 @property (nonatomic, readonly) NSString *username;
 

@@ -7,7 +7,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-
 /**
  * Abstract superclass for utility window controllers.
  *
@@ -15,6 +14,6 @@
  */
 @interface EWUtilityWindowController : NSWindowController
 
-- (void) setInspectedWindowController: (NSWindowController *)aDoc;
+- (void)setInspectedWindowController: (NSWindowController *)aDoc;
 
 @end

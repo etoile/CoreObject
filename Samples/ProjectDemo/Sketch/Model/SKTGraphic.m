@@ -12,27 +12,27 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 @implementation SKTGraphic
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-    
+
     ETPropertyDescription *documentProperty = [ETPropertyDescription descriptionWithName: @"document"
                                                                                     type: (id)@"SKTDrawDocument"];
     [documentProperty setDerived: YES];
     [documentProperty setOpposite: (id)@"SKTDrawDocument.graphics"];
-    
+
     ETPropertyDescription *originProperty = [ETPropertyDescription descriptionWithName: @"origin"
                                                                                   type: (id)@"NSPoint"];
     originProperty.persistent = YES;
-    
+
     ETPropertyDescription *sizeProperty = [ETPropertyDescription descriptionWithName: @"size"
-                                                                                  type: (id)@"NSSize"];
+                                                                                type: (id)@"NSSize"];
     sizeProperty.persistent = YES;
-    
+
     ETPropertyDescription *drawsFillProperty = [ETPropertyDescription descriptionWithName: @"drawsFill"
                                                                                      type: (id)@"NSNumber"];
     drawsFillProperty.persistent = YES;
-    
+
     ETPropertyDescription *fillColorProperty = [ETPropertyDescription descriptionWithName: @"fillColor"
                                                                                      type: (id)@"NSColor"];
     fillColorProperty.valueTransformerName = @"COColorToHTMLString";
@@ -42,7 +42,7 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
     ETPropertyDescription *drawsStrokeProperty = [ETPropertyDescription descriptionWithName: @"drawsStroke"
                                                                                        type: (id)@"NSNumber"];
     drawsStrokeProperty.persistent = YES;
-    
+
     ETPropertyDescription *strokeColorProperty = [ETPropertyDescription descriptionWithName: @"strokeColor"
                                                                                        type: (id)@"NSColor"];
     strokeColorProperty.valueTransformerName = @"COColorToHTMLString";
@@ -52,41 +52,50 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
     ETPropertyDescription *strokeLineWidthProperty = [ETPropertyDescription descriptionWithName: @"strokeLineWidth"
                                                                                            type: (id)@"NSNumber"];
     strokeLineWidthProperty.persistent = YES;
-    
-    [entity setPropertyDescriptions: A(documentProperty, originProperty, sizeProperty, drawsFillProperty, fillColorProperty, drawsStrokeProperty, strokeColorProperty, strokeLineWidthProperty)];
-    
+
+    [entity setPropertyDescriptions: A(documentProperty,
+                                       originProperty,
+                                       sizeProperty,
+                                       drawsFillProperty,
+                                       fillColorProperty,
+                                       drawsStrokeProperty,
+                                       strokeColorProperty,
+                                       strokeLineWidthProperty)];
+
     return entity;
 }
 
 
 // =================================== Initialization ===================================
-- (id)initWithObjectGraphContext:(COObjectGraphContext *)aContext
+- (id)initWithObjectGraphContext: (COObjectGraphContext *)aContext
 {
     self = [super initWithObjectGraphContext: aContext];
-    if (self) {
-        [self setBounds:NSMakeRect(0.0, 0.0, 1.0, 1.0)];
+    if (self)
+    {
+        [self setBounds: NSMakeRect(0.0, 0.0, 1.0, 1.0)];
         //[self setFillColor:[NSColor whiteColor]];
-        [self setFillColor:[NSColor colorWithCalibratedRed: 1.0 green: 1.0 blue: 1.0 alpha: 0.5]];
-        [self setDrawsFill:NO];
-        [self setStrokeColor:[NSColor blackColor]];
-        [self setDrawsStroke:YES];
-        [self setStrokeLineWidth:1.0];
+        [self setFillColor: [NSColor colorWithCalibratedRed: 1.0 green: 1.0 blue: 1.0 alpha: 0.5]];
+        [self setDrawsFill: NO];
+        [self setStrokeColor: [NSColor blackColor]];
+        [self setDrawsStroke: YES];
+        [self setStrokeLineWidth: 1.0];
         _origBounds = NSZeroRect;
         _gFlags.manipulatingBounds = NO;
     }
     return self;
 }
 
-- (id)copyWithZone:(NSZone *)zone {
-    id newObj = [[[self class] allocWithZone:zone] initWithObjectGraphContext: [self objectGraphContext]];
+- (id)copyWithZone: (NSZone *)zone
+{
+    id newObj = [[[self class] allocWithZone: zone] initWithObjectGraphContext: [self objectGraphContext]];
 
     // Document is not "copied".  The new graphic will need to be inserted into a document.
-    [newObj setBounds:[self bounds]];
-    [newObj setFillColor:[self fillColor]];
-    [newObj setDrawsFill:[self drawsFill]];
-    [newObj setStrokeColor:[self strokeColor]];
-    [newObj setDrawsStroke:[self drawsStroke]];
-    [newObj setStrokeLineWidth:[self strokeLineWidth]];
+    [newObj setBounds: [self bounds]];
+    [newObj setFillColor: [self fillColor]];
+    [newObj setDrawsFill: [self drawsFill]];
+    [newObj setStrokeColor: [self strokeColor]];
+    [newObj setDrawsStroke: [self drawsStroke]];
+    [newObj setStrokeLineWidth: [self strokeLineWidth]];
 
     return newObj;
 }
@@ -95,7 +104,8 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 @dynamic document;
 
-- (NSString *)graphicType {
+- (NSString *)graphicType
+{
     return NSStringFromClass([self class]);
 }
 
@@ -103,14 +113,19 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 @dynamic origin, size;
 
-- (void)didChange {
-    [self.document invalidateGraphic:self];
-    [[NSNotificationCenter defaultCenter] postNotificationName:SKTGraphicDidChangeNotification object:self];
+- (void)didChange
+{
+    [self.document invalidateGraphic: self];
+    [[NSNotificationCenter defaultCenter] postNotificationName: SKTGraphicDidChangeNotification
+                                                        object: self];
 }
-    
-- (void)setBounds:(NSRect)bounds {
-    if (!NSEqualRects(bounds, self.bounds)) {
-        if (!_gFlags.manipulatingBounds) {
+
+- (void)setBounds: (NSRect)bounds
+{
+    if (!NSEqualRects(bounds, self.bounds))
+    {
+        if (!_gFlags.manipulatingBounds)
+        {
             // Send the notification before and after so that observers who invalidate display in views will wind up invalidating both the original rect and the new one.
             [self didChange];
             //[[[self undoManager] prepareWithInvocationTarget:self] setBounds:_bounds];
@@ -118,22 +133,26 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
         self.origin = [NSValue valueWithPoint: bounds.origin];
         self.size = [NSValue valueWithSize: bounds.size];
-        
-        if (!_gFlags.manipulatingBounds) {
+
+        if (!_gFlags.manipulatingBounds)
+        {
             [self didChange];
         }
     }
 }
 
-- (NSRect)bounds {
+- (NSRect)bounds
+{
     NSRect result;
     result.origin = [self.origin pointValue];
     result.size = [self.size sizeValue];
     return result;
 }
 
-- (void)setDrawsFill:(BOOL)flag {
-    if (_drawsFill != flag) {
+- (void)setDrawsFill: (BOOL)flag
+{
+    if (_drawsFill != flag)
+    {
         //[[[self undoManager] prepareWithInvocationTarget:self] setDrawsFill:_drawsFill];
         [self willChangeValueForProperty: @"drawsFill"];
         _drawsFill = (flag ? YES : NO);
@@ -142,31 +161,39 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
     }
 }
 
-- (BOOL)drawsFill {
+- (BOOL)drawsFill
+{
     return _drawsFill;
 }
 
-- (void)setFillColor:(NSColor *)fillColor {
+- (void)setFillColor: (NSColor *)fillColor
+{
 
     //[[[self undoManager] prepareWithInvocationTarget:self] setFillColor:_fillColor];
     [self willChangeValueForProperty: @"fillColor"];
     _fillColor = fillColor;
-    [self didChangeValueForProperty:@"fillColor"];
+    [self didChangeValueForProperty: @"fillColor"];
     [self didChange];
 
-    if (_fillColor) {
-        [self setDrawsFill:YES];
-    } else {
-        [self setDrawsFill:NO];
+    if (_fillColor)
+    {
+        [self setDrawsFill: YES];
+    }
+    else
+    {
+        [self setDrawsFill: NO];
     }
 }
 
-- (NSColor *)fillColor {
+- (NSColor *)fillColor
+{
     return _fillColor;
 }
 
-- (void)setDrawsStroke:(BOOL)flag {
-    if (_drawsStroke != flag) {
+- (void)setDrawsStroke: (BOOL)flag
+{
+    if (_drawsStroke != flag)
+    {
         //[[[self undoManager] prepareWithInvocationTarget:self] setDrawsStroke:_drawsStroke];
         [self willChangeValueForProperty: @"drawsStroke"];
         _drawsStroke = (flag ? YES : NO);
@@ -175,39 +202,50 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
     }
 }
 
-- (BOOL)drawsStroke {
+- (BOOL)drawsStroke
+{
     return _drawsStroke;
 }
 
-- (void)setStrokeColor:(NSColor *)strokeColor {
-        //[[[self undoManager] prepareWithInvocationTarget:self] setStrokeColor:_strokeColor];
+- (void)setStrokeColor: (NSColor *)strokeColor
+{
+    //[[[self undoManager] prepareWithInvocationTarget:self] setStrokeColor:_strokeColor];
     [self willChangeValueForProperty: @"strokeColor"];
     _strokeColor = strokeColor;
     [self didChangeValueForProperty: @"strokeColor"];
     [self didChange];
-    
-    if (_strokeColor) {
-        [self setDrawsStroke:YES];
-    } else {
-        [self setDrawsStroke:NO];
+
+    if (_strokeColor)
+    {
+        [self setDrawsStroke: YES];
+    }
+    else
+    {
+        [self setDrawsStroke: NO];
     }
 }
 
-- (NSColor *)strokeColor {
+- (NSColor *)strokeColor
+{
     return _strokeColor;
 }
 
-- (void)setStrokeLineWidth:(float)width {
-    if (_strokeLineWidth != width) {
+- (void)setStrokeLineWidth: (float)width
+{
+    if (_strokeLineWidth != width)
+    {
         //[[[self undoManager] prepareWithInvocationTarget:self] setStrokeLineWidth:_lineWidth];
-        
-        if (width >= 0.0) {
-            [self setDrawsStroke:YES];
-        } else {
-            [self setDrawsStroke:NO];
+
+        if (width >= 0.0)
+        {
+            [self setDrawsStroke: YES];
+        }
+        else
+        {
+            [self setDrawsStroke: NO];
             width = 0;
         }
-        
+
         [self willChangeValueForProperty: @"strokeLineWidth"];
         _strokeLineWidth = width;
         [self didChangeValueForProperty: @"strokeLineWidth"];
@@ -216,53 +254,65 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
     }
 }
 
-- (float)strokeLineWidth {
+- (float)strokeLineWidth
+{
     return _strokeLineWidth;
 }
 
 // =================================== Extended mutation ===================================
-- (void)startBoundsManipulation {
+- (void)startBoundsManipulation
+{
     // Save the original bounds.
     _gFlags.manipulatingBounds = YES;
     _origBounds = self.bounds;
 }
 
-- (void)stopBoundsManipulation {
-    if (_gFlags.manipulatingBounds) {
+- (void)stopBoundsManipulation
+{
+    if (_gFlags.manipulatingBounds)
+    {
         // Restore the original bounds, the set the new bounds.
-        if (!NSEqualRects(_origBounds, self.bounds)) {
+        if (!NSEqualRects(_origBounds, self.bounds))
+        {
             NSRect temp;
 
             _gFlags.manipulatingBounds = NO;
             temp = self.bounds;
             [self setBounds: _origBounds];
-            [self setBounds:temp];
-        } else {
+            [self setBounds: temp];
+        }
+        else
+        {
             _gFlags.manipulatingBounds = NO;
         }
     }
 }
 
-- (void)moveBy:(NSPoint)vector {
-    [self setBounds:NSOffsetRect([self bounds], vector.x, vector.y)];
+- (void)moveBy: (NSPoint)vector
+{
+    [self setBounds: NSOffsetRect([self bounds], vector.x, vector.y)];
 }
 
-- (void)flipHorizontally {
+- (void)flipHorizontally
+{
     // Some subclasses need to know.
     return;
 }
 
-- (void)flipVertically {
+- (void)flipVertically
+{
     // Some subclasses need to know.
     return;
 }
 
-+ (int)flipKnob:(int)knob horizontal:(BOOL)horizFlag {
++ (int)flipKnob: (int)knob horizontal: (BOOL)horizFlag
+{
     static BOOL initedFlips = NO;
     static int horizFlips[9];
     static int vertFlips[9];
 
-    if (!initedFlips) {
+    if (!initedFlips)
+    {
         horizFlips[UpperLeftKnob] = UpperRightKnob;
         horizFlips[UpperMiddleKnob] = UpperMiddleKnob;
         horizFlips[UpperRightKnob] = UpperLeftKnob;
@@ -271,7 +321,7 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
         horizFlips[LowerLeftKnob] = LowerRightKnob;
         horizFlips[LowerMiddleKnob] = LowerMiddleKnob;
         horizFlips[LowerRightKnob] = LowerLeftKnob;
-        
+
         vertFlips[UpperLeftKnob] = LowerLeftKnob;
         vertFlips[UpperMiddleKnob] = LowerMiddleKnob;
         vertFlips[UpperRightKnob] = LowerRightKnob;
@@ -282,50 +332,63 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
         vertFlips[LowerRightKnob] = UpperRightKnob;
         initedFlips = YES;
     }
-    if (horizFlag) {
+    if (horizFlag)
+    {
         return horizFlips[knob];
-    } else {
+    }
+    else
+    {
         return vertFlips[knob];
     }
 }
 
-- (int)resizeByMovingKnob:(int)knob toPoint:(NSPoint)point {
+- (int)resizeByMovingKnob: (int)knob toPoint: (NSPoint)point
+{
     NSRect bounds = [self bounds];
 
-    if ((knob == UpperLeftKnob) || (knob == MiddleLeftKnob) || (knob == LowerLeftKnob)) {
+    if ((knob == UpperLeftKnob) || (knob == MiddleLeftKnob) || (knob == LowerLeftKnob))
+    {
         // Adjust left edge
         bounds.size.width = NSMaxX(bounds) - point.x;
         bounds.origin.x = point.x;
-    } else if ((knob == UpperRightKnob) || (knob == MiddleRightKnob) || (knob == LowerRightKnob)) {
+    }
+    else if ((knob == UpperRightKnob) || (knob == MiddleRightKnob) || (knob == LowerRightKnob))
+    {
         // Adjust left edge
         bounds.size.width = point.x - bounds.origin.x;
     }
-    if (bounds.size.width < 0.0) {
-        knob = [SKTGraphic flipKnob:knob horizontal:YES];
+    if (bounds.size.width < 0.0)
+    {
+        knob = [SKTGraphic flipKnob: knob horizontal: YES];
         bounds.size.width = -bounds.size.width;
         bounds.origin.x -= bounds.size.width;
         [self flipHorizontally];
     }
 
-    if ((knob == UpperLeftKnob) || (knob == UpperMiddleKnob) || (knob == UpperRightKnob)) {
+    if ((knob == UpperLeftKnob) || (knob == UpperMiddleKnob) || (knob == UpperRightKnob))
+    {
         // Adjust top edge
         bounds.size.height = NSMaxY(bounds) - point.y;
         bounds.origin.y = point.y;
-    } else if ((knob == LowerLeftKnob) || (knob == LowerMiddleKnob) || (knob == LowerRightKnob)) {
+    }
+    else if ((knob == LowerLeftKnob) || (knob == LowerMiddleKnob) || (knob == LowerRightKnob))
+    {
         // Adjust bottom edge
         bounds.size.height = point.y - bounds.origin.y;
     }
-    if (bounds.size.height < 0.0) {
-        knob = [SKTGraphic flipKnob:knob horizontal:NO];
+    if (bounds.size.height < 0.0)
+    {
+        knob = [SKTGraphic flipKnob: knob horizontal: NO];
         bounds.size.height = -bounds.size.height;
         bounds.origin.y -= bounds.size.height;
         [self flipVertically];
     }
-    [self setBounds:bounds];
+    [self setBounds: bounds];
     return knob;
 }
 
-- (void)makeNaturalSize {
+- (void)makeNaturalSize
+{
     // Do nothing by default
 }
 
@@ -333,15 +396,18 @@ NSString *SKTGraphicDidChangeNotification = @"SKTGraphicDidChange";
 
 // Some subclasses will not ever have a stroke or fill or a natural size.  Overriding these methods in such subclasses allows the Inspector and Menu items to better reflect allowable actions.
 
-- (BOOL)canDrawStroke {
+- (BOOL)canDrawStroke
+{
     return YES;
 }
 
-- (BOOL)canDrawFill {
+- (BOOL)canDrawFill
+{
     return YES;
 }
 
-- (BOOL)hasNaturalSize {
+- (BOOL)hasNaturalSize
+{
     return YES;
 }
 
@@ -354,85 +420,106 @@ NSString *SKTDrawsStrokeKey = @"DrawsStroke";
 NSString *SKTStrokeColorKey = @"StrokeColor";
 NSString *SKTStrokeLineWidthKey = @"StrokeLineWidth";
 
-- (NSMutableDictionary *)propertyListRepresentation {
+- (NSMutableDictionary *)propertyListRepresentation
+{
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     NSString *className = NSStringFromClass([self class]);
-    NSRange sktRange = [className rangeOfString:@"SKT" options:NSAnchoredSearch];
-    
+    NSRange sktRange = [className rangeOfString: @"SKT" options: NSAnchoredSearch];
+
     // Strip SKT prefix to preserve document capatibility with old versions of Sketch.
-    if (sktRange.location != NSNotFound) {
-        className = [className substringFromIndex:NSMaxRange(sktRange)];
+    if (sktRange.location != NSNotFound)
+    {
+        className = [className substringFromIndex: NSMaxRange(sktRange)];
     }
-    [dict setObject:className forKey:SKTClassKey];
-    [dict setObject:NSStringFromRect([self bounds]) forKey:SKTBoundsKey];
-    [dict setObject:([self drawsFill] ? @"YES" : @"NO") forKey:SKTDrawsFillKey];
-    if ([self fillColor]) {
-        [dict setObject:[NSArchiver archivedDataWithRootObject:[self fillColor]] forKey:SKTFillColorKey];
+    [dict setObject: className forKey: SKTClassKey];
+    [dict setObject: NSStringFromRect([self bounds]) forKey: SKTBoundsKey];
+    [dict setObject: ([self drawsFill] ? @"YES" : @"NO") forKey: SKTDrawsFillKey];
+    if ([self fillColor])
+    {
+        [dict setObject: [NSArchiver archivedDataWithRootObject: [self fillColor]]
+                 forKey: SKTFillColorKey];
     }
-    [dict setObject:([self drawsStroke] ? @"YES" : @"NO") forKey:SKTDrawsStrokeKey];
-    if ([self strokeColor]) {
-        [dict setObject:[NSArchiver archivedDataWithRootObject:[self strokeColor]] forKey:SKTStrokeColorKey];
+    [dict setObject: ([self drawsStroke] ? @"YES" : @"NO") forKey: SKTDrawsStrokeKey];
+    if ([self strokeColor])
+    {
+        [dict setObject: [NSArchiver archivedDataWithRootObject: [self strokeColor]]
+                 forKey: SKTStrokeColorKey];
     }
-    [dict setObject:[NSString stringWithFormat:@"%.2f", [self strokeLineWidth]] forKey:SKTStrokeLineWidthKey];
+    [dict setObject: [NSString stringWithFormat: @"%.2f", [self strokeLineWidth]]
+             forKey: SKTStrokeLineWidthKey];
 
     return dict;
 }
 
-+ (id)graphicWithPropertyListRepresentation:(NSDictionary *)dict {
++ (id)graphicWithPropertyListRepresentation: (NSDictionary *)dict
+{
     assert(0); // FIXME: What context do we use?
-    
-    Class theClass = NSClassFromString([dict objectForKey:SKTClassKey]);
+
+    Class theClass = NSClassFromString([dict objectForKey: SKTClassKey]);
     id theGraphic = nil;
-    
+
     // Prepend SKT to the class name if we did not find it literally.  When we write the classname key we strip the prefix.  We try it first without the prefix because for a short time Sketch did not strip the prefix so there could be documents that do not need it prepended.
-    if (!theClass) {
-        theClass = NSClassFromString([@"SKT" stringByAppendingString:[dict objectForKey:SKTClassKey]]);
+    if (!theClass)
+    {
+        theClass = NSClassFromString([@"SKT" stringByAppendingString: [dict objectForKey: SKTClassKey]]);
     }
-    if (theClass) {
+    if (theClass)
+    {
         theGraphic = [[theClass alloc] init];
-        if (theGraphic) {
-            [theGraphic loadPropertyListRepresentation:dict];
+        if (theGraphic)
+        {
+            [theGraphic loadPropertyListRepresentation: dict];
         }
     }
     return theGraphic;
 }
 
-- (void)loadPropertyListRepresentation:(NSDictionary *)dict {
+- (void)loadPropertyListRepresentation: (NSDictionary *)dict
+{
     id obj;
 
-    obj = [dict objectForKey:SKTBoundsKey];
-    if (obj) {
-        [self setBounds:NSRectFromString(obj)];
+    obj = [dict objectForKey: SKTBoundsKey];
+    if (obj)
+    {
+        [self setBounds: NSRectFromString(obj)];
     }
-    obj = [dict objectForKey:SKTFillColorKey];
-    if (obj) {
-        [self setFillColor:[NSUnarchiver unarchiveObjectWithData:obj]];
+    obj = [dict objectForKey: SKTFillColorKey];
+    if (obj)
+    {
+        [self setFillColor: [NSUnarchiver unarchiveObjectWithData: obj]];
     }
-    obj = [dict objectForKey:SKTDrawsFillKey];
-    if (obj) {
-        [self setDrawsFill:[obj isEqualToString:@"YES"]];
+    obj = [dict objectForKey: SKTDrawsFillKey];
+    if (obj)
+    {
+        [self setDrawsFill: [obj isEqualToString: @"YES"]];
     }
-    obj = [dict objectForKey:SKTStrokeColorKey];
-    if (obj) {
-        [self setStrokeColor:[NSUnarchiver unarchiveObjectWithData:obj]];
+    obj = [dict objectForKey: SKTStrokeColorKey];
+    if (obj)
+    {
+        [self setStrokeColor: [NSUnarchiver unarchiveObjectWithData: obj]];
     }
-    obj = [dict objectForKey:SKTStrokeLineWidthKey];
-    if (obj) {
-        [self setStrokeLineWidth:[obj floatValue]];
+    obj = [dict objectForKey: SKTStrokeLineWidthKey];
+    if (obj)
+    {
+        [self setStrokeLineWidth: [obj floatValue]];
     }
-    obj = [dict objectForKey:SKTDrawsStrokeKey];
-    if (obj) {
-        [self setDrawsStroke:[obj isEqualToString:@"YES"]];
+    obj = [dict objectForKey: SKTDrawsStrokeKey];
+    if (obj)
+    {
+        [self setDrawsStroke: [obj isEqualToString: @"YES"]];
     }
     return;
 }
 
 // =================================== Drawing ===================================
-- (NSRect)drawingBounds {
+- (NSRect)drawingBounds
+{
     float inset = -SKT_HALF_HANDLE_WIDTH;
-    if ([self drawsStroke]) {
+    if ([self drawsStroke])
+    {
         float halfLineWidth = ([self strokeLineWidth] / 2.0) + 1.0;
-        if (-halfLineWidth < inset) {
+        if (-halfLineWidth < inset)
+        {
             inset = -halfLineWidth;
         }
     }
@@ -440,33 +527,41 @@ NSString *SKTStrokeLineWidthKey = @"StrokeLineWidth";
     return NSInsetRect([self bounds], inset, inset);
 }
 
-- (NSBezierPath *)bezierPath {
+- (NSBezierPath *)bezierPath
+{
     // Subclasses that just have a simple path override this to return it.  The basic drawInView:isSelected: implementation below will stroke and fill this path.  Subclasses that need more complex drawing will just override drawInView:isSelected:.
     return nil;
 }
 
-- (void)drawInView:(SKTGraphicView *)view isSelected:(BOOL)flag {
+- (void)drawInView: (SKTGraphicView *)view isSelected: (BOOL)flag
+{
     NSBezierPath *path = [self bezierPath];
-    if (path) {
-        if ([self drawsFill]) {
+    if (path)
+    {
+        if ([self drawsFill])
+        {
             [[self fillColor] set];
             [path fill];
         }
-        if ([self drawsStroke]) {
+        if ([self drawsStroke])
+        {
             [[self strokeColor] set];
             [path stroke];
         }
     }
-    if (flag) {
-        [self drawHandlesInView:view];
+    if (flag)
+    {
+        [self drawHandlesInView: view];
     }
 }
 
-- (unsigned)knobMask {
+- (unsigned)knobMask
+{
     return AllKnobsMask;
 }
 
-- (int)knobUnderPoint:(NSPoint)point {
+- (int)knobUnderPoint: (NSPoint)point
+{
     NSRect bounds = [self bounds];
     unsigned knobMask = [self knobMask];
     NSRect handleRect;
@@ -474,59 +569,75 @@ NSString *SKTStrokeLineWidthKey = @"StrokeLineWidth";
     handleRect.size.width = SKT_HANDLE_WIDTH;
     handleRect.size.height = SKT_HANDLE_WIDTH;
 
-    if (knobMask & UpperLeftKnobMask) {
+    if (knobMask & UpperLeftKnobMask)
+    {
         handleRect.origin.x = NSMinX(bounds) - SKT_HALF_HANDLE_WIDTH;
         handleRect.origin.y = NSMinY(bounds) - SKT_HALF_HANDLE_WIDTH;
-        if (NSPointInRect(point, handleRect)) {
+        if (NSPointInRect(point, handleRect))
+        {
             return UpperLeftKnob;
         }
     }
-    if (knobMask & UpperMiddleKnobMask) {
+    if (knobMask & UpperMiddleKnobMask)
+    {
         handleRect.origin.x = NSMidX(bounds) - SKT_HALF_HANDLE_WIDTH;
         handleRect.origin.y = NSMinY(bounds) - SKT_HALF_HANDLE_WIDTH;
-        if (NSPointInRect(point, handleRect)) {
+        if (NSPointInRect(point, handleRect))
+        {
             return UpperMiddleKnob;
         }
     }
-    if (knobMask & UpperRightKnobMask) {
+    if (knobMask & UpperRightKnobMask)
+    {
         handleRect.origin.x = NSMaxX(bounds) - SKT_HALF_HANDLE_WIDTH;
         handleRect.origin.y = NSMinY(bounds) - SKT_HALF_HANDLE_WIDTH;
-        if (NSPointInRect(point, handleRect)) {
+        if (NSPointInRect(point, handleRect))
+        {
             return UpperRightKnob;
         }
     }
-    if (knobMask & MiddleLeftKnobMask) {
+    if (knobMask & MiddleLeftKnobMask)
+    {
         handleRect.origin.x = NSMinX(bounds) - SKT_HALF_HANDLE_WIDTH;
         handleRect.origin.y = NSMidY(bounds) - SKT_HALF_HANDLE_WIDTH;
-        if (NSPointInRect(point, handleRect)) {
+        if (NSPointInRect(point, handleRect))
+        {
             return MiddleLeftKnob;
         }
     }
-    if (knobMask & MiddleRightKnobMask) {
+    if (knobMask & MiddleRightKnobMask)
+    {
         handleRect.origin.x = NSMaxX(bounds) - SKT_HALF_HANDLE_WIDTH;
         handleRect.origin.y = NSMidY(bounds) - SKT_HALF_HANDLE_WIDTH;
-        if (NSPointInRect(point, handleRect)) {
+        if (NSPointInRect(point, handleRect))
+        {
             return MiddleRightKnob;
         }
     }
-    if (knobMask & LowerLeftKnobMask) {
+    if (knobMask & LowerLeftKnobMask)
+    {
         handleRect.origin.x = NSMinX(bounds) - SKT_HALF_HANDLE_WIDTH;
         handleRect.origin.y = NSMaxY(bounds) - SKT_HALF_HANDLE_WIDTH;
-        if (NSPointInRect(point, handleRect)) {
+        if (NSPointInRect(point, handleRect))
+        {
             return LowerLeftKnob;
         }
     }
-    if (knobMask & LowerMiddleKnobMask) {
+    if (knobMask & LowerMiddleKnobMask)
+    {
         handleRect.origin.x = NSMidX(bounds) - SKT_HALF_HANDLE_WIDTH;
         handleRect.origin.y = NSMaxY(bounds) - SKT_HALF_HANDLE_WIDTH;
-        if (NSPointInRect(point, handleRect)) {
+        if (NSPointInRect(point, handleRect))
+        {
             return LowerMiddleKnob;
         }
     }
-    if (knobMask & LowerRightKnobMask) {
+    if (knobMask & LowerRightKnobMask)
+    {
         handleRect.origin.x = NSMaxX(bounds) - SKT_HALF_HANDLE_WIDTH;
         handleRect.origin.y = NSMaxY(bounds) - SKT_HALF_HANDLE_WIDTH;
-        if (NSPointInRect(point, handleRect)) {
+        if (NSPointInRect(point, handleRect))
+        {
             return LowerRightKnob;
         }
     }
@@ -534,14 +645,15 @@ NSString *SKTStrokeLineWidthKey = @"StrokeLineWidth";
     return NoKnob;
 }
 
-- (void)drawHandleAtPoint:(NSPoint)point inView:(SKTGraphicView *)view {
+- (void)drawHandleAtPoint: (NSPoint)point inView: (SKTGraphicView *)view
+{
     NSRect handleRect;
 
     handleRect.origin.x = point.x - SKT_HALF_HANDLE_WIDTH + 1.0;
     handleRect.origin.y = point.y - SKT_HALF_HANDLE_WIDTH + 1.0;
     handleRect.size.width = SKT_HANDLE_WIDTH - 1.0;
     handleRect.size.height = SKT_HANDLE_WIDTH - 1.0;
-    handleRect = [view centerScanRect:handleRect];
+    handleRect = [view centerScanRect: handleRect];
     [[NSColor controlDarkShadowColor] set];
     NSRectFill(handleRect);
     handleRect = NSOffsetRect(handleRect, -1.0, -1.0);
@@ -549,53 +661,67 @@ NSString *SKTStrokeLineWidthKey = @"StrokeLineWidth";
     NSRectFill(handleRect);
 }
 
-- (void)drawHandlesInView:(SKTGraphicView *)view {
+- (void)drawHandlesInView: (SKTGraphicView *)view
+{
     NSRect bounds = [self bounds];
     unsigned knobMask = [self knobMask];
 
-    if (knobMask & UpperLeftKnobMask) {
-        [self drawHandleAtPoint:NSMakePoint(NSMinX(bounds), NSMinY(bounds)) inView:view];
+    if (knobMask & UpperLeftKnobMask)
+    {
+        [self drawHandleAtPoint: NSMakePoint(NSMinX(bounds), NSMinY(bounds)) inView: view];
     }
-    if (knobMask & UpperMiddleKnobMask) {
-        [self drawHandleAtPoint:NSMakePoint(NSMidX(bounds), NSMinY(bounds)) inView:view];
+    if (knobMask & UpperMiddleKnobMask)
+    {
+        [self drawHandleAtPoint: NSMakePoint(NSMidX(bounds), NSMinY(bounds)) inView: view];
     }
-    if (knobMask & UpperRightKnobMask) {
-        [self drawHandleAtPoint:NSMakePoint(NSMaxX(bounds), NSMinY(bounds)) inView:view];
-    }
-
-    if (knobMask & MiddleLeftKnobMask) {
-        [self drawHandleAtPoint:NSMakePoint(NSMinX(bounds), NSMidY(bounds)) inView:view];
-    }
-    if (knobMask & MiddleRightKnobMask) {
-        [self drawHandleAtPoint:NSMakePoint(NSMaxX(bounds), NSMidY(bounds)) inView:view];
+    if (knobMask & UpperRightKnobMask)
+    {
+        [self drawHandleAtPoint: NSMakePoint(NSMaxX(bounds), NSMinY(bounds)) inView: view];
     }
 
-    if (knobMask & LowerLeftKnobMask) {
-        [self drawHandleAtPoint:NSMakePoint(NSMinX(bounds), NSMaxY(bounds)) inView:view];
+    if (knobMask & MiddleLeftKnobMask)
+    {
+        [self drawHandleAtPoint: NSMakePoint(NSMinX(bounds), NSMidY(bounds)) inView: view];
     }
-    if (knobMask & LowerMiddleKnobMask) {
-        [self drawHandleAtPoint:NSMakePoint(NSMidX(bounds), NSMaxY(bounds)) inView:view];
+    if (knobMask & MiddleRightKnobMask)
+    {
+        [self drawHandleAtPoint: NSMakePoint(NSMaxX(bounds), NSMidY(bounds)) inView: view];
     }
-    if (knobMask & LowerRightKnobMask) {
-        [self drawHandleAtPoint:NSMakePoint(NSMaxX(bounds), NSMaxY(bounds)) inView:view];
+
+    if (knobMask & LowerLeftKnobMask)
+    {
+        [self drawHandleAtPoint: NSMakePoint(NSMinX(bounds), NSMaxY(bounds)) inView: view];
+    }
+    if (knobMask & LowerMiddleKnobMask)
+    {
+        [self drawHandleAtPoint: NSMakePoint(NSMidX(bounds), NSMaxY(bounds)) inView: view];
+    }
+    if (knobMask & LowerRightKnobMask)
+    {
+        [self drawHandleAtPoint: NSMakePoint(NSMaxX(bounds), NSMaxY(bounds)) inView: view];
     }
 }
 
 // =================================== Event Handling ===================================
-+ (NSCursor *)creationCursor {
++ (NSCursor *)creationCursor
+{
     // By default we use the crosshair cursor
     static NSCursor *crosshairCursor = nil;
-    if (!crosshairCursor) {
-        NSImage *crosshairImage = [NSImage imageNamed:@"Cross"];
+    if (!crosshairCursor)
+    {
+        NSImage *crosshairImage = [NSImage imageNamed: @"Cross"];
         NSSize imageSize = [crosshairImage size];
-        crosshairCursor = [[NSCursor alloc] initWithImage:crosshairImage hotSpot:NSMakePoint((imageSize.width / 2.0), (imageSize.height / 2.0))];
+        crosshairCursor = [[NSCursor alloc] initWithImage: crosshairImage
+                                                  hotSpot: NSMakePoint((imageSize.width / 2.0),
+                                                                       (imageSize.height / 2.0))];
     }
     return crosshairCursor;
 }
 
-- (BOOL)createWithEvent:(NSEvent *)theEvent inView:(SKTGraphicView *)view {
+- (BOOL)createWithEvent: (NSEvent *)theEvent inView: (SKTGraphicView *)view
+{
     // default implementation tracks until mouseUp: just setting the bounds of the new graphic.
-    NSPoint point = [view convertPoint:[theEvent locationInWindow] fromView:nil];
+    NSPoint point = [view convertPoint: [theEvent locationInWindow] fromView: nil];
     int knob = LowerRightKnob;
     NSRect bounds;
     BOOL snapsToGrid = [view snapsToGrid];
@@ -603,69 +729,91 @@ NSString *SKTStrokeLineWidthKey = @"StrokeLineWidth";
     BOOL echoToRulers = [[view enclosingScrollView] rulersVisible];
 
     [self startBoundsManipulation];
-    if (snapsToGrid) {
+    if (snapsToGrid)
+    {
         point.x = floor((point.x / spacing) + 0.5) * spacing;
         point.y = floor((point.y / spacing) + 0.5) * spacing;
     }
-    [self setBounds:NSMakeRect(point.x, point.y, 0.0, 0.0)];
-    if (echoToRulers) {
-        [view beginEchoingMoveToRulers:[self bounds]];
+    [self setBounds: NSMakeRect(point.x, point.y, 0.0, 0.0)];
+    if (echoToRulers)
+    {
+        [view beginEchoingMoveToRulers: [self bounds]];
     }
-    while (1) {
-        theEvent = [[view window] nextEventMatchingMask:(NSLeftMouseDraggedMask | NSLeftMouseUpMask)];
-        point = [view convertPoint:[theEvent locationInWindow] fromView:nil];
-        if (snapsToGrid) {
+    while (1)
+    {
+        theEvent = [[view window] nextEventMatchingMask: (NSLeftMouseDraggedMask | NSLeftMouseUpMask)];
+        point = [view convertPoint: [theEvent locationInWindow] fromView: nil];
+        if (snapsToGrid)
+        {
             point.x = floor((point.x / spacing) + 0.5) * spacing;
             point.y = floor((point.y / spacing) + 0.5) * spacing;
         }
-        [view setNeedsDisplayInRect:[self drawingBounds]];
-        knob = [self resizeByMovingKnob:knob toPoint:point];
-        [view setNeedsDisplayInRect:[self drawingBounds]];
-        if (echoToRulers) {
-            [view continueEchoingMoveToRulers:[self bounds]];
+        [view setNeedsDisplayInRect: [self drawingBounds]];
+        knob = [self resizeByMovingKnob: knob toPoint: point];
+        [view setNeedsDisplayInRect: [self drawingBounds]];
+        if (echoToRulers)
+        {
+            [view continueEchoingMoveToRulers: [self bounds]];
         }
-        if ([theEvent type] == NSLeftMouseUp) {
+        if ([theEvent type] == NSLeftMouseUp)
+        {
             break;
         }
     }
-    if (echoToRulers) {
+    if (echoToRulers)
+    {
         [view stopEchoingMoveToRulers];
     }
 
     [self stopBoundsManipulation];
-    
+
     bounds = [self bounds];
-    if ((bounds.size.width > 0.0) || (bounds.size.height > 0.0)) {
+    if ((bounds.size.width > 0.0) || (bounds.size.height > 0.0))
+    {
         return YES;
-    } else {
+    }
+    else
+    {
         return NO;
     }
 }
 
-- (BOOL)isEditable {
+- (BOOL)isEditable
+{
     return NO;
 }
 
-- (void)startEditingWithEvent:(NSEvent *)event inView:(SKTGraphicView *)view {
+- (void)startEditingWithEvent: (NSEvent *)event inView: (SKTGraphicView *)view
+{
     return;
 }
 
-- (void)endEditingInView:(SKTGraphicView *)view {
+- (void)endEditingInView: (SKTGraphicView *)view
+{
     return;
 }
 
-- (BOOL)hitTest:(NSPoint)point isSelected:(BOOL)isSelected {
-    if (isSelected && ([self knobUnderPoint:point] != NoKnob)) {
+- (BOOL)hitTest: (NSPoint)point isSelected: (BOOL)isSelected
+{
+    if (isSelected && ([self knobUnderPoint: point] != NoKnob))
+    {
         return YES;
-    } else {
+    }
+    else
+    {
         NSBezierPath *path = [self bezierPath];
 
-        if (path) {
-            if ([path containsPoint:point]) {
+        if (path)
+        {
+            if ([path containsPoint: point])
+            {
                 return YES;
             }
-        } else {
-            if (NSPointInRect(point, [self bounds])) {
+        }
+        else
+        {
+            if (NSPointInRect(point, [self bounds]))
+            {
                 return YES;
             }
         }
@@ -673,7 +821,8 @@ NSString *SKTStrokeLineWidthKey = @"StrokeLineWidth";
     }
 }
 
-- (NSString *)description {
+- (NSString *)description
+{
     return [[self propertyListRepresentation] description];
 }
 

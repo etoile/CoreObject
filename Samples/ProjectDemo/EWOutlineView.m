@@ -4,7 +4,7 @@
 
 @synthesize delegate;
 
-- (void)textDidEndEditing:(NSNotification *)notification
+- (void)textDidEndEditing: (NSNotification *)notification
 {
     [super textDidEndEditing: notification];
 
@@ -14,7 +14,10 @@
     }
 }
 
-- (void)editColumn:(NSInteger)columnIndex row:(NSInteger)rowIndex withEvent:(NSEvent *)theEvent select:(BOOL)flag
+- (void)editColumn: (NSInteger)columnIndex
+               row: (NSInteger)rowIndex
+         withEvent: (NSEvent *)theEvent
+            select: (BOOL)flag
 {
     if ([self.delegate respondsToSelector: @selector(outlineViewDidStartFieldEditor:)])
     {

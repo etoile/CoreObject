@@ -12,13 +12,13 @@
     return self;
 }
 
-- (void) show: (id)sender
+- (void)show: (id)sender
 {
     [window makeKeyAndOrderFront: nil];
     [table reloadData];
 }
 
-- (void) setDocument: (Document*)doc
+- (void)setDocument: (Document *)doc
 {
     document = doc;
     [window setTitle: [NSString stringWithFormat: @"Tags for %@", [doc documentName]]];
@@ -111,11 +111,14 @@
 
 /* NSTableViewDataSource */
 
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger)numberOfRowsInTableView: (NSTableView *)tableView
 {
     return [[self tagsArray] count];
 }
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+
+- (id)          tableView: (NSTableView *)tableView
+objectValueForTableColumn: (NSTableColumn *)tableColumn
+                      row: (NSInteger)row
 {
     return [[[self tagsArray] objectAtIndex: row] label];
 }

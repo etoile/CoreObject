@@ -1,9 +1,8 @@
 #import "Application.h"
 
-
 @implementation Application
 
-- (void)sendEvent:(NSEvent *)event
+- (void)sendEvent: (NSEvent *)event
 {
 //  if (([event type] == NSKeyDown || [event type] == NSKeyUp) && ![event isARepeat])
 //  {

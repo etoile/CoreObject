@@ -4,21 +4,22 @@
 
 #import "SKTGraphic.h"
 
-@interface SKTImage : SKTGraphic {
-    @private
+@interface SKTImage : SKTGraphic
+{
+@private
     NSImage *_image;
     NSImage *_cachedImage;
     BOOL _flippedHorizontally;
     BOOL _flippedVertically;
 }
 
-- (void)setImage:(NSImage *)image;
+- (void)setImage: (NSImage *)image;
 - (NSImage *)image;
 - (NSImage *)transformedImage;
 
-- (void)setFlippedHorizontally:(BOOL)flag;
+- (void)setFlippedHorizontally: (BOOL)flag;
 - (BOOL)flippedHorizontally;
-- (void)setFlippedVertically:(BOOL)flag;
+- (void)setFlippedVertically: (BOOL)flag;
 - (BOOL)flippedVertically;
 
 @end

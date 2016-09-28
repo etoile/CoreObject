@@ -9,112 +9,142 @@
 
 @implementation SKTGridPanelController
 
-+ (id)sharedGridPanelController {
++ (id)sharedGridPanelController
+{
     static SKTGridPanelController *sharedGridPanelController = nil;
 
-    if (!sharedGridPanelController) {
-        sharedGridPanelController = [[SKTGridPanelController allocWithZone:NULL] init];
+    if (!sharedGridPanelController)
+    {
+        sharedGridPanelController = [[SKTGridPanelController allocWithZone: NULL] init];
     }
 
     return sharedGridPanelController;
 }
 
-- (id)init {
-    self = [self initWithWindowNibName:@"GridPanel"];
-    if (self) {
-        [self setWindowFrameAutosaveName:@"Grid"];
+- (id)init
+{
+    self = [self initWithWindowNibName: @"GridPanel"];
+    if (self)
+    {
+        [self setWindowFrameAutosaveName: @"Grid"];
     }
     return self;
 }
 
-- (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
 }
 
-- (void)updatePanel {
-    if ([self isWindowLoaded]) {
+- (void)updatePanel
+{
+    if ([self isWindowLoaded])
+    {
         BOOL hasGraphicView = ((_inspectingGraphicView == nil) ? NO : YES);
-        [snapsToGridCheckbox setState:([self snapsToGrid] ? NSOnState : NSOffState)];
-        [showsGridCheckbox setState:([self showsGrid] ? NSOnState : NSOffState)];
-        [gridSpacingSlider setIntValue:[self gridSpacing]];
-        [gridColorWell setColor:[self gridColor]];
-        [snapsToGridCheckbox setEnabled:hasGraphicView];
-        [showsGridCheckbox setEnabled:hasGraphicView];
-        [gridSpacingSlider setEnabled:hasGraphicView];
-        [gridColorWell setEnabled:hasGraphicView];
-        [gridView setNeedsDisplay:YES];
+        [snapsToGridCheckbox setState: ([self snapsToGrid] ? NSOnState : NSOffState)];
+        [showsGridCheckbox setState: ([self showsGrid] ? NSOnState : NSOffState)];
+        [gridSpacingSlider setIntValue: [self gridSpacing]];
+        [gridColorWell setColor: [self gridColor]];
+        [snapsToGridCheckbox setEnabled: hasGraphicView];
+        [showsGridCheckbox setEnabled: hasGraphicView];
+        [gridSpacingSlider setEnabled: hasGraphicView];
+        [gridColorWell setEnabled: hasGraphicView];
+        [gridView setNeedsDisplay: YES];
     }
 }
 
-- (void)setMainWindow:(NSWindow *)mainWindow {
+- (void)setMainWindow: (NSWindow *)mainWindow
+{
     // FIXME: get the view
     _inspectingGraphicView = nil;
-    
+
     [self updatePanel];
 }
 
-- (void)mainWindowChanged:(NSNotification *)notification {
-    [self setMainWindow:[notification object]];
+- (void)mainWindowChanged: (NSNotification *)notification
+{
+    [self setMainWindow: [notification object]];
 }
 
-- (void)mainWindowResigned:(NSNotification *)notification {
-    [self setMainWindow:nil];
+- (void)mainWindowResigned: (NSNotification *)notification
+{
+    [self setMainWindow: nil];
 }
 
-- (void)windowDidLoad {
+- (void)windowDidLoad
+{
     [super windowDidLoad];
-    [(NSPanel *)[self window] setFloatingPanel:YES];
-    [(NSPanel *)[self window] setBecomesKeyOnlyIfNeeded:YES];
-    [self setMainWindow:[NSApp mainWindow]];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mainWindowChanged:) name:NSWindowDidBecomeMainNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mainWindowResigned:) name:NSWindowDidResignMainNotification object:nil];
+    [(NSPanel *)[self window] setFloatingPanel: YES];
+    [(NSPanel *)[self window] setBecomesKeyOnlyIfNeeded: YES];
+    [self setMainWindow: [NSApp mainWindow]];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(mainWindowChanged:)
+                                                 name: NSWindowDidBecomeMainNotification
+                                               object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(mainWindowResigned:)
+                                                 name: NSWindowDidResignMainNotification
+                                               object: nil];
 }
 
-- (BOOL)snapsToGrid {
+- (BOOL)snapsToGrid
+{
     return (_inspectingGraphicView ? [_inspectingGraphicView snapsToGrid] : NO);
 }
 
-- (BOOL)showsGrid {
+- (BOOL)showsGrid
+{
     return (_inspectingGraphicView ? [_inspectingGraphicView showsGrid] : NO);
 }
 
-- (float)gridSpacing {
+- (float)gridSpacing
+{
     return (_inspectingGraphicView ? [_inspectingGraphicView gridSpacing] : 8);
 }
 
-- (NSColor *)gridColor {
+- (NSColor *)gridColor
+{
     return (_inspectingGraphicView ? [_inspectingGraphicView gridColor] : [NSColor lightGrayColor]);
 }
 
-- (IBAction)snapsToGridCheckboxAction:(id)sender {
-    if (_inspectingGraphicView) {
-        [_inspectingGraphicView setSnapsToGrid:[sender state]];
+- (IBAction)snapsToGridCheckboxAction: (id)sender
+{
+    if (_inspectingGraphicView)
+    {
+        [_inspectingGraphicView setSnapsToGrid: [sender state]];
     }
 }
 
-- (IBAction)showsGridCheckboxAction:(id)sender {
-    if (_inspectingGraphicView) {
-        [_inspectingGraphicView setShowsGrid:[sender state]];
+- (IBAction)showsGridCheckboxAction: (id)sender
+{
+    if (_inspectingGraphicView)
+    {
+        [_inspectingGraphicView setShowsGrid: [sender state]];
     }
 }
 
-- (IBAction)gridSpacingSliderAction:(id)sender {
-    if (_inspectingGraphicView) {
-        [_inspectingGraphicView setGridSpacing:(float)[sender intValue]];
+- (IBAction)gridSpacingSliderAction: (id)sender
+{
+    if (_inspectingGraphicView)
+    {
+        [_inspectingGraphicView setGridSpacing: (float)[sender intValue]];
     }
-    [gridView setNeedsDisplay:YES];
+    [gridView setNeedsDisplay: YES];
 }
 
-- (IBAction)gridColorWellAction:(id)sender {
-    if (_inspectingGraphicView) {
-        [_inspectingGraphicView setGridColor:[sender color]];
+- (IBAction)gridColorWellAction: (id)sender
+{
+    if (_inspectingGraphicView)
+    {
+        [_inspectingGraphicView setGridColor: [sender color]];
     }
-    [gridView setNeedsDisplay:YES];
+    [gridView setNeedsDisplay: YES];
 }
 
 @end
 
-void SKTDrawGridWithSettingsInRect(float spacing, NSColor *color, NSRect rect, NSPoint gridOrigin) {
+void SKTDrawGridWithSettingsInRect(float spacing, NSColor *color, NSRect rect, NSPoint gridOrigin)
+{
     int curLine, endLine;
     NSBezierPath *gridPath = [NSBezierPath bezierPath];
 
@@ -123,20 +153,22 @@ void SKTDrawGridWithSettingsInRect(float spacing, NSColor *color, NSRect rect, N
     // Columns
     curLine = ceil((NSMinX(rect) - gridOrigin.x) / spacing);
     endLine = floor((NSMaxX(rect) - gridOrigin.x) / spacing);
-    for (; curLine<=endLine; curLine++) {
-        [gridPath moveToPoint:NSMakePoint((curLine * spacing) + gridOrigin.x, NSMinY(rect))];
-        [gridPath lineToPoint:NSMakePoint((curLine * spacing) + gridOrigin.x, NSMaxY(rect))];
+    for (; curLine <= endLine; curLine++)
+    {
+        [gridPath moveToPoint: NSMakePoint((curLine * spacing) + gridOrigin.x, NSMinY(rect))];
+        [gridPath lineToPoint: NSMakePoint((curLine * spacing) + gridOrigin.x, NSMaxY(rect))];
     }
 
     // Rows
     curLine = ceil((NSMinY(rect) - gridOrigin.y) / spacing);
     endLine = floor((NSMaxY(rect) - gridOrigin.y) / spacing);
-    for (; curLine<=endLine; curLine++) {
-        [gridPath moveToPoint:NSMakePoint(NSMinX(rect), (curLine * spacing) + gridOrigin.y)];
-        [gridPath lineToPoint:NSMakePoint(NSMaxX(rect), (curLine * spacing) + gridOrigin.y)];
+    for (; curLine <= endLine; curLine++)
+    {
+        [gridPath moveToPoint: NSMakePoint(NSMinX(rect), (curLine * spacing) + gridOrigin.y)];
+        [gridPath lineToPoint: NSMakePoint(NSMaxX(rect), (curLine * spacing) + gridOrigin.y)];
     }
 
-    [gridPath setLineWidth:0.0];
+    [gridPath setLineWidth: 0.0];
     [gridPath stroke];
 }
 

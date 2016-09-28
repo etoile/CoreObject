@@ -1,7 +1,7 @@
 #import <Cocoa/Cocoa.h>
 
-
-@interface Application : NSApplication {
+@interface Application : NSApplication
+{
 }
 
 @end

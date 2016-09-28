@@ -7,29 +7,30 @@
 
 @class SKTGraphic;
 
-@interface SKTDrawDocument : COObject {
+@interface SKTDrawDocument : COObject
+{
 }
 
-- (NSDictionary *)drawDocumentDictionaryForGraphics:(NSArray *)graphics;
-- (NSData *)drawDocumentDataForGraphics:(NSArray *)graphics;
-- (NSDictionary *)drawDocumentDictionaryFromData:(NSData *)data error:(NSError **)outError;
-- (NSArray *)graphicsFromDrawDocumentDictionary:(NSDictionary *)doc;
+- (NSDictionary *)drawDocumentDictionaryForGraphics: (NSArray *)graphics;
+- (NSData *)drawDocumentDataForGraphics: (NSArray *)graphics;
+- (NSDictionary *)drawDocumentDictionaryFromData: (NSData *)data error: (NSError **)outError;
+- (NSArray *)graphicsFromDrawDocumentDictionary: (NSDictionary *)doc;
 
-- (NSRect)boundsForGraphics:(NSArray *)graphics;
-- (NSData *)TIFFRepresentationForGraphics:(NSArray *)graphics error:(NSError **)outError;
-- (NSData *)PDFRepresentationForGraphics:(NSArray *)graphics;
+- (NSRect)boundsForGraphics: (NSArray *)graphics;
+- (NSData *)TIFFRepresentationForGraphics: (NSArray *)graphics error: (NSError **)outError;
+- (NSData *)PDFRepresentationForGraphics: (NSArray *)graphics;
 
 @property (readwrite, nonatomic, retain) NSArray *graphics;
 
-- (void)invalidateGraphic:(SKTGraphic *)graphic;
+- (void)invalidateGraphic: (SKTGraphic *)graphic;
 
-- (void)insertGraphic:(SKTGraphic *)graphic atIndex:(unsigned)index;
-- (void)removeGraphicAtIndex:(unsigned)index;
-- (void)removeGraphic:(SKTGraphic *)graphic;
-- (void)moveGraphic:(SKTGraphic *)graphic toIndex:(unsigned)newIndex;
+- (void)insertGraphic: (SKTGraphic *)graphic atIndex: (unsigned)index;
+- (void)removeGraphicAtIndex: (unsigned)index;
+- (void)removeGraphic: (SKTGraphic *)graphic;
+- (void)moveGraphic: (SKTGraphic *)graphic toIndex: (unsigned)newIndex;
 
 - (NSSize)documentSize;
-    // Returns usable document size based on print info paper size and margins.
+// Returns usable document size based on print info paper size and margins.
 
 @end
 

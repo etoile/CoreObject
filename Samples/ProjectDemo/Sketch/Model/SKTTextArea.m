@@ -9,74 +9,77 @@
 
 @implementation SKTTextArea
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-    
+
     ETPropertyDescription *attrStrProperty = [ETPropertyDescription descriptionWithName: @"attrStr"
-                                                                                      type: (id)@"COAttributedString"];
+                                                                                   type: (id)@"COAttributedString"];
     [attrStrProperty setPersistent: YES];
     [entity setPropertyDescriptions: A(attrStrProperty)];
-    
+
     return entity;
 }
 
-- (instancetype) initWithObjectGraphContext:(COObjectGraphContext *)aContext
+- (instancetype)initWithObjectGraphContext: (COObjectGraphContext *)aContext
 {
     self = [super initWithObjectGraphContext: aContext];
-    
+
     [self setAttrStr: [[COAttributedString alloc] initWithObjectGraphContext: aContext]];
-    
+
     return self;
 }
 
-- (void)dealloc 
+- (void)dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
 }
 
-- (COAttributedString *) attrStr
+- (COAttributedString *)attrStr
 {
     return [self valueForVariableStorageKey: @"attrStr"];
 }
 
-- (void) setAttrStr: (COAttributedString *)attrStr
+- (void)setAttrStr: (COAttributedString *)attrStr
 {
     // Set the value
     [self willChangeValueForProperty: @"attrStr"];
     [self setValue: attrStr forVariableStorageKey: @"attrStr"];
     [self didChangeValueForProperty: @"attrStr"];
-    
+
     // After
-    
+
     [textStorage setBacking: attrStr];
 }
 
-- (NSTextStorage *) contents
+- (NSTextStorage *)contents
 {
     if (textStorage == nil)
     {
         textStorage = [[COAttributedStringWrapper alloc] initWithBacking: [self attrStr]];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(SKT_contentsChanged:) name:NSTextStorageDidProcessEditingNotification object:textStorage];
+
+        [[NSNotificationCenter defaultCenter] addObserver: self
+                                                 selector: @selector(SKT_contentsChanged:)
+                                                     name: NSTextStorageDidProcessEditingNotification
+                                                   object: textStorage];
     }
-    
+
     return textStorage;
 }
 
-- (void)SKT_contentsChanged:(NSNotification *)notification 
+- (void)SKT_contentsChanged: (NSNotification *)notification
 {
     // MF:!!! We won't be able to undo piecemeal changes to the text currently.
     [self didChange];
 }
 
-- (BOOL)drawsStroke 
+- (BOOL)drawsStroke
 {
     // Never draw stroke.
     return NO;
 }
 
-- (BOOL)canDrawStroke 
+- (BOOL)canDrawStroke
 {
     // Never draw stroke.
     return NO;
@@ -84,20 +87,20 @@
 
 NSArray *makeLMAndTC()
 {
-    NSTextContainer *tc = [[NSTextContainer new] initWithContainerSize:NSMakeSize(1.0e6, 1.0e6)];
+    NSTextContainer *tc = [[NSTextContainer new] initWithContainerSize: NSMakeSize(1.0e6, 1.0e6)];
     NSLayoutManager *lm = [[NSLayoutManager new] init];
 
-    [tc setWidthTracksTextView:NO];
-    [tc setHeightTracksTextView:NO];
-    [lm addTextContainer:tc];
+    [tc setWidthTracksTextView: NO];
+    [tc setHeightTracksTextView: NO];
+    [lm addTextContainer: tc];
 
     return @[lm, tc];
 }
 
-- (void)drawInView:(SKTGraphicView *)view isSelected:(BOOL)flag 
+- (void)drawInView: (SKTGraphicView *)view isSelected: (BOOL)flag
 {
     NSRect bounds = [self bounds];
-    if ([self drawsFill]) 
+    if ([self drawsFill])
     {
         [[self fillColor] set];
         NSRectFill(bounds);
@@ -108,148 +111,153 @@ NSArray *makeLMAndTC()
         NSFrameRect(NSInsetRect(bounds, -1.0, -1.0));
         // If we are creating we have no text.  If we are editing, the editor (ie NSTextView) will draw the text.
     }
-    else 
+    else
     {
         NSTextStorage *contents = [self contents];
-        if ([contents length] > 0) 
+        if ([contents length] > 0)
         {
             NSArray *lmAndTc = makeLMAndTC();
             NSLayoutManager *lm = lmAndTc[0];
             NSTextContainer *tc = lmAndTc[1];
             NSRange glyphRange;
 
-            [tc setContainerSize:bounds.size];
-            [contents addLayoutManager:lm];
+            [tc setContainerSize: bounds.size];
+            [contents addLayoutManager: lm];
             // Force layout of the text and find out how much of it fits in the container.
-            glyphRange = [lm glyphRangeForTextContainer:tc];
+            glyphRange = [lm glyphRangeForTextContainer: tc];
             //glyphRange.length  = 100; 
 
-            if (glyphRange.length > 0) 
+            if (glyphRange.length > 0)
             {
-                [lm drawBackgroundForGlyphRange:glyphRange atPoint:bounds.origin];
-                [lm drawGlyphsForGlyphRange:glyphRange atPoint:bounds.origin];
+                [lm drawBackgroundForGlyphRange: glyphRange atPoint: bounds.origin];
+                [lm drawGlyphsForGlyphRange: glyphRange atPoint: bounds.origin];
             }
-            [contents removeLayoutManager:lm];
+            [contents removeLayoutManager: lm];
         }
     }
-    [super drawInView:view isSelected:flag];
+    [super drawInView: view isSelected: flag];
 }
 
-- (NSSize)minSize 
+- (NSSize)minSize
 {
     return NSMakeSize(10.0, 15.0);
 }
 
 static const float SKTRightMargin = 36.0;
 
-- (NSSize)maxSize 
+- (NSSize)maxSize
 {
     return NSMakeSize(1.0e6, 1.0e6);
 }
 
-- (NSSize)requiredSize:(float)maxWidth 
+- (NSSize)requiredSize: (float)maxWidth
 {
     NSTextStorage *contents = [self contents];
     NSSize minSize = [self minSize];
     NSSize maxSize = [self maxSize];
     unsigned len = [contents length];
-    
-    if (len > 0) 
+
+    if (len > 0)
     {
         NSArray *lmAndTc = makeLMAndTC();
         NSLayoutManager *lm = lmAndTc[0];
         NSTextContainer *tc = lmAndTc[1];
         NSRange glyphRange;
         NSSize requiredSize;
-        
-        [tc setContainerSize: NSMakeSize(((maxSize.width < maxWidth) ? maxSize.width : maxWidth), maxSize.height)];
-        [contents addLayoutManager:lm];
-        // Force layout of the text and find out how much of it fits in the container.
-        glyphRange = [lm glyphRangeForTextContainer:tc];
 
-        requiredSize = [lm usedRectForTextContainer:tc].size;
+        [tc setContainerSize: NSMakeSize(((maxSize.width < maxWidth) ? maxSize.width : maxWidth),
+                                         maxSize.height)];
+        [contents addLayoutManager: lm];
+        // Force layout of the text and find out how much of it fits in the container.
+        glyphRange = [lm glyphRangeForTextContainer: tc];
+
+        requiredSize = [lm usedRectForTextContainer: tc].size;
         requiredSize.width += 1.0;
 
-        if (requiredSize.width < minSize.width) 
+        if (requiredSize.width < minSize.width)
         {
             requiredSize.width = minSize.width;
         }
-        if (requiredSize.height < minSize.height) 
+        if (requiredSize.height < minSize.height)
         {
             requiredSize.height = minSize.height;
         }
 
-        [contents removeLayoutManager:lm];
+        [contents removeLayoutManager: lm];
         return requiredSize;
     }
-    else 
+    else
     {
         return minSize;
     }
 }
 
-- (void)makeNaturalSize 
+- (void)makeNaturalSize
 {
     NSRect bounds = [self bounds];
-    NSSize requiredSize = [self requiredSize:1.0e6];
+    NSSize requiredSize = [self requiredSize: 1.0e6];
     bounds.size = requiredSize;
-    [self setBounds:bounds];
+    [self setBounds: bounds];
 }
 
-- (void)setBounds:(NSRect)rect 
+- (void)setBounds: (NSRect)rect
 {
     // We need to make sure there's enough room for the text.
     NSSize minSize = [self minSize];
-    if (minSize.width > rect.size.width) {
+    if (minSize.width > rect.size.width)
+    {
         rect.size.width = minSize.width;
     }
-    if (minSize.height > rect.size.height) {
+    if (minSize.height > rect.size.height)
+    {
         rect.size.height = minSize.height;
     }
-    [super setBounds:rect];
+    [super setBounds: rect];
 }
 
-- (int)resizeByMovingKnob:(int)knob toPoint:(NSPoint)point 
+- (int)resizeByMovingKnob: (int)knob toPoint: (NSPoint)point
 {
     NSSize minSize = [self minSize];
     NSRect bounds = [self bounds];
 
     // This constrains the size to be big enough for the text.  It is different from the constraining in -setBounds since it takes into account which corner or edge is moving to figure out which way to grow the bounds if necessary.
-    if ((knob == UpperLeftKnob) || (knob == MiddleLeftKnob) || (knob == LowerLeftKnob)) 
+    if ((knob == UpperLeftKnob) || (knob == MiddleLeftKnob) || (knob == LowerLeftKnob))
     {
         // Adjust left edge
-        if ((NSMaxX(bounds) - point.x) < minSize.width) 
+        if ((NSMaxX(bounds) - point.x) < minSize.width)
         {
             point.x -= minSize.width - (NSMaxX(bounds) - point.x);
         }
     }
-    else if ((knob == UpperRightKnob) || (knob == MiddleRightKnob) || (knob == LowerRightKnob)) 
+    else if ((knob == UpperRightKnob) || (knob == MiddleRightKnob) || (knob == LowerRightKnob))
     {
         // Adjust right edge
-        if ((point.x - bounds.origin.x) < minSize.width) {
+        if ((point.x - bounds.origin.x) < minSize.width)
+        {
             point.x += minSize.width - (point.x - bounds.origin.x);
         }
     }
-    if ((knob == UpperLeftKnob) || (knob == UpperMiddleKnob) || (knob == UpperRightKnob)) {
+    if ((knob == UpperLeftKnob) || (knob == UpperMiddleKnob) || (knob == UpperRightKnob))
+    {
         // Adjust top edge
-        if ((NSMaxY(bounds) - point.y) < minSize.height) 
+        if ((NSMaxY(bounds) - point.y) < minSize.height)
         {
             point.y -= minSize.height - (NSMaxY(bounds) - point.y);
         }
     }
-    else if ((knob == LowerLeftKnob) || (knob == LowerMiddleKnob) || (knob == LowerRightKnob)) 
+    else if ((knob == LowerLeftKnob) || (knob == LowerMiddleKnob) || (knob == LowerRightKnob))
     {
         // Adjust bottom edge
-        if ((point.y - bounds.origin.y) < minSize.height) 
+        if ((point.y - bounds.origin.y) < minSize.height)
         {
             point.y += minSize.height - (point.y - bounds.origin.y);
         }
     }
-    
-    return [super resizeByMovingKnob:knob toPoint:point];
+
+    return [super resizeByMovingKnob: knob toPoint: point];
 }
 
-- (BOOL)isEditable 
+- (BOOL)isEditable
 {
     return YES;
 }
@@ -257,23 +265,24 @@ static const float SKTRightMargin = 36.0;
 static NSArray *makeLM_TC_TV()
 {
     NSLayoutManager *lm = [[NSLayoutManager alloc] init];
-    NSTextContainer *tc = [[NSTextContainer alloc] initWithContainerSize:NSMakeSize(1.0e6, 1.0e6)];
-    NSTextView *tv = [[NSTextView alloc] initWithFrame:NSMakeRect(0.0, 0.0, 100.0, 100.0) textContainer:nil];
+    NSTextContainer *tc = [[NSTextContainer alloc] initWithContainerSize: NSMakeSize(1.0e6, 1.0e6)];
+    NSTextView *tv = [[NSTextView alloc] initWithFrame: NSMakeRect(0.0, 0.0, 100.0, 100.0)
+                                         textContainer: nil];
 
-    [lm addTextContainer:tc];
+    [lm addTextContainer: tc];
 
-    [tv setTextContainerInset:NSMakeSize(0.0, 0.0)];
-    [tv setDrawsBackground:NO];
-    [tv setAllowsUndo:YES];
-    [tc setTextView:tv];
+    [tv setTextContainerInset: NSMakeSize(0.0, 0.0)];
+    [tv setDrawsBackground: NO];
+    [tv setAllowsUndo: YES];
+    [tc setTextView: tv];
 
     assert([tv layoutManager] == lm);
     assert([tv textContainer] == tc);
-    
+
     return @[lm, tc, tv];
 }
 
-- (void)startEditingWithEvent:(NSEvent *)event inView:(SKTGraphicView *)view 
+- (void)startEditingWithEvent: (NSEvent *)event inView: (SKTGraphicView *)view
 {
     NSLayoutManager *lm;
     NSTextContainer *tc;
@@ -282,72 +291,75 @@ static NSArray *makeLM_TC_TV()
     NSSize maxSize = [self maxSize];
     NSSize minSize = [self minSize];
     NSRect bounds = [self bounds];
-    
+
     NSArray *lmTcTv = makeLM_TC_TV();
     lm = lmTcTv[0];
     tc = lmTcTv[1];
     editor = lmTcTv[2];
-    
-    [tc setWidthTracksTextView:NO];
-    if (NSWidth(bounds) > minSize.width + 1.0) 
+
+    [tc setWidthTracksTextView: NO];
+    if (NSWidth(bounds) > minSize.width + 1.0)
     {
         // If we are bigger than the minimum width we assume that someone already edited this SKTTextArea or that they created it by dragging out a rect.  In either case, we figure the width should remain fixed.
-        [tc setContainerSize:NSMakeSize(NSWidth(bounds), maxSize.height)];
-        [editor setHorizontallyResizable:NO];
+        [tc setContainerSize: NSMakeSize(NSWidth(bounds), maxSize.height)];
+        [editor setHorizontallyResizable: NO];
     }
-    else 
+    else
     {
-        [tc setContainerSize:maxSize];
-        [editor setHorizontallyResizable:YES];
+        [tc setContainerSize: maxSize];
+        [editor setHorizontallyResizable: YES];
     }
-    [editor setMinSize:minSize];
-    [editor setMaxSize:maxSize];
-    [tc setHeightTracksTextView:NO];
-    [editor setVerticallyResizable:YES];
-    [editor setFrame:bounds];
+    [editor setMinSize: minSize];
+    [editor setMaxSize: maxSize];
+    [tc setHeightTracksTextView: NO];
+    [editor setVerticallyResizable: YES];
+    [editor setFrame: bounds];
 
-    [contents addLayoutManager:lm];
-    [view addSubview:editor];
-    [view setEditingGraphic:self editorView:editor];
-    [editor setSelectedRange:NSMakeRange(0, [contents length])];
-    [editor setDelegate:self];
+    [contents addLayoutManager: lm];
+    [view addSubview: editor];
+    [view setEditingGraphic: self editorView: editor];
+    [editor setSelectedRange: NSMakeRange(0, [contents length])];
+    [editor setDelegate: self];
 
     // Make sure we redisplay
     [self didChange];
 
-    [[view window] makeFirstResponder:editor];
-    if (event) 
+    [[view window] makeFirstResponder: editor];
+    if (event)
     {
-        [editor mouseDown:event];
+        [editor mouseDown: event];
     }
 }
 
-- (void)endEditingInView:(SKTGraphicView *)view 
+- (void)endEditingInView: (SKTGraphicView *)view
 {
-    if ([view editingGraphic] == self) 
+    if ([view editingGraphic] == self)
     {
         NSTextView *editor = (NSTextView *)[view editorView];
-        [editor setDelegate:nil];
+        [editor setDelegate: nil];
         [editor removeFromSuperview];
-        [[self contents] removeLayoutManager:[editor layoutManager]];
-        
-        [view setEditingGraphic:nil editorView:nil];
-        
+        [[self contents] removeLayoutManager: [editor layoutManager]];
+
+        [view setEditingGraphic: nil editorView: nil];
+
         [[view drawingController] commitWithIdentifier: @"typing"];
     }
 }
 
-- (void)textDidChange:(NSNotification *)notification 
+- (void)textDidChange: (NSNotification *)notification
 {
     NSSize textSize;
     NSRect myBounds = [self bounds];
     BOOL fixedWidth = ([[notification object] isHorizontallyResizable] ? NO : YES);
-    
-    textSize = [self requiredSize:(fixedWidth ? NSWidth(myBounds) : 1.0e6)];
-    
-    if ((textSize.width > myBounds.size.width) || (textSize.height > myBounds.size.height)) 
+
+    textSize = [self requiredSize: (fixedWidth ? NSWidth(myBounds) : 1.0e6)];
+
+    if ((textSize.width > myBounds.size.width) || (textSize.height > myBounds.size.height))
     {
-        [self setBounds:NSMakeRect(myBounds.origin.x, myBounds.origin.y, ((!fixedWidth && (textSize.width > myBounds.size.width)) ? textSize.width : myBounds.size.width), ((textSize.height > myBounds.size.height) ? textSize.height : myBounds.size.height))];
+        [self setBounds: NSMakeRect(myBounds.origin.x,
+                                    myBounds.origin.y,
+                                    ((!fixedWidth && (textSize.width > myBounds.size.width)) ? textSize.width : myBounds.size.width),
+                                    ((textSize.height > myBounds.size.height) ? textSize.height : myBounds.size.height))];
         // MF: For multiple editors we must fix up the others...  but we don't support multiple views of a document yet, and that's the only way we'd ever have the potential for multiple editors.
     }
 }

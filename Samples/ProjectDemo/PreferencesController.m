@@ -9,8 +9,9 @@
 - (id)init
 {
     self = [super initWithWindowNibName: @"Preferences"];
-    
-    if (self) {
+
+    if (self)
+    {
         [[NSNotificationCenter defaultCenter] addObserver: self
                                                  selector: @selector(defaultsChanged:)
                                                      name: NSUserDefaultsDidChangeNotification
@@ -19,12 +20,12 @@
     return self;
 }
 
-- (void) dealloc
+- (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 }
 
-- (void) defaultsChanged: (NSNotification*)notif
+- (void)defaultsChanged: (NSNotification *)notif
 {
     NSString *mode = [[NSUserDefaults standardUserDefaults] stringForKey: @"UndoMode"];
     if ([mode isEqual: @"Project"] || mode == nil)
@@ -46,7 +47,7 @@
 {
     NSInteger tag = [((NSMatrix *)sender) selectedTag];
     NSString *value = nil;
-    
+
     if (tag == PER_PROJECT)
     {
         value = @"Project";
@@ -60,13 +61,13 @@
         [[COUndoTrack trackForPattern: @"org.etoile.projectdemo*" withEditingContext: nil] clear];
         NSLog(@"Cleared document stacks");
     }
-    
+
     [[NSUserDefaults standardUserDefaults] setValue: value forKey: @"UndoMode"];
     NSLog(@"changed to %@", value);
-    
+
     // Clear the undo stacks
-    
-    
+
+
 }
 
 @end

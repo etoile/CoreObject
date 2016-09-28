@@ -6,8 +6,8 @@
 
 @interface NSObject (SKTPerformExtras)
 
-- (void)performSelector:(SEL)sel withEachObjectInArray:(NSArray *)array;
-- (void)performSelector:(SEL)sel withEachObjectInSet:(NSSet *)set;
+- (void)performSelector: (SEL)sel withEachObjectInArray: (NSArray *)array;
+- (void)performSelector: (SEL)sel withEachObjectInSet: (NSSet *)set;
 
 @end
 

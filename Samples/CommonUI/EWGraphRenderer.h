@@ -9,8 +9,9 @@
 #import <CoreObject/CoreObject.h>
 
 @protocol EWGraphRendererDelegate <NSObject>
-- (NSArray *) allOrderedNodesToDisplayForTrack: (id<COTrack>)aTrack;
-- (NSColor *) colorForNode: (id<COTrack>)aTrack isCurrentOrAncestorOfCurrent: (BOOL)current;
+
+- (NSArray *)allOrderedNodesToDisplayForTrack: (id <COTrack>)aTrack;
+- (NSColor *)colorForNode: (id <COTrack>)aTrack isCurrentOrAncestorOfCurrent: (BOOL)current;
 @end
 
 @interface EWGraphRenderer : NSObject
@@ -23,16 +24,16 @@
     NSMutableDictionary *levelForUUID;
     NSMutableSet *currentUUIDAndAncestors;
     NSMutableArray *graphRows;
-    
-    id<COTrack> track;
+
+    id <COTrack> track;
 }
 
-- (void) updateWithTrack: (id<COTrack>)aTrack;
+- (void)updateWithTrack: (id <COTrack>)aTrack;
 
-- (NSUInteger) count;
-- (id<COTrackNode>) revisionAtIndex: (NSUInteger)index;
-- (void) drawRevisionAtIndex: (NSUInteger)index inRect: (NSRect)aRect;
+- (NSUInteger)count;
+- (id <COTrackNode>)revisionAtIndex: (NSUInteger)index;
+- (void)drawRevisionAtIndex: (NSUInteger)index inRect: (NSRect)aRect;
 
-@property (nonatomic, readwrite, unsafe_unretained) id<EWGraphRendererDelegate> delegate;
+@property (nonatomic, readwrite, unsafe_unretained) id <EWGraphRendererDelegate> delegate;
 
 @end

@@ -7,8 +7,9 @@
 @class SKTGridView;
 @class SKTGraphicView;
 
-@interface SKTGridPanelController : NSWindowController {
-    @private
+@interface SKTGridPanelController : NSWindowController
+{
+@private
     IBOutlet NSButton *snapsToGridCheckbox;
     IBOutlet NSButton *showsGridCheckbox;
     IBOutlet NSSlider *gridSpacingSlider;
@@ -27,14 +28,17 @@
 - (float)gridSpacing;
 - (NSColor *)gridColor;
 
-- (IBAction)snapsToGridCheckboxAction:(id)sender;
-- (IBAction)showsGridCheckboxAction:(id)sender;
-- (IBAction)gridSpacingSliderAction:(id)sender;
-- (IBAction)gridColorWellAction:(id)sender;
+- (IBAction)snapsToGridCheckboxAction: (id)sender;
+- (IBAction)showsGridCheckboxAction: (id)sender;
+- (IBAction)gridSpacingSliderAction: (id)sender;
+- (IBAction)gridColorWellAction: (id)sender;
 
 @end
 
-extern void SKTDrawGridWithSettingsInRect(float spacing, NSColor *color, NSRect rect, NSPoint gridOrigin);
+extern void SKTDrawGridWithSettingsInRect(float spacing,
+                                          NSColor *color,
+                                          NSRect rect,
+                                          NSPoint gridOrigin);
 
 /*
  IMPORTANT:  This Apple software is supplied to you by Apple Computer, Inc. ("Apple") in

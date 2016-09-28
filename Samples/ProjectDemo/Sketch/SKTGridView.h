@@ -6,7 +6,8 @@
 
 @class SKTGridPanelController;
 
-@interface SKTGridView : NSView {
+@interface SKTGridView : NSView
+{
     IBOutlet SKTGridPanelController *controller;
 }
 

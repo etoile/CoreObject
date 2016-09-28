@@ -8,7 +8,7 @@
 }
 
 /** Shows the sheet, returns the entered name, or nil if the user pressed cancel */
-- (NSString*) showSheet;
+- (NSString *)showSheet;
 
 - (IBAction)save: (id)sender;
 - (IBAction)cancel: (id)sender;

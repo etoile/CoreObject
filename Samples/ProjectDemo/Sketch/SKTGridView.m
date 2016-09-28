@@ -7,17 +7,23 @@
 
 @implementation SKTGridView
 
-- (void)drawRect:(NSRect)rect {
+- (void)drawRect: (NSRect)rect
+{
     NSDrawWhiteBezel([self bounds], rect);
     rect = NSIntersectionRect(NSInsetRect([self bounds], 2.0, 2.0), rect);
-    SKTDrawGridWithSettingsInRect([controller gridSpacing], [controller gridColor], rect, NSMakePoint(2.0, 2.0));
+    SKTDrawGridWithSettingsInRect([controller gridSpacing],
+                                  [controller gridColor],
+                                  rect,
+                                  NSMakePoint(2.0, 2.0));
 }
 
-- (BOOL)isFlipped {
+- (BOOL)isFlipped
+{
     return YES;
 }
 
-- (BOOL)isOpaque {
+- (BOOL)isOpaque
+{
     return YES;
 }
 

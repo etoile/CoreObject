@@ -8,110 +8,136 @@
 
 @implementation SKTLine
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-    
+
     ETPropertyDescription *startsAtLowerLeftProperty = [ETPropertyDescription descriptionWithName: @"startsAtLowerLeft"
                                                                                              type: (id)@"Anonymous.NSNumber"];
     [startsAtLowerLeftProperty setPersistent: YES];
     [entity setPropertyDescriptions: A(startsAtLowerLeftProperty)];
 
-    
     return entity;
 }
 
-- (id)copyWithZone:(NSZone *)zone {
-    id newObj = [super copyWithZone:zone];
+- (id)copyWithZone: (NSZone *)zone
+{
+    id newObj = [super copyWithZone: zone];
 
-    [newObj setStartsAtLowerLeft:[self startsAtLowerLeft]];
+    [newObj setStartsAtLowerLeft: [self startsAtLowerLeft]];
 
     return newObj;
 }
 
-- (void)setStartsAtLowerLeft:(BOOL)flag {
-    if (_startsAtLowerLeft != flag) {
+- (void)setStartsAtLowerLeft: (BOOL)flag
+{
+    if (_startsAtLowerLeft != flag)
+    {
         [self willChangeValueForProperty: @"startsAtLowerLeft"];
         _startsAtLowerLeft = flag;
         [self didChangeValueForProperty: @"startsAtLowerLeft"];
     }
 }
 
-- (BOOL)startsAtLowerLeft {
+- (BOOL)startsAtLowerLeft
+{
     return _startsAtLowerLeft;
 }
 
-- (void)flipHorizontally {
-    [self setStartsAtLowerLeft:![self startsAtLowerLeft]];
+- (void)flipHorizontally
+{
+    [self setStartsAtLowerLeft: ![self startsAtLowerLeft]];
     return;
 }
 
-- (void)flipVertically {
-    [self setStartsAtLowerLeft:![self startsAtLowerLeft]];
+- (void)flipVertically
+{
+    [self setStartsAtLowerLeft: ![self startsAtLowerLeft]];
     return;
 }
 
-- (BOOL)drawsFill {
+- (BOOL)drawsFill
+{
     // SKTLines never draw fill
     return NO;
 }
 
-- (BOOL)canDrawFill {
+- (BOOL)canDrawFill
+{
     // SKTLines never draw fill
     return NO;
 }
 
-- (BOOL)hasNaturalSize {
+- (BOOL)hasNaturalSize
+{
     // SKTLines have no "natural" size
     return NO;
 }
 
-- (NSBezierPath *)bezierPath {
+- (NSBezierPath *)bezierPath
+{
     NSBezierPath *path = [NSBezierPath bezierPath];
     NSRect bounds = [self bounds];
-    
-    if ([self startsAtLowerLeft]) {
-        [path moveToPoint:NSMakePoint(NSMinX(bounds), NSMaxY(bounds))];
-        [path lineToPoint:NSMakePoint(NSMaxX(bounds), NSMinY(bounds))];
-    } else {
-        [path moveToPoint:NSMakePoint(NSMinX(bounds), NSMinY(bounds))];
-        [path lineToPoint:NSMakePoint(NSMaxX(bounds), NSMaxY(bounds))];
+
+    if ([self startsAtLowerLeft])
+    {
+        [path moveToPoint: NSMakePoint(NSMinX(bounds), NSMaxY(bounds))];
+        [path lineToPoint: NSMakePoint(NSMaxX(bounds), NSMinY(bounds))];
+    }
+    else
+    {
+        [path moveToPoint: NSMakePoint(NSMinX(bounds), NSMinY(bounds))];
+        [path lineToPoint: NSMakePoint(NSMaxX(bounds), NSMaxY(bounds))];
     }
 
-    [path setLineWidth:[self strokeLineWidth]];
+    [path setLineWidth: [self strokeLineWidth]];
 
     return path;
 }
 
-- (unsigned)knobMask {
-    if ([self startsAtLowerLeft]) {
+- (unsigned)knobMask
+{
+    if ([self startsAtLowerLeft])
+    {
         return (LowerLeftKnobMask | UpperRightKnobMask);
-    } else {
+    }
+    else
+    {
         return (UpperLeftKnobMask | LowerRightKnobMask);
     }
 }
 
-- (BOOL)hitTest:(NSPoint)point isSelected:(BOOL)isSelected {
-    if (isSelected && ([self knobUnderPoint:point] != NoKnob)) {
+- (BOOL)hitTest: (NSPoint)point isSelected: (BOOL)isSelected
+{
+    if (isSelected && ([self knobUnderPoint: point] != NoKnob))
+    {
         return YES;
-    } else {
+    }
+    else
+    {
         NSRect bounds = [self bounds];
         float halfWidth = [self strokeLineWidth] / 2.0;
         halfWidth += 2.0;  // Fudge
-        if (bounds.size.width == 0.0) {
-            if (fabs(point.x - bounds.origin.x) <= halfWidth) {
+        if (bounds.size.width == 0.0)
+        {
+            if (fabs(point.x - bounds.origin.x) <= halfWidth)
+            {
                 return YES;
             }
-        } else {
+        }
+        else
+        {
             BOOL startsAtLowerLeft = [self startsAtLowerLeft];
             float slope = bounds.size.height / bounds.size.width;
 
-            if (startsAtLowerLeft) {
+            if (startsAtLowerLeft)
+            {
                 slope = -slope;
             }
 
-            
-            if (fabs(((point.x - bounds.origin.x) * slope) - (point.y - (startsAtLowerLeft ? NSMaxY(bounds) : bounds.origin.y))) <= halfWidth) {
+            if (fabs(((point.x - bounds.origin.x) * slope) - (point.y - (startsAtLowerLeft ? NSMaxY(
+                bounds) : bounds.origin.y))) <= halfWidth)
+            {
                 return YES;
             }
         }
@@ -121,20 +147,24 @@
 
 NSString *SKTLineStartsAtLowerLeftKey = @"LineStartsAtLowerLeft";
 
-- (NSMutableDictionary *)propertyListRepresentation {
+- (NSMutableDictionary *)propertyListRepresentation
+{
     NSMutableDictionary *dict = [super propertyListRepresentation];
-    [dict setObject:([self startsAtLowerLeft] ? @"YES" : @"NO") forKey:SKTLineStartsAtLowerLeftKey];
+    [dict setObject: ([self startsAtLowerLeft] ? @"YES" : @"NO")
+             forKey: SKTLineStartsAtLowerLeftKey];
     return dict;
 }
 
-- (void)loadPropertyListRepresentation:(NSDictionary *)dict {
+- (void)loadPropertyListRepresentation: (NSDictionary *)dict
+{
     id obj;
-    
-    [super loadPropertyListRepresentation:dict];
 
-    obj = [dict objectForKey:SKTLineStartsAtLowerLeftKey];
-    if (obj) {
-        [self setStartsAtLowerLeft:[obj isEqualToString:@"YES"]];
+    [super loadPropertyListRepresentation: dict];
+
+    obj = [dict objectForKey: SKTLineStartsAtLowerLeftKey];
+    if (obj)
+    {
+        [self setStartsAtLowerLeft: [obj isEqualToString: @"YES"]];
     }
 }
 

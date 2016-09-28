@@ -6,29 +6,34 @@
 
 @implementation SKTRectangle
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-    
+
     return entity;
 }
 
-- (NSBezierPath *)bezierPath {
-    NSBezierPath *path = [NSBezierPath bezierPathWithRect:[self bounds]];
+- (NSBezierPath *)bezierPath
+{
+    NSBezierPath *path = [NSBezierPath bezierPathWithRect: [self bounds]];
 
-    [path setLineWidth:[self strokeLineWidth]];
+    [path setLineWidth: [self strokeLineWidth]];
 
     return path;
 }
 
-- (void)makeNaturalSize {
+- (void)makeNaturalSize
+{
     NSRect bounds = [self bounds];
-    if (bounds.size.width < bounds.size.height) {
+    if (bounds.size.width < bounds.size.height)
+    {
         bounds.size.height = bounds.size.width;
-        [self setBounds:bounds];
-    } else if (bounds.size.width > bounds.size.height) {
+        [self setBounds: bounds];
+    }
+    else if (bounds.size.width > bounds.size.height)
+    {
         bounds.size.width = bounds.size.height;
-        [self setBounds:bounds];
+        [self setBounds: bounds];
     }
 }
 

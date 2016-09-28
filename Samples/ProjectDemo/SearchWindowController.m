@@ -8,8 +8,9 @@
 - (id)init
 {
     self = [super initWithWindowNibName: @"Search"];
-    
-    if (self) {
+
+    if (self)
+    {
     }
     return self;
 }
@@ -27,17 +28,19 @@
 - (IBAction) search: (id)sender
 {
     NSString *query = [(NSSearchField *)sender stringValue];
-    
+
     COSQLiteStore *store = [[(ApplicationDelegate *)[NSApp delegate] editingContext] store];
     NSArray *results = [store searchResultsForQuery: query];
-    
+
     searchResults = [[NSMutableArray alloc] init];
-    
+
     for (COSearchResult *result in results)
     {
-        [(NSMutableArray *)searchResults addObject: [NSString stringWithFormat: @"Revision %@, persistent root %@", result.revision, result.persistentRoot]];
+        [(NSMutableArray *)searchResults addObject: [NSString stringWithFormat: @"Revision %@, persistent root %@",
+                                                                                result.revision,
+                                                                                result.persistentRoot]];
     }
-    
+
     [table reloadData];
 }
 
@@ -50,14 +53,17 @@
 
 /* NSTableViewDataSource */
 
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+- (NSInteger)numberOfRowsInTableView: (NSTableView *)tableView
 {
     return [searchResults count];;
 }
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+
+- (id)          tableView: (NSTableView *)tableView
+objectValueForTableColumn: (NSTableColumn *)tableColumn
+                      row: (NSInteger)row
 {
     id result = [searchResults objectAtIndex: row];
-    
+
     return result;
 //  
 //    if ([[tableColumn identifier] isEqual: @"name"])

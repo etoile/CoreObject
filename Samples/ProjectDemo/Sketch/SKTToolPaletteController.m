@@ -9,7 +9,8 @@
 #import "SKTLine.h"
 #import "SKTTextArea.h"
 
-enum {
+enum
+{
     SKTArrowToolRow = 0,
     SKTRectToolRow,
     SKTCircleToolRow,
@@ -21,65 +22,83 @@ NSString *SKTSelectedToolDidChangeNotification = @"SKTSelectedToolDidChange";
 
 @implementation SKTToolPaletteController
 
-+ (id)sharedToolPaletteController {
++ (id)sharedToolPaletteController
+{
     static SKTToolPaletteController *sharedToolPaletteController = nil;
 
-    if (!sharedToolPaletteController) {
-        sharedToolPaletteController = [[SKTToolPaletteController allocWithZone:NULL] init];
+    if (!sharedToolPaletteController)
+    {
+        sharedToolPaletteController = [[SKTToolPaletteController allocWithZone: NULL] init];
     }
 
     return sharedToolPaletteController;
 }
 
-- (id)init {
-    self = [self initWithWindowNibName:@"ToolPalette"];
-    if (self) {
-        [self setWindowFrameAutosaveName:@"ToolPalette"];
+- (id)init
+{
+    self = [self initWithWindowNibName: @"ToolPalette"];
+    if (self)
+    {
+        [self setWindowFrameAutosaveName: @"ToolPalette"];
     }
     return self;
 }
 
-- (void)windowDidLoad {
+- (void)windowDidLoad
+{
     NSArray *cells = [toolButtons cells];
     unsigned i, c = [cells count];
-    
+
     [super windowDidLoad];
 
-    for (i=0; i<c; i++) {
-        [[cells objectAtIndex:i] setRefusesFirstResponder:YES];
-    [[cells objectAtIndex:i] setImagePosition:NSImageOnly];
+    for (i = 0; i < c; i++)
+    {
+        [[cells objectAtIndex: i] setRefusesFirstResponder: YES];
+        [[cells objectAtIndex: i] setImagePosition: NSImageOnly];
     }
-    [(NSPanel *)[self window] setFloatingPanel:YES];
-    [(NSPanel *)[self window] setBecomesKeyOnlyIfNeeded:YES];
+    [(NSPanel *)[self window] setFloatingPanel: YES];
+    [(NSPanel *)[self window] setBecomesKeyOnlyIfNeeded: YES];
 
-    [toolButtons setIntercellSpacing:NSMakeSize(0.0, 0.0)];
+    [toolButtons setIntercellSpacing: NSMakeSize(0.0, 0.0)];
     [toolButtons sizeToFit];
-    [[self window] setContentSize:[toolButtons frame].size];
-    [toolButtons setFrameOrigin:NSMakePoint(0.0, 0.0)];
+    [[self window] setContentSize: [toolButtons frame].size];
+    [toolButtons setFrameOrigin: NSMakePoint(0.0, 0.0)];
 }
 
-- (IBAction)selectToolAction:(id)sender {
-    [[NSNotificationCenter defaultCenter] postNotificationName:SKTSelectedToolDidChangeNotification object:self];
+- (IBAction)selectToolAction: (id)sender
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName: SKTSelectedToolDidChangeNotification
+                                                        object: self];
 }
 
-- (Class)currentGraphicClass {
+- (Class)currentGraphicClass
+{
     int row = [toolButtons selectedRow];
     Class theClass = nil;
-    if (row == SKTRectToolRow) {
+    if (row == SKTRectToolRow)
+    {
         theClass = [SKTRectangle class];
-    } else if (row == SKTCircleToolRow) {
+    }
+    else if (row == SKTCircleToolRow)
+    {
         theClass = [SKTCircle class];
-    } else if (row == SKTLineToolRow) {
+    }
+    else if (row == SKTLineToolRow)
+    {
         theClass = [SKTLine class];
-    } else if (row == SKTTextToolRow) {
+    }
+    else if (row == SKTTextToolRow)
+    {
         theClass = [SKTTextArea class];
     }
     return theClass;
 }
 
-- (void)selectArrowTool {
-    [toolButtons selectCellAtRow:SKTArrowToolRow column:0];
-    [[NSNotificationCenter defaultCenter] postNotificationName:SKTSelectedToolDidChangeNotification object:self];
+- (void)selectArrowTool
+{
+    [toolButtons selectCellAtRow: SKTArrowToolRow column: 0];
+    [[NSNotificationCenter defaultCenter] postNotificationName: SKTSelectedToolDidChangeNotification
+                                                        object: self];
 }
 
 @end

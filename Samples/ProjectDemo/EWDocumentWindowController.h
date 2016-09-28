@@ -22,26 +22,26 @@
     NSString *_windowID;
     NSDrawer *_sharingDrawer;
     SharingDrawerViewController *_sharingDrawerViewController;
-    
+
     // UI stuff
-    
+
     IBOutlet NSPopUpButton *branchesPopUpButton;
     IBOutlet NSButton *defaultBranchCheckBox;
-    
+
     COUndoTrack *_undoTrack;
-    
+
     EWUndoManager *undoManagerBridge;
-    
+
     ProjectDemoHistoryWindowController *historyWindowController;
 }
 
-- (instancetype) initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
-                                             windowID: (NSString*)windowID
-                                        windowNibName: (NSString *)nibName;
+- (instancetype)initAsPrimaryWindowForPersistentRoot: (COPersistentRoot *)aPersistentRoot
+                                            windowID: (NSString *)windowID
+                                       windowNibName: (NSString *)nibName;
 
-- (instancetype) initPinnedToBranch: (COBranch *)aBranch
-                           windowID: (NSString*)windowID
-                      windowNibName: (NSString *)nibName;
+- (instancetype)initPinnedToBranch: (COBranch *)aBranch
+                          windowID: (NSString *)windowID
+                     windowNibName: (NSString *)nibName;
 
 /**
  * Unique identifier for this window
@@ -68,13 +68,13 @@
 @property (readonly, nonatomic, strong) COSQLiteStore *store;
 @property (readonly, nonatomic, strong) COEditingContext *editingContext;
 
-- (Document *) documentObject;
+- (Document *)documentObject;
 
-- (COUndoTrack *) undoTrack;
+- (COUndoTrack *)undoTrack;
 
-- (void) persistentRootDidChange: (NSNotification *)notif;
+- (void)persistentRootDidChange: (NSNotification *)notif;
 
-+ (BOOL) isProjectUndo;
++ (BOOL)isProjectUndo;
 
 // UI stuff
 
@@ -82,25 +82,25 @@
 
 // Subclasses override
 
-- (void) objectGraphDidChange;
+- (void)objectGraphDidChange;
 
 /**
  * Called when objectGraphContext is switched to a new instance. Subclasses
  * should reload everything. This is called when the branch is switched
  */
-- (void) objectGraphContextDidSwitch;
+- (void)objectGraphContextDidSwitch;
 
 /* History stuff */
 
-- (void) commitWithIdentifier: (NSString *)identifier;
+- (void)commitWithIdentifier: (NSString *)identifier;
 
-- (void) commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray*)args;
+- (void)commitWithIdentifier: (NSString *)identifier descriptionArguments: (NSArray *)args;
 
-- (void) switchToRevision: (CORevision *)aRevision;
+- (void)switchToRevision: (CORevision *)aRevision;
 
-- (void) selectiveUndo: (CORevision *)aRevision;
+- (void)selectiveUndo: (CORevision *)aRevision;
 
-- (void) selectiveRedo: (CORevision *)aRevision;
+- (void)selectiveRedo: (CORevision *)aRevision;
 
 - (IBAction) projectDemoUndo: (id)sender;
 
@@ -115,12 +115,12 @@
 - (IBAction) showGraphvizHistoryGraph: (id)sender;
 - (IBAction) showGraphvizItemGraph: (id)sender;
 
-- (IBAction) showDocumentHistory:(id)sender;
+- (IBAction) showDocumentHistory: (id)sender;
 
 - (IBAction) shareWith: (id)sender;
 
-- (IBAction) moveToTrash:(id)sender;
+- (IBAction) moveToTrash: (id)sender;
 
-- (SharingSession *) sharingSession;
+- (SharingSession *)sharingSession;
 
 @end

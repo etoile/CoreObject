@@ -4,7 +4,8 @@
 
 #import "SKTGraphic.h"
 
-@interface SKTRectangle : SKTGraphic {}
+@interface SKTRectangle : SKTGraphic
+{ }
 
 @end
 

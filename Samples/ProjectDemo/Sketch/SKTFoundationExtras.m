@@ -6,21 +6,28 @@
 
 @implementation NSObject (SKTPerformExtras)
 
-- (void)performSelector:(SEL)sel withEachObjectInArray:(NSArray *)array {
+- (void)performSelector: (SEL)sel withEachObjectInArray: (NSArray *)array
+{
     unsigned i, c = [array count];
-    for (i=0; i<c; i++) {
-        [self performSelector:sel withObject:[array objectAtIndex:i]];
+    for (i = 0; i < c; i++)
+    {
+        [self performSelector: sel withObject: [array objectAtIndex: i]];
     }
 }
 
-- (void)performSelector:(SEL)sel withEachObjectInSet:(NSSet *)set {
-    [self performSelector:sel withEachObjectInArray:[set allObjects]];
+- (void)performSelector: (SEL)sel withEachObjectInSet: (NSSet *)set
+{
+    [self performSelector: sel withEachObjectInArray: [set allObjects]];
 }
 
 @end
 
-NSRect SKTRectFromPoints(NSPoint point1, NSPoint point2) {
-    return NSMakeRect(((point1.x <= point2.x) ? point1.x : point2.x), ((point1.y <= point2.y) ? point1.y : point2.y), ((point1.x <= point2.x) ? point2.x - point1.x : point1.x - point2.x), ((point1.y <= point2.y) ? point2.y - point1.y : point1.y - point2.y));
+NSRect SKTRectFromPoints(NSPoint point1, NSPoint point2)
+{
+    return NSMakeRect(((point1.x <= point2.x) ? point1.x : point2.x),
+                      ((point1.y <= point2.y) ? point1.y : point2.y),
+                      ((point1.x <= point2.x) ? point2.x - point1.x : point1.x - point2.x),
+                      ((point1.y <= point2.y) ? point2.y - point1.y : point1.y - point2.y));
 }
 
 

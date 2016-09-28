@@ -10,14 +10,14 @@
 
 @protocol EWUndoManagerDelegate
 
-- (void) undo;
-- (void) redo;
+- (void)undo;
+- (void)redo;
 
-- (BOOL) canUndo;
-- (BOOL) canRedo;
+- (BOOL)canUndo;
+- (BOOL)canRedo;
 
-- (NSString *) undoMenuItemTitle;
-- (NSString *) redoMenuItemTitle;
+- (NSString *)undoMenuItemTitle;
+- (NSString *)redoMenuItemTitle;
 
 @end
 
@@ -32,15 +32,15 @@
  */
 @interface EWUndoManager : NSObject
 
-@property (nonatomic, readwrite, unsafe_unretained) id<EWUndoManagerDelegate> delegate;
+@property (nonatomic, readwrite, unsafe_unretained) id <EWUndoManagerDelegate> delegate;
 
-- (void) undo;
-- (void) redo;
+- (void)undo;
+- (void)redo;
 
-- (BOOL) canUndo;
-- (BOOL) canRedo;
+- (BOOL)canUndo;
+- (BOOL)canRedo;
 
-- (NSString *) undoMenuItemTitle;
-- (NSString *) redoMenuItemTitle;
+- (NSString *)undoMenuItemTitle;
+- (NSString *)redoMenuItemTitle;
 
 @end

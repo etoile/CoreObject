@@ -4,12 +4,13 @@
 
 #import <AppKit/AppKit.h>
 
-@interface SKTRenderingView : NSView {
-    @private
+@interface SKTRenderingView : NSView
+{
+@private
     NSArray *_graphics;
 }
 
-- (id)initWithFrame:(NSRect)frame graphics:(NSArray *)graphics;
+- (id)initWithFrame: (NSRect)frame graphics: (NSArray *)graphics;
 
 @end
 

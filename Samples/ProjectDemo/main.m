@@ -7,6 +7,6 @@ int main(int argc, char *argv[])
     //setExceptionHandlingMask:NSLogAndHandleEveryExceptionMask];
     //[[NSExceptionHandler defaultExceptionHandler]
     //setExceptionHangingMask: NSHangOnTopLevelExceptionMask | NSHangOnOtherExceptionMask];
-    
-    return NSApplicationMain(argc,  (const char **) argv);
+
+    return NSApplicationMain(argc, (const char **)argv);
 }
