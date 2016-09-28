@@ -27,7 +27,7 @@
 
     UKTrue([data isPrimitive]);
     UKTrue([attachmentID isPrimitive]);
-    
+
     UKObjectsSame(data, [repo entityDescriptionForClass: [NSData class]]);
     UKObjectsSame(attachmentID, [repo entityDescriptionForClass: [COAttachmentID class]]);
 }
@@ -50,10 +50,10 @@
  *    the objects but doesn't matter from an implementation/behavior perspective.
  *    While composite matters from an implementation/behavior perspective.
  */
-- (void) testNoAggregate
+- (void)testNoAggregate
 {
     ETPropertyDescription *testProp = [ETPropertyDescription descriptionWithName: @"contents"
-                                                                            typeName: @"COObject"];
+                                                                        typeName: @"COObject"];
     UKFalse([testProp respondsToSelector: @selector(setAggregate:)]);
 }
 
@@ -63,21 +63,21 @@
 {
     ETEntityDescription *entity = [ETEntityDescription descriptionWithName: @"NonCompositeOneToManyWithOpposite"];
     entity.parentName = @"COObject";
-    
+
     ETPropertyDescription *contentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
-                                                                                    typeName: @"NonCompositeOneToManyWithOpposite"];
+                                                                                typeName: @"NonCompositeOneToManyWithOpposite"];
     contentsProperty.persistent = YES;
     contentsProperty.multivalued = YES;
     contentsProperty.oppositeName = @"NonCompositeOneToManyWithOpposite.parent";
-    
+
     ETPropertyDescription *parentProperty = [ETPropertyDescription descriptionWithName: @"parent"
-                                                                                  typeName: @"NonCompositeOneToManyWithOpposite"];
+                                                                              typeName: @"NonCompositeOneToManyWithOpposite"];
     parentProperty.multivalued = NO;
     parentProperty.oppositeName = @"NonCompositeOneToManyWithOpposite.contents";
     parentProperty.derived = YES;
-    
+
     entity.propertyDescriptions = @[contentsProperty, parentProperty];
-    
+
     return entity;
 }
 
@@ -90,10 +90,10 @@
  *    constraints (all composite relationships form a DAG, only one container
  *    property is non-null per object)
  */
-- (void) testOneToManyWithOppositeNotComposite
+- (void)testOneToManyWithOppositeNotComposite
 {
     ETEntityDescription *entity = [self nonCompositeOneToManyWithOppositeEntityDescription];
-    
+
     ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
     [repo addUnresolvedDescription: entity];
     [repo resolveNamedObjectReferences];
@@ -109,9 +109,9 @@
  * A: No. FM3 also doesn't support unidirectional composites, not sure about EMOF.
  *    Don't have a compelling use case in mind, so it's probably not worth the effort.
  */
-- (void) testUnidirectionalCompositeUnsupported
+- (void)testUnidirectionalCompositeUnsupported
 {
-    
+
 }
 
 /**
@@ -125,9 +125,9 @@
  *    Quentin: if we support multiple inheritance, I'm fine with the FM3
  *    approach, otherwise we should stick to EMOF.
  */
-- (void) testOnlyOneContainerPropertyAllowed
+- (void)testOnlyOneContainerPropertyAllowed
 {
-    
+
 }
 
 /**
@@ -138,9 +138,9 @@
  *
  * A: We probably should.
  */
-- (void) testMultipleInheritance
+- (void)testMultipleInheritance
 {
-    
+
 }
 
 @end

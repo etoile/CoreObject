@@ -6,20 +6,11 @@
  */
 
 #import <UnitKit/UnitKit.h>
-#import <Foundation/Foundation.h>
 #import <EtoileFoundation/ETModelDescriptionRepository.h>
 #import "TestCommon.h"
-#import "COEditingContext.h"
-#import "COBookmark.h"
-#import "COObject.h"
-#import "COCollection.h"
-#import "COContainer.h"
-#import "COGroup.h"
-#import "COLibrary.h"
-#import "COPersistentRoot.h"
-#import "COTag.h"
 
 @interface COObject (TestCollection)
+
 /**
  * Includes at least 'tags' among the multivalued properties since all COObject 
  * derived instances can be tagged.
@@ -48,6 +39,7 @@
 
 @interface TestCollection : EditingContextTestCase <UKTest>
 @end
+
 
 @implementation TestCollection
 
@@ -174,7 +166,7 @@
 {
     COTag *tag = [ctx insertNewPersistentRootWithEntityName: @"COTag"].rootObject;
     COObject *original = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
-    
+
     [ctx commit];
 
     COObject *copy = [original.objectGraphContext.branch
@@ -192,25 +184,30 @@
 {
     COTag *tag = [ctx insertNewPersistentRootWithEntityName: @"COTag"].rootObject;
     COObject *original = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
-    
+
     [ctx commit];
-    
+
     [tag addObject: original];
-    
+
     UKObjectsEqual(A(original), tag.content);
     UKObjectsEqual(S(tag), original.tags);
 }
+
 - (void)testSmartGroup
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"COSmartGroup"];
-    
+
     [ctx commit];
 
     [self checkPersistentRootWithExistingAndNewContext: persistentRoot
-                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
-    {
-        UKNotNil([testPersistentRoot.rootObject content]);
-    }];
+                                               inBlock:
+       ^(COEditingContext *testCtx,
+         COPersistentRoot *testPersistentRoot,
+         COBranch *testBranch,
+         BOOL isNewContext)
+       {
+           UKNotNil([testPersistentRoot.rootObject content]);
+       }];
 }
 
 @end

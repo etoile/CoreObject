@@ -10,9 +10,10 @@
 @interface TestAttributedStringMerge : EditingContextTestCase <UKTest>
 @end
 
+
 @implementation TestAttributedStringMerge
 
-- (void) testMergeOverlappingAttributeAdditions
+- (void)testMergeOverlappingAttributeAdditions
 {
     [self checkMergingBase: @"abc"
                withBranchA: @"<B>ab</B>c"
@@ -20,7 +21,7 @@
                      gives: @"d<B>a<I>b</B>c</I>"];
 }
 
-- (void) testMergeOverlappingAttributeAdditions2
+- (void)testMergeOverlappingAttributeAdditions2
 {
     [self checkMergingBase: @"hello"
                withBranchA: @"<B>hell</B>o"
@@ -28,7 +29,7 @@
                      gives: @"<B>he<I>ll</B>o</I>"];
 }
 
-- (void) testMergeEmptyDiffPlusAddCharacter
+- (void)testMergeEmptyDiffPlusAddCharacter
 {
     [self checkMergingBase: @"a"
                withBranchA: @"a"
@@ -36,7 +37,7 @@
                      gives: @"ab"];
 }
 
-- (void) testMergeAdditions
+- (void)testMergeAdditions
 {
     [self checkMergingBase: @"a"
                withBranchA: @"ab"
@@ -63,26 +64,29 @@
 }
 #endif
 
-- (void) testMergeConflictingInserts
+- (void)testMergeConflictingInserts
 {
     COObjectGraphContext *ctx1 = [self makeAttributedString];
     [self appendString: @"a" htmlCode: nil toAttributedString: ctx1.rootObject];
-    UKObjectsEqual(@"a", [[[COAttributedStringWrapper alloc] initWithBacking: ctx1.rootObject] string]);
-    
+    UKObjectsEqual(@"a",
+                   [[[COAttributedStringWrapper alloc] initWithBacking: ctx1.rootObject] string]);
+
     COObjectGraphContext *ctx2 = [COObjectGraphContext new];
     [ctx2 setItemGraph: ctx1];
     [self appendString: @"bc" htmlCode: nil toAttributedString: ctx2.rootObject];
-    UKObjectsEqual(@"abc", [[[COAttributedStringWrapper alloc] initWithBacking: ctx2.rootObject] string]);
-    
+    UKObjectsEqual(@"abc",
+                   [[[COAttributedStringWrapper alloc] initWithBacking: ctx2.rootObject] string]);
+
     COObjectGraphContext *ctx3 = [COObjectGraphContext new];
     [ctx3 setItemGraph: ctx1];
     [self appendString: @"def" htmlCode: nil toAttributedString: ctx3.rootObject];
-    UKObjectsEqual(@"adef", [[[COAttributedStringWrapper alloc] initWithBacking: ctx3.rootObject] string]);
-    
+    UKObjectsEqual(@"adef",
+                   [[[COAttributedStringWrapper alloc] initWithBacking: ctx3.rootObject] string]);
+
     COAttributedStringDiff *diff12 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: ctx1.rootObject
                                                                             secondAttributedString: ctx2.rootObject
                                                                                             source: @"diff12"];
-    
+
     COAttributedStringDiff *diff13 = [[COAttributedStringDiff alloc] initWithFirstAttributedString: ctx1.rootObject
                                                                             secondAttributedString: ctx3.rootObject
                                                                                             source: @"diff13"];

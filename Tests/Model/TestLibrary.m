@@ -10,6 +10,7 @@
 @interface TestLibrary : EditingContextTestCase <UKTest>
 @end
 
+
 @implementation TestLibrary
 
 /**
@@ -22,23 +23,32 @@
 {
     COLibrary *library = [ctx insertNewPersistentRootWithEntityName: @"COLibrary"].rootObject;
     [ctx commit];
-    
+
     [self checkPersistentRootWithExistingAndNewContext: library.persistentRoot
-                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-     {
-         UKNil([testProot.rootObject identifier]);
-     }];
-    
+                                               inBlock:
+       ^(COEditingContext *testCtx,
+         COPersistentRoot *testProot,
+         COBranch *testBranch,
+         BOOL isNewContext)
+       {
+           UKNil([testProot.rootObject identifier]);
+       }];
+
     UKFalse(library.persistentRoot.hasChanges);
     library.identifier = @"hello";
     UKTrue(library.persistentRoot.hasChanges);
     [ctx commit];
-    
+
     [self checkPersistentRootWithExistingAndNewContext: library.persistentRoot
-                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-     {
-         UKObjectsEqual(@"hello", [testProot.rootObject identifier]);
-     }];
+                                               inBlock:
+       ^(COEditingContext *testCtx,
+         COPersistentRoot *testProot,
+         COBranch *testBranch,
+         BOOL isNewContext)
+       {
+           UKObjectsEqual(@"hello",
+                          [testProot.rootObject identifier]);
+       }];
 }
 
 @end

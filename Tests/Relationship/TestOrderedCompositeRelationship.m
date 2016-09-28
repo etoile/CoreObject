@@ -6,9 +6,7 @@
  */
 
 #import <UnitKit/UnitKit.h>
-#import <Foundation/Foundation.h>
 #import "TestCommon.h"
-#import "COPrimitiveCollection.h"
 
 /**
  * Tests ordered composite relationships.
@@ -22,47 +20,55 @@
     OutlineItem *child1;
     OutlineItem *child2;
 }
+
 @end
+
 
 @implementation TestOrderedCompositeRelationship
 
-- (id) init
+- (id)init
 {
     self = [super init];
-    
+
     persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     parent = persistentRoot.rootObject;
     parent.label = @"Parent";
     UKObjectsEqual(@[], parent.contents);
-    
+
     child1 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     child2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     child1.label = @"Child1";
     child2.label = @"Child2";
     parent.contents = @[child1, child2];
-    
+
     [ctx commit];
-    
+
     return self;
 }
 
 - (void)testBasic
 {
     [self checkPersistentRootWithExistingAndNewContext: persistentRoot
-                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-     {
-         OutlineItem *testParent = testProot.rootObject;
-         OutlineItem *testChild1 = testParent.contents[0];
-         OutlineItem *testChild2 = testParent.contents[1];
-         
-         UKIntsEqual(2, testParent.contents.count);
-         
-         UKObjectsEqual(@"Parent", testParent.label);
-         UKObjectsSame(testParent, testChild1.parentContainer);
-         UKObjectsSame(testParent, testChild2.parentContainer);
-         UKObjectsEqual(@"Child1", testChild1.label);
-         UKObjectsEqual(@"Child2", testChild2.label);
-     }];
+                                               inBlock:
+       ^(COEditingContext *testCtx,
+         COPersistentRoot *testProot,
+         COBranch *testBranch,
+         BOOL isNewContext)
+       {
+           OutlineItem *testParent = testProot.rootObject;
+           OutlineItem *testChild1 = testParent.contents[0];
+           OutlineItem *testChild2 = testParent.contents[1];
+
+           UKIntsEqual(2, testParent.contents.count);
+
+           UKObjectsEqual(@"Parent", testParent.label);
+           UKObjectsSame(testParent,
+                         testChild1.parentContainer);
+           UKObjectsSame(testParent,
+                         testChild2.parentContainer);
+           UKObjectsEqual(@"Child1", testChild1.label);
+           UKObjectsEqual(@"Child2", testChild2.label);
+       }];
 }
 
 - (void)testAddAndRemoveChildren
@@ -74,79 +80,86 @@
 
     [parent addObject: child3];
     [parent removeObject: child1];
-    
+
     UKObjectsEqual((@[child2, child3]), parent.contents);
-    
+
     UKNil(child1.parentContainer);
     UKObjectsSame(parent, child2.parentContainer);
     UKObjectsSame(parent, child3.parentContainer);
-    
+
     [ctx commit];
-    
+
     [self checkPersistentRootWithExistingAndNewContext: persistentRoot
-                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-     {
-         OutlineItem *testParent = testProot.rootObject;
-         OutlineItem *testChild2 = testParent.contents[0];
-         OutlineItem *testChild3 = testParent.contents[1];
-         
-         UKIntsEqual(2, testParent.contents.count);
-         
-         UKObjectsEqual(@"Parent", testParent.label);
-         UKObjectsSame(testParent, testChild2.parentContainer);
-         UKObjectsSame(testParent, testChild3.parentContainer);
-         UKObjectsEqual(@"Child2", testChild2.label);
-         UKObjectsEqual(@"Child3", testChild3.label);
-     }];
+                                               inBlock:
+       ^(COEditingContext *testCtx,
+         COPersistentRoot *testProot,
+         COBranch *testBranch,
+         BOOL isNewContext)
+       {
+           OutlineItem *testParent = testProot.rootObject;
+           OutlineItem *testChild2 = testParent.contents[0];
+           OutlineItem *testChild3 = testParent.contents[1];
+
+           UKIntsEqual(2, testParent.contents.count);
+
+           UKObjectsEqual(@"Parent", testParent.label);
+           UKObjectsSame(testParent,
+                         testChild2.parentContainer);
+           UKObjectsSame(testParent,
+                         testChild3.parentContainer);
+           UKObjectsEqual(@"Child2", testChild2.label);
+           UKObjectsEqual(@"Child3", testChild3.label);
+       }];
 }
 
 - (void)testMoveChildren
 {
     OutlineItem *parent2 = [persistentRoot.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     parent2.label = @"Parent2";
-    
+
     UKObjectsEqual(@[], parent2.contents);
-    
+
     [parent2 addObject: child1];
-    
+
     UKObjectsEqual((@[child2]), parent.contents);
     UKObjectsEqual((@[child1]), parent2.contents);
-    
+
     UKObjectsSame(parent, child2.parentContainer);
     UKObjectsSame(parent2, child1.parentContainer);
 }
 
-- (void) testDuplicatesAutomaticallyRemoved
+- (void)testDuplicatesAutomaticallyRemoved
 {
     parent.contents = @[child2, child2, child1, child1, child1, child2];
     UKTrue(([@[child2, child1] isEqual: parent.contents]
             || [@[child1, child2] isEqual: parent.contents]));
 }
 
-- (void) testDuplicatesAutomaticallyRemovedOnAddObject
+- (void)testDuplicatesAutomaticallyRemovedOnAddObject
 {
     parent.contents = @[child1, child2];
     [parent addObject: child1];
     UKObjectsEqual(A(child1, child2), parent.contents);
     [parent addObject: child2];
     UKObjectsEqual(A(child1, child2), parent.contents);
-    
+
     // Verify at the store item level too
     UKObjectsEqual(A(child1.UUID, child2.UUID), [parent.storeItem valueForAttribute: @"contents"]);
 }
 
-- (void) testIllegalDirectModificationOfCollection
+- (void)testIllegalDirectModificationOfCollection
 {
     // Test that an exception is raised when modifying when we last set the array using a setter
     UKObjectsEqual((@[child1, child2]), parent.contents);
     UKRaisesException([(NSMutableArray *)parent.contents removeObjectAtIndex: 1]);
-    
+
     // Test that an exception is raised when modifying after deserialization
-    
+
     // TODO: Rewrite in a cleaner way
     COObjectGraphContext *ctx2 = [[COObjectGraphContext alloc] init];
     [ctx2 setItemGraph: parent.objectGraphContext];
-    UKObjectsEqual((@[child1.UUID, child2.UUID]), [[[ctx2.rootObject contents] mappedCollection] UUID]);
+    UKObjectsEqual((@[child1.UUID, child2.UUID]),
+                   [[[ctx2.rootObject contents] mappedCollection] UUID]);
     UKRaisesException([(NSMutableArray *)[ctx2.rootObject contents] removeObjectAtIndex: 1]);
 }
 
@@ -160,12 +173,12 @@
  * fixed. So we don't want to run cycle detection in -didChangeValueForProperty:
  * because it would be tripped in that case.
  */
-- (void) testCompositeCycleWithThreeObjects
+- (void)testCompositeCycleWithThreeObjects
 {
     UKTrue([parent isRoot]);
     UKObjectsEqual((@[child1, child2]), parent.contents);
-    
-    child1.contents = @[child2];    
+
+    child1.contents = @[child2];
     UKObjectsEqual((@[child1]), parent.contents); /* since adding child2 to child1 moved it */
 
     child2.contents = @[parent]; /* attempt to create a cycle... */
@@ -173,10 +186,10 @@
     UKRaisesException([ctx commit]);
 }
 
-- (void) testCompositeCycleWithOneObject
+- (void)testCompositeCycleWithOneObject
 {
     parent.contents = @[parent];
-    
+
     UKRaisesException([ctx commit]);
 }
 
@@ -196,7 +209,9 @@
     TransientOutlineItem *parent;
     TransientOutlineItem *child;
 }
+
 @end
+
 
 @implementation TestTransientOrderedCompositeRelationship
 
@@ -224,7 +239,7 @@
 - (void)testMutateChildren
 {
     [parent addObject: child];
-    
+
     [self checkVariableStorageCollectionForProperty: @"contents"];
 
     UKObjectsEqual(A(child), parent.contents);
