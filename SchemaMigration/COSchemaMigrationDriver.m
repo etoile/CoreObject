@@ -7,12 +7,13 @@
 
 #import "COSchemaMigrationDriver.h"
 #import "CODictionary.h"
-#import "COItem.h"
 #import "COModelElementMove.h"
 #import "COSchemaMigration.h"
 
 @interface ETEntityDescription (COSchemaMigration)
+
 - (NSArray *)persistentPropertyDescriptionNamesForPackageDescription: (ETPackageDescription *)aPackage;
+
 @end
 
 
@@ -20,7 +21,9 @@
 
 @synthesize modelDescriptionRepository = _modelDescriptionRepository;
 
+
 #pragma mark Initialization -
+
 
 - (instancetype)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)repo
 {
@@ -35,7 +38,9 @@
     return [self initWithModelDescriptionRepository: nil];
 }
 
+
 #pragma mark Grouping Item by Packages -
+
 
 static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSString *key)
 {
@@ -54,7 +59,7 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
  * comes from, namely the package/version pairs for the entity and all of its
  * superclasses.
  */
-- (NSDictionary *) versionsByPackageNameForItem: (COItem *)item
+- (NSDictionary *)versionsByPackageNameForItem: (COItem *)item
 {
     for (COSchemaMigration *migration in [COSchemaMigration migrations])
     {
@@ -62,8 +67,8 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
             && item.packageVersion == migration.sourceVersion)
         {
             NSDictionary *versionsByPackageName = [migration.dependentSourceVersionsByPackageName
-                                                   dictionaryByAddingEntriesFromDictionary:
-                                                   @{ migration.packageName : @(migration.sourceVersion) }];
+                dictionaryByAddingEntriesFromDictionary:
+                    @{migration.packageName: @(migration.sourceVersion)}];
             return versionsByPackageName;
         }
     }
@@ -74,21 +79,21 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 {
     ETEntityDescription *entity = [_modelDescriptionRepository descriptionForName: item.entityName];
     BOOL isDeletedEntity = (entity == nil);
-    
+
     /* For a deleted entity, the package versions match between item and packages */
     if (isDeletedEntity)
     {
         // NOTE: CODictionary hits this case because it doesn't have an entity description
         return S(item.packageName);
     }
-    
+
     /* Early exit, the item has no version specified, or no package, (i.e.
        saved with an old version of CO) so we can't do any migration. */
     if (item.packageVersion == -1 || item.packageName == nil)
     {
         return [NSSet set];
     }
-    
+
     /* Early exit, common case: the version in the item matches the package verion
        in the model description repository. In that case we have no migration to do */
     if (entity.owner != nil
@@ -97,11 +102,11 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
     {
         return [NSSet set];
     }
-    
+
     /* At this point we are doing a migration for some packages for sure. */
 
     NSDictionary *versionsByPackageName = [self versionsByPackageNameForItem: item];
-    
+
     if (versionsByPackageName == nil
         || versionsByPackageName[@"org.etoile-project.CoreObject"] == nil
         || ![versionsByPackageName[item.packageName] isEqual: @(item.packageVersion)])
@@ -109,19 +114,22 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
         // TODO: Test that we get this exception when needed
         [NSException raise: NSInternalInconsistencyException
                     format: @"Item with entityName '%@' package '%@' version %d needs a migration, "
-                            "but -versionsByPackageNameForItem: returned an incomplete "
-                            "snapshot of the past version of the metamodel we need. "
-                            "It returned: %@. \n"
-                            "We require it to be a non-nil dictionary, have a "
-                            "version set for the org.etoile-project.CoreObject "
-                            "package, and include the same package/version as "
-                            "the item being migrated. Probably, you forgot to "
-                            "set COSchemaMigration.dependentSourceVersionsByPackageName.",
-                            item.entityName, item.packageName, (int)item.packageVersion, versionsByPackageName];
+                             "but -versionsByPackageNameForItem: returned an incomplete "
+                             "snapshot of the past version of the metamodel we need. "
+                             "It returned: %@. \n"
+                             "We require it to be a non-nil dictionary, have a "
+                             "version set for the org.etoile-project.CoreObject "
+                             "package, and include the same package/version as "
+                             "the item being migrated. Probably, you forgot to "
+                             "set COSchemaMigration.dependentSourceVersionsByPackageName.",
+                            item.entityName,
+                            item.packageName,
+                            (int)item.packageVersion,
+                            versionsByPackageName];
     }
-    
+
     NSMutableSet *packagesToMigrate = [NSMutableSet new];
-    
+
     for (NSString *package in versionsByPackageName.allKeys)
     {
         /* We migrate even when we encounter these special cases too:
@@ -150,16 +158,18 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
     return ![packagesToMigrate isEmpty];
 }
 
+
 #pragma mark Triggering a Migration -
+
 
 - (NSArray *)prepareMigrationForItems: (NSArray *)storeItems
 {
     NSMutableArray *upToDateItems = [NSMutableArray new];
-    
+
     for (COItem *item in storeItems)
     {
         BOOL migrate = [self addItem: item];
-        
+
         if (!migrate)
         {
             [upToDateItems addObject: item];
@@ -185,9 +195,13 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
     return [upToDateItems arrayByAddingObjectsFromArray: [self combineMigratedItems: itemsToMigrate]];
 }
 
+
 #pragma mark Ungrouping Items by Packages -
 
-static inline void copyAttributesFromItemTo(NSArray *attributes, COItem *sourceItem, COMutableItem *destinationItem)
+
+static inline void copyAttributesFromItemTo(NSArray *attributes,
+                                            COItem *sourceItem,
+                                            COMutableItem *destinationItem)
 {
     for (NSString *attribute in attributes)
     {
@@ -213,7 +227,9 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
     if (item.isAdditionalItem)
     {
         return [item.attributeNames arrayByRemovingObjectsInArray:
-            @[kCOObjectEntityNameProperty, kCOObjectPackageNameProperty, kCOObjectPackageVersionProperty]];
+            @[kCOObjectEntityNameProperty,
+              kCOObjectPackageNameProperty,
+              kCOObjectPackageVersionProperty]];
     }
 
     ETEntityDescription *entity = [_modelDescriptionRepository descriptionForName: item.entityName];
@@ -221,19 +237,23 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
     return [entity persistentPropertyDescriptionNamesForPackageDescription: package];
 }
 
-static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *sourceItem, ETPackageDescription *package, COMutableItem *destinationItem)
+static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *sourceItem,
+                                                                        ETPackageDescription *package,
+                                                                        COMutableItem *destinationItem)
 {
     BOOL isOwningPackage = [sourceItem.packageName isEqualToString: package.name];
-    
+
     if (!isOwningPackage)
         return;
-    
+
     if (sourceItem.packageVersion != package.version)
     {
         [NSException raise: NSInternalInconsistencyException
                     format: @"A migrated item doesn't match its owning package current version "
-                             "%lu. You probably forgot to update COItem.packageVersion in some "
-                             "migration applied to this item: %@", (unsigned long)package.version, sourceItem];
+                                "%lu. You probably forgot to update COItem.packageVersion in some "
+                                "migration applied to this item: %@",
+                            (unsigned long)package.version,
+                            sourceItem];
     }
     assert([sourceItem.packageName isEqualToString: package.name]);
 
@@ -250,7 +270,7 @@ static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *
 - (NSArray *)combineMigratedItems: (NSDictionary *)migratedItems
 {
     NSMutableDictionary *combinedItems = [NSMutableDictionary new];
-    
+
     for (NSString *packageName in migratedItems)
     {
         ETPackageDescription *package = [_modelDescriptionRepository descriptionForName: packageName];
@@ -261,13 +281,13 @@ static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *
                                                       inItem: item];
             ETAssert(attributes != nil);
             COMutableItem *combinedItem = combinedItems[item.UUID];
-            
+
             if (combinedItem == nil)
             {
                 combinedItem = pristineMutableItemFrom(item);
                 combinedItems[item.UUID] = combinedItem;
             }
-            
+
             copyAttributesFromItemTo(attributes, item, combinedItem);
             copySchemaAttributesFromItemWhenOwnedByPackageToItem(item, package, combinedItem);
         }
@@ -276,14 +296,16 @@ static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *
     return combinedItems.allValues;
 }
 
+
 #pragma mark Migrating Items in a Package to a Future Version -
+
 
 - (void)migrateItemsBoundToPackageNamed: (NSString *)packageName
                               toVersion: (int64_t)destinationVersion
 {
     COItem *randomItem = [itemsToMigrate[packageName] firstObject];
     int64_t proposedVersion = [[self versionsByPackageNameForItem: randomItem][packageName] longLongValue];
-    
+
     if (proposedVersion < 0)
     {
         [NSException raise: NSInvalidArgumentException
@@ -302,8 +324,8 @@ static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *
 
         COSchemaMigration *migration =
             [COSchemaMigration migrationForPackageName: packageName
-                               destinationVersion: proposedVersion];
-        
+                                    destinationVersion: proposedVersion];
+
         if (migration == nil)
         {
             [NSException raise: NSInternalInconsistencyException
@@ -315,7 +337,7 @@ static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *
 
         migration.migrationDriver = self;
         itemsToMigrate[packageName] = [migration migrateItems: itemsToMigrate[packageName]];
-        
+
         /* Moving entities and properties after -[COSchemaMigration migrateItems:]
            ensures that:
            - an incorrect package/version increment on a entity concerned by a 
@@ -327,7 +349,9 @@ static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *
     }
 }
 
+
 #pragma mark Moving Entities and Properties Accross Packages -
+
 
 - (void)moveEntitiesForMigration: (COSchemaMigration *)migration
 {
@@ -355,7 +379,7 @@ static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *
 
             // TODO: This code path is not tested
             COMutableItem *newItem = [item mutableCopy];
-            
+
             if ([newItem.packageName isEqual: migration.packageName])
             {
                 newItem.packageName = move.packageName;
@@ -365,7 +389,7 @@ static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *
             [destinationItems addObject: newItem];
             [sourceItems removeObject: item];
         }
-        
+
         ETAssert(initialItemCount == sourceItems.count + destinationItems.count);
     }
 }
@@ -388,10 +412,10 @@ static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *
         {
             if (![item.entityName isEqualToString: move.ownerName])
                 continue;
-            
+
             [selectedSourceItems addObject: item];
         }
-        
+
         for (COItem *item in destinationItems)
         {
             if (![item.entityName isEqualToString: move.ownerName])
@@ -399,17 +423,17 @@ static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *
 
             selectedDestItems[item.UUID] = item;
         }
-    
+
         for (COItem *sourceItem in selectedSourceItems)
         {
             COMutableItem *destinationItem = [selectedDestItems[sourceItem.UUID] mutableCopy];
-            
+
             [destinationItem setValue: [sourceItem valueForAttribute: move.name]
                          forAttribute: move.name];
-            
+
             NSUInteger index =
                 [destinationItems indexOfObject: selectedDestItems[sourceItem.UUID]];
-            
+
             destinationItems[index] = destinationItem;
         }
     }
@@ -420,7 +444,7 @@ static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *
     ETKeyValuePair *pair = [ETKeyValuePair pairWithKey: aMigration.packageName
                                                  value: @(aMigration.destinationVersion)];
     NSArray *dependencies = [COSchemaMigration dependencies][pair];
-    
+
     for (COSchemaMigration *migration in dependencies)
     {
         /* Run enumerated migration and all preceding migrations not yet run */
@@ -433,6 +457,7 @@ static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *
 
 
 #pragma mark Migration Conveniency  -
+
 
 @implementation ETEntityDescription (COSchemaMigration)
 

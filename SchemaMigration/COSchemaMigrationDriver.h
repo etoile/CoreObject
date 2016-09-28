@@ -36,7 +36,7 @@
  */
 @interface COSchemaMigrationDriver : NSObject
 {
-    @private
+@private
     ETModelDescriptionRepository *_modelDescriptionRepository;
     NSMutableDictionary *itemsToMigrate;
 }
@@ -79,6 +79,6 @@
 /** @taskunit Framework private */
 
 
-- (NSDictionary *) versionsByPackageNameForItem: (COItem *)item;
+- (NSDictionary *)versionsByPackageNameForItem: (COItem *)item;
 
 @end

@@ -17,7 +17,7 @@
  */
 @interface COModelElementMove : NSObject
 {
-    @private
+@private
     NSString *_name;
     NSString *_ownerName;
     NSString *_packageName;

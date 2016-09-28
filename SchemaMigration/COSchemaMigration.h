@@ -295,7 +295,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  */
 @interface COSchemaMigration : NSObject
 {
-    @private
+@private
     NSString *_packageName;
     int64_t _destinationVersion;
     COMigrationBlock _migrationBlock;
@@ -322,7 +322,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  * See +registerMigration: and -destinationVersion.
  */
 + (COSchemaMigration *)migrationForPackageName: (NSString *)package
-                       destinationVersion: (NSInteger)version;
+                            destinationVersion: (NSInteger)version;
 /**
  * Returns a dictionary that contains dependent migrations to be run before a 
  * specific migration. 
@@ -398,7 +398,6 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  * You must not call the superclass implementation.
  */
 - (NSArray *)migrateItems: (NSArray *)storeItems;
-
 
 
 /** @taskunit Private */

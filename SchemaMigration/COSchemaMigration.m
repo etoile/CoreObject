@@ -27,7 +27,9 @@ static NSMutableDictionary *dependencies;
     migrations = [NSMutableDictionary new];
 }
 
+
 #pragma mark Schema Migration Registration -
+
 
 + (void)registerMigration: (COSchemaMigration *)migration
 {
@@ -38,7 +40,8 @@ static NSMutableDictionary *dependencies;
     dependencies = nil;
 }
 
-+ (COSchemaMigration *)migrationForPackageName: (NSString *)package destinationVersion: (NSInteger)version
++ (COSchemaMigration *)migrationForPackageName: (NSString *)package
+                            destinationVersion: (NSInteger)version
 {
     NILARG_EXCEPTION_TEST(package);
     INVALIDARG_EXCEPTION_TEST(version, version > 0);
@@ -57,7 +60,7 @@ static NSMutableDictionary *dependencies;
 {
     if (dependencies != nil)
         return dependencies;
-    
+
     dependencies = [NSMutableDictionary new];
 
     for (COSchemaMigration *migration in [migrations objectEnumerator])
@@ -76,10 +79,10 @@ static NSMutableDictionary *dependencies;
             }
             [(NSMutableArray *)dependencies[pair] addObject: migration];
         }
-        
+
     }
     // TODO: Check there is no cycle with a topological sort.
-    
+
     return dependencies;
 }
 
@@ -88,14 +91,18 @@ static NSMutableDictionary *dependencies;
     return migrations.allValues;
 }
 
+
 #pragma mark Targeted Versions -
+
 
 - (int64_t)sourceVersion
 {
     return (self.destinationVersion == 0 ? 0 : self.destinationVersion - 1);
 }
 
+
 #pragma mark Migration Process -
+
 
 - (void)validateItems: (NSArray *)storeItems
 {
