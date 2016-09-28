@@ -7,10 +7,10 @@
 @interface EWDocument : NSDocument <EWUndoManagerDelegate>
 {
     NSString *_title;
-    COPersistentRoot  *_persistentRoot;
+    COPersistentRoot *_persistentRoot;
 }
 
-- (id) initWithPersistentRoot: (COPersistentRoot *)aRoot title: (NSString *)aTitle;
+- (id)initWithPersistentRoot: (COPersistentRoot *)aRoot title: (NSString *)aTitle;
 
 - (IBAction) branch: (id)sender;
 - (IBAction) showBranches: (id)sender;
@@ -23,30 +23,30 @@
 - (IBAction) pull2: (id)sender;
 - (IBAction) pull3: (id)sender;
 
-- (void) recordUpdatedItems: (NSArray *)items;
+- (void)recordUpdatedItems: (NSArray *)items;
 
-- (COPersistentRoot *) currentPersistentRoot;
-- (COSQLiteStore *) store;
+- (COPersistentRoot *)currentPersistentRoot;
+- (COSQLiteStore *)store;
 
-- (ETUUID *) editingBranch;
-
-/**
- * @param aToken
- *   should be a state token that belongs to [self editingBranch]
- */
-- (void) loadStateToken: (CORevisionID *)aToken;
+- (ETUUID *)editingBranch;
 
 /**
  * @param aToken
  *   should be a state token that belongs to [self editingBranch]
  */
-- (void) persistentSwitchToStateToken: (CORevisionID *)aToken;
+- (void)loadStateToken: (CORevisionID *)aToken;
 
-- (void) switchToBranch: (ETUUID *)aBranchUUID;
+/**
+ * @param aToken
+ *   should be a state token that belongs to [self editingBranch]
+ */
+- (void)persistentSwitchToStateToken: (CORevisionID *)aToken;
 
-- (void) deleteBranch: (ETUUID *)aBranchUUID;
+- (void)switchToBranch: (ETUUID *)aBranchUUID;
 
-- (void) commit;
+- (void)deleteBranch: (ETUUID *)aBranchUUID;
+
+- (void)commit;
 
 - (COUndoTrack *)undoStack;
 

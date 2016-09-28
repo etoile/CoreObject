@@ -12,6 +12,7 @@
 @class FMDatabase;
 
 @protocol COTrackNodeBuilder <NSObject>
+
 - (id)makeNodeWithID: (int64_t)aNodeID revision: (CORevision *)aRevision;
 @end
 
@@ -30,11 +31,11 @@
  */
 @interface COStore : NSObject
 {
-    @package
+@package
     NSURL *url;
     FMDatabase *db;
     NSMutableDictionary *commitObjectForID;
-    
+
     NSNumber *commitInProgress;
     NSNumber *rootInProgress;
     NSNumber *trackInProgress;
@@ -79,7 +80,7 @@
  *
  * See -metadata to learn about the keys in the returned plist.
  */
-- (NSDictionary *) metadata;
+- (NSDictionary *)metadata;
 /**
  * <override-subclass />
  * Sets the metadata attached to the store.
@@ -95,7 +96,7 @@
  *
  * For a nil plist, raises a NSInvalidArgumentException.
  */
-- (void) setMetadata: (NSDictionary *)plist;
+- (void)setMetadata: (NSDictionary *)plist;
 
 /** @taskunit Listing Persistent Objects */
 
@@ -484,6 +485,6 @@ Should be provided by SQLClient or moved to EtoileFoundation. */
     NSDictionary *dictionary;
 }
 
-- (id) initWithDictionary: (NSDictionary *)aDict;
+- (id)initWithDictionary: (NSDictionary *)aDict;
 
 @end

@@ -4,29 +4,29 @@
 @interface EWTextStorage : NSTextStorage
 {
     ETUUID *_rootUUID;
-    
+
     NSMutableAttributedString *backing_;
-    
+
     NSMutableSet *paragraphsChangedDuringEditing_;
 }
 
-- (id) initWithDocumentUUID: (ETUUID *)aUUID;
+- (id)initWithDocumentUUID: (ETUUID *)aUUID;
 
-- (BOOL) setTypewriterDocument: (id <COItemGraph>)aTree;
-- (id <COItemGraph>) typewriterDocument;
-- (COItem *) paragraphTreeForUUID: (ETUUID *)aUUID;
+- (BOOL)setTypewriterDocument: (id <COItemGraph>)aTree;
+- (id <COItemGraph>)typewriterDocument;
+- (COItem *)paragraphTreeForUUID: (ETUUID *)aUUID;
 
 // FIXME: we will need the ability to incrementally update an EWTextStorage
 // by writing a new root node and supplying the relevant added/modified paragraph
 // nodes.
 
 
-- (NSArray *) paragraphUUIDs;
+- (NSArray *)paragraphUUIDs;
 
-- (NSRange) rangeForParagraphWithUUID: (ETUUID *)aUUID;
+- (NSRange)rangeForParagraphWithUUID: (ETUUID *)aUUID;
 
-- (NSAttributedString *) attributedStringForParagraphWithUUID: (ETUUID *)aUUID;
+- (NSAttributedString *)attributedStringForParagraphWithUUID: (ETUUID *)aUUID;
 
-- (NSArray *) paragraphUUIDsChangedDuringEditing;
+- (NSArray *)paragraphUUIDsChangedDuringEditing;
 
 @end

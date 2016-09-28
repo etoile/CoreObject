@@ -4,10 +4,10 @@
     // FIXME: Incomplete/incorrect
     if ([object isKindOfClass: [COObject class]])
     {
-        COObject *other = (COObject*)object;
+        COObject *other = (COObject *)object;
         if (![[self UUID] isEqual: [other UUID]])
         {
-            return NO; 
+            return NO;
         }
         for (ETPropertyDescription *propDesc in [[self entityDescription] allPropertyDescriptions])
         {
@@ -21,7 +21,7 @@
                 }
                 if (![selfValue isEqual: otherValue] && !(selfValue == nil && otherValue == nil))
                 {
-                    return NO; 
+                    return NO;
                 }
             }
         }

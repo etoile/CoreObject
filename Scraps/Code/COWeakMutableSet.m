@@ -18,27 +18,27 @@
     [super dealloc];
 }
 
-- (NSUInteger) count
+- (NSUInteger)count
 {
     return NSCountHashTable(_hashTable);
 }
 
-- (id) member: (id)anObject
+- (id)member: (id)anObject
 {
     return NSHashGet(_hashTable, anObject);
 }
 
-- (NSEnumerator *) objectEnumerator
+- (NSEnumerator *)objectEnumerator
 {
     return [_hashTable objectEnumerator];
 }
 
-- (void) addObject: (id)anObject
+- (void)addObject: (id)anObject
 {
     NSHashInsert(_hashTable, anObject);
 }
 
-- (void) removeObject: (id)anObject
+- (void)removeObject: (id)anObject
 {
     NSHashRemove(_hashTable, anObject);
 }

@@ -19,9 +19,9 @@
 /** @taskunit Private */
 
 - (BOOL)setupDB;
-- (NSNumber*)keyForUUID: (ETUUID*)uuid;
-- (ETUUID*)UUIDForKey: (int64_t)key;
-- (NSNumber*)keyForProperty: (NSString*)property;
-- (NSString*)propertyForKey: (int64_t)key;
+- (NSNumber *)keyForUUID: (ETUUID *)uuid;
+- (ETUUID *)UUIDForKey: (int64_t)key;
+- (NSNumber *)keyForProperty: (NSString *)property;
+- (NSString *)propertyForKey: (int64_t)key;
 
 @end

@@ -25,29 +25,35 @@
 - (NSString *)sha1HashHexString;
 
 - (NSString *)hexString;
-+ (NSData *)dataWithHexString: (NSString*)hex;
++ (NSData *)dataWithHexString: (NSString *)hex;
 @end
 
 @interface NSString (sha1)
+
 - (NSData *)sha1Hash;
 @end
 
 @interface NSNumber (sha1)
+
 - (NSData *)sha1Hash;
 @end
 
 @interface NSArray (sha1)
+
 - (NSData *)sha1Hash;
 @end
 
 @interface NSDictionary (sha1)
+
 - (NSData *)sha1Hash;
 @end
 
 @interface NSSet (sha1)
+
 - (NSData *)sha1Hash;
 @end
 
 @interface NSDate (sha1)
+
 - (NSData *)sha1Hash;
 @end

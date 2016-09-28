@@ -13,18 +13,18 @@
 {
     COObject *_owningObject;
     NSString *_owningProperty;
-    
+
 }
 
-+ (COReference *) referenceToCurrentBranchOfPersistentRoot: (COPersistentRoot *)aPersistentRoot;
-+ (COReference *) referenceToBranch: (COBranch *)aBranch;
-+ (COReference *) referenceToInnerObject: (COObject *)anObject;
++ (COReference *)referenceToCurrentBranchOfPersistentRoot: (COPersistentRoot *)aPersistentRoot;
++ (COReference *)referenceToBranch: (COBranch *)aBranch;
++ (COReference *)referenceToInnerObject: (COObject *)anObject;
 
 @property (readwrite, nonatomic) BOOL isToCurrentBranch;
 @property (readwrite, nonatomic, assign) COBranch *branch;
 @property (readwrite, nonatomic, assign) COPersistentRoot *persistentRoot;
 
-- (BOOL) isBroken;
-- (BOOL) isInnerReference;
+- (BOOL)isBroken;
+- (BOOL)isInnerReference;
 
 @end

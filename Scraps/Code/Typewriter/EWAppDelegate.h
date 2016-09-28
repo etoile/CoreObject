@@ -11,9 +11,9 @@
     COEditingContext *_user3Ctx;
 }
 
-- (COPersistentRoot *) user1PersistentRoot;
-- (COPersistentRoot *) user2PersistentRoot;
-- (COPersistentRoot *) user3PersistentRoot;
-- (IBAction)undoHistory:(id)sender;
+- (COPersistentRoot *)user1PersistentRoot;
+- (COPersistentRoot *)user2PersistentRoot;
+- (COPersistentRoot *)user3PersistentRoot;
+- (IBAction)undoHistory: (id)sender;
 
 @end

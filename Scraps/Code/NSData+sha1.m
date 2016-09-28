@@ -26,33 +26,33 @@
 - (NSString *)hexString
 {
     NSUInteger len = [self length];
-    NSMutableString *string = [NSMutableString stringWithCapacity: 2*len];
+    NSMutableString *string = [NSMutableString stringWithCapacity: 2 * len];
     const unsigned char *bytes = [self bytes];
-    
-    for (NSUInteger i=0; i<len; i++)
+
+    for (NSUInteger i = 0; i < len; i++)
     {
-        [string appendFormat:@"%02x", (unsigned int)bytes[i]];
+        [string appendFormat: @"%02x", (unsigned int)bytes[i]];
     }
     return string;
 }
 
-+ (NSData *)dataWithHexString: (NSString*)hex
++ (NSData *)dataWithHexString: (NSString *)hex
 {
     const NSUInteger len = [hex length];
     if (len % 2 != 0 || len == 0)
     {
         return nil;
     }
-    
-    NSMutableData *data = [NSMutableData dataWithLength: len/2];
+
+    NSMutableData *data = [NSMutableData dataWithLength: len / 2];
     const char *hexdata = [hex UTF8String];
     unsigned char *outputbytes = [data mutableBytes];
-    
-    for (NSUInteger i=0; i < len; i+=2)
+
+    for (NSUInteger i = 0; i < len; i += 2)
     {
         unsigned int byte;
-        sscanf(hexdata+i, "%02x", &byte);
-        outputbytes[i/2] = (unsigned char)byte;
+        sscanf(hexdata + i, "%02x", &byte);
+        outputbytes[i / 2] = (unsigned char)byte;
     }
     return data;
 }
