@@ -25,8 +25,6 @@
 /**
  * The behavior to decide when the editing context should unload persistent 
  * roots.
- *
- * TODO: If we keep it around, this should probably become a mask.
  */
 typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
 {

@@ -245,7 +245,6 @@
         COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: secondBranch.UUID];
-
         COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
         UKFalse(ctx2secondBranch.deleted);
@@ -270,7 +269,6 @@
         COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: secondBranch.UUID];
-
         COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
         UKFalse(ctx2secondBranch.deleted);
@@ -295,7 +293,6 @@
         COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: secondBranch.UUID];
-
         COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
         UKNotNil(ctx2secondBranch);
@@ -323,7 +320,6 @@
         COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: secondBranch.UUID];
-
         COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
         UKTrue(ctx2secondBranch.deleted);
@@ -347,7 +343,6 @@
     {
         COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
-
         COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
         UKObjectsEqual(D(@"world2", @"hello"), ctx2persistentRoot.currentBranch.metadata);
@@ -371,7 +366,6 @@
     {
         COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
-
         COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
         UKObjectsEqual(D(@"world2", @"hello"), ctx2persistentRoot.metadata);
@@ -402,7 +396,6 @@
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
         COBranch *ctx2originalBranch = [ctx2persistentRoot branchForUUID: originalBranch.UUID];
         COBranch *ctx2secondBranch = [ctx2persistentRoot branchForUUID: secondBranch.UUID];
-
         COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
 
         UKObjectsEqual(ctx2secondBranch, ctx2persistentRoot.currentBranch);
@@ -429,8 +422,9 @@
     {
         COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
-
         COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
+
+        ctx2.unloadingBehavior = COEditingContextUnloadingBehaviorManual;
 
         UKFalse(ctx2persistentRoot.deleted);
         [testTrack undo];
@@ -450,8 +444,9 @@
     {
         COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
-
         COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
+
+        ctx2.unloadingBehavior = COEditingContextUnloadingBehaviorManual;
 
         UKFalse(ctx2persistentRoot.deleted);
         [testTrack undo];
@@ -473,8 +468,9 @@
     {
         COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *ctx2persistentRoot = [ctx2 persistentRootForUUID: persistentRoot.UUID];
-
         COUndoTrack *testTrack = [_testTrack trackWithEditingContext: ctx2];
+
+        ctx2.unloadingBehavior = COEditingContextUnloadingBehaviorManual;
 
         UKTrue(ctx2persistentRoot.deleted);
         [testTrack undo];

@@ -21,6 +21,9 @@
 - (instancetype)init
 {
     SUPERINIT;
+
+    ctx.unloadingBehavior = COEditingContextUnloadingBehaviorManual;
+    
     persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
 
@@ -236,9 +239,6 @@
     UKTrue([store commitStoreTransaction: txn]);
 
     [self wait];
-
-    // Reload the persistent root in case it was unloaded on deletion
-    persistentRoot = [ctx persistentRootForUUID: persistentRoot.UUID];
 
     // Check that a notification was sent to the editing context, and it automatically updated.
     UKFalse(persistentRoot.deleted);

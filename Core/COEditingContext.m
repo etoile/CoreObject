@@ -966,8 +966,11 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
                 [self updateCrossPersistentRootReferencesToPersistentRoot: loaded
                                                                    branch: nil
                                                                   isFault: loaded.deleted];
-                // TODO: Unload the persistent root when deleted (this represents
-                // an external deletion)
+
+                if (loaded.deleted && _unloadingBehavior == COEditingContextUnloadingBehaviorOnDeletion)
+                {
+                    [self unloadPersistentRoot: loaded];
+                }
             }
         }
         else if (![deletedPersistentRootUUIDs containsObject: persistentRootUUID])
@@ -983,20 +986,21 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 
     for (ETUUID *persistentRootUUID in compactedPersistentRootUUIDs)
     {
-        COPersistentRoot *loaded = _loadedPersistentRoots[persistentRootUUID];
-
-        [loaded storePersistentRootDidChange: notif isDistributed: isDistributed];
+        [_loadedPersistentRoots[persistentRootUUID] storePersistentRootDidChange: notif
+                                                                   isDistributed: isDistributed];
         hadChanges = YES;
     }
 
     for (ETUUID *persistentRootUUID in finalizedPersistentRootUUIDs)
     {
-        __unused COPersistentRoot *loaded = _loadedPersistentRoots[persistentRootUUID];
+        COPersistentRoot *loaded = _loadedPersistentRoots[persistentRootUUID];
+        
+        if (loaded == nil)
+            continue;
 
-        // TODO: [self unloadPersistentRoot: loaded]
-        // Temporary hack until we have -unloadPersistentRoot:
-        [_lastTransactionIDForPersistentRootUUID removeObjectForKey: persistentRootUUID];
-
+        // For finalized persistent roots, the unloading behavior is ignored since we must not let
+        // the user interacts with them anymore.
+        [self unloadPersistentRoot: loaded];
         hadChanges = YES;
     }
 
