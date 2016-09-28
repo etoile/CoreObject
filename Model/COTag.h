@@ -24,9 +24,6 @@
  * A tag belongs to a COTagLibrary and can also belong to multiple COTagGroup.
  */
 @interface COTag : COGroup
-{
-
-}
 
 
 /** @taskunit Type Querying */
@@ -75,10 +72,6 @@
  * Tags can belong to multiple tag groups. Tag groups belong to a COTagLibrary.
  */
 @interface COTagGroup : COGroup
-{
-
-}
-
 @end
 
 

@@ -21,11 +21,10 @@
  * the UI without sorting.
  */
 @interface COGroup : COCollection
-{
 
-}
 
 /** @taskunit Type Querying */
+
 
 /**
  * Returns YES.

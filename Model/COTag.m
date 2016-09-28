@@ -6,17 +6,16 @@
  */
 
 #import "COTag.h"
-#import "COPersistentRoot.h"
 
 @implementation COTag
 
-+ (ETEntityDescription *) newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *collection = [self newBasicEntityDescription];
 
     // For subclasses that don't override -newEntityDescription, we must not add the 
     // property descriptions that we will inherit through the parent
-    if (![collection.name isEqual: [COTag className]]) 
+    if (![collection.name isEqual: [COTag className]])
         return collection;
 
     ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COTag"
@@ -66,13 +65,13 @@
 
 @implementation COTagGroup
 
-+ (ETEntityDescription *) newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *collection = [self newBasicEntityDescription];
 
     // For subclasses that don't override -newEntityDescription, we must not add the 
     // property descriptions that we will inherit through the parent
-    if (![collection.name isEqual: [COTagGroup className]]) 
+    if (![collection.name isEqual: [COTagGroup className]])
         return collection;
 
     ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COTagGroup"
@@ -103,13 +102,13 @@
 + (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *collection = [self newBasicEntityDescription];
-    
+
     // For subclasses that don't override -newEntityDescription, we must not add the
     // property descriptions that we will inherit through the parent
     if (![collection.name isEqual: [COTagLibrary className]])
         return collection;
 
-     ETPropertyDescription *tagGroups =
+    ETPropertyDescription *tagGroups =
         [ETPropertyDescription descriptionWithName: @"tagGroups" typeName: @"COTagGroup"];
     tagGroups.multivalued = YES;
     tagGroups.ordered = YES;
@@ -120,7 +119,7 @@
                                         opposite: nil];
 
     collection.propertyDescriptions = @[tagGroups, objects];
-    
+
     return collection;
 }
 

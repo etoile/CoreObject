@@ -11,6 +11,7 @@
 #import "COSerialization.h"
 
 @interface COObject ()
+
 - (id)serializedValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc;
 - (id)serializedValueForValue: (id)value
  univaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc;
@@ -19,12 +20,15 @@
 - (id)valueForSerializedValue: (id)value
                        ofType: (COType)type
  univaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc;
+
 @end
+
 
 @implementation COObject (CODictionarySerialization)
 
-#pragma mark Serialization
-#pragma mark -
+
+#pragma mark Serialization -
+
 
 - (COItem *)storeItemFromDictionaryForPropertyDescription: (ETPropertyDescription *)aPropertyDesc
 {
@@ -39,16 +43,16 @@
     for (NSString *key in dict.allKeys)
     {
         NSAssert2(isSerializablePrimitiveValue(key),
-            @"Unsupported key type %@ in %@. For dictionary serialization, "
-              "keys must be a primitive CoreObject values (NSString, NSNumber or NSData).",
-              key, dict);
-    
+                  @"Unsupported key type %@ in %@. For dictionary serialization, "
+                      "keys must be a primitive CoreObject values (NSString, NSNumber or NSData).",
+                  key, dict);
+
         id value = dict[key];
         id serializedValue = [self serializedValueForValue: value
                               univaluedPropertyDescription: aPropertyDesc];
         COType serializedType = [self serializedTypeForUnivaluedPropertyDescription: aPropertyDesc
                                                                             ofValue: serializedValue];
-    
+
         values[key] = serializedValue;
         types[key] = @(serializedType);
     }
@@ -74,8 +78,8 @@
     for (NSString *property in aStoreItem.attributeNames)
     {
         if ([property isEqualToString: kCOObjectEntityNameProperty]
-         || [property isEqualToString: kCOObjectPackageVersionProperty]
-         || [property isEqualToString: kCOObjectPackageNameProperty])
+            || [property isEqualToString: kCOObjectPackageVersionProperty]
+            || [property isEqualToString: kCOObjectPackageNameProperty])
         {
             // HACK
             continue;
@@ -83,13 +87,16 @@
 
         id serializedValue = [aStoreItem valueForAttribute: property];
         COType serializedType = [aStoreItem typeForAttribute: property];
-    
+
         if (propertyDesc == nil)
         {
             [NSException raise: NSInvalidArgumentException
                         format: @"Tried to set serialized value %@ of type %@ "
-                                 "for property %@ missing in the metamodel %@",
-                                serializedValue, @(serializedType), propertyDesc.name, self.entityDescription];
+                                    "for property %@ missing in the metamodel %@",
+                                serializedValue,
+                                @(serializedType),
+                                propertyDesc.name,
+                                self.entityDescription];
         }
 
         id value = [self valueForSerializedValue: serializedValue
@@ -103,6 +110,7 @@
 }
 
 @end
+
 
 @implementation COItem (CODictionarySerialization)
 

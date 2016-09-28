@@ -19,21 +19,22 @@
 
     // For subclasses that don't override -newEntityDescription, we must not add the 
     // property descriptions that we will inherit through the parent
-    if (![collection.name isEqual: [COLibrary className]]) 
+    if (![collection.name isEqual: [COLibrary className]])
         return collection;
 
     [collection setLocalizedDescription: _(@"Library")];
 
-    ETPropertyDescription *idProperty = 
+    ETPropertyDescription *idProperty =
         [ETPropertyDescription descriptionWithName: @"identifier" typeName: @"NSString"];
     idProperty.persistent = YES;
 
     collection.propertyDescriptions = @[idProperty];
 
-    return collection;  
+    return collection;
 }
 
-+ (ETEntityDescription *)makeEntityDescriptionWithName: (NSString *)aName contentType: (NSString *)aType
++ (ETEntityDescription *)makeEntityDescriptionWithName: (NSString *)aName
+                                           contentType: (NSString *)aType
 {
     ETEntityDescription *collection = [ETEntityDescription descriptionWithName: aName];
     ETPropertyDescription *objects =
@@ -46,7 +47,7 @@
 
     return collection;
 }
-     
+
 + (NSSet *)additionalEntityDescriptions
 {
     return S([self makeEntityDescriptionWithName: @"COBookmarkLibrary" contentType: @"COBookmark"],
@@ -90,7 +91,7 @@
 #ifdef GNUSTEP
     [group setQuery: [COQuery queryWithPredicate: [NSPredicate predicateWithFormat: @"isLibrary == YES"]]];
 #else
-    group.query = [COQuery queryWithPredicateBlock: ^ BOOL (id object, NSDictionary *bindings)
+    group.query = [COQuery queryWithPredicateBlock: ^BOOL(id object, NSDictionary *bindings)
     {
         return [object isLibrary];
     }];
@@ -106,7 +107,7 @@
     {
         ETEntityDescription *contentType =
             [lib.entityDescription propertyDescriptionForName: lib.contentKey].type;
-                                            
+
         if ([aType isKindOfEntity: contentType])
             return lib;
     }
@@ -127,7 +128,7 @@
 - (COLibrary *)bookmarkLibrary
 {
     COLibrary *lib = [self.libraryGroup objectForIdentifier: kCOLibraryIdentifierBookmark];
-    
+
     if (lib == nil)
     {
         lib = [self insertNewPersistentRootWithEntityName: @"COBookmarkLibrary"].rootObject;
@@ -140,7 +141,7 @@
 - (COLibrary *)noteLibrary
 {
     COLibrary *lib = [self.libraryGroup objectForIdentifier: kCOLibraryIdentifierNote];
-    
+
     if (lib == nil)
     {
         lib = [self insertNewPersistentRootWithEntityName: @"CONoteLibrary"].rootObject;
@@ -178,8 +179,8 @@
 
 @end
 
-NSString * const kCOLibraryIdentifierTag = @"kCOLibraryIdentifierTag";
-NSString * const kCOLibraryIdentifierBookmark = @"kCOLibraryIdentifierBookmark";
-NSString * const kCOLibraryIdentifierNote = @"kCOLibraryIdentifierNote";
-NSString * const kCOLibraryIdentifierPhoto = @"kCOLibraryIdentifierPhoto";
-NSString * const kCOLibraryIdentifierMusic = @"kCOLibraryIdentifierMusic";
+NSString *const kCOLibraryIdentifierTag = @"kCOLibraryIdentifierTag";
+NSString *const kCOLibraryIdentifierBookmark = @"kCOLibraryIdentifierBookmark";
+NSString *const kCOLibraryIdentifierNote = @"kCOLibraryIdentifierNote";
+NSString *const kCOLibraryIdentifierPhoto = @"kCOLibraryIdentifierPhoto";
+NSString *const kCOLibraryIdentifierMusic = @"kCOLibraryIdentifierMusic";

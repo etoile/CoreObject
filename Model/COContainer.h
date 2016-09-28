@@ -19,11 +19,10 @@
  * indexes.
  */
 @interface COContainer : COCollection
-{
 
-}
 
 /** @taskunit Type Querying */
+
 
 /**
  * Returns YES.

@@ -26,7 +26,7 @@
                                                          type: (NSString *)aType
                                                      opposite: (NSString *)oppositeType
 {
-    ETPropertyDescription *contentProperty = 
+    ETPropertyDescription *contentProperty =
         [ETPropertyDescription descriptionWithName: aName typeName: aType];
     contentProperty.multivalued = YES;
     contentProperty.opposite = (id)oppositeType;
@@ -35,16 +35,16 @@
     return contentProperty;
 }
 
-+ (ETEntityDescription *) newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *collection = [self newBasicEntityDescription];
 
     // For subclasses that don't override -newEntityDescription, we must not add the 
     // property descriptions that we will inherit through the parent
-    if (![collection.name isEqual: [COCollection className]]) 
+    if (![collection.name isEqual: [COCollection className]])
         return collection;
 
-    return collection;  
+    return collection;
 }
 
 - (instancetype)initWithObjectGraphContext: (COObjectGraphContext *)aContext
@@ -65,7 +65,7 @@
     // NOTE: COCollection is abstract, so subclasses uses either COObject or
     // a COCollection subentity.
     if (![self.entityDescription isEqual: coreObjectEntity]
-      && [self.entityDescription propertyDescriptionForName: self.contentKey] == nil)
+        && [self.entityDescription propertyDescriptionForName: self.contentKey] == nil)
     {
         [NSException raise: NSInternalInconsistencyException
                     format: @"Found no property description for -contentKey %@", self.contentKey];
@@ -97,7 +97,7 @@
 
 - (void)didUpdate
 {
-    [[NSNotificationCenter defaultCenter] 
+    [[NSNotificationCenter defaultCenter]
         postNotificationName: ETCollectionDidUpdateNotification object: self];
 }
 

@@ -32,9 +32,6 @@
  * ETSourceDidUpdateNotification is posted).
  */
 @interface COCollection : COObject <ETCollection, ETCollectionMutation>
-{
-
-}
 
 
 /** @taskunit Metamodel */
@@ -151,6 +148,7 @@
  * @group Object Collection and Organization 
  */
 @interface COObject (COCollectionTypeQuerying)
+
 /**
  * Returns whether the receiver is a group or not.
  */

@@ -6,25 +6,24 @@
  */
 
 #import "COContainer.h"
-#import "COGroup.h"
 
 @implementation COContainer
 
-+ (ETEntityDescription *) newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *collection = [self newBasicEntityDescription];
 
     // For subclasses that don't override -newEntityDescription, we must not add the 
     // property descriptions that we will inherit through the parent
-    if (![collection.name isEqual: [COContainer className]]) 
+    if (![collection.name isEqual: [COContainer className]])
         return collection;
-    
+
     ETPropertyDescription *objects =
         [self contentPropertyDescriptionWithName: @"objects" type: (id)@"COObject" opposite: nil];
-    
+
     collection.propertyDescriptions = @[objects];
 
-    return collection;  
+    return collection;
 }
 
 - (BOOL)isContainer

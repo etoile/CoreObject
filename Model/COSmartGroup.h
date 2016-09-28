@@ -23,7 +23,7 @@ typedef NSArray *(^COContentBlock)(void);
  */
 @interface COSmartGroup : COObject <ETCollection>
 {
-    @private
+@private
     id <ETCollection> targetCollection;
     COQuery *query;
     COContentBlock contentBlock;

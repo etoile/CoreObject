@@ -14,12 +14,12 @@
 + (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *bookmark = [self newBasicEntityDescription];
-    
+
     // For subclasses that don't override -newEntityDescription, we must not add the
     // property descriptions that we will inherit through the parent
     if (![bookmark.name isEqual: [COBookmark className]])
         return bookmark;
-    
+
     ETPropertyDescription *URL =
         [ETPropertyDescription descriptionWithName: @"URL" typeName: @"NSURL"];
     ETPropertyDescription *lastVisitedDate =
@@ -28,24 +28,23 @@
         [ETPropertyDescription descriptionWithName: @"favIconData" typeName: @"NSData"];
 
     NSArray *persistentProperties = @[URL, lastVisitedDate, favIconData];
-    
+
     [[persistentProperties mappedCollection] setPersistent: YES];
     bookmark.propertyDescriptions = persistentProperties;
 
     return bookmark;
 }
 
-
-- (instancetype) initWithURL: (NSURL *)aURL
+- (instancetype)initWithURL: (NSURL *)aURL
 {
     NILARG_EXCEPTION_TEST(aURL);
     SUPERINIT;
-    _URL =  aURL;
-    _favIconData =  aURL.favIconData;
+    _URL = aURL;
+    _favIconData = aURL.favIconData;
     return self;
 }
 
-- (instancetype) initWithURLFile: (NSString *)aFilePath
+- (instancetype)initWithURLFile: (NSString *)aFilePath
 {
     // TODO: Finish to implement
     NSURL *URL = nil;
@@ -55,7 +54,7 @@
 - (void)setURL: (NSURL *)aURL
 {
     [self willChangeValueForProperty: @"URL"];
-    _URL =  [aURL copy];
+    _URL = [aURL copy];
     [self didChangeValueForProperty: @"URL"];
 }
 
@@ -71,24 +70,24 @@ support bookmark search based on URL text. */
     _URL = (aURLString != nil ? [NSURL URLWithString: aURLString] : nil);
 }
 
-- (void)setLastVisitedDate:(NSDate *)aDate
+- (void)setLastVisitedDate: (NSDate *)aDate
 {
     [self willChangeValueForProperty: @"lastVisitedDate"];
-    _lastVisitedDate =  [aDate copy];
+    _lastVisitedDate = [aDate copy];
     [self didChangeValueForProperty: @"lastVisitedDate"];
 }
 
 - (void)setFavIconData: (NSData *)favIconData
 {
     [self willChangeValueForProperty: @"favIconData"];
-    _favIconData =  [favIconData copy];
+    _favIconData = [favIconData copy];
     [self didChangeValueForProperty: @"favIconData"];
 }
 
 @end
 
 
-@implementation  NSURL (COBookmark)
+@implementation NSURL (COBookmark)
 
 - (NSData *)favIconData
 {

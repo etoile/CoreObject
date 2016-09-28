@@ -18,7 +18,7 @@
  */
 @interface COBookmark : COObject
 {
-    @private
+@private
     NSURL *_URL;
     NSDate *_lastVisitedDate;
     NSData *_favIconData;
@@ -34,7 +34,7 @@
  *
  * For a nil URL, raises an NSInvalidArgumentException.
  */
-- (instancetype) initWithURL: (NSURL *)aURL NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithURL: (NSURL *)aURL NS_DESIGNATED_INITIALIZER;
 /**
  * Intializes and returns a bookmark from the URL location file at the given 
  * path.
@@ -45,7 +45,7 @@
  *
  * For a nil URL, raises an NSInvalidArgumentException.
  */
-- (instancetype) initWithURLFile: (NSString *)aFilePath;
+- (instancetype)initWithURLFile: (NSString *)aFilePath;
 
 
 /** @taskunit Bookmark Properties */
@@ -84,8 +84,10 @@
  * @abstract CoreObject additions for NSURL.
  */
 @interface NSURL (COBookmark)
+
 /**
  * Returns the image data of the fav icon that symbolizes the given URL. 
  */
 @property (nonatomic, readonly) NSData *favIconData;
+
 @end

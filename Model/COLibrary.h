@@ -25,7 +25,7 @@
  */
 @interface COLibrary : COContainer
 {
-    @private
+@private
     NSString *_identifier;
 }
 
@@ -139,20 +139,20 @@
 /** A unique identifier to mark the library listing the tags in the store.
 
 See also -[COEditingContext tagLibrary]. */
-extern NSString * const kCOLibraryIdentifierTag;
+extern NSString *const kCOLibraryIdentifierTag;
 /** A unique identifier to mark the library listing the bookmarks in the store.
  
 See also -[COEditingContext bookmarkLibrary]. */
-extern NSString * const kCOLibraryIdentifierBookmark;
+extern NSString *const kCOLibraryIdentifierBookmark;
 /** A unique identifier to mark the library listing the notes in the store.
  
 See also -[COEditingContext noteLibrary]. */
-extern NSString * const kCOLibraryIdentifierNote;
+extern NSString *const kCOLibraryIdentifierNote;
 /** A unique identifier to mark the library listing the pictures in the store.
 
 See also -[COEditingContext photoLibrary]. */
-extern NSString * const kCOLibraryIdentifierPhoto;
+extern NSString *const kCOLibraryIdentifierPhoto;
 /** A unique identifier to mark the library listing the music tracks in the store.
 
 See also -[COEditingContext musicLibrary]. */
-extern NSString * const kCOLibraryIdentifierMusic;
+extern NSString *const kCOLibraryIdentifierMusic;

@@ -6,7 +6,6 @@
  */
 
 #import "COSmartGroup.h"
-#import "COSerialization.h"
 
 @implementation COSmartGroup
 
@@ -26,7 +25,7 @@
 
     // For subclasses that don't override -newEntityDescription, we must not add the 
     // property descriptions that we will inherit through the parent
-    if (![group.name isEqual: [COSmartGroup className]]) 
+    if (![group.name isEqual: [COSmartGroup className]])
         return group;
 
     ETUTI *uti = [ETUTI registerTypeWithString: @"org.etoile-project.objc.class.COSmartGroup"
@@ -37,17 +36,17 @@
 
     [group setLocalizedDescription: _(@"Smart Group")];
 
-    ETPropertyDescription *content = 
+    ETPropertyDescription *content =
         [ETPropertyDescription descriptionWithName: @"content" typeName: @"COObject"];
     content.multivalued = YES;
     content.ordered = YES;
 
     group.propertyDescriptions = @[content];
 
-    return group;   
+    return group;
 }
 
-- (instancetype)initWithObjectGraphContext:(COObjectGraphContext *)aContext
+- (instancetype)initWithObjectGraphContext: (COObjectGraphContext *)aContext
 {
     self = [super initWithObjectGraphContext: aContext];
     if (self == nil)
@@ -65,7 +64,7 @@
 
 - (void)setTargetCollection: (id <ETCollection>)aGroup
 {
-    targetCollection =  (id)aGroup;
+    targetCollection = (id)aGroup;
     [self refresh];
 }
 
@@ -77,7 +76,7 @@
 
 - (void)setQuery: (COQuery *)aQuery
 {
-    query =  aQuery;
+    query = aQuery;
     [self refresh];
 }
 
@@ -132,7 +131,7 @@
 
     ETAssert([result isKindOfClass: [NSArray class]]);
 
-    content =  result;
+    content = result;
     [self didUpdate];
 }
 
