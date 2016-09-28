@@ -32,6 +32,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 @synthesize parentContext = _parentContext, UUID = _UUID, persistentRootInfo = _persistentRootInfo;
 @synthesize branchesPendingDeletion = _branchesPendingDeletion;
 @synthesize branchesPendingUndeletion = _branchesPendingUndeletion;
+@synthesize objectGraphContext = _objectGraphContext;
 
 #pragma mark Creating a New Persistent Root -
 
@@ -97,15 +98,15 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     _branchesPendingUndeletion = [NSMutableSet new];
     if (anObjectGraphContext != nil)
     {
-        _currentBranchObjectGraph = anObjectGraphContext;
+        _objectGraphContext = anObjectGraphContext;
     }
     else
     {
-        _currentBranchObjectGraph = [[COObjectGraphContext alloc]
+        _objectGraphContext = [[COObjectGraphContext alloc]
             initWithModelDescriptionRepository: aCtxt.modelDescriptionRepository
                           migrationDriverClass: aCtxt.migrationDriverClass];
     }
-    [_currentBranchObjectGraph setPersistentRoot: self];
+    [_objectGraphContext setPersistentRoot: self];
 
     if (_persistentRootInfo != nil)
     {
@@ -145,7 +146,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
                                          persistentRootUUID: cheapCopyPersistentRootID];
         }
 
-        [self validateNewObjectGraphContext: _currentBranchObjectGraph
+        [self validateNewObjectGraphContext: _objectGraphContext
                                 createdFrom: branch.objectGraphContextWithoutUnfaulting];
 
         _branchForUUID[branchUUID] = branch;
@@ -217,8 +218,8 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 {
     id <COItemGraph> aGraph = [self.store itemGraphForRevisionUUID: aRevision
                                                     persistentRoot: aPersistentRoot];
-    [_currentBranchObjectGraph setItemGraph: aGraph];
-    [_currentBranchObjectGraph removeUnreachableObjects];
+    [_objectGraphContext setItemGraph: aGraph];
+    [_objectGraphContext removeUnreachableObjects];
 }
 
 - (void)reloadCurrentBranchObjectGraph
@@ -349,7 +350,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 - (void)setCurrentBranch: (COBranch *)aBranch
 {
     _currentBranchUUID = aBranch.UUID;
-    _currentBranchObjectGraph.branch = aBranch;
+    _objectGraphContext.branch = aBranch;
 
     [self reloadCurrentBranchObjectGraph];
     // TODO: Update cross persistent root references
@@ -455,7 +456,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     if (_metadataChanged)
         return YES;
 
-    if (_currentBranchObjectGraph.hasChanges)
+    if (_objectGraphContext.hasChanges)
         return YES;
 
     for (COBranch *branch in self.branches)
@@ -498,7 +499,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
         _metadataChanged = NO;
     }
 
-    [_currentBranchObjectGraph discardAllChanges];
+    [_objectGraphContext discardAllChanges];
 
     ETAssert(!self.hasChanges);
 }
@@ -510,15 +511,10 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 
 #pragma mark Convenience -
 
-- (COObjectGraphContext *)objectGraphContext
-{
-    return _currentBranchObjectGraph;
-}
-
 - (NSSet *)allObjectGraphContexts
 {
     NSMutableSet *objectGraphs = [NSMutableSet setWithCapacity: _branchForUUID.count + 1];
-    [objectGraphs addObject: _currentBranchObjectGraph];
+    [objectGraphs addObject: _objectGraphContext];
 
     for (COBranch *branch in _branchForUUID.objectEnumerator)
     {
@@ -644,11 +640,11 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
         if (_cheapCopyRevisionUUID == nil)
         {
             ETAssert(!(self.currentBranch.objectGraphContextWithoutUnfaulting.hasChanges
-                       && _currentBranchObjectGraph.hasChanges));
+                       && _objectGraphContext.hasChanges));
             // FIXME: Move this into -createPersistentRootWithInitialItemGraph:
             // and make that take a id<COItemGraph>
 
-            COObjectGraphContext *graphCtx = _currentBranchObjectGraph;
+            COObjectGraphContext *graphCtx = _objectGraphContext;
 
             if (self.currentBranch.objectGraphContextWithoutUnfaulting.hasChanges)
             {
@@ -657,7 +653,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
             }
             [graphCtx doPreCommitChecks];
 
-            // FIXME: check both _currentBranchObjectGraph and branch.objectGraphContext
+            // FIXME: check both _objectGraphContext and branch.objectGraphContext
             // FIXME: After, update the other graph with the contents of the one we committed
             COItemGraph *graphCopy = [[COItemGraph alloc] initWithItemGraph: graphCtx];
 
@@ -673,7 +669,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
             ETAssert(parentBranchUUID != nil);
             ETAssert(_cheapCopyPersistentRootUUID != nil);
 
-            const BOOL currentBranchObjectGraphHasChanges = _currentBranchObjectGraph.hasChanges;
+            const BOOL currentBranchObjectGraphHasChanges = _objectGraphContext.hasChanges;
             const BOOL specificBranchObjectGraphHasChanges = self.currentBranch.objectGraphContextWithoutUnfaulting.hasChanges;
 
             ETAssert(!(currentBranchObjectGraphHasChanges && specificBranchObjectGraphHasChanges));
@@ -691,7 +687,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
                 COItemGraph *modifiedItems;
                 if (currentBranchObjectGraphHasChanges)
                 {
-                    modifiedItems = _currentBranchObjectGraph.modifiedItemsSnapshot;
+                    modifiedItems = _objectGraphContext.modifiedItemsSnapshot;
                 }
                 else
                 {
@@ -731,16 +727,16 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 
         if (usingCurrentBranchObjectGraph)
         {
-            [_currentBranchObjectGraph acceptAllChanges];
-            [self.currentBranch.objectGraphContextWithoutUnfaulting setItemGraph: _currentBranchObjectGraph];
+            [_objectGraphContext acceptAllChanges];
+            [self.currentBranch.objectGraphContextWithoutUnfaulting setItemGraph: _objectGraphContext];
         }
         else
         {
             [self.currentBranch.objectGraphContextWithoutUnfaulting acceptAllChanges];
-            [_currentBranchObjectGraph setItemGraph: self.currentBranch.objectGraphContext];
+            [_objectGraphContext setItemGraph: self.currentBranch.objectGraphContext];
         }
 
-        [self validateNewObjectGraphContext: _currentBranchObjectGraph
+        [self validateNewObjectGraphContext: _objectGraphContext
                                 createdFrom: self.currentBranch.objectGraphContextWithoutUnfaulting];
     }
     else
