@@ -1,14 +1,14 @@
-CoreObject Mac OS X and iOS INSTALL
-===================================
+CoreObject macOS and iOS INSTALL
+================================
 
 Required software
 -----------------
 
 CoreObject requires the following:
 
-  - Mac OS X 10.7 or higher
+  - macOS 10.8 or higher
   - Xcode 4.6 or higher
-  - [libsqlite](http://www.sqlite.org/) 3.7.7 or higher (included with Mac OS X 10.7)
+  - [libsqlite](http://www.sqlite.org/) 3.7.7 or higher (included with macOS 10.8)
   - [EtoileFoundation](https://github.com/etoile/EtoileFoundation)
   - [UnitKit](https://github.com/etoile/UnitKit) (Only required for running the test suite)
 
@@ -42,7 +42,7 @@ choose ProjectDemo in the Scheme menu.
 Framework Installation
 ----------------------
 
-We don't recommend installing frameworks on OS X, but if you want to,
+We don't recommend installing frameworks on macOS, but if you want to,
 the following shell command will install CoreObject.framework in /Library/Frameworks:
 
     sudo xcodebuild -scheme CoreObject -configuration Release clean install DSTROOT=/Library INSTALL_PATH=/Frameworks

@@ -416,7 +416,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a,
 - (NSFont *)convertFont: (NSFont *)font toHaveTrait: (NSFontSymbolicTraits)aTrait
 {
 #if TARGET_OS_IPHONE
-    // NOTE: This code should work on Mac OS X, but -fontWithDescriptor:size: is broken.
+    // NOTE: This code should work on macOS, but -fontWithDescriptor:size: is broken.
     NSFontSymbolicTraits traits = (font.fontDescriptor.symbolicTraits | aTrait);
     NSFontDescriptor *desc = [font.fontDescriptor fontDescriptorWithSymbolicTraits: traits];
 

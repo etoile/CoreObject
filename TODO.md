@@ -109,9 +109,9 @@ Future Work (Minor features, refactoring, cleanup)
 
   - Add -predicateWithBlock: to GNUstep (see COQuery)
 
-  - Perhaps tweak `[[NSDecimalNumber defaultBehavior] scale]` to return NSDecimalScale by default as Mac OS X does
+  - Perhaps tweak `[[NSDecimalNumber defaultBehavior] scale]` to return NSDecimalScale by default as macOS does
 
-  - Perhaps don't treat `-[NSSet countByEnumeratingWithState:objects:count:]` as a primitive method to match Mac OS X behavior
+  - Perhaps don't treat `-[NSSet countByEnumeratingWithState:objects:count:]` as a primitive method to match macOS behavior
 
 
 - Store

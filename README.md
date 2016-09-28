@@ -140,9 +140,9 @@ Note: ProjectDemo and Typewriter cannot be run on iOS.
 For more details, see [INSTALL.Cocoa](https://github.com/etoile/CoreObject/blob/master/INSTALL.Cocoa.md) or [INSTALL.GNUstep](https://github.com/etoile/CoreObject/blob/master/INSTALL.GNUstep.md).
 
 
-Mac OS X and iOS support
-------------------------
+macOS and iOS support
+---------------------
 
-CoreObject is supported on Mac OS X (10.7 or higher), and iOS (7 or higher).
+CoreObject is supported on macOS (10.8 or higher), and iOS (7 or higher).
 
 **Warning:** Xcode 4.6 or higher is required to build the Xcode projects.

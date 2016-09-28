@@ -147,7 +147,7 @@
         changeSummary[persistentRoot.UUID] = persistentRoot.description;
     }
 
-    /* For Mac OS X, see http://www.cocoabuilder.com/archive/cocoa/197297-who-broke-nslog-on-leopard.html */
+    /* For macOS, see http://www.cocoabuilder.com/archive/cocoa/197297-who-broke-nslog-on-leopard.html */
     NSString *desc = changeSummary.description;
     desc = [desc stringByReplacingOccurrencesOfString: @"\\n" withString: @"\n"];
     desc = [desc stringByReplacingOccurrencesOfString: @"\\\"" withString: @""];

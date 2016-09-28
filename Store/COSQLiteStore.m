@@ -1034,7 +1034,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 /**
  * We could put this code in a block passed to dispatch_async(dispatch_get_main_queue(), theBlock) 
  * and  call dispatch_async() in our  caller, but dispatch_get_main_queue() is only supported for 
- * Mac OS X (not on Linux or elsewhere). In future, GNUstep GUI could create a wrapper queue 
+ * macOS (not on Linux or elsewhere). In future, GNUstep GUI could create a wrapper queue 
  * around NSRunLoop and set it as _dispatch_main_q.
  */
 - (void)postCommitNotificationsWithUserInfo: (NSDictionary *)userInfo

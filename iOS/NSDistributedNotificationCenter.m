@@ -13,7 +13,7 @@
  *
  * This makes possible to support NSDistributedNotificationCenter API on iOS.
  *
- * On Mac OS X, we use it to keep multiple store instances (using the same UUID)
+ * On macOS, we use it to keep multiple store instances (using the same UUID)
  * in sync, accross processes and inside the current process. On iOS, this is
  * the same, except we don't support the 'accross processes' case.
  *
