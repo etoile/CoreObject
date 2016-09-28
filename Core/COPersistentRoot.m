@@ -29,7 +29,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 
 @implementation COPersistentRoot
 
-@synthesize parentContext = _parentContext, UUID = _UUID, persistentRootInfo = _persistentRootInfo;
+@synthesize editingContext = _editingContext, UUID = _UUID, persistentRootInfo = _persistentRootInfo;
 @synthesize branchesPendingDeletion = _branchesPendingDeletion;
 @synthesize branchesPendingUndeletion = _branchesPendingUndeletion;
 @synthesize objectGraphContext = _objectGraphContext;
@@ -91,7 +91,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 
     SUPERINIT;
 
-    _parentContext = aCtxt;
+    _editingContext = aCtxt;
     _persistentRootInfo = info;
     _branchForUUID = [[NSMutableDictionary alloc] init];
     _branchesPendingDeletion = [NSMutableSet new];
@@ -119,8 +119,8 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
         }
 
         _currentBranchUUID = _persistentRootInfo.currentBranchUUID;
-        [_parentContext setLastTransactionID: _persistentRootInfo.transactionID
-                       forPersistentRootUUID: _UUID];
+        [_editingContext setLastTransactionID: _persistentRootInfo.transactionID
+                        forPersistentRootUUID: _UUID];
         _metadata = _persistentRootInfo.metadata;
 
         [self reloadCurrentBranchObjectGraph];
@@ -246,17 +246,17 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     return YES;
 }
 
-- (COEditingContext *)editingContext
+- (COEditingContext *)parentContext
 {
-    return self.parentContext;
+    return _editingContext;
 }
 
 - (BOOL)isDeleted
 {
-    if ([_parentContext.persistentRootsPendingUndeletion containsObject: self])
+    if ([_editingContext.persistentRootsPendingUndeletion containsObject: self])
         return NO;
 
-    if ([_parentContext.persistentRootsPendingDeletion containsObject: self])
+    if ([_editingContext.persistentRootsPendingDeletion containsObject: self])
         return YES;
 
     return _persistentRootInfo.deleted;
@@ -272,11 +272,11 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 
     if (deleted)
     {
-        [_parentContext deletePersistentRoot: self];
+        [_editingContext deletePersistentRoot: self];
     }
     else
     {
-        [_parentContext undeletePersistentRoot: self];
+        [_editingContext undeletePersistentRoot: self];
     }
 }
 
@@ -506,7 +506,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 
 - (BOOL)isZombie
 {
-    return (_parentContext == nil);
+    return (_editingContext == nil);
 }
 
 #pragma mark Convenience -
@@ -565,19 +565,19 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 
 - (COSQLiteStore *)store
 {
-    return _parentContext.store;
+    return _editingContext.store;
 }
 
 #pragma mark Committing Changes -
 
 - (int64_t)lastTransactionID
 {
-    return [_parentContext lastTransactionIDForPersistentRootUUID: _UUID].longLongValue;
+    return [_editingContext lastTransactionIDForPersistentRootUUID: _UUID].longLongValue;
 }
 
 - (void)setLastTransactionID: (int64_t)value
 {
-    [_parentContext setLastTransactionID: value forPersistentRootUUID: _UUID];
+    [_editingContext setLastTransactionID: value forPersistentRootUUID: _UUID];
 }
 
 - (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
@@ -596,10 +596,10 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     {
         [metadata addEntriesFromDictionary: additionalMetadata];
     }
-    return [_parentContext commitWithMetadata: metadata
-                  restrictedToPersistentRoots: @[self]
-                                withUndoTrack: undoTrack
-                                        error: anError];
+    return [_editingContext commitWithMetadata: metadata
+                   restrictedToPersistentRoots: @[self]
+                                 withUndoTrack: undoTrack
+                                         error: anError];
 }
 
 - (BOOL)commit
@@ -609,10 +609,10 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 
 - (BOOL)commitWithMetadata: (NSDictionary *)metadata
 {
-    return [_parentContext commitWithMetadata: metadata
-                  restrictedToPersistentRoots: @[self]
-                                withUndoTrack: nil
-                                        error: NULL];
+    return [_editingContext commitWithMetadata: metadata
+                   restrictedToPersistentRoots: @[self]
+                                 withUndoTrack: nil
+                                         error: NULL];
 }
 
 - (BOOL)isPersistentRootUncommitted
@@ -716,8 +716,8 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
         ETUUID *initialRevID = _persistentRootInfo.currentBranchInfo.currentRevisionUUID;
         ETAssert(initialRevID != nil);
 
-        [_parentContext recordPersistentRootCreation: self
-                                 atInitialRevisionID: initialRevID];
+        [_editingContext recordPersistentRootCreation: self
+                                  atInitialRevisionID: initialRevID];
 
         // N.B., we don't call -saveCommitWithMetadata: on the branch,
         // because the store call -createPersistentRootWithInitialContents:
@@ -756,9 +756,9 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
             [txn setCurrentBranch: _currentBranchUUID
                 forPersistentRoot: self.UUID];
 
-            [_parentContext recordPersistentRoot: self
-                                setCurrentBranch: self.currentBranch
-                                       oldBranch: [self branchForUUID: _persistentRootInfo.currentBranchUUID]];
+            [_editingContext recordPersistentRoot: self
+                                 setCurrentBranch: self.currentBranch
+                                        oldBranch: [self branchForUUID: _persistentRootInfo.currentBranchUUID]];
         }
 
         // N.B.: Ugly, the ordering of changes needs to be carefully controlled
@@ -772,8 +772,8 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     {
         [txn setMetadata: _metadata forPersistentRoot: _UUID];
 
-        [_parentContext recordPersistentRootSetMetadata: self
-                                            oldMetadata: _persistentRootInfo.metadata];
+        [_editingContext recordPersistentRootSetMetadata: self
+                                             oldMetadata: _persistentRootInfo.metadata];
 
         _metadataChanged = NO;
     }
@@ -937,7 +937,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 - (void)makeZombie
 {
     [self assertNotZombie];
-    _parentContext = nil;
+    _editingContext = nil;
 }
 
 @end

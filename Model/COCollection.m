@@ -77,7 +77,7 @@
 {
     ETPropertyDescription *propertyDesc =
         [self.entityDescription propertyDescriptionForName: self.contentKey];
-    ETModelDescriptionRepository *repo = self.persistentRoot.parentContext.modelDescriptionRepository;
+    ETModelDescriptionRepository *repo = self.persistentRoot.editingContext.modelDescriptionRepository;
 
     return [ETUTI typeWithClass: [repo classForEntityDescription: propertyDesc.type]];
 }

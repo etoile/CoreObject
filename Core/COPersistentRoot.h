@@ -154,7 +154,7 @@ extern NSString *const COPersistentRootDidChangeNotification;
 {
 @private
     ETUUID *_UUID;
-    COEditingContext *__weak _parentContext;
+    COEditingContext *__weak _editingContext;
     /**
      * State of the persistent root and its branches as loaded from the store.
      * We don't modify this as changes are being staged in-memory (class should 
@@ -338,13 +338,13 @@ extern NSString *const COPersistentRootDidChangeNotification;
  *
  * The parent context is managed by the user.
  */
-@property (nonatomic, readonly, weak) COEditingContext *parentContext;
+@property (nonatomic, readonly, weak) COEditingContext *editingContext;
 /**
  * Returns -parentContext.
  *
  * See also -[COPersistentObjectContext editingContext].
  */
-@property (nonatomic, readonly, weak) COEditingContext *editingContext;
+@property (nonatomic, readonly, weak) COEditingContext *parentContext;
 
 
 /** @taskunit Pending Changes */

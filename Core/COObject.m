@@ -609,8 +609,8 @@ See +[NSObject typePrefix]. */
         return NO;
     }
 
-    COEditingContext *valueEditingContext = value.persistentRoot.parentContext;
-    COEditingContext *currentEditingContext = self.persistentRoot.parentContext;
+    COEditingContext *valueEditingContext = value.persistentRoot.editingContext;
+    COEditingContext *currentEditingContext = self.persistentRoot.editingContext;
     BOOL involvesTransientObject = (valueEditingContext == nil || currentEditingContext == nil);
 
     return (involvesTransientObject || valueEditingContext == currentEditingContext);

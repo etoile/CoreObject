@@ -208,7 +208,7 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
 
 - (COEditingContext *)editingContext
 {
-    return _persistentRoot.parentContext;
+    return _persistentRoot.editingContext;
 }
 
 - (BOOL)isTrackingSpecificBranch
@@ -862,7 +862,7 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
         return [NSSet set];
 
     COCrossPersistentRootDeadRelationshipCache *deadRelationshipCache =
-        _persistentRoot.parentContext.deadRelationshipCache;
+        _persistentRoot.editingContext.deadRelationshipCache;
     COPath *pathToUndeletedObject = nil;
 
     if (undeletedObjectGraphContext.trackingSpecificBranch)

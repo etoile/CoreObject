@@ -46,7 +46,7 @@
     // FIXME: I just commented out this assertion which looks wrong to me,.. do we really want to forbit using tags in
     // a freestanding COObjectGraphContext, or just not registered with a tag library? -Eric
     //
-    //assert([self.persistentRoot.parentContext.tagLibrary containsObject: self]);
+    //assert([self.persistentRoot.editingContext.tagLibrary containsObject: self]);
     return YES;
 }
 

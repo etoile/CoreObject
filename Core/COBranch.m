@@ -66,7 +66,7 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
     NSParameterAssert([aUUID isKindOfClass: [ETUUID class]]);
     NILARG_EXCEPTION_TEST(aContext);
 
-    if (aContext.parentContext.store == nil)
+    if (aContext.editingContext.store == nil)
     {
         [NSException raise: NSInvalidArgumentException
                     format: @"Cannot load commit track for %@ which does not "
