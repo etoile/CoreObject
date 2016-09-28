@@ -10,37 +10,37 @@
 
 @implementation TestSynchronizerCommon
 
-- (instancetype) init
+- (instancetype)init
 {
     SUPERINIT;
-    
+
     [[[COSQLiteStore alloc] initWithURL: CLIENT_STORE_URL] clearStore];
-    
+
     serverPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupNoOpposite"];
     serverPersistentRoot.metadata = self.persistentRootMetadataForTest;
     serverBranch = serverPersistentRoot.currentBranch;
     serverBranch.metadata = self.branchMetadataForTest;
     [ctx commit];
-    
+
     server = [[COSynchronizerServer alloc] initWithBranch: serverBranch];
     transport = [[[[self class] messageTransportClass] alloc] initWithSynchronizerServer: server];
-    
+
     clientCtx = [COEditingContext contextWithURL: CLIENT_STORE_URL];
     client = [[COSynchronizerClient alloc] initWithClientID: @"client" editingContext: clientCtx];
-    
+
     // Transmits the persistent root to the client
     [transport addClient: client];
-    
+
     clientPersistentRoot = client.persistentRoot;
     clientBranch = client.branch;
-    
+
     ETAssert(clientPersistentRoot != nil);
     ETAssert(clientBranch != nil);
-    
+
     return self;
 }
 
-+ (Class) messageTransportClass
++ (Class)messageTransportClass
 {
     return [FakeMessageTransport class];
 }
@@ -48,32 +48,32 @@
 - (void)dealloc
 {
     NSError *error = nil;
-    
+
     [[NSFileManager defaultManager] removeItemAtURL: CLIENT_STORE_URL error: &error];
     ETAssert(error == nil);
 }
 
 - (NSDictionary *)serverRevisionMetadataForTest
 {
-    return @{ @"testMetadata" : @"server"};
+    return @{@"testMetadata": @"server"};
 }
 
 - (NSDictionary *)clientRevisionMetadataForTest
 {
-    return @{ @"testMetadata" : @"client"};
+    return @{@"testMetadata": @"client"};
 }
 
 - (NSDictionary *)branchMetadataForTest
 {
-    return @{ kCOBranchLabel : @"my branch" };
+    return @{kCOBranchLabel: @"my branch"};
 }
 
 - (NSDictionary *)persistentRootMetadataForTest
 {
-    return @{ COPersistentRootName : @"my persistent root" };
+    return @{COPersistentRootName: @"my persistent root"};
 }
 
-- (UnorderedGroupNoOpposite *) addAndCommitServerChild
+- (UnorderedGroupNoOpposite *)addAndCommitServerChild
 {
     UnorderedGroupNoOpposite *serverChild1 = [serverBranch.objectGraphContext insertObjectWithEntityName: @"UnorderedGroupNoOpposite"];
     [[serverBranch.rootObject mutableSetValueForKey: @"contents"] addObject: serverChild1];
@@ -81,7 +81,7 @@
     return serverChild1;
 }
 
-- (UnorderedGroupNoOpposite *) addAndCommitClientChild
+- (UnorderedGroupNoOpposite *)addAndCommitClientChild
 {
     UnorderedGroupNoOpposite *clientChild1 = [clientBranch.objectGraphContext insertObjectWithEntityName: @"UnorderedGroupNoOpposite"];
     [[clientBranch.rootObject mutableSetValueForKey: @"contents"] addObject: clientChild1];

@@ -9,25 +9,25 @@
 
 @implementation OrderedAttributeModel
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-    
+
     if (![entity.name isEqual: [OrderedAttributeModel className]])
         return entity;
-    
+
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 typeName: @"NSString"];
+                                                                             typeName: @"NSString"];
     labelProperty.persistent = YES;
-    
+
     ETPropertyDescription *contentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
-                                                                                    typeName: @"NSString"];
+                                                                                typeName: @"NSString"];
     contentsProperty.persistent = YES;
     contentsProperty.multivalued = YES;
     contentsProperty.ordered = YES;
-    
+
     entity.propertyDescriptions = @[labelProperty, contentsProperty];
-    
+
     return entity;
 }
 

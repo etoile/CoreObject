@@ -11,6 +11,8 @@
  * Test model object to be inserted as content in UnorderedGroupWithOpposite
  */
 @interface UnorderedGroupContent : COObject
+
 @property (nonatomic, readwrite, copy) NSString *label;
 @property (nonatomic, readwrite, copy) NSSet *parentGroups;
+
 @end

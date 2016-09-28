@@ -9,7 +9,7 @@
 
 @implementation Tag
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
 
@@ -21,26 +21,29 @@
     tagLabelProperty.persistent = YES;
 
     ETPropertyDescription *contentsProperty =
-    [ETPropertyDescription descriptionWithName: @"contents" typeName: @"OutlineItem"];
+        [ETPropertyDescription descriptionWithName: @"contents" typeName: @"OutlineItem"];
     contentsProperty.multivalued = YES;
     contentsProperty.ordered = NO;
     contentsProperty.persistent = YES;
 
     ETPropertyDescription *childTagsProperty =
-    [ETPropertyDescription descriptionWithName: @"childTags" typeName: @"Tag"];
+        [ETPropertyDescription descriptionWithName: @"childTags" typeName: @"Tag"];
     childTagsProperty.multivalued = YES;
     childTagsProperty.ordered = NO;
     childTagsProperty.persistent = YES;
-    
+
     ETPropertyDescription *parentTagProperty =
-    [ETPropertyDescription descriptionWithName: @"parentTag" typeName: @"Tag"];
+        [ETPropertyDescription descriptionWithName: @"parentTag" typeName: @"Tag"];
     parentTagProperty.opposite = childTagsProperty;
     parentTagProperty.derived = YES;
-    
+
     ETAssert(childTagsProperty.isComposite);
     ETAssert(parentTagProperty.isContainer);
-    
-    entity.propertyDescriptions = @[tagLabelProperty, contentsProperty, childTagsProperty, parentTagProperty];
+
+    entity.propertyDescriptions = @[tagLabelProperty,
+                                    contentsProperty,
+                                    childTagsProperty,
+                                    parentTagProperty];
     return entity;
 }
 

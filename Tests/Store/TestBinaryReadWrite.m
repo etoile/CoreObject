@@ -6,7 +6,6 @@
  */
 
 #import "TestCommon.h"
-#import <UnitKit/UnitKit.h>
 #import "COBinaryReader.h"
 #import "COBinaryWriter.h"
 
@@ -14,7 +13,9 @@
 {
     NSMutableArray *readObjects;
 }
+
 @end
+
 
 @implementation TestBinaryReadWrite
 
@@ -23,53 +24,62 @@ static NSString *endObject = @"<<end object>>";
 static NSString *beginArray = @"<<begin array>>";
 static NSString *endArray = @"<<end array>>";
 
-- (void) readObject: (id)anObject
+- (void)readObject: (id)anObject
 {
     [readObjects addObject: anObject];
 }
 
 static void test_read_int64(void *ctx, int64_t val)
 {
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: @(val)];
-}
-static void test_read_double(void *ctx, double val)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: @(val)];
-}
-static void test_read_string(void *ctx, NSString *val)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: val];
-}
-static void test_read_uuid(void *ctx, ETUUID *uuid)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: uuid];
-}
-static void test_read_bytes(void *ctx, const unsigned char *val, size_t size)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: [NSData dataWithBytes: val length: size]];
-}
-static void test_read_begin_object(void *ctx)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: beginObject];
-}
-static void test_read_end_object(void *ctx)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: endObject];
-}
-static void test_read_begin_array(void *ctx)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: beginArray];
-}
-static void test_read_end_array(void *ctx)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: endArray];
-}
-static void test_read_null(void *ctx)
-{
-    [((__bridge TestBinaryReadWrite*)ctx) readObject: [NSNull null]];
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: @(val)];
 }
 
-- (id) init
+static void test_read_double(void *ctx, double val)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: @(val)];
+}
+
+static void test_read_string(void *ctx, NSString *val)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: val];
+}
+
+static void test_read_uuid(void *ctx, ETUUID *uuid)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: uuid];
+}
+
+static void test_read_bytes(void *ctx, const unsigned char *val, size_t size)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: [NSData dataWithBytes: val length: size]];
+}
+
+static void test_read_begin_object(void *ctx)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: beginObject];
+}
+
+static void test_read_end_object(void *ctx)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: endObject];
+}
+
+static void test_read_begin_array(void *ctx)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: beginArray];
+}
+
+static void test_read_end_array(void *ctx)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: endArray];
+}
+
+static void test_read_null(void *ctx)
+{
+    [((__bridge TestBinaryReadWrite *)ctx) readObject: [NSNull null]];
+}
+
+- (id)init
 {
     SUPERINIT;
     readObjects = [[NSMutableArray alloc] init];
@@ -79,7 +89,7 @@ static void test_read_null(void *ctx)
 - (void)testBasic
 {
     ETUUID *uuid = [ETUUID UUID];
-    
+
     co_buffer_t buf;
     co_buffer_init(&buf);
     co_buffer_begin_object(&buf);
@@ -102,7 +112,7 @@ static void test_read_null(void *ctx)
     co_buffer_store_null(&buf);
     co_buffer_end_array(&buf);
     co_buffer_end_object(&buf);
-    
+
     NSArray *expected = @[beginObject,
                           beginArray,
                           @(0),
@@ -123,7 +133,7 @@ static void test_read_null(void *ctx)
                           [NSNull null],
                           endArray,
                           endObject];
-    
+
     co_reader_callback_t cb = {
         test_read_int64,
         test_read_double,
@@ -136,7 +146,7 @@ static void test_read_null(void *ctx)
         test_read_end_array,
         test_read_null
     };
-    
+
     co_reader_read(co_buffer_get_data(&buf),
                    co_buffer_get_length(&buf),
                    (__bridge void *)(self),
@@ -146,10 +156,9 @@ static void test_read_null(void *ctx)
     co_buffer_free(&buf);
 }
 
-
 static volatile char dest[2048];
 
-- (void) testWritePerf
+- (void)testWritePerf
 {
     ETUUID *uuid = [ETUUID UUID];
 
@@ -173,9 +182,9 @@ static volatile char dest[2048];
     co_buffer_store_uuid(&buf, uuid);
     co_buffer_end_array(&buf);
     co_buffer_end_object(&buf);
-    
+
     memcpy((void *)dest, co_buffer_get_data(&buf), co_buffer_get_length(&buf));
-    
+
     co_buffer_free(&buf);
 }
 

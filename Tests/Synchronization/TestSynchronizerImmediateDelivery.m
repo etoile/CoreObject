@@ -10,24 +10,25 @@
 @interface TestSynchronizerImmediateDelivery : TestSynchronizerCommon <UKTest>
 @end
 
+
 @implementation TestSynchronizerImmediateDelivery
 
-+ (Class) messageTransportClass
++ (Class)messageTransportClass
 {
     return [ImmediateMessageTransport class];
 }
 
-- (void) testPersistentRootMetadataReplicated
+- (void)testPersistentRootMetadataReplicated
 {
     UKObjectsEqual([self persistentRootMetadataForTest], clientPersistentRoot.metadata);
 }
 
-- (void) testBranchMetadataReplicated
+- (void)testBranchMetadataReplicated
 {
     UKObjectsEqual([self branchMetadataForTest], clientBranch.metadata);
 }
 
-- (void) testBasicReplicationToClient
+- (void)testBasicReplicationToClient
 {
     UKNotNil(clientPersistentRoot);
     UKNotNil(clientBranch);
@@ -38,40 +39,44 @@
     UKObjectsEqual([serverBranch.rootObject UUID], [clientBranch.rootObject UUID]);
 }
 
-- (void) testClientEdit
+- (void)testClientEdit
 {
     UnorderedGroupNoOpposite *clientChild1 = [self addAndCommitClientChild];
-    
+
     UKIntsEqual(1, [[serverBranch.rootObject contents] count]);
-    UKObjectsEqual(S(clientChild1.UUID), [serverBranch.rootObject valueForKeyPath: @"contents.UUID"]);
+    UKObjectsEqual(S(clientChild1.UUID),
+                   [serverBranch.rootObject valueForKeyPath: @"contents.UUID"]);
 }
 
-- (void) testServerEdit
+- (void)testServerEdit
 {
     UnorderedGroupNoOpposite *serverChild1 = [self addAndCommitServerChild];
-        
+
     UKIntsEqual(1, [[clientBranch.rootObject contents] count]);
-    UKObjectsEqual(S(serverChild1.UUID), [clientBranch.rootObject valueForKeyPath: @"contents.UUID"]);
+    UKObjectsEqual(S(serverChild1.UUID),
+                   [clientBranch.rootObject valueForKeyPath: @"contents.UUID"]);
 }
 
-- (void) checkClientChild: (UnorderedGroupNoOpposite *)clientChild1
-        serverChild: (UnorderedGroupNoOpposite *)serverChild1
+- (void)checkClientChild: (UnorderedGroupNoOpposite *)clientChild1
+             serverChild: (UnorderedGroupNoOpposite *)serverChild1
 {
     UKIntsEqual(2, [[serverBranch.rootObject contents] count]);
-    UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [serverBranch.rootObject valueForKeyPath: @"contents.UUID"]);
+    UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID),
+                   [serverBranch.rootObject valueForKeyPath: @"contents.UUID"]);
 
     UKIntsEqual(2, [[clientBranch.rootObject contents] count]);
-    UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID), [clientBranch.rootObject valueForKeyPath: @"contents.UUID"]);
+    UKObjectsEqual(S(clientChild1.UUID, serverChild1.UUID),
+                   [clientBranch.rootObject valueForKeyPath: @"contents.UUID"]);
 }
 
-- (void) testClientAndServerEdit
+- (void)testClientAndServerEdit
 {
     UnorderedGroupNoOpposite *clientChild1 = [self addAndCommitClientChild];
     UnorderedGroupNoOpposite *serverChild1 = [self addAndCommitServerChild];
     [self checkClientChild: clientChild1 serverChild: serverChild1];
 }
 
-- (void) testServerAndClientEdit
+- (void)testServerAndClientEdit
 {
     UnorderedGroupNoOpposite *serverChild1 = [self addAndCommitServerChild];
     UnorderedGroupNoOpposite *clientChild1 = [self addAndCommitClientChild];
@@ -79,4 +84,3 @@
 }
 
 @end
-

@@ -6,8 +6,6 @@
  */
 
 #import "TestCommon.h"
-#import "COItem.h"
-#import "COSQLiteStore+Attachments.h"
 
 /**
  * Tests the store method -revisionInfosForBranchUUID:options:
@@ -19,9 +17,8 @@
  * See comments in TestHistoryInspection.
  */
 @interface TestSQLiteStoreRevisionInfos : SQLiteStoreTestCase <UKTest>
-{
-}
 @end
+
 
 @implementation TestSQLiteStoreRevisionInfos
 
@@ -30,7 +27,7 @@ static ETUUID *r0, *r1, *r2, *r3, *r4, *r5, *r6;
 static ETUUID *p1, *p2;
 static ETUUID *b1A, *b1B, *b2A;
 
-+ (void) initialize
++ (void)initialize
 {
     if (self == [TestSQLiteStoreRevisionInfos class])
     {
@@ -62,36 +59,86 @@ static ETUUID *b1A, *b1B, *b2A;
 
  */
 
-- (COItemGraph *) itemGraphWithLabel: (NSString *)aLabel
+- (COItemGraph *)itemGraphWithLabel: (NSString *)aLabel
 {
     COMutableItem *rootItem = [[COMutableItem alloc] initWithUUID: rootItemUUID];
     [rootItem setValue: aLabel forAttribute: @"label" type: kCOTypeString];
-    
+
     return [COItemGraph itemGraphWithItemsRootFirst: @[rootItem]];
 }
 
-- (id) init
+- (id)init
 {
     SUPERINIT;
-    
+
     COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-    
-    [txn createPersistentRootCopyWithUUID: p1 parentPersistentRootUUID: nil branchUUID: b1A parentBranchUUID: nil initialRevisionUUID: r0];
+
+    [txn createPersistentRootCopyWithUUID: p1
+                 parentPersistentRootUUID: nil
+                               branchUUID: b1A
+                         parentBranchUUID: nil
+                      initialRevisionUUID: r0];
     [txn setCurrentRevision: r1 headRevision: r1 forBranch: b1A ofPersistentRoot: p1];
     [txn createBranchWithUUID: b1B parentBranch: b1A initialRevision: r2 forPersistentRoot: p1];
     [txn setCurrentRevision: r2 headRevision: r3 forBranch: b1B ofPersistentRoot: p1];
-    [txn createPersistentRootCopyWithUUID: p2 parentPersistentRootUUID: p1 branchUUID: b2A parentBranchUUID: b1A initialRevisionUUID: r6];
-    
-    [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"0"] revisionUUID: r0 metadata: nil parentRevisionID: nil mergeParentRevisionID: nil persistentRootUUID: p1 branchUUID: b1A];
-    [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"1"] revisionUUID: r1 metadata: nil parentRevisionID: r0 mergeParentRevisionID: nil persistentRootUUID: p1 branchUUID: b1A];
-    [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"2"] revisionUUID: r2 metadata: nil parentRevisionID: r1 mergeParentRevisionID: nil persistentRootUUID: p1 branchUUID: b1B];
-    [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"3"] revisionUUID: r3 metadata: nil parentRevisionID: r2 mergeParentRevisionID: nil persistentRootUUID: p1 branchUUID: b1B];
-    [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"4"] revisionUUID: r4 metadata: nil parentRevisionID: r3 mergeParentRevisionID: nil persistentRootUUID: p1 branchUUID: b1B];
-    [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"5"] revisionUUID: r5 metadata: nil parentRevisionID: r2 mergeParentRevisionID: nil persistentRootUUID: p1 branchUUID: b1B];
-    [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"6"] revisionUUID: r6 metadata: nil parentRevisionID: r0 mergeParentRevisionID: nil persistentRootUUID: p2 branchUUID: b2A];
-    
+    [txn createPersistentRootCopyWithUUID: p2
+                 parentPersistentRootUUID: p1
+                               branchUUID: b2A
+                         parentBranchUUID: b1A
+                      initialRevisionUUID: r6];
+
+    [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"0"]
+                           revisionUUID: r0
+                               metadata: nil
+                       parentRevisionID: nil
+                  mergeParentRevisionID: nil
+                     persistentRootUUID: p1
+                             branchUUID: b1A];
+    [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"1"]
+                           revisionUUID: r1
+                               metadata: nil
+                       parentRevisionID: r0
+                  mergeParentRevisionID: nil
+                     persistentRootUUID: p1
+                             branchUUID: b1A];
+    [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"2"]
+                           revisionUUID: r2
+                               metadata: nil
+                       parentRevisionID: r1
+                  mergeParentRevisionID: nil
+                     persistentRootUUID: p1
+                             branchUUID: b1B];
+    [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"3"]
+                           revisionUUID: r3
+                               metadata: nil
+                       parentRevisionID: r2
+                  mergeParentRevisionID: nil
+                     persistentRootUUID: p1
+                             branchUUID: b1B];
+    [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"4"]
+                           revisionUUID: r4
+                               metadata: nil
+                       parentRevisionID: r3
+                  mergeParentRevisionID: nil
+                     persistentRootUUID: p1
+                             branchUUID: b1B];
+    [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"5"]
+                           revisionUUID: r5
+                               metadata: nil
+                       parentRevisionID: r2
+                  mergeParentRevisionID: nil
+                     persistentRootUUID: p1
+                             branchUUID: b1B];
+    [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"6"]
+                           revisionUUID: r6
+                               metadata: nil
+                       parentRevisionID: r0
+                  mergeParentRevisionID: nil
+                     persistentRootUUID: p2
+                             branchUUID: b2A];
+
     ETAssert([store commitStoreTransaction: txn]);
-    
+
     return self;
 }
 
@@ -103,23 +150,22 @@ RevisionInfoUUIDs(NSArray *revInfos)
 
 #pragma mark - Tests
 
-- (void) testRevisionInfosRevisionProperties
+- (void)testRevisionInfosRevisionProperties
 {
     NSArray *b1ARevInfos = [store revisionInfosForBranchUUID: b1A options: 0];
-    
+
     for (CORevisionInfo *info in b1ARevInfos)
     {
         UKNotNil(info.date);
         UKTrue(fabs([info.date timeIntervalSinceNow]) < 1.0); /* Less than 1 second old */
         UKObjectsEqual(p1, info.persistentRootUUID);
         UKObjectsEqual(b1A, info.branchUUID);
-        
+
         // TODO: Check other properties
     }
 }
 
-
-- (void) testRevisionInfosForBranchDefaultOptions
+- (void)testRevisionInfosForBranchDefaultOptions
 {
     NSArray *b1ARevInfos = [store revisionInfosForBranchUUID: b1A options: 0];
     NSArray *b1BRevInfos = [store revisionInfosForBranchUUID: b1B options: 0];
@@ -130,43 +176,54 @@ RevisionInfoUUIDs(NSArray *revInfos)
     UKObjectsEqual(A(r6), RevisionInfoUUIDs(b2ARevInfos));
 }
 
-- (void) testRevisionInfosForBranchWithParentBranchesOption
+- (void)testRevisionInfosForBranchWithParentBranchesOption
 {
-    NSArray *b1ARevInfos = [store revisionInfosForBranchUUID: b1A options: COBranchRevisionReadingParentBranches];
-    NSArray *b1BRevInfos = [store revisionInfosForBranchUUID: b1B options: COBranchRevisionReadingParentBranches];
-    NSArray *b2ARevInfos = [store revisionInfosForBranchUUID: b2A options: COBranchRevisionReadingParentBranches];
-    
+    NSArray *b1ARevInfos = [store revisionInfosForBranchUUID: b1A
+                                                     options: COBranchRevisionReadingParentBranches];
+    NSArray *b1BRevInfos = [store revisionInfosForBranchUUID: b1B
+                                                     options: COBranchRevisionReadingParentBranches];
+    NSArray *b2ARevInfos = [store revisionInfosForBranchUUID: b2A
+                                                     options: COBranchRevisionReadingParentBranches];
+
     UKObjectsEqual(A(r0, r1), RevisionInfoUUIDs(b1ARevInfos));
     UKObjectsEqual(A(r0, r1, r2, r3), RevisionInfoUUIDs(b1BRevInfos));
     UKObjectsEqual(A(r0, r6), RevisionInfoUUIDs(b2ARevInfos));
 }
 
-- (void) testRevisionInfosForBranchWithDivergentRevisionsOption
+- (void)testRevisionInfosForBranchWithDivergentRevisionsOption
 {
-    NSArray *b1ARevInfos = [store revisionInfosForBranchUUID: b1A options: COBranchRevisionReadingDivergentRevisions];
-    NSArray *b1BRevInfos = [store revisionInfosForBranchUUID: b1B options: COBranchRevisionReadingDivergentRevisions];
-    NSArray *b2ARevInfos = [store revisionInfosForBranchUUID: b2A options: COBranchRevisionReadingDivergentRevisions];
-    
+    NSArray *b1ARevInfos = [store revisionInfosForBranchUUID: b1A
+                                                     options: COBranchRevisionReadingDivergentRevisions];
+    NSArray *b1BRevInfos = [store revisionInfosForBranchUUID: b1B
+                                                     options: COBranchRevisionReadingDivergentRevisions];
+    NSArray *b2ARevInfos = [store revisionInfosForBranchUUID: b2A
+                                                     options: COBranchRevisionReadingDivergentRevisions];
+
     UKObjectsEqual(A(r0, r1), RevisionInfoUUIDs(b1ARevInfos));
     UKObjectsEqual(A(r2, r3, r4, r5), RevisionInfoUUIDs(b1BRevInfos));
     UKObjectsEqual(A(r6), RevisionInfoUUIDs(b2ARevInfos));
 }
 
-- (void) testRevisionInfosForBranchWithParentBranchesAndDivergentRevisionsOption
+- (void)testRevisionInfosForBranchWithParentBranchesAndDivergentRevisionsOption
 {
-    NSArray *b1ARevInfos = [store revisionInfosForBranchUUID: b1A options: COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions];
-    NSArray *b1BRevInfos = [store revisionInfosForBranchUUID: b1B options: COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions];
-    NSArray *b2ARevInfos = [store revisionInfosForBranchUUID: b2A options: COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions];
-    
+    NSArray *b1ARevInfos = [store revisionInfosForBranchUUID: b1A
+                                                     options: COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions];
+    NSArray *b1BRevInfos = [store revisionInfosForBranchUUID: b1B
+                                                     options: COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions];
+    NSArray *b2ARevInfos = [store revisionInfosForBranchUUID: b2A
+                                                     options: COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions];
+
     UKObjectsEqual(A(r0, r1), RevisionInfoUUIDs(b1ARevInfos));
     UKObjectsEqual(A(r0, r1, r2, r3, r4, r5), RevisionInfoUUIDs(b1BRevInfos));
     UKObjectsEqual(A(r0, r6), RevisionInfoUUIDs(b2ARevInfos));
 }
 
-- (void) testRevisionInfosForBackingStoreOfPersistentRootUUID
+- (void)testRevisionInfosForBackingStoreOfPersistentRootUUID
 {
-    UKObjectsEqual(A(r0, r1, r2, r3, r4, r5, r6), RevisionInfoUUIDs([store revisionInfosForBackingStoreOfPersistentRootUUID: p1]));
-    UKObjectsEqual(A(r0, r1, r2, r3, r4, r5, r6), RevisionInfoUUIDs([store revisionInfosForBackingStoreOfPersistentRootUUID: p2]));
+    UKObjectsEqual(A(r0, r1, r2, r3, r4, r5, r6),
+                   RevisionInfoUUIDs([store revisionInfosForBackingStoreOfPersistentRootUUID: p1]));
+    UKObjectsEqual(A(r0, r1, r2, r3, r4, r5, r6),
+                   RevisionInfoUUIDs([store revisionInfosForBackingStoreOfPersistentRootUUID: p2]));
 }
 
 @end

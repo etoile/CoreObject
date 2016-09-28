@@ -12,7 +12,9 @@
 /**
  * Test model object that has an univalued relationship to UnivaluedGroupContent
  */
-@interface UnivaluedGroupWithOpposite: COObject
+@interface UnivaluedGroupWithOpposite : COObject
+
 @property (nonatomic, readwrite, copy) NSString *label;
 @property (nonatomic, readwrite, strong) UnivaluedGroupContent *content;
+
 @end

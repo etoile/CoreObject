@@ -21,9 +21,9 @@
     COSynchronizerServer *server;
     COPersistentRoot *serverPersistentRoot;
     COBranch *serverBranch;
-    
-    id<MessageTransport> transport;
-    
+
+    id <MessageTransport> transport;
+
     COSynchronizerClient *client;
     COEditingContext *clientCtx;
     COPersistentRoot *clientPersistentRoot;
@@ -33,17 +33,15 @@
 /**
  * Override return the message transport to use for the tests.
  */
-+ (Class) messageTransportClass;
++ (Class)messageTransportClass;
 
-- (UnorderedGroupNoOpposite *) addAndCommitServerChild;
-- (UnorderedGroupNoOpposite *) addAndCommitClientChild;
+- (UnorderedGroupNoOpposite *)addAndCommitServerChild;
+- (UnorderedGroupNoOpposite *)addAndCommitClientChild;
 
 @property (nonatomic, readonly) NSDictionary *serverRevisionMetadataForTest;
 @property (nonatomic, readonly) NSDictionary *clientRevisionMetadataForTest;
-
 @property (nonatomic, readonly) NSDictionary *branchMetadataForTest;
 @property (nonatomic, readonly) NSDictionary *persistentRootMetadataForTest;
-
 @property (nonatomic, readonly) NSArray *serverMessages;
 @property (nonatomic, readonly) NSArray *clientMessages;
 

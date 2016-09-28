@@ -6,7 +6,6 @@
  */
 
 #import <UnitKit/UnitKit.h>
-#import <Foundation/Foundation.h>
 #import <EtoileFoundation/ETModelDescriptionRepository.h>
 #import "TestCommon.h"
 
@@ -15,22 +14,23 @@
     COUndoTrack *_testTrack;
     COUndoTrack *_setupTrack;
 }
+
 @end
+
 
 @implementation TestCustomTrack
 
 - (id)init
 {
     SUPERINIT;
-    
+
     _testTrack = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
     _setupTrack = [COUndoTrack trackForName: @"setup" withEditingContext: ctx];
     [_testTrack clear];
     [_setupTrack clear];
-    
+
     return self;
 }
-
 
 /* The custom track uses the root object commit track to undo and redo, no 
 selective undo is involved. */
@@ -42,24 +42,24 @@ selective undo is involved. */
     [object setValue: @"Groceries" forProperty: @"label"];
     [ctx commitWithUndoTrack: _setupTrack];
     CORevision *firstRevision = object.persistentRoot.currentBranch.currentRevision;
-    
+
     /* Second commit */
 
     [object setValue: @"Shopping List" forProperty: @"label"];
     [ctx commitWithUndoTrack: _testTrack];
     CORevision *secondRevision = object.persistentRoot.currentBranch.currentRevision;
-    
+
     /* Third commit */
 
     [object setValue: @"Todo" forProperty: @"label"];
     [ctx commitWithUndoTrack: _testTrack];
     CORevision *thirdRevision = object.persistentRoot.currentBranch.currentRevision;
-    
+
     /* First undo  (Todo -> Shopping List) */
 
     UKTrue(_testTrack.canUndo);
     [_testTrack undo];
-    
+
     UKStringsEqual(@"Shopping List", [object valueForProperty: @"label"]);
     UKObjectsEqual(secondRevision, object.persistentRoot.currentRevision);
 
@@ -68,7 +68,7 @@ selective undo is involved. */
     UKTrue(_testTrack.canUndo);
     [_testTrack undo];
     UKFalse(_testTrack.canUndo);
-    
+
     UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);
     UKObjectsEqual(firstRevision, object.persistentRoot.currentRevision);
 
@@ -85,7 +85,7 @@ selective undo is involved. */
     UKTrue(_testTrack.canRedo);
     [_testTrack redo];
     UKFalse(_testTrack.canRedo);
-    
+
     UKStringsEqual(@"Todo", [object valueForProperty: @"label"]);
     UKObjectsEqual(thirdRevision, object.persistentRoot.currentRevision);
 }
@@ -100,8 +100,8 @@ selective undo is involved. */
         docPersistentRoot:        x---x-------x---x
      
      */
-    
-    
+
+
     /* First commit */
 
     COPersistentRoot *objectPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
@@ -109,7 +109,7 @@ selective undo is involved. */
     [object setValue: @"Groceries" forProperty: @"label"];
 
     [ctx commitWithUndoTrack: _testTrack];
-    
+
     /* Second commit */
 
     COPersistentRoot *docPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
@@ -161,22 +161,22 @@ selective undo is involved. */
 
     COPersistentRoot *objectPersistentRoot = object.persistentRoot;
     UKNotNil(objectPersistentRoot);
-    
+
     COPersistentRoot *docPersistentRoot = doc.persistentRoot;
     UKNotNil(docPersistentRoot);
-    
+
     UKObjectsNotEqual(docPersistentRoot, objectPersistentRoot);
-    
+
     /* Basic undo/redo check */
 
     [_testTrack undo];
     UKStringsEqual(@"paragraph 1", [para1 valueForProperty: @"label"]);
-    
+
     [_testTrack redo];
     UKStringsEqual(@"paragraph with different contents", [para1 valueForProperty: @"label"]);
-    
+
     /* Sixth and fifth commit undone ('doc' revision) */
-    
+
     UKNotNil([docPersistentRoot loadedObjectForUUID: para2.UUID]);
     UKObjectsEqual((@[para1, para2]), doc.contents);
     [_testTrack undo];
@@ -203,11 +203,11 @@ selective undo is involved. */
 
     [_testTrack undo];
     UKTrue(docPersistentRoot.deleted);
-    
+
     /***********************************************/
     /* First commit reached (root object 'object') */
     /***********************************************/
-    
+
     // Just check the object creation hasn't been undone
     UKNotNil([objectPersistentRoot loadedObjectForUUID: object.UUID]);
     UKStringsEqual(@"Groceries", [object valueForProperty: @"label"]);

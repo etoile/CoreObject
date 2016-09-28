@@ -9,29 +9,30 @@
 
 @implementation OrderedGroupWithOpposite
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-    
+
     if (![entity.name isEqual: [OrderedGroupWithOpposite className]])
         return entity;
-    
+
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 typeName: @"NSString"];
+                                                                             typeName: @"NSString"];
     labelProperty.persistent = YES;
-    
+
     ETPropertyDescription *contentsProperty = [ETPropertyDescription descriptionWithName: @"contents"
-                                                                                    typeName: @"OrderedGroupContent"];
+                                                                                typeName: @"OrderedGroupContent"];
     contentsProperty.persistent = YES;
     contentsProperty.multivalued = YES;
     contentsProperty.ordered = YES;
     contentsProperty.oppositeName = @"OrderedGroupContent.parentGroups";
-    
+
     entity.propertyDescriptions = @[labelProperty, contentsProperty];
-    
+
     return entity;
 }
 
 @dynamic label;
 @dynamic contents;
+
 @end

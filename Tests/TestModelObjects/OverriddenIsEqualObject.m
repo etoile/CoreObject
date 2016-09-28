@@ -9,30 +9,30 @@
 
 @implementation OverriddenIsEqualObject
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-    
+
     if (![entity.name isEqual: [OverriddenIsEqualObject className]])
         return entity;
-    
+
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 typeName: @"NSString"];
+                                                                             typeName: @"NSString"];
     labelProperty.persistent = YES;
-    
+
     entity.propertyDescriptions = @[labelProperty];
-    
+
     return entity;
 }
 
 @dynamic label;
 
-- (NSUInteger) hash
+- (NSUInteger)hash
 {
     return self.label.hash;
 }
 
-- (BOOL) isEqual:(id)anObject
+- (BOOL)isEqual: (id)anObject
 {
     if (![anObject isKindOfClass: [OverriddenIsEqualObject class]])
         return NO;
@@ -40,4 +40,3 @@
 }
 
 @end
-

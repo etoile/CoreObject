@@ -11,5 +11,7 @@
  * Test model object that has a univalued NSString attribute
  */
 @interface UnivaluedAttributeModel : COObject
+
 @property (nonatomic, readwrite, copy) NSString *label;
+
 @end

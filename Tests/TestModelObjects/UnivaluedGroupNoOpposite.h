@@ -6,13 +6,15 @@
  */
 
 #import "TestCommon.h"
+
 /**
  * Test model object that has an univalued relationship to COObject (no opposite)
  */
-@interface UnivaluedGroupNoOpposite: COObject
+@interface UnivaluedGroupNoOpposite : COObject
+
 @property (nonatomic, readwrite, copy) NSString *label;
 @property (nonatomic, readwrite, strong) COObject *content;
 
-+ (NSUInteger) countOfDeallocCalls;
++ (NSUInteger)countOfDeallocCalls;
 
 @end

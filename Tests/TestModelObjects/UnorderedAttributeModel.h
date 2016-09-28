@@ -11,6 +11,8 @@
  * Test model object that has an unordered multivalued NSString attribute
  */
 @interface UnorderedAttributeModel : COObject
+
 @property (nonatomic, readwrite, copy) NSString *label;
 @property (nonatomic, readwrite, copy) NSSet *contents;
+
 @end

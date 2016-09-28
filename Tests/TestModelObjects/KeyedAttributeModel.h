@@ -8,5 +8,7 @@
 #import "TestCommon.h"
 
 @interface KeyedAttributeModel : COObject
+
 @property (nonatomic, readwrite, copy) NSDictionary *entries;
+
 @end

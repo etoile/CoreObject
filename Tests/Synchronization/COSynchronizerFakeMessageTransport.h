@@ -19,17 +19,18 @@
 {
     COSynchronizerServer *server;
     NSMutableArray *serverMessages;
-    
+
     NSMutableDictionary *clientForID;
     NSMutableDictionary *clientMessagesForID;
 }
 
-- (void) deliverMessages;
-- (BOOL) deliverMessagesToClient;
-- (BOOL) deliverMessagesToClient: (NSString *)clientID;
-- (BOOL) deliverMessagesToServer;
+- (void)deliverMessages;
+- (BOOL)deliverMessagesToClient;
+- (BOOL)deliverMessagesToClient: (NSString *)clientID;
+- (BOOL)deliverMessagesToServer;
 
 @property (nonatomic, readonly) NSArray *serverMessages;
-- (NSArray *) messagesForClient: (NSString *)anID;
+
+- (NSArray *)messagesForClient: (NSString *)anID;
 
 @end

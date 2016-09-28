@@ -8,5 +8,7 @@
 #import "TestCommon.h"
 
 @interface OverriddenIsEqualObject : COObject
+
 @property (nonatomic) NSString *label;
+
 @end

@@ -9,29 +9,30 @@
 
 @implementation UnivaluedGroupContent
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-    
+
     if (![entity.name isEqual: [UnivaluedGroupContent className]])
         return entity;
-    
+
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 typeName: @"NSString"];
+                                                                             typeName: @"NSString"];
     labelProperty.persistent = YES;
-    
+
     ETPropertyDescription *parentsProperty = [ETPropertyDescription descriptionWithName: @"parents"
-                                                                                   typeName: @"UnivaluedGroupWithOpposite"];
+                                                                               typeName: @"UnivaluedGroupWithOpposite"];
     parentsProperty.multivalued = YES;
     parentsProperty.ordered = NO;
     parentsProperty.oppositeName = @"UnivaluedGroupWithOpposite.content";
     parentsProperty.derived = YES;
-    
+
     entity.propertyDescriptions = @[labelProperty, parentsProperty];
-    
+
     return entity;
 }
 
 @dynamic label;
 @dynamic parents;
+
 @end

@@ -9,23 +9,23 @@
 
 @implementation Parent
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-    
+
     if (![entity.name isEqual: [Parent className]])
         return entity;
-    
+
     ETPropertyDescription *labelProperty = [ETPropertyDescription descriptionWithName: @"label"
-                                                                                 typeName: @"NSString"];
+                                                                             typeName: @"NSString"];
     labelProperty.persistent = YES;
-    
+
     ETPropertyDescription *childProperty =
-    [ETPropertyDescription descriptionWithName: @"child" typeName: @"Child"];
+        [ETPropertyDescription descriptionWithName: @"child" typeName: @"Child"];
     childProperty.persistent = YES;
-    
+
     entity.propertyDescriptions = @[labelProperty, childProperty];
-    
+
     return entity;
 }
 

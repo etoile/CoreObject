@@ -10,7 +10,9 @@
 /**
  * Test model object that has an unordered many-to-many relationship to UnorderedGroupContent
  */
-@interface UnorderedGroupWithOpposite: COObject
+@interface UnorderedGroupWithOpposite : COObject
+
 @property (nonatomic, readwrite, copy) NSString *label;
 @property (nonatomic, readwrite, copy) NSSet *contents;
+
 @end

@@ -6,19 +6,21 @@
  */
 
 #import <UnitKit/UnitKit.h>
-#import <Foundation/Foundation.h>
 #import "TestCommon.h"
 
 @interface ValueTransformerModel : COObject
+
 @property (nonatomic, readwrite, copy) NSColor *color;
+
 @end
+
 
 @implementation ValueTransformerModel
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-    
+
     if (![entity.name isEqual: [ValueTransformerModel className]])
         return entity;
 
@@ -29,13 +31,13 @@
 #endif
 
     ETPropertyDescription *colorProperty = [ETPropertyDescription descriptionWithName: @"color"
-                                                                                 typeName: colorType];
+                                                                             typeName: colorType];
     colorProperty.valueTransformerName = @"COColorToHTMLString";
     colorProperty.persistentType = (id)@"NSString";
     colorProperty.persistent = YES;
-    
+
     entity.propertyDescriptions = @[colorProperty];
-    
+
     return entity;
 }
 
@@ -43,16 +45,19 @@
 
 @end
 
+
 @interface TestValueTransformerAttribute : TestCase <UKTest>
 {
     COObjectGraphContext *ctx;
     ValueTransformerModel *item1;
 }
+
 @end
+
 
 @implementation TestValueTransformerAttribute
 
-- (id) init
+- (id)init
 {
     SUPERINIT;
     ctx = [COObjectGraphContext new];
@@ -61,37 +66,40 @@
     return self;
 }
 
-- (void) testMetamodel
+- (void)testMetamodel
 {
     ETPropertyDescription *colorPropDesc = [item1.entityDescription propertyDescriptionForName: @"color"];
     NSValueTransformer *transformer = [NSValueTransformer valueTransformerForName: colorPropDesc.valueTransformerName];
     ETEntityDescription *persistentType = colorPropDesc.persistentType;
-    
+
     UKObjectKindOf(transformer, NSValueTransformer);
     UKObjectKindOf(persistentType, ETEntityDescription);
-    
+
     UKObjectsEqual(@"NSString", persistentType.name);
 }
 
-- (void) testSerialization
+- (void)testSerialization
 {
     item1.color = [NSColor redColor];
-    
+
     UKObjectsEqual(@"#ffff0000", [item1.storeItem valueForAttribute: @"color"]);
 }
 
-- (void) testRoundTrip
+- (void)testRoundTrip
 {
     item1.color = [NSColor redColor];
-    
+
     [self checkObjectGraphBeforeAndAfterSerializationRoundtrip: ctx
-                                                       inBlock: ^(COObjectGraphContext *testGraph, COObject *testRootObject, BOOL isObjectGraphCopy)
-     {
-         ValueTransformerModel *testItem1 = (ValueTransformerModel *)testRootObject;
-         NSColor *roundTripColor = testItem1.color;
-         
-         UKObjectsEqual([NSColor redColor], roundTripColor);
-     }];
+                                                       inBlock:
+       ^(COObjectGraphContext *testGraph,
+         COObject *testRootObject,
+         BOOL isObjectGraphCopy)
+       {
+           ValueTransformerModel *testItem1 = (ValueTransformerModel *)testRootObject;
+           NSColor *roundTripColor = testItem1.color;
+
+           UKObjectsEqual([NSColor redColor], roundTripColor);
+       }];
 }
 
 @end

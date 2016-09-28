@@ -27,38 +27,50 @@
 {
     NSArray *objects;
 }
-- (instancetype) initWithArray:(NSArray *)array;
+
+- (instancetype)initWithArray: (NSArray *)array;
+
 @end
 
+
 @implementation MutableItemAscendingAttributes
+
 - (NSArray *)attributeNames
 {
     NSArray *attrs = [super.attributeNames sortedArrayUsingSelector: @selector(compare:)];
     return attrs;
 }
+
 @end
 
+
 @implementation MutableItemDescendingAttributes
+
 - (NSArray *)attributeNames
 {
     NSArray *attrs = [super.attributeNames sortedArrayUsingSelector: @selector(compare:)];
     NSArray *reversed = [attrs reverseObjectEnumerator].allObjects;
     return reversed;
 }
+
 @end
 
+
 @implementation OrderedSet
-- (instancetype) initWithArray: (NSArray *)array
+
+- (instancetype)initWithArray: (NSArray *)array
 {
     SUPERINIT;
     objects = [array copy];
     return self;
 }
-- (NSUInteger) count
+
+- (NSUInteger)count
 {
     return objects.count;
 }
-- (id) member:(id)object
+
+- (id)member: (id)object
 {
     NSUInteger index = [objects indexOfObject: object];
     if (index != NSNotFound)
@@ -67,18 +79,20 @@
     }
     return nil;
 }
-- (NSEnumerator *) objectEnumerator
+
+- (NSEnumerator *)objectEnumerator
 {
     return [objects objectEnumerator];
 }
-- (NSUInteger)countByEnumeratingWithState: (NSFastEnumerationState *)state 
-                                  objects: (__unsafe_unretained id[])stackbuf 
+
+- (NSUInteger)countByEnumeratingWithState: (NSFastEnumerationState *)state
+                                  objects: (__unsafe_unretained id[])stackbuf
                                     count: (NSUInteger)len
 {
     return [objects countByEnumeratingWithState: state objects: stackbuf count: len];
 }
-@end
 
+@end
 
 /**
  * Test that the unordered parts of COItem are always serialized in the same way
@@ -90,11 +104,12 @@
 }
 @end
 
+
 @implementation TestItemStableSerialization
 
 static ETUUID *ItemUUID;
 
-+ (void) initialize
++ (void)initialize
 {
     if (self == [TestItemStableSerialization class])
     {
@@ -123,7 +138,7 @@ static ETUUID *UUID(unsigned char num)
     unsigned char uuid[16];
     memset(uuid, 0, 16);
     uuid[0] = num;
-    
+
     return [ETUUID UUIDWithData: [NSData dataWithBytes: uuid length: 16]];
 }
 
@@ -139,21 +154,23 @@ static COPath *Path(unsigned char num)
     }
 }
 
-
-- (void) setSetWithOrder: (NSArray *)order reverse: (BOOL)reverse forAttribute: (NSString *)attrib primitiveType: (COType)type inItem: (COMutableItem *)item
+- (void)setSetWithOrder: (NSArray *)order
+                reverse: (BOOL)reverse
+           forAttribute: (NSString *)attrib
+          primitiveType: (COType)type
+                 inItem: (COMutableItem *)item
 {
     if (reverse)
     {
         order = [order reverseObjectEnumerator].allObjects;
     }
-    
+
     [item setValue: [[OrderedSet alloc] initWithArray: order]
       forAttribute: attrib
               type: COTypeMakeSetOf(type)];
 }
 
-
-- (COItem *) makeItemAscending: (BOOL)ascend
+- (COItem *)makeItemAscending: (BOOL)ascend
 {
     COMutableItem *item;
     if (ascend)
@@ -164,23 +181,51 @@ static COPath *Path(unsigned char num)
     {
         item = [[MutableItemDescendingAttributes alloc] initWithUUID: ItemUUID];
     }
-    
+
     const BOOL reverse = !ascend;
-    
+
     // Add a bunch of NSSets with a fixed, known order
-    
-    [self setSetWithOrder: @[@1, @2, @3] reverse: reverse forAttribute: @"int64" primitiveType: kCOTypeInt64 inItem: item];
-    [self setSetWithOrder: @[@1.1, @1.2, @1.3] reverse: reverse forAttribute: @"double" primitiveType: kCOTypeDouble inItem: item];
-    [self setSetWithOrder: @[@"a", @"b", @"c", @"aa"] reverse: reverse forAttribute: @"string" primitiveType: kCOTypeString inItem: item];
-    [self setSetWithOrder: @[Data(0), Data(1), Data(2), Data2(0, 0)] reverse: reverse forAttribute: @"data" primitiveType: kCOTypeBlob inItem: item];
-    [self setSetWithOrder: @[UUID(0), UUID(1), UUID(2)] reverse: reverse forAttribute: @"composite" primitiveType: kCOTypeCompositeReference inItem: item];
-    [self setSetWithOrder: @[UUID(0), UUID(1), UUID(2), Path(0), Path(1), Path(2)] reverse: reverse forAttribute: @"ref" primitiveType: kCOTypeReference inItem: item];
-    [self setSetWithOrder: @[Attach(0), Attach(1), Attach(2)] reverse: reverse forAttribute: @"attachment" primitiveType: kCOTypeAttachment inItem: item];
-    
+
+    [self setSetWithOrder: @[@1, @2, @3]
+                  reverse: reverse
+             forAttribute: @"int64"
+            primitiveType: kCOTypeInt64
+                   inItem: item];
+    [self setSetWithOrder: @[@1.1, @1.2, @1.3]
+                  reverse: reverse
+             forAttribute: @"double"
+            primitiveType: kCOTypeDouble
+                   inItem: item];
+    [self setSetWithOrder: @[@"a", @"b", @"c", @"aa"]
+                  reverse: reverse
+             forAttribute: @"string"
+            primitiveType: kCOTypeString
+                   inItem: item];
+    [self setSetWithOrder: @[Data(0), Data(1), Data(2), Data2(0, 0)]
+                  reverse: reverse
+             forAttribute: @"data"
+            primitiveType: kCOTypeBlob
+                   inItem: item];
+    [self setSetWithOrder: @[UUID(0), UUID(1), UUID(2)]
+                  reverse: reverse
+             forAttribute: @"composite"
+            primitiveType: kCOTypeCompositeReference
+                   inItem: item];
+    [self setSetWithOrder: @[UUID(0), UUID(1), UUID(2), Path(0), Path(1), Path(2)]
+                  reverse: reverse
+             forAttribute: @"ref"
+            primitiveType: kCOTypeReference
+                   inItem: item];
+    [self setSetWithOrder: @[Attach(0), Attach(1), Attach(2)]
+                  reverse: reverse
+             forAttribute: @"attachment"
+            primitiveType: kCOTypeAttachment
+                   inItem: item];
+
     return item;
 }
 
-- (id) init
+- (id)init
 {
     SUPERINIT;
     asc = [self makeItemAscending: YES];
@@ -188,7 +233,7 @@ static COPath *Path(unsigned char num)
     return self;
 }
 
-- (void) testItemsPreparedCorrectly
+- (void)testItemsPreparedCorrectly
 {
     UKObjectsEqual(SA(asc.attributeNames), SA(dsc.attributeNames));
     UKObjectsNotEqual(asc.attributeNames, dsc.attributeNames);
@@ -197,7 +242,7 @@ static COPath *Path(unsigned char num)
     {
         id ascValue = [asc valueForAttribute: key];
         id dscValue = [dsc valueForAttribute: key];
-        
+
         UKObjectKindOf(ascValue, NSSet);
         UKObjectKindOf(dscValue, NSSet);
         UKObjectsEqual(ascValue, dscValue);
@@ -205,7 +250,7 @@ static COPath *Path(unsigned char num)
     }
 }
 
-- (void) testItemsHaveIdenticalBinarySerialization
+- (void)testItemsHaveIdenticalBinarySerialization
 {
     NSData *ascData = asc.dataValue;
     NSData *dscData = dsc.dataValue;

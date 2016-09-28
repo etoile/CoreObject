@@ -14,7 +14,7 @@
 + (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-    
+
     if (![entity.name isEqual: [Person className]])
         return entity;
 
@@ -62,15 +62,15 @@
 
     NSArray *persistentProperties =
         @[role, summary, age, iconData, streetAddress, city, administrativeArea, postalCode,
-            country, phoneNumber, website, emailAddress, stuff, students];
+          country, phoneNumber, website, emailAddress, stuff, students];
     [[persistentProperties mappedCollection] setPersistent: YES];
 
-    entity.propertyDescriptions =   [@[teachers] arrayByAddingObjectsFromArray: persistentProperties];
+    entity.propertyDescriptions = [@[teachers] arrayByAddingObjectsFromArray: persistentProperties];
 
     return entity;
 }
 
-- (instancetype)initWithObjectGraphContext:(COObjectGraphContext *)aContext
+- (instancetype)initWithObjectGraphContext: (COObjectGraphContext *)aContext
 {
     self = [super initWithObjectGraphContext: aContext];
     if (self == nil)

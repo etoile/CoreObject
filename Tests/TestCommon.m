@@ -8,80 +8,87 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import "COObject.h"
 #import "COObject+Private.h"
-#import "COObject+RelationshipCache.h"
 #import "COPersistentRoot.h"
 #import "COSQLiteStore.h"
 #import "TestCommon.h"
-#import "COObjectGraphContext+Private.h"
 
-NSString * const kCOLabel = @"label";
-NSString * const kCOContents = @"contents";
-NSString * const kCOParent = @"parentContainer";
+NSString *const kCOLabel = @"label";
+NSString *const kCOContents = @"contents";
+NSString *const kCOParent = @"parentContainer";
 
 @implementation TestCase
 
-- (void) checkObjectGraphBeforeAndAfterSerializationRoundtrip: (COObjectGraphContext *)anObjectGraph
-                                                      inBlock: (void (^)(COObjectGraphContext *testGraph, COObject *testRootObject, BOOL isObjectGraphCopy))block
+- (void)checkObjectGraphBeforeAndAfterSerializationRoundtrip: (COObjectGraphContext *)anObjectGraph
+                                                     inBlock: (void (^)(COObjectGraphContext *testGraph,
+                                                                        COObject *testRootObject,
+                                                                        BOOL isObjectGraphCopy))block
 {
     block(anObjectGraph, anObjectGraph.rootObject, NO);
-    
+
     NSData *data = COItemGraphToJSONData(anObjectGraph);
     COItemGraph *deseriazlied = COItemGraphFromJSONData(data);
-    
+
     COObjectGraphContext *deserializedContext = [[COObjectGraphContext alloc] init];
     [deserializedContext setItemGraph: deseriazlied];
     [deserializedContext removeUnreachableObjects];
-    
+
     block(deserializedContext, deserializedContext.rootObject, YES);
 }
 
-- (void)    checkBlock: (void (^)(void))block
-  postsNotification: (NSString *)notif
-          withCount: (NSUInteger)count
-         fromObject: (id)sender
-       withUserInfo: (NSDictionary *)expectedUserInfo
+- (void)checkBlock: (void (^)(void))block
+ postsNotification: (NSString *)notif
+         withCount: (NSUInteger)count
+        fromObject: (id)sender
+      withUserInfo: (NSDictionary *)expectedUserInfo
 {
     __block int timesNotified = 0;
-    
+
     id observer = [[NSNotificationCenter defaultCenter] addObserverForName: notif
                                                                     object: sender
                                                                      queue: nil
-                                                                usingBlock: ^(NSNotification *notif) {
+                                                                usingBlock: ^(NSNotification *notif)
+                                                                {
                                                                     for (NSString *key in expectedUserInfo)
                                                                     {
-                                                                        UKObjectsEqual(expectedUserInfo[key], notif.userInfo[key]);
+                                                                        UKObjectsEqual(
+                                                                            expectedUserInfo[key],
+                                                                            notif.userInfo[key]);
                                                                     }
                                                                     timesNotified++;
                                                                 }];
-    
+
     block();
-    
+
     [[NSNotificationCenter defaultCenter] removeObserver: observer];
-    
+
     UKIntsEqual(count, timesNotified);
 }
 
-- (void)    checkBlock: (void (^)(void))block
+- (void)     checkBlock: (void (^)(void))block
 doesNotPostNotification: (NSString *)notif
 {
-    [self checkBlock: block postsNotification: notif withCount: 0 fromObject: nil withUserInfo: nil];
+    [self checkBlock: block
+   postsNotification: notif
+           withCount: 0
+          fromObject: nil
+        withUserInfo: nil];
 }
 
 @end
 
 @implementation SQLiteStoreTestCase
 
-- (instancetype) init
+- (instancetype)init
 {
     self = [super init];
-    
+
     store = [[COSQLiteStore alloc] initWithURL: [SQLiteStoreTestCase storeURL]];
     [store clearStore];
-    
+
     return self;
 }
 
-- (void) dealloc
+- (void)dealloc
 {
 #ifdef DELETE_STORE_AFTER_EACH_TEST_METHOD
     // FIXME: For Mac OS X 10.7, this is unsupported, SQLite disk errors
@@ -90,7 +97,7 @@ doesNotPostNotification: (NSString *)notif
 #endif
 }
 
-+ (void) deleteStores
++ (void)deleteStores
 {
     BOOL isDir = NO;
 
@@ -103,7 +110,7 @@ doesNotPostNotification: (NSString *)notif
         [[NSFileManager defaultManager] removeItemAtURL: [self storeURL] error: &error];
         ETAssert(error == nil);
     }
-    
+
     if ([[NSFileManager defaultManager] fileExistsAtPath: [self undoTrackStoreURL].path
                                              isDirectory: &isDir])
     {
@@ -115,12 +122,12 @@ doesNotPostNotification: (NSString *)notif
     }
 }
 
-+ (NSURL *) temporaryURLForTestStorage
++ (NSURL *)temporaryURLForTestStorage
 {
     return [NSURL fileURLWithPath: [self temporaryPathForTestStorage]];
 }
 
-+ (NSString *) temporaryPathForTestStorage
++ (NSString *)temporaryPathForTestStorage
 {
 #ifdef IN_MEMORY_STORE
     return @"/tmp/coreobject-ramdisk";
@@ -129,7 +136,7 @@ doesNotPostNotification: (NSString *)notif
 #endif
 }
 
-+ (NSURL *) storeURL
++ (NSURL *)storeURL
 {
     return [[self temporaryURLForTestStorage] URLByAppendingPathComponent: @"TestStore.sqlite"];
 }
@@ -139,9 +146,9 @@ doesNotPostNotification: (NSString *)notif
     return [[self temporaryURLForTestStorage] URLByAppendingPathComponent: @"TestUndoTrackStore.sqlite"];
 }
 
-- (void) checkPersistentRoot: (ETUUID *)aPersistentRoot
-                     current: (ETUUID *)expectedCurrent
-                        head: (ETUUID *)expectedHead
+- (void)checkPersistentRoot: (ETUUID *)aPersistentRoot
+                    current: (ETUUID *)expectedCurrent
+                       head: (ETUUID *)expectedHead
 {
     COPersistentRootInfo *info = [store persistentRootInfoForUUID: aPersistentRoot];
     return [self checkBranch: info.currentBranchUUID
@@ -149,16 +156,16 @@ doesNotPostNotification: (NSString *)notif
                         head: expectedHead];
 }
 
-- (void) checkBranch: (ETUUID *)aBranch
-             current: (ETUUID *)expectedCurrent
-                head: (ETUUID *)expectedHead
+- (void)checkBranch: (ETUUID *)aBranch
+            current: (ETUUID *)expectedCurrent
+               head: (ETUUID *)expectedHead
 {
     ETUUID *persistentRoot = [store persistentRootUUIDForBranchUUID: aBranch];
     COPersistentRootInfo *info = [store persistentRootInfoForUUID: persistentRoot];
     COBranchInfo *branchInfo = [info branchInfoForUUID: aBranch];
-    
+
     UKNotNil(branchInfo);
-    
+
     if (expectedCurrent == nil)
     {
         UKNil(branchInfo.currentRevisionUUID);
@@ -167,7 +174,7 @@ doesNotPostNotification: (NSString *)notif
     {
         UKObjectsEqual(expectedCurrent, branchInfo.currentRevisionUUID);
     }
-    
+
     if (expectedHead == nil)
     {
         UKNil(branchInfo.headRevisionUUID);
@@ -178,41 +185,41 @@ doesNotPostNotification: (NSString *)notif
     }
 }
 
-- (COItemGraph *) currentItemGraphForBranch: (ETUUID *)aBranch
+- (COItemGraph *)currentItemGraphForBranch: (ETUUID *)aBranch
 {
     return [self currentItemGraphForBranch: aBranch store: store];
 }
 
-- (COItemGraph *) currentItemGraphForBranch: (ETUUID *)aBranch
-                                      store: (COSQLiteStore *)aStore
+- (COItemGraph *)currentItemGraphForBranch: (ETUUID *)aBranch
+                                     store: (COSQLiteStore *)aStore
 {
     ETUUID *persistentRoot = [aStore persistentRootUUIDForBranchUUID: aBranch];
     COPersistentRootInfo *info = [aStore persistentRootInfoForUUID: persistentRoot];
     COBranchInfo *branchInfo = [info branchInfoForUUID: aBranch];
-    
+
     return [store itemGraphForRevisionUUID: branchInfo.currentRevisionUUID
                             persistentRoot: persistentRoot];
 }
 
-- (COItemGraph *) currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot
+- (COItemGraph *)currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot
 {
     return [self currentItemGraphForPersistentRoot: aPersistentRoot store: store];
 }
 
-- (COItemGraph *) currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot
-                                              store: (COSQLiteStore *)aStore
+- (COItemGraph *)currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot
+                                             store: (COSQLiteStore *)aStore
 {
     COPersistentRootInfo *info = [aStore persistentRootInfoForUUID: aPersistentRoot];
-    
+
     return [aStore itemGraphForRevisionUUID: info.currentRevisionUUID
-                            persistentRoot: aPersistentRoot];
+                             persistentRoot: aPersistentRoot];
 }
 
 @end
 
 @implementation EditingContextTestCase
 
-+ (void) willRunTestSuite
++ (void)willRunTestSuite
 {
     [SQLiteStoreTestCase deleteStores];
 
@@ -222,13 +229,13 @@ doesNotPostNotification: (NSString *)notif
     [NSApplication sharedApplication];
 }
 
-+ (void) didRunTestSuite
++ (void)didRunTestSuite
 {
     [SQLiteStoreTestCase deleteStores];
-    
+
     // Run a runloop so we handle any outstanding notifications, so
     // we can check for leaks afterwards.
-    
+
     @autoreleasepool
     {
         NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
@@ -265,7 +272,8 @@ doesNotPostNotification: (NSString *)notif
         {
             [FMDatabase logOpenDatabases];
 
-            NSLog(@"ERROR: Expected only %d SQLite database connections to still be open.", expectedOpenDatabases);
+            NSLog(@"ERROR: Expected only %d SQLite database connections to still be open.",
+                  expectedOpenDatabases);
             UKFail();
         }
     }
@@ -273,7 +281,7 @@ doesNotPostNotification: (NSString *)notif
 #endif
 }
 
-- (instancetype) init
+- (instancetype)init
 {
     SUPERINIT;
     COUndoTrackStore *undoStore = [[COUndoTrackStore alloc] initWithURL: [[self class] undoTrackStoreURL]];
@@ -286,45 +294,51 @@ doesNotPostNotification: (NSString *)notif
     return self;
 }
 
-- (void) checkBranchWithExistingAndNewContext: (COBranch *)aBranch
-                                     inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block
+- (void)checkBranchWithExistingAndNewContext: (COBranch *)aBranch
+                                     inBlock: (void (^)(COEditingContext *testCtx,
+                                                        COPersistentRoot *testPersistentRoot,
+                                                        COBranch *testBranch,
+                                                        BOOL isNewContext))block
 {
     block(aBranch.editingContext, aBranch.persistentRoot, aBranch, NO);
-    
+
     // Create a second, isolated context that opens a new store object
     // at the current one's URL
-    
+
     COEditingContext *ctx2 = [COEditingContext contextWithURL: aBranch.persistentRoot.store.URL];
     COPersistentRoot *ctx2PersistentRoot = [ctx2 persistentRootForUUID: aBranch.persistentRoot.UUID];
     COBranch *ctx2Branch = [ctx2PersistentRoot branchForUUID: aBranch.UUID];
-    
+
     // Run the tests again
-    
+
     block(ctx2, ctx2PersistentRoot, ctx2Branch, YES);
 }
 
-- (void) checkPersistentRootWithExistingAndNewContext: (COPersistentRoot *)aPersistentRoot
-                                             inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block
+- (void)checkPersistentRootWithExistingAndNewContext: (COPersistentRoot *)aPersistentRoot
+                                             inBlock: (void (^)(COEditingContext *testCtx,
+                                                                COPersistentRoot *testPersistentRoot,
+                                                                COBranch *testBranch,
+                                                                BOOL isNewContext))block
 {
     // N.B. This method is not merely a wrapper around -testBranchWithExistingAndNewContext:
     // because for the second execution of the block I want to pass in the current branch that
     // was persistent.
-    
+
     block(aPersistentRoot.editingContext, aPersistentRoot, aPersistentRoot.currentBranch, NO);
 
     // Create a second, isolated context that opens a new store object
     // at the current one's URL
-    
+
     COEditingContext *ctx2 = [COEditingContext contextWithURL: aPersistentRoot.store.URL];
     COPersistentRoot *ctx2PersistentRoot = [ctx2 persistentRootForUUID: aPersistentRoot.UUID];
     COBranch *ctx2Branch = ctx2PersistentRoot.currentBranch;
-    
+
     // Run the tests again
-    
+
     block(ctx2, ctx2PersistentRoot, ctx2Branch, YES);
 }
 
-- (void) wait
+- (void)wait
 {
     NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
     [runLoop runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.2]];
@@ -334,7 +348,7 @@ doesNotPostNotification: (NSString *)notif
 {
     return [[COEditingContext alloc] initWithStore: [[COSQLiteStore alloc] initWithURL: ctx.store.URL]
                         modelDescriptionRepository: ctx.modelDescriptionRepository
-                             migrationDriverClass: [COSchemaMigrationDriver class]
+                              migrationDriverClass: [COSchemaMigrationDriver class]
                                     undoTrackStore: ctx.undoTrackStore];
 }
 
@@ -347,14 +361,16 @@ doesNotPostNotification: (NSString *)notif
     ETEntityDescription *desc = [self.modelDescriptionRepository descriptionForName: aFullName];
     if (desc == nil)
     {
-        [NSException raise: NSInvalidArgumentException format: @"Entity name %@ invalid", aFullName];
+        [NSException raise: NSInvalidArgumentException
+                    format: @"Entity name %@ invalid",
+                            aFullName];
     }
     Class objClass = [self.modelDescriptionRepository classForEntityDescription: desc];
-    
+
     /* Nil root object means the new object will be a root */
     COObject *obj = [[objClass alloc] initWithEntityDescription: desc
                                              objectGraphContext: self];
-    
+
     return obj;
 }
 
@@ -362,22 +378,28 @@ doesNotPostNotification: (NSString *)notif
 
 @implementation COObject (TestCommon)
 
-- (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
+- (void)insertObject: (id)object
+             atIndex: (NSUInteger)index
+                hint: (id)hint
+         forProperty: (NSString *)key
 {
     NSIndexSet *indexes =
         (index != ETUndeterminedIndex ? [NSIndexSet indexSetWithIndex: index] : [NSIndexSet indexSet]);
-    
+
     [self insertObjects: (object != nil ? @[object] : @[])
               atIndexes: indexes
                   hints: (hint != nil ? @[hint] : @[])
             forProperty: key];
 }
 
-- (void)removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key
+- (void)removeObject: (id)object
+             atIndex: (NSUInteger)index
+                hint: (id)hint
+         forProperty: (NSString *)key
 {
     NSIndexSet *indexes =
         (index != ETUndeterminedIndex ? [NSIndexSet indexSetWithIndex: index] : [NSIndexSet indexSet]);
-    
+
     [self removeObjects: (object != nil ? @[object] : @[])
               atIndexes: indexes
                   hints: (hint != nil ? @[hint] : @[])

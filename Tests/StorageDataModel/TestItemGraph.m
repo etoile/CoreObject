@@ -10,15 +10,16 @@
 @interface TestItemGraph : NSObject <UKTest>
 @end
 
+
 @implementation TestItemGraph
 
-- (void) testInit
+- (void)testInit
 {
     COItemGraph *graph = [[COItemGraph alloc] init];
-    
+
     UKNil(graph.rootItemUUID);
     UKObjectsEqual(@[], graph.itemUUIDs);
-    
+
     COItem *item = [[COMutableItem alloc] init];
     [graph insertOrUpdateItems: @[item]];
 
@@ -26,7 +27,7 @@
     UKObjectsEqual(@[item.UUID], graph.itemUUIDs);
 
     graph.rootItemUUID = item.UUID;
-    
+
     UKObjectsEqual(item.UUID, graph.rootItemUUID);
 }
 

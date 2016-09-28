@@ -10,7 +10,9 @@
 /**
  * Test model object that has an ordered many-to-many relationship to OrderedGroupContent
  */
-@interface OrderedGroupWithOpposite: COObject
+@interface OrderedGroupWithOpposite : COObject
+
 @property (nonatomic, readwrite, copy) NSString *label;
 @property (nonatomic, readwrite, copy) NSArray *contents;
+
 @end

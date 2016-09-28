@@ -10,10 +10,11 @@
 /**
  * Test model object that has an ordered many-to-many relationship to COObject
  */
-@interface OrderedGroupNoOpposite: COObject
+@interface OrderedGroupNoOpposite : COObject
+
 @property (nonatomic, readwrite, copy) NSString *label;
 @property (nonatomic, readwrite, copy) NSArray *contents;
 
-+ (NSUInteger) countOfDeallocCalls;
++ (NSUInteger)countOfDeallocCalls;
 
 @end

@@ -85,9 +85,9 @@
 #undef S
 #define S(...) UNIQUESET(__VA_ARGS__)
 
-extern NSString * const kCOLabel;
-extern NSString * const kCOContents;
-extern NSString * const kCOParent;
+extern NSString *const kCOLabel;
+extern NSString *const kCOContents;
+extern NSString *const kCOParent;
 
 @interface TestCase : NSObject
 
@@ -96,8 +96,10 @@ extern NSString * const kCOParent;
  * Then, serialize the object graph and load the serialized form in to a new
  * COObjectGraphContext instane, and re-run the tests in the block.
  */
-- (void) checkObjectGraphBeforeAndAfterSerializationRoundtrip: (COObjectGraphContext *)anObjectGraph
-                                                      inBlock: (void (^)(COObjectGraphContext *testGraph, COObject *testRootObject, BOOL isObjectGraphCopy))block;
+- (void)checkObjectGraphBeforeAndAfterSerializationRoundtrip: (COObjectGraphContext *)anObjectGraph
+                                                     inBlock: (void (^)(COObjectGraphContext *testGraph,
+                                                                        COObject *testRootObject,
+                                                                        BOOL isObjectGraphCopy))block;
 /**
  * Executes the provided block, and tests that the given notification type
  * is posted exactly count times from sender as a result.
@@ -105,13 +107,12 @@ extern NSString * const kCOParent;
  * If expectedUserInfo is non-nil, test that each key/value pair in the dictionary
  * is also in [notif userInfo].
  */
-- (void)    checkBlock: (void (^)(void))block
-  postsNotification: (NSString *)notif
-          withCount: (NSUInteger)count
-         fromObject: (id)sender
-       withUserInfo: (NSDictionary *)expectedUserInfo;
-
-- (void)    checkBlock: (void (^)(void))block
+- (void)checkBlock: (void (^)(void))block
+ postsNotification: (NSString *)notif
+         withCount: (NSUInteger)count
+        fromObject: (id)sender
+      withUserInfo: (NSDictionary *)expectedUserInfo;
+- (void)     checkBlock: (void (^)(void))block
 doesNotPostNotification: (NSString *)notif;
 
 @end
@@ -128,13 +129,11 @@ doesNotPostNotification: (NSString *)notif;
  * Returns the base URL in which all temporary files/stores used during
  * the test should be stored in.
  */
-+ (NSURL *) temporaryURLForTestStorage;
-
++ (NSURL *)temporaryURLForTestStorage;
 /**
  * Same as +temporaryURLForTestStorage but returns a NSString path
  */
-+ (NSString *) temporaryPathForTestStorage;
-
++ (NSString *)temporaryPathForTestStorage;
 /**
  * Returns the URL used for the store.
  * This is a subdirectory of +temporaryDirectoryForTestStorage.
@@ -152,24 +151,18 @@ doesNotPostNotification: (NSString *)notif;
  * Saved datas are usually .sqlitedb files.
  */
 + (void)deleteStores;
-
-- (void) checkPersistentRoot: (ETUUID *)aPersistentRoot
-                     current: (ETUUID *)expectedCurrent
-                        head: (ETUUID *)expectedHead;
-
-- (void) checkBranch: (ETUUID *)aBranch
-             current: (ETUUID *)expectedCurrent
-                head: (ETUUID *)expectedHead;
-
-- (COItemGraph *) currentItemGraphForBranch: (ETUUID *)aBranch;
-
-- (COItemGraph *) currentItemGraphForBranch: (ETUUID *)aBranch
-                                      store: (COSQLiteStore *)aStore;
-
-- (COItemGraph *) currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot;
-
-- (COItemGraph *) currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot
-                                              store: (COSQLiteStore *)aStore;
+- (void)checkPersistentRoot: (ETUUID *)aPersistentRoot
+                    current: (ETUUID *)expectedCurrent
+                       head: (ETUUID *)expectedHead;
+- (void)checkBranch: (ETUUID *)aBranch
+            current: (ETUUID *)expectedCurrent
+               head: (ETUUID *)expectedHead;
+- (COItemGraph *)currentItemGraphForBranch: (ETUUID *)aBranch;
+- (COItemGraph *)currentItemGraphForBranch: (ETUUID *)aBranch
+                                     store: (COSQLiteStore *)aStore;
+- (COItemGraph *)currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot;
+- (COItemGraph *)currentItemGraphForPersistentRoot: (ETUUID *)aPersistentRoot
+                                             store: (COSQLiteStore *)aStore;
 
 @end
 
@@ -194,42 +187,56 @@ doesNotPostNotification: (NSString *)notif;
  * The isNewContext flag is NO when the block is executing with aBranch's
  * context/store, and YES when the block is executing with the reloaded context.
  */
-- (void) checkBranchWithExistingAndNewContext: (COBranch *)aBranch
-                                      inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block;
-
+- (void)checkBranchWithExistingAndNewContext: (COBranch *)aBranch
+                                     inBlock: (void (^)(COEditingContext *testCtx,
+                                                        COPersistentRoot *testPersistentRoot,
+                                                        COBranch *testBranch,
+                                                        BOOL isNewContext))block;
 /**
  * Same as above but uses the provided persistent root's current branch
  */
-- (void) checkPersistentRootWithExistingAndNewContext: (COPersistentRoot *)aPersistentRoot
-                                              inBlock: (void (^)(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext))block;
-
-
+- (void)checkPersistentRootWithExistingAndNewContext: (COPersistentRoot *)aPersistentRoot
+                                             inBlock: (void (^)(COEditingContext *testCtx,
+                                                                COPersistentRoot *testPersistentRoot,
+                                                                COBranch *testBranch,
+                                                                BOOL isNewContext))block;
 /**
  * Runs the default runloop for a short period of time.
  * If you make changes in one editing context, you should call this to give
  * other editing contexts time to process the change notification
  */
-- (void) wait;
-
+- (void)wait;
 /**
  * Returns a new context with its own store object, open on the same store URL
  * as the receiver.
  */
-- (COEditingContext *) newContext;
+- (COEditingContext *)newContext;
 
 @end
+
 
 @interface COObjectGraphContext (TestCommon)
+
 - (id)insertObjectWithEntityName: (NSString *)aFullName;
+
 @end
 
+
 @interface COObject (TestCommon)
-/** 
+
+/**
  * Simple wrapper around -insertObjects:atIndexes:hints:forProperty:.
  */
-- (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key;
+- (void)insertObject: (id)object
+             atIndex: (NSUInteger)index
+                hint: (id)hint
+         forProperty: (NSString *)key;
 /** 
  * Simple wrapper around -removeObjects:atIndexes:hints:forProperty:.
  */
-- (void)removeObject: (id)object atIndex: (NSUInteger)index hint: (id)hint forProperty: (NSString *)key;
+- (void)removeObject: (id)object
+             atIndex: (NSUInteger)index
+                hint: (id)hint
+         forProperty: (NSString *)key;
+
 @end
