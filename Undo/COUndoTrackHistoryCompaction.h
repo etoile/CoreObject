@@ -46,7 +46,7 @@
  */
 @interface COUndoTrackHistoryCompaction : NSObject <COHistoryCompaction>
 {
-    @private
+@private
     COUndoTrack *_undoTrack;
     COCommandGroup *_newestCommandToDiscard;
     NSMutableSet *_finalizablePersistentRootUUIDs;
@@ -78,7 +78,8 @@
  * For nil track or command, or a command that doesn't on the track, raises an
  * NSInvalidArgumentException.
  */
-- (instancetype)initWithUndoTrack: (COUndoTrack *)aTrack upToCommand: (COCommandGroup *)aCommand NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithUndoTrack: (COUndoTrack *)aTrack
+                      upToCommand: (COCommandGroup *)aCommand NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readonly) COUndoTrack *undoTrack;
 
@@ -91,9 +92,9 @@
  */
 - (void)compute;
 
-/**
- * @taskunit Computed Results
- */
+
+/** @taskunit Computed Results */
+
 
 /**
  * The deletable revision sets when compacting the history, organized by 
@@ -113,6 +114,7 @@
  * -deadRevisionUUIDs.
  */
 @property (nonatomic, readonly) NSDictionary *liveRevisionUUIDs;
+
 /**
  * Returns the dead revisions per persistent root. 
  *

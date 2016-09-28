@@ -12,17 +12,17 @@
 #import "COBranch.h"
 #import "COStoreTransaction.h"
 
-static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
-static NSString * const kCOCommandOldMetadata = @"COCommandOldMetadata";
-static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
+static NSString *const kCOCommandBranchUUID = @"COCommandBranchUUID";
+static NSString *const kCOCommandOldMetadata = @"COCommandOldMetadata";
+static NSString *const kCOCommandNewMetadata = @"COCommandNewMetadata";
 
-@implementation COCommandSetBranchMetadata 
+@implementation COCommandSetBranchMetadata
 
 @synthesize branchUUID = _branchUUID;
 @synthesize oldMetadata = _oldMetadata;
 @synthesize metadata = _newMetadata;
 
-- (instancetype) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
+- (instancetype)initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
     self = [super initWithPropertyList: plist parentUndoTrack: aParent];
     self.branchUUID = [ETUUID UUIDWithString: plist[kCOCommandBranchUUID]];
@@ -31,7 +31,7 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
     return self;
 }
 
-- (id) propertyList
+- (id)propertyList
 {
     NSMutableDictionary *result = super.propertyList;
     result[kCOCommandBranchUUID] = [_branchUUID stringValue];
@@ -46,30 +46,32 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
     return result;
 }
 
-- (COCommand *) inverse
+- (COCommand *)inverse
 {
     COCommandSetBranchMetadata *inverse = [[COCommandSetBranchMetadata alloc] init];
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
-    
+
     inverse.branchUUID = _branchUUID;
     inverse.oldMetadata = _newMetadata;
     inverse.metadata = _oldMetadata;
     return inverse;
 }
 
-- (BOOL) canApplyToContext: (COEditingContext *)aContext
+- (BOOL)canApplyToContext: (COEditingContext *)aContext
 {
     NILARG_EXCEPTION_TEST(aContext);
     return YES;
 }
 
-- (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
+- (void)addToStoreTransaction: (COStoreTransaction *)txn
+         withRevisionMetadata: (NSDictionary *)metadata
+  assumingEditingContextState: (COEditingContext *)ctx
 {
     [txn setMetadata: _newMetadata forBranch: _branchUUID ofPersistentRoot: _persistentRootUUID];
 }
 
-- (void) applyToContext: (COEditingContext *)aContext
+- (void)applyToContext: (COEditingContext *)aContext
 {
     NILARG_EXCEPTION_TEST(aContext);
 
@@ -85,7 +87,7 @@ static NSString * const kCOCommandNewMetadata = @"COCommandNewMetadata";
     return _(@"Branch Metadata Update");
 }
 
-- (id) copyWithZone:(NSZone *)zone
+- (id)copyWithZone: (NSZone *)zone
 {
     COCommandSetBranchMetadata *aCopy = [super copyWithZone: zone];
     aCopy->_branchUUID = _branchUUID;

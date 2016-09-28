@@ -9,7 +9,7 @@
 
 @interface COCommandDeletePersistentRoot : COCommand
 {
-    @private
+@private
     ETUUID *_initialRevisionID;
 }
 

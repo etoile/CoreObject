@@ -19,7 +19,7 @@
  */
 @interface COCommandGroup : NSObject <COTrackNode, ETCollection, NSCopying>
 {
-    @private
+@private
     COUndoTrack __weak *_parentUndoTrack;
     /**
      * Not equal to _parentUndoTrack.name if _parentUndoTrack is a pattern track
@@ -134,20 +134,21 @@
  * <code>[command inverse]</code>.
  */
 @property (nonatomic, readonly) COCommandGroup *inverse;
+
 /** 
  * Returns whether the receiver changes can be applied to the editing context.
  */
-- (BOOL) canApplyToContext: (COEditingContext *)aContext;
+- (BOOL)canApplyToContext: (COEditingContext *)aContext;
 /**
  * Applies the receiver changes to the editing context.
  */
-- (void) applyToContext: (COEditingContext *)aContext;
+- (void)applyToContext: (COEditingContext *)aContext;
 /**
  * Applies the receiver changes directly to a store transaction.
  */
-- (void) addToStoreTransaction: (COStoreTransaction *)txn
-          withRevisionMetadata: (NSDictionary *)metadata
-   assumingEditingContextState: (COEditingContext *)ctx;
+- (void)addToStoreTransaction: (COStoreTransaction *)txn
+         withRevisionMetadata: (NSDictionary *)metadata
+  assumingEditingContextState: (COEditingContext *)ctx;
 
 
 /** @taskunit Framework Private */
@@ -158,8 +159,9 @@
  * Initializes a command group from a serialized represention and with a parent 
  * undo track.
  */
-- (instancetype) initWithSerializedCommand: (COUndoTrackSerializedCommand *)aCommand
-                                     owner: (COUndoTrack *)anOwner NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithSerializedCommand: (COUndoTrackSerializedCommand *)aCommand
+                                    owner: (COUndoTrack *)anOwner NS_DESIGNATED_INITIALIZER;
+
 /**
  * Returns a serialized represention.
  */

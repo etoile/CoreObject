@@ -76,6 +76,7 @@
 
 /** @taskunit Accessing Track Nodes */
 
+
 /**
  * Returns all the nodes on the track.
  *
@@ -85,6 +86,7 @@
  * much as possible.
  */
 @property (nonatomic, readonly) NSArray *nodes;
+
 /**
  * Returns the node that follows aNode on the track when back is NO, otherwise
  * when back is YES, returns the node that precedes aNode.
@@ -178,6 +180,7 @@
  * For a detailed discussion, see COTrack.
  */
 @protocol COTrackNode <NSObject>
+
 /**
  * See -[CORevision metadata].
  */

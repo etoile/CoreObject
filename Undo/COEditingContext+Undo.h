@@ -50,37 +50,38 @@
  */
 @interface COEditingContext (Undo)
 
+
 /** @taskunit Framework Private */
+
 
 // Called from COEditingContext
 
-- (void) recordBeginUndoGroupWithMetadata: (NSDictionary *)metadata;
-- (COCommandGroup *) recordEndUndoGroupWithUndoTrack: (COUndoTrack *)track;
-
-- (void) recordPersistentRootDeletion: (COPersistentRoot *)aPersistentRoot;
-- (void) recordPersistentRootUndeletion: (COPersistentRoot *)aPersistentRoot;
+- (void)recordBeginUndoGroupWithMetadata: (NSDictionary *)metadata;
+- (COCommandGroup *)recordEndUndoGroupWithUndoTrack: (COUndoTrack *)track;
+- (void)recordPersistentRootDeletion: (COPersistentRoot *)aPersistentRoot;
+- (void)recordPersistentRootUndeletion: (COPersistentRoot *)aPersistentRoot;
 
 // Called from COPersistentRoot
 
-- (void) recordPersistentRootCreation: (COPersistentRoot *)aPersistentRoot
-                  atInitialRevisionID: (ETUUID *)aRevID;
-- (void) recordPersistentRoot: (COPersistentRoot *)aPersistentRoot
-             setCurrentBranch: (COBranch *)aBranch
-                    oldBranch: (COBranch *)oldBranch;
-- (void) recordPersistentRootSetMetadata: (COPersistentRoot *)aPersistentRoot
-                             oldMetadata: (id)oldMetadata;
+- (void)recordPersistentRootCreation: (COPersistentRoot *)aPersistentRoot
+                 atInitialRevisionID: (ETUUID *)aRevID;
+- (void)recordPersistentRoot: (COPersistentRoot *)aPersistentRoot
+            setCurrentBranch: (COBranch *)aBranch
+                   oldBranch: (COBranch *)oldBranch;
+- (void)recordPersistentRootSetMetadata: (COPersistentRoot *)aPersistentRoot
+                            oldMetadata: (id)oldMetadata;
 
 // Called from COBranch
 
-- (void) recordBranchCreation: (COBranch *)aBranch;
-- (void) recordBranchSetCurrentRevisionUUID: (ETUUID *)current
-                            oldRevisionUUID: (ETUUID *)old
-                           headRevisionUUID: (ETUUID *)head
-                        oldHeadRevisionUUID: (ETUUID *)oldHead
-                                   ofBranch: (COBranch *)aBranch;
-- (void) recordBranchSetMetadata: (COBranch *)aBranch
-                     oldMetadata: (id)oldMetadata;
-- (void) recordBranchDeletion: (COBranch *)aBranch;
-- (void) recordBranchUndeletion: (COBranch *)aBranch;
+- (void)recordBranchCreation: (COBranch *)aBranch;
+- (void)recordBranchSetCurrentRevisionUUID: (ETUUID *)current
+                           oldRevisionUUID: (ETUUID *)old
+                          headRevisionUUID: (ETUUID *)head
+                       oldHeadRevisionUUID: (ETUUID *)oldHead
+                                  ofBranch: (COBranch *)aBranch;
+- (void)recordBranchSetMetadata: (COBranch *)aBranch
+                    oldMetadata: (id)oldMetadata;
+- (void)recordBranchDeletion: (COBranch *)aBranch;
+- (void)recordBranchUndeletion: (COBranch *)aBranch;
 
 @end

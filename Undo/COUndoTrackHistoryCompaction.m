@@ -17,8 +17,6 @@
 #import "COCommandUndeleteBranch.h"
 #import "COCommandUndeletePersistentRoot.h"
 #import "COEndOfUndoTrackPlaceholderNode.h"
-#import "COUndoTrack.h"
-#import "COUndoTrackStore.h"
 #import "COUndoTrackStore+Private.h"
 
 #define PERSISTENT_ROOT_CAPACITY_HINT 25000
@@ -26,17 +24,13 @@
 
 @implementation COUndoTrackHistoryCompaction
 
-@synthesize undoTrack = _undoTrack, finalizablePersistentRootUUIDs = _finalizablePersistentRootUUIDs,
-    compactablePersistentRootUUIDs = _compactablePersistentRootUUIDs,
-    finalizableBranchUUIDs = _finalizableBranchUUIDs,
-    compactableBranchUUIDs = _compactableBranchUUIDs,
-    deadRevisionUUIDs = _deadRevisionUUIDs, liveRevisionUUIDs = _liveRevisionUUIDs;
+@synthesize undoTrack = _undoTrack, finalizablePersistentRootUUIDs = _finalizablePersistentRootUUIDs, compactablePersistentRootUUIDs = _compactablePersistentRootUUIDs, finalizableBranchUUIDs = _finalizableBranchUUIDs, compactableBranchUUIDs = _compactableBranchUUIDs, deadRevisionUUIDs = _deadRevisionUUIDs, liveRevisionUUIDs = _liveRevisionUUIDs;
 
 - (COCommandGroup *)newestCommandToDiscardOnUndoTrack: (COUndoTrack *)aTrack
                                   withProposedCommand: (COCommandGroup *)aCommand
 {
     id <COTrackNode> current = aTrack.currentNode;
-    
+
     /* For current as placeholder node, we compact nothing */
     if (![current isKindOfClass: [COCommandGroup class]])
         return nil;
@@ -97,7 +91,7 @@
 - (void)scanPersistentRoots
 {
     BOOL isScanningLiveCommands = NO;
-    
+
     if (_newestCommandToDiscard == nil)
         return;
 
@@ -144,7 +138,7 @@
 
     if (_newestCommandToDiscard == nil)
         return;
-    
+
     [self allocateRevisionSets];
 
     // NOTE: If we switch to a backward scanning, then we must change and move
@@ -206,9 +200,9 @@
         [_compactableBranchUUIDs removeObject: command.branchUUID];
     }
     else if ([command isKindOfClass: [COCommandUndeleteBranch class]]
-          || [command isKindOfClass: [COCommandSetCurrentVersionForBranch class]]
-          || [command isKindOfClass: [COCommandSetBranchMetadata class]]
-          || [command isKindOfClass: [COCommandSetCurrentBranch class]])
+             || [command isKindOfClass: [COCommandSetCurrentVersionForBranch class]]
+             || [command isKindOfClass: [COCommandSetBranchMetadata class]]
+             || [command isKindOfClass: [COCommandSetCurrentBranch class]])
     {
         /* This can represent "COCommandCreateBranch" too.
            Don't delete alive branches, even when we committed no changes on 
@@ -248,16 +242,16 @@
         [_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
     }
     else if ([command isKindOfClass: [COCommandDeletePersistentRoot class]]
-          || [command isKindOfClass: [COCommandUndeletePersistentRoot class]]
-          || [command isKindOfClass: [COCommandSetPersistentRootMetadata class]])
+             || [command isKindOfClass: [COCommandUndeletePersistentRoot class]]
+             || [command isKindOfClass: [COCommandSetPersistentRootMetadata class]])
     {
         [_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
         [_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
     }
     else if ([command isKindOfClass: [COCommandDeleteBranch class]]
-          || [command isKindOfClass: [COCommandUndeleteBranch class]]
-          || [command isKindOfClass: [COCommandSetBranchMetadata class]]
-          || [command isKindOfClass: [COCommandSetCurrentBranch class]])
+             || [command isKindOfClass: [COCommandUndeleteBranch class]]
+             || [command isKindOfClass: [COCommandSetBranchMetadata class]]
+             || [command isKindOfClass: [COCommandSetCurrentBranch class]])
     {
         [_finalizablePersistentRootUUIDs removeObject: command.persistentRootUUID];
         [_compactablePersistentRootUUIDs addObject: command.persistentRootUUID];
@@ -302,13 +296,13 @@
         [_deadRevisionUUIDs[persistentRootUUID] addObject: [command oldRevisionUUID]];
         [_deadRevisionUUIDs[persistentRootUUID] addObject: [command headRevisionUUID]];
         [_deadRevisionUUIDs[persistentRootUUID] addObject: [command oldHeadRevisionUUID]];
-        
+
         _newestDeadRevisionUUIDs[persistentRootUUID] = [command revisionUUID];
     }
     else if ([command isKindOfClass: [COCommandCreatePersistentRoot class]])
     {
         [_deadRevisionUUIDs[persistentRootUUID] addObject: [command initialRevisionID]];
-        
+
         _newestDeadRevisionUUIDs[persistentRootUUID] = [command initialRevisionID];
     }
     ETAssert([_liveRevisionUUIDs[persistentRootUUID] isEmpty]);
@@ -362,18 +356,18 @@
 {
     [_liveRevisionUUIDs enumerateKeysAndObjectsUsingBlock:
         ^(ETUUID *persistentRootUUID, NSMutableSet *revisionUUIDs, BOOL *stop)
-    {
-        if (revisionUUIDs.isEmpty)
         {
-            [revisionUUIDs addObject: _newestDeadRevisionUUIDs[persistentRootUUID]];
-        }
-    }];
+            if (revisionUUIDs.isEmpty)
+            {
+                [revisionUUIDs addObject: _newestDeadRevisionUUIDs[persistentRootUUID]];
+            }
+        }];
 }
 
 - (NSSet *)deadRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs
 {
     NSMutableSet *revisionUUIDs = [NSMutableSet new];
-    
+
     for (NSSet *revisionSet in [_deadRevisionUUIDs objectsForKeys: persistentRootUUIDs
                                                    notFoundMarker: [NSNull null]])
     {
@@ -388,7 +382,7 @@
 - (NSSet *)liveRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs
 {
     NSMutableSet *revisionUUIDs = [NSMutableSet new];
-    
+
     for (NSSet *revisionSet in [_liveRevisionUUIDs objectsForKeys: persistentRootUUIDs
                                                    notFoundMarker: [NSNull null]])
     {
@@ -448,7 +442,7 @@
 - (void)validateCompaction
 {
     NSMutableArray *trackStates = [NSMutableArray new];
-    
+
     if ([_undoTrack isKindOfClass: NSClassFromString(@"COPatternUndoTrack")])
     {
         for (NSString *name in [_undoTrack.store trackNamesMatchingGlobPattern: _undoTrack.name])
@@ -460,13 +454,13 @@
     {
         [trackStates addObject: [_undoTrack.store stateForTrackName: _undoTrack.name]];
     }
-    
+
     for (COUndoTrackState *state in trackStates)
     {
         ETAssert(state.currentCommandUUID == nil
-            || [_undoTrack.store commandForUUID: state.currentCommandUUID] != nil);
+                 || [_undoTrack.store commandForUUID: state.currentCommandUUID] != nil);
         ETAssert(state.headCommandUUID == nil
-            || [_undoTrack.store commandForUUID: state.headCommandUUID] != nil);
+                 || [_undoTrack.store commandForUUID: state.headCommandUUID] != nil);
     }
 }
 

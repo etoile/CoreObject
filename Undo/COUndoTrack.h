@@ -31,13 +31,13 @@
  *
  * Note: tracks are append-only, so node removal is not supported.
  */
-extern NSString * const COUndoTrackDidChangeNotification;
+extern NSString *const COUndoTrackDidChangeNotification;
 /**
  * Key in the userInfo dictionary for COUndoTrackDidChangeNotification. 
  *
  * The value is an NSString containing the track name of the track that changed.
  */
-extern NSString * const kCOUndoTrackName;
+extern NSString *const kCOUndoTrackName;
 
 /**
  * @group Undo
@@ -90,16 +90,17 @@ extern NSString * const kCOUndoTrackName;
  */
 @interface COUndoTrack : NSObject <COTrack>
 {
-    @private
+@private
     NSString *_name;
     NSMutableArray *_nodesOnCurrentUndoBranch;
     NSMutableDictionary *_commandsByUUID;
     COEditingContext *_editingContext;
     NSMutableDictionary *_trackStateForName;
-    
+
     BOOL _coalescing;
     ETUUID *_lastCoalescedCommandUUID;
 }
+
 
 /** @taskunit Track Access and Creation */
 
@@ -147,6 +148,7 @@ extern NSString * const kCOUndoTrackName;
  * in revisions they commit using the undo track.
  */
 @property (nonatomic, readwrite, copy) NSDictionary *customRevisionMetadata;
+
 
 /** @taskunit Clearing and Coalescing Commands */
 
@@ -211,7 +213,7 @@ extern NSString * const kCOUndoTrackName;
  * Returns all commands that are children of the given node (the order is 
  * undefined).
  */
-- (NSArray *) childrenOfNode: (id<COTrackNode>)aNode;
+- (NSArray *)childrenOfNode: (id <COTrackNode>)aNode;
 
 
 /** @taskunit Framework Private */
@@ -224,7 +226,7 @@ extern NSString * const kCOUndoTrackName;
  *
  * See also -currentCommand.
  */
-- (void) recordCommand: (COCommandGroup *)aCommand;
+- (void)recordCommand: (COCommandGroup *)aCommand;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -239,6 +241,6 @@ extern NSString * const kCOUndoTrackName;
  *
  * If the command has been deleted, returns nil.
  */
-- (COCommandGroup *) commandForUUID: (ETUUID*)aUUID;
+- (COCommandGroup *)commandForUUID: (ETUUID *)aUUID;
 
 @end

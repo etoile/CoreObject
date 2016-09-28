@@ -6,22 +6,15 @@
  */
 
 #import "COCommandGroup.h"
-#import "COCommand.h"
-#import "COCommandSetCurrentVersionForBranch.h"
-#import "COCommandUndeletePersistentRoot.h"
 #import "COCommitDescriptor.h"
-#import "CORevision.h"
-#import "CODateSerialization.h"
-#import "COUndoTrackStore.h"
 #import "COUndoTrackStore+Private.h"
 #import "COUndoTrack.h"
 #import "COEndOfUndoTrackPlaceholderNode.h"
-#import <EtoileFoundation/Macros.h>
 
-NSString * const kCOCommandUUID = @"COCommandUUID";
-static NSString * const kCOCommandTimestamp = @"COCommandTimestamp";
-static NSString * const kCOCommandContents = @"COCommandContents";
-static NSString * const kCOCommandMetadata = @"COCommandMetadata";
+NSString *const kCOCommandUUID = @"COCommandUUID";
+static NSString *const kCOCommandTimestamp = @"COCommandTimestamp";
+static NSString *const kCOCommandContents = @"COCommandContents";
+static NSString *const kCOCommandMetadata = @"COCommandMetadata";
 
 @implementation COCommandGroup
 
@@ -31,29 +24,30 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 @synthesize parentUUID = _parentUUID;
 @synthesize trackName = _trackName;
 
-#pragma mark -
-#pragma mark Initialization
 
-+ (void) initialize
+#pragma mark Initialization -
+
+
++ (void)initialize
 {
     if (self != [COCommandGroup class])
         return;
-    
+
     [self applyTraitFromClass: [ETCollectionTrait class]];
 }
 
 - (instancetype)init
 {
     COUndoTrackSerializedCommand *command = [COUndoTrackSerializedCommand new];
-    
+
     command.UUID = [ETUUID UUID];
     command.timestamp = [NSDate date];
 
     return [self initWithSerializedCommand: command owner: nil];
 }
 
-- (instancetype) initWithSerializedCommand: (COUndoTrackSerializedCommand *)aCommand
-                                     owner: (COUndoTrack *)anOwner
+- (instancetype)initWithSerializedCommand: (COUndoTrackSerializedCommand *)aCommand
+                                    owner: (COUndoTrack *)anOwner
 {
     NILARG_EXCEPTION_TEST(aCommand);
     SUPERINIT;
@@ -76,7 +70,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     return self;
 }
 
-- (COUndoTrackSerializedCommand *) serializedCommand
+- (COUndoTrackSerializedCommand *)serializedCommand
 {
     COUndoTrackSerializedCommand *cmd = [COUndoTrackSerializedCommand new];
     cmd.JSONData = [self commandsPropertyList];
@@ -96,12 +90,13 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     return cmd;
 }
 
-- (id) commandsPropertyList
+- (id)commandsPropertyList
 {
-    return @{kCOCommandContents : [[_contents mappedCollection] propertyList]};
+    return @{kCOCommandContents: [[_contents mappedCollection] propertyList]};
 }
 
-- (NSMutableArray *)commandsFromPropertyList: (NSDictionary *)plist parentUndoTrack: (COUndoTrack *)aParent
+- (NSMutableArray *)commandsFromPropertyList: (NSDictionary *)plist
+                             parentUndoTrack: (COUndoTrack *)aParent
 {
     NSMutableArray *commands = [NSMutableArray array];
 
@@ -123,7 +118,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     return ([((COCommandGroup *)object)->_UUID isEqual: _UUID]);
 }
 
-- (NSUInteger) hash
+- (NSUInteger)hash
 {
     return _UUID.hash;
 }
@@ -131,7 +126,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
 - (NSMutableArray *)inversedCommands
 {
     NSMutableArray *inversedCommands = [NSMutableArray array];
-    
+
     for (COCommand *command in _contents)
     {
         // Insert the inverses back to front, so the inverse of the most recent
@@ -152,21 +147,21 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     return commands;
 }
 
-- (COCommandGroup *) inverse
+- (COCommandGroup *)inverse
 {
     COCommandGroup *inverse = [[COCommandGroup alloc] init];
     inverse.contents = [self inversedCommands];
     return inverse;
 }
 
-- (id) copyWithZone: (NSZone *)aZone
+- (id)copyWithZone: (NSZone *)aZone
 {
     COCommandGroup *copied = [[COCommandGroup alloc] init];
     copied.contents = [self copiedCommands];
     return copied;
 }
 
-- (BOOL) canApplyToContext: (COEditingContext *)aContext
+- (BOOL)canApplyToContext: (COEditingContext *)aContext
 {
     NILARG_EXCEPTION_TEST(aContext);
 
@@ -180,7 +175,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     return YES;
 }
 
-- (void) applyToContext: (COEditingContext *)aContext
+- (void)applyToContext: (COEditingContext *)aContext
 {
     NILARG_EXCEPTION_TEST(aContext);
 
@@ -190,14 +185,18 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     }
 }
 
-- (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
+- (void)addToStoreTransaction: (COStoreTransaction *)txn
+         withRevisionMetadata: (NSDictionary *)metadata
+  assumingEditingContextState: (COEditingContext *)ctx
 {
     NILARG_EXCEPTION_TEST(ctx);
     NILARG_EXCEPTION_TEST(txn);
-    
+
     for (COCommand *command in _contents)
     {
-        [command addToStoreTransaction: txn withRevisionMetadata: metadata assumingEditingContextState: ctx];
+        [command addToStoreTransaction: txn
+                  withRevisionMetadata: metadata
+           assumingEditingContextState: ctx];
     }
 }
 
@@ -211,7 +210,7 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     return _parentUndoTrack;
 }
 
-- (void)setParentUndoTrack:(COUndoTrack *)parentUndoTrack
+- (void)setParentUndoTrack: (COUndoTrack *)parentUndoTrack
 {
     _parentUndoTrack = parentUndoTrack;
     for (COCommand *childCommand in self.contents)
@@ -220,8 +219,9 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     }
 }
 
-#pragma mark -
-#pragma mark Track Node Protocol
+
+#pragma mark Track Node Protocol -
+
 
 - (ETUUID *)persistentRootUUID
 {
@@ -270,23 +270,24 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     return [COCommitDescriptor localizedShortDescriptionFromMetadata: self.metadata];
 }
 
-- (id<COTrackNode>)parentNode
+- (id <COTrackNode>)parentNode
 {
     ETAssert(self.parentUUID != nil);
-    
+
     if ([self.parentUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID])
         return [COEndOfUndoTrackPlaceholderNode sharedInstance];
-    
+
     return [_parentUndoTrack commandForUUID: self.parentUUID];
 }
 
-- (id<COTrackNode>)mergeParentNode
+- (id <COTrackNode>)mergeParentNode
 {
     return nil;
 }
 
-#pragma mark -
-#pragma mark Collection Protocol
+
+#pragma mark Collection Protocol -
+
 
 - (BOOL)isOrdered
 {
@@ -303,16 +304,20 @@ static NSString * const kCOCommandMetadata = @"COCommandMetadata";
     return [NSArray arrayWithArray: self.content];
 }
 
+
 #pragma mark -
 
-- (COCommandGroup *) parentCommand
+
+- (COCommandGroup *)parentCommand
 {
     return nil;// [_owner commandForUUID: _parentCommandUUID];
 }
 
-- (NSString *) description
+- (NSString *)description
 {
-    return [NSString stringWithFormat: @"COCommandGroup %@\n\t%@", _UUID, self.localizedShortDescription];
+    return [NSString stringWithFormat: @"COCommandGroup %@\n\t%@",
+                                       _UUID,
+                                       self.localizedShortDescription];
 }
 
 @end

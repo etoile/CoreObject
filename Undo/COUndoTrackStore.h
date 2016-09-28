@@ -42,7 +42,7 @@
  */
 @interface COUndoTrackStore : NSObject
 {
-    @private
+@private
     NSURL *_URL;
     FMDatabase *_db;
     NSMutableDictionary *_modifiedTrackStateForTrackName;
@@ -52,6 +52,7 @@
 
 
 /** @taskunit Initialization */
+
 
 /**
  * Returns the default store that can shared by CoreObject applications.

@@ -8,35 +8,41 @@
 #import "COUndoTrackStore.h"
 #import "COUndoTrackStore+Private.h"
 #import "COUndoTrack.h"
-#import <EtoileFoundation/EtoileFoundation.h>
 #import "FMDatabase.h"
 #import "FMDatabaseAdditions.h"
-#import "COCommand.h"
 #import "CODateSerialization.h"
 #import "COEndOfUndoTrackPlaceholderNode.h"
 #import "COJSONSerialization.h"
 #import "COSQLiteUtilities.h"
+
 #if TARGET_OS_IPHONE
+
 #import "NSDistributedNotificationCenter.h"
+
 #endif
 
 /* For dispatch_get_current_queue() deprecated on iOS (to prevent to people to 
    use it beside debugging) */
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
-NSString * const COUndoTrackStoreTrackDidChangeNotification = @"COUndoTrackStoreTrackDidChangeNotification";
-NSString * const COUndoTrackStoreTrackName = @"COUndoTrackStoreTrackName";
-NSString * const COUndoTrackStoreTrackHeadCommandUUID = @"COUndoTrackStoreTrackHeadCommandUUID";
-NSString * const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTrackCurrentCommandUUID";
-NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompacted";
+NSString *const COUndoTrackStoreTrackDidChangeNotification = @"COUndoTrackStoreTrackDidChangeNotification";
+NSString *const COUndoTrackStoreTrackName = @"COUndoTrackStoreTrackName";
+NSString *const COUndoTrackStoreTrackHeadCommandUUID = @"COUndoTrackStoreTrackHeadCommandUUID";
+NSString *const COUndoTrackStoreTrackCurrentCommandUUID = @"COUndoTrackStoreTrackCurrentCommandUUID";
+NSString *const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompacted";
 
 @implementation COUndoTrackSerializedCommand
+
 @synthesize JSONData, metadata, UUID, parentUUID, trackName, timestamp, sequenceNumber;
+
 @end
 
+
 @implementation COUndoTrackState
+
 @synthesize trackName, headCommandUUID, currentCommandUUID, compacted;
-- (id)copyWithZone:(NSZone *)zone
+
+- (id)copyWithZone: (NSZone *)zone
 {
     COUndoTrackState *aCopy = [COUndoTrackState new];
     aCopy.trackName = self.trackName;
@@ -45,19 +51,21 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
     aCopy.compacted = self.compacted;
     return aCopy;
 }
-- (BOOL) isEqual:(id)object
+
+- (BOOL)isEqual: (id)object
 {
     if (![object isKindOfClass: [COUndoTrackState class]])
         return NO;
-    
+
     COUndoTrackState *otherState = object;
 
     return [self.trackName isEqual: otherState.trackName]
-        && [self.headCommandUUID isEqual: otherState.headCommandUUID]
-        && ((self.currentCommandUUID == nil && otherState.currentCommandUUID == nil)
-            || [self.currentCommandUUID isEqual: otherState.currentCommandUUID])
-        && self.compacted == otherState.compacted;
+           && [self.headCommandUUID isEqual: otherState.headCommandUUID]
+           && ((self.currentCommandUUID == nil && otherState.currentCommandUUID == nil)
+               || [self.currentCommandUUID isEqual: otherState.currentCommandUUID])
+           && self.compacted == otherState.compacted;
 }
+
 @end
 
 /*
@@ -115,7 +123,9 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
 + (NSURL *)defaultStoreURL
 {
-    NSArray *libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+    NSArray *libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
+                                                               NSUserDomainMask,
+                                                               YES);
 
     return [NSURL fileURLWithPath: [[libraryDirs[0] stringByAppendingPathComponent: @"CoreObject"]
         stringByAppendingPathComponent: @"Undo"]];
@@ -139,36 +149,39 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
     _URL = aURL;
     _modifiedTrackStateForTrackName = [NSMutableDictionary new];
-    _queue = dispatch_queue_create([NSString stringWithFormat: @"COUndoTrackStore-%p", self].UTF8String, NULL);
+    _queue = dispatch_queue_create([NSString stringWithFormat: @"COUndoTrackStore-%p",
+                                                               self].UTF8String, NULL);
     _transactionLock = dispatch_semaphore_create(1);
 
     __block BOOL ok = YES;
-    
-    dispatch_sync(_queue, ^() {
-        // Ignore if this fails (it will fail if the directory already exists).
-        // If it really fails, we will notice later when we try to open the db.
-        [[NSFileManager defaultManager] createDirectoryAtPath: _URL.path
-                                  withIntermediateDirectories: YES
-                                                   attributes: nil
-                                                        error: NULL];
-        
-        _db = [[FMDatabase alloc] initWithPath: [aURL.path stringByAppendingPathComponent: @"undo.sqlite"]];
-        [_db setShouldCacheStatements: YES];
-        [_db setCrashOnErrors: NO];
-        [_db setLogsErrors: YES];
-        assert([_db open]);
-        
-        // Use write-ahead-log mode
-        {
-            NSString *result = [_db stringForQuery: @"PRAGMA journal_mode=WAL"];
-            if (![@"wal" isEqualToString: result])
-            {
-                NSLog(@"Enabling WAL mode failed.");
-            }
-        }
 
-        ok = [self setupSchema];
-    });
+    dispatch_sync(_queue,
+        ^()
+        {
+            // Ignore if this fails (it will fail if the directory already exists).
+            // If it really fails, we will notice later when we try to open the db.
+            [[NSFileManager defaultManager] createDirectoryAtPath: _URL.path
+                                      withIntermediateDirectories: YES
+                                                       attributes: nil
+                                                            error: NULL];
+
+            _db = [[FMDatabase alloc] initWithPath: [aURL.path stringByAppendingPathComponent: @"undo.sqlite"]];
+            [_db setShouldCacheStatements: YES];
+            [_db setCrashOnErrors: NO];
+            [_db setLogsErrors: YES];
+            assert([_db open]);
+
+            // Use write-ahead-log mode
+            {
+                NSString *result = [_db stringForQuery: @"PRAGMA journal_mode=WAL"];
+                if (![@"wal" isEqualToString: result])
+                {
+                    NSLog(@"Enabling WAL mode failed.");
+                }
+            }
+
+            ok = [self setupSchema];
+        });
 
     if (!ok)
     {
@@ -182,14 +195,15 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
     return [self initWithURL: nil];
 }
 
-- (void) dealloc
+- (void)dealloc
 {
     assert(dispatch_get_current_queue() != _queue);
-    
-    dispatch_sync(_queue, ^() {
+
+    dispatch_sync(_queue, ^()
+    {
         [_db close];
     });
-    
+
 #if !(TARGET_OS_IPHONE)
     // N.B.: We are using deployment target 10.7, so ARC does not manage libdispatch objects.
     // If we switch to deployment target 10.8, ARC will manage libdispatch objects automatically.
@@ -200,19 +214,19 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 #endif
 }
 
-- (BOOL) setupSchema
+- (BOOL)setupSchema
 {
     assert(dispatch_get_current_queue() == _queue);
 
     /* SQLite compatibility */
-    
+
     [_db executeUpdate: @"PRAGMA foreign_keys = ON"];
     if (1 != [_db intForQuery: @"PRAGMA foreign_keys"])
     {
         [NSException raise: NSGenericException
                     format: @"Your SQLite version doesn't support foreign keys"];
     }
-    
+
     [_db beginDeferredTransaction];
 
     /* Store Metadata table (including schema version) */
@@ -232,21 +246,21 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
             return NO;
         }
     }
-    
+
     /* Commands and Tracks tables */
-    
+
     [_db executeUpdate: @"CREATE TABLE IF NOT EXISTS commands (id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                         "uuid BLOB NOT NULL UNIQUE, parentid INTEGER, trackname STRING NOT NULL, data BLOB NOT NULL, "
-                         "metadata BLOB, timestamp INTEGER NOT NULL, deleted BOOLEAN DEFAULT 0)"];
-    
+        "uuid BLOB NOT NULL UNIQUE, parentid INTEGER, trackname STRING NOT NULL, data BLOB NOT NULL, "
+        "metadata BLOB, timestamp INTEGER NOT NULL, deleted BOOLEAN DEFAULT 0)"];
+
     // NULL currentid means "the start of the track"
     [_db executeUpdate: @"CREATE TABLE IF NOT EXISTS tracks (trackname STRING PRIMARY KEY, "
-                         "headid INTEGER NOT NULL, currentid INTEGER, "
-                         "FOREIGN KEY(headid) REFERENCES commands(id), "
-                         "FOREIGN KEY(currentid) REFERENCES commands(id))"];
+        "headid INTEGER NOT NULL, currentid INTEGER, "
+        "FOREIGN KEY(headid) REFERENCES commands(id), "
+        "FOREIGN KEY(currentid) REFERENCES commands(id))"];
 
     [_db commit];
-    
+
     if ([_db hadError])
     {
         NSLog(@"Error %d: %@", [_db lastErrorCode], [_db lastErrorMessage]);
@@ -257,21 +271,22 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
 - (void)clearStore
 {
-    dispatch_sync(_queue, ^() {
+    dispatch_sync(_queue, ^()
+    {
         [_db beginTransaction];
-        
+
         [_db executeUpdate: @"DELETE FROM tracks"];
         [_db executeUpdate: @"DELETE FROM commands"];
         [_db executeUpdate: @"DROP TABLE IF EXISTS storeMetadata"];
         [_db commit];
-        
+
         [_modifiedTrackStateForTrackName removeAllObjects];
-        
+
         [self setupSchema];
     });
 }
 
-- (BOOL) beginTransaction
+- (BOOL)beginTransaction
 {
     ETAssert([NSThread isMainThread]);
 
@@ -281,11 +296,16 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
     __block BOOL ok = NO;
 
-    @try {
-        dispatch_sync(_queue, ^() {
-            ok = [_db beginTransaction];
-        });
-    } @finally {
+    @try
+    {
+        dispatch_sync(_queue,
+            ^()
+            {
+                ok = [_db beginTransaction];
+            });
+    }
+    @finally
+    {
         if (!ok)
         {
             dispatch_semaphore_signal(_transactionLock);
@@ -294,14 +314,16 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
     return ok;
 }
 
-- (BOOL) commitTransaction
+- (BOOL)commitTransaction
 {
     ETAssert([NSThread isMainThread]);
     __block BOOL ok = NO;
 
-    dispatch_sync(_queue, ^() {
-        ok = [_db commit];
-    });
+    dispatch_sync(_queue,
+        ^()
+        {
+            ok = [_db commit];
+        });
 
     if (ok)
     {
@@ -311,25 +333,30 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
     return ok;
 }
 
-- (NSArray *) trackNames
+- (NSArray *)trackNames
 {
     __block NSArray *result = nil;
     assert(dispatch_get_current_queue() != _queue);
-    
-    dispatch_sync(_queue, ^() {
-        result = [_db arrayForQuery: @"SELECT DISTINCT trackname FROM tracks"];
-    });
+
+    dispatch_sync(_queue,
+        ^()
+        {
+           result = [_db arrayForQuery: @"SELECT DISTINCT trackname FROM tracks"];
+        });
     return result;
 }
 
-- (NSArray *) trackNamesMatchingGlobPattern: (NSString *)aPattern
+- (NSArray *)trackNamesMatchingGlobPattern: (NSString *)aPattern
 {
     __block NSArray *result = nil;
     assert(dispatch_get_current_queue() != _queue);
-    
-    dispatch_sync(_queue, ^() {
-        result = [_db arrayForQuery: @"SELECT DISTINCT trackname FROM tracks WHERE trackname GLOB ?", aPattern];
-    });
+
+    dispatch_sync(_queue,
+        ^()
+        {
+            result = [_db arrayForQuery: @"SELECT DISTINCT trackname FROM tracks WHERE trackname GLOB ?",
+                                         aPattern];
+        });
     return result;
 }
 
@@ -343,11 +370,11 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
     COUndoTrackState *result = nil;
     FMResultSet *rs = [_db executeQuery:
-        @"SELECT track.trackname, head.uuid AS headuuid, current.uuid AS currentuuid, head.deleted AS headdeleted, current.deleted AS currentdeleted "
-         "FROM tracks AS track "
-         "LEFT OUTER JOIN commands AS head ON track.headid = head.id "
-         "LEFT OUTER JOIN commands AS current ON track.currentid = current.id "
-         "WHERE track.trackname = ? AND headdeleted = 0", aName];
+       @"SELECT track.trackname, head.uuid AS headuuid, current.uuid AS currentuuid, head.deleted AS headdeleted, current.deleted AS currentdeleted "
+        "FROM tracks AS track "
+        "LEFT OUTER JOIN commands AS head ON track.headid = head.id "
+        "LEFT OUTER JOIN commands AS current ON track.currentid = current.id "
+        "WHERE track.trackname = ? AND headdeleted = 0", aName];
 
     result = [COUndoTrackState new];
     result.trackName = aName;
@@ -365,7 +392,7 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
         {
             result.currentCommandUUID = nil;
         }
-        
+
         ETAssert(![result.currentCommandUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
         ETAssert(![result.headCommandUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
     }
@@ -374,154 +401,172 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
     return result;
 }
 
-- (COUndoTrackState *) stateForTrackName: (NSString*)aName
+- (COUndoTrackState *)stateForTrackName: (NSString *)aName
 {
     __block COUndoTrackState *result = nil;
     assert(dispatch_get_current_queue() != _queue);
-    
-    dispatch_sync(_queue, ^() {
-        result = [self stateForTrackNameInCurrentQueue: aName];
-    });
+
+    dispatch_sync(_queue,
+        ^()
+        {
+            result = [self stateForTrackNameInCurrentQueue: aName];
+        });
 
     return result;
 }
 
-- (void) setTrackState: (COUndoTrackState *)aState
+- (void)setTrackState: (COUndoTrackState *)aState
 {
     assert(dispatch_get_current_queue() != _queue);
     ETAssert([NSThread isMainThread]);
     ETAssert(![aState.headCommandUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
     ETAssert(![aState.currentCommandUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
-    
-    dispatch_sync(_queue, ^() {
-        ETAssert([_db inTransaction]);
 
-        [_db executeUpdate: @"INSERT OR REPLACE INTO tracks (trackname, headid, currentid) "
-                            @"VALUES (?, (SELECT id FROM commands WHERE uuid = ?),"
-                                       @"(SELECT id FROM commands WHERE uuid = ?))",
-            aState.trackName, [aState.headCommandUUID dataValue], [aState.currentCommandUUID dataValue]];
-    });
+    dispatch_sync(_queue,
+        ^()
+        {
+            ETAssert([_db inTransaction]);
+
+            [_db executeUpdate: @"INSERT OR REPLACE INTO tracks (trackname, headid, currentid) "
+                                    @"VALUES (?, (SELECT id FROM commands WHERE uuid = ?),"
+                                    @"(SELECT id FROM commands WHERE uuid = ?))",
+                                aState.trackName,
+                                [aState.headCommandUUID dataValue],
+                                [aState.currentCommandUUID dataValue]];
+        });
 
     _modifiedTrackStateForTrackName[aState.trackName] = [aState copy];
 }
 
-- (void) removeTrackWithName: (NSString*)aName
+- (void)removeTrackWithName: (NSString *)aName
 {
     assert(dispatch_get_current_queue() != _queue);
 
-    dispatch_sync(_queue, ^() {
-        ETAssert([_db inTransaction]);
+    dispatch_sync(_queue,
+        ^()
+        {
+            ETAssert([_db inTransaction]);
 
-        [_db executeUpdate: @"DELETE FROM tracks WHERE trackname = ?", aName];
-        [_db executeUpdate: @"DELETE FROM commands WHERE trackname = ?", aName];
-    });
+            [_db executeUpdate: @"DELETE FROM tracks WHERE trackname = ?", aName];
+            [_db executeUpdate: @"DELETE FROM commands WHERE trackname = ?", aName];
+        });
 }
 
-- (NSArray *) allCommandUUIDsOnTrackWithName: (NSString*)aName
+- (NSArray *)allCommandUUIDsOnTrackWithName: (NSString *)aName
 {
     __block NSArray *result = nil;
     assert(dispatch_get_current_queue() != _queue);
-    
-    dispatch_sync(_queue, ^() {
-        result = [[_db arrayForQuery: @"SELECT uuid FROM commands WHERE trackname = ? and deleted = 0", aName] mappedCollectionWithBlock: ^(id object) { return [ETUUID UUIDWithData: object]; }];
-    });
+
+    dispatch_sync(_queue,
+        ^()
+        {
+            result = [[_db arrayForQuery: @"SELECT uuid FROM commands WHERE trackname = ? and deleted = 0",
+                                          aName] mappedCollectionWithBlock: ^(id object) { return [ETUUID UUIDWithData: object]; }];
+        });
     return result;
 }
 
-- (NSData *) serialize: (id)json
+- (NSData *)serialize: (id)json
 {
     if (json != nil)
         return CODataWithJSONObject(json, NULL);
     return nil;
 }
 
-- (id) deserialize: (NSData *)data
+- (id)deserialize: (NSData *)data
 {
     if (data != nil)
         return COJSONObjectWithData(data, NULL);
     return nil;
 }
 
-- (void) addCommand: (COUndoTrackSerializedCommand *)aCommand
+- (void)addCommand: (COUndoTrackSerializedCommand *)aCommand
 {
     assert(dispatch_get_current_queue() != _queue);
     ETAssert(![aCommand.parentUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
     ETAssert(![aCommand.UUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
-    
+
     __block int64_t rowid = -1;
-    
-    dispatch_sync(_queue, ^() {
-        [_db executeUpdate: @"INSERT INTO commands(uuid, parentid, trackname, data, metadata, timestamp) "
-                            @"VALUES(?, (SELECT id FROM commands WHERE uuid = ?), ?, ?, ?, ?)",
-                            [aCommand.UUID dataValue],
-                            [aCommand.parentUUID dataValue],
-                            aCommand.trackName,
-                            [self serialize: aCommand.JSONData],
-                            [self serialize: aCommand.metadata],
-                            CODateToJavaTimestamp(aCommand.timestamp)];
-    
-        rowid = [_db lastInsertRowId];
-    });
-     
+
+    dispatch_sync(_queue,
+        ^()
+        {
+            [_db executeUpdate: @"INSERT INTO commands(uuid, parentid, trackname, data, metadata, timestamp) "
+                                    @"VALUES(?, (SELECT id FROM commands WHERE uuid = ?), ?, ?, ?, ?)",
+                                [aCommand.UUID dataValue],
+                                [aCommand.parentUUID dataValue],
+                                aCommand.trackName,
+                                [self serialize: aCommand.JSONData],
+                                [self serialize: aCommand.metadata],
+                                CODateToJavaTimestamp(aCommand.timestamp)];
+
+            rowid = [_db lastInsertRowId];
+        });
+
     aCommand.sequenceNumber = rowid;
 }
 
-- (COUndoTrackSerializedCommand *) commandForUUID: (ETUUID *)aUUID
+- (COUndoTrackSerializedCommand *)commandForUUID: (ETUUID *)aUUID
 {
     assert(dispatch_get_current_queue() != _queue);
     __block COUndoTrackSerializedCommand *result = nil;
 
-    dispatch_sync(_queue, ^() {
-        FMResultSet *rs = [_db executeQuery:
-            @"SELECT c.id, parent.uuid AS parentuuid, c.trackname, c.data, c.metadata, c.timestamp "
-             "FROM commands AS c "
-             "LEFT OUTER JOIN commands AS parent ON c.parentid = parent.id "
-             "WHERE c.uuid = ? and c.deleted = 0", [aUUID dataValue]];
-
-
-        if ([rs next])
+    dispatch_sync(_queue,
+        ^()
         {
-            result = [COUndoTrackSerializedCommand new];
+            FMResultSet *rs = [_db executeQuery:
+                @"SELECT c.id, parent.uuid AS parentuuid, c.trackname, c.data, c.metadata, c.timestamp "
+                    "FROM commands AS c "
+                    "LEFT OUTER JOIN commands AS parent ON c.parentid = parent.id "
+                    "WHERE c.uuid = ? and c.deleted = 0", [aUUID dataValue]];
 
-            result.JSONData = [self deserialize: [rs dataForColumn: @"data"]];
-            result.metadata = [self deserialize: [rs dataForColumn: @"metadata"]];
-            result.UUID = aUUID;
-            ETAssert(![result.UUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
-
-            if ([rs dataForColumn: @"parentuuid"] != nil)
+            if ([rs next])
             {
-                result.parentUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"parentuuid"]];
-                ETAssert(![result.parentUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
-            }
+                result = [COUndoTrackSerializedCommand new];
 
-            result.trackName = [rs stringForColumn: @"trackname"];
-            result.timestamp = CODateFromJavaTimestamp([rs numberForColumn: @"timestamp"]);
-            result.sequenceNumber = [rs longForColumn: @"id"];
-        }
-        [rs close];
-    });
+                result.JSONData = [self deserialize: [rs dataForColumn: @"data"]];
+                result.metadata = [self deserialize: [rs dataForColumn: @"metadata"]];
+                result.UUID = aUUID;
+                ETAssert(![result.UUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
+
+                if ([rs dataForColumn: @"parentuuid"] != nil)
+                {
+                    result.parentUUID = [ETUUID UUIDWithData: [rs dataForColumn: @"parentuuid"]];
+                    ETAssert(![result.parentUUID isEqual: [COEndOfUndoTrackPlaceholderNode sharedInstance].UUID]);
+                }
+
+                result.trackName = [rs stringForColumn: @"trackname"];
+                result.timestamp = CODateFromJavaTimestamp([rs numberForColumn: @"timestamp"]);
+                result.sequenceNumber = [rs longForColumn: @"id"];
+            }
+            [rs close];
+        });
 
     return result;
 }
 
-- (void) removeCommandForUUID: (ETUUID *)aUUID
+- (void)removeCommandForUUID: (ETUUID *)aUUID
 {
     assert(dispatch_get_current_queue() != _queue);
-    
-    dispatch_sync(_queue, ^() {
-        [_db executeUpdate: @"DELETE FROM commands WHERE uuid = ?", [aUUID dataValue]];
-    });
+
+    dispatch_sync(_queue,
+        ^()
+        {
+            [_db executeUpdate: @"DELETE FROM commands WHERE uuid = ?", [aUUID dataValue]];
+        });
 }
 
-- (BOOL) string: (NSString *)aString matchesGlobPattern: (NSString *)aPattern
+- (BOOL)string: (NSString *)aString matchesGlobPattern: (NSString *)aPattern
 {
     assert(dispatch_get_current_queue() != _queue);
     __block BOOL result = NO;
 
-    dispatch_sync(_queue, ^() {
-        result = [_db boolForQuery: @"SELECT 1 WHERE ? GLOB ?", aString, aPattern];
-    });
-    
+    dispatch_sync(_queue,
+        ^()
+        {
+            result = [_db boolForQuery: @"SELECT 1 WHERE ? GLOB ?", aString, aPattern];
+        });
+
     return result;
 }
 
@@ -536,19 +581,22 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
     {
         __block NSArray *compactedTrackNames = nil;
         // This can be run in background
-        dispatch_sync(_queue, ^() {
-            [_db beginTransaction];
-
-            for (ETUUID *UUID in UUIDs)
+        dispatch_sync(_queue,
+            ^()
             {
-                [_db executeUpdate: @"UPDATE commands SET deleted = 1 WHERE uuid = ?", [UUID dataValue]];
-            }
+                [_db beginTransaction];
 
-            compactedTrackNames =
-            [_db arrayForQuery: @"SELECT DISTINCT trackname FROM commands WHERE deleted = 1 "];
+                for (ETUUID *UUID in UUIDs)
+                {
+                    [_db executeUpdate: @"UPDATE commands SET deleted = 1 WHERE uuid = ?",
+                                        [UUID dataValue]];
+                }
 
-            [_db commit];
-        });
+                compactedTrackNames =
+                    [_db arrayForQuery: @"SELECT DISTINCT trackname FROM commands WHERE deleted = 1 "];
+
+                [_db commit];
+            });
 
         /* This must be run in the main thread:
          - no one must access _modifiedTrackStateForTrackName at the same time
@@ -556,24 +604,27 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
 
          If we post it with some delay, someone could touch
          _modifiedTrackStateForTrackName and overwrite COUndoTrackState.compacted. */
-        dispatch_sync_now(dispatch_get_main_queue(), ^() {
-            dispatch_sync(_queue, ^() {
-                [_db beginTransaction];
-
-                for (NSString *trackName in compactedTrackNames)
+        dispatch_sync_now(dispatch_get_main_queue(),
+            ^()
+            {
+                dispatch_sync(_queue, ^()
                 {
-                    if (_modifiedTrackStateForTrackName[trackName] == nil)
+                    [_db beginTransaction];
+
+                    for (NSString *trackName in compactedTrackNames)
                     {
-                        _modifiedTrackStateForTrackName[trackName] = [self stateForTrackNameInCurrentQueue: trackName];
+                        if (_modifiedTrackStateForTrackName[trackName] == nil)
+                        {
+                            _modifiedTrackStateForTrackName[trackName] = [self stateForTrackNameInCurrentQueue: trackName];
+                        }
+                        ((COUndoTrackState *)_modifiedTrackStateForTrackName[trackName]).compacted = YES;
                     }
-                    ((COUndoTrackState *)_modifiedTrackStateForTrackName[trackName]).compacted = YES;
-                }
 
-                [_db commit];
+                    [_db commit];
+                });
+
+                [self postCommitNotifications];
             });
-
-            [self postCommitNotifications];
-        });
     }
     @finally
     {
@@ -589,44 +640,47 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
     dispatch_semaphore_wait(_transactionLock, DISPATCH_TIME_FOREVER);
     @try
     {
-        dispatch_sync(_queue, ^() {
-            NSArray *compactedTrackNames =
-                [_db arrayForQuery: @"SELECT DISTINCT trackname FROM commands WHERE deleted = 1 "];
-            
-            for (NSString *trackName in compactedTrackNames)
+        dispatch_sync(_queue,
+            ^()
             {
-                if (_modifiedTrackStateForTrackName[trackName] == nil)
-                {
-                    _modifiedTrackStateForTrackName[trackName] = [self stateForTrackNameInCurrentQueue: trackName];
-                }
-                
-                /* When we compact up to the head, we delete all commands
-                   between head and tail including divergent ones, this means
-                   the track becomes empty. */
-                BOOL isEmptyTrack = ([_modifiedTrackStateForTrackName[trackName] headCommandUUID] == nil);
-                
-                if (isEmptyTrack)
-                {
-                    [_db executeUpdate: @"DELETE FROM tracks WHERE trackname = ?", trackName];
-                    /* If the head was moved back to the past just before the
-                       compaction, then any divergent commands more recent than
-                       the head won't be marked as deleted. */
-                    [_db executeUpdate: @"DELETE FROM commands WHERE trackname = ?", trackName];
-                }
-                else
-                {
-                    BOOL currentMarkedAsDeleted =
-                        ([_modifiedTrackStateForTrackName[trackName] currentCommandUUID] == nil);
+                NSArray *compactedTrackNames =
+                    [_db arrayForQuery: @"SELECT DISTINCT trackname FROM commands WHERE deleted = 1 "];
 
-                    if (currentMarkedAsDeleted)
+                for (NSString *trackName in compactedTrackNames)
+                {
+                    if (_modifiedTrackStateForTrackName[trackName] == nil)
                     {
-                        [_db executeUpdate: @"UPDATE tracks SET currentid = NULL WHERE trackname = ?", trackName];
+                        _modifiedTrackStateForTrackName[trackName] = [self stateForTrackNameInCurrentQueue: trackName];
                     }
-                    [_db executeUpdate: @"DELETE FROM commands WHERE deleted = 1"];
-                    
+
+                    /* When we compact up to the head, we delete all commands
+                       between head and tail including divergent ones, this means
+                       the track becomes empty. */
+                    BOOL isEmptyTrack = ([_modifiedTrackStateForTrackName[trackName] headCommandUUID] == nil);
+
+                    if (isEmptyTrack)
+                    {
+                        [_db executeUpdate: @"DELETE FROM tracks WHERE trackname = ?", trackName];
+                        /* If the head was moved back to the past just before the
+                           compaction, then any divergent commands more recent than
+                           the head won't be marked as deleted. */
+                        [_db executeUpdate: @"DELETE FROM commands WHERE trackname = ?", trackName];
+                    }
+                    else
+                    {
+                        BOOL currentMarkedAsDeleted =
+                            ([_modifiedTrackStateForTrackName[trackName] currentCommandUUID] == nil);
+
+                        if (currentMarkedAsDeleted)
+                        {
+                            [_db executeUpdate: @"UPDATE tracks SET currentid = NULL WHERE trackname = ?",
+                                                trackName];
+                        }
+                        [_db executeUpdate: @"DELETE FROM commands WHERE deleted = 1"];
+
+                    }
                 }
-            }
-        });
+            });
     }
     @finally
     {
@@ -647,9 +701,11 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
     dispatch_semaphore_wait(_transactionLock, DISPATCH_TIME_FOREVER);
     @try
     {
-        dispatch_sync(_queue, ^() {
-            success = [_db executeUpdate: @"VACUUM"];
-        });
+        dispatch_sync(_queue,
+            ^()
+            {
+                success = [_db executeUpdate: @"VACUUM"];
+            });
     }
     @finally
     {
@@ -663,14 +719,15 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
     assert(dispatch_get_current_queue() != _queue);
     __block NSDictionary *statistics = nil;
 
-    dispatch_sync(_queue, ^() {
+    dispatch_sync(_queue, ^()
+    {
         statistics = pageStatisticsForDatabase(_db);
     });
-    
+
     return statistics;
 }
 
-- (void) postCommitNotificationsWithUserInfo: (NSDictionary *)userInfo
+- (void)postCommitNotificationsWithUserInfo: (NSDictionary *)userInfo
 {
     ETAssert([NSThread isMainThread]);
     ETAssert([NSPropertyListSerialization propertyList: userInfo
@@ -681,19 +738,19 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
                                                       userInfo: userInfo];
 
     [[NSDistributedNotificationCenter defaultCenter]
-     postNotificationName: COUndoTrackStoreTrackDidChangeNotification
-     object: [_db databasePath]
-     userInfo: userInfo
-     deliverImmediately: YES];
+        postNotificationName: COUndoTrackStoreTrackDidChangeNotification
+                      object: [_db databasePath]
+                    userInfo: userInfo
+          deliverImmediately: YES];
 }
 
-- (void) postCommitNotifications
+- (void)postCommitNotifications
 {
     for (NSString *modifiedTrack in _modifiedTrackStateForTrackName)
     {
         COUndoTrackState *state = _modifiedTrackStateForTrackName[modifiedTrack];
         NSMutableDictionary *userInfo = [NSMutableDictionary new];
-  
+
         userInfo[COUndoTrackStoreTrackName] = modifiedTrack;
         if (state.headCommandUUID != nil)
         {
@@ -706,7 +763,7 @@ NSString * const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompact
         userInfo[COUndoTrackStoreTrackCompacted] = @(state.compacted);
 
         [self postCommitNotificationsWithUserInfo: userInfo];
-        
+
     }
     [_modifiedTrackStateForTrackName removeAllObjects];
 }

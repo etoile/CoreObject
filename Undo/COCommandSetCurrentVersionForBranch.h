@@ -14,10 +14,10 @@
     ETUUID *_branchUUID;
     ETUUID *_oldRevisionUUID;
     ETUUID *_newRevisionUUID;
-    
+
     ETUUID *_oldHeadRevisionUUID;
     ETUUID *_newHeadRevisionUUID;
-    
+
     // Non-persistent
     ETUUID *_currentRevisionBeforeSelectiveApply;
 }

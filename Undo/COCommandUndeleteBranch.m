@@ -13,55 +13,57 @@
 #import "COBranch.h"
 #import "COStoreTransaction.h"
 
-static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
+static NSString *const kCOCommandBranchUUID = @"COCommandBranchUUID";
 
 @implementation COCommandUndeleteBranch
 
 @synthesize branchUUID = _branchUUID;
 
-- (instancetype) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
+- (instancetype)initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
     self = [super initWithPropertyList: plist parentUndoTrack: aParent];
     self.branchUUID = [ETUUID UUIDWithString: plist[kCOCommandBranchUUID]];
     return self;
 }
 
-- (id) propertyList
+- (id)propertyList
 {
     NSMutableDictionary *result = super.propertyList;
     result[kCOCommandBranchUUID] = [_branchUUID stringValue];
     return result;
 }
 
-- (COCommand *) inverse
+- (COCommand *)inverse
 {
     COCommandDeleteBranch *inverse = [[COCommandDeleteBranch alloc] init];
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
-    
+
     inverse.branchUUID = _branchUUID;
     return inverse;
 }
 
-- (BOOL) canApplyToContext: (COEditingContext *)aContext
+- (BOOL)canApplyToContext: (COEditingContext *)aContext
 {
     NILARG_EXCEPTION_TEST(aContext);
     return YES;
 }
 
-- (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
+- (void)addToStoreTransaction: (COStoreTransaction *)txn
+         withRevisionMetadata: (NSDictionary *)metadata
+  assumingEditingContextState: (COEditingContext *)ctx
 {
     [txn undeleteBranch: _branchUUID ofPersistentRoot: _persistentRootUUID];
 }
 
-- (void) applyToContext: (COEditingContext *)aContext
+- (void)applyToContext: (COEditingContext *)aContext
 {
     NILARG_EXCEPTION_TEST(aContext);
 
     COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
     COBranch *branch = [proot branchForUUID: _branchUUID];
     ETAssert(branch != nil);
-    
+
     [branch setDeleted: NO];
 }
 
@@ -70,7 +72,7 @@ static NSString * const kCOCommandBranchUUID = @"COCommandBranchUUID";
     return _(@"Branch Undeletion");
 }
 
-- (id) copyWithZone:(NSZone *)zone
+- (id)copyWithZone: (NSZone *)zone
 {
     COCommandUndeleteBranch *aCopy = [super copyWithZone: zone];
     aCopy->_branchUUID = _branchUUID;

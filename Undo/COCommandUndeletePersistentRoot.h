@@ -10,9 +10,10 @@
 @interface COCommandUndeletePersistentRoot : COCommand
 @end
 
+
 @interface COCommandCreatePersistentRoot : COCommandUndeletePersistentRoot
 {
-    @private
+@private
     ETUUID *_initialRevisionID;
 }
 

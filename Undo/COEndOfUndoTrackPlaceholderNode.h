@@ -9,6 +9,6 @@
 
 @interface COEndOfUndoTrackPlaceholderNode : NSObject <COTrackNode>
 
-+ (COEndOfUndoTrackPlaceholderNode *) sharedInstance;
++ (COEndOfUndoTrackPlaceholderNode *)sharedInstance;
 
 @end

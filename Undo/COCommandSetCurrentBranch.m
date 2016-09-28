@@ -12,17 +12,15 @@
 #import "COBranch.h"
 #import "COStoreTransaction.h"
 
-#import <EtoileFoundation/Macros.h>
-
-static NSString * const kCOCommandOldBranchUUID = @"COCommandOldBranchUUID";
-static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
+static NSString *const kCOCommandOldBranchUUID = @"COCommandOldBranchUUID";
+static NSString *const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
 
 @implementation COCommandSetCurrentBranch
 
 @synthesize oldBranchUUID = _oldBranchUUID;
 @synthesize branchUUID = _newBranchUUID;
 
-- (instancetype) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
+- (instancetype)initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent
 {
     self = [super initWithPropertyList: plist parentUndoTrack: aParent];
     self.oldBranchUUID = [ETUUID UUIDWithString: plist[kCOCommandOldBranchUUID]];
@@ -30,7 +28,7 @@ static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
     return self;
 }
 
-- (id) propertyList
+- (id)propertyList
 {
     NSMutableDictionary *result = super.propertyList;
     result[kCOCommandOldBranchUUID] = [_oldBranchUUID stringValue];
@@ -38,35 +36,38 @@ static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
     return result;
 }
 
-- (COCommand *) inverse
+- (COCommand *)inverse
 {
     COCommandSetCurrentBranch *inverse = [[COCommandSetCurrentBranch alloc] init];
     inverse.storeUUID = _storeUUID;
     inverse.persistentRootUUID = _persistentRootUUID;
-    
+
     inverse.oldBranchUUID = _newBranchUUID;
     inverse.branchUUID = _oldBranchUUID;
     return inverse;
 }
 
-- (BOOL) canApplyToContext: (COEditingContext *)aContext
+- (BOOL)canApplyToContext: (COEditingContext *)aContext
 {
     NILARG_EXCEPTION_TEST(aContext);
     return YES;
 }
-- (void) addToStoreTransaction: (COStoreTransaction *)txn withRevisionMetadata: (NSDictionary *)metadata assumingEditingContextState: (COEditingContext *)ctx
+
+- (void)addToStoreTransaction: (COStoreTransaction *)txn
+         withRevisionMetadata: (NSDictionary *)metadata
+  assumingEditingContextState: (COEditingContext *)ctx
 {
     [txn setCurrentBranch: _newBranchUUID forPersistentRoot: _persistentRootUUID];
 }
 
-- (void) applyToContext: (COEditingContext *)aContext
+- (void)applyToContext: (COEditingContext *)aContext
 {
     NILARG_EXCEPTION_TEST(aContext);
-    
+
     COPersistentRoot *proot = [aContext persistentRootForUUID: _persistentRootUUID];
     COBranch *branch = [proot branchForUUID: _newBranchUUID];
     ETAssert(branch != nil);
-    
+
     proot.currentBranch = branch;
 }
 
@@ -75,7 +76,7 @@ static NSString * const kCOCommandNewBranchUUID = @"COCommandNewBranchUUID";
     return _(@"Branch Switch");
 }
 
-- (id) copyWithZone:(NSZone *)zone
+- (id)copyWithZone: (NSZone *)zone
 {
     COCommandSetCurrentBranch *aCopy = [super copyWithZone: zone];
     aCopy->_oldBranchUUID = _oldBranchUUID;

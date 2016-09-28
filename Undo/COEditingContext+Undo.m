@@ -8,15 +8,10 @@
 #import "COEditingContext+Undo.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
-#import "CORevision.h"
 #import "COUndoTrack.h"
 #import "COCommand.h"
 #import "COCommandGroup.h"
-#import "COCommitDescriptor.h"
-#import <EtoileFoundation/Macros.h>
-#import "COSQLiteStore.h"
 
-#import "COCommandGroup.h"
 #import "COCommandDeleteBranch.h"
 #import "COCommandUndeleteBranch.h"
 #import "COCommandSetBranchMetadata.h"
@@ -32,7 +27,7 @@
 
 // Called from COEditingContext
 
-- (void) recordBeginUndoGroupWithMetadata: (NSDictionary *)metadata
+- (void)recordBeginUndoGroupWithMetadata: (NSDictionary *)metadata
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
     if (_recordingUndo)
@@ -46,7 +41,7 @@
     }
 }
 
-- (COCommandGroup *) recordEndUndoGroupWithUndoTrack: (COUndoTrack *)track
+- (COCommandGroup *)recordEndUndoGroupWithUndoTrack: (COUndoTrack *)track
 {
     if (!_recordingUndo)
         return nil;
@@ -67,23 +62,24 @@
     return recordedCommand;
 }
 
-- (void) recordCommand: (COCommand *)aCommand
+- (void)recordCommand: (COCommand *)aCommand
 {
     [_currentEditGroup.contents addObject: aCommand];
 }
 
 // Called from COEditingContext
 
-- (void) recordPersistentRootDeletion: (COPersistentRoot *)aPersistentRoot
+- (void)recordPersistentRootDeletion: (COPersistentRoot *)aPersistentRoot
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
-    
+
     COCommandDeletePersistentRoot *edit = [[COCommandDeletePersistentRoot alloc] init];
     edit.storeUUID = aPersistentRoot.editingContext.store.UUID;
     edit.persistentRootUUID = aPersistentRoot.UUID;
     [self recordCommand: edit];
 }
-- (void) recordPersistentRootUndeletion: (COPersistentRoot *)aPersistentRoot
+
+- (void)recordPersistentRootUndeletion: (COPersistentRoot *)aPersistentRoot
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 
@@ -95,8 +91,8 @@
 
 // Called from COPersistentRoot
 
-- (void) recordPersistentRootCreation: (COPersistentRoot *)aPersistentRoot
-                  atInitialRevisionID: (ETUUID *)aRevID
+- (void)recordPersistentRootCreation: (COPersistentRoot *)aPersistentRoot
+                 atInitialRevisionID: (ETUUID *)aRevID
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 
@@ -104,41 +100,42 @@
     edit.storeUUID = aPersistentRoot.editingContext.store.UUID;
     edit.persistentRootUUID = aPersistentRoot.UUID;
     edit.initialRevisionID = aRevID;
-    
+
     [self recordCommand: edit];
 }
-- (void) recordPersistentRoot: (COPersistentRoot *)aPersistentRoot
-             setCurrentBranch: (COBranch *)aBranch
-                    oldBranch: (COBranch *)oldBranch
+
+- (void)recordPersistentRoot: (COPersistentRoot *)aPersistentRoot
+            setCurrentBranch: (COBranch *)aBranch
+                   oldBranch: (COBranch *)oldBranch
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 
     COCommandSetCurrentBranch *edit = [[COCommandSetCurrentBranch alloc] init];
     edit.storeUUID = aPersistentRoot.editingContext.store.UUID;
     edit.persistentRootUUID = aPersistentRoot.UUID;
-    
+
     edit.oldBranchUUID = oldBranch.UUID;
     edit.branchUUID = aBranch.UUID;
-    
+
     [self recordCommand: edit];
 }
 
-- (void) recordPersistentRootSetMetadata: (COPersistentRoot *)aPersistentRoot
-                             oldMetadata: (id)oldMetadata
+- (void)recordPersistentRootSetMetadata: (COPersistentRoot *)aPersistentRoot
+                            oldMetadata: (id)oldMetadata
 {
     COCommandSetPersistentRootMetadata *edit = [[COCommandSetPersistentRootMetadata alloc] init];
     edit.storeUUID = aPersistentRoot.editingContext.store.UUID;
     edit.persistentRootUUID = aPersistentRoot.UUID;
-    
+
     edit.oldMetadata = oldMetadata;
     edit.metadata = aPersistentRoot.metadata;
-    
+
     [self recordCommand: edit];
 }
 
 // Called from COBranch
 
-- (void) recordBranchCreation: (COBranch *)aBranch
+- (void)recordBranchCreation: (COBranch *)aBranch
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 
@@ -146,18 +143,17 @@
     COCommandUndeleteBranch *edit = [[COCommandUndeleteBranch alloc] init];
     edit.storeUUID = aBranch.editingContext.store.UUID;
     edit.persistentRootUUID = aBranch.persistentRoot.UUID;
-    
+
     edit.branchUUID = aBranch.UUID;
-    
+
     [self recordCommand: edit];
 }
 
-- (void) recordBranchSetCurrentRevisionUUID: (ETUUID *)current
-                            oldRevisionUUID: (ETUUID *)old
-                           headRevisionUUID: (ETUUID *)head
-                        oldHeadRevisionUUID: (ETUUID *)oldHead
-                                   ofBranch: (COBranch *)aBranch
-
+- (void)recordBranchSetCurrentRevisionUUID: (ETUUID *)current
+                           oldRevisionUUID: (ETUUID *)old
+                          headRevisionUUID: (ETUUID *)head
+                       oldHeadRevisionUUID: (ETUUID *)oldHead
+                                  ofBranch: (COBranch *)aBranch
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
     NILARG_EXCEPTION_TEST(current);
@@ -165,59 +161,59 @@
     NILARG_EXCEPTION_TEST(head);
     NILARG_EXCEPTION_TEST(oldHead);
     NILARG_EXCEPTION_TEST(aBranch);
-    
+
     COCommandSetCurrentVersionForBranch *edit = [[COCommandSetCurrentVersionForBranch alloc] init];
     edit.storeUUID = aBranch.editingContext.store.UUID;
     edit.persistentRootUUID = aBranch.persistentRoot.UUID;
-    
+
     edit.branchUUID = aBranch.UUID;
     edit.oldRevisionUUID = old;
     edit.revisionUUID = current;
     edit.headRevisionUUID = head;
     edit.oldHeadRevisionUUID = oldHead;
-    
+
     [self recordCommand: edit];
 }
 
-- (void) recordBranchSetMetadata: (COBranch *)aBranch
-                     oldMetadata: (id)oldMetadata
+- (void)recordBranchSetMetadata: (COBranch *)aBranch
+                    oldMetadata: (id)oldMetadata
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
-    
+
     COCommandSetBranchMetadata *edit = [[COCommandSetBranchMetadata alloc] init];
     edit.storeUUID = aBranch.editingContext.store.UUID;
     edit.persistentRootUUID = aBranch.persistentRoot.UUID;
-    
+
     edit.branchUUID = aBranch.UUID;
     edit.oldMetadata = oldMetadata;
     edit.metadata = aBranch.metadata;
-    
+
     [self recordCommand: edit];
 }
 
-- (void) recordBranchDeletion: (COBranch *)aBranch
+- (void)recordBranchDeletion: (COBranch *)aBranch
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
 
     COCommandDeleteBranch *edit = [[COCommandDeleteBranch alloc] init];
     edit.storeUUID = aBranch.editingContext.store.UUID;
     edit.persistentRootUUID = aBranch.persistentRoot.UUID;
-    
+
     edit.branchUUID = aBranch.UUID;
-    
+
     [self recordCommand: edit];
 }
 
-- (void) recordBranchUndeletion: (COBranch *)aBranch
+- (void)recordBranchUndeletion: (COBranch *)aBranch
 {
 //    NSLog(@"%@", NSStringFromSelector(_cmd));
-  
+
     COCommandUndeleteBranch *edit = [[COCommandUndeleteBranch alloc] init];
     edit.storeUUID = aBranch.editingContext.store.UUID;
     edit.persistentRootUUID = aBranch.persistentRoot.UUID;
-    
+
     edit.branchUUID = aBranch.UUID;
-    
+
     [self recordCommand: edit];
 }
 

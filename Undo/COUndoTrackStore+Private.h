@@ -10,24 +10,25 @@
 @class FMDatabase;
 @class ETUUID;
 
-NSString * const COUndoTrackStoreTrackDidChangeNotification;
+NSString *const COUndoTrackStoreTrackDidChangeNotification;
 
 // User info keys for COUndoTrackStoreTrackDidChangeNotification
-NSString * const COUndoTrackStoreTrackName;
+NSString *const COUndoTrackStoreTrackName;
 /**
  * UUID string
  */
-NSString * const COUndoTrackStoreTrackHeadCommandUUID;
+NSString *const COUndoTrackStoreTrackHeadCommandUUID;
 /**
  * NSNull or UUID string
  */
-NSString * const COUndoTrackStoreTrackCurrentCommandUUID;
+NSString *const COUndoTrackStoreTrackCurrentCommandUUID;
 /**
  * NSNumber boolean
  */
-NSString * const COUndoTrackStoreTrackCompacted;
+NSString *const COUndoTrackStoreTrackCompacted;
 
 @interface COUndoTrackSerializedCommand : NSObject
+
 @property (nonatomic, readwrite, strong) id JSONData;
 @property (nonatomic, readwrite, copy) NSDictionary *metadata;
 @property (nonatomic, readwrite, copy) ETUUID *UUID;
@@ -35,9 +36,12 @@ NSString * const COUndoTrackStoreTrackCompacted;
 @property (nonatomic, readwrite, copy) NSString *trackName;
 @property (nonatomic, readwrite, copy) NSDate *timestamp;
 @property (nonatomic, readwrite, assign) int64_t sequenceNumber;
+
 @end
 
+
 @interface COUndoTrackState : NSObject <NSCopying>
+
 @property (nonatomic, readwrite, copy) NSString *trackName;
 @property (nonatomic, readwrite, copy) ETUUID *headCommandUUID;
 @property (nonatomic, readwrite, copy) ETUUID *currentCommandUUID;
@@ -51,8 +55,8 @@ NSString * const COUndoTrackStoreTrackCompacted;
  * property is currently always NO.
  */
 @property (nonatomic, readwrite, assign, getter=isCompacted) BOOL compacted;
-@end
 
+@end
 
 /**
  * COUndoTrackStore API is mostly thread-safe, except -beginTransaction,
@@ -71,7 +75,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
  *
  * See also -[COSQLiteStore clearStore].
  */
-- (void) clearStore;
+- (void)clearStore;
 
 
 /** @taskunit Batch Operations */
@@ -107,6 +111,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
  * track appears in the returned array until -removeTrackWithName: is called.
  */
 @property (nonatomic, readonly) NSArray *trackNames;
+
 /**
  * Returns the current track names that match a pattern built with '*'.
  *
@@ -114,14 +119,14 @@ NSString * const COUndoTrackStoreTrackCompacted;
  *
  * See COPatternUndoTrack which uses this method to discover its child tracks.
  */
-- (NSArray *) trackNamesMatchingGlobPattern: (NSString *)aPattern;
+- (NSArray *)trackNamesMatchingGlobPattern: (NSString *)aPattern;
 /**
  * Returns the persistent state describing a track.
  *
  * When no persistent state exists in the dabase, returns nil. This means the 
  * track has never saved or has been deleted.
  */
-- (COUndoTrackState *) stateForTrackName: (NSString*)aName;
+- (COUndoTrackState *)stateForTrackName: (NSString *)aName;
 /**
  * Updates the persistent state describing a track.
  *
@@ -131,11 +136,11 @@ NSString * const COUndoTrackStoreTrackCompacted;
  *
  * This method must be run in the main thread.
  */
-- (void) setTrackState: (COUndoTrackState *)aState;
+- (void)setTrackState: (COUndoTrackState *)aState;
 /**
  * Deletes a track including all its commands.
  */
-- (void) removeTrackWithName: (NSString*)aName;
+- (void)removeTrackWithName: (NSString *)aName;
 
 
 
@@ -145,17 +150,17 @@ NSString * const COUndoTrackStoreTrackCompacted;
 /**
  * Saves a command and sets -[COUndoTrackSerializedCommand sequenceNumber].
  */
-- (void) addCommand: (COUndoTrackSerializedCommand *)aCommand;
+- (void)addCommand: (COUndoTrackSerializedCommand *)aCommand;
 /** 
  * Deletes the command bound the given UUID.
  */
-- (void) removeCommandForUUID: (ETUUID *)aUUID;
+- (void)removeCommandForUUID: (ETUUID *)aUUID;
 /**
  * Returns the serialized representation for the command bound to the given UUID.
  *
  * If the UUID corresponds to a deleted command, returns nil.
  */
-- (COUndoTrackSerializedCommand *) commandForUUID: (ETUUID *)aUUID;
+- (COUndoTrackSerializedCommand *)commandForUUID: (ETUUID *)aUUID;
 /**
  * Returns UUIDs for all the commands on a given track.
  *
@@ -163,8 +168,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
  *
  * See -markCommandsAsDeletedForUUIDs:.
  */
-- (NSArray *) allCommandUUIDsOnTrackWithName: (NSString*)aName;
-
+- (NSArray *)allCommandUUIDsOnTrackWithName: (NSString *)aName;
 
 
 /** @taskunit History Compaction Integration */
@@ -210,6 +214,7 @@ NSString * const COUndoTrackStoreTrackCompacted;
  * See also -[COSQLiteStore vacuum].
  */
 - (BOOL)vacuum;
+
 /**
  * See -[COSQLiteStore pageStatistics].
  */
@@ -224,6 +229,6 @@ NSString * const COUndoTrackStoreTrackCompacted;
  *
  * See also -trackNamesMatchingGlobPattern:.
  */
-- (BOOL) string: (NSString *)aString matchesGlobPattern: (NSString *)aPattern;
+- (BOOL)string: (NSString *)aString matchesGlobPattern: (NSString *)aPattern;
 
 @end

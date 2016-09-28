@@ -99,19 +99,20 @@
  * <override-subclass />
  * Returns whether the receiver changes can be applied to the editing context.
  */
-- (BOOL) canApplyToContext: (COEditingContext *)aContext;
+- (BOOL)canApplyToContext: (COEditingContext *)aContext;
 /**
  * <override-subclass />
  * Applies the receiver changes to the editing context.
  */
-- (void) applyToContext: (COEditingContext *)aContext;
+- (void)applyToContext: (COEditingContext *)aContext;
 /**
  * <override-subclass />
  * Applies the receiver changes directly to a store transaction.
  */
-- (void) addToStoreTransaction: (COStoreTransaction *)txn
-          withRevisionMetadata: (NSDictionary *)metadata
-   assumingEditingContextState: (COEditingContext *)ctx;
+- (void)addToStoreTransaction: (COStoreTransaction *)txn
+         withRevisionMetadata: (NSDictionary *)metadata
+  assumingEditingContextState: (COEditingContext *)ctx;
+
 
 /** @taskunit Framework Private */
 
@@ -122,24 +123,27 @@
  *
  * See -initWithPropertyList:parentUndoTrack:.
  */
-+ (COCommand *) commandWithPropertyList: (id)aPlist parentUndoTrack: (COUndoTrack *)aParent;
++ (COCommand *)commandWithPropertyList: (id)aPlist parentUndoTrack: (COUndoTrack *)aParent;
 /**
  * <init />
  * Initializes and returns a command deserialized from a property list.
  */
-- (instancetype) initWithPropertyList: (id)plist parentUndoTrack: (COUndoTrack *)aParent NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithPropertyList: (id)plist
+                     parentUndoTrack: (COUndoTrack *)aParent NS_DESIGNATED_INITIALIZER;
 /**
  * <init />
  * Returns a command that needs to be initialized manually.
  */
-- (instancetype) init NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_DESIGNATED_INITIALIZER;
+
 /**
  * Returns the receiver serialized as a property list.
  */
 @property (nonatomic, readonly, strong) id propertyList;
+
 /**
  * Returns a new command equal to the receiver.
  */
-- (id) copyWithZone: (NSZone *)zone;
+- (id)copyWithZone: (NSZone *)zone;
 
 @end
