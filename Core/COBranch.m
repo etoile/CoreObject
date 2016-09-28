@@ -568,6 +568,21 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
     return _persistentRoot.store;
 }
 
+- (void)writeMetadataWithTransaction: (COStoreTransaction *)txn
+{
+    if (!_metadataChanged)
+        return;
+
+    [txn setMetadata: _metadata
+           forBranch: _UUID
+    ofPersistentRoot: self.persistentRoot.UUID];
+
+    [self.editingContext recordBranchSetMetadata: self
+                                     oldMetadata: self.branchInfo.metadata];
+
+    _metadataChanged = NO;
+}
+
 - (void)saveCommitWithMetadata: (NSDictionary *)metadata transaction: (COStoreTransaction *)txn
 {
     if ([self hasChangesOtherThanDeletionOrUndeletion] && self.deletedInStore && self.deleted)
@@ -613,19 +628,7 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
                                                        ofBranch: self];
     }
 
-    // Write metadata
-
-    if (_metadataChanged)
-    {
-        [txn setMetadata: _metadata
-               forBranch: _UUID
-        ofPersistentRoot: self.persistentRoot.UUID];
-
-        [self.editingContext recordBranchSetMetadata: self
-                                         oldMetadata: self.branchInfo.metadata];
-
-        _metadataChanged = NO;
-    }
+    [self writeMetadataWithTransaction: txn];
 
     // Write a regular commit
 
@@ -728,19 +731,7 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
 {
     NSParameterAssert(aRevisionUUID != nil);
 
-    // Write metadata
-    // FIXME: Copied-n-pasted from above
-    if (_metadataChanged)
-    {
-        [txn setMetadata: _metadata
-               forBranch: _UUID
-        ofPersistentRoot: self.persistentRoot.UUID];
-
-        [self.editingContext recordBranchSetMetadata: self
-                                         oldMetadata: self.branchInfo.metadata];
-
-        _metadataChanged = NO;
-    }
+    [self writeMetadataWithTransaction: txn];
     ETAssert(!_isCreated);
 
     _currentRevisionUUID = aRevisionUUID;
