@@ -37,7 +37,7 @@
 
 @implementation TestSynchronizerMultiUser
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

@@ -79,7 +79,7 @@ static void test_read_null(void *ctx)
     [((__bridge TestBinaryReadWrite *)ctx) readObject: [NSNull null]];
 }
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     readObjects = [[NSMutableArray alloc] init];

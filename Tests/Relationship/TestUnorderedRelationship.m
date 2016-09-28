@@ -147,7 +147,7 @@
 
 @implementation TestCrossPersistentRootUnorderedRelationship
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

@@ -9,23 +9,23 @@
 
 @implementation EWGraphCell
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     return self;
 }
 
-- (id)initImageCell: (NSImage *)image
+- (instancetype)initImageCell: (NSImage *)image
 {
     return [self init];
 }
 
-- (id)initTextCell: (NSString *)aString
+- (instancetype)initTextCell: (NSString *)aString
 {
     return [self init];
 }
 
-- (id)initWithCoder: (NSCoder *)aDecoder
+- (instancetype)initWithCoder: (NSCoder *)aDecoder
 {
     return [self init];
 }

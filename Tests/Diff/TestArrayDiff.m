@@ -19,7 +19,7 @@
 
 @implementation TestArrayDiff
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     obj = [ETUUID UUID];

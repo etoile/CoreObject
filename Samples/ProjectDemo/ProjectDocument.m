@@ -2,7 +2,7 @@
 
 @implementation ProjectDocument
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     if (self)

@@ -159,7 +159,7 @@ static ETUUID *childUUID2;
     return @{@"name": @"branch B"};
 }
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

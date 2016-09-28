@@ -469,7 +469,7 @@
 
 @implementation TestObjectInsertionHint
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     objectGraphContext = [COObjectGraphContext objectGraphContext];

@@ -60,7 +60,7 @@ changeInLength: (NSInteger)delta
 
 @implementation SimpleTextStorage
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     _backing = [[NSMutableAttributedString alloc] init];

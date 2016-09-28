@@ -24,7 +24,7 @@
 
 @implementation TestUndoTrackFailedNavigation
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     track = [COUndoTrack trackForName: @"test" withEditingContext: ctx];

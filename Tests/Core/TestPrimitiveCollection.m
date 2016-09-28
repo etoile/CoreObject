@@ -25,7 +25,7 @@
 
 @implementation TestMutableArray
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     array = [COMutableArray new];
@@ -543,7 +543,7 @@
 
 @implementation TestMutableSet
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     set = [COMutableSet new];
@@ -779,7 +779,7 @@
 
 @implementation TestUnsafeRetainedMutableArray
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     array = [COUnsafeRetainedMutableArray new];
@@ -896,7 +896,7 @@
 
 @implementation TestUnsafeRetainedMutableSet
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     set = [COUnsafeRetainedMutableSet new];

@@ -8,7 +8,7 @@
 
 static EWBranchesWindowController *shared;
 
-- (id)init
+- (instancetype)init
 {
     self = [super initWithWindowNibName: @"Branches"];
     if (self)

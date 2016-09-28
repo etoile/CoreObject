@@ -19,7 +19,7 @@
 
 @implementation TestUnorderedAttribute
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     ctx = [COObjectGraphContext new];

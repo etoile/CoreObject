@@ -18,7 +18,7 @@
 
 @synthesize xmppStream = xmppStream;
 
-- (id)init
+- (instancetype)init
 {
     static XMPPController *sharedInstance;
     if (sharedInstance != nil)

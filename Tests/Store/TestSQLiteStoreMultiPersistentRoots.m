@@ -52,7 +52,7 @@ static ETUUID *tagUUID;
     return [COItemGraph itemGraphWithItemsRootFirst: @[rootItem]];
 }
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

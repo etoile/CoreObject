@@ -18,7 +18,7 @@ NSString *SKTGraphicViewSelectionDidChangeNotification = @"SKTGraphicViewSelecti
 
 static float SKTDefaultPasteCascadeDelta = 10.0;
 
-- (id)initWithFrame: (NSRect)frame
+- (instancetype)initWithFrame: (NSRect)frame
 {
     self = [super initWithFrame: frame];
     if (self)

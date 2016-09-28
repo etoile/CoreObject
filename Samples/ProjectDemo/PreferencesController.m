@@ -6,7 +6,7 @@
 #define PER_PROJECT 0
 #define PER_DOCUMENT 1
 
-- (id)init
+- (instancetype)init
 {
     self = [super initWithWindowNibName: @"Preferences"];
 

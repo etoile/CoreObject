@@ -19,7 +19,7 @@
 
 @implementation TestObjectGraphContext
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     copier = [[COCopier alloc] init];

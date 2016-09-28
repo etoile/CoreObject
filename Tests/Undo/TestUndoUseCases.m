@@ -23,7 +23,7 @@
 
 @implementation TestUndoUseCases
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

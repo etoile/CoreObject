@@ -79,7 +79,7 @@
     return entity;
 }
 
-- (id)initWithObjectGraphContext: (COObjectGraphContext *)aContext
+- (instancetype)initWithObjectGraphContext: (COObjectGraphContext *)aContext
 {
     self = [super initWithObjectGraphContext: aContext];
     if (self == nil)
@@ -142,7 +142,7 @@
     }
 }
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     object = [ctx insertNewPersistentRootWithEntityName: [self entityName]].rootObject;
@@ -377,7 +377,7 @@
     }
 }
 
-- (id)init
+- (instancetype)init
 {
     // N.B., We must add the 'city' property to COObject before registering
     // an observer for the 'city' key (done in [super init]), because we need

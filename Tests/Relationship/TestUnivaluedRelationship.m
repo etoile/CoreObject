@@ -142,7 +142,7 @@
 
 @implementation TestCrossPersistentRootUnivaluedRelationship
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

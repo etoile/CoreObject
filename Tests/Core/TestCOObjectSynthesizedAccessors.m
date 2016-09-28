@@ -26,7 +26,7 @@
 
 @implementation TestCOObjectSynthesizedAccessors
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     item = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;

@@ -53,7 +53,7 @@ static ETUUID *branchBUUID;
     return [COItemGraph itemGraphWithItemsRootFirst: @[child]];
 }
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     serverStore = [[COSQLiteStore alloc] initWithURL: SERVER_STORE_URL];

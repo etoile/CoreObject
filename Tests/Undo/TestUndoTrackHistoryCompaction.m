@@ -69,7 +69,7 @@
 
 @implementation UndoTrackHistoryCompactionTestCase
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     store.maxNumberOfDeltaCommits = 0;

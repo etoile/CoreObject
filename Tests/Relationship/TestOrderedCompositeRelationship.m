@@ -26,7 +26,7 @@
 
 @implementation TestOrderedCompositeRelationship
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 
@@ -215,7 +215,7 @@
 
 @implementation TestTransientOrderedCompositeRelationship
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     parent = [ctx insertNewPersistentRootWithEntityName: @"TransientOutlineItem"].rootObject;

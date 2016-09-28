@@ -56,7 +56,7 @@ static NSArray *initialUUIDs;
     }
 }
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     copier = [[COCopier alloc] init];

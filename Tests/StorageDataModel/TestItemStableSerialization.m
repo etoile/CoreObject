@@ -225,7 +225,7 @@ static COPath *Path(unsigned char num)
     return item;
 }
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     asc = [self makeItemAscending: YES];

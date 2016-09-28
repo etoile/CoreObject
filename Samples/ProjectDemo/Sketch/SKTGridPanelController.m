@@ -21,7 +21,7 @@
     return sharedGridPanelController;
 }
 
-- (id)init
+- (instancetype)init
 {
     self = [self initWithWindowNibName: @"GridPanel"];
     if (self)

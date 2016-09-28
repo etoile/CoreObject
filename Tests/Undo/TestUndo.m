@@ -29,7 +29,7 @@
 
 @implementation TestUndo
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

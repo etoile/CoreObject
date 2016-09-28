@@ -112,7 +112,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 
 #pragma mark - tests
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

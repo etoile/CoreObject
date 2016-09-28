@@ -38,7 +38,7 @@ static ETUUID *drawing2;
     }
 }
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     copier = [[COCopier alloc] init];

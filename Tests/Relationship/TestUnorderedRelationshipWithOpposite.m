@@ -110,7 +110,7 @@
 
 @implementation TestCrossPersistentRootUnorderedRelationshipWithOpposite
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

@@ -20,7 +20,7 @@
 
 @implementation TestUnivaluedCompositeRelationship
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

@@ -24,7 +24,7 @@
     return _sharedInspectorController;
 }
 
-- (id)init
+- (instancetype)init
 {
     self = [self initWithWindowNibName: @"Inspector"];
     if (self)

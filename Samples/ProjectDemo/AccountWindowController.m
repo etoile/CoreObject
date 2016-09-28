@@ -3,7 +3,7 @@
 
 @implementation AccountWindowController
 
-- (id)init
+- (instancetype)init
 {
     self = [super initWithWindowNibName: @"AccountBox"];
     return self;

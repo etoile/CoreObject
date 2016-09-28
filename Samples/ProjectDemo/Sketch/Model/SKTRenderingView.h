@@ -10,7 +10,7 @@
     NSArray *_graphics;
 }
 
-- (id)initWithFrame: (NSRect)frame graphics: (NSArray *)graphics;
+- (instancetype)initWithFrame: (NSRect)frame graphics: (NSArray *)graphics;
 
 @end
 

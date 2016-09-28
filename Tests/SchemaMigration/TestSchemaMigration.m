@@ -32,7 +32,7 @@
 
 @implementation TestSchemaMigration
 
-- (id)init
+- (instancetype)init
 {
     [COSchemaMigration clearRegisteredMigrations];
     SUPERINIT;

@@ -11,6 +11,6 @@
     EWDocumentWindowController *parent;
 }
 
-- (id)initWithParent: (EWDocumentWindowController *)aParent;
+- (instancetype)initWithParent: (EWDocumentWindowController *)aParent;
 
 @end

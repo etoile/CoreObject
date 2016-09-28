@@ -23,7 +23,7 @@
 
 @implementation TestBranch
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];

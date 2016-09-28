@@ -7,8 +7,8 @@
 @synthesize branchUUID = _branchUUID;
 @synthesize persistentRootUUID = _persistentRootUUID;
 
-- (id)initAsServerWithBranch: (COBranch *)aBranch
-                  xmppStream: (XMPPStream *)xmppStream;
+- (instancetype)initAsServerWithBranch: (COBranch *)aBranch
+                            xmppStream: (XMPPStream *)xmppStream;
 {
     NILARG_EXCEPTION_TEST(aBranch);
     NILARG_EXCEPTION_TEST(xmppStream);
@@ -61,11 +61,11 @@
 }
 
 
-- (id)initAsClientWithEditingContext: (COEditingContext *)ctx
-                  persistentRootUUID: (ETUUID *)persistentRootUUID
-                          branchUUID: (ETUUID *)branchUUID
-                           serverJID: (XMPPJID *)peerJID
-                          xmppStream: (XMPPStream *)xmppStream
+- (instancetype)initAsClientWithEditingContext: (COEditingContext *)ctx
+                            persistentRootUUID: (ETUUID *)persistentRootUUID
+                                    branchUUID: (ETUUID *)branchUUID
+                                     serverJID: (XMPPJID *)peerJID
+                                    xmppStream: (XMPPStream *)xmppStream
 {
     SUPERINIT;
 

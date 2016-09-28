@@ -21,7 +21,7 @@
 
 @implementation TestUnorderedCompositeRelationship
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

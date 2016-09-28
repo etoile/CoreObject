@@ -21,7 +21,7 @@
 
 @implementation TestHistoryTrack
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

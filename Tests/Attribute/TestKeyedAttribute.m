@@ -22,7 +22,7 @@
 
 @implementation TestKeyedAttribute
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     model = [ctx insertNewPersistentRootWithEntityName: @"KeyedAttributeModel"].rootObject;

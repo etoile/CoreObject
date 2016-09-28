@@ -9,7 +9,7 @@
 
 @implementation SharingDrawerViewController
 
-- (id)initWithParent: (EWDocumentWindowController *)aParent
+- (instancetype)initWithParent: (EWDocumentWindowController *)aParent
 {
     self = [super initWithNibName: @"SharingDrawer" bundle: nil];
     if (self)

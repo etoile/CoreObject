@@ -50,7 +50,7 @@ static int debug_total_connections_opened;
 
 #endif
 
-- (id)initWithPath: (NSString *)aPath
+- (instancetype)initWithPath: (NSString *)aPath
 {
     self = [super init];
 

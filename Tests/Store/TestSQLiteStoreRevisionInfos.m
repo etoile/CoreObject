@@ -67,7 +67,7 @@ static ETUUID *b1A, *b1B, *b2A;
     return [COItemGraph itemGraphWithItemsRootFirst: @[rootItem]];
 }
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

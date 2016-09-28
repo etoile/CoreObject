@@ -22,7 +22,7 @@
 
 @implementation TestKeyedRelationship
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     model = [ctx insertNewPersistentRootWithEntityName: @"KeyedRelationshipModel"].rootObject;

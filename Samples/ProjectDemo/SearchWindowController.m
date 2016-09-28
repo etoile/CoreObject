@@ -5,7 +5,7 @@
 
 @implementation SearchWindowController
 
-- (id)init
+- (instancetype)init
 {
     self = [super initWithWindowNibName: @"Search"];
 

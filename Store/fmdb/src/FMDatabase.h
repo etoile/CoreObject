@@ -24,7 +24,7 @@
 #endif
 
 + (id)databaseWithPath: (NSString *)inPath;
-- (id)initWithPath: (NSString *)inPath;
+- (instancetype)initWithPath: (NSString *)inPath;
 
 - (BOOL)open;
 #if SQLITE_VERSION_NUMBER >= 3005000

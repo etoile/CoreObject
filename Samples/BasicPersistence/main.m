@@ -21,9 +21,9 @@
 @property (nonatomic, readwrite, copy) NSDate *endDate;
 @property (nonatomic, readonly, weak) Calendar *calendar;
 
-- (id)initWithStartDate: (NSDate *)aStartDate
-                endDate: (NSDate *)aEndDate
-     objectGraphContext: (COObjectGraphContext *)aGraph;
+- (instancetype)initWithStartDate: (NSDate *)aStartDate
+                          endDate: (NSDate *)aEndDate
+               objectGraphContext: (COObjectGraphContext *)aGraph;
 
 @end
 
@@ -79,9 +79,9 @@
     return desc;
 }
 
-- (id)initWithStartDate: (NSDate *)aStartDate
-                endDate: (NSDate *)aEndDate
-     objectGraphContext: (COObjectGraphContext *)aGraph
+- (instancetype)initWithStartDate: (NSDate *)aStartDate
+                          endDate: (NSDate *)aEndDate
+               objectGraphContext: (COObjectGraphContext *)aGraph
 {
     self = [super initWithObjectGraphContext: aGraph];
     if (self == nil)

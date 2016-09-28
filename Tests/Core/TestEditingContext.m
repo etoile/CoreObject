@@ -16,7 +16,7 @@
 
 @implementation TestEditingContext
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     [[NSNotificationCenter defaultCenter]

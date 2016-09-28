@@ -30,14 +30,14 @@
     XMPPJID *_serverJID;
 }
 
-- (id)initAsClientWithEditingContext: (COEditingContext *)ctx
-                  persistentRootUUID: (ETUUID *)persistentRootUUID
-                          branchUUID: (ETUUID *)branchUUID
-                           serverJID: (XMPPJID *)peerJID
-                          xmppStream: (XMPPStream *)xmppStream;
+- (instancetype)initAsClientWithEditingContext: (COEditingContext *)ctx
+                            persistentRootUUID: (ETUUID *)persistentRootUUID
+                                    branchUUID: (ETUUID *)branchUUID
+                                     serverJID: (XMPPJID *)peerJID
+                                    xmppStream: (XMPPStream *)xmppStream;
 
-- (id)initAsServerWithBranch: (COBranch *)aBranch
-                  xmppStream: (XMPPStream *)xmppStream;
+- (instancetype)initAsServerWithBranch: (COBranch *)aBranch
+                            xmppStream: (XMPPStream *)xmppStream;
 
 @property (nonatomic, readonly) ETUUID *persistentRootUUID;
 @property (nonatomic, readonly) ETUUID *branchUUID;

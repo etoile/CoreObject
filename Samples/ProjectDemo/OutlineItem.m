@@ -37,7 +37,7 @@
     return outlineEntity;
 }
 
-- (id)initWithObjectGraphContext: (COObjectGraphContext *)aContext
+- (instancetype)initWithObjectGraphContext: (COObjectGraphContext *)aContext
 {
     self = [super initWithObjectGraphContext: aContext];
     [self setLabel: @"Untitled Item"];

@@ -9,7 +9,7 @@
 
 @implementation EWUtilityWindowController
 
-- (id)initWithWindowNibName: (NSString *)name
+- (instancetype)initWithWindowNibName: (NSString *)name
 {
     self = [super initWithWindowNibName: name];
     if (self)

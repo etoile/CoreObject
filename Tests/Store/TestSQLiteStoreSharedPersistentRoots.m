@@ -51,7 +51,7 @@ static ETUUID *rootUUID;
     return [COItemGraph itemGraphWithItemsRootFirst: @[rootItem]];
 }
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

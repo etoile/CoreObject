@@ -14,7 +14,7 @@
     return entity;
 }
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     if (self)

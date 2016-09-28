@@ -5,7 +5,7 @@
 
 @implementation TagWindowController
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

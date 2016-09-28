@@ -25,9 +25,9 @@
     return itemReference;
 }
 
-- (id)initWithParent: (OutlineItem *)p
-      referencedItem: (OutlineItem *)ref
-             context: (COObjectGraphContext *)ctx
+- (instancetype)initWithParent: (OutlineItem *)p
+                referencedItem: (OutlineItem *)ref
+                       context: (COObjectGraphContext *)ctx
 {
     self = [super initWithObjectGraphContext: ctx];
     [self setParent: p];

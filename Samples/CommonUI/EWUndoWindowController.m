@@ -15,7 +15,7 @@
 
 @implementation EWUndoWindowController
 
-- (id)init
+- (instancetype)init
 {
     self = [super initWithWindowNibName: @"Undo"];
     if (self)

@@ -21,7 +21,7 @@
 
 @implementation TestMerge
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     ctx1 = [[COObjectGraphContext alloc] init];

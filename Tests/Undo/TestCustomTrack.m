@@ -20,7 +20,7 @@
 
 @implementation TestCustomTrack
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

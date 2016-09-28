@@ -20,7 +20,7 @@
 
 @implementation TestNotifications
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

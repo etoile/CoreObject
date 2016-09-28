@@ -24,7 +24,7 @@
 
 @implementation TestPersistentRoot
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

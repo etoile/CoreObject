@@ -75,7 +75,7 @@
 
 @implementation TestSynchronizerJSONTransport
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

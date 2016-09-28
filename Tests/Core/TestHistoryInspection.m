@@ -85,7 +85,7 @@
  
  */
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     p1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];

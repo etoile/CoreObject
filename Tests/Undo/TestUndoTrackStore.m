@@ -17,7 +17,7 @@
 
 @implementation TestUndoTrackStore
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
 

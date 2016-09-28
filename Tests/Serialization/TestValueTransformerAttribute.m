@@ -57,7 +57,7 @@
 
 @implementation TestValueTransformerAttribute
 
-- (id)init
+- (instancetype)init
 {
     SUPERINIT;
     ctx = [COObjectGraphContext new];

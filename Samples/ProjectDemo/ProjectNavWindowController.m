@@ -4,7 +4,7 @@
 
 @implementation ProjectNavWindowController
 
-- (id)init
+- (instancetype)init
 {
     self = [super initWithWindowNibName: @"ProjectNav"];
 
