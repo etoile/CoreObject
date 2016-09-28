@@ -6,7 +6,6 @@
  */
 
 #import <UnitKit/UnitKit.h>
-#import <Foundation/Foundation.h>
 #import "TestCommon.h"
 
 @interface TestUnivaluedAttribute : TestCase <UKTest>
@@ -14,11 +13,13 @@
     COObjectGraphContext *ctx;
     UnivaluedAttributeModel *item1;
 }
+
 @end
+
 
 @implementation TestUnivaluedAttribute
 
-- (id) init
+- (id)init
 {
     SUPERINIT;
     ctx = [COObjectGraphContext new];
@@ -28,14 +29,18 @@
     return self;
 }
 
-- (void) testBasic
+- (void)testBasic
 {
     [self checkObjectGraphBeforeAndAfterSerializationRoundtrip: ctx
-                                                       inBlock: ^(COObjectGraphContext *testGraph, COObject *testRootObject, BOOL isObjectGraphCopy)
-     {
-         UnivaluedAttributeModel *testItem1 = (UnivaluedAttributeModel *)testRootObject;
-         UKObjectsEqual(@"test", testItem1.label);
-     }];
+                                                       inBlock:
+       ^(COObjectGraphContext *testGraph,
+         COObject *testRootObject,
+         BOOL isObjectGraphCopy)
+       {
+           UnivaluedAttributeModel *testItem1 = (UnivaluedAttributeModel *)testRootObject;
+           UKObjectsEqual(@"test",
+                          testItem1.label);
+       }];
 }
 
 - (void)testNullAllowedForUnivalued
@@ -50,19 +55,19 @@
     UKNil(item1.label);
 }
 
-- (void) testStringCopied
+- (void)testStringCopied
 {
     NSMutableString *mutableString = [NSMutableString new];
     item1.label = mutableString;
-    
+
     UKObjectsEqual(@"", item1.label);
-    
+
     [mutableString setString: @"test"];
-    
+
     UKObjectsEqual(@"", item1.label);
 }
 
-- (void) testNumberValueDisallowedForStringAttribute
+- (void)testNumberValueDisallowedForStringAttribute
 {
     UKRaisesException([item1 setLabel: (id)@123]);
 }

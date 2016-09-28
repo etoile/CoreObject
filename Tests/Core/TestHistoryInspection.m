@@ -6,12 +6,12 @@
  */
 
 #import <UnitKit/UnitKit.h>
-#import <Foundation/Foundation.h>
 #import "TestCommon.h"
-#import "CORevisionCache.h"
 
 @interface COBranch ()
-- (void) setHeadRevision: (CORevision *)rev;
+
+- (void)setHeadRevision: (CORevision *)rev;
+
 @end
 
 /**
@@ -32,7 +32,7 @@
 
     COPersistentRoot *p2;
     COBranch *branch2A;
-    
+
     CORevision *r0;
     CORevision *r1;
     CORevision *r2;
@@ -45,7 +45,9 @@
     CORevision *r9;
     CORevision *r10;
 }
+
 @end
+
 
 @implementation TestHistoryInspection
 
@@ -83,28 +85,28 @@
  
  */
 
-- (id) init
+- (id)init
 {
     SUPERINIT;
     p1 = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
-    
+
     branch1A = p1.currentBranch;
     r0 = branch1A.currentRevision;
     [p1.rootObject setLabel: @"1"];
     [ctx commit];
     r1 = branch1A.currentRevision;
-    
+
     [branch1A.rootObject setLabel: @"2"];
     [ctx commit];
     r2 = branch1A.currentRevision;
-    
+
     branch1B = [branch1A makeBranchWithLabel: @"1B" atRevision: r1];
 
     [branch1B.rootObject setLabel: @"3"];
     [ctx commit];
     r3 = branch1B.currentRevision;
-    
+
     p2 = branch1A.makePersistentRootCopy;
     [ctx commit]; // FIXME: This commit is a hack, should be removed. add test and fix.
 
@@ -116,10 +118,10 @@
     [branch1B.rootObject setLabel: @"5"];
     [ctx commit];
     r5 = branch1B.currentRevision;
-    
+
     branch1B.currentRevision = r3;
     [ctx commit];
-    
+
     [branch1B.rootObject setLabel: @"6"];
     [ctx commit];
     r6 = branch1B.currentRevision;
@@ -140,7 +142,7 @@
 
     branch1C.currentRevision = r6;
     [ctx commit];
-    
+
     [branch1C.rootObject setLabel: @"10"];
     [ctx commit];
     r10 = branch1C.currentRevision;
@@ -151,7 +153,7 @@
     return self;
 }
 
-- (void) testRevisionContents
+- (void)testRevisionContents
 {
     UKObjectsEqual(@"4", [[[p2 objectGraphContextForPreviewingRevision: r4] rootObject] label]);
     UKObjectsEqual(@"3", [[[p1 objectGraphContextForPreviewingRevision: r3] rootObject] label]);
@@ -160,7 +162,7 @@
     UKNil([[[p1 objectGraphContextForPreviewingRevision: r0] rootObject] label]);
 }
 
-- (void) testRevisionParentRevision
+- (void)testRevisionParentRevision
 {
     UKNil(r0.parentRevision);
     UKNil(r0.mergeParentRevision);
@@ -176,7 +178,7 @@
     UKObjectsEqual(r6, r10.parentRevision);
 }
 
-- (void) testRevisionPersistentRootUUID
+- (void)testRevisionPersistentRootUUID
 {
     UKObjectsEqual(p1.UUID, r0.persistentRootUUID);
     UKObjectsEqual(p1.UUID, r1.persistentRootUUID);
@@ -185,7 +187,7 @@
     UKObjectsEqual(p2.UUID, r4.persistentRootUUID);
 }
 
-- (void) testRevisionBranchUUID
+- (void)testRevisionBranchUUID
 {
     UKObjectsEqual(branch1A.UUID, r0.branchUUID);
     UKObjectsEqual(branch1A.UUID, r1.branchUUID);
@@ -194,20 +196,21 @@
     UKObjectsEqual(branch2A.UUID, r4.branchUUID);
 }
 
-- (void) testParentBranch
+- (void)testParentBranch
 {
     UKObjectsEqual(branch1A, branch1B.parentBranch);
     UKNil(branch1A.parentBranch);
     {
         COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: ctx.store];
         UKObjectsEqual(branch1A.UUID, [[ctx2 persistentRootForUUID: p1.UUID]
-                                           branchForUUID: branch1B.UUID].parentBranch.UUID);
+            branchForUUID: branch1B.UUID].parentBranch.UUID);
     }
-    
+
     UKObjectsEqual(branch1A, branch2A.parentBranch);
     {
         COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore: ctx.store];
-        UKObjectsEqual(branch1A.UUID, [ctx2 persistentRootForUUID: p2.UUID].currentBranch.parentBranch.UUID);
+        UKObjectsEqual(branch1A.UUID,
+                       [ctx2 persistentRootForUUID: p2.UUID].currentBranch.parentBranch.UUID);
     }
 }
 
@@ -215,12 +218,13 @@
                         options: (COBranchRevisionReadingOptions)options
 {
     NSArray *revInfos = [ctx.store revisionInfosForBranchUUID: aBranch.UUID
-                                                        options: options];
+                                                      options: options];
     NSMutableArray *revs = [NSMutableArray array];
-    
+
     for (CORevisionInfo *revInfo in revInfos)
     {
-        [revs addObject: [ctx revisionForRevisionUUID: revInfo.revisionUUID persistentRootUUID: revInfo.persistentRootUUID]];
+        [revs addObject: [ctx revisionForRevisionUUID: revInfo.revisionUUID
+                                   persistentRootUUID: revInfo.persistentRootUUID]];
     }
     return revs;
 }
@@ -247,13 +251,14 @@
 {
     COBranchRevisionReadingOptions options =
         (COBranchRevisionReadingParentBranches | COBranchRevisionReadingDivergentRevisions);
-    
+
     UKObjectsEqual(A(r0, r1, r2), [self revisionsForBranch: branch1A options: options]);
     UKObjectsEqual(A(r0, r1, r3, r5, r6, r8), [self revisionsForBranch: branch1B options: options]);
-    
+
     // FIXME: For this next line, if r5 is included, r8 should also be (since they are both
     // diverget revisions in branch 1B).
-    UKObjectsEqual(A(r0, r1, r3, r5, r6, r7, r9, r10), [self revisionsForBranch: branch1C options: options]);
+    UKObjectsEqual(A(r0, r1, r3, r5, r6, r7, r9, r10),
+                   [self revisionsForBranch: branch1C options: options]);
     UKObjectsEqual(A(r0, r1, r2, r4), [self revisionsForBranch: branch2A options: options]);
 }
 
@@ -275,11 +280,12 @@
     UKObjectsEqual(r5.UUID, [p1Info branchInfoForUUID: branch1C.UUID].headRevisionUUID);
     UKObjectsEqual(r3.UUID, [p1Info branchInfoForUUID: branch1C.UUID].currentRevisionUUID);
 
-    UKObjectsEqual(A(r0, r1, r3, r5, r6, r7, r9, r10), [self revisionsForBranch: branch1C options: options]);
+    UKObjectsEqual(A(r0, r1, r3, r5, r6, r7, r9, r10),
+                   [self revisionsForBranch: branch1C options: options]);
     UKObjectsEqual(A(r0, r1, r3, r5, r6, r8), [self revisionsForBranch: branch1B options: options]);
 }
 
-- (void) wait
+- (void)wait
 {
     NSRunLoop *runLoop = [NSRunLoop currentRunLoop];
     [runLoop runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
@@ -312,14 +318,14 @@
  * It's important for syncing to be able to look up a revision in the cache
  * that is not present and get nil instead of an exception
  */
-- (void) testRevisionCacheReturnsNilForUnknownRevision
+- (void)testRevisionCacheReturnsNilForUnknownRevision
 {
     CORevision *rev = [ctx revisionForRevisionUUID: [ETUUID UUID]
                                 persistentRootUUID: p1.UUID];
     UKNil(rev);
 }
 
-- (void) testHeadRevisionAndCurrentRevision
+- (void)testHeadRevisionAndCurrentRevision
 {
     UKObjectsEqual(r2, branch1A.currentRevision);
     UKObjectsEqual(r2, branch1A.headRevision);
@@ -331,26 +337,26 @@
     UKObjectsEqual(r4, branch2A.headRevision);
 }
 
-- (void) testSetCurrentRevisionToPastLeavesHeadRevisionUnchanged
+- (void)testSetCurrentRevisionToPastLeavesHeadRevisionUnchanged
 {
     branch1B.currentRevision = r3;
     UKObjectsEqual(r8, branch1B.headRevision);
 }
 
-- (void) testSetCurrentRevisionToFutureUpdatesHeadRevision
+- (void)testSetCurrentRevisionToFutureUpdatesHeadRevision
 {
     branch1B.currentRevision = r10;
     UKObjectsEqual(r10, branch1B.headRevision);
 }
 
-- (void) testNewCommitUpdatesHeadRevision
+- (void)testNewCommitUpdatesHeadRevision
 {
     [branch1B.rootObject setLabel: @"new commit"];
     [p1 commit];
-    
+
     CORevision *r11 = branch1B.currentRevision;
     UKObjectsEqual(r6, r11.parentRevision);
-    
+
     UKObjectsEqual(r11, branch1B.headRevision);
 }
 

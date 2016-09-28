@@ -8,34 +8,39 @@
 #import "TestCommon.h"
 
 @interface NSObject (TestObjectSynthesizedAccessors)
+
 - (id)unkownMethod;
 - (void)setIsPersistent: (BOOL)persistent;
 - (NSString *)something;
+
 @end
+
 
 @interface TestCOObjectSynthesizedAccessors : EditingContextTestCase <UKTest>
 {
     OutlineItem *item;
 }
+
 @end
+
 
 @implementation TestCOObjectSynthesizedAccessors
 
-- (id) init
+- (id)init
 {
     SUPERINIT;
     item = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
     return self;
 }
 
-- (void) testAttributeGetterAndSetter
+- (void)testAttributeGetterAndSetter
 {
 
     UKObjectKindOf(item, OutlineItem);
-    
+
     item.label = @"hello";
     UKObjectsEqual(@"hello", item.label);
-    
+
     OutlineItem *child1 = [item.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     child1.label = @"child1";
 
@@ -51,14 +56,14 @@
     UKRaisesException([item unkownMethod]);
 
     NSAssert([[item.entityDescription propertyDescriptionForName: @"isPersistent"] isReadOnly],
-        @"We expect isPersistent to be read-only for COObject and its subclasses");
+             @"We expect isPersistent to be read-only for COObject and its subclasses");
     UKRaisesException([(id)item setIsPersistent: YES]);
 }
 
-- (void) testMutableProxy
+- (void)testMutableProxy
 {
     OutlineItem *child1 = [item.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
-    
+
     // At first I didn't think this would work right now, but
     // when -mutableArrayValueForKey: does its accessor search, it causes
     // +resolveInstanceMethod: to be invoked, which lets us auto-generate
@@ -67,7 +72,7 @@
     // Currently we only generate -XXX and -setXXX:, but that's sufficient
     // for -mutableArrayValueForKey: to work. We will need to add support
     // for generating the indexed ones for good performance, though.
-    
+
     // FIXME: Change to mutableOrderedSetValueForKey
     [[item mutableArrayValueForKey: @"contents"] addObject: child1];
     UKObjectsEqual(@[child1], item.contents);
@@ -76,12 +81,12 @@
     UKObjectsEqual(@[], item.contents);
 }
 
-- (void) testSetterToProperty
+- (void)testSetterToProperty
 {
     const char *setter = "setFoo:";
-    char *property = malloc(strlen(setter)-3);
+    char *property = malloc(strlen(setter) - 3);
     SetterToProperty(setter, strlen(setter), property);
-    
+
     UKIntsEqual(0, strcmp("foo", property));
     free(property);
 }
@@ -91,11 +96,11 @@ static BOOL IsSetterWrapper(const char *selname)
     return IsSetter(selname, strlen(selname));
 }
 
-- (void) testIsSetter
+- (void)testIsSetter
 {
     UKTrue(IsSetterWrapper("setFoo:"));
     UKTrue(IsSetterWrapper("seta:"));
-    
+
     UKFalse(IsSetterWrapper("set:"));
     UKFalse(IsSetterWrapper("setFoo"));
     UKFalse(IsSetterWrapper("foo:"));

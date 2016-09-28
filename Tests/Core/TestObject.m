@@ -6,23 +6,23 @@
  */
 
 #import <UnitKit/UnitKit.h>
-#import <Foundation/Foundation.h>
 #import <EtoileFoundation/ETModelDescriptionRepository.h>
 #import "TestCommon.h"
-#import "COObject.h"
-#import "COBookmark.h"
-#import "COSerialization.h"
 
 #pragma GCC diagnostic ignored "-Wunused"
 
 @interface COObject (COSerializationPrivate)
+
 - (id)serializedValueForPropertyDescription: (ETPropertyDescription *)aPropertyDesc;
-- (void)setSerializedValue: (id)value forPropertyDescription: (ETPropertyDescription *)aPropertyDesc;
+- (void)setSerializedValue: (id)value
+    forPropertyDescription: (ETPropertyDescription *)aPropertyDesc;
+
 @end
+
 
 @interface COOverridenSetterBookmark : COBookmark
 {
-    @public
+@public
     BOOL setterInvoked;
     BOOL validated;
     BOOL serialized;
@@ -31,12 +31,14 @@
 
 @end
 
+
 @interface TestObject : EditingContextTestCase <UKTest>
 @end
 
+
 @implementation TestObject
 
-- (void) testEntityDescriptionMismatch
+- (void)testEntityDescriptionMismatch
 {
     ETModelDescriptionRepository *repo = [ETModelDescriptionRepository mainRepository];
     ETEntityDescription *groupEntity = [repo entityDescriptionForClass: [COGroup class]];
@@ -51,7 +53,7 @@
                                                         objectGraphContext: [COObjectGraphContext new]]);
 }
 
-- (void) testEntityDescriptionMissingCOObjectParent
+- (void)testEntityDescriptionMissingCOObjectParent
 {
     ETEntityDescription *rootEntity = [ETEntityDescription descriptionWithName: @"RootEntity"];
     ETEntityDescription *emptyEntity = [ETEntityDescription descriptionWithName: @"EmptyEntity"];
@@ -60,29 +62,29 @@
     [[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: rootEntity];
     [[ETModelDescriptionRepository mainRepository] addUnresolvedDescription: emptyEntity];
     [[ETModelDescriptionRepository mainRepository] resolveNamedObjectReferences];
-    
+
     // Expected to fail because rootEntity does not declare COObject as its parent
     UKRaisesException([[COObject alloc] initWithEntityDescription: rootEntity
                                                objectGraphContext: [COObjectGraphContext new]]);
     UKRaisesException([ctx insertNewPersistentRootWithEntityName: @"RootEntity"]);
-    
+
     UKDoesNotRaiseException([[COObject alloc] initWithEntityDescription: emptyEntity
                                                      objectGraphContext: [COObjectGraphContext new]]);
     UKDoesNotRaiseException([ctx insertNewPersistentRootWithEntityName: @"EmptyEntity"]);
 }
 
-- (void) testInit
+- (void)testInit
 {
     UKRaisesException([[COObject alloc] init]);
 }
 
-- (void) testEquality
+- (void)testEquality
 {
     COObject *object = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
     COObject *otherObject = [ctx insertNewPersistentRootWithEntityName: @"COObject"].rootObject;
-    
+
     // FIXME: bookmark stuff is commented out because it fails serialization to an item graph
-    
+
     //COBookmark *bookmark = [[ctx insertNewPersistentRootWithEntityName: @"COBookmark"] rootObject];
 
     UKObjectsEqual(object, object);
@@ -102,7 +104,7 @@
     UKTrue([objects containsObject: otherObject]);
 }
 
-- (void) testEqualityFromTransienceToPersistence
+- (void)testEqualityFromTransienceToPersistence
 {
     COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
     COObject *object = [[COObject alloc] initWithObjectGraphContext: objectGraphContext];
@@ -114,7 +116,7 @@
     NSSet *objects = S(object/*, bookmark*/);
 
     UKObjectsEqual(object, object);
-    
+
     [ctx insertNewPersistentRootWithRootObject: object];
 
     UKObjectsEqual(object, object);
@@ -127,44 +129,52 @@
     //UKTrue([objects containsObject: bookmark]);
 }
 
-- (void) testHashStabilityAcrossSetCurrentBranch
+- (void)testHashStabilityAcrossSetCurrentBranch
 {
     COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     COObject *object = proot.rootObject;
     const NSUInteger hash = object.hash;
     [ctx commit];
-    
+
     COBranch *secondaryBranch = [proot.currentBranch makeBranchWithLabel: @"secondaryBranch"];
     proot.currentBranch = secondaryBranch;
     [ctx commit];
-    
+
     UKIntsEqual(hash, [object hash]);
 }
 
-- (void) testIsEqualUsesPointerEquality
+- (void)testIsEqualUsesPointerEquality
 {
     COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
-    
+
     COObject *object = proot.rootObject;
-    
+
     [self checkPersistentRootWithExistingAndNewContext: proot
-                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-     {
-         if (isNewContext)
-         {
-             UKObjectsNotEqual(object, testProot.rootObject);
-             UKObjectsNotSame(object, testProot.rootObject);
-         }
-         else
-         {
-             UKObjectsEqual(object, testProot.rootObject);
-             UKObjectsSame(object, testProot.rootObject);
-         }
-     }];
+                                               inBlock:
+       ^(COEditingContext *testCtx,
+         COPersistentRoot *testProot,
+         COBranch *testBranch,
+         BOOL isNewContext)
+       {
+           if (isNewContext)
+           {
+               UKObjectsNotEqual(object,
+                                 testProot.rootObject);
+               UKObjectsNotSame(object,
+                                testProot.rootObject);
+           }
+           else
+           {
+               UKObjectsEqual(object,
+                              testProot.rootObject);
+               UKObjectsSame(object,
+                             testProot.rootObject);
+           }
+       }];
 }
 
-- (void) testDetailedDescription
+- (void)testDetailedDescription
 {
     COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
     COObject *object = proot.rootObject;
@@ -172,7 +182,7 @@
     UKStringsEqual(object.description, [object stringValue]);
 }
 
-- (void) testCreationAndModificationDates
+- (void)testCreationAndModificationDates
 {
     COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COObject"];
     COObject *object = proot.rootObject;
@@ -193,16 +203,22 @@
 
     CORevision *lastRev = object.revision;
     UKObjectsNotEqual(lastRev, firstRev);
-    
+
     [self checkPersistentRootWithExistingAndNewContext: proot
-                                              inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-     {
-         UKObjectsEqual(firstRev.date, testProot.creationDate);
-         UKObjectsEqual(lastRev.date, testProot.modificationDate);
-     }];
+                                               inBlock:
+       ^(COEditingContext *testCtx,
+         COPersistentRoot *testProot,
+         COBranch *testBranch,
+         BOOL isNewContext)
+       {
+           UKObjectsEqual(firstRev.date,
+                          testProot.creationDate);
+           UKObjectsEqual(lastRev.date,
+                          testProot.modificationDate);
+       }];
 }
 
-- (void) testKVCForSynthesizedSetterName
+- (void)testKVCForSynthesizedSetterName
 {
     COOverridenSetterBookmark *bookmark =
         [ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"].rootObject;
@@ -214,7 +230,7 @@
     UKTrue(bookmark->setterInvoked);
 }
 
-- (void) testValidationForSynthesizedSetterName
+- (void)testValidationForSynthesizedSetterName
 {
     COOverridenSetterBookmark *bookmark =
         [ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"].rootObject;
@@ -225,7 +241,7 @@
     UKTrue(bookmark->validated);
 }
 
-- (void) testSerializationForSynthesizedSetterName
+- (void)testSerializationForSynthesizedSetterName
 {
     COOverridenSetterBookmark *bookmark =
         [ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"].rootObject;
@@ -239,7 +255,7 @@
     UKTrue(bookmark->serialized);
 }
 
-- (void) testDeserializationForSynthesizedSetterName
+- (void)testDeserializationForSynthesizedSetterName
 {
     COOverridenSetterBookmark *bookmark =
         [ctx insertNewPersistentRootWithEntityName: @"COOverridenSetterBookmark"].rootObject;
@@ -248,132 +264,140 @@
         [bookmark.entityDescription propertyDescriptionForName: @"lastVisitedDate"];
 
     [bookmark setSerializedValue: date forPropertyDescription: propertyDesc];
-    
+
     UKObjectsEqual(date, bookmark.lastVisitedDate);
     UKTrue(bookmark->deserialized);
     UKTrue(bookmark->setterInvoked);
 }
 
-- (void) testTransientState
+- (void)testTransientState
 {
     ObjectWithTransientState *object =
         [ctx insertNewPersistentRootWithEntityName: @"ObjectWithTransientState"].rootObject;
 
     object.label = @"Whatever";
     object.derivedOrderedCollection = @[@"One", @"Two"];
-    
-    [ctx commit];
-    
-    [self checkPersistentRootWithExistingAndNewContext: object.persistentRoot
-                                              inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
-    {
-        ObjectWithTransientState *testObject = testPersistentRoot.rootObject;
 
-        if (isNewContext)
-        {
-            UKNil(testObject.label);
-            UKObjectsEqual(@[], testObject.orderedCollection);
-        }
-        else
-        {
-            UKStringsEqual(@"Whatever", testObject.label);
-            UKObjectsEqual(A(@"One", @"Two"), testObject.orderedCollection);
-        }
-        UKObjectsEqual(testObject.orderedCollection, testObject.derivedOrderedCollection);
-    }];
+    [ctx commit];
+
+    [self checkPersistentRootWithExistingAndNewContext: object.persistentRoot
+                                               inBlock:
+       ^(COEditingContext *testCtx,
+         COPersistentRoot *testPersistentRoot,
+         COBranch *testBranch,
+         BOOL isNewContext)
+       {
+           ObjectWithTransientState *testObject = testPersistentRoot.rootObject;
+
+           if (isNewContext)
+           {
+               UKNil(testObject.label);
+               UKObjectsEqual(@[],
+                              testObject.orderedCollection);
+           }
+           else
+           {
+               UKStringsEqual(@"Whatever",
+                              testObject.label);
+               UKObjectsEqual(A(@"One", @"Two"),
+                              testObject.orderedCollection);
+           }
+           UKObjectsEqual(testObject.orderedCollection,
+                          testObject.derivedOrderedCollection);
+       }];
 }
 
-- (void) testExceptionOnTransientCollectionInvalidUpdate
+- (void)testExceptionOnTransientCollectionInvalidUpdate
 {
     COPersistentRoot *persistentRoot =
         [ctx insertNewPersistentRootWithEntityName: @"ObjectWithTransientState"];
-    
+
     // FIXME: Turn on to match COObject class documentation
     //UKRaisesException([persistentRoot.rootObject setValue: nil
     //                                          forProperty: @"orderedCollection"]);
 }
 
-- (void) testExceptionOnInvalidTransientCollectionAfterDeserialization
+- (void)testExceptionOnInvalidTransientCollectionAfterDeserialization
 {
     ObjectWithTransientState *object =
         [ctx insertNewPersistentRootWithEntityName: @"ObjectWithTransientState"].rootObject;
 
     [object setValue: nil forStorageKey: @"orderedCollection"];
-    
+
     UKRaisesException([object.objectGraphContext insertOrUpdateItems: @[object.storeItem]]);
 }
 
-- (void) testUsingZombieObjectRaisesException
+- (void)testUsingZombieObjectRaisesException
 {
     COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-    
+
     OutlineItem *obj2 = [[OutlineItem alloc] initWithObjectGraphContext: proot.objectGraphContext];
     obj2.label = @"test";
-    
+
     /* obj2 is removed since it's unreachable */
     [proot.objectGraphContext removeUnreachableObjects];
-    
+
     UKRaisesException([obj2 setLabel: @"test2"]);
 }
 
 /**
  * Simple test of -objectGraphContext, -branch, -persistentRoot, and -editingContext
  */
-- (void) testPersistencyAttributes
+- (void)testPersistencyAttributes
 {
     COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
     COObject *object = [[COObject alloc] initWithObjectGraphContext: objectGraphContext];
-    
+
     UKObjectsSame(objectGraphContext, object.objectGraphContext);
     UKNil(object.branch);
     UKNil(object.persistentRoot);
     UKNil(object.editingContext);
-    
+
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithRootObject: object];
     COBranch *branch = persistentRoot.currentBranch;
     UKNotNil(persistentRoot);
     UKNotNil(branch);
-    
+
     UKObjectsSame(objectGraphContext, object.objectGraphContext);
     UKObjectsSame(branch, object.branch);
     UKObjectsSame(persistentRoot, object.persistentRoot);
     UKObjectsSame(ctx, object.editingContext);
 }
 
-- (void) testEntityDescriptionImmutableAfterCOObjectCreation
+- (void)testEntityDescriptionImmutableAfterCOObjectCreation
 {
     COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
     OutlineItem *object = [[OutlineItem alloc] initWithObjectGraphContext: objectGraphContext];
-    
+
     ETEntityDescription *entityDesc = object.entityDescription;
     ETPropertyDescription *contentsDesc = [entityDesc propertyDescriptionForName: @"contents"];
-    
+
     UKTrue(contentsDesc.ordered);
     UKRaisesException(contentsDesc.ordered = NO);
 }
 
-- (void) testDidChangeValueForWrongProperty
+- (void)testDidChangeValueForWrongProperty
 {
     COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
     OutlineItem *object = [[OutlineItem alloc] initWithObjectGraphContext: objectGraphContext];
-    
+
     [object willChangeValueForProperty: @"label"];
     UKRaisesException([object didChangeValueForProperty: @"contents"]);
 }
 
-- (void) testUnpairedDidChangeValueForProperty
+- (void)testUnpairedDidChangeValueForProperty
 {
     COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
     OutlineItem *object = [[OutlineItem alloc] initWithObjectGraphContext: objectGraphContext];
-    
+
     UKRaisesException([object didChangeValueForProperty: @"contents"]);
 }
 
-- (void) testEmptyDidChangeValueForProperty
+- (void)testEmptyDidChangeValueForProperty
 {
     COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
     OutlineItem *object = [[OutlineItem alloc] initWithObjectGraphContext: objectGraphContext];
-    
+
     [object willChangeValueForProperty: @"label"];
     UKDoesNotRaiseException([object didChangeValueForProperty: @"label"]);
 }
@@ -383,25 +407,25 @@
 
 @implementation COOverridenSetterBookmark
 
-- (void) setLastVisitedDate: (NSDate *)lastVisitedDate
+- (void)setLastVisitedDate: (NSDate *)lastVisitedDate
 {
     setterInvoked = YES;
     super.lastVisitedDate = lastVisitedDate;
 }
 
-- (id) validateLastVisitedDate: (id)aValue
+- (id)validateLastVisitedDate: (id)aValue
 {
     validated = YES;
     return [ETValidationResult validResult: aValue];
 }
 
-- (id) serializedLastVisitedDate
+- (id)serializedLastVisitedDate
 {
     serialized = YES;
     return [self.lastVisitedDate stringValue];
 }
 
-- (void) setSerializedLastVisitedDate: (id)aValue
+- (void)setSerializedLastVisitedDate: (id)aValue
 {
     deserialized = YES;
     self.lastVisitedDate = aValue;
@@ -412,6 +436,7 @@
 #pragma mark - Test Insertion Hint
 
 @interface OutlineItem_InsertObjectAtIndexHint_Mock : OutlineItem
+
 @property (nonatomic, readwrite, strong) NSMutableArray *insertObjectArgumentsForCalls;
 @end
 
@@ -419,16 +444,16 @@
 
 @synthesize insertObjectArgumentsForCalls;
 
--(void)insertObject:(id)object atIndex:(NSUInteger)index hint:(id)hint
+- (void)insertObject: (id)object atIndex: (NSUInteger)index hint: (id)hint
 {
-    [super insertObject:object atIndex:index hint:hint];
-    
+    [super insertObject: object atIndex: index hint: hint];
+
     if (nil == insertObjectArgumentsForCalls)
         insertObjectArgumentsForCalls = [NSMutableArray array];
 
-    [insertObjectArgumentsForCalls addObject: @{ @"object" : object,
-                                                 @"index" : @(index),
-                                                 @"hint" : hint ? hint : [NSNull null]}];
+    [insertObjectArgumentsForCalls addObject: @{@"object": object,
+                                                @"index": @(index),
+                                                @"hint": hint ? hint : [NSNull null]}];
 }
 
 @end
@@ -450,20 +475,20 @@
     objectGraphContext = [COObjectGraphContext objectGraphContext];
 
     parent = [[OutlineItem_InsertObjectAtIndexHint_Mock alloc]
-                initWithObjectGraphContext: objectGraphContext];
-    
+                  initWithObjectGraphContext: objectGraphContext];
+
     // N.B.: Not added to parent yet.
     other = [[OutlineItem alloc] initWithObjectGraphContext: objectGraphContext];
 
     return self;
 }
 
-- (void) testAddObject
+- (void)testAddObject
 {
     UKNil(parent.insertObjectArgumentsForCalls);
     [parent addObject: other];
     UKIntsEqual(1, parent.insertObjectArgumentsForCalls.count);
-    
+
     // Check the arguments that were passed to -insertObject:atIndex:hint:
     NSDictionary *args = parent.insertObjectArgumentsForCalls[0];
     UKObjectsSame(other, args[@"object"]);

@@ -7,7 +7,6 @@
 
 #import <EtoileFoundation/ETModelDescriptionRepository.h>
 #import "TestCommon.h"
-#import "CORevisionCache.h"
 
 @interface TestEditingContext : EditingContextTestCase <UKTest>
 {
@@ -17,7 +16,7 @@
 
 @implementation TestEditingContext
 
-- (id) init
+- (id)init
 {
     SUPERINIT;
     [[NSNotificationCenter defaultCenter]
@@ -65,7 +64,7 @@
     UKRaisesException([ctx insertNewPersistentRootWithRootObject: rootObject]);
 }
 
-- (void) validateNewPersistentRoot: (COPersistentRoot *)persistentRoot UUID: (ETUUID *)uuid
+- (void)validateNewPersistentRoot: (COPersistentRoot *)persistentRoot UUID: (ETUUID *)uuid
 {
     UKTrue(ctx.hasChanges);
     UKObjectsEqual(S(persistentRoot), ctx.persistentRoots);
@@ -80,11 +79,11 @@
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     ETUUID *uuid = persistentRoot.UUID;
-    
+
     [self validateNewPersistentRoot: persistentRoot UUID: uuid];
-    
+
     persistentRoot.deleted = YES;
-    
+
     UKFalse(ctx.hasChanges);
     UKTrue([ctx.persistentRoots isEmpty]);
     UKTrue([ctx.persistentRootsPendingDeletion isEmpty]);
@@ -98,14 +97,14 @@
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     ETUUID *uuid = persistentRoot.UUID;
-    
+
     [self validateNewPersistentRoot: persistentRoot UUID: uuid];
-    
+
     persistentRoot.deleted = YES;
-    
+
     // can't undelete since it's a zombie
     UKRaisesException(persistentRoot.deleted = NO);
-    
+
     UKFalse(ctx.hasChanges);
     UKTrue([ctx.persistentRoots isEmpty]);
     UKTrue([ctx.persistentRootsPendingDeletion isEmpty]);
@@ -119,21 +118,28 @@
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     ETUUID *uuid = persistentRoot.UUID;
-    
+
     [ctx commit];
-    
+
     [self checkPersistentRootWithExistingAndNewContext: persistentRoot
-                                              inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-     {
-         UKFalse(testCtx.hasChanges);
-         UKObjectsEqual(S(testProot), testCtx.persistentRoots);
-         UKObjectsEqual([NSSet set], testCtx.persistentRootsPendingDeletion);
-         UKObjectsEqual([NSSet set], testCtx.deletedPersistentRoots);
-         UKNotNil([testCtx persistentRootForUUID: uuid]);
-         UKNotNil([testCtx.store persistentRootInfoForUUID: uuid]);
-         UKFalse(testProot.deleted);
-     }];
-    
+                                               inBlock:
+       ^(COEditingContext *testCtx,
+         COPersistentRoot *testProot,
+         COBranch *testBranch,
+         BOOL isNewContext)
+       {
+           UKFalse(testCtx.hasChanges);
+           UKObjectsEqual(S(testProot),
+                          testCtx.persistentRoots);
+           UKObjectsEqual([NSSet set],
+                          testCtx.persistentRootsPendingDeletion);
+           UKObjectsEqual([NSSet set],
+                          testCtx.deletedPersistentRoots);
+           UKNotNil([testCtx persistentRootForUUID: uuid]);
+           UKNotNil([testCtx.store persistentRootInfoForUUID: uuid]);
+           UKFalse(testProot.deleted);
+       }];
+
     persistentRoot.deleted = YES;
 
     UKTrue(ctx.hasChanges);
@@ -143,9 +149,9 @@
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNotNil([store persistentRootInfoForUUID: uuid]);
     UKTrue(persistentRoot.deleted);
-    
+
     [ctx commit];
-    
+
     UKObjectsEqual(S(persistentRoot), unloadNotification.userInfo[kCOUnloadedPersistentRootsKey]);
 
     // Force unloaded persistent root to be reloaded
@@ -154,19 +160,26 @@
     UKObjectsEqual([NSSet set], ctx.persistentRoots);
     UKObjectsEqual([NSSet set], ctx.persistentRootsPendingDeletion);
     UKObjectsEqual(S(persistentRoot), ctx.deletedPersistentRoots);
-    
+
     [self checkPersistentRootWithExistingAndNewContext: persistentRoot
-                                              inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-     {
-         UKFalse(testCtx.hasChanges);
-         UKObjectsEqual([NSSet set], testCtx.persistentRoots);
-         UKObjectsEqual([NSSet set], testCtx.persistentRootsPendingDeletion);
-         UKIntsEqual(1, testCtx.deletedPersistentRoots.count);
-         /* You can still retrieve a deleted persistent root, until the deletion is finalized */
-         UKNotNil([testCtx persistentRootForUUID: uuid]);
-         UKNotNil([testCtx.store persistentRootInfoForUUID: uuid]);
-         UKTrue(testProot.deleted);
-     }];
+                                               inBlock:
+       ^(COEditingContext *testCtx,
+         COPersistentRoot *testProot,
+         COBranch *testBranch,
+         BOOL isNewContext)
+       {
+           UKFalse(testCtx.hasChanges);
+           UKObjectsEqual([NSSet set],
+                          testCtx.persistentRoots);
+           UKObjectsEqual([NSSet set],
+                          testCtx.persistentRootsPendingDeletion);
+           UKIntsEqual(1,
+                       testCtx.deletedPersistentRoots.count);
+           /* You can still retrieve a deleted persistent root, until the deletion is finalized */
+           UKNotNil([testCtx persistentRootForUUID: uuid]);
+           UKNotNil([testCtx.store persistentRootInfoForUUID: uuid]);
+           UKTrue(testProot.deleted);
+       }];
 }
 
 - (void)testUndeleteCommittedPersistentRoot
@@ -174,15 +187,15 @@
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     ETUUID *uuid = persistentRoot.UUID;
     [ctx commit];
-    
+
     persistentRoot.deleted = YES;
     [ctx commit];
-    
+
     UKObjectsEqual(S(persistentRoot), unloadNotification.userInfo[kCOUnloadedPersistentRootsKey]);
 
     // Force unloaded persistent root to be reloaded
     persistentRoot = [ctx persistentRootForUUID: persistentRoot.UUID];
-    
+
     [persistentRoot setDeleted: NO];
 
     UKTrue([store persistentRootInfoForUUID: uuid].deleted);
@@ -192,37 +205,45 @@
     UKObjectsEqual(S(persistentRoot), ctx.persistentRootsPendingUndeletion);
     UKObjectsEqual([NSSet set], ctx.deletedPersistentRoots);
     UKFalse(persistentRoot.deleted);
-    
+
     [ctx commit];
-    
+
     [self checkPersistentRootWithExistingAndNewContext: persistentRoot
-                                              inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-     {
-        UKFalse([[testCtx.store persistentRootInfoForUUID: uuid] isDeleted]);
-        UKFalse(testCtx.hasChanges);
-        UKObjectsEqual(S(testProot), testCtx.persistentRoots);
-        UKObjectsEqual([NSSet set], testCtx.persistentRootsPendingDeletion);
-        UKObjectsEqual([NSSet set], testCtx.persistentRootsPendingUndeletion);
-        UKObjectsEqual([NSSet set], testCtx.deletedPersistentRoots);
-        UKFalse(testProot.deleted);
-     }];
+                                               inBlock:
+       ^(COEditingContext *testCtx,
+         COPersistentRoot *testProot,
+         COBranch *testBranch,
+         BOOL isNewContext)
+       {
+           UKFalse([[testCtx.store persistentRootInfoForUUID: uuid] isDeleted]);
+           UKFalse(testCtx.hasChanges);
+           UKObjectsEqual(S(testProot),
+                          testCtx.persistentRoots);
+           UKObjectsEqual([NSSet set],
+                          testCtx.persistentRootsPendingDeletion);
+           UKObjectsEqual([NSSet set],
+                          testCtx.persistentRootsPendingUndeletion);
+           UKObjectsEqual([NSSet set],
+                          testCtx.deletedPersistentRoots);
+           UKFalse(testProot.deleted);
+       }];
 }
 
 - (void)testUnloadPeristentRoot
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     ETUUID *uuid = persistentRoot.UUID;
-    
+
     [ctx commit];
     [ctx unloadPersistentRoot: persistentRoot];
-    
+
     UKObjectsEqual(S(persistentRoot), unloadNotification.userInfo[kCOUnloadedPersistentRootsKey]);
-    
+
     UKFalse(ctx.hasChanges);
     UKFalse(persistentRoot.isZombie);
     UKNil([ctx loadedPersistentRootForUUID: uuid]);
     UKNotNil([store persistentRootInfoForUUID: uuid]);
-    
+
     // Triggers reload
     UKNotNil([ctx persistentRootForUUID: uuid]);
     UKNotNil([ctx loadedPersistentRootForUUID: uuid]);
@@ -232,11 +253,11 @@
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     ETUUID *uuid = persistentRoot.UUID;
-    
+
     [ctx unloadPersistentRoot: persistentRoot];
-    
+
     UKObjectsEqual(S(persistentRoot), unloadNotification.userInfo[kCOUnloadedPersistentRootsKey]);
-    
+
     UKFalse(ctx.hasChanges);
     UKTrue(persistentRoot.isZombie);
     UKNil([ctx loadedPersistentRootForUUID: uuid]);
@@ -247,32 +268,32 @@
 /**
  * Try to test all of the requirements of -persistentRoots and the other accessors
  */
-- (void) testPersistentRootsAccessors
+- (void)testPersistentRootsAccessors
 {
     COPersistentRoot *regular;
     COPersistentRoot *deletedOnDisk;
     COPersistentRoot *pendingInsertion;
     COPersistentRoot *pendingDeletion;
     COPersistentRoot *pendingUndeletion;
-    
+
     // 1. Setup the persistent roots
     {
         regular = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
         [regular commit];
-        
+
         deletedOnDisk = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
         [deletedOnDisk commit];
         deletedOnDisk.deleted = YES;
         [deletedOnDisk commit];
         // Force unloaded persistent root to be reloaded
         deletedOnDisk = [ctx persistentRootForUUID: deletedOnDisk.UUID];
-        
+
         pendingInsertion = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
-        
+
         pendingDeletion = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
         [pendingDeletion commit];
         pendingDeletion.deleted = YES;
-        
+
         pendingUndeletion = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
         [pendingUndeletion commit];
         pendingUndeletion.deleted = YES;
@@ -280,7 +301,7 @@
         // Force unloaded persistent root to be reloaded
         pendingUndeletion = [ctx persistentRootForUUID: pendingUndeletion.UUID];
         pendingUndeletion.deleted = NO;
-        
+
         // Check that the constraints we wanted to set up hold
         UKTrue([store.persistentRootUUIDs containsObject: regular.UUID]);
         UKTrue([store.deletedPersistentRootUUIDs containsObject: deletedOnDisk.UUID]);
@@ -291,9 +312,9 @@
         UKTrue(pendingDeletion.deleted);
         UKFalse(pendingUndeletion.deleted);
     }
-    
+
     // 2. Test the accessors
-    
+
     UKObjectsEqual(S(regular, pendingInsertion, pendingUndeletion), ctx.persistentRoots);
     UKObjectsEqual(S(deletedOnDisk, pendingDeletion), ctx.deletedPersistentRoots);
     UKObjectsEqual(S(pendingInsertion), ctx.persistentRootsPendingInsertion);
@@ -307,31 +328,43 @@
     UKObjectsEqual(pendingUndeletion, [ctx persistentRootForUUID: pendingUndeletion.UUID]);
 
     // 3. Test what happens when we commit (all pending changes are made and no longer pending)
-    
+
     [ctx commit];
-    
+
     [self checkPersistentRootWithExistingAndNewContext: regular
-                                              inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testRegular, COBranch *testBranch, BOOL isNewContext)
-     {
-         COPersistentRoot *testDeletedOnDisk = [testCtx persistentRootForUUID: deletedOnDisk.UUID];
-         COPersistentRoot *testPendingInsertion = [testCtx persistentRootForUUID: pendingInsertion.UUID];
-         COPersistentRoot *testPendingDeletion = [testCtx persistentRootForUUID: pendingDeletion.UUID];
-         COPersistentRoot *testPendingUndeletion = [testCtx persistentRootForUUID: pendingUndeletion.UUID];
-         
-         UKObjectsEqual(S(testRegular, testPendingInsertion, testPendingUndeletion), testCtx.persistentRoots);
-         UKObjectsEqual(S(testDeletedOnDisk, testPendingDeletion), testCtx.deletedPersistentRoots);
-         UKObjectsEqual([NSSet set], testCtx.persistentRootsPendingInsertion);
-         UKObjectsEqual([NSSet set], testCtx.persistentRootsPendingDeletion);
-         UKObjectsEqual([NSSet set], testCtx.persistentRootsPendingUndeletion);
-     }];
+                                               inBlock:
+       ^(COEditingContext *testCtx,
+         COPersistentRoot *testRegular,
+         COBranch *testBranch,
+         BOOL isNewContext)
+       {
+           COPersistentRoot *testDeletedOnDisk = [testCtx persistentRootForUUID: deletedOnDisk.UUID];
+           COPersistentRoot *testPendingInsertion = [testCtx persistentRootForUUID: pendingInsertion.UUID];
+           COPersistentRoot *testPendingDeletion = [testCtx persistentRootForUUID: pendingDeletion.UUID];
+           COPersistentRoot *testPendingUndeletion = [testCtx persistentRootForUUID: pendingUndeletion.UUID];
+
+           UKObjectsEqual(S(testRegular,
+                            testPendingInsertion,
+                            testPendingUndeletion),
+                          testCtx.persistentRoots);
+           UKObjectsEqual(S(testDeletedOnDisk,
+                            testPendingDeletion),
+                          testCtx.deletedPersistentRoots);
+           UKObjectsEqual([NSSet set],
+                          testCtx.persistentRootsPendingInsertion);
+           UKObjectsEqual([NSSet set],
+                          testCtx.persistentRootsPendingDeletion);
+           UKObjectsEqual([NSSet set],
+                          testCtx.persistentRootsPendingUndeletion);
+       }];
 }
 
-- (void) testRequestNilPersistentRoot
+- (void)testRequestNilPersistentRoot
 {
     UKNil([ctx persistentRootForUUID: nil]);
 }
 
-- (void) testWithNoStore
+- (void)testWithNoStore
 {
     UKRaisesException([[COEditingContext alloc] initWithStore: nil]);
     UKRaisesException([[COEditingContext alloc] initWithStore: nil
@@ -352,84 +385,92 @@
                                                undoTrackStore: nil]);
 }
 
-- (void) testRevisionEqualityFromMultipleEditingContexts
+- (void)testRevisionEqualityFromMultipleEditingContexts
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
-    
+
     CORevision *firstRevision = persistentRoot.currentRevision;
-    
+
     [self checkPersistentRootWithExistingAndNewContext: persistentRoot
-                                               inBlock: ^(COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-     {
-         if (isNewContext)
-         {
-             CORevision *testRevision = testProot.currentRevision;
-             UKObjectsNotSame(testRevision, firstRevision);
-             UKObjectsEqual(testRevision.UUID, firstRevision.UUID);
-             UKObjectsEqual(testRevision, firstRevision);
-         }
-     }];
+                                               inBlock:
+       ^(COEditingContext *testCtx,
+         COPersistentRoot *testProot,
+         COBranch *testBranch,
+         BOOL isNewContext)
+       {
+           if (isNewContext)
+           {
+               CORevision *testRevision = testProot.currentRevision;
+               UKObjectsNotSame(testRevision,
+                                firstRevision);
+               UKObjectsEqual(testRevision.UUID,
+                              firstRevision.UUID);
+               UKObjectsEqual(testRevision,
+                              firstRevision);
+           }
+       }];
 }
 
-- (void) testRevisionLifetime
+- (void)testRevisionLifetime
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
     CORevision *r1 = persistentRoot.currentRevision;
-    
+
     [persistentRoot.rootObject setLabel: @"test"];
     [ctx commit];
     CORevision *r2 = persistentRoot.currentRevision;
-        
+
     CORevision *r2cxt2 = nil;
-    
+
     @autoreleasepool
     {
         COEditingContext *ctx2 = [[COEditingContext alloc] initWithStore:
             [[COSQLiteStore alloc] initWithURL: [[self class] storeURL]]];
-        
+
         r2cxt2 = [ctx2 persistentRootForUUID: persistentRoot.UUID].currentRevision;
     }
-    
+
     // At this point, r2ctx2's editing context is deallocated, so calling
     // any methods on r2ctx2 that require loading more revisions should throw
     // an exception
-    
+
     UKObjectsEqual(r2.UUID, r2cxt2.UUID);
 
     UKObjectsEqual(r1, r2.parentRevision);
     UKRaisesException([r2cxt2 parentRevision]);
 }
 
-- (void) testCommitWithinCommitNotificationIllegal
+- (void)testCommitWithinCommitNotificationIllegal
 {
     __block BOOL receivedNotification = NO;
     __block BOOL insideCommit = NO;
-    
+
     id observer = [[NSNotificationCenter defaultCenter]
         addObserverForName: COEditingContextDidChangeNotification
                     object: ctx
                      queue: nil
-                usingBlock: ^(NSNotification *notif)
-    {
-        receivedNotification = YES;
-        UKTrue(insideCommit);
-        UKRaisesException([ctx commit]);
-    }];
-        
+                usingBlock:
+        ^(NSNotification *notif)
+        {
+            receivedNotification = YES;
+            UKTrue(insideCommit);
+            UKRaisesException([ctx commit]);
+        }];
+
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 
     insideCommit = YES;
     [ctx commit];
     insideCommit = NO;
-    
+
     UKTrue(receivedNotification);
-    
+
     [[NSNotificationCenter defaultCenter] removeObserver: observer];
 }
 
-- (void) testPersistentRootsPropertyNotLazy
+- (void)testPersistentRootsPropertyNotLazy
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
@@ -440,45 +481,44 @@
     UKObjectsEqual(persistentRoot.UUID, [ctx2persistentRoots.anyObject UUID]);
 }
 
-- (void) testDeletedPersistentRootsPropertyNotLazy
+- (void)testDeletedPersistentRootsPropertyNotLazy
 {
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
-    
+
     persistentRoot.deleted = YES;
     [ctx commit];
-    
+
     COEditingContext *ctx2 = [self newContext];
     NSSet *ctx2deletedPersistentRoots = ctx2.deletedPersistentRoots;
     UKIntsEqual(1, ctx2deletedPersistentRoots.count);
     UKObjectsEqual(persistentRoot.UUID, [ctx2deletedPersistentRoots.anyObject UUID]);
 }
 
-- (void) testPersistentRootInsertionInOtherContextIsLazy
+- (void)testPersistentRootInsertionInOtherContextIsLazy
 {
     ETUUID *uuid;
     UKObjectsEqual(S(), ctx.loadedPersistentRoots);
-    
+
     // Insert a persistent root in a second context
     {
         COEditingContext *ctx2 = [self newContext];
         COPersistentRoot *persistentRoot = [ctx2 insertNewPersistentRootWithEntityName: @"OutlineItem"];
         uuid = persistentRoot.UUID;
         [ctx2 commit];
-        
+
         UKObjectsEqual(S(persistentRoot), ctx2.loadedPersistentRoots);
     }
-    
-    [self wait];    
-    
+
+    [self wait];
+
     // That should not have caused `ctx` to load the persistent root
     UKObjectsEqual(S(), ctx.loadedPersistentRoots);
-    
+
     // Check that we can load it explicitly
     COPersistentRoot *persistentRoot = [ctx persistentRootForUUID: uuid];
     UKNotNil(persistentRoot);
     UKObjectsEqual(S(persistentRoot), ctx.loadedPersistentRoots);
 }
-
 
 @end

@@ -6,11 +6,8 @@
  */
 
 #import <UnitKit/UnitKit.h>
-#import <Foundation/Foundation.h>
 #import <EtoileFoundation/ETModelDescriptionRepository.h>
 #import "TestCommon.h"
-#import "CODictionary.h"
-#import "COObjectGraphContext+Private.h"
 
 /**
  * Tests a keyed collection from NSString : NSString
@@ -19,7 +16,9 @@
 {
     KeyedAttributeModel *model;
 }
+
 @end
+
 
 @implementation TestKeyedAttribute
 
@@ -53,12 +52,12 @@
     return [model.objectGraphContext itemForUUID: model.UUID];
 }
 
-- (void) testDictionaryAndModelItems
+- (void)testDictionaryAndModelItems
 {
     UKObjectsEqual([self dictionaryItemUUID], [self dictionaryItem].UUID);
     UKStringsEqual(@"CODictionary",
-        [[self dictionaryItem] valueForAttribute: kCOObjectEntityNameProperty]);
-    
+                   [[self dictionaryItem] valueForAttribute: kCOObjectEntityNameProperty]);
+
     UKObjectsEqual(model.UUID, [self modelItem].UUID);
     UKObjectsEqual([self dictionaryItemUUID], [[self modelItem] valueForAttribute: @"entries"]);
 }
@@ -66,9 +65,9 @@
 - (void)testInsertOrUpdateItems
 {
     COMutableItem *newDictItem = [[self dictionaryItem] mutableCopy];
-    
+
     /* Dictionary Item Insertion */
-    
+
     [newDictItem setValue: @"tic"
              forAttribute: @"sound"
                      type: kCOTypeString];
@@ -76,23 +75,23 @@
     [model.objectGraphContext insertOrUpdateItems: @[newDictItem]];
 
     UKObjectsEqual(D(@"tic", @"sound"), [model valueForProperty: @"entries"]);
-    
+
     /* Dictionary Item Update */
-    
+
     [newDictItem setValue: @"boum"
              forAttribute: @"sound"
                      type: kCOTypeString];
 
     [model.objectGraphContext insertOrUpdateItems: @[newDictItem]];
-    
+
     UKObjectsEqual(D(@"boum", @"sound"), [model valueForProperty: @"entries"]);
 
     /* Model Item Update */
-    
+
     [model.objectGraphContext insertOrUpdateItems: @[[self modelItem]]];
 
     UKObjectsEqual(D(@"boum", @"sound"), [model valueForProperty: @"entries"]);
-    
+
     /* Mixed Item Update */
 
     [newDictItem setValue: @"here"
@@ -101,7 +100,8 @@
 
     [model.objectGraphContext insertOrUpdateItems: @[newDictItem, [self modelItem]]];
 
-    UKObjectsEqual(D(@"boum", @"sound", @"here", @"location"), [model valueForProperty: @"entries"]);
+    UKObjectsEqual(D(@"boum", @"sound", @"here", @"location"),
+                   [model valueForProperty: @"entries"]);
 }
 
 - (void)testKeyedAttributeModelInitialization
@@ -110,38 +110,46 @@
 
     [self checkPersistentRootWithExistingAndNewContext: model.persistentRoot
                                                inBlock:
-    ^ (COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
-    {
-        KeyedAttributeModel *testModel = testPersistentRoot.rootObject;
+       ^(COEditingContext *testCtx,
+         COPersistentRoot *testPersistentRoot,
+         COBranch *testBranch,
+         BOOL isNewContext)
+       {
+           KeyedAttributeModel *testModel = testPersistentRoot.rootObject;
 
-        UKObjectsEqual(@{}, [testModel valueForProperty: @"entries"]);
-    }];
+           UKObjectsEqual(@{},
+                          [testModel valueForProperty: @"entries"]);
+       }];
 }
 
 - (void)testSetContent
 {
-    [model setValue: @{ @"sound": @"boum" } forProperty: @"entries"];
-    
+    [model setValue: @{@"sound": @"boum"} forProperty: @"entries"];
+
     UKObjectsEqual(S(model.UUID), model.objectGraphContext.insertedObjectUUIDs);
 
     [ctx commit];
 
     [self checkPersistentRootWithExistingAndNewContext: model.persistentRoot
                                                inBlock:
-    ^ (COEditingContext *testCtx, COPersistentRoot *testPersistentRoot, COBranch *testBranch, BOOL isNewContext)
-    {
-        KeyedAttributeModel *testModel = testPersistentRoot.rootObject;
+       ^(COEditingContext *testCtx,
+         COPersistentRoot *testPersistentRoot,
+         COBranch *testBranch,
+         BOOL isNewContext)
+       {
+           KeyedAttributeModel *testModel = testPersistentRoot.rootObject;
 
-        UKObjectsEqual(D(@"boum", @"sound"), [testModel valueForProperty: @"entries"]);
-    }];
+           UKObjectsEqual(D(@"boum", @"sound"),
+                          [testModel valueForProperty: @"entries"]);
+       }];
 }
 
 - (void)testIllegalDirectModificationOfCollection
 {
     UKRaisesException(((NSMutableDictionary *)[model entries])[@"fruit"] = @"pear");
-    
-    model.entries = @{@"name" : @"John" };
-    
+
+    model.entries = @{@"name": @"John"};
+
     UKRaisesException(((NSMutableDictionary *)[model entries])[@"fruit"] = @"pear");
 }
 
@@ -163,26 +171,30 @@
                 atIndex: ETUndeterminedIndex
                    hint: [ETKeyValuePair pairWithKey: @"fruit" value: nil]
             forProperty: @"entries"];
-            
+
     UKObjectsEqual(D(@"leak", @"vegetable"), model.entries.content);
 }
 
 - (void)testSerializationRoundTrip
 {
     UKObjectsEqual([model entries], [model roundTripValueForProperty: @"entries"]);
-    
+
     [ctx commit];
     [self checkPersistentRootWithExistingAndNewContext: model.persistentRoot
                                                inBlock:
-    ^ (COEditingContext *testCtx, COPersistentRoot *testProot, COBranch *testBranch, BOOL isNewContext)
-    {
-        UKObjectsEqual([model entries], [testProot.rootObject entries]);
-    }];
+       ^(COEditingContext *testCtx,
+         COPersistentRoot *testProot,
+         COBranch *testBranch,
+         BOOL isNewContext)
+       {
+           UKObjectsEqual([model entries],
+                          [testProot.rootObject entries]);
+       }];
 }
 
 - (void)testNullDisallowedInCollection
 {
-    UKRaisesException([model setEntries: @{@"Test" : [NSNull null]}]);
+    UKRaisesException([model setEntries: @{@"Test": [NSNull null]}]);
 }
 
 @end
