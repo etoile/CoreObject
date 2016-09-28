@@ -23,32 +23,31 @@
 
 @property (nonatomic, readonly) NSMutableArray *operations;
 
-- (instancetype) initWithFirstAttributedString: (COAttributedString *)first
-              secondAttributedString: (COAttributedString *)second
-                              source: (id)source NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithFirstAttributedString: (COAttributedString *)first
+                       secondAttributedString: (COAttributedString *)second
+                                       source: (id)source NS_DESIGNATED_INITIALIZER;
+- (void)addOperationsFromDiff: (COAttributedStringDiff *)aDiff;
+- (COAttributedStringDiff *)diffByMergingWithDiff: (COAttributedStringDiff *)aDiff;
+- (void)applyToAttributedString: (COAttributedString *)target;
 
-- (void) addOperationsFromDiff: (COAttributedStringDiff *)aDiff;
-- (COAttributedStringDiff *) diffByMergingWithDiff: (COAttributedStringDiff *)aDiff;
-
-- (void) applyToAttributedString: (COAttributedString *)target;
 
 /* @taskunit CODiffAlgorithm Protocol */
 
-+ (instancetype) diffItemUUIDs: (NSArray *)uuids
-                     fromGraph: (id <COItemGraph>)a
-                       toGraph: (id <COItemGraph>)b
-              sourceIdentifier: (id)aSource;
 
-- (id<CODiffAlgorithm>) itemTreeDiffByMergingWithDiff: (id<CODiffAlgorithm>)aDiff;
-
++ (instancetype)diffItemUUIDs: (NSArray *)uuids
+                    fromGraph: (id <COItemGraph>)a
+                      toGraph: (id <COItemGraph>)b
+             sourceIdentifier: (id)aSource;
+- (id <CODiffAlgorithm>)itemTreeDiffByMergingWithDiff: (id <CODiffAlgorithm>)aDiff;
 /** 
  * For testing
  */
-- (instancetype) initWithOperations: (NSArray *)ops NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithOperations: (NSArray *)ops NS_DESIGNATED_INITIALIZER;
 
 @end
 
 @protocol COAttributedStringDiffOperation <NSObject>
+
 @required
 @property (nonatomic, readwrite, copy) ETUUID *attributedStringUUID;
 @property (nonatomic, readwrite, assign) NSRange range;
@@ -58,33 +57,49 @@
  * Returns the number of characters added (if positive) or removed (if negative)
  * from the string.
  */
-- (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset;
+- (NSInteger)applyOperationToAttributedString: (COAttributedString *)target
+                                   withOffset: (NSInteger)offset;
+
 @end
 
 @interface COAttributedStringOperation : NSObject <COAttributedStringDiffOperation>
 {
-@protected;
+@protected
     ETUUID *attributedStringUUID;
     NSRange range;
     id source;
 }
+
 @end
 
+
 @interface COAttributedStringDiffOperationInsertAttributedSubstring : COAttributedStringOperation
+
 @property (nonatomic, readwrite, strong) COItemGraph *attributedStringItemGraph;
+
 @end
+
 
 @interface COAttributedStringDiffOperationDeleteRange : COAttributedStringOperation
 @end
 
+
 @interface COAttributedStringDiffOperationReplaceRange : COAttributedStringOperation
+
 @property (nonatomic, readwrite, strong) COItemGraph *attributedStringItemGraph;
+
 @end
+
 
 @interface COAttributedStringDiffOperationAddAttribute : COAttributedStringOperation
+
 @property (nonatomic, readwrite, strong) COItemGraph *attributeItemGraph;
+
 @end
 
+
 @interface COAttributedStringDiffOperationRemoveAttribute : COAttributedStringOperation
+
 @property (nonatomic, readwrite, strong) COItemGraph *attributeItemGraph;
+
 @end

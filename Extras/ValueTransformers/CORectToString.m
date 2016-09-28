@@ -31,7 +31,7 @@
 {
     ETAssert([value isKindOfClass: [NSString class]]);
     NSString *string = value;
-    
+
     return [NSValue valueWithRect: NSRectFromString(string)];
 }
 

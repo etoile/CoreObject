@@ -44,9 +44,12 @@ static NSString *ColorToString(NSColor *color)
     rgbColor = [color colorUsingColorSpaceName: NSCalibratedRGBColorSpace];
 #endif
     [rgbColor getRed: &r green: &g blue: &b alpha: &a];
-    
+
     return [NSString stringWithFormat: @"#%@%@%@%@",
-        HexFromFraction(a), HexFromFraction(r), HexFromFraction(g), HexFromFraction(b)];
+                                       HexFromFraction(a),
+                                       HexFromFraction(r),
+                                       HexFromFraction(g),
+                                       HexFromFraction(b)];
 }
 
 static NSColor *ColorFromString(NSString *color)
@@ -66,11 +69,11 @@ static NSColor *ColorFromString(NSString *color)
 - (id)transformedValue: (id)value
 {
     if (value == nil)
-        return  nil;
+        return nil;
 
     ETAssert([value isKindOfClass: [NSColor class]]);
     NSColor *color = value;
-    
+
     NSString *string = ColorToString(color);
     return string;
 }
@@ -82,7 +85,7 @@ static NSColor *ColorFromString(NSString *color)
 
     ETAssert([value isKindOfClass: [NSString class]]);
     NSString *string = value;
-    
+
     NSColor *color = ColorFromString(string);
     return color;
 }

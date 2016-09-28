@@ -13,7 +13,7 @@
 
 @interface COTrackViewController : UITableViewController <UITableViewDataSource, UITableViewDelegate>
 {
-    @private
+@private
     id <COTrack> _track;
     UIColor *_pastColor;
     UIColor *_futureColor;
@@ -27,7 +27,7 @@
 /**
  * The track whose nodes are presented in the table view.
  */
-@property (nonatomic, readwrite, strong)  id <COTrack> track;
+@property (nonatomic, readwrite, strong) id <COTrack> track;
 /**
  * Returns the node at the given index path in the table view.
  *
@@ -49,7 +49,7 @@
  *
  * See -suggestedColorForNode:.
  */
-@property (nonatomic, readwrite, copy)  UIColor *pastColor;
+@property (nonatomic, readwrite, copy) UIColor *pastColor;
 /**
  * The color used to indicate the future history.
  *
@@ -57,7 +57,8 @@
  *
  * See -suggestedColorForNode:.
  */
-@property (nonatomic, readwrite, copy)  UIColor *futureColor;
+@property (nonatomic, readwrite, copy) UIColor *futureColor;
+
 /**
  * Returns either -pastColor or -futureColor based on where the node sits 
  * relative to -[COTrack currentNode].

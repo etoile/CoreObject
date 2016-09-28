@@ -8,5 +8,7 @@
 #import <CoreObject/CoreObject.h>
 
 @interface COBezierPath : COObject
+
 @property (nonatomic, readwrite, copy) NSArray *nodes;
+
 @end

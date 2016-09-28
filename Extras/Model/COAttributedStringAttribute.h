@@ -17,16 +17,12 @@
  * e.g. bold
  */
 @property (nonatomic, readwrite, copy) NSString *styleValue;
-
 @property (nonatomic, readonly) COItemGraph *attributeItemGraph;
 
-+ (BOOL) isAttributeSet: (NSSet *)aSet equalToSet: (NSSet *)anotherSet;
-+ (NSSet *) attributeSet: (NSSet *)aSet minusSet: (NSSet *)anotherSet;
-
-+ (COItemGraph *) attributeItemGraphForStyleKey: (NSString *)aKey styleValue: (NSString *)aValue;
-
-+ (BOOL) isAttributeItemGraph: (COItemGraph *)aGraph equalToItemGraph: (COItemGraph *)anotherGraph;
-
-- (BOOL) isDeeplyEqualToAttribute: (COAttributedStringAttribute *)anAttribute;
++ (BOOL)isAttributeSet: (NSSet *)aSet equalToSet: (NSSet *)anotherSet;
++ (NSSet *)attributeSet: (NSSet *)aSet minusSet: (NSSet *)anotherSet;
++ (COItemGraph *)attributeItemGraphForStyleKey: (NSString *)aKey styleValue: (NSString *)aValue;
++ (BOOL)isAttributeItemGraph: (COItemGraph *)aGraph equalToItemGraph: (COItemGraph *)anotherGraph;
+- (BOOL)isDeeplyEqualToAttribute: (COAttributedStringAttribute *)anAttribute;
 
 @end

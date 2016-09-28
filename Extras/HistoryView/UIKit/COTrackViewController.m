@@ -12,7 +12,9 @@
 
 @synthesize track = _track, pastColor = _pastColor, futureColor = _futureColor;
 
-#pragma mark - Initialization
+
+#pragma mark - Initialization -
+
 
 - (void)setUp
 {
@@ -25,7 +27,7 @@
     self = [super initWithNibName: nibName bundle: nibBundle];
     if (self == nil)
         return nil;
-    
+
     [self setUp];
     return self;
 }
@@ -35,7 +37,7 @@
     self = [super initWithCoder: aDecoder];
     if (self == nil)
         return nil;
-    
+
     [self setUp];
     return self;
 }
@@ -45,7 +47,9 @@
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 }
 
-#pragma mark - Accessing Track and Nodes
+
+#pragma mark - Accessing Track and Nodes -
+
 
 - (void)setTrack: (id <COTrack>)aTrack
 {
@@ -65,7 +69,7 @@
 {
     NSArray *nodes = self.track.nodes;
     NSInteger reversedIndex = nodes.count - 1 - indexPath.row;
-    
+
     return nodes[reversedIndex];
 }
 
@@ -92,7 +96,9 @@
     return NO;
 }
 
-#pragma mark - Customizing Appearance
+
+#pragma mark - Customizing Appearance -
+
 
 - (UIColor *)suggestedColorForNode: (id <COTrackNode>)node
 {
@@ -103,13 +109,13 @@
 {
     static NSString *TrackCellIdentifier = @"TrackCell";
     UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier: TrackCellIdentifier];
- 
+
     if (cell == nil)
     {
         cell = [[UITableViewCell alloc] initWithStyle: UITableViewCellStyleDefault
                                       reuseIdentifier: TrackCellIdentifier];
     }
-    
+
     cell.textLabel.text = node.localizedShortDescription;
     cell.textLabel.textColor = [self suggestedColorForNode: node];
 
@@ -129,14 +135,18 @@
     cell.accessoryType = UITableViewCellAccessoryNone;
 }
 
-#pragma mark - Reacting to Track Changes
+
+#pragma mark - Reacting to Track Changes -
+
 
 - (void)trackDidUpdate: (NSNotification *)notif
 {
     [self.tableView reloadData];
 }
 
-#pragma mark - Actions
+
+#pragma mark - Actions -
+
 
 - (IBAction)undo
 {
@@ -153,7 +163,9 @@
     [self.track setCurrentNode: aNode];
 }
 
-#pragma mark - Table View Data Source
+
+#pragma mark - Table View Data Source -
+
 
 - (NSInteger)tableView: (UITableView *)tableView numberOfRowsInSection: (NSInteger)section
 {
@@ -166,7 +178,7 @@
     ETAssert(self.tableView == tableView);
     id <COTrackNode> node = [self nodeForRowAtIndexPath: indexPath];
     UITableViewCell *cell = [self makeCellForNode: node];
-    
+
     if ([[self.track currentNode] isEqual: node])
     {
         [self checkRow: cell];
@@ -175,7 +187,7 @@
     {
         [self uncheckRow: cell];
     }
-    
+
     return cell;
 }
 
@@ -187,7 +199,7 @@
 
     [self.tableView deselectRowAtIndexPath: indexPath
                                   animated: NO];
-    
+
     /* Will trigger -trackDidUpdate: */
     [self didSelectNode: [self nodeForRowAtIndexPath: indexPath]];
 }

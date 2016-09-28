@@ -13,7 +13,9 @@
 #if (TARGET_OS_IPHONE)
 #   import <CoreObject/COCocoaTouchCompatibility.h>
 #else
+
 #   import <AppKit/AppKit.h>
+
 #   if defined(GNUSTEP) || MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_11
 #       define NSTextStorageEditActions NSUInteger
 #   endif
@@ -32,14 +34,14 @@
      * so we can unregister accurately.
      */
     NSHashTable *_observedObjectsSet;
-    
+
     // Debugging / Self-checks
     NSInteger _beginEditingStackDepth;
     NSInteger _lengthAtStartOfBatch;
     NSInteger _lengthDeltaInBatch;
 }
 
-- (instancetype) initWithBacking: (COAttributedString *)aBacking NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithBacking: (COAttributedString *)aBacking NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readwrite, strong) COAttributedString *backing;
 

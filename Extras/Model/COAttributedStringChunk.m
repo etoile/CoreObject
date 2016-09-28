@@ -10,48 +10,52 @@
 #import "COAttributedString.h"
 
 @implementation COAttributedStringChunk
-+ (ETEntityDescription*)newEntityDescription
+
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *entity = [self newBasicEntityDescription];
-    
+
     if (![entity.name isEqual: [COAttributedStringChunk className]])
         return entity;
-    
+
     ETPropertyDescription *textProperty = [ETPropertyDescription descriptionWithName: @"text"
-                                                                                typeName: @"NSString"];
+                                                                            typeName: @"NSString"];
     textProperty.persistent = YES;
-    
+
     ETPropertyDescription *attributesProperty = [ETPropertyDescription descriptionWithName: @"attributes"
-                                                                                      typeName: @"COAttributedStringAttribute"];
+                                                                                  typeName: @"COAttributedStringAttribute"];
     attributesProperty.multivalued = YES;
     attributesProperty.persistent = YES;
-    
+
     ETPropertyDescription *parentStringProperty = [ETPropertyDescription descriptionWithName: @"parentString"
-                                                                                        typeName: @"COAttributedString"];
+                                                                                    typeName: @"COAttributedString"];
     parentStringProperty.multivalued = NO;
     parentStringProperty.derived = YES;
     parentStringProperty.oppositeName = @"COAttributedString.chunks";
-    
+
     entity.propertyDescriptions = @[textProperty, attributesProperty, parentStringProperty];
-    
+
     entity.diffAlgorithm = @"COAttributedStringDiff";
-    
+
     return entity;
 }
+
 @dynamic attributes, parentString;
 
-- (COItemGraph *) subchunkItemGraphWithRange: (NSRange)aRange
+- (COItemGraph *)subchunkItemGraphWithRange: (NSRange)aRange
 {
     COItemGraph *result = [[COItemGraph alloc] init];
     COCopier *copier = [[COCopier alloc] init];
-    
-    ETUUID *copyRootUUID = [copier copyItemWithUUID: self.UUID fromGraph: self.objectGraphContext toGraph: result];
+
+    ETUUID *copyRootUUID = [copier copyItemWithUUID: self.UUID
+                                          fromGraph: self.objectGraphContext
+                                            toGraph: result];
     result.rootItemUUID = copyRootUUID;
-    
+
     COMutableItem *chunkCopy = [result itemForUUID: copyRootUUID];
     [chunkCopy setValue: [self.text substringWithRange: aRange]
            forAttribute: @"text"];
-    
+
     return result;
 }
 
@@ -71,23 +75,24 @@
 }
 
 // NOTE: This gets called a lot by AppKit
-- (NSUInteger) length
+- (NSUInteger)length
 {
     return text.length;
 }
 
-- (NSString *) attributesDebugDescription
+- (NSString *)attributesDebugDescription
 {
-    return [[self.attributes mappedCollectionWithBlock: ^(id anObj) {
+    return [[self.attributes mappedCollectionWithBlock: ^(id anObj)
+    {
         COAttributedStringAttribute *attr = anObj;
         return [NSString stringWithFormat: @"%@=%@", attr.styleKey, attr.styleValue];
     }] componentsJoinedByString: @","];
 }
 
-- (NSUInteger) characterIndex
+- (NSUInteger)characterIndex
 {
     NSUInteger i = 0;
-    
+
     for (COAttributedStringChunk *chunk in self.parentString.chunks)
     {
         if (chunk == self)
@@ -98,12 +103,12 @@
     return NSUIntegerMax;
 }
 
-- (NSRange) characterRange
+- (NSRange)characterRange
 {
     return NSMakeRange(self.characterIndex, self.length);
 }
 
-- (NSString *) description
+- (NSString *)description
 {
     NSMutableString *result = [NSMutableString new];
     if (self.attributes.count == 0)
@@ -113,7 +118,7 @@
     else
     {
         NSArray *attrs = [self.attributes.allObjects sortedArrayUsingDescriptors:
-                          @[[NSSortDescriptor sortDescriptorWithKey: @"htmlCode" ascending: YES]]];
+            @[[NSSortDescriptor sortDescriptorWithKey: @"htmlCode" ascending: YES]]];
         for (COAttributedStringAttribute *attr in attrs)
         {
             [result appendFormat: @"<%@>", attr];

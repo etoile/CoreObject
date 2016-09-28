@@ -20,26 +20,27 @@
 static bool arraycomparefn(size_t i, size_t j, const void *userdata1, const void *userdata2)
 {
     return [(__bridge NSString *)userdata1 characterAtIndex: i]
-    == [(__bridge NSString *)userdata2 characterAtIndex: j];
+           == [(__bridge NSString *)userdata2 characterAtIndex: j];
 }
 
-static BOOL coalesceOpPair(id<COAttributedStringDiffOperation> op, id<COAttributedStringDiffOperation> nextOp)
+static BOOL coalesceOpPair(id <COAttributedStringDiffOperation> op,
+                           id <COAttributedStringDiffOperation> nextOp)
 {
     const BOOL isOpAttributeOp = ([op isKindOfClass: [COAttributedStringDiffOperationAddAttribute class]]
                                   || [op isKindOfClass: [COAttributedStringDiffOperationRemoveAttribute class]]);
     const BOOL isOpSameClassAsNextOp = ([op class] == [nextOp class]);
     const BOOL isAdjacent = NSMaxRange(op.range) == nextOp.range.location;
-    
+
     if (isOpAttributeOp && isOpSameClassAsNextOp && isAdjacent)
     {
         COObjectGraphContext *opAttributeGraph = [COObjectGraphContext new];
         [opAttributeGraph setItemGraph: [(id)op attributeItemGraph]];
         COAttributedStringAttribute *opAttribute = opAttributeGraph.rootObject;
-        
+
         COObjectGraphContext *nextOpAttributeGraph = [COObjectGraphContext new];
         [nextOpAttributeGraph setItemGraph: [(id)nextOp attributeItemGraph]];
         COAttributedStringAttribute *nextOpAttribute = nextOpAttributeGraph.rootObject;
-        
+
         const BOOL sameAttributes = [opAttribute isDeeplyEqualToAttribute: nextOpAttribute];
         if (sameAttributes)
         {
@@ -52,17 +53,17 @@ static BOOL coalesceOpPair(id<COAttributedStringDiffOperation> op, id<COAttribut
 
 static void coalesceOpsInternal(NSMutableArray *ops, NSUInteger i)
 {
-    if (i+1 >= ops.count)
+    if (i + 1 >= ops.count)
         return;
-    
-    if (coalesceOpPair(ops[i], ops[i+1]))
+
+    if (coalesceOpPair(ops[i], ops[i + 1]))
     {
-        [ops removeObjectAtIndex: i+1];
+        [ops removeObjectAtIndex: i + 1];
         coalesceOpsInternal(ops, i);
     }
     else
     {
-        return coalesceOpsInternal(ops, i+1);
+        return coalesceOpsInternal(ops, i + 1);
     }
 }
 
@@ -71,24 +72,24 @@ static void coalesceOps(NSMutableArray *ops)
     coalesceOpsInternal(ops, 0);
 }
 
-+ (instancetype) diffItemUUIDs: (NSArray *)uuids
-                     fromGraph: (id <COItemGraph>)a
-                       toGraph: (id <COItemGraph>)b
-              sourceIdentifier: (id)aSource
++ (instancetype)diffItemUUIDs: (NSArray *)uuids
+                    fromGraph: (id <COItemGraph>)a
+                      toGraph: (id <COItemGraph>)b
+             sourceIdentifier: (id)aSource
 {
     // FIXME: Ugly hack.
     COObjectGraphContext *ctxA = [[COObjectGraphContext alloc] init];
     [ctxA setItemGraph: a];
     COObjectGraphContext *ctxB = [[COObjectGraphContext alloc] init];
     [ctxB setItemGraph: b];
-    
+
     COAttributedStringDiff *result = [[COAttributedStringDiff alloc] initWithOperations: @[]];
-    
+
     for (ETUUID *uuid in uuids)
     {
         COAttributedString *objectA = [ctxA loadedObjectForUUID: uuid];
         COAttributedString *objectB = [ctxB loadedObjectForUUID: uuid];
-        
+
         // HACK: -diffFirst: method won't handle one string being nil, so just
         // make a fake string.
         if (objectA == nil)
@@ -98,17 +99,17 @@ static void coalesceOps(NSMutableArray *ops)
                                                objectGraphContext: ctxA
                                                             isNew: YES];
         }
-        
+
         if ([objectB isKindOfClass: [COAttributedString class]])
         {
-            [result diffFirst:objectA second: objectB source: aSource];
+            [result diffFirst: objectA second: objectB source: aSource];
         }
     }
 
     return result;
 }
 
-- (id<CODiffAlgorithm>) itemTreeDiffByMergingWithDiff: (id<CODiffAlgorithm>)aDiff
+- (id <CODiffAlgorithm>)itemTreeDiffByMergingWithDiff: (id <CODiffAlgorithm>)aDiff
 {
     COAttributedStringDiff *result = [[COAttributedStringDiff alloc] initWithOperations: @[]];
     [result addOperationsFromDiff: self];
@@ -116,16 +117,16 @@ static void coalesceOps(NSMutableArray *ops)
     return result;
 }
 
-- (instancetype) initWithOperations: (NSArray *)ops
+- (instancetype)initWithOperations: (NSArray *)ops
 {
     SUPERINIT;
     _operations = [[NSMutableArray alloc] initWithArray: ops];
     return self;
 }
 
-- (instancetype) initWithFirstAttributedString: (COAttributedString *)first
-                        secondAttributedString: (COAttributedString *)second
-                                        source: (id)source
+- (instancetype)initWithFirstAttributedString: (COAttributedString *)first
+                       secondAttributedString: (COAttributedString *)second
+                                       source: (id)source
 {
     NILARG_EXCEPTION_TEST(first);
     NILARG_EXCEPTION_TEST(second);
@@ -140,222 +141,285 @@ static void coalesceOps(NSMutableArray *ops)
     return [self initWithFirstAttributedString: nil secondAttributedString: nil source: nil];
 }
 
-- (void) diffFirst: (COAttributedString *)first
-            second: (COAttributedString *)second
-            source: (id)source
+- (void)diffFirst: (COAttributedString *)first
+           second: (COAttributedString *)second
+           source: (id)source
 {
     NSString *firstString = [[COAttributedStringWrapper alloc] initWithBacking: first].string;
     NSString *secondString = [[COAttributedStringWrapper alloc] initWithBacking: second].string;
-        
-    diffresult_t *result = diff_arrays(firstString.length, secondString.length, arraycomparefn, (__bridge void *)firstString, (__bridge void *)secondString);
-    
+
+    diffresult_t *result = diff_arrays(firstString.length,
+                                       secondString.length,
+                                       arraycomparefn,
+                                       (__bridge void *)firstString,
+                                       (__bridge void *)secondString);
+
     for (size_t i = 0; i < diff_editcount(result); i++)
     {
         const diffedit_t edit = diff_edit_at_index(result, i);
         const NSRange rangeInA = NSMakeRange(edit.range_in_a.location, edit.range_in_a.length);
         const NSRange rangeInB = NSMakeRange(edit.range_in_b.location, edit.range_in_b.length);
-        
+
         switch (edit.type)
         {
             case difftype_insertion:
-                [self recordInsertionRangeA: rangeInA rangeB: rangeInB first: first second: second source: source];
+                [self recordInsertionRangeA: rangeInA
+                                     rangeB: rangeInB
+                                      first: first
+                                     second: second
+                                     source: source];
                 break;
             case difftype_deletion:
-                [self recordDeletionRangeA: rangeInA rangeB: rangeInB first: first second: second source: source];
+                [self recordDeletionRangeA: rangeInA
+                                    rangeB: rangeInB
+                                     first: first
+                                    second: second
+                                    source: source];
                 break;
             case difftype_modification:
-                [self recordModificationRangeA: rangeInA rangeB: rangeInB first: first second: second source: source];
+                [self recordModificationRangeA: rangeInA
+                                        rangeB: rangeInB
+                                         first: first
+                                        second: second
+                                        source: source];
                 break;
             case difftype_copy:
-                [self recordCopyRangeA: rangeInA rangeB: rangeInB first: first second: second source: source];
+                [self recordCopyRangeA: rangeInA
+                                rangeB: rangeInB
+                                 first: first
+                                second: second
+                                source: source];
                 break;
         }
     }
-    
+
     diff_free(result);
-    
+
     // To make testing easier
     coalesceOps(_operations);
 }
 
-- (void) recordInsertionRangeA: (NSRange)rangeInA rangeB: (NSRange)rangeInB first: (COAttributedString *)first second: (COAttributedString *)second source: (id)source
+- (void)recordInsertionRangeA: (NSRange)rangeInA
+                       rangeB: (NSRange)rangeInB
+                        first: (COAttributedString *)first
+                       second: (COAttributedString *)second
+                       source: (id)source
 {
     COItemGraph *graph = [second substringItemGraphWithRange: rangeInB];
-    
+
     COAttributedStringDiffOperationInsertAttributedSubstring *op = [COAttributedStringDiffOperationInsertAttributedSubstring new];
     op.attributedStringUUID = second.UUID;
     op.range = rangeInA;
     op.source = source;
     op.attributedStringItemGraph = graph;
-    
+
     [_operations addObject: op];
 }
 
-- (void) recordDeletionRangeA: (NSRange)rangeInA rangeB: (NSRange)rangeInB first: (COAttributedString *)first second: (COAttributedString *)second source: (id)source
+- (void)recordDeletionRangeA: (NSRange)rangeInA
+                      rangeB: (NSRange)rangeInB
+                       first: (COAttributedString *)first
+                      second: (COAttributedString *)second
+                      source: (id)source
 {
     COAttributedStringDiffOperationDeleteRange *op = [COAttributedStringDiffOperationDeleteRange new];
     op.attributedStringUUID = second.UUID;
     op.range = rangeInA;
     op.source = source;
-    
+
     [_operations addObject: op];
 }
 
-- (void) recordModificationRangeA: (NSRange)rangeInA rangeB: (NSRange)rangeInB first: (COAttributedString *)first second: (COAttributedString *)second source: (id)source
+- (void)recordModificationRangeA: (NSRange)rangeInA
+                          rangeB: (NSRange)rangeInB
+                           first: (COAttributedString *)first
+                          second: (COAttributedString *)second
+                          source: (id)source
 {
     // The semantics of "modification" are that the old and new
     // block are totally unrelated. Thus the old and new attributes
     // are totally semantically unrelated, so we just record it in the diff as
     // 'replace this range with this new attributed string'
-    
+
     COItemGraph *graph = [second substringItemGraphWithRange: rangeInB];
-    
+
     COAttributedStringDiffOperationReplaceRange *op = [COAttributedStringDiffOperationReplaceRange new];
     op.attributedStringUUID = second.UUID;
     op.range = rangeInA;
     op.source = source;
     op.attributedStringItemGraph = graph;
-    
+
     [_operations addObject: op];
 }
 
-- (void) recordAddAttribute: (COAttributedStringAttribute *)attr toRangeA: (NSRange)rangeInA first: (COAttributedString *)first second: (COAttributedString *)second source: (id)source
+- (void)recordAddAttribute: (COAttributedStringAttribute *)attr
+                  toRangeA: (NSRange)rangeInA
+                     first: (COAttributedString *)first
+                    second: (COAttributedString *)second
+                    source: (id)source
 {
     COItemGraph *graph = attr.attributeItemGraph;
-    
+
     COAttributedStringDiffOperationAddAttribute *op = [COAttributedStringDiffOperationAddAttribute new];
     op.range = rangeInA;
     op.source = source;
     op.attributeItemGraph = graph;
     op.attributedStringUUID = second.UUID;
-    
+
     [_operations addObject: op];
 }
 
-- (void) recordRemoveAttribute: (COAttributedStringAttribute *)attr toRangeA: (NSRange)rangeInA first: (COAttributedString *)first second: (COAttributedString *)second source: (id)source
+- (void)recordRemoveAttribute: (COAttributedStringAttribute *)attr
+                     toRangeA: (NSRange)rangeInA
+                        first: (COAttributedString *)first
+                       second: (COAttributedString *)second
+                       source: (id)source
 {
     COItemGraph *graph = attr.attributeItemGraph;
-    
+
     COAttributedStringDiffOperationRemoveAttribute *op = [COAttributedStringDiffOperationRemoveAttribute new];
     op.range = rangeInA;
     op.source = source;
     op.attributeItemGraph = graph;
     op.attributedStringUUID = second.UUID;
-    
+
     [_operations addObject: op];
 }
 
-- (void) recordCopyRangeA: (NSRange)firstRange rangeB: (NSRange)secondRange first: (COAttributedString *)first second: (COAttributedString *)second source: (id)source
+- (void)recordCopyRangeA: (NSRange)firstRange
+                  rangeB: (NSRange)secondRange
+                   first: (COAttributedString *)first
+                  second: (COAttributedString *)second
+                  source: (id)source
 {
     // The textual content of these regions is unchanged. Iterate
     // through the attributes and see if they are the same too.
-    
+
     ETAssert(firstRange.length == secondRange.length);
-    
-    NSUInteger i=0;
-    while (i<firstRange.length)
+
+    NSUInteger i = 0;
+    while (i < firstRange.length)
     {
         NSRange rangeAtIForFirstString;
         NSRange rangeAtIForSecondString;
         NSSet *firstAttributes = [first attributesSetAtIndex: firstRange.location + i
-                                        longestEffectiveRange: &rangeAtIForFirstString
-                                                      inRange: firstRange];
+                                       longestEffectiveRange: &rangeAtIForFirstString
+                                                     inRange: firstRange];
         NSSet *secondAttributes = [second attributesSetAtIndex: secondRange.location + i
-                                          longestEffectiveRange: &rangeAtIForSecondString
-                                                        inRange: secondRange];
-        
+                                         longestEffectiveRange: &rangeAtIForSecondString
+                                                       inRange: secondRange];
+
         if (rangeAtIForFirstString.location < firstRange.location + i)
         {
             rangeAtIForFirstString.length -= (firstRange.location + i) - rangeAtIForFirstString.location;
             rangeAtIForFirstString.location = firstRange.location + i;
         }
-        
+
         if (rangeAtIForSecondString.location < secondRange.location + i)
         {
             rangeAtIForSecondString.length -= (secondRange.location + i) - rangeAtIForSecondString.location;
             rangeAtIForSecondString.location = secondRange.location + i;
         }
-        
-        const NSUInteger minLength = MIN(rangeAtIForFirstString.length, rangeAtIForSecondString.length);
+
+        const NSUInteger minLength = MIN(rangeAtIForFirstString.length,
+                                         rangeAtIForSecondString.length);
         ETAssert(minLength >= 1);
-        const NSRange consideredRangeForFirstString = NSMakeRange(rangeAtIForFirstString.location,  minLength);
-        
-        if (![COAttributedStringAttribute isAttributeSet: firstAttributes equalToSet: secondAttributes])
+        const NSRange consideredRangeForFirstString = NSMakeRange(rangeAtIForFirstString.location,
+                                                                  minLength);
+
+        if (![COAttributedStringAttribute isAttributeSet: firstAttributes
+                                              equalToSet: secondAttributes])
         {
             {
-                NSSet *removed = [COAttributedStringAttribute attributeSet: firstAttributes minusSet: secondAttributes];
-                
+                NSSet *removed = [COAttributedStringAttribute attributeSet: firstAttributes
+                                                                  minusSet: secondAttributes];
+
                 for (COAttributedStringAttribute *attr in removed)
                 {
-                    [self recordRemoveAttribute: attr toRangeA: consideredRangeForFirstString first: first second: second source: source];
+                    [self recordRemoveAttribute: attr
+                                       toRangeA: consideredRangeForFirstString
+                                          first: first
+                                         second: second
+                                         source: source];
                 }
             }
             {
-                NSSet *added = [COAttributedStringAttribute attributeSet: secondAttributes minusSet: firstAttributes];
-                
+                NSSet *added = [COAttributedStringAttribute attributeSet: secondAttributes
+                                                                minusSet: firstAttributes];
+
                 for (COAttributedStringAttribute *attr in added)
                 {
-                    [self recordAddAttribute: attr toRangeA: consideredRangeForFirstString first: first second: second source: source];
+                    [self recordAddAttribute: attr
+                                    toRangeA: consideredRangeForFirstString
+                                       first: first
+                                      second: second
+                                      source: source];
                 }
             }
         }
-        
+
         i += minLength;
     }
 }
 
-#pragma mark - Diff Application
 
-- (void) sortOperationsFavouringSourceIdentifier: (id)aSource
+#pragma mark - Diff Application -
+
+
+- (void)sortOperationsFavouringSourceIdentifier: (id)aSource
 {
-    [_operations sortUsingComparator: ^(id obj1, id obj2){
-        id<COAttributedStringDiffOperation> string1 = obj1;
-        id<COAttributedStringDiffOperation> string2 = obj2;
-        
-        if (![string1.attributedStringUUID isEqual: string2.attributedStringUUID])
+    [_operations sortUsingComparator:
+        ^(id obj1, id obj2)
         {
-            int result = memcmp([string1.attributedStringUUID UUIDValue], [string2.attributedStringUUID UUIDValue], 16);
-            return (result < 0) ? NSOrderedAscending : NSOrderedDescending;
-        }
-        
-        NSRange r1 = string1.range;
-        NSRange r2 = string2.range;
-        
-        if (r1.location < r2.location)
-        {
-            return NSOrderedAscending;
-        }
-        if (r1.location == r2.location)
-        {
-            if ([aSource isEqual: string1.source])
+            id <COAttributedStringDiffOperation> string1 = obj1;
+            id <COAttributedStringDiffOperation> string2 = obj2;
+
+            if (![string1.attributedStringUUID isEqual: string2.attributedStringUUID])
+            {
+                int result = memcmp([string1.attributedStringUUID UUIDValue],
+                                    [string2.attributedStringUUID UUIDValue],
+                                    16);
+                return (result < 0) ? NSOrderedAscending : NSOrderedDescending;
+            }
+
+            NSRange r1 = string1.range;
+            NSRange r2 = string2.range;
+
+            if (r1.location < r2.location)
             {
                 return NSOrderedAscending;
             }
-            if ([aSource isEqual: string2.source])
+            if (r1.location == r2.location)
+            {
+                if ([aSource isEqual: string1.source])
+                {
+                    return NSOrderedAscending;
+                }
+                if ([aSource isEqual: string2.source])
+                {
+                    return NSOrderedDescending;
+                }
+
+                return NSOrderedSame;
+            }
+            else
             {
                 return NSOrderedDescending;
             }
-            
-            return NSOrderedSame;
-        }
-        else
-        {
-            return NSOrderedDescending;
-        }
-    }];
-    
+        }];
+
     // To make testing easier
     coalesceOps(_operations);
 }
 
-- (void) addOperationsFromDiff: (COAttributedStringDiff *)aDiff
+- (void)addOperationsFromDiff: (COAttributedStringDiff *)aDiff
 {
     [_operations addObjectsFromArray: aDiff.operations];
-    
+
     [self sortOperationsFavouringSourceIdentifier: nil];
 }
 
-- (COAttributedStringDiff *) diffByMergingWithDiff: (COAttributedStringDiff *)aDiff
+- (COAttributedStringDiff *)diffByMergingWithDiff: (COAttributedStringDiff *)aDiff
 {
     COAttributedStringDiff *result = [[COAttributedStringDiff alloc] initWithOperations: @[]];
     [result->_operations addObjectsFromArray: _operations];
@@ -364,10 +428,10 @@ static void coalesceOps(NSMutableArray *ops)
     return result;
 }
 
-- (NSDictionary *) operationArraysByUUID
+- (NSDictionary *)operationArraysByUUID
 {
     NSMutableDictionary *operationArrays = [NSMutableDictionary new];
-    for (id<COAttributedStringDiffOperation>op in _operations)
+    for (id <COAttributedStringDiffOperation> op in _operations)
     {
         NSMutableArray *array = operationArrays[op.attributedStringUUID];
         if (array == nil)
@@ -380,34 +444,36 @@ static void coalesceOps(NSMutableArray *ops)
     return operationArrays;
 }
 
-- (NSDictionary *) addedOrUpdatedItemsForApplyingTo: (id<COItemGraph>)dest
+- (NSDictionary *)addedOrUpdatedItemsForApplyingTo: (id <COItemGraph>)dest
 {
     COObjectGraphContext *workingCtx = [[COObjectGraphContext alloc] init];
     [workingCtx setItemGraph: dest];
-    
+
     [self applyToObjectGraph: workingCtx];
 
     // Sort of a hack..
-    
-    COItemGraphDiff *diff = [COItemGraphDiff diffItemTree: dest withItemTree: workingCtx sourceIdentifier: @""];
+
+    COItemGraphDiff *diff = [COItemGraphDiff diffItemTree: dest
+                                             withItemTree: workingCtx
+                                         sourceIdentifier: @""];
     NSDictionary *result = [diff addedOrUpdatedItemsForApplyingTo: dest];
     return result;
 }
 
-- (void) applyToAttributedString: (COAttributedString *)attrStr
+- (void)applyToAttributedString: (COAttributedString *)attrStr
 {
     NSDictionary *operationArraysByUUID = [self operationArraysByUUID];
     NSArray *array = operationArraysByUUID[attrStr.UUID];
     NSInteger i = 0;
-    for (id<COAttributedStringDiffOperation> op in array)
+    for (id <COAttributedStringDiffOperation> op in array)
     {
         NSLog(@"Applying %@", op);
-        
+
         i += [op applyOperationToAttributedString: attrStr withOffset: i];
     }
 }
 
-- (void) applyToObjectGraph: (COObjectGraphContext *)dest
+- (void)applyToObjectGraph: (COObjectGraphContext *)dest
 {
     NSDictionary *operationArraysByUUID = [self operationArraysByUUID];
     for (ETUUID *attributedStringUUID in operationArraysByUUID)
@@ -420,33 +486,33 @@ static void coalesceOps(NSMutableArray *ops)
                                                objectGraphContext: dest
                                                             isNew: YES];
         }
-        
+
         NSArray *array = operationArraysByUUID[attributedStringUUID];
         NSInteger i = 0;
-        for (id<COAttributedStringDiffOperation> op in array)
+        for (id <COAttributedStringDiffOperation> op in array)
         {
             NSLog(@"Applying %@", op);
-            
+
             i += [op applyOperationToAttributedString: attrStr withOffset: i];
         }
     }
 }
 
-- (BOOL) isEmpty
+- (BOOL)isEmpty
 {
     return [_operations isEmpty];
 }
 
-- (BOOL) hasConflicts
+- (BOOL)hasConflicts
 {
     // FIXME: Implement
     return NO;
 }
 
-- (void) resolveConflictsFavoringSourceIdentifier: (id)aSource
+- (void)resolveConflictsFavoringSourceIdentifier: (id)aSource
 {
     [self sortOperationsFavouringSourceIdentifier: aSource];
-    
+
     // FIXME: Handle actual conflicts
 }
 
@@ -464,13 +530,15 @@ static void coalesceOps(NSMutableArray *ops)
 
 @end
 
-#pragma mark - Operation Classes
+
+#pragma mark - Operation Classes -
+
 
 static NSString *
 COHTMLCodesForAttributesItemGraph(COItemGraph *graph)
 {
     NSString *htmlCodes = [[graph.items mappedCollectionWithBlock:
-                            ^(id obj) { return [obj valueForAttribute: @"htmlCode"]; }] componentsJoinedByString: @","];
+        ^(id obj) { return [obj valueForAttribute: @"htmlCode"]; }] componentsJoinedByString: @","];
     return htmlCodes;
 }
 
@@ -479,18 +547,19 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 {
     COObjectGraphContext *tempCtx = [COObjectGraphContext new];
     [tempCtx setItemGraph: graph];
-    
+
     COAttributedString *string = tempCtx.rootObject;
     NSMutableString *result = [NSMutableString new];
     for (COAttributedStringChunk *chunk in string.chunks)
     {
         [result appendFormat: @"%@", chunk];
     }
-    
+
     return result;
 }
 
 @implementation COAttributedStringOperation
+
 @synthesize range = range, source = source, attributedStringUUID = attributedStringUUID;
 
 - (NSUInteger)hash
@@ -498,17 +567,18 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
     return NSStringFromClass([self class]).hash ^ range.location ^ range.length ^ attributedStringUUID.hash;
 }
 
-- (BOOL)isEqual:(id)object
+- (BOOL)isEqual: (id)object
 {
     if (![object isKindOfClass: [self class]])
         return NO;
-    
+
     COAttributedStringOperation *op = object;
     return NSEqualRanges(self.range, op.range)
-        && [self.attributedStringUUID isEqual: op.attributedStringUUID];
+           && [self.attributedStringUUID isEqual: op.attributedStringUUID];
 }
 
-- (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
+- (NSInteger)applyOperationToAttributedString: (COAttributedString *)target
+                                   withOffset: (NSInteger)offset
 {
     [NSException raise: NSGenericException format: @"unimplemented"];
     return 0;
@@ -518,114 +588,138 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 
 
 @implementation COAttributedStringDiffOperationInsertAttributedSubstring
+
 @synthesize attributedStringItemGraph;
 
-- (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
+- (NSInteger)applyOperationToAttributedString: (COAttributedString *)target
+                                   withOffset: (NSInteger)offset
 {
     COObjectGraphContext *targetCtx = target.objectGraphContext;
     const NSInteger insertionPos = range.location + offset;
-        
+
     [targetCtx insertOrUpdateItems: attributedStringItemGraph.items];
-    
+
     COAttributedString *sourceString = [targetCtx loadedObjectForUUID: attributedStringItemGraph.rootItemUUID];
     const NSUInteger sourceStringLength = sourceString.length;
     const NSInteger insertionPosChunkIndex = [target splitChunkAtIndex: insertionPos];
-        
+
     // FIXME: Why is -insertObjects:atIndexes:hints:forProperty: private?!
     [target insertObjects: sourceString.chunks
-                atIndexes: [[NSIndexSet alloc] initWithIndexesInRange: NSMakeRange(insertionPosChunkIndex, sourceString.chunks.count)]
+                atIndexes: [[NSIndexSet alloc] initWithIndexesInRange: NSMakeRange(
+                    insertionPosChunkIndex,
+                    sourceString.chunks.count)]
                     hints: @[]
               forProperty: @"chunks"];
-    
+
     return sourceStringLength;
 }
 
-- (NSString *) description
+- (NSString *)description
 {
     return [NSString stringWithFormat: @"%@: insert %@ at %@ (%@)",
-            self.attributedStringUUID, CODescriptionForAttributedStringItemGraph(self.attributedStringItemGraph), NSStringFromRange(self.range), self.source];
+                                       self.attributedStringUUID,
+                                       CODescriptionForAttributedStringItemGraph(self.attributedStringItemGraph),
+                                       NSStringFromRange(self.range),
+                                       self.source];
 }
 
-- (BOOL) isEqual:(id)object
+- (BOOL)isEqual: (id)object
 {
     if (![super isEqual: object])
         return NO;
-    
+
     COAttributedStringDiffOperationInsertAttributedSubstring *op = object;
-    
+
     return [COAttributedString isAttributedStringItemGraph: self.attributedStringItemGraph
                                           equalToItemGraph: op.attributedStringItemGraph];
 }
 
 @end
+
 
 @implementation COAttributedStringDiffOperationDeleteRange
 
-- (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
+- (NSInteger)applyOperationToAttributedString: (COAttributedString *)target
+                                   withOffset: (NSInteger)offset
 {
     const NSInteger deletionStartChunkIndex = [target splitChunkAtIndex: range.location + offset];
     const NSInteger deletionEndChunkIndex = [target splitChunkAtIndex: NSMaxRange(range) + offset];
-    
-    [[target mutableArrayValueForKey: @"chunks"] removeObjectsInRange: NSMakeRange(deletionStartChunkIndex, deletionEndChunkIndex - deletionStartChunkIndex)];
-    
+
+    [[target mutableArrayValueForKey: @"chunks"] removeObjectsInRange: NSMakeRange(
+        deletionStartChunkIndex,
+        deletionEndChunkIndex - deletionStartChunkIndex)];
+
     return -range.length;
 }
 
-- (NSString *) description
+- (NSString *)description
 {
     return [NSString stringWithFormat: @"%@: delete %@ (%@)",
-            self.attributedStringUUID, NSStringFromRange(self.range), self.source];
+                                       self.attributedStringUUID,
+                                       NSStringFromRange(self.range),
+                                       self.source];
 }
 
 @end
 
+
 @implementation COAttributedStringDiffOperationReplaceRange
+
 @synthesize attributedStringItemGraph;
 
-- (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
+- (NSInteger)applyOperationToAttributedString: (COAttributedString *)target
+                                   withOffset: (NSInteger)offset
 {
     COObjectGraphContext *targetCtx = target.objectGraphContext;
-    
+
     [targetCtx insertOrUpdateItems: attributedStringItemGraph.items];
     COAttributedString *sourceString = [targetCtx loadedObjectForUUID: attributedStringItemGraph.rootItemUUID];
     const NSUInteger sourceStringLength = sourceString.length;
-    
+
     const NSInteger deletionStartChunkIndex = [target splitChunkAtIndex: range.location + offset];
     const NSInteger deletionEndChunkIndex = [target splitChunkAtIndex: NSMaxRange(range) + offset];
-    
-    [[target mutableArrayValueForKey: @"chunks"] replaceObjectsInRange: NSMakeRange(deletionStartChunkIndex, deletionEndChunkIndex - deletionStartChunkIndex)
+
+    [[target mutableArrayValueForKey: @"chunks"] replaceObjectsInRange: NSMakeRange(
+            deletionStartChunkIndex,
+            deletionEndChunkIndex - deletionStartChunkIndex)
                                                   withObjectsFromArray: sourceString.chunks];
-    
+
     return sourceStringLength - range.length;
 }
 
-- (NSString *) description
+- (NSString *)description
 {
     return [NSString stringWithFormat: @"%@: replace %@ with %@ (%@)",
-            self.attributedStringUUID, NSStringFromRange(self.range), CODescriptionForAttributedStringItemGraph(self.attributedStringItemGraph), self.source];
+                                       self.attributedStringUUID,
+                                       NSStringFromRange(self.range),
+                                       CODescriptionForAttributedStringItemGraph(self.attributedStringItemGraph),
+                                       self.source];
 }
 
-- (BOOL) isEqual:(id)object
+- (BOOL)isEqual: (id)object
 {
     if (![super isEqual: object])
         return NO;
-    
+
     COAttributedStringDiffOperationReplaceRange *op = object;
-    
+
     return [COAttributedString isAttributedStringItemGraph: self.attributedStringItemGraph
                                           equalToItemGraph: op.attributedStringItemGraph];
 }
 
 @end
 
+
 @implementation COAttributedStringDiffOperationAddAttribute
+
 @synthesize attributeItemGraph;
 
-- (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
+- (NSInteger)applyOperationToAttributedString: (COAttributedString *)target
+                                   withOffset: (NSInteger)offset
 {
     [target.objectGraphContext insertOrUpdateItems: attributeItemGraph.items];
     COAttributedStringAttribute *attributeToAdd = [target.objectGraphContext loadedObjectForUUID: attributeItemGraph.rootItemUUID];
-    
+
     const NSInteger editStartChunkIndex = [target splitChunkAtIndex: range.location + offset];
     const NSInteger editEndChunkIndex = [target splitChunkAtIndex: NSMaxRange(range) + offset];
 
@@ -634,23 +728,26 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
         COAttributedStringChunk *chunk = target.chunks[chunkIndex];
         [[chunk mutableSetValueForKey: @"attributes"] addObject: attributeToAdd];
     }
-        
+
     return 0;
 }
 
-- (NSString *) description
+- (NSString *)description
 {
     return [NSString stringWithFormat: @"%@: add attrs (%@) to %@ (%@)",
-            self.attributedStringUUID, COHTMLCodesForAttributesItemGraph(self.attributeItemGraph), NSStringFromRange(self.range), self.source];
+                                       self.attributedStringUUID,
+                                       COHTMLCodesForAttributesItemGraph(self.attributeItemGraph),
+                                       NSStringFromRange(self.range),
+                                       self.source];
 }
 
-- (BOOL) isEqual:(id)object
+- (BOOL)isEqual: (id)object
 {
     if (![super isEqual: object])
         return NO;
-    
+
     COAttributedStringDiffOperationAddAttribute *op = object;
-    
+
     return [COAttributedStringAttribute isAttributeItemGraph: self.attributeItemGraph
                                             equalToItemGraph: op.attributeItemGraph];
 }
@@ -658,21 +755,24 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
 
 @end
 
+
 @implementation COAttributedStringDiffOperationRemoveAttribute
+
 @synthesize attributeItemGraph;
 
-- (NSInteger) applyOperationToAttributedString: (COAttributedString *)target withOffset: (NSInteger)offset
+- (NSInteger)applyOperationToAttributedString: (COAttributedString *)target
+                                   withOffset: (NSInteger)offset
 {
     [target.objectGraphContext insertOrUpdateItems: attributeItemGraph.items];
     COAttributedStringAttribute *attributeToRemove = [target.objectGraphContext loadedObjectForUUID: attributeItemGraph.rootItemUUID];
-    
+
     const NSInteger editStartChunkIndex = [target splitChunkAtIndex: range.location + offset];
     const NSInteger editEndChunkIndex = [target splitChunkAtIndex: NSMaxRange(range) + offset];
-    
+
     for (NSUInteger chunkIndex = editStartChunkIndex; chunkIndex < editEndChunkIndex; chunkIndex++)
     {
         COAttributedStringChunk *chunk = target.chunks[chunkIndex];
-        
+
         for (COAttributedStringAttribute *attribute in [chunk.attributes copy])
         {
             if ([attribute isDeeplyEqualToAttribute: attributeToRemove])
@@ -681,23 +781,26 @@ CODescriptionForAttributedStringItemGraph(COItemGraph *graph)
             }
         }
     }
-    
+
     return 0;
 }
 
-- (NSString *) description
+- (NSString *)description
 {
     return [NSString stringWithFormat: @"%@: remove attrs (%@) from %@ (%@)",
-            self.attributedStringUUID, COHTMLCodesForAttributesItemGraph(self.attributeItemGraph), NSStringFromRange(self.range), self.source];
+                                       self.attributedStringUUID,
+                                       COHTMLCodesForAttributesItemGraph(self.attributeItemGraph),
+                                       NSStringFromRange(self.range),
+                                       self.source];
 }
 
-- (BOOL) isEqual:(id)object
+- (BOOL)isEqual: (id)object
 {
     if (![super isEqual: object])
         return NO;
-    
+
     COAttributedStringDiffOperationRemoveAttribute *op = object;
-    
+
     return [COAttributedStringAttribute isAttributeItemGraph: self.attributeItemGraph
                                             equalToItemGraph: op.attributeItemGraph];
 }

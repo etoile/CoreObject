@@ -28,12 +28,11 @@
  *   be added / removed.
  */
 @interface COAttributedString : COObject
-@property (nonatomic, readwrite, copy) NSArray *chunks;
 
+@property (nonatomic, readwrite, copy) NSArray *chunks;
 @property (nonatomic, readonly) NSString *string;
 
-- (COItemGraph *) substringItemGraphWithRange: (NSRange)aRange;
-
+- (COItemGraph *)substringItemGraphWithRange: (NSRange)aRange;
 /**
  * Returns the chunk containing the given index. 
  * If the index is the end of the string, returns nil.
@@ -42,7 +41,9 @@
  * If a non-nil chunk is returned, and chunkStartOut is non-NULL, writes the
  * index of the beginning of the returned chunk into chunkStartOut.
  */
-- (COAttributedStringChunk *) chunkContainingIndex: (NSUInteger)anIndex chunkStart: (NSUInteger *)chunkStartOut chunkIndex: (NSUInteger *)chunkIndexOut;
+- (COAttributedStringChunk *)chunkContainingIndex: (NSUInteger)anIndex
+                                       chunkStart: (NSUInteger *)chunkStartOut
+                                       chunkIndex: (NSUInteger *)chunkIndexOut;
 
 @property (nonatomic, readonly, assign) NSUInteger length;
 
@@ -51,10 +52,11 @@
  * Returns the _chunk index_ of the split location. 
  * If the given characterIndex is already on a chunk boundary, does nothing.
  */
-- (NSUInteger) splitChunkAtIndex: (NSUInteger)characterIndex;
-
-- (NSSet *) attributesSetAtIndex: (NSUInteger)characterIndex longestEffectiveRange: (NSRange *)rangeOut inRange: (NSRange)rangeLimit;
-
-+ (BOOL) isAttributedStringItemGraph: (COItemGraph *)aGraph equalToItemGraph: (COItemGraph *)anotherGraph;
+- (NSUInteger)splitChunkAtIndex: (NSUInteger)characterIndex;
+- (NSSet *)attributesSetAtIndex: (NSUInteger)characterIndex
+          longestEffectiveRange: (NSRange *)rangeOut
+                        inRange: (NSRange)rangeLimit;
++ (BOOL)isAttributedStringItemGraph: (COItemGraph *)aGraph
+                   equalToItemGraph: (COItemGraph *)anotherGraph;
 
 @end
