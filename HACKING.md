@@ -207,7 +207,7 @@ retain attributes
     - don't declare a readonly property as copy (copy only describes if the 
 object is copied by the setter), unless you are overriding a (readwrite, copy) property
 
-Note: for overriden properties, sometimes we have to break these rules to ensure the code compile without warnings or disable -Wproperty-attribute-mismatch with clang diagnostic pragma. For instance, NSObject.description is marked with copy, this implies COObject.description has to be marked as copy too, although copy is useless when no setter exists.
+      Note: for overriden properties, sometimes we have to break these rules to ensure the code compile without warnings or disable -Wproperty-attribute-mismatch with clang diagnostic pragma. For instance, NSObject.description is marked with copy, this implies COObject.description has to be marked as copy too, although copy is useless when no setter exists.
 
 
 Blocks
@@ -221,7 +221,7 @@ Blocks
                                                         }
                                                 sorted: YES];
 
-Take note that the opening brace must be on a newline.
+   Take note that the opening brace must be on a newline.
 If a block is the last argument, it can either be indented to line up with the colon:
 
         return [collection filteredCollectionWithBlock: ^(id obj)
@@ -229,7 +229,7 @@ If a block is the last argument, it can either be indented to line up with the c
                                                             return (BOOL)![obj isDeleted];
                                                         }];
 
-Or, to make the lines shorter, it can be moved down to the next line:
+   Or, to make the lines shorter, it can be moved down to the next line:
 
         return [collection filteredCollectionWithBlock: 
                     ^(id obj)
