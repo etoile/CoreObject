@@ -7,7 +7,7 @@
 
 - (id)init
 {
-    self = [super init];
+    SUPERINIT;
 
     return self;
 }

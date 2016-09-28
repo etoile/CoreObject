@@ -62,7 +62,7 @@ changeInLength: (NSInteger)delta
 
 - (id)init
 {
-    self = [super init];
+    SUPERINIT;
     _backing = [[NSMutableAttributedString alloc] init];
     return self;
 }
@@ -477,7 +477,7 @@ withLongestEffectiveRange: NSMakeRange(1, 1)
 
 - (instancetype)init
 {
-    self = [super init];
+    SUPERINIT;
 
     objectGraph = [self makeAttributedString];
     attributedString = objectGraph.rootObject;
@@ -734,7 +734,7 @@ withLongestEffectiveRange: NSMakeRange(1, 1)
 
 - (instancetype)init
 {
-    self = [super init];
+    SUPERINIT;
     as = [[SimpleTextStorage alloc] init];
     return self;
 }
@@ -754,7 +754,7 @@ withLongestEffectiveRange: NSMakeRange(1, 1)
 
 - (instancetype)init
 {
-    self = [super init];
+    SUPERINIT;
     as = [[NSTextView alloc] init].textStorage;
     return self;
 }

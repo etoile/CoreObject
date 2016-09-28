@@ -80,7 +80,7 @@ doesNotPostNotification: (NSString *)notif
 
 - (instancetype)init
 {
-    self = [super init];
+    SUPERINIT;
 
     store = [[COSQLiteStore alloc] initWithURL: [SQLiteStoreTestCase storeURL]];
     [store clearStore];

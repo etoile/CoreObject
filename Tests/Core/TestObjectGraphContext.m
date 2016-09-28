@@ -21,7 +21,7 @@
 
 - (id)init
 {
-    self = [super init];
+    SUPERINIT;
     copier = [[COCopier alloc] init];
 
     /* Create a context which uses the main model repository. In +[EditingContextTestCase setUp], 

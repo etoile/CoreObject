@@ -20,7 +20,7 @@
 
 - (id)init
 {
-    self = [super init];
+    SUPERINIT;
     persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
     [ctx commit];
 

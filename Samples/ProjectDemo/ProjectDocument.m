@@ -4,7 +4,7 @@
 
 - (id)init
 {
-    self = [super init];
+    SUPERINIT;
     if (self)
     {
 

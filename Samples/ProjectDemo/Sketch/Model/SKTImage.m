@@ -16,7 +16,7 @@
 
 - (id)init
 {
-    self = [super init];
+    SUPERINIT;
     if (self)
     {
         _image = nil;

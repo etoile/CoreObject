@@ -22,7 +22,7 @@
 
 - (id)init
 {
-    self = [super init];
+    SUPERINIT;
 
     persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"Parent"];
     parent = persistentRoot.rootObject;

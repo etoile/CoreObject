@@ -26,7 +26,7 @@
         return sharedInstance;
     }
 
-    self = [super init];
+    SUPERINIT;
     sharedInstance = self;
 
     if (self)

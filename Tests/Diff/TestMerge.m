@@ -23,7 +23,7 @@
 
 - (id)init
 {
-    self = [super init];
+    SUPERINIT;
     ctx1 = [[COObjectGraphContext alloc] init];
     ctx2 = [[COObjectGraphContext alloc] init];
     ctx3 = [[COObjectGraphContext alloc] init];
