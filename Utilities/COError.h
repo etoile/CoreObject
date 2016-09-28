@@ -26,7 +26,7 @@
  */
 @interface COError : NSError
 {
-    @private
+@private
     ETValidationResult *validationResult;
     NSArray *errors;
 }

@@ -11,24 +11,25 @@
 
 @synthesize errors, validationResult;
 
-- (instancetype)initWithValidationResult: (ETValidationResult *)aResult errors: (id <ETCollection>)suberrors
+- (instancetype)initWithValidationResult: (ETValidationResult *)aResult
+                                  errors: (id <ETCollection>)suberrors
 {
     NILARG_EXCEPTION_TEST(suberrors);
-    
+
     if (aResult == nil && [suberrors isEmpty])
     {
         return nil;
     }
 
     BOOL isAggregate = ![suberrors isEmpty];
-    self = [super initWithDomain: kCOCoreObjectErrorDomain 
+    self = [super initWithDomain: kCOCoreObjectErrorDomain
                             code: (isAggregate ? kCOValidationMultipleErrorsError : kCOValidationError)
                         userInfo: nil];
     if (self == nil)
         return nil;
 
-    validationResult =  aResult;
-    errors =  [suberrors contentArray];
+    validationResult = aResult;
+    errors = [suberrors contentArray];
     return self;
 }
 

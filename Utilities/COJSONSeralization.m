@@ -6,9 +6,8 @@
  */
 
 #import "COJSONSerialization.h"
-#import <EtoileFoundation/Macros.h>
 
-NSString * const COJSONSerializationException = @"COJSONSerializationException";
+NSString *const COJSONSerializationException = @"COJSONSerializationException";
 
 id COJSONObjectWithData(NSData *data, NSError **anError)
 {

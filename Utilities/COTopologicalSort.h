@@ -18,4 +18,4 @@
  * When a cycle is detected, returns nil immediately, otherwise always returns 
  * a valid array containing all the nodes passed in argument.
  */
-extern NSArray * COTopologicalSort(NSSet *nodes, NSString *edgeKey);
+extern NSArray *COTopologicalSort(NSSet *nodes, NSString *edgeKey);

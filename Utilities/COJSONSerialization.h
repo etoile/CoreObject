@@ -11,7 +11,7 @@
  * The exception raised by COJSONObjectWithData() and CODataWithJSONObject() 
  * on a serialization or deserialization error, when the error is not handled.
  */
-extern NSString * const COJSONSerializationException;
+extern NSString *const COJSONSerializationException;
 
 /**
  * Deserializes the given data into a JSON object.

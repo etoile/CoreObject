@@ -130,7 +130,7 @@
  */
 @interface COCommitDescriptor : NSObject
 {
-    @private
+@private
     NSString *_identifier;
     NSString *_type;
     NSString *_shortDescription;

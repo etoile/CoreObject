@@ -46,7 +46,7 @@ static NSMutableDictionary *descriptorTypeTable = nil;
         COCommitDescriptor *descriptor =
             [[COCommitDescriptor alloc] initWithIdentifier: identifier
                                               propertyList: plist];
-        
+
         ETAssert([identifier hasPrefix: [descriptor domain]]);
         ETAssert([descriptor typeDescription] != nil);
         ETAssert([descriptor shortDescription] != nil);
@@ -59,7 +59,7 @@ static NSMutableDictionary *descriptorTypeTable = nil;
                         inTables: (NSMutableDictionary *)someLocalizationTables
 {
     NSParameterAssert(aStringsFile != nil);
-    
+
     if (![[NSFileManager defaultManager] fileExistsAtPath: aStringsFile isDirectory: NULL])
         return;
 
@@ -70,7 +70,7 @@ static NSMutableDictionary *descriptorTypeTable = nil;
     ETAssert(error == nil);
     NSDictionary *plist = [content propertyListFromStringsFileFormat];
     NSString *domain = aStringsFile.lastPathComponent.stringByDeletingPathExtension;
-    
+
     someLocalizationTables[domain] = plist;
 }
 
@@ -84,7 +84,7 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
     {
         NSString *baseDirectory = [bundle.resourcePath
             stringByAppendingPathComponent: [@"Base" stringByAppendingPathExtension: @"lproj"]];
-        
+
         if ([fileManager fileExistsAtPath: baseDirectory isDirectory: &isDir] && isDir)
         {
             lang = @"Base";
@@ -104,13 +104,14 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
        (it doesn't link the CoreObject framework) */
     NSBundle *coreObjectBundle = [NSBundle bundleForClass: self];
     NSArray *bundles =
-        [@[[NSBundle mainBundle], coreObjectBundle] arrayByAddingObjectsFromArray: [NSBundle allFrameworks]];
+        [@[[NSBundle mainBundle],
+           coreObjectBundle] arrayByAddingObjectsFromArray: [NSBundle allFrameworks]];
 
     for (NSBundle *bundle in bundles)
     {
         // FIXME: Once -[NSBundle pathsForResourcesOfType:inDirectory:] searches
         // language directories correctly on GNUstep, remove the inner loop below.
-        
+
         /* Collect localized files according to the preferred localizations of
            the app or test runner tool (the main bundle in both cases) */
         for (NSString *localization in [NSBundle mainBundle].preferredLocalizations)
@@ -123,9 +124,10 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
             if (![fileManager fileExistsAtPath: localizedDirectory isDirectory: &isDir] || !isDir)
                 continue;
 
-            NSArray *localizedFiles = [fileManager contentsOfDirectoryAtPath: localizedDirectory error: NULL];
+            NSArray *localizedFiles = [fileManager contentsOfDirectoryAtPath: localizedDirectory
+                                                                       error: NULL];
             ETAssert(localizedFiles != nil);
-            localizedFiles = [localizedFiles mappedCollectionWithBlock: ^ (NSString *subpath)
+            localizedFiles = [localizedFiles mappedCollectionWithBlock: ^(NSString *subpath)
             {
                 return [localizedDirectory stringByAppendingPathComponent: subpath];
             }];
@@ -134,7 +136,7 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
             [stringsFiles addObjectsFromArray: [localizedFiles pathsMatchingExtensions: @[@"strings"]]];
         }
     }
-    
+
     for (NSString *file in commitsFiles)
     {
         [self loadCommitDescriptorsFromFile: file
@@ -148,7 +150,7 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
     }
 }
 
-+ (void) initialize
++ (void)initialize
 {
     if (self != [COCommitDescriptor class])
         return;
@@ -178,7 +180,7 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
                         format: @"Format string %@ doesn't match the argument count in %@",
                                 format, args];
         }
-        
+
         formattedString = [formattedString stringByReplacingCharactersInRange: range
                                                                    withString: arg];
     }
@@ -191,7 +193,7 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 {
     NSString *localizedString = localizationTables[self.domain][aKey];
     localizedString = (localizedString != nil ? localizedString : aFallbackString);
-    
+
     if (formatArgs != nil)
     {
         localizedString = [self stringWithFormat: localizedString
@@ -207,16 +209,17 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
  *
  * See also -identifier and +registeredDescriptorForIdentifier:.
  */
-+ (void) registerDescriptor: (COCommitDescriptor *)aDescriptor
++ (void)registerDescriptor: (COCommitDescriptor *)aDescriptor
 {
     NILARG_EXCEPTION_TEST(aDescriptor);
     INVALIDARG_EXCEPTION_TEST(aDescriptor, [aDescriptor domain] != nil);
-    INVALIDARG_EXCEPTION_TEST(aDescriptor, [[aDescriptor domain] isEqual: [aDescriptor identifier]]);
+    INVALIDARG_EXCEPTION_TEST(aDescriptor,
+                              [[aDescriptor domain] isEqual: [aDescriptor identifier]]);
 
     descriptorTable[aDescriptor.identifier] = aDescriptor;
 }
 
-+ (COCommitDescriptor *) registeredDescriptorForIdentifier: (NSString *)anIdentifier
++ (COCommitDescriptor *)registeredDescriptorForIdentifier: (NSString *)anIdentifier
 {
     NILARG_EXCEPTION_TEST(anIdentifier);
 
@@ -224,7 +227,7 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 }
 
 - (instancetype)initWithIdentifier: (NSString *)anId
-            propertyList: (NSDictionary *)plist
+                      propertyList: (NSDictionary *)plist
 {
     SUPERINIT;
     _identifier = anId;
@@ -235,11 +238,11 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 
 - (NSString *)description
 {
-    return @{ kCOCommitMetadataIdentifier: self.identifier,
-              kCOCommitMetadataTypeDescription: self.typeDescription,
-              kCOCommitMetadataShortDescription: self.shortDescription }.description;
+    return @{kCOCommitMetadataIdentifier: self.identifier,
+             kCOCommitMetadataTypeDescription: self.typeDescription,
+             kCOCommitMetadataShortDescription: self.shortDescription}.description;
 }
-                                            
+
 - (NSString *)domain
 {
     /* Turn 'org.etoile-project.ObjectManager.rename/shortDescription'  
@@ -257,7 +260,7 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
     NSRange domainRange = NSMakeRange(0, subcomponents.count - 1);
     NSString *domain =
         [[subcomponents subarrayWithRange: domainRange] componentsJoinedByString: @"."];
-    
+
     return domain;
 }
 
@@ -326,7 +329,7 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
         description = [descriptor localizedShortDescriptionWithArguments:
             metadata[kCOCommitMetadataShortDescriptionArguments]];
     }
-    
+
     if (operationIdentifier != nil)
     {
         COCommitDescriptor *operationDescriptor =

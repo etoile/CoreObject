@@ -24,6 +24,7 @@
  * ETController object can instantiate either persistent roots or inner objects.
  */
 @protocol COPersistentObjectContext <NSObject>
+
 @optional
 /**
  * See -[NSObject isEditingContext].
@@ -33,6 +34,7 @@
  * See -[NSObject isObjectGraphContext].
  */
 @property (nonatomic, readonly) BOOL isObjectGraphContext;
+
 @required
 /**
  * Returns the editing context for the receiver.
@@ -52,6 +54,7 @@
  *  -[COBranch hasChanges] and -[COObjectGraphContext hasChanges].
  */
 @property (nonatomic, readonly) BOOL hasChanges;
+
 @end
 
 /** 
@@ -62,7 +65,9 @@
  */
 @interface NSObject (CoreObject)
 
+
 /** @taskunit Type Querying */
+
 
 /**
  * Returns whether the receiver is an editing context or not.
