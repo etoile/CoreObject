@@ -61,9 +61,10 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
 @implementation COObjectGraphContext
 
 @synthesize modelDescriptionRepository = _modelDescriptionRepository;
+@synthesize migrationDriverClass = _migrationDriverClass;
+@synthesize rootItemUUID = _rootItemUUID;
 @synthesize insertedObjectUUIDs = _insertedObjectUUIDs;
 @synthesize updatedObjectUUIDs = _updatedObjectUUIDs;
-@synthesize migrationDriverClass = _migrationDriverClass;
 
 #pragma mark Creation
 
@@ -383,11 +384,6 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
 #pragma mark -
 #pragma mark Item Graph Protocol
 
-- (ETUUID *)rootItemUUID
-{
-    return _rootObjectUUID;
-}
-
 - (COItem *)itemForUUID: (ETUUID *)aUUID
 {
     ETAssert([aUUID isKindOfClass: [ETUUID class]]);
@@ -581,8 +577,8 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
     NILARG_EXCEPTION_TEST(aTree);
     // i.e., the root object can be set once and never changed.
     INVALIDARG_EXCEPTION_TEST(aTree,
-                              _rootObjectUUID == nil || [_rootObjectUUID isEqual: aTree.rootItemUUID]);
-    _rootObjectUUID = aTree.rootItemUUID;
+                              _rootItemUUID == nil || [_rootItemUUID isEqual: aTree.rootItemUUID]);
+    _rootItemUUID = aTree.rootItemUUID;
 
     NSSet *aTreeReachableUUIDs = COItemGraphReachableUUIDs(aTree);
     if (aTreeReachableUUIDs.count == 0)
@@ -619,9 +615,9 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
 {
     NSParameterAssert(anObject.objectGraphContext == self);
     // i.e., the root object can be set once and never changed.
-    NSParameterAssert(_rootObjectUUID == nil || [_rootObjectUUID isEqual: anObject.UUID]);
+    NSParameterAssert(_rootItemUUID == nil || [_rootItemUUID isEqual: anObject.UUID]);
 
-    _rootObjectUUID = anObject.UUID;
+    _rootItemUUID = anObject.UUID;
 }
 
 #pragma mark -

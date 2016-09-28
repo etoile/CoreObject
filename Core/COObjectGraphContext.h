@@ -176,7 +176,7 @@ extern NSString *const COObjectGraphContextEndBatchChangeNotification;
     COBranch *__weak _branch;
     COPersistentRoot *__weak _persistentRoot;
     ETUUID *_futureBranchUUID;
-    ETUUID *_rootObjectUUID;
+    ETUUID *_rootItemUUID;
     /** Loaded (or inserted) objects by UUID */
     NSMutableDictionary *_loadedObjects;
     /** Item graph exposed during loading (nil once the loading is done) */
