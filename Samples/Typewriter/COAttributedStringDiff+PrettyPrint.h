@@ -9,6 +9,6 @@
 
 @interface COAttributedStringDiff (PrettyPrint)
 
-- (NSAttributedString *)prettyPrintedWithSource: (NSAttributedString*)string;
+- (NSAttributedString *)prettyPrintedWithSource: (NSAttributedString *)string;
 
 @end

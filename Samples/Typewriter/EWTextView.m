@@ -10,12 +10,12 @@
 
 @implementation EWTextView
 
-- (id)initWithFrame:(NSRect)frame
+- (id)initWithFrame: (NSRect)frame
 {
-    self = [super initWithFrame:frame];
+    self = [super initWithFrame: frame];
     if (self)
     {
-    }    
+    }
     return self;
 }
 

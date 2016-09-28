@@ -10,5 +10,7 @@
 #import <CoreObject/COAttributedString.h>
 
 @interface TypewriterDocument : COObject
+
 @property (nonatomic, readwrite, retain) COAttributedString *attrString;
+
 @end

@@ -9,7 +9,7 @@
 
 @implementation COPersistentRoot (Revert)
 
-- (CORevision*) revisionToRevertTo
+- (CORevision *)revisionToRevertTo
 {
     CORevision *inspectedRevision = [self currentRevision];
     while (inspectedRevision != nil

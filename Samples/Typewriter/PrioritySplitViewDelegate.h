@@ -26,9 +26,9 @@
     NSMutableDictionary *viewIndicesByPriority;
 }
 
-- (void)setMinimumLength:(CGFloat)minLength
-    forViewAtIndex:(NSInteger)viewIndex;
-- (void)setPriority:(NSInteger)priorityIndex
-    forViewAtIndex:(NSInteger)viewIndex;
+- (void)setMinimumLength: (CGFloat)minLength
+          forViewAtIndex: (NSInteger)viewIndex;
+- (void)setPriority: (NSInteger)priorityIndex
+     forViewAtIndex: (NSInteger)viewIndex;
 
 @end

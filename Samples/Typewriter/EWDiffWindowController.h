@@ -13,6 +13,6 @@
     COPersistentRoot *inspectedPersistentRoot;
 }
 
-- (instancetype) initWithInspectedPersistentRoot: (COPersistentRoot *)aPersistentRoot;
+- (instancetype)initWithInspectedPersistentRoot: (COPersistentRoot *)aPersistentRoot;
 
 @end

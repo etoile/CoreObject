@@ -12,7 +12,7 @@
 
 @implementation EWAppDelegate
 
-- (void) applicationDidFinishLaunching: (NSNotification*)notif
+- (void)applicationDidFinishLaunching: (NSNotification *)notif
 {
     windowController = [[EWTypewriterWindowController alloc] initWithWindowNibName: @"Document"];
     [self orderFrontTypewriter: self];
@@ -23,36 +23,40 @@
     [windowController showWindow: self];
 }
 
-- (void)applicationWillTerminate:(NSNotification *)notification
+- (void)applicationWillTerminate: (NSNotification *)notification
 {
 }
 
-- (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)flag
+- (BOOL)applicationShouldHandleReopen: (NSApplication *)sender hasVisibleWindows: (BOOL)flag
 {
     [self orderFrontTypewriter: sender];
     return NO;
 }
 
+
 #pragma mark -
+
 
 @synthesize editingContext = ctx;
 @synthesize libraryPersistentRoot = library;
 
-#pragma mark - initialization
 
-- (instancetype) initWithStoreURL: (NSURL *)aURL
+#pragma mark - initialization -
+
+
+- (instancetype)initWithStoreURL: (NSURL *)aURL
 {
     self = [super init];
-    
+
     ctx = [COEditingContext contextWithURL: aURL];
-    
+
     NSSet *libraryPersistentRoots = [[ctx persistentRoots] filteredSetUsingPredicate:
-                                     [NSPredicate predicateWithBlock: ^(id object, NSDictionary *bindings)
-                                      {
-                                          COPersistentRoot *persistentRoot = object;
-                                          return [[persistentRoot rootObject] isKindOfClass: [COLibrary class]];
-                                      }]];
-    
+        [NSPredicate predicateWithBlock: ^(id object, NSDictionary *bindings)
+        {
+            COPersistentRoot *persistentRoot = object;
+            return [[persistentRoot rootObject] isKindOfClass: [COLibrary class]];
+        }]];
+
     if ([libraryPersistentRoots count] == 0)
     {
         library = [ctx insertNewPersistentRootWithEntityName: @"COTagLibrary"];
@@ -66,27 +70,29 @@
     {
         [NSException raise: NSGenericException format: @"Expected only a single library"];
     }
-    
+
     NSLog(@"Library is %@", library);
-    
+
     utilityWindowControllers = [NSMutableArray new];
-    
+
     return self;
 }
 
-+ (NSURL *) defaultDocumentURL
++ (NSURL *)defaultDocumentURL
 {
-    NSArray *libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-    
+    NSArray *libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
+                                                               NSUserDomainMask,
+                                                               YES);
+
     NSString *dir = [[[libraryDirs objectAtIndex: 0]
-                      stringByAppendingPathComponent: @"CoreObject"]
-                     stringByAppendingPathComponent: @"Typewriter.coreobjectstore"];
-    
+        stringByAppendingPathComponent: @"CoreObject"]
+        stringByAppendingPathComponent: @"Typewriter.coreobjectstore"];
+
     [[NSFileManager defaultManager] createDirectoryAtPath: dir
                               withIntermediateDirectories: YES
                                                attributes: nil
                                                     error: NULL];
-    
+
     return [NSURL fileURLWithPath: dir isDirectory: YES];
 }
 
@@ -95,12 +101,12 @@
     return [self initWithStoreURL: [[self class] defaultDocumentURL]];
 }
 
-- (void) addWindowController: (NSWindowController *)aController
+- (void)addWindowController: (NSWindowController *)aController
 {
     [utilityWindowControllers addObject: aController];
 }
 
-- (void) removeWindowController: (NSWindowController *)aController
+- (void)removeWindowController: (NSWindowController *)aController
 {
     [utilityWindowControllers removeObject: aController];
 }
@@ -111,7 +117,7 @@
     [prefsController showWindow: nil];
 }
 
-- (void) clearUndo
+- (void)clearUndo
 {
     [windowController.undoTrack clear];
 }

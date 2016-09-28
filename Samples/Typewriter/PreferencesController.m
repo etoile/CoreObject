@@ -7,8 +7,9 @@
 - (id)init
 {
     self = [super initWithWindowNibName: @"Preferences"];
-    
-    if (self) {
+
+    if (self)
+    {
     }
     return self;
 }

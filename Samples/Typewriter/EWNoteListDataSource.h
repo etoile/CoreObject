@@ -17,8 +17,10 @@
 
 @property (nonatomic, unsafe_unretained) EWTypewriterWindowController *owner;
 @property (nonatomic, strong) NSTableView *tableView;
+
 - (void)reloadData;
 - (void)cacheSelection;
-- (void) setNextSelection: (ETUUID *)aUUID;
-- (void) selectNoteWithUUID: (ETUUID *)aUUID;
+- (void)setNextSelection: (ETUUID *)aUUID;
+- (void)selectNoteWithUUID: (ETUUID *)aUUID;
+
 @end

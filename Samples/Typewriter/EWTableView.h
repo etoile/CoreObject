@@ -10,8 +10,13 @@
 @class EWTableView;
 
 @protocol EWTableViewDelegate
-- (NSMenu *) tableView: (EWTableView *)aTableView menuForEvent: (NSEvent *)anEvent defaultMenu: (NSMenu *)aMenu;
+
+- (NSMenu *)tableView: (EWTableView *)aTableView
+         menuForEvent: (NSEvent *)anEvent
+          defaultMenu: (NSMenu *)aMenu;
+
 @end
+
 
 @interface EWTableView : NSTableView
 @end

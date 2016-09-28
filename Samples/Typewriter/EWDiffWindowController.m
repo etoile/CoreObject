@@ -14,22 +14,22 @@
 #import "TypewriterDocument.h"
 
 @interface EWDiffWindowController ()
-
 @end
+
 
 @implementation EWDiffWindowController
 
-- (instancetype) initWithInspectedPersistentRoot: (COPersistentRoot *)aPersistentRoot
+- (instancetype)initWithInspectedPersistentRoot: (COPersistentRoot *)aPersistentRoot
 {
     self = [super initWithWindowNibName: @"DiffWindow"];
-    
+
     inspectedPersistentRoot = aPersistentRoot;
-    
+
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(persistentRootDidChange:)
                                                  name: COPersistentRootDidChangeNotification
                                                object: inspectedPersistentRoot];
-    
+
     return self;
 }
 
@@ -44,21 +44,21 @@
     [self update];
 }
 
-- (void) persistentRootDidChange: (NSNotification *)notif
+- (void)persistentRootDidChange: (NSNotification *)notif
 {
     [self update];
 }
 
-- (void) update
+- (void)update
 {
     if ([inspectedPersistentRoot revisionToRevertTo] == nil)
     {
         return;
     }
-    
+
     TypewriterDocument *doc = [[inspectedPersistentRoot objectGraphContext] rootObject];
     COAttributedString *as = doc.attrString;
-    
+
     COObjectGraphContext *oldDocCtx = [inspectedPersistentRoot objectGraphContextForPreviewingRevision: [inspectedPersistentRoot revisionToRevertTo]];
     TypewriterDocument *oldDoc = [oldDocCtx rootObject];
     COAttributedString *oldAs = oldDoc.attrString;
@@ -67,15 +67,15 @@
     {
         return;
     }
-    
+
     COAttributedStringDiff *diff = [[COAttributedStringDiff alloc] initWithFirstAttributedString: oldAs
                                                                           secondAttributedString: as
                                                                                           source: nil];
-    
+
     COAttributedStringWrapper *oldAsWrapper = [[COAttributedStringWrapper alloc] initWithBacking: oldAs];
-    
+
     NSAttributedString *prettyPrinted = [diff prettyPrintedWithSource: oldAsWrapper];
-    
+
     [[textView textStorage] setAttributedString: prettyPrinted];
 }
 

@@ -9,15 +9,17 @@
 
 @implementation EWTableView
 
-- (NSMenu *)menuForEvent:(NSEvent *)event
+- (NSMenu *)menuForEvent: (NSEvent *)event
 {
     NSMenu *menu = [super menuForEvent: event];
-    
+
     if ([[self delegate] respondsToSelector: @selector(tableView:menuForEvent:defaultMenu:)])
     {
-        menu = [(id<EWTableViewDelegate>)[self delegate] tableView: self menuForEvent: event defaultMenu: menu];
+        menu = [(id <EWTableViewDelegate>)[self delegate] tableView: self
+                                                       menuForEvent: event
+                                                        defaultMenu: menu];
     }
-    
+
     return menu;
 }
 

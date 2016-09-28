@@ -15,9 +15,9 @@
 {
     COEditingContext *ctx;
     COPersistentRoot *library;
-    
+
     EWTypewriterWindowController *windowController;
-    
+
     NSMutableArray *utilityWindowControllers;
     PreferencesController *prefsController;
 }
@@ -28,9 +28,9 @@
 - (IBAction) orderFrontTypewriter: (id)sender;
 - (IBAction) orderFrontPreferences: (id)sender;
 
-- (void) addWindowController: (NSWindowController *)aController;
-- (void) removeWindowController: (NSWindowController *)aController;
+- (void)addWindowController: (NSWindowController *)aController;
+- (void)removeWindowController: (NSWindowController *)aController;
 
-- (void) clearUndo;
+- (void)clearUndo;
 
 @end

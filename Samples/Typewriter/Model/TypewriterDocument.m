@@ -9,13 +9,13 @@
 
 @implementation TypewriterDocument
 
-+ (ETEntityDescription*)newEntityDescription
++ (ETEntityDescription *)newEntityDescription
 {
     ETEntityDescription *entity = [super newBasicEntityDescription];
-    
+
     if (![entity.name isEqual: [TypewriterDocument className]])
         return entity;
-    
+
     ETPropertyDescription *attrString = [ETPropertyDescription descriptionWithName: @"attrString"
                                                                               type: (id)@"COAttributedString"];
     [attrString setPersistent: YES];
@@ -23,7 +23,7 @@
     return entity;
 }
 
-- (instancetype) initWithObjectGraphContext:(COObjectGraphContext *)aContext
+- (instancetype)initWithObjectGraphContext: (COObjectGraphContext *)aContext
 {
     self = [super initWithObjectGraphContext: aContext];
     self.attrString = [[COAttributedString alloc] initWithObjectGraphContext: aContext];

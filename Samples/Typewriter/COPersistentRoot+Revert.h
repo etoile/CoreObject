@@ -9,6 +9,6 @@
 
 @interface COPersistentRoot (Revert)
 
-- (CORevision*) revisionToRevertTo;
+- (CORevision *)revisionToRevertTo;
 
 @end
