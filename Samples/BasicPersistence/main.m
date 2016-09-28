@@ -9,10 +9,14 @@
 #include <assert.h>
 
 @interface Calendar : COObject
+
 @property (nonatomic, readwrite, copy) NSSet *appointments;
+
 @end
 
+
 @interface Appointment : COObject
+
 @property (nonatomic, readwrite, copy) NSDate *startDate;
 @property (nonatomic, readwrite, copy) NSDate *endDate;
 @property (nonatomic, readonly, weak) Calendar *calendar;
@@ -20,6 +24,7 @@
 - (id)initWithStartDate: (NSDate *)aStartDate
                 endDate: (NSDate *)aEndDate
      objectGraphContext: (COObjectGraphContext *)aGraph;
+
 @end
 
 
@@ -33,7 +38,7 @@
         return desc;
 
     ETPropertyDescription *appointments = [ETPropertyDescription descriptionWithName: @"appointments"
-                                                                                typeName: @"Appointment"];
+                                                                            typeName: @"Appointment"];
     appointments.multivalued = YES;
     appointments.ordered = NO;
     appointments.persistent = YES;
@@ -47,7 +52,8 @@
 
 @end
 
-@implementation Appointment 
+
+@implementation Appointment
 
 + (ETEntityDescription *)newEntityDescription
 {
@@ -57,15 +63,15 @@
         return desc;
 
     ETPropertyDescription *calendar = [ETPropertyDescription descriptionWithName: @"calendar"
-                                                                            typeName: @"Calendar"];
+                                                                        typeName: @"Calendar"];
     calendar.oppositeName = @"Calendar.appointments";
     calendar.derived = YES;
-    
+
     ETPropertyDescription *startDate = [ETPropertyDescription descriptionWithName: @"startDate"
-                                                                             typeName: @"NSDate"];
+                                                                         typeName: @"NSDate"];
     startDate.persistent = YES;
     ETPropertyDescription *endDate = [ETPropertyDescription descriptionWithName: @"endDate"
-                                                                           typeName: @"NSDate"];
+                                                                       typeName: @"NSDate"];
     endDate.persistent = YES;
 
     desc.propertyDescriptions = @[startDate, endDate, calendar];
@@ -75,12 +81,12 @@
 
 - (id)initWithStartDate: (NSDate *)aStartDate
                 endDate: (NSDate *)aEndDate
-            objectGraphContext: (COObjectGraphContext *)aGraph
+     objectGraphContext: (COObjectGraphContext *)aGraph
 {
     self = [super initWithObjectGraphContext: aGraph];
     if (self == nil)
         return nil;
-    
+
     self.startDate = aStartDate;
     self.endDate = aEndDate;
 
@@ -120,8 +126,10 @@ int main(int argc, char **argv)
         COEditingContext *newCtx = [COEditingContext contextWithURL: url];
         Calendar *newCalendar = [newCtx persistentRootForUUID: persistentRootUUID].rootObject;
         Appointment *newAppointment = newCalendar.appointments.anyObject;
-    
-        NSLog(@"Reloaded appointment: %@ - %@\n\n", newAppointment.startDate, newAppointment.endDate);
+
+        NSLog(@"Reloaded appointment: %@ - %@\n\n",
+              newAppointment.startDate,
+              newAppointment.endDate);
 
         ShowStoreContentsForContext(newCtx);
     }
@@ -138,18 +146,23 @@ void ShowStoreContentsForContext(COEditingContext *ctx)
 
     for (COPersistentRoot *persistentRoot in ctx.persistentRoots)
     {
-        NSLog(@"\tPersistent root %@ (root object class: %@)", persistentRoot.UUID, [persistentRoot.rootObject class]);
-        
+        NSLog(@"\tPersistent root %@ (root object class: %@)",
+              persistentRoot.UUID,
+              [persistentRoot.rootObject class]);
+
         if (![persistentRoot.rootObject isKindOfClass: [Calendar class]])
             continue;
-    
+
         Calendar *calendar = persistentRoot.rootObject;
-            
+
         for (Appointment *appointment in calendar.appointments)
         {
             assert(appointment.calendar == calendar);
 
-            NSLog(@"\t\tAppointment %@: %@ - %@", appointment.UUID, appointment.startDate, appointment.endDate);
+            NSLog(@"\t\tAppointment %@: %@ - %@",
+                  appointment.UUID,
+                  appointment.startDate,
+                  appointment.endDate);
         }
     }
 }
