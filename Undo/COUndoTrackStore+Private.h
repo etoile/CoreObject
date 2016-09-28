@@ -6,6 +6,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CoreObject/COUndoTrackStore.h>
 
 @class FMDatabase;
 @class ETUUID;
