@@ -162,7 +162,7 @@ extern NSString *const COPersistentRootDidChangeNotification;
      *
      * If nil, this is a newly created persistent root.
      */
-    COPersistentRootInfo *_savedState;
+    COPersistentRootInfo *_persistentRootInfo;
     /**
      * COBranch objects indexed by ETUUID
      */

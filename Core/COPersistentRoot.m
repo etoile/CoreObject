@@ -29,7 +29,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 
 @implementation COPersistentRoot
 
-@synthesize parentContext = _parentContext, UUID = _UUID;
+@synthesize parentContext = _parentContext, UUID = _UUID, persistentRootInfo = _persistentRootInfo;
 @synthesize branchesPendingDeletion = _branchesPendingDeletion;
 @synthesize branchesPendingUndeletion = _branchesPendingUndeletion;
 
@@ -91,7 +91,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     SUPERINIT;
 
     _parentContext = aCtxt;
-    _savedState = info;
+    _persistentRootInfo = info;
     _branchForUUID = [[NSMutableDictionary alloc] init];
     _branchesPendingDeletion = [NSMutableSet new];
     _branchesPendingUndeletion = [NSMutableSet new];
@@ -107,20 +107,20 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     }
     [_currentBranchObjectGraph setPersistentRoot: self];
 
-    if (_savedState != nil)
+    if (_persistentRootInfo != nil)
     {
-        _UUID = _savedState.UUID;
+        _UUID = _persistentRootInfo.UUID;
 
-        for (COBranchInfo *branchInfo in _savedState.branchForUUID.allValues)
+        for (COBranchInfo *branchInfo in _persistentRootInfo.branchForUUID.allValues)
         {
             [self updateBranchWithBranchInfo: branchInfo
                                    compacted: NO];
         }
 
-        _currentBranchUUID = _savedState.currentBranchUUID;
-        [_parentContext setLastTransactionID: _savedState.transactionID
+        _currentBranchUUID = _persistentRootInfo.currentBranchUUID;
+        [_parentContext setLastTransactionID: _persistentRootInfo.transactionID
                        forPersistentRootUUID: _UUID];
-        _metadata = _savedState.metadata;
+        _metadata = _persistentRootInfo.metadata;
 
         [self reloadCurrentBranchObjectGraph];
     }
@@ -258,7 +258,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     if ([_parentContext.persistentRootsPendingDeletion containsObject: self])
         return YES;
 
-    return _savedState.deleted;
+    return _persistentRootInfo.deleted;
 }
 
 - (void)setDeleted: (BOOL)deleted
@@ -621,7 +621,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 
 - (BOOL)isPersistentRootUncommitted
 {
-    return _savedState == nil;
+    return _persistentRootInfo == nil;
 }
 
 - (void)saveCommitWithMetadata: (NSDictionary *)metadata transaction: (COStoreTransaction *)txn
@@ -661,10 +661,10 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
             // FIXME: After, update the other graph with the contents of the one we committed
             COItemGraph *graphCopy = [[COItemGraph alloc] initWithItemGraph: graphCtx];
 
-            _savedState = [txn createPersistentRootWithInitialItemGraph: graphCopy
-                                                                   UUID: self.UUID
-                                                             branchUUID: self.currentBranch.UUID
-                                                       revisionMetadata: metadata];
+            _persistentRootInfo = [txn createPersistentRootWithInitialItemGraph: graphCopy
+                                                                           UUID: self.UUID
+                                                                     branchUUID: self.currentBranch.UUID
+                                                               revisionMetadata: metadata];
         }
         else
         {
@@ -682,11 +682,11 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
             {
                 ETUUID *newRevisionUUID = [ETUUID UUID];
 
-                _savedState = [txn createPersistentRootCopyWithUUID: _UUID
-                                           parentPersistentRootUUID: _cheapCopyPersistentRootUUID
-                                                         branchUUID: self.currentBranch.UUID
-                                                   parentBranchUUID: parentBranchUUID
-                                                initialRevisionUUID: newRevisionUUID];
+                _persistentRootInfo = [txn createPersistentRootCopyWithUUID: _UUID
+                                                   parentPersistentRootUUID: _cheapCopyPersistentRootUUID
+                                                                 branchUUID: self.currentBranch.UUID
+                                                           parentBranchUUID: parentBranchUUID
+                                                        initialRevisionUUID: newRevisionUUID];
 
                 COItemGraph *modifiedItems;
                 if (currentBranchObjectGraphHasChanges)
@@ -709,15 +709,15 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
             }
             else
             {
-                _savedState = [txn createPersistentRootCopyWithUUID: _UUID
-                                           parentPersistentRootUUID: _cheapCopyPersistentRootUUID
-                                                         branchUUID: self.currentBranch.UUID
-                                                   parentBranchUUID: parentBranchUUID
-                                                initialRevisionUUID: _cheapCopyRevisionUUID];
+                _persistentRootInfo = [txn createPersistentRootCopyWithUUID: _UUID
+                                                   parentPersistentRootUUID: _cheapCopyPersistentRootUUID
+                                                                 branchUUID: self.currentBranch.UUID
+                                                           parentBranchUUID: parentBranchUUID
+                                                        initialRevisionUUID: _cheapCopyRevisionUUID];
             }
         }
-        ETAssert(_savedState != nil);
-        ETUUID *initialRevID = _savedState.currentBranchInfo.currentRevisionUUID;
+        ETAssert(_persistentRootInfo != nil);
+        ETUUID *initialRevID = _persistentRootInfo.currentBranchInfo.currentRevisionUUID;
         ETAssert(initialRevID != nil);
 
         [_parentContext recordPersistentRootCreation: self
@@ -755,14 +755,14 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 
         // Commit a change to the current branch, if needed.
         // Needs to be done after because the above loop may create the branch
-        if (![_savedState.currentBranchUUID isEqual: _currentBranchUUID])
+        if (![_persistentRootInfo.currentBranchUUID isEqual: _currentBranchUUID])
         {
             [txn setCurrentBranch: _currentBranchUUID
                 forPersistentRoot: self.UUID];
 
             [_parentContext recordPersistentRoot: self
                                 setCurrentBranch: self.currentBranch
-                                       oldBranch: [self branchForUUID: _savedState.currentBranchUUID]];
+                                       oldBranch: [self branchForUUID: _persistentRootInfo.currentBranchUUID]];
         }
 
         // N.B.: Ugly, the ordering of changes needs to be carefully controlled
@@ -777,7 +777,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
         [txn setMetadata: _metadata forPersistentRoot: _UUID];
 
         [_parentContext recordPersistentRootSetMetadata: self
-                                            oldMetadata: _savedState.metadata];
+                                            oldMetadata: _persistentRootInfo.metadata];
 
         _metadataChanged = NO;
     }
@@ -791,11 +791,6 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     [_branchesPendingUndeletion removeAllObjects];
 }
 
-- (COPersistentRootInfo *)persistentRootInfo
-{
-    return _savedState;
-}
-
 - (void)reloadPersistentRootInfo
 {
     COPersistentRootInfo *newInfo = [self.store persistentRootInfoForUUID: self.UUID];
@@ -803,7 +798,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     if (newInfo == nil)
         return;
 
-    _savedState = newInfo;
+    _persistentRootInfo = newInfo;
 }
 
 - (void)didMakeNewCommit
@@ -889,7 +884,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     if (info == nil)
         return;
 
-    _savedState = info;
+    _persistentRootInfo = info;
 
     for (ETUUID *uuid in info.branchUUIDs)
     {
@@ -904,9 +899,9 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     // FIXME: Factor out like -[COBranch updateBranchWithBranchInfo:compacted:]
     // TODO: Test that _everything_ is reloaded
 
-    _currentBranchUUID = _savedState.currentBranchUUID;
-    self.lastTransactionID = _savedState.transactionID;
-    _metadata = _savedState.metadata;
+    _currentBranchUUID = _persistentRootInfo.currentBranchUUID;
+    self.lastTransactionID = _persistentRootInfo.transactionID;
+    _metadata = _persistentRootInfo.metadata;
 
     [self reloadCurrentBranchObjectGraph];
     [self sendChangeNotification];
