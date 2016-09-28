@@ -359,6 +359,9 @@
        }];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+
 - (void)testRequestNilPersistentRoot
 {
     UKNil([ctx persistentRootForUUID: nil]);
@@ -384,6 +387,8 @@
                                          migrationDriverClass: [COSchemaMigrationDriver class]
                                                undoTrackStore: nil]);
 }
+
+#pragma clang diagnostic pop
 
 - (void)testRevisionEqualityFromMultipleEditingContexts
 {
