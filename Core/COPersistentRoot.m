@@ -225,7 +225,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 - (void)reloadCurrentBranchObjectGraph
 {
     [self setCurrentBranchObjectGraphToRevisionUUID: self.currentRevision.UUID
-                                 persistentRootUUID: self.UUID];
+                                 persistentRootUUID: _UUID];
 }
 
 #pragma mark Persistent Root Properties -
@@ -308,7 +308,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     if (uuidString == nil)
         return nil;
 
-    return [self.editingContext persistentRootForUUID: [ETUUID UUIDWithString: uuidString]];
+    return [_editingContext persistentRootForUUID: [ETUUID UUIDWithString: uuidString]];
 }
 
 - (BOOL)isCopy
@@ -395,9 +395,9 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     {
         [_branchesPendingDeletion addObject: aBranch];
     }
-    [self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: aBranch.persistentRoot
-                                                                      branch: aBranch
-                                                                     isFault: YES];
+    [_editingContext updateCrossPersistentRootReferencesToPersistentRoot: aBranch.persistentRoot
+                                                                  branch: aBranch
+                                                                 isFault: YES];
 
     if (aBranch.branchUncommitted)
     {
@@ -417,9 +417,9 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     {
         [_branchesPendingUndeletion addObject: aBranch];
     }
-    [self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: aBranch.persistentRoot
-                                                                      branch: aBranch
-                                                                     isFault: aBranch.persistentRoot.deleted];
+    [_editingContext updateCrossPersistentRootReferencesToPersistentRoot: aBranch.persistentRoot
+                                                                  branch: aBranch
+                                                                 isFault: aBranch.persistentRoot.deleted];
 
     if (aBranch.branchUncommitted)
     {
@@ -495,7 +495,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 
     if (_metadataChanged)
     {
-        _metadata = [self.persistentRootInfo.metadata copy];
+        _metadata = [_persistentRootInfo.metadata copy];
         _metadataChanged = NO;
     }
 
@@ -530,17 +530,17 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 
 - (id)rootObject
 {
-    return self.objectGraphContext.rootObject;
+    return _objectGraphContext.rootObject;
 }
 
 - (void)setRootObject: (COObject *)aRootObject
 {
-    self.objectGraphContext.rootObject = aRootObject;
+    _objectGraphContext.rootObject = aRootObject;
 }
 
 - (COObject *)loadedObjectForUUID: (ETUUID *)uuid
 {
-    return [self.objectGraphContext loadedObjectForUUID: uuid];
+    return [_objectGraphContext loadedObjectForUUID: uuid];
 }
 
 - (CORevision *)currentRevision
@@ -622,7 +622,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 
 - (void)saveCommitWithMetadata: (NSDictionary *)metadata transaction: (COStoreTransaction *)txn
 {
-    if (self.hasChanges && self.deleted && self.persistentRootInfo.deleted)
+    if (self.hasChanges && self.deleted && _persistentRootInfo.deleted)
     {
         [NSException raise: NSGenericException
                     format: @"Attempted to commit changes to deleted persistent root %@", self];
@@ -630,7 +630,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     ETAssert(self.currentBranch != nil);
     ETAssert(self.rootObject != nil);
     ETAssert([self.rootObject isRoot]);
-    ETAssert(self.objectGraphContext.rootObject != nil
+    ETAssert(_objectGraphContext.rootObject != nil
              || self.currentBranch.objectGraphContextWithoutUnfaulting.rootObject != nil);
 
     if (self.persistentRootUncommitted)
@@ -658,7 +658,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
             COItemGraph *graphCopy = [[COItemGraph alloc] initWithItemGraph: graphCtx];
 
             _persistentRootInfo = [txn createPersistentRootWithInitialItemGraph: graphCopy
-                                                                           UUID: self.UUID
+                                                                           UUID: _UUID
                                                                      branchUUID: self.currentBranch.UUID
                                                                revisionMetadata: metadata];
         }
@@ -754,7 +754,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
         if (![_persistentRootInfo.currentBranchUUID isEqual: _currentBranchUUID])
         {
             [txn setCurrentBranch: _currentBranchUUID
-                forPersistentRoot: self.UUID];
+                forPersistentRoot: _UUID];
 
             [_editingContext recordPersistentRoot: self
                                  setCurrentBranch: self.currentBranch
@@ -789,7 +789,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 
 - (void)reloadPersistentRootInfo
 {
-    COPersistentRootInfo *newInfo = [self.store persistentRootInfoForUUID: self.UUID];
+    COPersistentRootInfo *newInfo = [self.store persistentRootInfoForUUID: _UUID];
 
     if (newInfo == nil)
         return;
@@ -872,7 +872,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 //  NSLog(@"++++Not ignoring update notif %d > %d (distributed: %d)",
 //        (int)notifTransaction, (int)_lastTransactionID, (int)isDistributed);
 
-    COPersistentRootInfo *info = [self.store persistentRootInfoForUUID: self.UUID];
+    COPersistentRootInfo *info = [self.store persistentRootInfoForUUID: _UUID];
 
     /* If we are receiving a changed/compacted notification but the persistent
        root has been finalized in the meantime (distributed notifications are 
@@ -886,7 +886,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     {
         COBranchInfo *branchInfo = [info branchInfoForUUID: uuid];
         BOOL wasCompacted =
-            [notif.userInfo[kCOStoreCompactedPersistentRoots] containsObject: self.UUID.stringValue];
+            [notif.userInfo[kCOStoreCompactedPersistentRoots] containsObject: _UUID.stringValue];
 
         [self updateBranchWithBranchInfo: branchInfo
                                compacted: wasCompacted];
@@ -915,8 +915,8 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 - (COObjectGraphContext *)objectGraphContextForPreviewingRevision: (CORevision *)aRevision
 {
     COObjectGraphContext *ctx = [[COObjectGraphContext alloc]
-        initWithModelDescriptionRepository: self.editingContext.modelDescriptionRepository
-                      migrationDriverClass: self.editingContext.migrationDriverClass];
+        initWithModelDescriptionRepository: _editingContext.modelDescriptionRepository
+                      migrationDriverClass: _editingContext.migrationDriverClass];
     id <COItemGraph> items = [self.store itemGraphForRevisionUUID: aRevision.UUID
                                                    persistentRoot: _UUID];
 
