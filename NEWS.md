@@ -4,6 +4,7 @@ CoreObject NEWS
 0.6
 ---
 
+- Automatic unloading of deleted persistent roots
 - Lazy loading of persistent roots and branches
 - Hidden dead cross references
     - Relationships accross persistent roots are transparently resolved when deleting/undeleting persistent roots or branches
@@ -23,7 +24,8 @@ CoreObject NEWS
     - Allow to build custom presentation of the history
 - Improved history localization
 - Introduced iOS 7 and higher support
-
+- Swift compatibility
+- Modernized Objective-C code base and API (including nullability and lightweight generics annotations)
 
 0.5
 ---
