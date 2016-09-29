@@ -183,10 +183,7 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
 
 - (BOOL)objectGraphContextHasChanges
 {
-    if (_objectGraph != nil)
-        return _objectGraph.hasChanges;
-
-    return NO;
+    return _objectGraph != nil ? _objectGraph.hasChanges : NO;
 }
 
 - (BOOL)isBranchUncommitted
@@ -912,10 +909,7 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
         }
         return graph;
     }
-    else
-    {
-        return _objectGraph;
-    }
+    return _objectGraph;
 }
 
 - (COItemGraph *)modifiedItemsSnapshot
