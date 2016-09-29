@@ -7,22 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6079427B1D9D7BC600D3D864 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 6079426F1D9D7BC600D3D864 /* Credits.rtf */; };
+		6079427C1D9D7BC600D3D864 /* DiffWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607942711D9D7BC600D3D864 /* DiffWindow.xib */; };
+		6079427D1D9D7BC600D3D864 /* Document.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607942731D9D7BC600D3D864 /* Document.xib */; };
+		6079427E1D9D7BC600D3D864 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 607942751D9D7BC600D3D864 /* InfoPlist.strings */; };
+		6079427F1D9D7BC600D3D864 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607942771D9D7BC600D3D864 /* MainMenu.xib */; };
+		607944401D9D7F680086E054 /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 6079443E1D9D7F680086E054 /* Commits */; };
 		662599E218B551E400235B65 /* EWGraphRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 662599DA18B551E400235B65 /* EWGraphRenderer.m */; };
 		662599E318B551E400235B65 /* EWGraphCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 662599DE18B551E400235B65 /* EWGraphCell.m */; };
 		662599F218B5776300235B65 /* PrioritySplitViewDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 662599F118B5776300235B65 /* PrioritySplitViewDelegate.m */; };
-		663EFD7B18A17FB30030BD2F /* Document.xib in Resources */ = {isa = PBXBuildFile; fileRef = 663EFD6118A17FB30030BD2F /* Document.xib */; };
-		663EFD7D18A17FB30030BD2F /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 663EFD6518A17FB30030BD2F /* InfoPlist.strings */; };
-		663EFD7E18A17FB30030BD2F /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 663EFD6718A17FB30030BD2F /* MainMenu.xib */; };
 		663EFD8018A17FB30030BD2F /* EWAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 663EFD6C18A17FB30030BD2F /* EWAppDelegate.m */; };
 		663EFD8318A17FB30030BD2F /* EWTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 663EFD7218A17FB30030BD2F /* EWTextView.m */; };
 		663EFD8418A17FB30030BD2F /* EWTypewriterWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 663EFD7418A17FB30030BD2F /* EWTypewriterWindowController.m */; };
 		663EFD8618A17FB30030BD2F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 663EFD7718A17FB30030BD2F /* main.m */; };
 		6642F88418C1471900E30BFF /* EWHistoryWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6642F88318C1471900E30BFF /* EWHistoryWindowController.m */; };
 		6642F88E18C16C2700E30BFF /* History.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6642F88D18C16C2700E30BFF /* History.xib */; };
-		664CC9E818A4607F002F04B7 /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 664CC9E618A4607F002F04B7 /* Commits */; };
 		664CC9F618A4A3FC002F04B7 /* plus_8x8.png in Resources */ = {isa = PBXBuildFile; fileRef = 664CC9F118A4A3FC002F04B7 /* plus_8x8.png */; };
 		664E93B518A1929300261673 /* TypewriterDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 664E93B418A1929300261673 /* TypewriterDocument.m */; };
-		665880BC18F31BB1004B03D6 /* DiffWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 665880BA18F31BB1004B03D6 /* DiffWindow.xib */; };
 		665880C718F31D09004B03D6 /* EWDiffWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 665880C618F31D09004B03D6 /* EWDiffWindowController.m */; };
 		666293DC18F348DC00BC2AFB /* COAttributedStringDiff+PrettyPrint.m in Sources */ = {isa = PBXBuildFile; fileRef = 666293DB18F348DC00BC2AFB /* COAttributedStringDiff+PrettyPrint.m */; };
 		666293E718F35E6200BC2AFB /* COPersistentRoot+Revert.m in Sources */ = {isa = PBXBuildFile; fileRef = 666293E618F35E6200BC2AFB /* COPersistentRoot+Revert.m */; };
@@ -36,7 +37,6 @@
 		66B7DB3718A96FD900010BCB /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 663EFD2C18A17E270030BD2F /* Cocoa.framework */; };
 		66B7DB3818A96FEE00010BCB /* CoreObject.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 663EFD9318A180170030BD2F /* CoreObject.framework */; };
 		66B7DB3918A96FF500010BCB /* EtoileFoundation.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66B7DB2C18A96F9100010BCB /* EtoileFoundation.framework */; };
-		66C4588E1939509A00F57A24 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 66C4588C1939509A00F57A24 /* Credits.rtf */; };
 		66E6821518B723AD003294EB /* plus_8x8@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 66E6821418B723AD003294EB /* plus_8x8@2x.png */; };
 		66E6822018B72428003294EB /* plus_8x8-grey.png in Resources */ = {isa = PBXBuildFile; fileRef = 66E6821E18B72427003294EB /* plus_8x8-grey.png */; };
 		66E6822118B72428003294EB /* plus_8x8-grey@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 66E6821F18B72428003294EB /* plus_8x8-grey@2x.png */; };
@@ -48,6 +48,34 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		607942531D9D7A4B00D3D864 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 663EFD8818A180150030BD2F /* CoreObject.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 60E08C6219792BEA00D1B7AD;
+			remoteInfo = "CoreObject (iOS)";
+		};
+		607942551D9D7A4B00D3D864 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 663EFD8818A180150030BD2F /* CoreObject.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 60F91E9D197D1B8F009F47D7;
+			remoteInfo = "TestCoreObject (iOS)";
+		};
+		607942571D9D7A4B00D3D864 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 663EFD8818A180150030BD2F /* CoreObject.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6002E28E197FD90300AC9150;
+			remoteInfo = "BasicPersistence (iOS)";
+		};
+		607942591D9D7A4B00D3D864 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 663EFD8818A180150030BD2F /* CoreObject.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 6061B8D71C57E89700813C18;
+			remoteInfo = "BenchmarkCoreObject (iOS)";
+		};
 		662599EC18B551E400235B65 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 66B7DB2218A96F9100010BCB /* EtoileFoundation.xcodeproj */;
@@ -149,6 +177,13 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		607942701D9D7BC600D3D864 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = Base; path = Base.lproj/Credits.rtf; sourceTree = SOURCE_ROOT; };
+		607942721D9D7BC600D3D864 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/DiffWindow.xib; sourceTree = SOURCE_ROOT; };
+		607942741D9D7BC600D3D864 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Document.xib; sourceTree = SOURCE_ROOT; };
+		607942761D9D7BC600D3D864 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
+		607942781D9D7BC600D3D864 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = SOURCE_ROOT; };
+		6079443F1D9D7F680086E054 /* Base */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Base; path = Base.lproj/Commits; sourceTree = SOURCE_ROOT; };
+		607944411D9D7F7E0086E054 /* fr */ = {isa = PBXFileReference; lastKnownFileType = folder; name = fr; path = fr.lproj/Commits; sourceTree = "<group>"; };
 		662599DA18B551E400235B65 /* EWGraphRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWGraphRenderer.m; path = ../CommonUI/EWGraphRenderer.m; sourceTree = "<group>"; };
 		662599DB18B551E400235B65 /* EWGraphRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWGraphRenderer.h; path = ../CommonUI/EWGraphRenderer.h; sourceTree = "<group>"; };
 		662599DE18B551E400235B65 /* EWGraphCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWGraphCell.m; path = ../CommonUI/EWGraphCell.m; sourceTree = "<group>"; };
@@ -159,9 +194,6 @@
 		663EFD2C18A17E270030BD2F /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		663EFD2F18A17E270030BD2F /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		663EFD3118A17E270030BD2F /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		663EFD6218A17FB30030BD2F /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = Document.xib; sourceTree = "<group>"; };
-		663EFD6618A17FB30030BD2F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = InfoPlist.strings; sourceTree = "<group>"; };
-		663EFD6818A17FB30030BD2F /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = MainMenu.xib; sourceTree = "<group>"; };
 		663EFD6B18A17FB30030BD2F /* EWAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWAppDelegate.h; sourceTree = SOURCE_ROOT; };
 		663EFD6C18A17FB30030BD2F /* EWAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWAppDelegate.m; sourceTree = SOURCE_ROOT; };
 		663EFD7118A17FB30030BD2F /* EWTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWTextView.h; sourceTree = SOURCE_ROOT; };
@@ -176,12 +208,9 @@
 		6642F88218C1471900E30BFF /* EWHistoryWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = EWHistoryWindowController.h; path = ../CommonUI/EWHistoryWindowController.h; sourceTree = "<group>"; };
 		6642F88318C1471900E30BFF /* EWHistoryWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = EWHistoryWindowController.m; path = ../CommonUI/EWHistoryWindowController.m; sourceTree = "<group>"; };
 		6642F88D18C16C2700E30BFF /* History.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = History.xib; path = ../CommonUI/History.xib; sourceTree = "<group>"; };
-		664CC9E718A4607F002F04B7 /* en */ = {isa = PBXFileReference; lastKnownFileType = folder; name = en; path = Commits; sourceTree = "<group>"; };
-		664CC9EC18A4608A002F04B7 /* org.etoile.Typewriter.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = org.etoile.Typewriter.json; path = Commits/org.etoile.Typewriter.json; sourceTree = "<group>"; };
 		664CC9F118A4A3FC002F04B7 /* plus_8x8.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = plus_8x8.png; sourceTree = "<group>"; };
 		664E93B318A1929300261673 /* TypewriterDocument.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TypewriterDocument.h; sourceTree = "<group>"; };
 		664E93B418A1929300261673 /* TypewriterDocument.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TypewriterDocument.m; sourceTree = "<group>"; };
-		665880BB18F31BB1004B03D6 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = DiffWindow.xib; sourceTree = "<group>"; };
 		665880C518F31D09004B03D6 /* EWDiffWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EWDiffWindowController.h; sourceTree = SOURCE_ROOT; };
 		665880C618F31D09004B03D6 /* EWDiffWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EWDiffWindowController.m; sourceTree = SOURCE_ROOT; };
 		666293DA18F348DC00BC2AFB /* COAttributedStringDiff+PrettyPrint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "COAttributedStringDiff+PrettyPrint.h"; sourceTree = SOURCE_ROOT; };
@@ -199,7 +228,6 @@
 		66B7DB1C18A96F2900010BCB /* EtoileFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EtoileFoundation.framework; path = "../../../../../../../../Library/Developer/Xcode/DerivedData/Typewriter-ewqruishaxmvlhhefeyihtxobbmk/Build/Products/Debug/EtoileFoundation.framework"; sourceTree = "<group>"; };
 		66B7DB2218A96F9100010BCB /* EtoileFoundation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = EtoileFoundation.xcodeproj; path = ../../../EtoileFoundation/EtoileFoundation.xcodeproj; sourceTree = "<group>"; };
 		66BA3D5618DA81FE00641D40 /* TODO.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = TODO.md; sourceTree = SOURCE_ROOT; };
-		66C4588D1939509A00F57A24 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = en.lproj/Credits.rtf; sourceTree = SOURCE_ROOT; };
 		66E6821418B723AD003294EB /* plus_8x8@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plus_8x8@2x.png"; sourceTree = "<group>"; };
 		66E6821E18B72427003294EB /* plus_8x8-grey.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plus_8x8-grey.png"; sourceTree = "<group>"; };
 		66E6821F18B72428003294EB /* plus_8x8-grey@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "plus_8x8-grey@2x.png"; sourceTree = "<group>"; };
@@ -228,6 +256,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		607944421D9D802A0086E054 /* Localizable Resources */ = {
+			isa = PBXGroup;
+			children = (
+				6079443E1D9D7F680086E054 /* Commits */,
+				6079426F1D9D7BC600D3D864 /* Credits.rtf */,
+				607942711D9D7BC600D3D864 /* DiffWindow.xib */,
+				607942731D9D7BC600D3D864 /* Document.xib */,
+				607942751D9D7BC600D3D864 /* InfoPlist.strings */,
+				607942771D9D7BC600D3D864 /* MainMenu.xib */,
+			);
+			name = "Localizable Resources";
+			path = ..;
+			sourceTree = SOURCE_ROOT;
+		};
 		663EFD1E18A17DF90030BD2F = {
 			isa = PBXGroup;
 			children = (
@@ -274,7 +316,7 @@
 			children = (
 				66BA3D5618DA81FE00641D40 /* TODO.md */,
 				664E93AC18A1914C00261673 /* Model */,
-				663EFD5E18A17FB30030BD2F /* en.lproj */,
+				607944421D9D802A0086E054 /* Localizable Resources */,
 				663EFD6B18A17FB30030BD2F /* EWAppDelegate.h */,
 				663EFD6C18A17FB30030BD2F /* EWAppDelegate.m */,
 				663EFD7118A17FB30030BD2F /* EWTextView.h */,
@@ -302,20 +344,7 @@
 				666293E518F35E6200BC2AFB /* COPersistentRoot+Revert.h */,
 				666293E618F35E6200BC2AFB /* COPersistentRoot+Revert.m */,
 			);
-			path = Typewriter;
-			sourceTree = "<group>";
-		};
-		663EFD5E18A17FB30030BD2F /* en.lproj */ = {
-			isa = PBXGroup;
-			children = (
-				664CC9E618A4607F002F04B7 /* Commits */,
-				664CC9EC18A4608A002F04B7 /* org.etoile.Typewriter.json */,
-				663EFD6118A17FB30030BD2F /* Document.xib */,
-				663EFD6518A17FB30030BD2F /* InfoPlist.strings */,
-				663EFD6718A17FB30030BD2F /* MainMenu.xib */,
-				665880BA18F31BB1004B03D6 /* DiffWindow.xib */,
-			);
-			path = en.lproj;
+			name = Typewriter;
 			sourceTree = SOURCE_ROOT;
 		};
 		663EFD8918A180150030BD2F /* Products */ = {
@@ -325,6 +354,10 @@
 				663EFD9518A180170030BD2F /* Test */,
 				663EFD9718A180170030BD2F /* BenchmarkCoreObject */,
 				663EFD9918A180170030BD2F /* BasicPersistence */,
+				607942541D9D7A4B00D3D864 /* libCoreObject.a */,
+				607942561D9D7A4B00D3D864 /* TestCoreObject.app */,
+				607942581D9D7A4B00D3D864 /* BasicPersistence.app */,
+				6079425A1D9D7A4B00D3D864 /* BenchmarkCoreObject (iOS).app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -332,7 +365,6 @@
 		664CC9EE18A4A321002F04B7 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				66C4588C1939509A00F57A24 /* Credits.rtf */,
 				66E6821E18B72427003294EB /* plus_8x8-grey.png */,
 				66E6821F18B72428003294EB /* plus_8x8-grey@2x.png */,
 				664CC9F118A4A3FC002F04B7 /* plus_8x8.png */,
@@ -423,6 +455,7 @@
 			knownRegions = (
 				en,
 				Base,
+				fr,
 			);
 			mainGroup = 663EFD1E18A17DF90030BD2F;
 			productRefGroup = 663EFD2A18A17E270030BD2F /* Products */;
@@ -445,6 +478,34 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		607942541D9D7A4B00D3D864 /* libCoreObject.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libCoreObject.a;
+			remoteRef = 607942531D9D7A4B00D3D864 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		607942561D9D7A4B00D3D864 /* TestCoreObject.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = TestCoreObject.app;
+			remoteRef = 607942551D9D7A4B00D3D864 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		607942581D9D7A4B00D3D864 /* BasicPersistence.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = BasicPersistence.app;
+			remoteRef = 607942571D9D7A4B00D3D864 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		6079425A1D9D7A4B00D3D864 /* BenchmarkCoreObject (iOS).app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = "BenchmarkCoreObject (iOS).app";
+			remoteRef = 607942591D9D7A4B00D3D864 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		662599ED18B551E400235B65 /* libEtoileFoundation.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
@@ -522,18 +583,18 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				665880BC18F31BB1004B03D6 /* DiffWindow.xib in Resources */,
+				6079427D1D9D7BC600D3D864 /* Document.xib in Resources */,
 				66A4840B191AF24F00D28106 /* Preferences.xib in Resources */,
-				663EFD7E18A17FB30030BD2F /* MainMenu.xib in Resources */,
-				664CC9E818A4607F002F04B7 /* Commits in Resources */,
-				663EFD7D18A17FB30030BD2F /* InfoPlist.strings in Resources */,
-				66C4588E1939509A00F57A24 /* Credits.rtf in Resources */,
 				66E6821518B723AD003294EB /* plus_8x8@2x.png in Resources */,
+				6079427E1D9D7BC600D3D864 /* InfoPlist.strings in Resources */,
+				6079427C1D9D7BC600D3D864 /* DiffWindow.xib in Resources */,
 				66E6822018B72428003294EB /* plus_8x8-grey.png in Resources */,
+				6079427F1D9D7BC600D3D864 /* MainMenu.xib in Resources */,
+				607944401D9D7F680086E054 /* Commits in Resources */,
 				6642F88E18C16C2700E30BFF /* History.xib in Resources */,
 				66E6822118B72428003294EB /* plus_8x8-grey@2x.png in Resources */,
+				6079427B1D9D7BC600D3D864 /* Credits.rtf in Resources */,
 				667A9A9018A5A34E009A2F0E /* document_stroke.icns in Resources */,
-				663EFD7B18A17FB30030BD2F /* Document.xib in Resources */,
 				664CC9F618A4A3FC002F04B7 /* plus_8x8.png in Resources */,
 				66EDFEC418ABFF9E00B29CFE /* Undo.xib in Resources */,
 			);
@@ -584,53 +645,59 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		663EFD6118A17FB30030BD2F /* Document.xib */ = {
+		6079426F1D9D7BC600D3D864 /* Credits.rtf */ = {
 			isa = PBXVariantGroup;
 			children = (
-				663EFD6218A17FB30030BD2F /* en */,
-			);
-			name = Document.xib;
-			sourceTree = "<group>";
-		};
-		663EFD6518A17FB30030BD2F /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				663EFD6618A17FB30030BD2F /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		663EFD6718A17FB30030BD2F /* MainMenu.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				663EFD6818A17FB30030BD2F /* en */,
-			);
-			name = MainMenu.xib;
-			sourceTree = "<group>";
-		};
-		664CC9E618A4607F002F04B7 /* Commits */ = {
-			isa = PBXVariantGroup;
-			children = (
-				664CC9E718A4607F002F04B7 /* en */,
-			);
-			name = Commits;
-			sourceTree = "<group>";
-		};
-		665880BA18F31BB1004B03D6 /* DiffWindow.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				665880BB18F31BB1004B03D6 /* en */,
-			);
-			name = DiffWindow.xib;
-			sourceTree = "<group>";
-		};
-		66C4588C1939509A00F57A24 /* Credits.rtf */ = {
-			isa = PBXVariantGroup;
-			children = (
-				66C4588D1939509A00F57A24 /* en */,
+				607942701D9D7BC600D3D864 /* Base */,
 			);
 			name = Credits.rtf;
+			path = en.lproj;
 			sourceTree = "<group>";
+		};
+		607942711D9D7BC600D3D864 /* DiffWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				607942721D9D7BC600D3D864 /* Base */,
+			);
+			name = DiffWindow.xib;
+			path = en.lproj;
+			sourceTree = "<group>";
+		};
+		607942731D9D7BC600D3D864 /* Document.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				607942741D9D7BC600D3D864 /* Base */,
+			);
+			name = Document.xib;
+			path = en.lproj;
+			sourceTree = "<group>";
+		};
+		607942751D9D7BC600D3D864 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				607942761D9D7BC600D3D864 /* Base */,
+			);
+			name = InfoPlist.strings;
+			path = en.lproj;
+			sourceTree = "<group>";
+		};
+		607942771D9D7BC600D3D864 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				607942781D9D7BC600D3D864 /* Base */,
+			);
+			name = MainMenu.xib;
+			path = en.lproj;
+			sourceTree = "<group>";
+		};
+		6079443E1D9D7F680086E054 /* Commits */ = {
+			isa = PBXVariantGroup;
+			children = (
+				6079443F1D9D7F680086E054 /* Base */,
+				607944411D9D7F7E0086E054 /* fr */,
+			);
+			name = Commits;
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXVariantGroup section */
 

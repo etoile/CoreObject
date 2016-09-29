@@ -1,0 +1,146 @@
+{
+    "types":
+	{
+		"renaming": "Renommage d'objet",
+		"tagging": "Étiquettage d'objet",
+		"modification": "Modification",
+		"creation": "Création d'objet",
+		"deletion": "Suppression d'objet",
+		"copy": "Copie d'objet",
+		"history": "Historique",
+		"branch": "Branche"
+	},
+
+	"descriptors":
+	{
+		"delete-note":
+		{
+			"type": "deletion",
+			"shortDescription": "Supprimer note '%@'"
+		},
+		"add-note":
+		{
+			"type": "creation",
+			"shortDescription": "Créer note '%@'"
+		},
+		"rename-note":
+		{
+			"type": "renaming",
+			"shortDescription": "Renommer note de '%@' à '%@'"
+		},
+		"tag-note":
+		{
+			"type": "tagging",
+			"shortDescription": "Ajouter étiquette '%@' à '%@'"
+		},
+		"untag-note":
+		{
+			"type": "tagging",
+			"shortDescription": "Enlever étiquette '%@' de '%@'"
+		},
+		"duplicate-note":
+		{
+			"type": "creation",
+			"shortDescription": "Dupliquer '%@'"
+		},
+		
+		"delete-tag":
+		{
+			"type": "deletion",
+			"shortDescription": "Supprimer étiquette '%@'"
+		},
+		"add-tag":
+		{
+			"type": "creation",
+			"shortDescription": "Créer étiquette '%@'"
+		},
+		"rename-tag":
+		{
+			"type": "renaming",
+			"shortDescription": "Renommer étiquette de '%@' à '%@'"
+		},
+		"move-tag":
+		{
+			"type": "renaming",
+			"shortDescription": "Déplacer étiquette '%@'"
+		},
+		
+		
+		
+		"delete-tag-group":
+		{
+			"type": "deletion",
+			"shortDescription": "Supprimer groupe d'étiques '%@'"
+		},
+		"add-tag-group":
+		{
+			"type": "creation",
+			"shortDescription": "Créer groupe d'étiquettes '%@'"
+		},
+		"rename-tag-group":
+		{
+			"type": "renaming",
+			"shortDescription": "Renommer groupe d'étiquttes de '%@' à '%@'"
+		},
+		
+		
+		
+		"typing":
+		{
+			"type": "modification",
+			"shortDescription": "En train d'écrire"
+		},
+		
+		
+		
+		"insert-text":
+		{
+			"type": "modification",
+			"shortDescription": "Insérer texte '%@'"
+		},
+
+		"delete-text":
+		{
+			"type": "deletion",
+			"shortDescription": "Supprimer texte '%@'"
+		},
+
+		"replace-text":
+		{
+			"type": "modification",
+			"shortDescription": "Remplacer texte '%@' avec '%@'"
+		},
+
+		"modify-text":
+		{
+			"type": "modification",
+			"shortDescription": "Changer attributs du texte '%@'"
+		},
+		
+		
+		
+		"insert-text-and-others-edits":
+		{
+			"type": "modification",
+			"shortDescription": "Insérer texte '%@' et autres modifications"
+		},
+		
+		"delete-text-and-others-edits":
+		{
+			"type": "deletion",
+			"shortDescription": "Supprimer texte '%@' et autres modifications"
+		},
+		
+		"replace-text-and-others-edits":
+		{
+			"type": "modification",
+			"shortDescription": "Remplacer texte '%@' avec '%@' et autres modifications"
+		},
+		
+		"modify-text-and-others-edits":
+		{
+			"type": "modification",
+			"shortDescription": "Changer attributs du text '%@' et autres modifications"
+		}
+	}
+}
