@@ -164,6 +164,9 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     return self;
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+
 - (instancetype)init
 {
     return [self initWithInfo: nil
@@ -173,6 +176,8 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
            objectGraphContext: nil
                 parentContext: nil];
 }
+
+#pragma clang diagnostic pop
 
 - (NSString *)description
 {
@@ -813,16 +818,11 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
                        atRevision: (CORevision *)aRev
                      parentBranch: (COBranch *)aParent
 {
-    COBranch *newBranch = [[COBranch alloc] initWithUUID: [ETUUID UUID]
-                                          persistentRoot: self
-                                        parentBranchUUID: aParent.UUID
-                              parentRevisionForNewBranch: aRev.UUID];
-
-    newBranch.metadata = @{@"COBranchLabel": aLabel};
-
-    _branchForUUID[newBranch.UUID] = newBranch;
-
-    return newBranch;
+    ETAssert(aLabel != nil);
+    return [self makeBranchWithUUID: [ETUUID new]
+                           metadata: @{@"COBranchLabel": aLabel}
+                         atRevision: aRev
+                       parentBranch: aParent];
 }
 
 - (COBranch *)makeBranchWithUUID: (ETUUID *)aUUID
@@ -830,6 +830,8 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
                       atRevision: (CORevision *)aRev
                     parentBranch: (COBranch *)aParent
 {
+    ETAssert(aRev!= nil);
+    ETAssert(aParent != nil);
     COBranch *newBranch = [[COBranch alloc] initWithUUID: aUUID
                                           persistentRoot: self
                                         parentBranchUUID: aParent.UUID

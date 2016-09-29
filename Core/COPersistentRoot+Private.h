@@ -7,12 +7,14 @@
 
 #import <CoreObject/COPersistentRoot.h>
 
+@class COStoreTransaction;
+
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * Metadata dictionary key used by the `name` property.
  */
 extern NSString *const COPersistentRootName;
-
-@class COStoreTransaction;
 
 @interface COPersistentRoot ()
 
@@ -29,12 +31,12 @@ extern NSString *const COPersistentRootName;
  * cheapCopyRevisionID is normally nil, and only set to create a cheap copy.
  * See -[COBranch makeCopyFromRevision:]
  */
-- (instancetype)initWithInfo: (COPersistentRootInfo *)info
-       cheapCopyRevisionUUID: (ETUUID *)cheapCopyRevisionID
- cheapCopyPersistentRootUUID: (ETUUID *)cheapCopyPersistentRootID
-            parentBranchUUID: (ETUUID *)aBranchUUID
-          objectGraphContext: (COObjectGraphContext *)anObjectGraphContext
-               parentContext: (COEditingContext *)aCtxt;
+- (instancetype)initWithInfo: (nullable COPersistentRootInfo *)info
+       cheapCopyRevisionUUID: (nullable ETUUID *)cheapCopyRevisionID
+ cheapCopyPersistentRootUUID: (nullable ETUUID *)cheapCopyPersistentRootID
+            parentBranchUUID: (nullable ETUUID *)aBranchUUID
+          objectGraphContext: (nullable COObjectGraphContext *)anObjectGraphContext
+               parentContext: (COEditingContext *)aCtxt NS_DESIGNATED_INITIALIZER;
 
 /**
  * This method is only exposed to be used internally by CoreObject.
@@ -45,14 +47,15 @@ extern NSString *const COPersistentRootName;
  * The commit procedure is the parent context responsability, the parent context
  * calls back -saveCommitWithMetadata:.
  */
-- (BOOL)commitWithMetadata: (NSDictionary *)metadata;
+- (BOOL)commitWithMetadata: (nullable NSDictionary<NSString *, id> *)metadata;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
  * Extracts the current changes, saves them to the store with the provided
  * metadatas and returns the resulting revision.
  */
-- (void)saveCommitWithMetadata: (NSDictionary *)metadata transaction: (COStoreTransaction *)txn;
+- (void)saveCommitWithMetadata: (nullable NSDictionary<NSString *, id> *)metadata
+                   transaction: (COStoreTransaction *)txn;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -84,7 +87,7 @@ extern NSString *const COPersistentRootName;
                      parentBranch: (COBranch *)aParent;
 
 - (COBranch *)makeBranchWithUUID: (ETUUID *)aUUID
-                        metadata: (NSDictionary *)metadata
+                        metadata: (nullable NSDictionary<NSString *, id> *)metadata
                       atRevision: (CORevision *)aRev
                     parentBranch: (COBranch *)aParent;
 
@@ -97,7 +100,7 @@ extern NSString *const COPersistentRootName;
 /**
  * This property is only exposed to be used internally by CoreObject.
  */
-@property (nonatomic, readonly) NSSet *allBranches;
+@property (nonatomic, readonly) NSSet<COBranch *> *allBranches;
 
 - (void)deleteBranch: (COBranch *)aBranch;
 - (void)undeleteBranch: (COBranch *)aBranch;
@@ -110,3 +113,5 @@ extern NSString *const COPersistentRootName;
  */
 - (void)makeZombie;
 @end
+
+NS_ASSUME_NONNULL_END

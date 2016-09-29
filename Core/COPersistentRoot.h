@@ -13,6 +13,8 @@
 
 @class COBranch, COObject, CORevision, COSQLiteStore, CORelationshipCache, COPersistentRootInfo, COObjectGraphContext;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * Posted when any changes are committed to this persistent root, including
  * changes committed in another process.
@@ -208,7 +210,7 @@ extern NSString *const COPersistentRootDidChangeNotification;
  *
  * You must never overwrite any existing metadata set by CoreObject.
  */
-@property (nonatomic, readwrite, copy) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy) NSDictionary<NSString *, id> *metadata;
 /**
  * The persistent root deletion status.
  *
@@ -232,7 +234,7 @@ extern NSString *const COPersistentRootDidChangeNotification;
  *
  * See -[COBranch headRevision] and -[CORevision date].
  */
-@property (nonatomic, readonly) NSDate *modificationDate;
+@property (nonatomic, readonly, nullable) NSDate *modificationDate;
 /**
  * The first revision date.
  *
@@ -240,13 +242,13 @@ extern NSString *const COPersistentRootDidChangeNotification;
  *
  * See -[COBranch firstRevision] and -[CORevision date].
  */
-@property (nonatomic, readonly) NSDate *creationDate;
+@property (nonatomic, readonly, nullable) NSDate *creationDate;
 /**
  * The persistent root this is a copy of, or nil if the receiver is not a copy.
  *
  * See -[COPersistentRoot isCopy].
  */
-@property (nonatomic, readonly) COPersistentRoot *parentPersistentRoot;
+@property (nonatomic, readonly, nullable) COPersistentRoot *parentPersistentRoot;
 /**
  * Returns YES if this persistent root is a copy (-parentPersistentRoot != nil).
  *
@@ -258,7 +260,7 @@ extern NSString *const COPersistentRootDidChangeNotification;
  *
  * See COPersistentRootAttributeExportSize, COPersistentRootAttributeUsedSize.
  */
-@property (nonatomic, readonly) NSDictionary *attributes;
+@property (nonatomic, readonly, nullable) NSDictionary<NSString *, id> *attributes;
 /**
  * The user-facing name of the persistent root. This property is provided for
  * convenience; it is implemented on top of the metadata property.
@@ -274,7 +276,7 @@ extern NSString *const COPersistentRootDidChangeNotification;
  *
  * TODO: Rename to -displayName or -label to emphasize that this is the user-facing name?
  */
-@property (nonatomic, readwrite, copy) NSString *name;
+@property (nonatomic, readwrite, copy, nullable) NSString *name;
 
 /** @taskunit Accessing Branches */
 
@@ -299,7 +301,7 @@ extern NSString *const COPersistentRootDidChangeNotification;
  * The returned branches never contains the -currentBranch object, but contains 
  * another current branch instance (both instances use the same UUID).
  */
-@property (nonatomic, readonly) NSSet *branches;
+@property (nonatomic, readonly) NSSet<COBranch *> *branches;
 /**
  * All the branches marked as deleted on disk, excluding those that are pending 
  * undeletion, plus those pending deletion.
@@ -307,7 +309,7 @@ extern NSString *const COPersistentRootDidChangeNotification;
  * TODO: Document if the current branch UUID can appear among the returned 
  * branches.
  */
-@property (nonatomic, readonly) NSSet *deletedBranches;
+@property (nonatomic, readonly) NSSet<COBranch *> *deletedBranches;
 /**
  * Returns the branch using the given UUID or nil.
  *
@@ -322,7 +324,7 @@ extern NSString *const COPersistentRootDidChangeNotification;
  *
  * See also -setDeleted:.
  */
-- (COBranch *)branchForUUID: (ETUUID *)aUUID;
+- (nullable COBranch *)branchForUUID: (ETUUID *)aUUID;
 
 
 /** @taskunit Editing Context Nesting */
@@ -353,19 +355,19 @@ extern NSString *const COPersistentRootDidChangeNotification;
 /**
  * The new branches to be saved in the store on the next commit.
  */
-@property (nonatomic, readonly) NSSet *branchesPendingInsertion;
+@property (nonatomic, readonly) NSSet<COBranch *> *branchesPendingInsertion;
 /**
  * The branche to be deleted in the store on the next commit.
  */
-@property (nonatomic, readonly) NSSet *branchesPendingDeletion;
+@property (nonatomic, readonly) NSSet<COBranch *> *branchesPendingDeletion;
 /**
  * The branches to be undeleted in the store on the next commit.
  */
-@property (nonatomic, readonly) NSSet *branchesPendingUndeletion;
+@property (nonatomic, readonly) NSSet<COBranch *> *branchesPendingUndeletion;
 /**
  * The branches to be updated in the store on the next commit.
  */
-@property (nonatomic, readonly) NSSet *branchesPendingUpdate;
+@property (nonatomic, readonly) NSSet<COBranch *> *branchesPendingUpdate;
 /**
  * Returns whether the persistent root contains uncommitted changes.
  *
@@ -423,18 +425,18 @@ extern NSString *const COPersistentRootDidChangeNotification;
 /**
  * Shorthand for <code>[self.objectGraphContext loadedObjectForUUID:]</code>.
  */
-- (COObject *)loadedObjectForUUID: (ETUUID *)uuid;
+- (nullable COObject *)loadedObjectForUUID: (ETUUID *)uuid;
 /**
  * Shortcut for <code>self.currentBranch.currentRevision</code>.
  *
  * For a new persistent root, the revision is nil, unless it is a cheap copy. 
  * See -[COBranch makeCopyFromRevision:].
  */
-@property (nonatomic, readwrite, strong) CORevision *currentRevision;
+@property (nonatomic, readwrite, strong, nullable) CORevision *currentRevision;
 /**
  * Shortcut for <code>self.currentBranch.headRevision</code>.
  */
-@property (nonatomic, readwrite, strong) CORevision *headRevision;
+@property (nonatomic, readwrite, strong, nullable) CORevision *headRevision;
 /**
  * Shorthand for <code>self.editingContext.store</code>.
  */
@@ -468,7 +470,7 @@ extern NSString *const COPersistentRootDidChangeNotification;
  * Returns the object graphs for the -branches (if they have been instantiated),
  * plus the object graph that dynamically tracks the -currentBranch (see -objectGraphContext).
  */
-@property (nonatomic, readonly) NSSet *allObjectGraphContexts;
+@property (nonatomic, readonly) NSSet<COObjectGraphContext *> *allObjectGraphContexts;
 
 
 /** @taskunit Committing Changes */
@@ -481,10 +483,10 @@ extern NSString *const COPersistentRootDidChangeNotification;
  *
  * See -[COEditingContext commitWithIdentifier:metadata:undoTrack:error:].
  */
-- (BOOL)commitWithIdentifier: (NSString *)aCommitDescriptorId
-                    metadata: (NSDictionary *)additionalMetadata
-                   undoTrack: (COUndoTrack *)undoTrack
-                       error: (COError **)anError;
+- (BOOL)commitWithIdentifier: (nullable NSString *)aCommitDescriptorId
+                    metadata: (nullable NSDictionary<NSString *, id> *)additionalMetadata
+                   undoTrack: (nullable COUndoTrack *)undoTrack
+                       error: (COError *_Nullable *_Nullable)anError;
 /**
  * Commits this persistent root changes to the store and returns whether it 
  * succeeds.
@@ -535,3 +537,5 @@ extern NSString *const COPersistentRootDidChangeNotification;
 @property (nonatomic, readonly) BOOL isPersistentRoot;
 
 @end
+
+NS_ASSUME_NONNULL_END
