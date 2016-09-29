@@ -47,11 +47,18 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
     [self applyTraitFromClass: [ETCollectionTrait class]];
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+
 - (instancetype)init
 {
-    [self doesNotRecognizeSelector: _cmd];
-    return nil;
+    return [self initWithUUID: nil
+               persistentRoot: nil
+             parentBranchUUID: nil
+   parentRevisionForNewBranch: nil];
 }
+
+#pragma clang diagnostic pop
 
 /**
  * Both root object and revision are lazily retrieved by the persistent root.

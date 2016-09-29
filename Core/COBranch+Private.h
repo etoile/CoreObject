@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithUUID: (ETUUID *)aUUID
               persistentRoot: (COPersistentRoot *)aPersistentRoot
             parentBranchUUID: (nullable ETUUID *)aParentBranchUUID
-  parentRevisionForNewBranch: (nullable ETUUID *)parentRevisionForNewBranch;
+  parentRevisionForNewBranch: (nullable ETUUID *)parentRevisionForNewBranch NS_DESIGNATED_INITIALIZER;
 @property (nonatomic, readonly) COSQLiteStore *store;
 /**
  * This method is only exposed to be used internally by CoreObject.
