@@ -3,4 +3,5 @@ notifications:
     recipients:
       - etoile-testbuild@gna.org
 language: objective-c
+osx_image: xcode7.3
 script: ./travis-ci-checkout-deps-and-run-tests.sh
