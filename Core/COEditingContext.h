@@ -214,13 +214,9 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
  * To register types bound to classes manually, see
  * -[ETModelDescriptionRepository registerEntityDescriptionsForClasses:resolveNow:].
  *
- * For a nil model repository, or a repository that doesn't a COObject entity
- * description, raises a NSInvalidArgumentException.
+ * The repository must contain a COObject entitydescription.
  *
- * For a migration driver class that is not a subclass of COSchemaMigrationDriver, 
- * raises a NSInvalidArgumentException.
- *
- * For a nil undo track store, raises a NSInvalidArgumentException.
+ * The migration driver class must be a subclass of COSchemaMigrationDriver.
  */
 - (instancetype)initWithStore: (COSQLiteStore *)store
    modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
@@ -335,14 +331,10 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
  * The returned persistent root is added to -persistentRootsPendingInsertion 
  * and will be saved to the store on the next commit.
  *
- * The object graph context of the root object must be transient, otherwise 
- * a NSInvalidArgumentException is raised.
+ * The object graph context of the root object must be transient.
  *
  * The object graph context of the root object must also use the same model 
- * description repository than the receiver, otherwise a 
- * NSInvalidArgumentException is raised.
- *
- * For a nil root object, raises a NSInvalidArgumentException.
+ * description repository than the receiver.
  */
 - (COPersistentRoot *)insertNewPersistentRootWithRootObject: (COObject *)aRootObject;
 /**
