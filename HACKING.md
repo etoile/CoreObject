@@ -67,7 +67,9 @@ supported on GNUstep), but use NSAssert1(), NSAssert2() etc.
     - Use INVALIDARG_EXCEPTION_TEST() and NILARG_EXCEPTION_TEST() when possible
     
 - Document every argument values which is not valid and related exceptions (e.g. 
-For a nil name, raises a NSInvalidArgumentException.) 
+The revision must be equal to or an ancestor of -headRevision.) 
+
+    - Don't document nil exceptions but use nullability annotations in @interface
 
 
 State Access
@@ -165,7 +167,7 @@ retain attributes
 
 - readwrite must be used for properties not declared as readonly
 
-- the ordering must be: atomicity, writability, memory-management, getter, setter
+- the ordering must be: atomicity, writability, memory-management, getter, setter, nullability
 
 ### Examples
 
@@ -208,6 +210,19 @@ retain attributes
 object is copied by the setter), unless you are overriding a (readwrite, copy) property
 
       Note: for overriden properties, sometimes we have to break these rules to ensure the code compile without warnings or disable -Wproperty-attribute-mismatch with clang diagnostic pragma. For instance, NSObject.description is marked with copy, this implies COObject.description has to be marked as copy too, although copy is useless when no setter exists.
+
+
+Nullability and Lightweight Generics
+------------------------------------
+
+- Annotate methods and properties declared in public and private @interface
+
+    - Don't re-annotate them on the implementation side, the compiler is smart enough
+    
+- Annotate variables with lightweight generics in implementation code only when there is a real benefit
+
+    - Good: complex code with lots of collection operations/transformations
+    - Bad: an array variable followed by a for loop, pretty much useless since the element type has to be declared in the for loop
 
 
 Blocks
