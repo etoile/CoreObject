@@ -7,6 +7,8 @@
 
 #import <CoreObject/COBranch.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COBranch ()
 
 /**
@@ -14,8 +16,8 @@
  */
 - (instancetype)initWithUUID: (ETUUID *)aUUID
               persistentRoot: (COPersistentRoot *)aPersistentRoot
-            parentBranchUUID: (ETUUID *)aParentBranchUUID
-  parentRevisionForNewBranch: (ETUUID *)parentRevisionForNewBranch;
+            parentBranchUUID: (nullable ETUUID *)aParentBranchUUID
+  parentRevisionForNewBranch: (nullable ETUUID *)parentRevisionForNewBranch;
 @property (nonatomic, readonly) COSQLiteStore *store;
 /**
  * This method is only exposed to be used internally by CoreObject.
@@ -46,7 +48,7 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (void)saveCommitWithMetadata: (NSDictionary *)metadata
+- (void)saveCommitWithMetadata: (nullable NSDictionary<NSString *, id> *)metadata
                    transaction: (COStoreTransaction *)txn;
 /**
  * This method is only exposed to be used internally by CoreObject.
@@ -66,7 +68,7 @@
  *
  * A head revision change is saved on the next branch commit.
  */
-@property (nonatomic) CORevision *headRevision;
+@property (nonatomic, readwrite, nullable) CORevision *headRevision;
 
 @property (nonatomic, readonly, strong) COObjectGraphContext *objectGraphContextWithoutUnfaulting;
 @property (nonatomic, readonly) BOOL objectGraphContextHasChanges;
@@ -82,3 +84,5 @@
 - (void)setCurrentRevisionSkipSupportsRevertCheck: (CORevision *)currentRevision;
 
 @end
+
+NS_ASSUME_NONNULL_END

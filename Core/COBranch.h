@@ -11,6 +11,8 @@
 @class COObject, CORevision, COPersistentRoot, COBranchInfo, COObjectGraphContext, COEditingContext;
 @class CODiffManager, COMergeInfo;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * The key that corresponds to the branch name in -[COBranch metadatata].
  *
@@ -148,7 +150,7 @@ extern NSString *const kCOBranchLabel;
 /**
  * The branch label (used as the branch name in most cases).
  */
-@property (nonatomic, readwrite, copy) NSString *label;
+@property (nonatomic, readwrite, copy, nullable) NSString *label;
 /**
  * The metadata in JSON format attached to the branch.
  *
@@ -156,7 +158,7 @@ extern NSString *const kCOBranchLabel;
  *
  * You must never overwrite any existing metadata set by CoreObject.
  */
-@property (nonatomic, readwrite, copy) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy) NSDictionary<NSString *, id> *metadata;
 /** 
  * The branch deletion status.
  *
@@ -197,7 +199,7 @@ extern NSString *const kCOBranchLabel;
  *
  * For a cheap copy, the parent branch is never nil. See -isCopy.
  */
-@property (nonatomic, readonly) COBranch *parentBranch;
+@property (nonatomic, readonly, nullable) COBranch *parentBranch;
 /**
  * The revision at which the receiver was forked from the parent branch.
  *
@@ -207,7 +209,7 @@ extern NSString *const kCOBranchLabel;
  *
  * See also -parentBranch and -firstRevision.
  */
-@property (nonatomic, readonly) CORevision *initialRevision;
+@property (nonatomic, readonly, nullable) CORevision *initialRevision;
 /**
  * The oldest revision in the entire branch history.
  *
@@ -224,7 +226,7 @@ extern NSString *const kCOBranchLabel;
  *
  * See also -initialRevision.
  */
-@property (nonatomic, readonly) CORevision *firstRevision;
+@property (nonatomic, readonly, nullable) CORevision *firstRevision;
 /**
  * The revision bound to the state loaded in the object graph context.
  *
@@ -242,7 +244,7 @@ extern NSString *const kCOBranchLabel;
  *
  * See also -headRevision.
  */
-@property (nonatomic, readwrite, strong) CORevision *currentRevision;
+@property (nonatomic, readwrite, strong, nullable) CORevision *currentRevision;
 /**
  * The revision bound to the most recent commit in the branch.
  *
@@ -250,7 +252,7 @@ extern NSString *const kCOBranchLabel;
  *
  * See also -currentRevision.
  */
-@property (nonatomic, readonly) CORevision *headRevision;
+@property (nonatomic, readonly, nullable) CORevision *headRevision;
 
 
 /** @taskunit Persistent Root and Object Graph Context */
@@ -417,7 +419,7 @@ extern NSString *const kCOBranchLabel;
  * If it is set at commit time, records the <em>current revision</em> of 
  * the merging branch as the merge parent of the new commit.
  */
-@property (nonatomic, readwrite, strong) COBranch *mergingBranch;
+@property (nonatomic, readwrite, strong, nullable) COBranch *mergingBranch;
 /**
  * The revision that is currently being merged.
  *
@@ -427,7 +429,7 @@ extern NSString *const kCOBranchLabel;
  * If it is set at commit time, records the given revision
  * as the merge parent of the new commit.
  */
-@property (nonatomic, readwrite, strong) CORevision *mergingRevision;
+@property (nonatomic, readwrite, strong, nullable) CORevision *mergingRevision;
 /**
  * Returns a merge info object representing the changes between the receiver and 
  * the given branch to be merged.
@@ -478,3 +480,5 @@ extern NSString *const kCOBranchLabel;
 
 
 @end
+
+NS_ASSUME_NONNULL_END

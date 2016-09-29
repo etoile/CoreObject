@@ -465,6 +465,7 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
 
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel atRevision: (CORevision *)aRev
 {
+    NILARG_EXCEPTION_TEST(aLabel);
     NILARG_EXCEPTION_TEST(aRev);
     INVALIDARG_EXCEPTION_TEST(aRev, [aRev isEqualToOrAncestorOfRevision: [self headRevision]]);
 
@@ -767,6 +768,7 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
 
 - (COMergeInfo *)mergeInfoForMergingBranch: (COBranch *)aBranch
 {
+    NILARG_EXCEPTION_TEST(aBranch);
     ETUUID *lca = [self.editingContext commonAncestorForCommit: aBranch.currentRevision.UUID
                                                      andCommit: self.currentRevision.UUID
                                                 persistentRoot: self.persistentRoot.UUID];
@@ -781,6 +783,7 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
 
 - (COMergeInfo *)mergeInfoForMergingRevision: (CORevision *)aRevision
 {
+    NILARG_EXCEPTION_TEST(aRevision);
     ETUUID *lca = [self.editingContext commonAncestorForCommit: aRevision.UUID
                                                      andCommit: self.currentRevision.UUID
                                                 persistentRoot: self.persistentRoot.UUID];
