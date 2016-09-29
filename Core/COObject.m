@@ -829,7 +829,7 @@ static NSNull *cachedNSNull = nil;
     if (results.count == 1 && [results.firstObject isValid])
         return YES;
 
-    *aValue = [results.lastObject value];
+    *aValue = [((ETValidationResult *)results.lastObject) value];
     if (anError != NULL)
     {
         *anError = [COError errorWithValidationResults: results];
