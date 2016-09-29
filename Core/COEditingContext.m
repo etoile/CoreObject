@@ -972,9 +972,11 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
                                                                    branch: nil
                                                                   isFault: loaded.deleted];
 
-                if (loaded.deleted && _unloadingBehavior == COEditingContextUnloadingBehaviorOnDeletion)
+                if (loaded.deleted)
                 {
-                    [self unloadPersistentRoot: loaded];
+                    [self unloadPersistentRoot: loaded
+                                     isDeleted: YES
+                                         force: NO];
                 }
             }
         }
@@ -1005,7 +1007,13 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 
         // For finalized persistent roots, the unloading behavior is ignored since we must not let
         // the user interacts with them anymore.
-        [self unloadPersistentRoot: loaded];
+        //
+        // If a persistent root has been deleted externally and we have missed the corresponding
+        // store notification, it can transition from non-deleted to finalized in the editing
+        // context. We must update the cross references in this case (loaded.isDeleted is NO).
+        [self unloadPersistentRoot: loaded
+                         isDeleted: loaded.isDeleted
+                             force: YES];
         hadChanges = YES;
     }
 
