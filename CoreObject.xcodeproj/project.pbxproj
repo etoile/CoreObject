@@ -165,6 +165,7 @@
 		60AA7EBC1A641FDE00897498 /* COSchemaMigrationDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 60FA55DF1A447A8600A2D8A7 /* COSchemaMigrationDriver.m */; };
 		60AD2F521B0A5BB000A9F473 /* TestPrimitiveCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 60AD2F511B0A5BB000A9F473 /* TestPrimitiveCollection.m */; };
 		60AD2F531B0A5BB000A9F473 /* TestPrimitiveCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 60AD2F511B0A5BB000A9F473 /* TestPrimitiveCollection.m */; };
+		60B141711D9D66C100552FA0 /* Commits in Resources */ = {isa = PBXBuildFile; fileRef = 60811AF21D7193DA00D4DEEA /* Commits */; };
 		60B1568D19B860C8006D5EEF /* COUndoTrackStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 663CE29317C07ED800E729F5 /* COUndoTrackStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60B1568E19B861BF006D5EEF /* COEditingContext+Debugging.h in Headers */ = {isa = PBXBuildFile; fileRef = 601FD94418893ED50002F957 /* COEditingContext+Debugging.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60B1568F19B861D3006D5EEF /* COObjectGraphContext+Debugging.h in Headers */ = {isa = PBXBuildFile; fileRef = 66A00A18187DDB6A005CFE16 /* COObjectGraphContext+Debugging.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -3136,6 +3137,7 @@
 				6028484E1BBAB5820094CDB0 /* Default-568h@2x.png in Resources */,
 				60F91F3A197D32F2009F47D7 /* 1b.json in Resources */,
 				60F91F39197D32F2009F47D7 /* 1a.json in Resources */,
+				60B141711D9D66C100552FA0 /* Commits in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
