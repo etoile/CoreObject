@@ -59,16 +59,6 @@ static NSNull *cachedNSNull = nil;
     [self initializeSerialization];
 }
 
-// For EtoileUI
-/** <override-dummy />
-Returns <em>CO</em>.
- 
-See +[NSObject typePrefix]. */
-+ (NSString *)typePrefix
-{
-    return @"CO";
-}
-
 #if (TARGET_OS_IPHONE)
 /**
  * To support iOS 7, CoreObject is compiled as a static library, this means we
@@ -392,30 +382,6 @@ See +[NSObject typePrefix]. */
 
     /* For subclasses that override the designated initializer */
     return [self initWithObjectGraphContext: aContext];
-}
-
-- (void)dealloc
-{
-
-}
-
-// TODO: Maybe add convenience copying method, - (COObject *) copyWithCopier: (COCopier *)aCopier
-// where the copier stores the state relating to copying, e.g. which context to copy into.
-
-// TODO: Migrate EtoileUI to COCopier and remove. COObject should not respond to
-// -copyWithZone:
-- (id)copyWithZone: (NSZone *)aZone
-{
-    COObject *newObject = [[self class] allocWithZone: aZone];
-
-    newObject->_UUID = [[ETUUID alloc] init];
-    newObject->_entityDescription = _entityDescription;
-    newObject->_objectGraphContext = _objectGraphContext;
-    newObject->_variableStorage = [self newVariableStorage];
-    newObject->_incomingRelationshipCache = [[CORelationshipCache alloc] initWithOwner: self];
-    newObject->_propertyChangeStack = [NSMutableArray new];
-
-    return newObject;
 }
 
 #pragma mark - Persistency Attributes
@@ -1499,15 +1465,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
     if (oldParent == nil || oldParent == self)
         return;
 
-    // FIXME: EtoileUI handles removing the object from its old parent.
-    // In that case, don't try to do it ourselves.
-    id <ETCollection> oldParentChildren = [oldParent valueForStorageKey: key shouldLoad: NO];
-    BOOL alreadyRemoved = (![oldParentChildren containsObject: child]);
-
-    if (alreadyRemoved)
-        return;
-
-    // NOTE: A KVO notification must be posted.
+    /* Post a KVO notification */
     [oldParent removeObjects: @[child]
                    atIndexes: [NSIndexSet indexSet]
                        hints: @[]
@@ -1564,15 +1522,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 
         if (propertyDesc.multivalued)
         {
-            // FIXME: EtoileUI handles removing the object from its old parent.
-            // In that case, don't try to do it ourselves.
-            id <ETCollection> oldParentChildren = [oldParent valueForStorageKey: key];
-            BOOL alreadyRemoved = (![oldParentChildren containsObject: child]);
-
-            if (alreadyRemoved)
-                continue;
-
-            // NOTE: A KVO notification must be posted.
+            /* Post a KVO notification */
             [oldParent removeObjects: @[child]
                            atIndexes: [NSIndexSet indexSet]
                                hints: @[]
