@@ -12,6 +12,8 @@
 
 @class COItem;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * @group Core
  * @abstract Additions to convert inner objects into a "semi-serialized" 
@@ -93,25 +95,26 @@
 
 /** @taskunit Serialization */
 
-- (id)serializedValueForValue: (id)aValue
+- (id)serializedValueForValue: (nullable id)aValue
           propertyDescription: (ETPropertyDescription *)aPropertyDesc;
-- (id)serializedTypeForPropertyDescription: (ETPropertyDescription *)aPropertyDesc value: (id)value;
+- (NSNumber *)serializedTypeForPropertyDescription: (ETPropertyDescription *)aPropertyDesc
+                                             value: (nullable id)value;
 - (SEL)serializationGetterForProperty: (NSString *)property;
 - (COItem *)storeItemWithUUID: (ETUUID *)aUUID
-                        types: (NSMutableDictionary *)types
-                       values: (NSMutableDictionary *)values
+                        types: (NSMutableDictionary<NSString *, NSNumber *> *)types
+                       values: (NSMutableDictionary<NSString *, id> *)values
                    entityName: (NSString *)anEntityName
            packageDescription: (ETPackageDescription *)package;
-- (COItem *)additionalStoreItemForUUID: (ETUUID *)anItemUUID;
+- (nullable COItem *)additionalStoreItemForUUID: (ETUUID *)anItemUUID;
 
 /** @taskunit Deserialization */
 
-- (COObject *)objectForSerializedReference: (id)value
-                                    ofType: (COType)type
-                       propertyDescription: (ETPropertyDescription *)aPropertyDesc;
-- (id)valueForSerializedValue: (id)value
-                       ofType: (COType)type
-          propertyDescription: (ETPropertyDescription *)aPropertyDesc;
+- (nullable __kindof COObject *)objectForSerializedReference: (id)value
+                                                      ofType: (COType)type
+                                         propertyDescription: (ETPropertyDescription *)aPropertyDesc;
+- (nullable id)valueForSerializedValue: (id)value
+                                ofType: (COType)type
+                   propertyDescription: (ETPropertyDescription *)aPropertyDesc;
 - (SEL)serializationSetterForProperty: (NSString *)property;
 - (void)validateStoreItem: (COItem *)aStoreItem;
 
@@ -129,3 +132,5 @@
 - (id)roundTripValueForProperty: (NSString *)key;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -8,19 +8,23 @@
 #import <Foundation/Foundation.h>
 #import <CoreObject/COObject.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COObject (RelationshipCache)
 
-- (void)updateCachedOutgoingRelationshipsForOldValue: (id)oldVal
-                                            newValue: (id)newVal
+- (void)updateCachedOutgoingRelationshipsForOldValue: (nullable id)oldVal
+                                            newValue: (nullable id)newVal
                            ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
 - (void)removeCachedOutgoingRelationships;
 - (void)removeCachedOutgoingRelationshipsForCollectionValue: (id)obj
                                   ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
 - (void)addCachedOutgoingRelationshipsForCollectionValue: (id)obj
                                ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
-- (void)removeCachedOutgoingRelationshipsForValue: (id)aValue
+- (void)removeCachedOutgoingRelationshipsForValue: (nullable id)aValue
                         ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
-- (void)addCachedOutgoingRelationshipsForValue: (id)aValue
+- (void)addCachedOutgoingRelationshipsForValue: (nullable id)aValue
                      ofPropertyWithDescription: (ETPropertyDescription *)aProperty;
 
 @end
+
+NS_ASSUME_NONNULL_END

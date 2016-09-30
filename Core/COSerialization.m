@@ -432,7 +432,8 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
     }
 }
 
-- (id)serializedTypeForPropertyDescription: (ETPropertyDescription *)aPropertyDesc value: (id)value
+- (NSNumber *)serializedTypeForPropertyDescription: (ETPropertyDescription *)aPropertyDesc
+                                             value: (id)value
 {
     COType type = 0;
 

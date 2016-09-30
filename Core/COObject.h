@@ -8,7 +8,10 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-@class COPersistentRoot, COEditingContext, CORevision, COBranch, CORelationshipCache, COObjectGraphContext, COCrossPersistentRootReferenceCache;
+@class COPersistentRoot, COEditingContext, CORevision, COBranch, COObjectGraphContext;
+@class CORelationshipCache, COCrossPersistentRootReferenceCache, COTag;
+
+NS_ASSUME_NONNULL_BEGIN
 
 /**
  * @group Core
@@ -500,17 +503,17 @@
  * Returns the branch when the receiver is persistent, otherwise
  * returns nil.
  */
-@property (nonatomic, readonly, weak) COBranch *branch;
+@property (nonatomic, readonly, weak, nullable) COBranch *branch;
 /**
  * Returns the persistent root when the receiver is persistent, otherwise 
  * returns nil.
  */
-@property (nonatomic, readonly, weak) COPersistentRoot *persistentRoot;
+@property (nonatomic, readonly, weak, nullable) COPersistentRoot *persistentRoot;
 /**
  * Returns the editing context when the receiver is persistent, otherwise
  * returns nil.
  */
-@property (nonatomic, readonly, weak) COEditingContext *editingContext;
+@property (nonatomic, readonly, weak, nullable) COEditingContext *editingContext;
 /**
  * Returns the object graph context owning the receiver.
  */
@@ -523,7 +526,7 @@
  *
  * See also -isRoot.
  */
-@property (nonatomic, readonly) id rootObject;
+@property (nonatomic, readonly, nullable) __kindof COObject *rootObject;
 /**
  * Returns whether the receiver is owned by a persistent root.
  *
@@ -551,6 +554,7 @@
  */
 @property (nonatomic, readonly) BOOL isShared;
 
+
 /** @taskunit History Attributes */
 
 
@@ -560,7 +564,7 @@
  *
  * See also -[COBranch currentRevision].
  */
-@property (nonatomic, readonly) CORevision *revision;
+@property (nonatomic, readonly, nullable) CORevision *revision;
 
 
 /** @taskunit Basic Properties */
@@ -569,7 +573,7 @@
 /**
  * The object name.
  */
-@property (nonatomic, readwrite, copy) NSString *name;
+@property (nonatomic, readwrite, copy, nullable) NSString *name;
 /**
  * <override-dummy />
  * Returns the object identifier.
@@ -590,7 +594,7 @@
  *
  * The returned collection contains COTag objects.
  */
-@property (nonatomic, readonly) NSSet *tags;
+@property (nonatomic, readonly) NSSet<COTag *> *tags;
 
 
 /** @taskunit Property-Value Coding */
@@ -602,7 +606,7 @@
  *
  * See also -entityDescription and -persistentPropertyNames.
  */
-@property (nonatomic, readonly) NSArray *propertyNames;
+@property (nonatomic, readonly) NSArray<NSString *> *propertyNames;
 /**
  * <override-never />
  * Returns the persistent properties declared in the receiver entity description.
@@ -612,7 +616,7 @@
  *
  * See also -entityDescription and -propertyNames.
  */
-@property (nonatomic, readonly) NSArray *persistentPropertyNames;
+@property (nonatomic, readonly) NSArray<NSString *> *persistentPropertyNames;
 /**
  * <override-never />
  * Returns the property value.
@@ -622,7 +626,7 @@
  *
  * See also -setValue:forProperty:.
  */
-- (id)valueForProperty: (NSString *)key;
+- (nullable id)valueForProperty: (NSString *)key;
 /**
  * <override-never />
  * Sets the property value.
@@ -632,7 +636,7 @@
  *
  * See also -valueForProperty:.
  */
-- (BOOL)setValue: (id)value forProperty: (NSString *)key;
+- (BOOL)setValue: (nullable id)value forProperty: (NSString *)key;
 
 
 /** @taskunit Validation */
@@ -648,7 +652,7 @@
  *
  * See -validateValue:forProperty: and ETValidationResult.
  */
-- (NSArray *)validateAllValues;
+- (NSArray<ETValidationResult *> *)validateAllValues;
 /**
  * Validates the proposed value against the property, then returns a validation 
  * result array.
@@ -671,7 +675,8 @@
  *
  * See -validateValue:forProperty: and ETValidationResult.
  */
-- (NSArray *)validateValue: (id)value forProperty: (NSString *)key;
+- (NSArray<ETValidationResult *> *)validateValue: (nullable id)value
+                                     forProperty: (NSString *)key;
 /**
  * <override-dummy />
  * Validates the receiver when it belongs to the inserted or updated objects in 
@@ -714,7 +719,7 @@
  * -[COObjectGraphContext updatedObjectUUIDs] and 
  * -[COObjectGraphContext changedObjectUUIDs].
  */
-- (NSArray *)validate;
+- (NSArray<ETValidationResult *> *)validate;
 /**
  * Calls -validateValue:forProperty: to validate the value, and returns the 
  * validation result through aValue and anError.
@@ -723,7 +728,9 @@
  * GNUstep programs.<br />
  * For Etoile programs or new projects, you should use -validateValue:forProperty:.
  */
-- (BOOL)validateValue: (id *)aValue forKey: (NSString *)key error: (NSError **)anError;
+- (BOOL)validateValue: (id _Nullable *_Nonnull)aValue
+               forKey: (NSString *)key
+                error: (NSError **)anError;
 
 
 /** @taskunit Direct Access to the Variable Storage */
@@ -738,7 +745,7 @@
  * This is a low-level method whose use should be restricted to serialization 
  * code and accessors that expose properties with no related instance variable.
  */
-- (id)valueForVariableStorageKey: (NSString *)key;
+- (nullable id)valueForVariableStorageKey: (NSString *)key;
 /**
  * <override-never />
  * Sets a value in the variable storage.
@@ -992,7 +999,7 @@
  *
  * This is used to present the revision to the user in the UI.
  */
-@property (nonatomic, readonly) NSString *revisionDescription;
+@property (nonatomic, readonly, nullable) NSString *revisionDescription;
 /** 
  * Returns the receiver tags in a coma separated list.
  *
@@ -1018,3 +1025,5 @@
 @property (nonatomic, readonly) BOOL isZombie;
 
 @end
+
+NS_ASSUME_NONNULL_END

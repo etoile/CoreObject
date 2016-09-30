@@ -11,6 +11,8 @@
 
 @class CORelationshipCache, COObjectGraphContext;
 
+NS_ASSUME_NONNULL_BEGIN
+
 void SetterToProperty(const char *setter, size_t setterlen, char *prop);
 BOOL IsSetter(const char *selname, size_t sellen);
 
@@ -24,7 +26,7 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (Class)coreObjectCollectionClassForPropertyDescription: (ETPropertyDescription *)propDesc;
+- (nullable Class)coreObjectCollectionClassForPropertyDescription: (ETPropertyDescription *)propDesc;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -57,7 +59,7 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-@property (nonatomic, readonly) NSDictionary *additionalStoreItemUUIDs;
+@property (nonatomic, readonly) NSDictionary<NSString *, ETUUID *> *additionalStoreItemUUIDs;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
@@ -72,23 +74,23 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (id)valueForStorageKey: (NSString *)key;
+- (nullable id)valueForStorageKey: (NSString *)key;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (id)valueForStorageKey: (NSString *)key shouldLoad: (BOOL)shouldLoad;
+- (nullable id)valueForStorageKey: (NSString *)key shouldLoad: (BOOL)shouldLoad;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (id)serializableValueForStorageKey: (NSString *)key;
+- (nullable id)serializableValueForStorageKey: (NSString *)key;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (void)setValue: (id)value forStorageKey: (NSString *)key;
+- (void)setValue: (nullable id)value forStorageKey: (NSString *)key;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (id)valueForProperty: (NSString *)key shouldLoad: (BOOL)shouldLoad;
+- (nullable id)valueForProperty: (NSString *)key shouldLoad: (BOOL)shouldLoad;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -135,11 +137,13 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
 /**
  * This method is only exposed to be used in the CoreObject tests.
  */
-@property (nonatomic, readonly) NSSet *referringObjects;
+@property (nonatomic, readonly) NSSet<__kindof COObject *> *referringObjects;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (void)replaceReferencesToObjectIdenticalTo: (COObject *)anObject
-                                  withObject: (COObject *)aReplacement;
+- (void)replaceReferencesToObjectIdenticalTo: (nullable COObject *)anObject
+                                  withObject: (nullable COObject *)aReplacement;
 
 @end
+
+NS_ASSUME_NONNULL_END

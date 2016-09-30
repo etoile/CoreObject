@@ -24,7 +24,7 @@
 
 @property (nonatomic, readonly) NSDictionary *descriptionDictionary;
 
-@property (readwrite, nonatomic, weak) COObject *sourceObject;
+@property (readwrite, nonatomic, weak) __kindof COObject *sourceObject;
 @property (readwrite, nonatomic, copy) NSString *sourceProperty;
 @property (readwrite, nonatomic, copy) NSString *targetProperty;
 
