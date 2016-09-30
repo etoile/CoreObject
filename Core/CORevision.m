@@ -18,9 +18,9 @@
     NILARG_EXCEPTION_TEST(aCache);
     NILARG_EXCEPTION_TEST(aRevInfo);
     SUPERINIT;
-    cache = aCache;
-    revisionInfo = aRevInfo;
-    assert(revisionInfo.revisionUUID != nil);
+    _cache = aCache;
+    _revisionInfo = aRevInfo;
+    assert(_revisionInfo.revisionUUID != nil);
     return self;
 }
 
@@ -39,12 +39,12 @@
     if (![rhs isKindOfClass: [CORevision class]])
         return NO;
 
-    return [revisionInfo.revisionUUID isEqual: ((CORevision *)rhs)->revisionInfo.revisionUUID];
+    return [_revisionInfo.revisionUUID isEqual: ((CORevision *)rhs)->_revisionInfo.revisionUUID];
 }
 
 - (NSUInteger)hash
 {
-    return revisionInfo.revisionUUID.hash;
+    return _revisionInfo.revisionUUID.hash;
 }
 
 - (NSArray *)propertyNames
@@ -56,57 +56,57 @@
 
 - (ETUUID *)UUID
 {
-    return revisionInfo.revisionUUID;
+    return _revisionInfo.revisionUUID;
 }
 
 - (CORevisionCache *)cache
 {
-    if (cache == nil)
+    if (_cache == nil)
     {
         [NSException raise: NSGenericException
                     format: @"Attempted to access a CORevision property from a revision whose "
                                 "parent revision cache/editing context have been deallocated"];
     }
-    return cache;
+    return _cache;
 }
 
 - (CORevision *)parentRevision
 {
-    if (revisionInfo.parentRevisionUUID == nil)
+    if (_revisionInfo.parentRevisionUUID == nil)
     {
         return nil;
     }
 
-    ETUUID *parentRevID = revisionInfo.parentRevisionUUID;
-    return [[self cache] revisionForRevisionUUID: parentRevID
-                              persistentRootUUID: revisionInfo.persistentRootUUID];
+    ETUUID *parentRevID = _revisionInfo.parentRevisionUUID;
+    return [_cache revisionForRevisionUUID: parentRevID
+                        persistentRootUUID: _revisionInfo.persistentRootUUID];
 }
 
 - (CORevision *)mergeParentRevision
 {
-    if (revisionInfo.mergeParentRevisionUUID == nil)
+    if (_revisionInfo.mergeParentRevisionUUID == nil)
     {
         return nil;
     }
 
-    ETUUID *revID = revisionInfo.mergeParentRevisionUUID;
-    return [[self cache] revisionForRevisionUUID: revID
-                              persistentRootUUID: revisionInfo.persistentRootUUID];
+    ETUUID *revID = _revisionInfo.mergeParentRevisionUUID;
+    return [_cache revisionForRevisionUUID: revID
+                        persistentRootUUID: _revisionInfo.persistentRootUUID];
 }
 
 - (ETUUID *)persistentRootUUID
 {
-    return revisionInfo.persistentRootUUID;
+    return _revisionInfo.persistentRootUUID;
 }
 
 - (ETUUID *)branchUUID
 {
-    return revisionInfo.branchUUID;
+    return _revisionInfo.branchUUID;
 }
 
 - (NSDate *)date
 {
-    return revisionInfo.date;
+    return _revisionInfo.date;
 }
 
 // TODO: Implement it in the metadata for the new store
@@ -117,7 +117,7 @@
 
 - (NSDictionary *)metadata
 {
-    return revisionInfo.metadata;
+    return _revisionInfo.metadata;
 }
 
 - (COCommitDescriptor *)commitDescriptor

@@ -40,8 +40,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CORevision : NSObject <COTrackNode>
 {
 @private
-    CORevisionCache *__weak cache;
-    CORevisionInfo *revisionInfo;
+    CORevisionCache *__weak _cache;
+    CORevisionInfo *_revisionInfo;
 }
 
 
