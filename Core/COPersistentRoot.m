@@ -331,6 +331,11 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     return self.metadata[COPersistentRootName];
 }
 
+- (NSString *)displayName
+{
+    return self.name != nil ? self.name : self.creationDate.description;
+}
+
 - (void)setName: (NSString *)name
 {
     NSMutableDictionary *md = [[NSMutableDictionary alloc] initWithDictionary: self.metadata];

@@ -196,18 +196,6 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
     return _currentRevisionUUID == nil && !_isCreated;
 }
 
-- (NSString *)displayName
-{
-    NSString *label = self.label;
-    NSString *displayName = [self.persistentRoot.rootObject displayName];
-
-    if (label != nil && ![label isEqual: @""])
-    {
-        displayName = [displayName stringByAppendingFormat: @" (%@)", label];
-    }
-    return displayName;
-}
-
 - (BOOL)isCopy
 {
     // FIXME: Implement
@@ -252,6 +240,22 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
 {
     _metadata[kCOBranchLabel] = aLabel;
     _metadataChanged = YES;
+}
+
+- (NSString *)displayName
+{
+    NSString *label = self.label;
+    NSString *displayName = self.persistentRoot.displayName;
+
+    if (label != nil && ![label isEqual: @""])
+    {
+        displayName = [displayName stringByAppendingFormat: @" (%@)", label];
+    }
+    else
+    {
+        displayName = [displayName stringByAppendingFormat: @" (%@)", self.initialRevision.date];
+    }
+    return displayName;
 }
 
 - (BOOL)isDeletedInStore

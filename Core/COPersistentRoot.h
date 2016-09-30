@@ -273,10 +273,13 @@ extern NSString *const COPersistentRootDidChangeNotification;
  * expected consequences: changing the name would cause a new revision to be committed, 
  * old revisions would still use the old name, and different branches could have different names
  * for the document.
- *
- * TODO: Rename to -displayName or -label to emphasize that this is the user-facing name?
  */
 @property (nonatomic, readwrite, copy, nullable) NSString *name;
+/**
+ * The persistent root name or a default name based on the creation date.
+ */
+@property (nonatomic, readonly) NSString *displayName;
+
 
 /** @taskunit Accessing Branches */
 

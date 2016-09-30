@@ -152,6 +152,11 @@ extern NSString *const kCOBranchLabel;
  */
 @property (nonatomic, readwrite, copy, nullable) NSString *label;
 /**
+ * The branch label or a default name that combines -[COPersistentRoot displayName]
+ * and the initial revision date.
+ */
+@property (nonatomic, readonly) NSString *displayName;
+/**
  * The metadata in JSON format attached to the branch.
  *
  * Any changes to the metadata is saved on the next branch commit.
