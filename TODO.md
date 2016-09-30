@@ -27,7 +27,7 @@ Major Missing Features
             return  [self.objectGraphContext.modelDescriptionRepository descriptionForName: @"COObject"];
         }
 
-- Better query support (in-memory and in-store as sketched in COQuery)
+- Better query support (in-memory and in-store)
 
   - Introduce our own query objects for expressing a search query, with
     implementations that can run against the store in SQL as well as in memory.
@@ -107,7 +107,7 @@ Future Work (Minor features, refactoring, cleanup)
 
   - Add -dateWithContentsOfFile:options:error: to GNUstep (see COOCommitDescriptor)
 
-  - Add -predicateWithBlock: to GNUstep (see COQuery)
+  - Add -predicateWithBlock: to GNUstep (see COSmartGroup)
 
   - Perhaps tweak `[[NSDecimalNumber defaultBehavior] scale]` to return NSDecimalScale by default as macOS does
 
@@ -142,7 +142,7 @@ Future Work (Minor features, refactoring, cleanup)
 
   - expose COSQLiteStore's finalize deletion method
 
-  - expose store's searching functionality (integrate COSearchResult and COQuery)
+  - expose store's searching functionality
 
   - Switch to NSUUID everywhere?
 
@@ -410,7 +410,7 @@ the following situations at least:
   - Check and update all Core, Model, Undo and Utilities API documentation (underway)
 
     - Reviewed classes
-      - Core: COObjectGraphContext, COEditingContext, COBranch, CORevision, COQuery, COObject
+      - Core: COObjectGraphContext, COEditingContext, COBranch, CORevision, COObject
       - Model: all
       - Undo: all, but needs to be checked again due to Undo-tree rewrite
       - Utilities: COCommitDescriptor, COError

@@ -135,8 +135,6 @@
 		609C00991704C3DA00D01AAB /* COObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C008D1704C3DA00D01AAB /* COObject.m */; };
 		609C009A1704C3DA00D01AAB /* COPersistentRoot.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C008E1704C3DA00D01AAB /* COPersistentRoot.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C009B1704C3DA00D01AAB /* COPersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C008F1704C3DA00D01AAB /* COPersistentRoot.m */; };
-		609C009C1704C3DA00D01AAB /* COQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00901704C3DA00D01AAB /* COQuery.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		609C009D1704C3DA00D01AAB /* COQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00911704C3DA00D01AAB /* COQuery.m */; };
 		609C00AC1704C3EF00D01AAB /* COBookmark.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00A01704C3EF00D01AAB /* COBookmark.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		609C00AD1704C3EF00D01AAB /* COBookmark.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00A11704C3EF00D01AAB /* COBookmark.m */; };
 		609C00AE1704C3EF00D01AAB /* COCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00A21704C3EF00D01AAB /* COCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -203,7 +201,6 @@
 		60E08C9419792F4600D1B7AD /* COObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C008D1704C3DA00D01AAB /* COObject.m */; };
 		60E08C9519792F4600D1B7AD /* COPersistentRoot.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C008F1704C3DA00D01AAB /* COPersistentRoot.m */; };
 		60E08C9619792F4600D1B7AD /* COSynchronizerServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66405DD0182A255800A6EF7A /* COSynchronizerServer.m */; };
-		60E08C9719792F4600D1B7AD /* COQuery.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00911704C3DA00D01AAB /* COQuery.m */; };
 		60E08C9819792F4600D1B7AD /* COBookmark.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00A11704C3EF00D01AAB /* COBookmark.m */; };
 		60E08C9919792F4600D1B7AD /* COCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00A31704C3EF00D01AAB /* COCollection.m */; };
 		60E08C9A19792F4600D1B7AD /* COContainer.m in Sources */ = {isa = PBXBuildFile; fileRef = 609C00A51704C3EF00D01AAB /* COContainer.m */; };
@@ -302,7 +299,6 @@
 		60E08CFE19792FFA00D1B7AD /* COEditingContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00881704C3DA00D01AAB /* COEditingContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60E08CFF19792FFA00D1B7AD /* COObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C008C1704C3DA00D01AAB /* COObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60E08D0019792FFA00D1B7AD /* COPersistentRoot.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C008E1704C3DA00D01AAB /* COPersistentRoot.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		60E08D0119792FFA00D1B7AD /* COQuery.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00901704C3DA00D01AAB /* COQuery.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60E08D0219792FFA00D1B7AD /* COBookmark.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00A01704C3EF00D01AAB /* COBookmark.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60E08D0319792FFA00D1B7AD /* COCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00A21704C3EF00D01AAB /* COCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60E08D0419792FFA00D1B7AD /* COContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = 609C00A41704C3EF00D01AAB /* COContainer.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1107,8 +1103,6 @@
 		609C008D1704C3DA00D01AAB /* COObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = COObject.m; path = Core/COObject.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
 		609C008E1704C3DA00D01AAB /* COPersistentRoot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = COPersistentRoot.h; path = Core/COPersistentRoot.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		609C008F1704C3DA00D01AAB /* COPersistentRoot.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; name = COPersistentRoot.m; path = Core/COPersistentRoot.m; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objc; };
-		609C00901704C3DA00D01AAB /* COQuery.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COQuery.h; path = Core/COQuery.h; sourceTree = "<group>"; };
-		609C00911704C3DA00D01AAB /* COQuery.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COQuery.m; path = Core/COQuery.m; sourceTree = "<group>"; };
 		609C00A01704C3EF00D01AAB /* COBookmark.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COBookmark.h; path = Model/COBookmark.h; sourceTree = "<group>"; };
 		609C00A11704C3EF00D01AAB /* COBookmark.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COBookmark.m; path = Model/COBookmark.m; sourceTree = "<group>"; };
 		609C00A21704C3EF00D01AAB /* COCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCollection.h; path = Model/COCollection.h; sourceTree = "<group>"; };
@@ -2098,8 +2092,6 @@
 				609C00B91704C3FF00D01AAB /* COBranch.m */,
 				609C00781704C2BA00D01AAB /* CORevision.h */,
 				609C00791704C2BA00D01AAB /* CORevision.m */,
-				609C00901704C3DA00D01AAB /* COQuery.h */,
-				609C00911704C3DA00D01AAB /* COQuery.m */,
 				601C1D4D180C115900CED07E /* COObjectGraphContext+GarbageCollection.h */,
 				601C1D4E180C115B00CED07E /* COObjectGraphContext+GarbageCollection.m */,
 				606E3DBF1787A07E00ED42DA /* COSerialization.h */,
@@ -2542,7 +2534,6 @@
 				60E08D4319792FFA00D1B7AD /* COSynchronizerJSONServer.h in Headers */,
 				60F46A881A01426000BDDE8E /* COSmartGroup.h in Headers */,
 				60E08D3A19792FFA00D1B7AD /* COSequenceModification.h in Headers */,
-				60E08D0119792FFA00D1B7AD /* COQuery.h in Headers */,
 				60E08D0819792FFA00D1B7AD /* COTag.h in Headers */,
 				60AA7EB11A641FCD00897498 /* COSchemaMigrationDriver.h in Headers */,
 				603643851B394E8800DC685B /* COUndoTrackHistoryCompaction.h in Headers */,
@@ -2668,7 +2659,6 @@
 				603643841B394E8800DC685B /* COUndoTrackHistoryCompaction.h in Headers */,
 				609C00981704C3DA00D01AAB /* COObject.h in Headers */,
 				609C009A1704C3DA00D01AAB /* COPersistentRoot.h in Headers */,
-				609C009C1704C3DA00D01AAB /* COQuery.h in Headers */,
 				609C00AC1704C3EF00D01AAB /* COBookmark.h in Headers */,
 				609C00AE1704C3EF00D01AAB /* COCollection.h in Headers */,
 				6076D0FF1A31E4110023C97A /* COSchemaMigration.h in Headers */,
@@ -3328,7 +3318,6 @@
 				60E08CEB19792F4600D1B7AD /* COSynchronizerPersistentRootInfoToClientMessage.m in Sources */,
 				60E08CE519792F4600D1B7AD /* COStoreCreateBranch.m in Sources */,
 				60E08CBA19792F4600D1B7AD /* COBezierPath.m in Sources */,
-				60E08C9719792F4600D1B7AD /* COQuery.m in Sources */,
 				60E08CB419792F4600D1B7AD /* COSQLiteStorePersistentRootBackingStore.m in Sources */,
 				60E08CE119792F4600D1B7AD /* COLeastCommonAncestor.m in Sources */,
 				60882F21197E629F00484033 /* NSDistributedNotificationCenter.m in Sources */,
@@ -3548,7 +3537,6 @@
 				609C00991704C3DA00D01AAB /* COObject.m in Sources */,
 				609C009B1704C3DA00D01AAB /* COPersistentRoot.m in Sources */,
 				66405DD2182A255800A6EF7A /* COSynchronizerServer.m in Sources */,
-				609C009D1704C3DA00D01AAB /* COQuery.m in Sources */,
 				609C00AD1704C3EF00D01AAB /* COBookmark.m in Sources */,
 				603643861B394E8800DC685B /* COUndoTrackHistoryCompaction.m in Sources */,
 				609C00AF1704C3EF00D01AAB /* COCollection.m in Sources */,

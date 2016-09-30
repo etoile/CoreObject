@@ -7,7 +7,6 @@
 
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
-#import <CoreObject/COQuery.h>
 
 @class COPersistentRoot, COEditingContext, CORevision, COBranch, CORelationshipCache, COObjectGraphContext, COCrossPersistentRootReferenceCache;
 
@@ -397,7 +396,7 @@
  * For now, CoreObject enforces these metamodel constraints in 
  * -didChangeValueForProperty:.
  */
-@interface COObject : NSObject <COObjectMatching>
+@interface COObject : NSObject
 {
 @private
     ETEntityDescription *_entityDescription;
@@ -935,16 +934,6 @@
  * See also -isEqual:.
  */
 - (BOOL)isTemporallyEqual: (id)anObject;
-
-
-/** @taskunit Object Matching */
-
-
-/**
- * Returns the receiver put in an array when it matches the query, otherwise 
- * returns an empty array.
- */
-- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
 
 
 /** @taskunit Debugging and Description */

@@ -168,13 +168,13 @@
     return nil;
 }
 
-- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
+- (NSArray *)objectsMatchingPredicate: (NSPredicate *)aPredicate
 {
     NSMutableArray *result = [NSMutableArray array];
 
     for (COObject *object in self.content)
     {
-        if ([aQuery.predicate evaluateWithObject: object])
+        if ([aPredicate evaluateWithObject: object])
         {
             [result addObject: object];
         }

@@ -9,7 +9,7 @@
 
 @implementation COSmartGroup
 
-@synthesize targetCollection, query, contentBlock;
+@synthesize targetCollection, predicate, contentBlock;
 
 + (void)initialize
 {
@@ -74,9 +74,9 @@
     [self refresh];
 }
 
-- (void)setQuery: (COQuery *)aQuery
+- (void)setPredicate: (NSPredicate *)aPredicate
 {
-    query = aQuery;
+    predicate = aPredicate;
     [self refresh];
 }
 
@@ -109,33 +109,19 @@
     {
         result = contentBlock();
     }
-    else if (targetCollection != nil && query != nil)
+    else if (targetCollection != nil && predicate != nil)
     {
-        if ([(id)targetCollection conformsToProtocol: @protocol(COObjectMatching)])
-        {
-            result = [(id <COObjectMatching>)targetCollection objectsMatchingQuery: query];
-        }
-        else if (query.predicate != nil)
-        {
-            result = [[targetCollection contentArray] filteredArrayUsingPredicate: query.predicate];
-        }
-    }
-    else if (query != nil)
-    {
-        // TODO: Query the store
+        result = [[targetCollection contentArray] filteredArrayUsingPredicate: predicate];
     }
     else
     {
         result = [targetCollection contentArray];
     }
-
     ETAssert([result isKindOfClass: [NSArray class]]);
 
     content = result;
     [self didUpdate];
 }
-
-// TODO: COGroup implements the same methods, put them in a COObjectMatchingTrait
 
 - (id)objectForIdentifier: (NSString *)anId
 {
@@ -147,21 +133,6 @@
         }
     }
     return nil;
-}
-
-- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
-{
-    NSMutableArray *result = [NSMutableArray array];
-
-    for (COObject *object in self.content)
-    {
-        if ([aQuery.predicate evaluateWithObject: object])
-        {
-            [result addObject: object];
-        }
-    }
-
-    return result;
 }
 
 @end

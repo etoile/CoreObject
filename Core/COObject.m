@@ -3,9 +3,6 @@
 
     Date:  November 2013
     License:  MIT  (see COPYING)
-
-    COObjectMatching protocol concrete implementation is based on MIT-licensed 
-    code by Yen-Ju Chen <yjchenx gmail> from the previous CoreObject.
  */
 
 #import "COObject.h"
@@ -1847,14 +1844,6 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
         return YES;
     }
     return NO;
-}
-
-#pragma mark - Object Matching
-
-- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery
-{
-    // TODO: Check and traverse relationships to visit the object graph
-    return ([aQuery.predicate evaluateWithObject: self] ? @[self] : @[]);
 }
 
 #pragma mark - Description

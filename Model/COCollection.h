@@ -134,12 +134,6 @@
  * See -[COObject identifier].
  */
 - (id)objectForIdentifier: (NSString *)anId;
-/**
- * See -[COObjectMatching objectsMatchingQuery:].
- *
- * Object graph traversal implementation for COObjectMatching protocol.
- */
-- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
 
 @end
 

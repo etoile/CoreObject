@@ -12,9 +12,9 @@
 typedef NSArray *(^COContentBlock)(void);
 
 /**
- * @group Object Collection and Organization
- * @abstract A custom group class whose content is provided a query or a code 
- * block.
+ * @group Search
+ * @abstract A custom group class whose content is provided by a predicate or
+ * code block.
  *
  * COSmartGroup is an immutable, ordered, weak (an object can be in any number 
  * of collections) collection class.
@@ -25,7 +25,7 @@ typedef NSArray *(^COContentBlock)(void);
 {
 @private
     id <ETCollection> targetCollection;
-    COQuery *query;
+    NSPredicate *predicate;
     COContentBlock contentBlock;
     NSArray *content;
 }
@@ -37,39 +37,36 @@ typedef NSArray *(^COContentBlock)(void);
 /**
  * The target collection used to compute the smart group content.
  *
- * If a content block is provided, the target collection is not used.
+ * If a content block is provided, the target collection and predicate are ignored.
  *
- * If a query is provided at the same time and the target collection supports 
- * COObjectMatching protocol, then -objectsMatchingQuery: provides the smart 
- * group content, otherwise the target collection is filtered as an array using 
- * the query predicate.
+ * If a predicate is provided and the target collection is filtered as an array 
+ * using the predicate.
  *
- * If no content block or query are set, the target collection is used as is as 
+ * If no content block or predicate are set, the target collection is used as is as
  * the smart group content.
  *
- * See -query and -contentBlock.
+ * See -predicate and -contentBlock.
  */
 @property (nonatomic, readwrite, strong) id <ETCollection> targetCollection;
 /**
- * The query used to compute the smart group content.
+ * The predicate used to compute the smart group content.
  *
- * If a content block is provided, the query is not used.
+ * If a content block is provided, the predicate is ignored.
  *
- * If no target collection is set, the query is evaluated directly against the 
- * store (e.g. as a SQL query) rather than again the object graph in memory.
+ * If no target collection is set, the predicate is ignored.
  *
  * If a target collection is provided, see -targetCollection to know how the 
- * query is evaluated.
+ * predicate is evaluated.
  *
  * See -targetCollection and -contentBlock.
  */
-@property (nonatomic, readwrite, strong) COQuery *query;
+@property (nonatomic, readwrite, strong) NSPredicate *predicate;
 /**
  * The content block used to compute the smart group content.
  *
- * If a content block is set, both the target collection and query are not used.
+ * If a content block is set, both the target collection and predicate are ignored.
  *
- * See -targetCollection and -query.
+ * See -targetCollection and -predicate.
  */
 @property (nonatomic, readwrite, copy) COContentBlock contentBlock;
 
@@ -89,10 +86,10 @@ typedef NSArray *(^COContentBlock)(void);
 
 
 /**
- * Forces the receiver content to be recreated by evaluating the query or 
- * content block.
+ * Forces the receiver content to be recreated by evaluating the predicate
+ * or content block.
  *
- * See also -query and -contentBlock.
+ * See also -predicate and -contentBlock.
  */
 - (void)refresh;
 
@@ -109,11 +106,6 @@ typedef NSArray *(^COContentBlock)(void);
  * See -[COObject identifier].
  */
 - (id)objectForIdentifier: (NSString *)anId;
-/**
- * See -[COObjectMatching objectsMatchingQuery:].
- *
- * Object graph traversal implementation for COObjectMatching protocol.
- */
-- (NSArray *)objectsMatchingQuery: (COQuery *)aQuery;
+
 
 @end

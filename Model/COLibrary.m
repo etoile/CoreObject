@@ -89,9 +89,9 @@
     [group setName: _(@"All Objects")];
     group.targetCollection = [[[self.persistentRoots mappedCollection] rootObject] allObjects];
 #ifdef GNUSTEP
-    [group setQuery: [COQuery queryWithPredicate: [NSPredicate predicateWithFormat: @"isLibrary == YES"]]];
+    group.predicate = [NSPredicate predicateWithFormat: @"isLibrary == YES"];
 #else
-    group.query = [COQuery queryWithPredicateBlock: ^BOOL(id object, NSDictionary *bindings)
+    group.predicate = [NSPredicate predicateWithBlock: ^BOOL(id object, NSDictionary *bindings)
     {
         return [object isLibrary];
     }];
