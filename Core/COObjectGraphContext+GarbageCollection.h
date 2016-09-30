@@ -9,6 +9,8 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COObjectGraphContext.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COObjectGraphContext (COGarbageCollection)
 
 /**
@@ -20,8 +22,10 @@
  *
  * Throws an exception if <code>self.rootObject</code> is nil.
  */
-@property (nonatomic, readonly) NSSet *allReachableObjectUUIDs;
+@property (nonatomic, readonly) NSSet<ETUUID *> *allReachableObjectUUIDs;
 
 - (void)checkForCyclesInCompositeRelationshipsInChangedObjects;
 
 @end
+
+NS_ASSUME_NONNULL_END

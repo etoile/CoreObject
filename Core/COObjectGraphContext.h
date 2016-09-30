@@ -13,6 +13,8 @@
 @class COPersistentRoot, COBranch, COObject, CORelationshipCache;
 @class COItemGraph, COItem;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * Posted during -[COObjectGraphContext acceptAllChanges].
  *
@@ -224,10 +226,7 @@ extern NSString *const COObjectGraphContextEndBatchChangeNotification;
  * -[COEditingContext insertNewPersistentRootWithRootObject:], the repository 
  * must be the same than the one used by the editing context.
  *
- * For a nil model description repository, raises a NSInvalidArgumentException.
- *
- * For a migration driver class that is neither nil nor a subclass of 
- * COSchemaMigrationDriver, raises a NSInvalidArgumentException.
+ * The migration driver class must be a subclass of COSchemaMigrationDriver.
  */
 - (instancetype)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
                               migrationDriverClass: (Class)aDriverClass;
@@ -289,19 +288,19 @@ extern NSString *const COObjectGraphContextEndBatchChangeNotification;
  *
  * For a transient object graph context, returns nil.
  */
-@property (nonatomic, readonly, weak) COBranch *branch;
+@property (nonatomic, readonly, weak, nullable) COBranch *branch;
 /**
  * The persistent root owning the branch.
  *
  * For a transient object graph context, returns nil.
  */
-@property (nonatomic, readonly, weak) COPersistentRoot *persistentRoot;
+@property (nonatomic, readonly, weak, nullable) COPersistentRoot *persistentRoot;
 /**
  * The editing context owing the persistent root.
  *
  * For a transient object graph context, returns nil.
  */
-@property (nonatomic, readonly) COEditingContext *editingContext;
+@property (nonatomic, readonly, nullable) COEditingContext *editingContext;
 
 
 /** @taskunit Item Graph Protocol */
@@ -314,17 +313,17 @@ extern NSString *const COObjectGraphContextEndBatchChangeNotification;
 /**
  * Returns the immutable item that corresponds to the given inner object UUID.
  */
-- (COItem *)itemForUUID: (ETUUID *)aUUID;
+- (nullable COItem *)itemForUUID: (ETUUID *)aUUID;
 /**
  * Returns all the inner object UUIDs.
  */
-@property (nonatomic, readonly) NSArray *itemUUIDs;
+@property (nonatomic, readonly) NSArray<ETUUID *> *itemUUIDs;
 /**
  * Returns the immutable items that corresponds to the inner objects.
  *
  * The returned item count is the same than -itemUUIDs.
  */
-@property (nonatomic, readonly) NSArray *items;
+@property (nonatomic, readonly) NSArray<COItem *> *items;
 /**
  * Updates the inner object graph to match the given item set.
  *
@@ -339,10 +338,8 @@ extern NSString *const COObjectGraphContextEndBatchChangeNotification;
  *
  * This marks the corresponding objects as inserted/object.
  * and does not call -acceptAllChanges.
- *
- * For a nil argument, raises a NSInvalidArgumentException.
  */
-- (void)insertOrUpdateItems: (NSArray *)items;
+- (void)insertOrUpdateItems: (NSArray<COItem *> *)items;
 /**
  * Does the same than -insertOrUpdateItems:, but in addition discards  
  * change tracking (calls -acceptAllChanges).
@@ -351,12 +348,9 @@ extern NSString *const COObjectGraphContextEndBatchChangeNotification;
  * at the root object.
  *
  * As a special case, if both the receiver and aTree have a nil root object, 
- * loads all objects from aTree. If <code>aTree.rootItemUUID</code> is not nil, 
- * it must match -rootItemUUID, otherwise a NSInvalidArgumentException is raised.
+ * loads all objects from aTree.
  *
- * For a nil argument, raises a NSInvalidArgumentException.
- *
- * FIXME: Document more corner cases (what causes exceptions to be thrown)
+ * <code>aTree.rootItemUUID</code> must be nil or match -rootItemUUID.
  */
 - (void)setItemGraph: (id <COItemGraph>)aTree;
 
@@ -390,7 +384,7 @@ extern NSString *const COObjectGraphContextEndBatchChangeNotification;
  *
  * See also -rootItemUUID.
  */
-@property (nonatomic, readwrite, strong) id rootObject;
+@property (nonatomic, readwrite, strong, nullable) __kindof COObject *rootObject;
 
 
 /** @taskunit Change Tracking */
@@ -401,14 +395,14 @@ extern NSString *const COObjectGraphContextEndBatchChangeNotification;
  *
  * After a commit, returns an empty set.
  */
-@property (nonatomic, readonly) NSSet *insertedObjectUUIDs;
+@property (nonatomic, readonly) NSSet<ETUUID *> *insertedObjectUUIDs;
 /**
  * Returns the object UUIDs whose properties have been edited since change tracking
  * was cleared.
  *
  * After a commit, returns an empty set.
  */
-@property (nonatomic, readonly) NSSet *updatedObjectUUIDs;
+@property (nonatomic, readonly) NSSet<ETUUID *> *updatedObjectUUIDs;
 /**
  * Returns whether the object is among the updated objects.
  *
@@ -421,7 +415,7 @@ extern NSString *const COObjectGraphContextEndBatchChangeNotification;
  *
  * After a commit, returns an empty set.
  */
-@property (nonatomic, readonly) NSSet *changedObjectUUIDs;
+@property (nonatomic, readonly) NSSet<ETUUID *> *changedObjectUUIDs;
 /**
  * Returns whether the context contains uncommitted changes.
  *
@@ -468,7 +462,7 @@ extern NSString *const COObjectGraphContextEndBatchChangeNotification;
  *
  * See also -loadedObjectForUUID: and -rootObject.
  */
-@property (nonatomic, readonly) NSArray *loadedObjects;
+@property (nonatomic, readonly) NSArray<__kindof COObject *> *loadedObjects;
 /**
  * Returns the inner object bound to the given UUID in the object graph.
  *
@@ -476,6 +470,8 @@ extern NSString *const COObjectGraphContextEndBatchChangeNotification;
  *
  * You shouldn't need to use this method, unless you extend CoreObject API.
  */
-- (id)loadedObjectForUUID: (ETUUID *)aUUID;
+- (nullable id)loadedObjectForUUID: (ETUUID *)aUUID;
 
 @end
+
+NS_ASSUME_NONNULL_END

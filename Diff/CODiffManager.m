@@ -28,8 +28,8 @@
 {
     if (commonItemA != nil && commonItemB != nil)
     {
-        NSString *oldEntityName = [COObjectGraphContext entityNameForItem: commonItemA];
-        NSString *newEntityName = [COObjectGraphContext entityNameForItem: commonItemB];
+        NSString *oldEntityName = commonItemA.entityName;
+        NSString *newEntityName = commonItemB.entityName;
         ETAssert([oldEntityName isEqual: newEntityName]);
     }
 }

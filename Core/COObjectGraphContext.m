@@ -219,11 +219,6 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
 #pragma mark -
 #pragma mark Metamodel Access
 
-+ (NSString *)entityNameForItem: (COItem *)anItem
-{
-    return [anItem valueForAttribute: kCOObjectEntityNameProperty];
-}
-
 // NOTE: If we decide to make the method public, move it to COEditingContext
 + (NSString *)defaultEntityName
 {
@@ -233,7 +228,9 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
 + (ETEntityDescription *)descriptionForItem: (COItem *)anItem
                  modelDescriptionRepository: (ETModelDescriptionRepository *)aRepository
 {
-    NSString *name = [self entityNameForItem: anItem];
+    NILARG_EXCEPTION_TEST(anItem);
+    NILARG_EXCEPTION_TEST(aRepository);
+    NSString *name = anItem.entityName;
 
     if (name == nil)
     {
@@ -246,6 +243,12 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
     if (desc == nil)
     {
         desc = [aRepository descriptionForName: [self defaultEntityName]];
+    }
+    if (desc == nil)
+    {
+        [NSException raise: NSInternalInconsistencyException
+                    format: @"The model description repository is missing a %@ entity",
+                            [self defaultEntityName]];
     }
 
     return desc;
@@ -281,7 +284,6 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
 - (id)objectReferenceWithUUID: (ETUUID *)aUUID
 {
     ETAssert(_loadingItemGraph != nil);
-
     COObject *loadedObject = _loadedObjects[aUUID];
 
     if (loadedObject != nil)
@@ -663,6 +665,7 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
     if (self.ignoresChangeTrackingNotifications)
         return;
 
+    NILARG_EXCEPTION_TEST(obj);
     ETAssert([aProperty isKindOfClass: [NSString class]]);
 
     ETUUID *uuid = obj.UUID;
@@ -810,6 +813,7 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
 
 - (NSArray *)loadedObjectsForUUIDs: (NSArray *)UUIDs
 {
+    NILARG_EXCEPTION_TEST(UUIDs);
     NSMutableArray *objects = [NSMutableArray arrayWithCapacity: UUIDs.count];
 
     for (ETUUID *UUID in UUIDs)
@@ -830,9 +834,7 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
 - (void)removeUnreachableObjects
 {
     if (self.rootObject == nil)
-    {
         return;
-    }
 
     NSMutableSet *deadUUIDs = [NSMutableSet setWithArray: _loadedObjects.allKeys];
     NSSet *liveUUIDs = self.allReachableObjectUUIDs;

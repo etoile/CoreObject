@@ -7,6 +7,8 @@
 
 #import "COObjectGraphContext.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COObjectGraphContext ()
 
 /**
@@ -54,7 +56,7 @@
  *
  * See -setItemGraph: and -insertAndUpdateItems:.
  */
-@property (nonatomic, readonly, strong) id <COItemGraph> loadingItemGraph;
+@property (nonatomic, readonly, strong, nullable) id <COItemGraph> loadingItemGraph;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -66,7 +68,7 @@
  *
  * See -loadedObjectForUUID:.
  */
-- (NSArray *)loadedObjectsForUUIDs: (NSArray *)UUIDs;
+- (NSArray<__kindof COObject *> *)loadedObjectsForUUIDs: (NSArray<ETUUID *> *)UUIDs;
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -85,7 +87,7 @@
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
-- (void)replaceObject: (COObject *)anObject withObject: (COObject *)aReplacement;
+- (void)replaceObject: (nullable COObject *)anObject withObject: (nullable COObject *)aReplacement;
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
@@ -94,10 +96,7 @@
 
 /** @taskunit Metamodel Access */
 
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-+ (NSString *)entityNameForItem: (COItem *)anItem;
+
 /**
  * This method is only exposed to be used internally by CoreObject.
  */
@@ -133,3 +132,5 @@
 @property (nonatomic, readwrite, assign) BOOL ignoresChangeTrackingNotifications;
 
 @end
+
+NS_ASSUME_NONNULL_END
