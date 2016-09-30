@@ -78,8 +78,8 @@
     }
 
     ETUUID *parentRevID = _revisionInfo.parentRevisionUUID;
-    return [_cache revisionForRevisionUUID: parentRevID
-                        persistentRootUUID: _revisionInfo.persistentRootUUID];
+    return [[self cache] revisionForRevisionUUID: parentRevID
+                              persistentRootUUID: _revisionInfo.persistentRootUUID];
 }
 
 - (CORevision *)mergeParentRevision
@@ -90,8 +90,8 @@
     }
 
     ETUUID *revID = _revisionInfo.mergeParentRevisionUUID;
-    return [_cache revisionForRevisionUUID: revID
-                        persistentRootUUID: _revisionInfo.persistentRootUUID];
+    return [[self cache] revisionForRevisionUUID: revID
+                              persistentRootUUID: _revisionInfo.persistentRootUUID];
 }
 
 - (ETUUID *)persistentRootUUID

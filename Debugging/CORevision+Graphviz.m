@@ -2,12 +2,16 @@
 #import "CORevisionCache.h"
 #import "COObjectGraphContext+Graphviz.h"
 
+@interface CORevision ()
+- (CORevisionCache *)cache;
+@end
+
 @implementation CORevision (Graphviz)
 
 - (void)show
 {
-    [[cache.parentEditingContext.store itemGraphForRevisionUUID: self.UUID
-                                                 persistentRoot: self.persistentRootUUID] showGraph];
+    [[[self cache].parentEditingContext.store itemGraphForRevisionUUID: self.UUID
+                                                        persistentRoot: self.persistentRootUUID] showGraph];
 }
 
 @end
