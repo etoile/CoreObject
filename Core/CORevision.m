@@ -24,10 +24,15 @@
     return self;
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+
 - (instancetype)init
 {
     return [self initWithCache: nil revisionInfo: nil];
 }
+
+#pragma clang diagnostic pop
 
 - (BOOL)isEqual: (id)rhs
 {
@@ -57,8 +62,11 @@
 - (CORevisionCache *)cache
 {
     if (cache == nil)
+    {
         [NSException raise: NSGenericException
-                    format: @"Attempted to access a CORevision property from a revision whose parent revision cache/editing context have been deallocated"];
+                    format: @"Attempted to access a CORevision property from a revision whose "
+                                "parent revision cache/editing context have been deallocated"];
+    }
     return cache;
 }
 
@@ -148,7 +156,9 @@
 
 - (BOOL)isEqualToOrAncestorOfRevision: (CORevision *)aRevision
 {
+    NILARG_EXCEPTION_TEST(aRevision);
     CORevision *rev = aRevision;
+
     while (rev != nil)
     {
         if ([rev isEqual: self])

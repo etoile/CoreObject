@@ -11,6 +11,8 @@
 
 @class COEditingContext, CORevisionInfo, CORevisionCache, COCommitDescriptor;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /** 
  * @group Core
  * @abstract CORevision represents a revision in the history graph.
@@ -58,12 +60,12 @@
  * For the first revision in a persistent root, returns nil (unless the 
  * persistent root is a cheap copy).
  */
-@property (nonatomic, readonly) CORevision *parentRevision;
+@property (nonatomic, readonly, nullable) CORevision *parentRevision;
 /**
  * If this revision is the result of merging another branch into the this branch,
  * returns the revision that was merged in, otherwise nil.
  */
-@property (nonatomic, readonly) CORevision *mergeParentRevision;
+@property (nonatomic, readonly, nullable) CORevision *mergeParentRevision;
 /**
  * Returns the persistent root UUID involved in the revision.
  *
@@ -87,11 +89,11 @@
 /**
  * Returns the commit descriptor matching the commit identifier in -metadata.
  */
-@property (nonatomic, readonly) COCommitDescriptor *commitDescriptor;
+@property (nonatomic, readonly, nullable) COCommitDescriptor *commitDescriptor;
 /**
  * Returns -[COCommitDescriptor localizedTypeDescription].
  */
-@property (nonatomic, readonly) NSString *localizedTypeDescription;
+@property (nonatomic, readonly, nullable) NSString *localizedTypeDescription;
 /**
  * Returns the commit descriptor short description evaluated with the arguments 
  * provided under the key kCOCommitMetadataShortDescriptionArguments in 
@@ -99,15 +101,15 @@
  *
  * See -[COCommitDescriptor localizedShortDescriptionWithArguments:]
  */
-@property (nonatomic, readonly) NSString *localizedShortDescription;
+@property (nonatomic, readonly, nullable) NSString *localizedShortDescription;
 /**
  * Returns -parentRevision.
  */
-@property (nonatomic, readonly) id <COTrackNode> parentNode;
+@property (nonatomic, readonly, nullable) id <COTrackNode> parentNode;
 /**
  * Returns -mergeParentRevision.
  */
-@property (nonatomic, readonly) id <COTrackNode> mergeParentNode;
+@property (nonatomic, readonly, nullable) id <COTrackNode> mergeParentNode;
 
 
 /** @taskunit History Graph Inspection */
@@ -134,3 +136,5 @@
 
 
 @end
+
+NS_ASSUME_NONNULL_END

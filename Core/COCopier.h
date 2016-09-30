@@ -9,6 +9,8 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COItemGraph.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * @group Core
  * @abstract Metamodel-driven copy support
@@ -37,8 +39,10 @@
  *
  * If source and destination item graphs are identical, the items are duplicated.
  */
-- (NSArray *)copyItemsWithUUIDs: (NSArray *)uuids
-                      fromGraph: (id <COItemGraph>)source
-                        toGraph: (id <COItemGraph>)dest NS_RETURNS_NOT_RETAINED;
+- (NSArray<ETUUID *> *)copyItemsWithUUIDs: (NSArray<ETUUID *> *)uuids
+                                fromGraph: (id <COItemGraph>)source
+                                  toGraph: (id <COItemGraph>)dest NS_RETURNS_NOT_RETAINED;
 
 @end
+
+NS_ASSUME_NONNULL_END
