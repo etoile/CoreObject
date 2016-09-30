@@ -9,35 +9,36 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COItemGraph.h>
 
-// TODO: Store the state relating to copying, e.g. which context to copy into.
-
+/**
+ * @group Core
+ * @abstract Metamodel-driven copy support
+ *
+ * COCopier can be used to copy objects or items between object or item graphs (both conform to
+ * the same COItemGraph protocol).
+ *
+ * This API implements the semantics documented in "Scraps/Slides/copy semantics.key".
+ *
+ * See also COItem, COItemGraph and COObjectGraphContext.
+ */
 @interface COCopier : NSObject
 
-
-// TODO: Implement
 /**
- * Creates a copier to copy into the destination graph.
+ * Copies a single item between two item graphs and returns the UUID of the item inserted in the 
+ * destination item graph.
  *
- * The entity descriptions for COItems will be obtained from the given model
- * description repository.
- *
- * We need to the model description for 
- */
-//- (id) initWithDestinationGraph: (id<COItemGraph>)dest
-//     modelDescriptionRepository: (ETModelDescriptionRepository *)repository;
-
-/**
- * Basic copying method implementing the semantics in "copy semantics.key".
- *
- * Handles copying into the same context, or another one.
+ * If source and destination item graphs are identical, the item is duplicated.
  */
 - (ETUUID *)copyItemWithUUID: (ETUUID *)aUUID
                    fromGraph: (id <COItemGraph>)source
                      toGraph: (id <COItemGraph>)dest NS_RETURNS_NOT_RETAINED;
-
+/**
+ * Copies the given items between two item graphs and returns the UUIDs of the items inserted in 
+ * the destination item graph.
+ *
+ * If source and destination item graphs are identical, the items are duplicated.
+ */
 - (NSArray *)copyItemsWithUUIDs: (NSArray *)uuids
                       fromGraph: (id <COItemGraph>)source
                         toGraph: (id <COItemGraph>)dest NS_RETURNS_NOT_RETAINED;
-
 
 @end
