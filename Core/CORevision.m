@@ -73,9 +73,7 @@
 - (CORevision *)parentRevision
 {
     if (_revisionInfo.parentRevisionUUID == nil)
-    {
         return nil;
-    }
 
     ETUUID *parentRevID = _revisionInfo.parentRevisionUUID;
     return [[self cache] revisionForRevisionUUID: parentRevID
@@ -85,9 +83,7 @@
 - (CORevision *)mergeParentRevision
 {
     if (_revisionInfo.mergeParentRevisionUUID == nil)
-    {
         return nil;
-    }
 
     ETUUID *revID = _revisionInfo.mergeParentRevisionUUID;
     return [[self cache] revisionForRevisionUUID: revID
@@ -162,9 +158,8 @@
     while (rev != nil)
     {
         if ([rev isEqual: self])
-        {
             return YES;
-        }
+
         rev = rev.parentRevision;
     }
     return NO;
