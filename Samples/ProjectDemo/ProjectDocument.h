@@ -1,4 +1,5 @@
 #import <Cocoa/Cocoa.h>
+#import <EtoileFoundation/EtoileFoundation.h>
 
 /**
  * ProjectDocument is the NSDocument subclass which are the documents
