@@ -421,7 +421,7 @@ extern NSString *const COPersistentRootDidChangeNotification;
  * if the current branch changes in the receiver, the other persistent root 
  * will continue to refer to the root object of the previous current branch.
  */
-@property (nonatomic, readwrite, strong) id rootObject;
+@property (nonatomic, readwrite, strong) __kindof COObject *rootObject;
 /**
  * Shorthand for <code>[self.objectGraphContext loadedObjectForUUID:]</code>.
  */
