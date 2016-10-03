@@ -966,7 +966,7 @@ NS_ASSUME_NONNULL_BEGIN
  * See -[NSObject descriptionWithOptions:] to implement custom detailed 
  * descriptions.
  */
-- (NSString *)detailedDescriptionWithTraversalKey: (NSString *)aProperty;
+- (NSString *)detailedDescriptionWithTraversalKey: (nullable NSString *)aProperty;
 /** 
  * Returns a short description to summarize the receiver. 
  *
