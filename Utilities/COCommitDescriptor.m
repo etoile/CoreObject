@@ -94,6 +94,24 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
         [lang stringByAppendingPathExtension: @"lproj"]];
 }
 
+/**
+ * See Language and Locale IDs in Apple Internalization Guide.
+ */
+static void validateMainBundlePreferredLocalizations()
+{
+    for (NSString *localization in [NSBundle mainBundle].preferredLocalizations)
+    {
+        BOOL isTwoLettersISOCode = (localization.length == 2);
+        BOOL isThreeLettersISOCode = (localization.length == 3);
+        BOOL isCompoundLanguageID = (localization.length >= 4
+            && ([localization characterAtIndex: 2] == '-' || [localization characterAtIndex: 3] == '-'));
+        
+        NSCAssert(isTwoLettersISOCode || isThreeLettersISOCode || isCompoundLanguageID,
+            @"-[NSBundle mainBundle].preferredLocalizations must not include full languages names, "
+                "check CFBundleDevelopmentRegion is set to a valid language ID in the Info.plist");
+    }
+}
+
 + (void)loadCommitDescriptorsInTable: (NSMutableDictionary *)aDescriptorTable
                            typeTable: (NSMutableDictionary *)aTypeTable
                   localizationTables: (NSMutableDictionary *)someLocalizationTables
@@ -106,6 +124,8 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
     NSArray *bundles =
         [@[[NSBundle mainBundle],
            coreObjectBundle] arrayByAddingObjectsFromArray: [NSBundle allFrameworks]];
+    
+    validateMainBundlePreferredLocalizations();
 
     for (NSBundle *bundle in bundles)
     {
