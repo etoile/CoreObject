@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10116" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10116"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="DrawingController">
+            <connections>
+                <outlet property="branchesPopUpButton" destination="WSb-pC-fzj" id="cvw-ZV-hMu"/>
+                <outlet property="defaultBranchCheckBox" destination="e03-Cm-Cyh" id="kFt-fc-V7a"/>
+                <outlet property="graphicView" destination="18" id="29"/>
+                <outlet property="window" destination="1" id="3"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application"/>
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" animationBehavior="default" id="1">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="196" y="148" width="513" height="362"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1058"/>
+            <view key="contentView" id="2">
+                <rect key="frame" x="0.0" y="0.0" width="513" height="362"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" id="15">
+                        <rect key="frame" x="-1" y="-1" width="515" height="330"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES"/>
+                        <clipView key="contentView" id="bPE-3W-8E5">
+                            <rect key="frame" x="0.0" y="0.0" width="500" height="315"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <customView id="18" customClass="SKTGraphicView">
+                                    <rect key="frame" x="0.0" y="0.0" width="500" height="315"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                </customView>
+                            </subviews>
+                        </clipView>
+                        <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="17">
+                            <rect key="frame" x="0.0" y="315" width="500" height="15"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="16">
+                            <rect key="frame" x="500" y="0.0" width="15" height="315"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
+                    <popUpButton verticalHuggingPriority="750" id="WSb-pC-fzj">
+                        <rect key="frame" x="70" y="332" width="319" height="26"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" id="M0I-Yb-pVk">
+                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <menu key="menu" title="OtherViews" id="KYl-V2-1jh">
+                                <items>
+                                    <menuItem title="Item 1" state="on" id="dVN-oj-Sjn"/>
+                                    <menuItem title="Item 2" id="YGw-nF-ipY"/>
+                                    <menuItem title="Item 3" id="moh-4D-CdA"/>
+                                </items>
+                            </menu>
+                        </popUpButtonCell>
+                    </popUpButton>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" id="fOk-sQ-cJM">
+                        <rect key="frame" x="-2" y="337" width="68" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Branch:" id="Hgh-nx-huk">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button id="e03-Cm-Cyh">
+                        <rect key="frame" x="392" y="337" width="68" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="check" title="Default" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="kHU-1w-IQr">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="checkDefaultBranch:" target="-2" id="L2n-dg-1Xf"/>
+                        </connections>
+                    </button>
+                </subviews>
+            </view>
+            <toolbar key="toolbar" implicitIdentifier="D421757F-F581-4254-A92D-316EDE27A4F9" autosavesConfiguration="NO" displayMode="iconAndLabel" sizeMode="small" id="5">
+                <allowedToolbarItems>
+                    <toolbarItem implicitItemIdentifier="NSToolbarShowFontsItem" id="7"/>
+                    <toolbarItem implicitItemIdentifier="NSToolbarShowColorsItem" id="6"/>
+                    <toolbarItem implicitItemIdentifier="NSToolbarSeparatorItem" id="8"/>
+                    <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="9"/>
+                    <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="10"/>
+                    <toolbarItem implicitItemIdentifier="88695023-1469-4A6B-BCE5-CF0BFF5E204C" explicitItemIdentifier="share" label="Share" paletteLabel="Share" tag="-1" image="NSEveryone" id="11">
+                        <nil key="toolTip"/>
+                        <connections>
+                            <action selector="shareWith:" target="-1" id="f4o-dg-5Fb"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="B8ABFC9C-631E-454B-A575-66CFD5FF755B" label="Step Backward" paletteLabel="Step Backward" tag="-1" image="edit-undo" id="12">
+                        <nil key="toolTip"/>
+                        <connections>
+                            <action selector="stepBackward:" target="-1" id="4ec-oX-Vk2"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="DA9CDB1B-C9E1-413B-9FDD-6A32B16364BD" label="Step Forward" paletteLabel="Step Forward" tag="-1" image="edit-redo" id="13">
+                        <nil key="toolTip"/>
+                        <connections>
+                            <action selector="stepForward:" target="-1" id="j1n-XW-qPn"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="FE71AF68-7008-485B-9555-6A5DAD7A9353" label="History" paletteLabel="History" tag="-1" image="history" id="14">
+                        <nil key="toolTip"/>
+                        <connections>
+                            <action selector="showDocumentHistory:" target="-1" id="2If-Np-arQ"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="1CCC6DFE-F591-4277-A725-D43FCDFB5C84" label="Select" paletteLabel="Select" tag="-1" image="Arrow" id="19">
+                        <nil key="toolTip"/>
+                        <connections>
+                            <action selector="selectTool:" target="-2" id="24"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="53D8CB8E-532E-4B3E-AFCF-27C10A211742" label="Circle" paletteLabel="Circle" tag="-1" image="Circle" id="20">
+                        <nil key="toolTip"/>
+                        <connections>
+                            <action selector="circleTool:" target="-2" id="25"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="1174D54B-AB9C-4E19-8B9B-6A04BDC56FA7" label="Line" paletteLabel="Line" tag="-1" image="Line" id="21">
+                        <nil key="toolTip"/>
+                        <connections>
+                            <action selector="lineTool:" target="-2" id="26"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="B24D3AC5-0FB0-4518-A3A8-32106E503401" label="Rectangle" paletteLabel="Rectangle" tag="-1" image="Rectangle" id="22">
+                        <nil key="toolTip"/>
+                        <connections>
+                            <action selector="rectangleTool:" target="-2" id="27"/>
+                        </connections>
+                    </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="71ADA20C-BDDB-466E-9A75-007D21719415" label="Text" paletteLabel="Text" tag="-1" image="TextGraphic" id="23">
+                        <nil key="toolTip"/>
+                        <connections>
+                            <action selector="textTool:" target="-2" id="28"/>
+                        </connections>
+                    </toolbarItem>
+                </allowedToolbarItems>
+                <defaultToolbarItems>
+                    <toolbarItem reference="7"/>
+                    <toolbarItem reference="6"/>
+                    <toolbarItem reference="8"/>
+                    <toolbarItem reference="12"/>
+                    <toolbarItem reference="13"/>
+                    <toolbarItem reference="8"/>
+                    <toolbarItem reference="19"/>
+                    <toolbarItem reference="20"/>
+                    <toolbarItem reference="21"/>
+                    <toolbarItem reference="22"/>
+                    <toolbarItem reference="23"/>
+                    <toolbarItem reference="10"/>
+                    <toolbarItem reference="14"/>
+                    <toolbarItem reference="11"/>
+                </defaultToolbarItems>
+            </toolbar>
+            <connections>
+                <outlet property="delegate" destination="-2" id="4"/>
+            </connections>
+        </window>
+    </objects>
+    <resources>
+        <image name="Arrow" width="32" height="32"/>
+        <image name="Circle" width="32" height="32"/>
+        <image name="Line" width="32" height="32"/>
+        <image name="NSEveryone" width="32" height="32"/>
+        <image name="Rectangle" width="32" height="32"/>
+        <image name="TextGraphic" width="32" height="32"/>
+        <image name="edit-redo" width="32" height="32"/>
+        <image name="edit-undo" width="32" height="32"/>
+        <image name="history" width="32" height="32"/>
+    </resources>
+</document>
