@@ -7,6 +7,10 @@
 
 #import "TestCommon.h"
 
+@interface COUndoTrackStore (TestUndoTrackStore)
+- (BOOL)commitTransaction;
+@end
+
 @interface TestUndoTrackStore : NSObject <UKTest>
 {
     COUndoTrackStore *_store;
@@ -188,3 +192,14 @@
 }
 
 @end
+
+
+@implementation COUndoTrackStore (TestUndoTrackStore)
+
+- (BOOL)commitTransaction
+{
+    return [self commitTransactionWithCompletionHandler: ^() { }];
+}
+
+@end
+

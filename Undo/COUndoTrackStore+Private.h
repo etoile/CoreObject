@@ -97,9 +97,12 @@ NSString *const COUndoTrackStoreTrackCompacted;
  *
  * Returns whether committing the transaction has succeeded.
  *
+ * On success, will execute the completion block in the main thread prior 
+ * to posting COUndoTrackStoreTrackDidChangeNotification.
+ *
  * This method must be run in the main thread.
  */
-- (BOOL)commitTransaction;
+- (BOOL)commitTransactionWithCompletionHandler: (void (^)())completion;
 
 
 /** @taskunit Managing Undo Tracks */

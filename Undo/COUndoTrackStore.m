@@ -314,7 +314,7 @@ NSString *const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompacte
     return ok;
 }
 
-- (BOOL)commitTransaction
+- (BOOL)commitTransactionWithCompletionHandler: (void (^)())completion
 {
     ETAssert([NSThread isMainThread]);
     __block BOOL ok = NO;
@@ -327,6 +327,7 @@ NSString *const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompacte
 
     if (ok)
     {
+        completion();
         [self postCommitNotifications];
     }
     dispatch_semaphore_signal(_transactionLock);

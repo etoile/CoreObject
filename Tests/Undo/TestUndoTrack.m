@@ -22,6 +22,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
     NSUInteger _trackNotificationCount;
     NSUInteger _track2NotificationCount;
     NSUInteger _patternTrackNotificationCount;
+    void (^_notificationBlock)(NSNotification *);
 }
 
 @end
@@ -67,6 +68,8 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
     {
         ETAssertUnreachable();
     }
+
+    _notificationBlock(notif);
 }
 
 /**
@@ -136,6 +139,9 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
                                              selector: @selector(trackDidChange:)
                                                  name: COUndoTrackDidChangeNotification
                                                object: _patternTrack];
+    
+    _notificationBlock = ^(NSNotification *notif) { };
+
     return self;
 }
 
@@ -297,6 +303,27 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
     [_track setCurrentNode: group1a];
 
     UKObjectsEqual(A(placeholderNode, group1, group1a), _track.nodes);
+}
+
+
+- (void)testValidNodesOnNotificationForSetCurrentNodeToDivergentNode
+{
+    COCommandGroup *group1 = [[COCommandGroup alloc] init];
+    COCommandGroup *group1a = [[COCommandGroup alloc] init];
+    COCommandGroup *group1b = [[COCommandGroup alloc] init];
+
+    [_track recordCommand: group1];
+    [_track recordCommand: group1a];
+    [_track setCurrentNode: group1];
+    [_track recordCommand: group1b];
+    
+    COUndoTrack *track = _track;
+    
+    _notificationBlock = ^(NSNotification *notif)
+    {
+        UKDoesNotRaiseException((void)track.canRedo);
+    };
+    _track.currentNode = group1a;
 }
 
 - (void)testDivergentNodesWhereCommonAncestorIsPlaceholderNode

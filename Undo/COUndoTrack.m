@@ -203,8 +203,7 @@ NSString *const kCOUndoTrackName = @"COUndoTrackName";
 
     [self undo: undo1 redo: redo1 undo: @[] redo: @[]];
 
-    BOOL ok = [self.store commitTransaction];
-    if (ok)
+    return [self.store commitTransactionWithCompletionHandler: ^()
     {
         if ([self isKindOfClass: [COPatternUndoTrack class]])
         {
@@ -229,8 +228,7 @@ NSString *const kCOUndoTrackName = @"COUndoTrackName";
         {
             [self didUpdate];
         }
-    }
-    return ok;
+    }];
 }
 
 - (NSArray *)nodesFromNode: (id <COTrackNode>)node toTargetNode: (id <COTrackNode>)targetNode
@@ -290,14 +288,12 @@ NSString *const kCOUndoTrackName = @"COUndoTrackName";
 
     [self undo: undo1 redo: redo1 undo: @[] redo: redo2];
 
-    BOOL ok = [self.store commitTransaction];
-    if (ok)
+    return [self.store commitTransactionWithCompletionHandler: ^()
     {
         /* When we set the current command to a divergent one, we switch to
            another command branch (the head command changes) */
         [self reloadNodesOnCurrentBranch];
-    }
-    return ok;
+    }];
 }
 
 - (void)undoNode: (id <COTrackNode>)aNode
@@ -430,15 +426,17 @@ NSString *const kCOUndoTrackName = @"COUndoTrackName";
         [_commandsByUUID removeObjectForKey: coalescedCommandUUIDToDelete];
     }
 
-    ETAssert([self.store commitTransaction]);
-    [self reloadNodesOnCurrentBranch];
+    ETAssert([self.store commitTransactionWithCompletionHandler: ^()
+    {
+        [self reloadNodesOnCurrentBranch];
+    }]);
 }
 
 - (void)clear
 {
     [self.store beginTransaction];
     [self.store removeTrackWithName: _name];
-    ETAssert([self.store commitTransaction]);
+    ETAssert([self.store commitTransactionWithCompletionHandler: ^() { }]);
 
     _nodesOnCurrentUndoBranch = nil;
     [_commandsByUUID removeAllObjects];
