@@ -10,6 +10,7 @@
 
 @class COEditingContext, CORevision;
 
+NS_ASSUME_NONNULL_BEGIN
 
 @interface CORevisionCache : NSObject
 {
@@ -23,7 +24,9 @@
 @property (nonatomic, readonly, weak) COEditingContext *parentEditingContext;
 
 - (instancetype)initWithParentEditingContext: (COEditingContext *)aCtx NS_DESIGNATED_INITIALIZER;
-- (CORevision *)revisionForRevisionUUID: (ETUUID *)aRevid
-                     persistentRootUUID: (ETUUID *)aPersistentRoot;
+- (nullable CORevision *)revisionForRevisionUUID: (ETUUID *)aRevid
+                              persistentRootUUID: (ETUUID *)aPersistentRoot;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -10,6 +10,8 @@
 
 @class COObject, COPath;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COWeakRef : NSObject
 {
 @public
@@ -44,12 +46,12 @@
 - (void)removeReference: (id)aReference;
 - (BOOL)containsReference: (id)aReference;
 
-@property (nonatomic, readonly) NSArray *deadReferencesArray;
+@property (nonatomic, readonly) NSArray<COPath *> *deadReferencesArray;
 
 @end
 
 @interface COMutableSet (TestPrimitiveCollection)
-@property (nonatomic, readonly) NSSet *deadReferences;
+@property (nonatomic, readonly) NSSet<COPath *> *deadReferences;
 @property (nonatomic, readonly) NSSet *allReferences;
 @end
 
@@ -82,7 +84,7 @@
 
 @interface COMutableArray (TestPrimitiveCollection)
 @property (nonatomic, readonly) NSIndexSet *deadIndexes;
-@property (nonatomic, readonly) NSArray *deadReferences;
+@property (nonatomic, readonly) NSArray<COPath *> *deadReferences;
 @property (nonatomic, readonly) NSArray *allReferences;
 @end
 
@@ -113,3 +115,5 @@
 - (void)setReference: (id)aReference forKey: (id <NSCopying>)aKey;
 
 @end
+
+NS_ASSUME_NONNULL_END

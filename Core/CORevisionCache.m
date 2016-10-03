@@ -22,10 +22,15 @@
     return self;
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+
 - (instancetype)init
 {
     return [self initWithParentEditingContext: nil];
 }
+
+#pragma clang diagnostic pop
 
 - (CORevision *)revisionForRevisionUUID: (ETUUID *)aRevid
                      persistentRootUUID: (ETUUID *)aPersistentRoot

@@ -10,6 +10,8 @@
 
 @class COPath, COObject;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * An instance of this class is owned by each COEditingContext, to cache 
  * incoming relationships for faulted, deleted or possibly finalized
@@ -37,7 +39,7 @@
 /**
  * When no referring objects exist, returns nil.
  */
-- (NSHashTable *)referringObjectsForPath: (COPath *)aPath;
+- (nullable NSHashTable<__kindof COObject *> *)referringObjectsForPath: (COPath *)aPath;
 - (void)removeReferringObject: (COObject *)aReferrer
                       forPath: (COPath *)aPath;
 - (void)removeReferringObject: (COObject *)aReferrer;
@@ -58,3 +60,5 @@
 - (void)removePath: (COPath *)aPath;
 
 @end
+
+NS_ASSUME_NONNULL_END

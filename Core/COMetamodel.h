@@ -8,4 +8,4 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
-void CORegisterCoreObjectMetamodel(ETModelDescriptionRepository *repo);
+void CORegisterCoreObjectMetamodel(ETModelDescriptionRepository *_Nonnull repo);

@@ -33,6 +33,8 @@
 
 - (BOOL)isSourceObjectTrackingSpecificBranchForTargetObject: (COObject *)aTargetObject
 {
+    NILARG_EXCEPTION_TEST(aTargetObject);
+
     if (_sourceObject.objectGraphContext == aTargetObject.objectGraphContext)
         return NO;
 
@@ -59,10 +61,15 @@
     return self;
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+
 - (instancetype)init
 {
     return [self initWithOwner: nil];
 }
+
+#pragma clang diagnostic pop
 
 - (NSString *)description
 {
@@ -73,6 +80,7 @@
 
 - (NSSet *)referringObjectsForPropertyInTarget: (NSString *)aProperty
 {
+    NILARG_EXCEPTION_TEST(aProperty);
     NSMutableSet *result = [NSMutableSet set];
 
     for (COCachedRelationship *entry in _cachedRelationships)
@@ -133,6 +141,7 @@
 
 - (COObject *)referringObjectForPropertyInTarget: (NSString *)aProperty
 {
+    NILARG_EXCEPTION_TEST(aProperty);
     NSMutableArray *results = [NSMutableArray array];
 
     for (COCachedRelationship *entry in _cachedRelationships)
@@ -167,6 +176,8 @@
 - (void)removeReferencesForPropertyInSource: (NSString *)aTargetProperty
                                sourceObject: (COObject *)anObject
 {
+    NILARG_EXCEPTION_TEST(aTargetProperty);
+    NILARG_EXCEPTION_TEST(anObject);
     // FIXME: Ugly, rewrite
     NSUInteger i = 0;
 
@@ -190,6 +201,8 @@
                       sourceProperty: (NSString *)aSource
                       targetProperty: (NSString *)aTarget
 {
+    NILARG_EXCEPTION_TEST(aReferrer);
+    NILARG_EXCEPTION_TEST(aSource);
     ETPropertyDescription *prop = [_owner.entityDescription propertyDescriptionForName: aTarget];
 
     if (!prop.multivalued)

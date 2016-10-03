@@ -149,7 +149,9 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
 - (void)addReference: (id)aReference
 {
+    NILARG_EXCEPTION_TEST(aReference);
     COThrowExceptionIfNotMutable(_permanentlyMutable, _temporaryMutable);
+
     if (!COIsTombstone(aReference))
     {
         [_externalIndexToBackingIndex addPointer: (void *)_backing.count];
@@ -189,6 +191,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
 - (void)replaceReferenceAtIndex: (NSUInteger)index withReference: (id)aReference
 {
+    NILARG_EXCEPTION_TEST(aReference);
     COThrowExceptionIfNotMutable(_permanentlyMutable, _temporaryMutable);
 
     const BOOL wasTombstone = COIsTombstone((id)[_backing pointerAtIndex: index]);
@@ -242,10 +245,10 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
 - (void)insertObject: (id)anObject atIndex: (NSUInteger)index
 {
+    NILARG_EXCEPTION_TEST(anObject);
+    INVALIDARG_EXCEPTION_TEST(anObject, !COIsTombstone(anObject));
     COThrowExceptionIfNotMutable(_permanentlyMutable, _temporaryMutable);
     COThrowExceptionIfOutOfBounds(self, index, YES);
-
-    ETAssert(!COIsTombstone(anObject));
 
     // NSPointerArray on 10.7 doesn't allow inserting at the end using index == count, so
     // call addPointer in that case as a workaround.
@@ -293,9 +296,10 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
 - (void)replaceObjectAtIndex: (NSUInteger)index withObject: (id)anObject
 {
+    NILARG_EXCEPTION_TEST(anObject);
+    INVALIDARG_EXCEPTION_TEST(anObject, !COIsTombstone(anObject));
     COThrowExceptionIfNotMutable(_permanentlyMutable, _temporaryMutable);
     COThrowExceptionIfOutOfBounds(self, index, NO);
-    ETAssert(!COIsTombstone(anObject));
 
     [_backing replacePointerAtIndex: [self backingIndex: index]
                         withPointer: (__bridge void *)anObject];
@@ -306,6 +310,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 // from the diff. In this way, the dead references would shifted around more properly.
 - (void)setArray: (NSArray *)liveObjects
 {
+    NILARG_EXCEPTION_TEST(liveObjects);
     COThrowExceptionIfNotMutable(_permanentlyMutable, _temporaryMutable);
     NSArray *deadReferences = [_backing.allObjects filteredCollectionWithBlock: ^(id obj)
     {
@@ -620,15 +625,15 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
 - (void)addObject: (id)anObject
 {
+    INVALIDARG_EXCEPTION_TEST(anObject, !COIsTombstone(anObject));
     COThrowExceptionIfNotMutable(_permanentlyMutable, _temporaryMutable);
-    ETAssert(!COIsTombstone(anObject));
     [_backing addObject: anObject];
 }
 
 - (void)removeObject: (id)anObject
 {
+    INVALIDARG_EXCEPTION_TEST(anObject, !COIsTombstone(anObject));
     COThrowExceptionIfNotMutable(_permanentlyMutable, _temporaryMutable);
-    ETAssert(!COIsTombstone(anObject));
     [_backing removeObject: anObject];
 }
 
@@ -753,6 +758,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
 - (void)setReference: (id)aReference forKey: (id <NSCopying>)aKey
 {
+    NILARG_EXCEPTION_TEST(aReference);
     COThrowExceptionIfNotMutable(_permanentlyMutable, _temporaryMutable);
 
     if (COIsTombstone(aReference))
