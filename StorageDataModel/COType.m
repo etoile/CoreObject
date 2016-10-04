@@ -10,8 +10,7 @@
 #import "COPath.h"
 #import "COAttachmentID.h"
 
-static NSString *
-COTypeMultivalueDescription(COType type)
+static NSString *COTypeMultivalueDescription(COType type)
 {
     if (COTypeIsMultivalued(type))
     {
@@ -27,8 +26,7 @@ COTypeMultivalueDescription(COType type)
     return @"";
 }
 
-static NSString *
-COTypePrimitiveDescription(COType type)
+static NSString *COTypePrimitiveDescription(COType type)
 {
     switch (COTypePrimitivePart(type))
     {
@@ -52,8 +50,7 @@ COTypePrimitiveDescription(COType type)
 }
 
 
-NSString *
-COTypeDescription(COType type)
+NSString *COTypeDescription(COType type)
 {
     if (!COTypeIsValid(type))
     {
@@ -64,8 +61,7 @@ COTypeDescription(COType type)
 }
 
 
-BOOL
-COTypePrimitiveValidateObject(COType type, id anObject)
+BOOL COTypePrimitiveValidateObject(COType type, id anObject)
 {
     switch (COTypePrimitivePart(type))
     {
@@ -92,8 +88,7 @@ COTypePrimitiveValidateObject(COType type, id anObject)
     }
 }
 
-BOOL
-COTypeValidateObject(COType type, id anObject)
+BOOL COTypeValidateObject(COType type, id anObject)
 {
     if (!COTypeIsValid(type))
     {

@@ -96,50 +96,42 @@ typedef NS_OPTIONS(uint32_t, COType)
     kCOTypeMultivaluedMask = 0xf0
 };
 
-static inline
-COType COTypeMultivaluedPart(COType type)
+static inline COType COTypeMultivaluedPart(COType type)
 {
     return type & kCOTypeMultivaluedMask;
 }
 
-static inline
-COType COTypePrimitivePart(COType type)
+static inline COType COTypePrimitivePart(COType type)
 {
     return type & kCOTypePrimitiveMask;
 }
 
-static inline
-BOOL COTypeIsMultivalued(COType type)
+static inline BOOL COTypeIsMultivalued(COType type)
 {
     return COTypeMultivaluedPart(type) != 0;
 }
 
-static inline
-BOOL COTypeIsUnivalued(COType type)
+static inline BOOL COTypeIsUnivalued(COType type)
 {
     return COTypeMultivaluedPart(type) == 0;
 }
 
-static inline
-BOOL COTypeIsOrdered(COType type)
+static inline BOOL COTypeIsOrdered(COType type)
 {
     return COTypeMultivaluedPart(type) == kCOTypeArray;
 }
 
-static inline
-COType COTypeMakeSetOf(COType type)
+static inline COType COTypeMakeSetOf(COType type)
 {
     return type | kCOTypeSet;
 }
 
-static inline
-COType COTypeMakeArrayOf(COType type)
+static inline COType COTypeMakeArrayOf(COType type)
 {
     return type | kCOTypeArray;
 }
 
-static inline
-BOOL COTypeIsValid(COType type)
+static inline BOOL COTypeIsValid(COType type)
 {
     if (!(COTypePrimitivePart(type) >= kCOTypeInt64
           && COTypePrimitivePart(type) <= kCOTypeAttachment))
@@ -162,8 +154,6 @@ BOOL COTypeIsValid(COType type)
     return YES;
 }
 
-NSString *
-COTypeDescription(COType type);
+NSString *COTypeDescription(COType type);
 
-BOOL
-COTypeValidateObject(COType type, id anObject);
+BOOL COTypeValidateObject(COType type, id anObject);
