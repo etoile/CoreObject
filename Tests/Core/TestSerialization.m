@@ -13,11 +13,11 @@
  * This class is for testing COSerialization, i.e. for testing the mapping
  * between COObject property values and their COItem representation.
  */
-@interface TestSerialization : EditingContextTestCase <UKTest>
+@interface TestCOSerialization : EditingContextTestCase <UKTest>
 @end
 
 
-@implementation TestSerialization
+@implementation TestCOSerialization
 
 /**
  * Adds an attachment to the store and returns its NSData ID

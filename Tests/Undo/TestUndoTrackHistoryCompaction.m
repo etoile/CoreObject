@@ -132,7 +132,7 @@
 
 - (void)checkUndoRedo
 {
-    __unused NSUInteger counter = track.nodes.count;
+     __attribute__((unused)) NSUInteger counter = track.nodes.count;
 
     while (track.canUndo)
     {

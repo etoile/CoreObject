@@ -1,5 +1,6 @@
 #import "FMResultSet.h"
 #import "FMDatabase.h"
+#include <unistd.h>
 
 @interface FMResultSet (Private)
 

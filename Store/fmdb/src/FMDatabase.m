@@ -1,4 +1,5 @@
 #import "FMDatabase.h"
+#include <dispatch/dispatch.h>
 
 @implementation FMDatabase
 
