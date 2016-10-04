@@ -18,14 +18,12 @@ extern NSString *const COPersistentRootName;
 
 @interface COPersistentRoot ()
 
-/** @taskunit Framework Private */
 
-@property (nonatomic, readwrite, assign) int64_t lastTransactionID;
+/** @taskunit Initialization */
+
 
 /**
  * <init />
- * This method is only exposed to be used internally by CoreObject.
- *
  * If info is nil, creates a new persistent root.
  *
  * cheapCopyRevisionID is normally nil, and only set to create a cheap copy.
@@ -38,9 +36,14 @@ extern NSString *const COPersistentRootName;
           objectGraphContext: (nullable COObjectGraphContext *)anObjectGraphContext
                parentContext: (COEditingContext *)aCtxt NS_DESIGNATED_INITIALIZER;
 
+@property (nonatomic, readonly, strong) COPersistentRootInfo *persistentRootInfo;
+@property (nonatomic, readonly, getter=isPersistentRootUncommitted) BOOL persistentRootUncommitted;
+
+
+/** @taskunit Committing Changes */
+
+
 /**
- * This method is only exposed to be used internally by CoreObject.
- *
  * Commits the current changes to the store with the provided metadatas and
  * returns the resulting revision.
  *
@@ -49,16 +52,12 @@ extern NSString *const COPersistentRootName;
  */
 - (BOOL)commitWithMetadata: (nullable NSDictionary<NSString *, id> *)metadata;
 /**
- * This method is only exposed to be used internally by CoreObject.
- *
  * Extracts the current changes, saves them to the store with the provided
  * metadatas and returns the resulting revision.
  */
 - (void)saveCommitWithMetadata: (nullable NSDictionary<NSString *, id> *)metadata
                    transaction: (COStoreTransaction *)txn;
 /**
- * This method is only exposed to be used internally by CoreObject.
- *
  * We must clear the branch status as late as possible to ensure the
  * deserialization code can decide whether references to another persistent root 
  * are alive or dead at any time during the commit.
@@ -78,40 +77,47 @@ extern NSString *const COPersistentRootName;
  * coherent view until the store transaction is constructed.
  */
 - (void)clearBranchesPendingDeletionAndUndeletion;
-@property (nonatomic, readonly, strong) COPersistentRootInfo *persistentRootInfo;
-
 - (void)didMakeNewCommit;
 
-- (COBranch *)makeBranchWithLabel: (NSString *)aLabel
-                       atRevision: (CORevision *)aRev
-                     parentBranch: (COBranch *)aParent;
 
-- (COBranch *)makeBranchWithUUID: (ETUUID *)aUUID
-                        metadata: (nullable NSDictionary<NSString *, id> *)metadata
-                      atRevision: (CORevision *)aRev
-                    parentBranch: (COBranch *)aParent;
+/** @taskunit Branches */
 
-@property (nonatomic, readonly, getter=isPersistentRootUncommitted) BOOL persistentRootUncommitted;
-
-- (void)storePersistentRootDidChange: (NSNotification *)notif isDistributed: (BOOL)isDistributed;
-
-- (void)sendChangeNotification;
 
 /**
  * This property is only exposed to be used internally by CoreObject.
  */
 @property (nonatomic, readonly) NSSet<COBranch *> *allBranches;
 
+- (COBranch *)makeBranchWithLabel: (NSString *)aLabel
+                       atRevision: (CORevision *)aRev
+                     parentBranch: (COBranch *)aParent;
+- (COBranch *)makeBranchWithUUID: (ETUUID *)aUUID
+                        metadata: (nullable NSDictionary<NSString *, id> *)metadata
+                      atRevision: (CORevision *)aRev
+                    parentBranch: (COBranch *)aParent;
 - (void)deleteBranch: (COBranch *)aBranch;
 - (void)undeleteBranch: (COBranch *)aBranch;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
+
+
+/** @taskunit Notifications */
+
+
+- (void)storePersistentRootDidChange: (NSNotification *)notif isDistributed: (BOOL)isDistributed;
+- (void)sendChangeNotification;
+
+
+/** @taskunit Transaction ID */
+
+
+@property (nonatomic, readwrite, assign) int64_t lastTransactionID;
+
+
+/** @taskunit Zombie Status */
+
+
 - (void)assertNotZombie;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
 - (void)makeZombie;
+
 @end
 
 NS_ASSUME_NONNULL_END
