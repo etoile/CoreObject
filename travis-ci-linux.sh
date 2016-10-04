@@ -28,6 +28,14 @@ CC="$CLANG" CXX="$CLANGXX" ../configure && make && sudo make install || exit 1
 cd ..
 cd ..
 
+# gnustep make
+cd make && git checkout be209c7eaae9978bb694fdcc2541e1c89b528ce8 && git clean -dfx
+CC="$CLANG" CXX="$CLANGXX" ./configure || exit 1
+make || exit 1
+sudo make install
+cd ..
+source /usr/local/share/GNUstep/Makefiles/GNUstep.sh || exit 1
+
 # libobjc2
 cd libobjc2 && git checkout 9a2f43ca7d579928279b5d854a19adfbe43d06d6 && git clean -dfx
 mkdir build && cd build
@@ -38,7 +46,7 @@ cd ..
 cd ..
 
 # gnustep make
-cd make && git checkout be209c7eaae9978bb694fdcc2541e1c89b528ce8 && git clean -dfx
+cd make
 CC="$CLANG" CXX="$CLANGXX" LDFLAGS=-L/usr/local/lib ./configure --enable-objc-nonfragile-abi --enable-objc-arc --with-objc-lib-flag=-lobjcgs --disable-strict-v2-mode --with-library-combo=ng-gnu-gnu || exit 1
 make || exit 1
 sudo make install
@@ -47,7 +55,7 @@ source /usr/local/share/GNUstep/Makefiles/GNUstep.sh || exit 1
 
 # gnustep base
 cd base && git checkout 23a7a83dedf240ac52407426e791c8627116d59e && git clean -dfx
-CC="$CLANG" CXX="$CLANGXX" LDFLAGS=-L/usr/local/lib ./configure || exit 1
+CC="$CLANG" CXX="$CLANGXX" LDFLAGS=-L/usr/local/lib ./configure --disable-mixedabi || exit 1
 make CC="$CLANG" CXX="$CLANGXX" && sudo -E make install || exit 1
 cd ..
 
