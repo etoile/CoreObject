@@ -12,7 +12,7 @@ sudo apt-get -y install libjpeg-dev libtiff-dev libpng-dev libgif-dev libx11-dev
 sudo apt-get -y install libsqlite3-dev
 
 # repos
-git clone https://github.com/nickhutchinson/libdispatch.git
+git clone https://github.com/ngrewe/libdispatch
 git clone https://github.com/gnustep/libobjc2
 git clone https://github.com/gnustep/make
 git clone https://github.com/gnustep/base
@@ -39,7 +39,7 @@ cd ..
 
 # gnustep make
 cd make && git checkout be209c7eaae9978bb694fdcc2541e1c89b528ce8 && git clean -dfx
-CC="$CLANG" CXX="$CLANGXX" LDFLAGS=-L/usr/local/lib ./configure --enable-objc-nonfragile-abi --enable-objc-arc --with-objc-lib-flag=-lobjcgs --disable-strict-v2-mode || exit 1
+CC="$CLANG" CXX="$CLANGXX" LDFLAGS=-L/usr/local/lib ./configure --enable-objc-nonfragile-abi --enable-objc-arc --with-objc-lib-flag=-lobjcgs --disable-strict-v2-mode --with-library-combo=ng-gnu-gnu || exit 1
 make || exit 1
 sudo make install
 cd ..
@@ -66,16 +66,16 @@ cd ..
 # UnitKit
 cd UnitKit && git clean -dfx
 wget https://raw.githubusercontent.com/etoile/Etoile/master/etoile.make
-make CC="$CLANG" CXX="$CLANGXX" OBJCFLAGS="-fobjc-nonfragile-abi" && sudo -E make install || exit 1
+make CC="$CLANG" CXX="$CLANGXX" && sudo -E make install || exit 1
 cd ..
 
 # EtoileFoundation
 cd EtoileFoundation && git clean -dfx
 wget https://raw.githubusercontent.com/etoile/Etoile/master/etoile.make
-make CC="$CLANG" CXX="$CLANGXX" OBJCFLAGS="-fobjc-nonfragile-abi" && sudo -E make install || exit 1
+make CC="$CLANG" CXX="$CLANGXX" && sudo -E make install || exit 1
 cd ..
 
 # CoreObject
 wget https://raw.githubusercontent.com/etoile/Etoile/master/etoile.make
-make CC="$CLANG" CXX="$CLANGXX" OBJCFLAGS="-fobjc-nonfragile-abi"
-make CC="$CLANG" CXX="$CLANGXX" OBJCFLAGS="-fobjc-nonfragile-abi" test=yes
+make CC="$CLANG" CXX="$CLANGXX"
+make CC="$CLANG" CXX="$CLANGXX" test=yes
