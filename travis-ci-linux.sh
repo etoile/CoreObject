@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -o verbose
+
 CLANG="clang-3.8"
 CLANGXX="clang++-3.8"
 
@@ -44,17 +46,17 @@ source /usr/local/share/GNUstep/Makefiles/GNUstep.sh || exit 1
 
 # gnustep base
 cd base && git checkout 23a7a83dedf240ac52407426e791c8627116d59e && git clean -dfx
-./configure && make -j8 && sudo -E make install || exit 1
+CC="$CLANG" CXX="$CLANGXX" LDFLAGS=-L/usr/local/lib ./configure && make -j8 && sudo -E make install || exit 1
 cd ..
 
 # gnustep gui
 cd gui && git checkout 995effb347ee0da948840f1047c232c1a4231777 && git clean -dfx
-./configure && make -j8 && sudo -E make install || exit 1
+CC="$CLANG" CXX="$CLANGXX" LDFLAGS=-L/usr/local/lib ./configure && make -j8 && sudo -E make install || exit 1
 cd ..
 
 # gnustep back
 cd back && git checkout ef2088d3c7065418409cf1a6f53ac45e94eb5cb5 && git clean -dfx
-./configure && make -j8 && sudo -E make install || exit 1
+CC="$CLANG" CXX="$CLANGXX" LDFLAGS=-L/usr/local/lib ./configure && make -j8 && sudo -E make install || exit 1
 cd ..
 
 # UnitKit
