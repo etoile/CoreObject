@@ -1,5 +1,5 @@
 #!/bin/bash
-clang --version
-clang test.m -o test
+clang-3.8 --version
+clang-3.8 test.m -o test
 ./test
 
