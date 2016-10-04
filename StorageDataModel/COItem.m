@@ -53,6 +53,8 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 
 @implementation COItem
 
+#pragma mark Initialization -
+
 - (instancetype)initWithUUID: (ETUUID *)aUUID
           typesForAttributes: (NSDictionary *)typesForAttributes
          valuesForAttributes: (NSDictionary *)valuesForAttributes
@@ -88,29 +90,26 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
                   valuesForAttributes: valuesForAttributes];
 }
 
-- (ETUUID *)UUID
+- (NSString *)description
 {
-    return uuid;
+    NSMutableString *result = [NSMutableString string];
+
+    [result appendFormat: @"{ COItem %@\n", uuid];
+
+    for (NSString *attrib in self.attributeNames)
+    {
+        [result appendFormat: @"\t%@ <%@> = '%@'\n",
+                              attrib,
+                              COTypeDescription([self typeForAttribute: attrib]),
+                              [self valueForAttribute: attrib]];
+    }
+
+    [result appendFormat: @"}"];
+
+    return result;
 }
 
-- (NSArray *)attributeNames
-{
-    return types.allKeys;
-}
-
-- (COType)typeForAttribute: (NSString *)anAttribute
-{
-    return [types[anAttribute] intValue];
-}
-
-- (id)valueForAttribute: (NSString *)anAttribute
-{
-    return values[anAttribute];
-}
-
-
-#pragma mark Equality testing -
-
+#pragma mark Equality -
 
 - (BOOL)isEqual: (id)object
 {
@@ -135,6 +134,33 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
     return uuid.hash ^ types.hash ^ values.hash ^ 9014972660509684524LL;
 }
 
+#pragma mark Accessing Attributes -
+
+
+- (ETUUID *)UUID
+{
+    return uuid;
+}
+
+- (NSArray *)attributeNames
+{
+    return types.allKeys;
+}
+
+- (COType)typeForAttribute: (NSString *)anAttribute
+{
+    return [types[anAttribute] intValue];
+}
+
+- (id)valueForAttribute: (NSString *)anAttribute
+{
+    return values[anAttribute];
+}
+
+- (id)objectForKeyedSubscript: (NSString *)key
+{
+    return values[key];
+}
 
 #pragma mark Convenience -
 
@@ -183,6 +209,8 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
         }
     }
 }
+
+#pragma mark Accessing Item References -
 
 - (NSSet *)compositeReferencedItemUUIDs
 {
@@ -248,7 +276,7 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
     return [NSSet setWithSet: result];
 }
 
-// Helper methods for doing GC
+#pragma mark Search and Garbage Collection Integration -
 
 - (NSArray *)attachments
 {
@@ -303,28 +331,7 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
     return [result componentsJoinedByString: @" "];
 }
 
-- (NSString *)description
-{
-    NSMutableString *result = [NSMutableString string];
-
-    [result appendFormat: @"{ COItem %@\n", uuid];
-
-    for (NSString *attrib in self.attributeNames)
-    {
-        [result appendFormat: @"\t%@ <%@> = '%@'\n",
-                              attrib,
-                              COTypeDescription([self typeForAttribute: attrib]),
-                              [self valueForAttribute: attrib]];
-    }
-
-    [result appendFormat: @"}"];
-
-    return result;
-}
-
-
-#pragma mark Copy -
-
+#pragma mark Copying -
 
 - (id)copyWithZone: (NSZone *)zone
 {
@@ -397,6 +404,8 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 
 @dynamic entityName, packageName, packageVersion;
 
+#pragma mark Initialization -
+
 + (COMutableItem *)itemWithTypesForAttributes: (NSDictionary *)typesForAttributes
                           valuesForAttributes: (NSDictionary *)valuesForAttributes
 {
@@ -446,6 +455,8 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
     return [(COMutableItem *)[self alloc] initWithUUID: aUUID];
 }
 
+#pragma mark Updating Attributes -
+
 - (void)setUUID: (ETUUID *)aUUID
 {
     NILARG_EXCEPTION_TEST(aUUID);
@@ -471,6 +482,10 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
     [(NSMutableDictionary *)values removeObjectForKey: anAttribute];
 }
 
+- (void)setObject: (id)obj forKeyedSubscript: (NSString *)key
+{
+    values[key] = obj;
+}
 
 #pragma mark Convenience -
 
@@ -504,6 +519,8 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
               type: [self typeForAttribute: anAttribute]];
 }
 
+#pragma mark Copying -
+
 - (id)copyWithZone: (NSZone *)zone
 {
     return [[COItem alloc] initWithUUID: uuid
@@ -512,4 +529,3 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 }
 
 @end
-

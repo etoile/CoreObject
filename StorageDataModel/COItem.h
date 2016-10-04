@@ -40,7 +40,6 @@ extern NSString *const kCOItemIsSharedProperty;
 {
 @package
     ETUUID *uuid;
-
 @protected
     NSMutableDictionary *types;
     NSMutableDictionary *values;
@@ -69,6 +68,12 @@ extern NSString *const kCOItemIsSharedProperty;
 - (id)valueForAttribute: (NSString *)anAttribute;
 
 
+/** @taskunit Accessing Attributes With Subscripting */
+
+
+- (id)objectForKeyedSubscript: (NSString *)key;
+
+
 /** @taskunit Convenience */
 
 
@@ -79,17 +84,25 @@ extern NSString *const kCOItemIsSharedProperty;
 @property (nonatomic, readonly) int64_t packageVersion;
 @property (nonatomic, readonly) NSString *packageName;
 
-// allows treating primitive or container, unordered or ordered as NSArray
+/**
+ * Allows treating primitive or container, unordered or ordered as NSArray.
+ */
 - (NSArray *)allObjectsForAttribute: (NSString *)attribute;
+
+
+/** @taskunit Accessing Item References */
+
 
 @property (nonatomic, readonly) NSSet *compositeReferencedItemUUIDs;
 @property (nonatomic, readonly) NSSet *referencedItemUUIDs;
 @property (nonatomic, readonly) NSSet *allInnerReferencedItemUUIDs;
 
-// GC helper methods
+
+/** @taskunit Search and Garbage Collection Integration */
+
+
 @property (nonatomic, readonly) NSArray *attachments;
 @property (nonatomic, readonly) NSArray *allReferencedPersistentRootUUIDs;
-
 @property (nonatomic, readonly) NSString *fullTextSearchContent;
 
 
@@ -98,7 +111,6 @@ extern NSString *const kCOItemIsSharedProperty;
 
 - (id)copyWithZone: (NSZone *)zone;
 - (id)mutableCopyWithZone: (NSZone *)zone;
-
 /**
  * Returns a mutable item.
  */
@@ -136,6 +148,12 @@ extern NSString *const kCOItemIsSharedProperty;
     forAttribute: (NSString *)anAttribute
             type: (COType)aType;
 - (void)removeValueForAttribute: (NSString *)anAttribute;
+
+
+/** @taskunit Updating Attributes With Subscripting */
+
+
+- (void)setObject: (id)obj forKeyedSubscript: (NSString *)key;
 
 
 /** @taskunit Convenience */
