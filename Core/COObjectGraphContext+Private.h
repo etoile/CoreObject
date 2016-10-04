@@ -80,8 +80,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 /**
- * This method is only exposed to be used internally by CoreObject.
- *
  * Tells the object graph context a property value has changed in a COObject
  * instance.
  */
