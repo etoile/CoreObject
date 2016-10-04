@@ -131,11 +131,17 @@ extern NSString *const kCOBranchLabel;
  * Returns whether the receiver is the current branch of its persistent root.
  */
 @property (nonatomic, readonly) BOOL isCurrentBranch;
-
 /**
  * Returns whether the receiver was the first branch of its persistent root.
  */
 @property (nonatomic, readonly) BOOL isTrunkBranch;
+/**
+ * Returns whether the editing context has relinquished control over this object.
+ *
+ * If YES, this instance can no longer be used and calling any methods may throw 
+ * an exception.
+ */
+@property (nonatomic, readonly) BOOL isZombie;
 
 
 /** @taskunit Basic Properties */
@@ -311,12 +317,7 @@ extern NSString *const kCOBranchLabel;
  * Use it to cause a "checkpoint" revision to be written.
  */
 @property (nonatomic, readwrite, assign) BOOL shouldMakeEmptyCommit;
-/**
- * Returns whether the editing context has relinquished
- * control over this object. If YES, this instance can no longer be used
- * and calling any methods may throw an exception
- */
-@property (nonatomic, readonly) BOOL isZombie;
+
 
 /** @taskunit Undo / Redo */
 

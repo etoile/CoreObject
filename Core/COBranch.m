@@ -112,6 +112,29 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
     return self;
 }
 
+- (void)updateWithBranchInfo: (COBranchInfo *)branchInfo
+                   compacted: (BOOL)wasCompacted
+{
+    NSParameterAssert(branchInfo != nil);
+
+    _currentRevisionUUID = branchInfo.currentRevisionUUID;
+    _headRevisionUUID = branchInfo.headRevisionUUID;
+    _metadata = [NSMutableDictionary dictionaryWithDictionary: branchInfo.metadata];
+    _isCreated = YES;
+    _parentBranchUUID = branchInfo.parentBranchUUID;
+
+    if (_objectGraph != nil)
+    {
+        id <COItemGraph> aGraph =
+            [_persistentRoot.store itemGraphForRevisionUUID: _currentRevisionUUID
+                                             persistentRoot: self.persistentRoot.UUID];
+        [_objectGraph setItemGraph: aGraph];
+        [_objectGraph removeUnreachableObjects];
+    }
+
+    [self updateRevisions: wasCompacted];
+}
+
 - (NSString *)description
 {
     if (self.isZombie)
@@ -135,56 +158,7 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
     return [self descriptionWithOptions: options];
 }
 
-- (COEditingContext *)editingContext
-{
-    return _persistentRoot.editingContext;
-}
-
-/**
- * For the interaction with cross persistent root references, see
- * -[COPersistentRoot setCurrentBranchObjectGraphToRevisionUUID:persistentRootUUID:]
- * whose discussion applies this method unfaulting logic in the same way.
- */
-- (COObjectGraphContext *)objectGraphContext
-{
-    if (_objectGraph == nil)
-    {
-        //NSLog(@"%@: unfaulting object graph context", self);
-
-        _objectGraph = [[COObjectGraphContext alloc] initWithBranch: self];
-
-        if (_currentRevisionUUID != nil
-            && !self.persistentRoot.persistentRootUncommitted)
-        {
-            id <COItemGraph> aGraph = [_persistentRoot.store itemGraphForRevisionUUID: _currentRevisionUUID
-                                                                       persistentRoot: self.persistentRoot.UUID];
-            ETAssert(aGraph != nil);
-
-            [_objectGraph setItemGraph: aGraph];
-        }
-        else
-        {
-            [_objectGraph setItemGraph: self.persistentRoot.objectGraphContext];
-        }
-        ETAssert(!_objectGraph.hasChanges);
-
-        // Lazy loading support
-        [self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: self.persistentRoot
-                                                                          branch: self
-                                                                         isFault: self.deleted || self.persistentRoot.deleted];
-    }
-    return _objectGraph;
-}
-
-- (COObjectGraphContext *)objectGraphContextWithoutUnfaulting
-{
-    return _objectGraph;
-}
-
-- (BOOL)objectGraphContextHasChanges
-{
-    return _objectGraph != nil ? _objectGraph.hasChanges : NO;
-}
+#pragma mark - Branch Kind
 
 - (BOOL)isBranchUncommitted
 {
@@ -212,6 +186,15 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
     // FIXME: Implement by reading from our metadata dictionary
     return NO;
 }
+
+#pragma mark Zombie Status -
+
+- (BOOL)isZombie
+{
+    return (_persistentRoot == nil);
+}
+
+#pragma mark Basic Properties -
 
 - (COBranchInfo *)branchInfo
 {
@@ -300,6 +283,8 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
     }
 }
 
+#pragma mark History -
+
 - (CORevision *)initialRevision
 {
     CORevision *rev = self.headRevision;
@@ -384,6 +369,67 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
     return [self.editingContext branchForUUID: _parentBranchUUID];
 }
 
+
+#pragma mark Persistent Root and Object Graph -
+
+- (COEditingContext *)editingContext
+{
+    return _persistentRoot.editingContext;
+}
+
+/**
+ * For the interaction with cross persistent root references, see
+ * -[COPersistentRoot setCurrentBranchObjectGraphToRevisionUUID:persistentRootUUID:]
+ * whose discussion applies this method unfaulting logic in the same way.
+ */
+- (COObjectGraphContext *)objectGraphContext
+{
+    if (_objectGraph == nil)
+    {
+        //NSLog(@"%@: unfaulting object graph context", self);
+
+        _objectGraph = [[COObjectGraphContext alloc] initWithBranch: self];
+
+        if (_currentRevisionUUID != nil
+            && !self.persistentRoot.persistentRootUncommitted)
+        {
+            id <COItemGraph> aGraph = [_persistentRoot.store itemGraphForRevisionUUID: _currentRevisionUUID
+                                                                       persistentRoot: self.persistentRoot.UUID];
+            ETAssert(aGraph != nil);
+
+            [_objectGraph setItemGraph: aGraph];
+        }
+        else
+        {
+            [_objectGraph setItemGraph: self.persistentRoot.objectGraphContext];
+        }
+        ETAssert(!_objectGraph.hasChanges);
+
+        // Lazy loading support
+        [self.editingContext updateCrossPersistentRootReferencesToPersistentRoot: self.persistentRoot
+                                                                          branch: self
+                                                                         isFault: self.deleted || self.persistentRoot.deleted];
+    }
+    return _objectGraph;
+}
+
+- (COObjectGraphContext *)objectGraphContextWithoutUnfaulting
+{
+    return _objectGraph;
+}
+
+- (BOOL)objectGraphContextHasChanges
+{
+    return _objectGraph != nil ? _objectGraph.hasChanges : NO;
+}
+
+- (id)rootObject
+{
+    return self.objectGraphContext.rootObject;
+}
+
+#pragma mark Pending Changes -
+
 - (BOOL)hasChangesOtherThanDeletionOrUndeletion
 {
     if (self.branchUncommitted)
@@ -456,10 +502,7 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
     [_objectGraph discardAllChanges];
 }
 
-- (BOOL)isZombie
-{
-    return (_persistentRoot == nil);
-}
+#pragma mark Creating Branches and Cheap copies -
 
 - (COBranch *)makeBranchWithLabel: (NSString *)aLabel
 {
@@ -511,10 +554,7 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
     return [self makePersistentRootCopyFromRevision: self.currentRevision];
 }
 
-- (BOOL)needsReloadNodes: (NSArray *)currentLoadedNodes
-{
-    return NO;
-}
+#pragma mark Undo / Redo -
 
 - (CORevision *)undoRevision
 {
@@ -572,10 +612,7 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
     self.currentRevision = [self redoRevision];
 }
 
-- (COSQLiteStore *)store
-{
-    return _persistentRoot.store;
-}
+#pragma mark Committing Changes -
 
 - (void)writeMetadataWithTransaction: (COStoreTransaction *)txn
 {
@@ -754,148 +791,6 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
     }
 }
 
-- (void)reloadAtRevision: (CORevision *)revision
-{
-    NSParameterAssert(revision != nil);
-    // TODO: Use optimized method on the store to get a delta for more performance
-    id <COItemGraph> aGraph = [self.store itemGraphForRevisionUUID: revision.UUID
-                                                    persistentRoot: self.persistentRoot.UUID];
-
-    if (_objectGraph != nil)
-    {
-        [_objectGraph setItemGraph: aGraph];
-        [_objectGraph removeUnreachableObjects];
-    }
-
-    if (self == self.persistentRoot.currentBranch)
-    {
-        [self.persistentRoot.objectGraphContext setItemGraph: aGraph];
-        [self.persistentRoot.objectGraphContext removeUnreachableObjects];
-    }
-}
-
-- (COMergeInfo *)mergeInfoForMergingBranch: (COBranch *)aBranch
-{
-    NILARG_EXCEPTION_TEST(aBranch);
-    ETUUID *lca = [self.editingContext commonAncestorForCommit: aBranch.currentRevision.UUID
-                                                     andCommit: self.currentRevision.UUID
-                                                persistentRoot: self.persistentRoot.UUID];
-    id <COItemGraph> baseGraph = [self.store itemGraphForRevisionUUID: lca
-                                                       persistentRoot: self.persistentRoot.UUID];
-
-    return [self diffForMergingGraphWithSelf: aBranch.objectGraphContext
-                                revisionUUID: aBranch.currentRevision.UUID
-                                   baseGraph: baseGraph
-                              baseRevisionID: lca];
-}
-
-- (COMergeInfo *)mergeInfoForMergingRevision: (CORevision *)aRevision
-{
-    NILARG_EXCEPTION_TEST(aRevision);
-    ETUUID *lca = [self.editingContext commonAncestorForCommit: aRevision.UUID
-                                                     andCommit: self.currentRevision.UUID
-                                                persistentRoot: self.persistentRoot.UUID];
-    id <COItemGraph> baseGraph = [self.store itemGraphForRevisionUUID: lca
-                                                       persistentRoot: self.persistentRoot.UUID];
-    id <COItemGraph> mergeGraph = [self.store itemGraphForRevisionUUID: aRevision.UUID
-                                                        persistentRoot: self.persistentRoot.UUID];
-
-    return [self diffForMergingGraphWithSelf: mergeGraph
-                                revisionUUID: aRevision.UUID
-                                   baseGraph: baseGraph
-                              baseRevisionID: lca];
-}
-
-- (COMergeInfo *)diffForMergingGraphWithSelf: (id <COItemGraph>)mergeGraph
-                                revisionUUID: (ETUUID *)mergeRevisionUUID
-                                   baseGraph: (id <COItemGraph>)baseGraph
-                              baseRevisionID: (ETUUID *)aBaseRevisionID
-{
-    CODiffManager *mergingBranchDiff = [CODiffManager diffItemGraph: baseGraph
-                                                      withItemGraph: mergeGraph
-                                         modelDescriptionRepository: self.editingContext.modelDescriptionRepository
-                                                   sourceIdentifier: @"merged"];
-    CODiffManager *selfDiff = [CODiffManager diffItemGraph: baseGraph
-                                             withItemGraph: self.objectGraphContext
-                                modelDescriptionRepository: self.editingContext.modelDescriptionRepository
-                                          sourceIdentifier: @"self"];
-    CODiffManager *merged = [selfDiff diffByMergingWithDiff: mergingBranchDiff];
-
-    COMergeInfo *result = [[COMergeInfo alloc] init];
-
-    result.mergeDestinationRevision = self.currentRevision;
-    result.mergeSourceRevision = [self.editingContext revisionForRevisionUUID: mergeRevisionUUID
-                                                           persistentRootUUID: self.persistentRoot.UUID];
-    result.baseRevision = [self.editingContext revisionForRevisionUUID: aBaseRevisionID
-                                                    persistentRootUUID: self.persistentRoot.UUID];
-    result.diff = merged;
-
-    return result;
-}
-
-- (void)didUpdate
-{
-    [[NSNotificationCenter defaultCenter]
-        postNotificationName: ETCollectionDidUpdateNotification object: self];
-}
-
-/**
- * When compacted or rebased, we discard all revisions, the next time -revisions 
- * is called, the latest revisions will be reloaded.
- */
-- (void)updateRevisions: (BOOL)wasCompactedOrRebased
-{
-    if (_revisions == nil)
-        return;
-
-    CORevision *currentRev = [self.editingContext revisionForRevisionUUID: _currentRevisionUUID
-                                                       persistentRootUUID: self.persistentRoot.UUID];
-    BOOL isUpToDate = [currentRev isEqual: _revisions.lastObject] && !wasCompactedOrRebased;
-
-    if (isUpToDate)
-        return;
-
-    BOOL isNewCommit = [currentRev.parentRevision isEqual: _revisions.lastObject] && !wasCompactedOrRebased;
-
-    if (isNewCommit)
-    {
-        [_revisions addObject: currentRev];
-    }
-    else
-    {
-        _revisions = nil;
-    }
-    [self didUpdate];
-}
-
-- (void)updateWithBranchInfo: (COBranchInfo *)branchInfo
-                   compacted: (BOOL)wasCompacted
-{
-    NSParameterAssert(branchInfo != nil);
-
-    _currentRevisionUUID = branchInfo.currentRevisionUUID;
-    _headRevisionUUID = branchInfo.headRevisionUUID;
-    _metadata = [NSMutableDictionary dictionaryWithDictionary: branchInfo.metadata];
-    _isCreated = YES;
-    _parentBranchUUID = branchInfo.parentBranchUUID;
-
-    if (_objectGraph != nil)
-    {
-        id <COItemGraph> aGraph =
-            [_persistentRoot.store itemGraphForRevisionUUID: _currentRevisionUUID
-                                             persistentRoot: self.persistentRoot.UUID];
-        [_objectGraph setItemGraph: aGraph];
-        [_objectGraph removeUnreachableObjects];
-    }
-
-    [self updateRevisions: wasCompacted];
-}
-
-- (id)rootObject
-{
-    return self.objectGraphContext.rootObject;
-}
-
 /**
  * Returns either nil, _objectGraph, or _persistentRoot.objectGraphContext
  */
@@ -978,6 +873,123 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
     return modifiedItems;
 }
 
+#pragma mark Merging Between Branches -
+
+- (COSQLiteStore *)store
+{
+    return _persistentRoot.store;
+}
+
+- (COMergeInfo *)mergeInfoForMergingBranch: (COBranch *)aBranch
+{
+    NILARG_EXCEPTION_TEST(aBranch);
+    ETUUID *lca = [self.editingContext commonAncestorForCommit: aBranch.currentRevision.UUID
+                                                     andCommit: self.currentRevision.UUID
+                                                persistentRoot: self.persistentRoot.UUID];
+    id <COItemGraph> baseGraph = [self.store itemGraphForRevisionUUID: lca
+                                                       persistentRoot: self.persistentRoot.UUID];
+
+    return [self diffForMergingGraphWithSelf: aBranch.objectGraphContext
+                                revisionUUID: aBranch.currentRevision.UUID
+                                   baseGraph: baseGraph
+                              baseRevisionID: lca];
+}
+
+- (COMergeInfo *)mergeInfoForMergingRevision: (CORevision *)aRevision
+{
+    NILARG_EXCEPTION_TEST(aRevision);
+    ETUUID *lca = [self.editingContext commonAncestorForCommit: aRevision.UUID
+                                                     andCommit: self.currentRevision.UUID
+                                                persistentRoot: self.persistentRoot.UUID];
+    id <COItemGraph> baseGraph = [self.store itemGraphForRevisionUUID: lca
+                                                       persistentRoot: self.persistentRoot.UUID];
+    id <COItemGraph> mergeGraph = [self.store itemGraphForRevisionUUID: aRevision.UUID
+                                                        persistentRoot: self.persistentRoot.UUID];
+
+    return [self diffForMergingGraphWithSelf: mergeGraph
+                                revisionUUID: aRevision.UUID
+                                   baseGraph: baseGraph
+                              baseRevisionID: lca];
+}
+
+- (COMergeInfo *)diffForMergingGraphWithSelf: (id <COItemGraph>)mergeGraph
+                                revisionUUID: (ETUUID *)mergeRevisionUUID
+                                   baseGraph: (id <COItemGraph>)baseGraph
+                              baseRevisionID: (ETUUID *)aBaseRevisionID
+{
+    CODiffManager *mergingBranchDiff = [CODiffManager diffItemGraph: baseGraph
+                                                      withItemGraph: mergeGraph
+                                         modelDescriptionRepository: self.editingContext.modelDescriptionRepository
+                                                   sourceIdentifier: @"merged"];
+    CODiffManager *selfDiff = [CODiffManager diffItemGraph: baseGraph
+                                             withItemGraph: self.objectGraphContext
+                                modelDescriptionRepository: self.editingContext.modelDescriptionRepository
+                                          sourceIdentifier: @"self"];
+    CODiffManager *merged = [selfDiff diffByMergingWithDiff: mergingBranchDiff];
+
+    COMergeInfo *result = [[COMergeInfo alloc] init];
+
+    result.mergeDestinationRevision = self.currentRevision;
+    result.mergeSourceRevision = [self.editingContext revisionForRevisionUUID: mergeRevisionUUID
+                                                           persistentRootUUID: self.persistentRoot.UUID];
+    result.baseRevision = [self.editingContext revisionForRevisionUUID: aBaseRevisionID
+                                                    persistentRootUUID: self.persistentRoot.UUID];
+    result.diff = merged;
+
+    return result;
+}
+
+#pragma mark Revisions -
+
+- (void)reloadAtRevision: (CORevision *)revision
+{
+    NSParameterAssert(revision != nil);
+    // TODO: Use optimized method on the store to get a delta for more performance
+    id <COItemGraph> aGraph = [self.store itemGraphForRevisionUUID: revision.UUID
+                                                    persistentRoot: self.persistentRoot.UUID];
+
+    if (_objectGraph != nil)
+    {
+        [_objectGraph setItemGraph: aGraph];
+        [_objectGraph removeUnreachableObjects];
+    }
+
+    if (self == self.persistentRoot.currentBranch)
+    {
+        [self.persistentRoot.objectGraphContext setItemGraph: aGraph];
+        [self.persistentRoot.objectGraphContext removeUnreachableObjects];
+    }
+}
+
+/**
+ * When compacted or rebased, we discard all revisions, the next time -revisions 
+ * is called, the latest revisions will be reloaded.
+ */
+- (void)updateRevisions: (BOOL)wasCompactedOrRebased
+{
+    if (_revisions == nil)
+        return;
+
+    CORevision *currentRev = [self.editingContext revisionForRevisionUUID: _currentRevisionUUID
+                                                       persistentRootUUID: self.persistentRoot.UUID];
+    BOOL isUpToDate = [currentRev isEqual: _revisions.lastObject] && !wasCompactedOrRebased;
+
+    if (isUpToDate)
+        return;
+
+    BOOL isNewCommit = [currentRev.parentRevision isEqual: _revisions.lastObject] && !wasCompactedOrRebased;
+
+    if (isNewCommit)
+    {
+        [_revisions addObject: currentRev];
+    }
+    else
+    {
+        _revisions = nil;
+    }
+    [self didUpdate];
+}
+
 - (NSMutableArray *)revisionsWithOptions: (COBranchRevisionReadingOptions)options
 {
     NSArray *revInfos = [self.store revisionInfosForBranchUUID: self.UUID
@@ -996,6 +1008,8 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
 {
     _revisions = [self revisionsWithOptions: COBranchRevisionReadingParentBranches];
 }
+
+#pragma mark Track Protocol -
 
 - (NSArray *)nodes
 {
@@ -1059,6 +1073,8 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
                           toRevision: (CORevision *)aNode];
 }
 
+#pragma mark Selective Undo / Redo -
+
 - (CODiffManager *)diffToSelectivelyApplyChangesFromRevision: (CORevision *)start
                                                   toRevision: (CORevision *)end
 {
@@ -1102,6 +1118,14 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
 
     // FIXME: Handle cross-persistent root relationship constraint violations, if we introduce those
     [self.objectGraphContext insertOrUpdateItems: items];
+}
+
+#pragma mark Collection Protocol -
+
+- (void)didUpdate
+{
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName: ETCollectionDidUpdateNotification object: self];
 }
 
 - (BOOL)isOrdered
