@@ -256,21 +256,21 @@
                                               forAttribute: @"bar"
                                                       type: kCOTypeString]);
 
-    UKRaisesException([[immutable valueForAttribute: @"key1"] addObject: @"b"]);
-    UKRaisesException([[immutable valueForAttribute: @"key2"] addObject: @"B"]);
+    UKRaisesException([immutable[@"key1"] addObject: @"b"]);
+    UKRaisesException([immutable[@"key2"] addObject: @"B"]);
 
     COMutableItem *mutable = [immutable mutableCopy];
 
-    UKDoesNotRaiseException([[mutable valueForAttribute: @"key1"] addObject: @"b"]);
-    UKDoesNotRaiseException([[mutable valueForAttribute: @"key2"] addObject: @"B"]);
+    UKDoesNotRaiseException([mutable[@"key1"] addObject: @"b"]);
+    UKDoesNotRaiseException([mutable[@"key2"] addObject: @"B"]);
 
-    UKIntsEqual(1, [[immutable valueForAttribute: @"key1"] count]);
-    UKIntsEqual(1, [[immutable valueForAttribute: @"key2"] count]);
+    UKIntsEqual(1, [immutable[@"key1"] count]);
+    UKIntsEqual(1, [immutable[@"key2"] count]);
 
-    UKIntsEqual(2, [[mutable valueForAttribute: @"key1"] count]);
-    UKIntsEqual(2, [[mutable valueForAttribute: @"key2"] count]);
+    UKIntsEqual(2, [mutable[@"key1"] count]);
+    UKIntsEqual(2, [mutable[@"key2"] count]);
 
-    UKRaisesException([[mutable valueForAttribute: @"name"] appendString: @"xxx"]);
+    UKRaisesException([mutable[@"name"] appendString: @"xxx"]);
 }
 
 - (void)testEquality

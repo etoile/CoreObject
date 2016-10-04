@@ -538,7 +538,7 @@ static NSString *
 COHTMLCodesForAttributesItemGraph(COItemGraph *graph)
 {
     NSString *htmlCodes = [[graph.items mappedCollectionWithBlock:
-        ^(id obj) { return [obj valueForAttribute: @"htmlCode"]; }] componentsJoinedByString: @","];
+        ^(id obj) { return obj[@"htmlCode"]; }] componentsJoinedByString: @","];
     return htmlCodes;
 }
 
