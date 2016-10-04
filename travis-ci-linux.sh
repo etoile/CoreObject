@@ -22,7 +22,7 @@ git clone https://github.com/etoile/UnitKit
 git clone https://github.com/etoile/EtoileFoundation
 
 # libdispatch
-cd libdispatch && git checkout bd1808980b04830cbbd79c959b8bc554085e38a1 && git clean -dfx
+cd libdispatch && git checkout ed8b5eedac5bbb536a6a399965f513b46af28361 && git clean -dfx
 mkdir build && cd build
 CC="$CLANG" CXX="$CLANGXX" ../configure && make && sudo make install || exit 1
 cd ..
