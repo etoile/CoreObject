@@ -39,7 +39,11 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * When no referring objects exist, returns nil.
  */
+#ifdef GNUSTEP
+- (nullable NSHashTable *)referringObjectsForPath: (COPath *)aPath;
+#else
 - (nullable NSHashTable<__kindof COObject *> *)referringObjectsForPath: (COPath *)aPath;
+#endif
 - (void)removeReferringObject: (COObject *)aReferrer
                       forPath: (COPath *)aPath;
 - (void)removeReferringObject: (COObject *)aReferrer;

@@ -146,6 +146,8 @@
     return [backing itemGraphForRevid: revid];
 }
 
+// FIXME: -rangeOfData:options:range: not on GNUstep
+#ifndef GNUSTEP
 - (BOOL)storeHasPassword
 {
     NSData *passwordBytes = [@"password" dataUsingEncoding: NSUTF8StringEncoding];
@@ -163,6 +165,7 @@
     }
     return NO;
 }
+#endif
 
 - (void)testDeletion
 {
@@ -181,12 +184,16 @@
     UKObjectsEqual(branch2_a, [backing itemGraphForRevid: 2]);
     UKObjectsEqual(branch1_b, [backing itemGraphForRevid: 3]);
 
+#ifndef GNUSTEP
     UKTrue([self storeHasPassword]);
+#endif
 
     // now delete revid 1, to remove "password!" from the store
 
     [backing deleteRevids: INDEXSET(1)];
+#ifndef GNUSTEP
     UKFalse([self storeHasPassword]);
+#endif
 
     UKObjectsEqual(rootgraph, [backing itemGraphForRevid: 0]);
     UKNil([backing itemGraphForRevid: 1]);

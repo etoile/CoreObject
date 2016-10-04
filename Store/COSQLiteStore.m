@@ -62,8 +62,8 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
     NILARG_EXCEPTION_TEST(aURL);
     SUPERINIT;
 
-    queue_ = dispatch_queue_create([NSString stringWithFormat: @"COSQLiteStore-%p",
-                                                               self].UTF8String, NULL);
+    queue_ = dispatch_queue_create([[NSString stringWithFormat: @"COSQLiteStore-%p",
+                                                                self] UTF8String], NULL);
 
     url_ = aURL;
     backingStores_ = [[NSMutableDictionary alloc] init];

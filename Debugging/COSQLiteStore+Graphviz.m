@@ -180,10 +180,10 @@ void COViewDOTGraphFile(NSString *dotFilePath)
         }
 
         // NOTE: Using NSTask rather than system() breaks 'po [objectGraphContext showGraph]' in LLDB on 10.7 
-        system([NSString stringWithFormat: @"%@ -Tpdf '%@' -o '%@'",
-                                           executablePath,
-                                           dotFilePath,
-                                           pdfPath].UTF8String);
+        system([[NSString stringWithFormat: @"%@ -Tpdf '%@' -o '%@'",
+                                            executablePath,
+                                            dotFilePath,
+                                            pdfPath] UTF8String]);
         [[NSWorkspace sharedWorkspace] openFile: pdfPath];
         break;
     }
