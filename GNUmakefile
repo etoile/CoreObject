@@ -12,7 +12,7 @@ LIBRARIES_DEPEND_UPON = $(shell pkg-config --libs sqlite3) -lEtoileFoundation $(
 # For test builds, pass one more libdispatch include directory located in GNUstep Local domain
 CoreObject_INCLUDE_DIRS = -IStore/fmdb/src -I$(GNUSTEP_LOCAL_ROOT)/Library/Headers/dispatch
 CoreObject_CPPFLAGS += -DGNUSTEP_MISSING_API_COMPATIBILITY -DOS_OBJECT_USE_OBJC=0
-CoreObject_LDFLAGS += -lsqlite3 -ldispatch
+CoreObject_LDFLAGS += -lsqlite3 -ldispatch -lcrypto
 # TODO: Check that -fobjc-arc is all we need to pass, then remove -fobjc-nonfragile-abi -fblocks
 CoreObject_OBJCFLAGS += -fblocks -fobjc-arc -Wall -Wno-arc-performSelector-leaks
 LD=${CXX}
@@ -50,6 +50,7 @@ CoreObject_OBJC_FILES += $(wildcard Store/*.m)
 CoreObject_C_FILES += $(wildcard Store/*.c)
 CoreObject_OBJC_FILES += $(wildcard Undo/*.m)
 CoreObject_OBJC_FILES += $(wildcard Utilities/*.m)
+CoreObject_OBJC_FILES += $(wildcard SchemaMigration/*.m)
 CoreObject_OBJC_FILES += $(wildcard StorageDataModel/*.m)
 CoreObject_OBJC_FILES += $(wildcard Synchronization/*.m)
 CoreObject_OBJC_FILES += $(wildcard Synchronization/Messages/*.m)
