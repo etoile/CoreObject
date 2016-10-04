@@ -65,15 +65,15 @@ cd ..
 # UnitKit
 cd UnitKit && git clean -dfx
 wget https://raw.githubusercontent.com/etoile/Etoile/master/etoile.make
-make OBJCFLAGS="-fobjc-nonfragile-abi" && sudo -E make install || exit 1
+make CC="$CLANG" CXX="$CLANGXX" OBJCFLAGS="-fobjc-nonfragile-abi" && sudo -E make install || exit 1
 cd ..
 
 # EtoileFoundation
 cd EtoileFoundation && git clean -dfx
 wget https://raw.githubusercontent.com/etoile/Etoile/master/etoile.make
-make OBJCFLAGS="-fobjc-nonfragile-abi" && sudo -E make install || exit 1
+make CC="$CLANG" CXX="$CLANGXX" OBJCFLAGS="-fobjc-nonfragile-abi" && sudo -E make install || exit 1
 cd ..
 
 # CoreObject
 wget https://raw.githubusercontent.com/etoile/Etoile/master/etoile.make
-make OBJCFLAGS="-fobjc-nonfragile-abi"
+make CC="$CLANG" CXX="$CLANGXX" OBJCFLAGS="-fobjc-nonfragile-abi"
