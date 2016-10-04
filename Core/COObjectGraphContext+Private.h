@@ -11,19 +11,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface COObjectGraphContext ()
 
+
+/** @taskunit Branch and Persistent Root */
+
+
 /**
- * This method is only exposed to be used internally by CoreObject.
- *
  * Sets the branch owning the object graph.
  */
 - (void)setBranch: (COBranch *)aBranch;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
 - (void)setPersistentRoot: (COPersistentRoot *)aPersistentRoot;
 /**
- * This property is only exposed to be used internally by CoreObject.
- *
  * The branch UUID.
  *
  * If the receiver is transient, returns the future branch UUID that will be 
@@ -33,9 +30,21 @@ NS_ASSUME_NONNULL_BEGIN
  * objects have a stable -[COObject hash] even if they become persistent.
  */
 @property (nonatomic, readonly) ETUUID *branchUUID;
+
+
+/** @taskunit Metamodel */
+
+
++ (NSString *)defaultEntityName;
++ (ETEntityDescription *)descriptionForItem: (COItem *)anItem
+                 modelDescriptionRepository: (ETModelDescriptionRepository *)aRepository;
+- (ETEntityDescription *)descriptionForItem: (COItem *)anItem;
+
+
+/** Creating and Loading Objects */
+
+
 /**
- * This method is only exposed to be used internally by CoreObject.
- *
  * Returns the inner object bound to the given UUID in the object graph.
  *
  * If the object is not loaded yet and a serialized representation exists in
@@ -48,8 +57,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (id)objectReferenceWithUUID: (ETUUID *)aUUID;
 /**
- * This method is only exposed to be used internally by CoreObject.
- *
  * Returns the item graph getting loaded into the object graph context.
  *
  * If no loading involving multiple items is underway, returns nil.
@@ -58,8 +65,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, strong, nullable) id <COItemGraph> loadingItemGraph;
 /**
- * This method is only exposed to be used internally by CoreObject.
- *
  * Puts the object among the loaded objects.
  */
 - (void)registerObject: (COObject *)object isNew: (BOOL)inserted;
@@ -69,6 +74,11 @@ NS_ASSUME_NONNULL_BEGIN
  * See -loadedObjectForUUID:.
  */
 - (NSArray<__kindof COObject *> *)loadedObjectsForUUIDs: (NSArray<ETUUID *> *)UUIDs;
+
+
+/** @taskunit Change Tracking and Snapshot */
+
+
 /**
  * This method is only exposed to be used internally by CoreObject.
  *
@@ -76,60 +86,32 @@ NS_ASSUME_NONNULL_BEGIN
  * instance.
  */
 - (void)markObjectAsUpdated: (COObject *)obj forProperty: (NSString *)aProperty;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-- (void)removeUnreachableObjects;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-- (void)discardAllObjects;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-- (void)replaceObject: (nullable COObject *)anObject withObject: (nullable COObject *)aReplacement;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-@property (nonatomic, readonly, getter=isTrackingSpecificBranch) BOOL trackingSpecificBranch;
 
-
-/** @taskunit Metamodel Access */
-
-
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-+ (NSString *)defaultEntityName;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-+ (ETEntityDescription *)descriptionForItem: (COItem *)anItem
-                 modelDescriptionRepository: (ETModelDescriptionRepository *)aRepository;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-- (ETEntityDescription *)descriptionForItem: (COItem *)anItem;
-
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
+@property (nonatomic, readwrite, assign) BOOL ignoresChangeTrackingNotifications;
 @property (nonatomic, readonly, strong) COItemGraph *modifiedItemsSnapshot;
+
+
+/** @taskunit Cross Persistent Root References */
+
+
+- (void)replaceObject: (nullable COObject *)anObject withObject: (nullable COObject *)aReplacement;
+
+@property (nonatomic, readonly, getter=isTrackingSpecificBranch) BOOL trackingSpecificBranch;
 
 
 /** @taskunit Garbage collection */
 
+
+- (void)removeUnreachableObjects;
+- (void)discardAllObjects;
 /**
  * Should be called by COBranch at every commit.
  */
 - (BOOL)incrementCommitCounterAndCheckIfGCNeeded;
-
 /**
  * Perform tasks needed before each commit. (GC, check for cycles in composites)
  */
 - (void)doPreCommitChecks;
-
-@property (nonatomic, readwrite, assign) BOOL ignoresChangeTrackingNotifications;
 
 @end
 

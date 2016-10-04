@@ -23,13 +23,12 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
 
 @interface COObject ()
 
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
+
+/** @taskunit Initialization */
+
+
 - (nullable Class)coreObjectCollectionClassForPropertyDescription: (ETPropertyDescription *)propDesc;
 /**
- * This method is only exposed to be used internally by CoreObject.
- *
  * Returns a new mutable dictionary to store properties.
  *
  * For multivalued properties not bound to an instance variable, the returned 
@@ -38,8 +37,6 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
  */
 - (NSMutableDictionary *)newVariableStorage;
 /**
- * This method is only exposed to be used internally by CoreObject.
- *
  * Prepares an object to be initialized or deserialized.
  *
  * COObject initialization is broken in two steps:
@@ -56,44 +53,32 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
     entityDescription: (ETEntityDescription *)anEntityDescription
    objectGraphContext: (COObjectGraphContext *)aContext
                 isNew: (BOOL)inserted  __attribute__((objc_method_family(init)));
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
+
 @property (nonatomic, readonly) NSDictionary<NSString *, ETUUID *> *additionalStoreItemUUIDs;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
-@property (nonatomic, readonly, strong) CORelationshipCache *incomingRelationshipCache;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
+
+
+/** @taskunit Status */
+
+
 - (void)markAsRemovedFromContext;
 
 @property (nonatomic, readonly, getter=isLoadingEnabled) BOOL loadingEnabled;
 
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
+
+/** @taskunit Variable Storage */
+
+
 - (nullable id)valueForStorageKey: (NSString *)key;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
 - (nullable id)valueForStorageKey: (NSString *)key shouldLoad: (BOOL)shouldLoad;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
 - (nullable id)serializableValueForStorageKey: (NSString *)key;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
 - (void)setValue: (nullable id)value forStorageKey: (NSString *)key;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
 - (nullable id)valueForProperty: (NSString *)key shouldLoad: (BOOL)shouldLoad;
+
+
+/** @taskunit Mutating Collections */
+
+
 /**
- * This method is only exposed to be used internally by CoreObject.
- *
  * Checks the collection to mutate, and the indexes that goes along, both 
  * respect the metamodel constraints.
  *
@@ -134,13 +119,18 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
             atIndexes: (NSIndexSet *)indexes
                 hints: (NSArray *)hints
           forProperty: (NSString *)key;
-/**
- * This method is only exposed to be used in the CoreObject tests.
- */
+
+
+/** @taskunit Relationship Cache */
+
+
 @property (nonatomic, readonly) NSSet<__kindof COObject *> *referringObjects;
-/**
- * This method is only exposed to be used internally by CoreObject.
- */
+@property (nonatomic, readonly, strong) CORelationshipCache *incomingRelationshipCache;
+
+
+/** @taskunit Cross Persistent Root References */
+
+
 - (void)replaceReferencesToObjectIdenticalTo: (nullable COObject *)anObject
                                   withObject: (nullable COObject *)aReplacement;
 
