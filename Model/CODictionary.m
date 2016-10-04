@@ -116,7 +116,7 @@
 
 - (BOOL)isAdditionalItem
 {
-    return [[self valueForAttribute: kCOItemEntityNameProperty] isEqualToString: @"CODictionary"];
+    return [self.entityName isEqualToString: @"CODictionary"];
 }
 
 @end

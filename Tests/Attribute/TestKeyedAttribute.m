@@ -55,8 +55,7 @@
 - (void)testDictionaryAndModelItems
 {
     UKObjectsEqual([self dictionaryItemUUID], [self dictionaryItem].UUID);
-    UKStringsEqual(@"CODictionary",
-                   [[self dictionaryItem] valueForAttribute: kCOItemEntityNameProperty]);
+    UKStringsEqual(@"CODictionary", [self dictionaryItem].entityName);
 
     UKObjectsEqual(model.UUID, [self modelItem].UUID);
     UKObjectsEqual([self dictionaryItemUUID], [[self modelItem] valueForAttribute: @"entries"]);

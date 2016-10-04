@@ -167,7 +167,7 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 
 - (NSString *)entityName
 {
-    return [self valueForAttribute: kCOItemEntityNameProperty];
+    return values[kCOItemEntityNameProperty];
 }
 
 - (int64_t)packageVersion

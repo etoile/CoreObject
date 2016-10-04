@@ -744,7 +744,7 @@
                 [mediaItem setValue: @"OutlineMedia"
                        forAttribute: kCOItemEntityNameProperty
                                type: kCOTypeString];
-                [mediaItem setValue: [oldItem valueForAttribute: kCOItemPackageNameProperty]
+                [mediaItem setValue: oldItem.packageName
                        forAttribute: kCOItemPackageNameProperty
                                type: [oldItem typeForAttribute: kCOItemPackageNameProperty]];
                 [mediaItem setValue: [oldItem valueForAttribute: kCOItemPackageVersionProperty]

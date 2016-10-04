@@ -215,7 +215,7 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 {
     COMutableItem *pristineItem = [COMutableItem itemWithUUID: item.UUID];
 
-    [pristineItem setValue: [item valueForAttribute: kCOItemEntityNameProperty]
+    [pristineItem setValue: item.entityName
               forAttribute: kCOItemEntityNameProperty
                       type: [item typeForAttribute: kCOItemEntityNameProperty]];
 
