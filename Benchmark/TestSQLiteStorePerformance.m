@@ -231,8 +231,7 @@ static int itemChangedAtCommit(int i)
 
         NSString *expectedLabel = [self labelForCommit: rev child: i];
 
-        UKObjectsEqual(expectedLabel,
-                       [item valueForAttribute: @"name"]);
+        UKObjectsEqual(expectedLabel, item[@"name"]);
 
         // Step back one revision
 
