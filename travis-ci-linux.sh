@@ -78,3 +78,4 @@ cd ..
 # CoreObject
 wget https://raw.githubusercontent.com/etoile/Etoile/master/etoile.make
 make CC="$CLANG" CXX="$CLANGXX" OBJCFLAGS="-fobjc-nonfragile-abi"
+make CC="$CLANG" CXX="$CLANGXX" OBJCFLAGS="-fobjc-nonfragile-abi" test=yes
