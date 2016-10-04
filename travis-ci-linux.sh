@@ -9,6 +9,7 @@ CLANGXX="clang++-3.8"
 sudo apt-get -y install libblocksruntime-dev libkqueue-dev libpthread-workqueue-dev cmake
 sudo apt-get -y install libxml2-dev libxslt1-dev libffi-dev libssl-dev libgnutls-dev libicu-dev libgmp3-dev
 sudo apt-get -y install libjpeg-dev libtiff-dev libpng-dev libgif-dev libx11-dev libcairo2-dev libxft-dev libxmu-dev 
+sudo apt-get -y install libsqlite3-dev
 
 # repos
 git clone https://github.com/nickhutchinson/libdispatch.git
