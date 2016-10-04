@@ -46,7 +46,8 @@ source /usr/local/share/GNUstep/Makefiles/GNUstep.sh || exit 1
 
 # gnustep base
 cd base && git checkout 23a7a83dedf240ac52407426e791c8627116d59e && git clean -dfx
-CC="$CLANG" CXX="$CLANGXX" LDFLAGS=-L/usr/local/lib ./configure && make -j8 && sudo -E make install || exit 1
+CC="$CLANG" CXX="$CLANGXX" LDFLAGS=-L/usr/local/lib ./configure
+make CC="$CLANG" CXX="$CLANGXX" && sudo -E make install || exit 1
 cd ..
 
 # gnustep gui
