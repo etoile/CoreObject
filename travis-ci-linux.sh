@@ -79,3 +79,5 @@ cd ..
 wget https://raw.githubusercontent.com/etoile/Etoile/master/etoile.make
 make CC="$CLANG" CXX="$CLANGXX"
 make CC="$CLANG" CXX="$CLANGXX" test=yes
+ukrun
+
