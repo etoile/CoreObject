@@ -961,9 +961,8 @@ static id deserializeUnivalue(COObject *self, id value, COType type,
                             self.UUID];
     }
 
-    NSString *entityName = [aStoreItem valueForAttribute: kCOItemEntityNameProperty];
     ETEntityDescription *entityDesc =
-        [_objectGraphContext.modelDescriptionRepository descriptionForName: entityName];
+        [_objectGraphContext.modelDescriptionRepository descriptionForName: aStoreItem.entityName];
 
     /* If B is a subclass of A, and a property description type is A but the 
        the property value is a B object, the deserialized property value is 
@@ -973,7 +972,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type,
         // TODO: Rewrite this exception to provide a better explanation.
         [NSException raise: NSInvalidArgumentException
                     format: @"-setStoreItem: called with entity name %@ on COObject with entity name %@",
-                            entityName, self.entityDescription.name];
+                            aStoreItem.entityName, self.entityDescription.name];
 
     }
 
