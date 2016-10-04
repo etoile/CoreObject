@@ -56,7 +56,7 @@
 {
     UKObjectsEqual([self dictionaryItemUUID], [self dictionaryItem].UUID);
     UKStringsEqual(@"CODictionary",
-                   [[self dictionaryItem] valueForAttribute: kCOObjectEntityNameProperty]);
+                   [[self dictionaryItem] valueForAttribute: kCOItemEntityNameProperty]);
 
     UKObjectsEqual(model.UUID, [self modelItem].UUID);
     UKObjectsEqual([self dictionaryItemUUID], [[self modelItem] valueForAttribute: @"entries"]);

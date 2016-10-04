@@ -215,9 +215,9 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
 {
     COMutableItem *pristineItem = [COMutableItem itemWithUUID: item.UUID];
 
-    [pristineItem setValue: [item valueForAttribute: kCOObjectEntityNameProperty]
-              forAttribute: kCOObjectEntityNameProperty
-                      type: [item typeForAttribute: kCOObjectEntityNameProperty]];
+    [pristineItem setValue: [item valueForAttribute: kCOItemEntityNameProperty]
+              forAttribute: kCOItemEntityNameProperty
+                      type: [item typeForAttribute: kCOItemEntityNameProperty]];
 
     return pristineItem;
 }
@@ -227,9 +227,9 @@ static inline COMutableItem *pristineMutableItemFrom(COItem *item)
     if (item.isAdditionalItem)
     {
         return [item.attributeNames arrayByRemovingObjectsInArray:
-            @[kCOObjectEntityNameProperty,
-              kCOObjectPackageNameProperty,
-              kCOObjectPackageVersionProperty]];
+            @[kCOItemEntityNameProperty,
+              kCOItemPackageNameProperty,
+              kCOItemPackageVersionProperty]];
     }
 
     ETEntityDescription *entity = [_modelDescriptionRepository descriptionForName: item.entityName];

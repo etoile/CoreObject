@@ -11,10 +11,10 @@
 #import "COPath.h"
 #import "COAttachmentID.h"
 
-NSString *kCOObjectEntityNameProperty = @"org.etoile-project.coreobject.entityname";
-NSString *kCOObjectPackageVersionProperty = @"org.etoile-project.coreobject.packageversion";
-NSString *kCOObjectPackageNameProperty = @"org.etoile-project.coreobject.packagename";
-NSString *kCOObjectIsSharedProperty = @"isShared";
+NSString *kCOItemEntityNameProperty = @"org.etoile-project.coreobject.entityname";
+NSString *kCOItemPackageVersionProperty = @"org.etoile-project.coreobject.packageversion";
+NSString *kCOItemPackageNameProperty = @"org.etoile-project.coreobject.packagename";
+NSString *kCOItemIsSharedProperty = @"isShared";
 
 static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 {
@@ -141,12 +141,12 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 
 - (NSString *)entityName
 {
-    return [self valueForAttribute: kCOObjectEntityNameProperty];
+    return [self valueForAttribute: kCOItemEntityNameProperty];
 }
 
 - (int64_t)packageVersion
 {
-    NSNumber *version = values[kCOObjectPackageVersionProperty];
+    NSNumber *version = values[kCOItemPackageVersionProperty];
     if (version != nil)
     {
         return version.longLongValue;
@@ -156,7 +156,7 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 
 - (NSString *)packageName
 {
-    return values[kCOObjectPackageNameProperty];
+    return values[kCOItemPackageNameProperty];
 }
 
 - (NSArray *)allObjectsForAttribute: (NSString *)attribute
@@ -478,21 +478,21 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 - (void)setEntityName: (NSString *)entityName
 {
     [self setValue: [entityName copy]
-      forAttribute: kCOObjectEntityNameProperty
+      forAttribute: kCOItemEntityNameProperty
               type: kCOTypeString];
 }
 
 - (void)setPackageVersion: (int64_t)entityVersion
 {
     [self setValue: @(entityVersion)
-      forAttribute: kCOObjectPackageVersionProperty
+      forAttribute: kCOItemPackageVersionProperty
               type: kCOTypeInt64];
 }
 
 - (void)setPackageName: (NSString *)packageName
 {
     [self setValue: [packageName copy]
-      forAttribute: kCOObjectPackageNameProperty
+      forAttribute: kCOItemPackageNameProperty
               type: kCOTypeString];
 }
 

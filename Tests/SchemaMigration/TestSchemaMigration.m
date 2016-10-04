@@ -742,14 +742,14 @@
                 COMutableItem *mediaItem = [COMutableItem item];
 
                 [mediaItem setValue: @"OutlineMedia"
-                       forAttribute: kCOObjectEntityNameProperty
+                       forAttribute: kCOItemEntityNameProperty
                                type: kCOTypeString];
-                [mediaItem setValue: [oldItem valueForAttribute: kCOObjectPackageNameProperty]
-                       forAttribute: kCOObjectPackageNameProperty
-                               type: [oldItem typeForAttribute: kCOObjectPackageNameProperty]];
-                [mediaItem setValue: [oldItem valueForAttribute: kCOObjectPackageVersionProperty]
-                       forAttribute: kCOObjectPackageVersionProperty
-                               type: [oldItem typeForAttribute: kCOObjectPackageVersionProperty]];
+                [mediaItem setValue: [oldItem valueForAttribute: kCOItemPackageNameProperty]
+                       forAttribute: kCOItemPackageNameProperty
+                               type: [oldItem typeForAttribute: kCOItemPackageNameProperty]];
+                [mediaItem setValue: [oldItem valueForAttribute: kCOItemPackageVersionProperty]
+                       forAttribute: kCOItemPackageVersionProperty
+                               type: [oldItem typeForAttribute: kCOItemPackageVersionProperty]];
 
                 mediaItem.packageVersion = migration.destinationVersion;
 

@@ -93,7 +93,7 @@ static NSArray *initialUUIDs;
 
     COMutableItem *style2Item = [COMutableItem itemWithUUID: style2];
     [style2Item setValue: @"style2" forAttribute: @"name" type: kCOTypeString];
-    [style2Item setValue: @NO forAttribute: kCOObjectIsSharedProperty type: kCOTypeInt64];
+    [style2Item setValue: @NO forAttribute: kCOItemIsSharedProperty type: kCOTypeInt64];
 
     initialGraph = [[COItemGraph alloc] initWithItems: @[drawingItem,
                                                          group1Item,

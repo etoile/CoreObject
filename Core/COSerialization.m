@@ -521,12 +521,12 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
                    entityName: (NSString *)anEntityName
            packageDescription: (ETPackageDescription *)package
 {
-    values[kCOObjectEntityNameProperty] = anEntityName;
-    types[kCOObjectEntityNameProperty] = @(kCOTypeString);
-    values[kCOObjectPackageVersionProperty] = @(package.version);
-    types[kCOObjectPackageVersionProperty] = @(kCOTypeInt64);
-    values[kCOObjectPackageNameProperty] = package.name;
-    types[kCOObjectPackageNameProperty] = @(kCOTypeString);
+    values[kCOItemEntityNameProperty] = anEntityName;
+    types[kCOItemEntityNameProperty] = @(kCOTypeString);
+    values[kCOItemPackageVersionProperty] = @(package.version);
+    types[kCOItemPackageVersionProperty] = @(kCOTypeInt64);
+    values[kCOItemPackageNameProperty] = package.name;
+    types[kCOItemPackageNameProperty] = @(kCOTypeString);
 
     return [[COItem alloc] initWithUUID: aUUID
                      typesForAttributes: types
@@ -961,7 +961,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type,
                             self.UUID];
     }
 
-    NSString *entityName = [aStoreItem valueForAttribute: kCOObjectEntityNameProperty];
+    NSString *entityName = [aStoreItem valueForAttribute: kCOItemEntityNameProperty];
     ETEntityDescription *entityDesc =
         [_objectGraphContext.modelDescriptionRepository descriptionForName: entityName];
 
@@ -978,7 +978,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type,
     }
 
     BOOL wasSerializedBeforeSchemaMigrationSupport =
-        aStoreItem.packageName == nil && [aStoreItem valueForAttribute: kCOObjectPackageVersionProperty] == nil;
+        aStoreItem.packageName == nil && [aStoreItem valueForAttribute: kCOItemPackageVersionProperty] == nil;
 
     if (wasSerializedBeforeSchemaMigrationSupport)
         return;
@@ -1007,9 +1007,9 @@ static id deserializeUnivalue(COObject *self, id value, COType type,
 
     for (NSString *property in aStoreItem.attributeNames)
     {
-        if ([property isEqualToString: kCOObjectEntityNameProperty]
-            || [property isEqualToString: kCOObjectPackageVersionProperty]
-            || [property isEqualToString: kCOObjectPackageNameProperty])
+        if ([property isEqualToString: kCOItemEntityNameProperty]
+            || [property isEqualToString: kCOItemPackageVersionProperty]
+            || [property isEqualToString: kCOItemPackageNameProperty])
         {
             // HACK
             continue;

@@ -32,7 +32,7 @@
                 {
                     COItem *refItem = [source itemForUUID: refUUID];
 
-                    if ([[refItem valueForAttribute: kCOObjectIsSharedProperty] isEqual: @NO])
+                    if ([[refItem valueForAttribute: kCOItemIsSharedProperty] isEqual: @NO])
                     {
                         [result addObject: refUUID];
                     }

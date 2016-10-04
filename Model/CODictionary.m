@@ -77,9 +77,9 @@
 
     for (NSString *property in aStoreItem.attributeNames)
     {
-        if ([property isEqualToString: kCOObjectEntityNameProperty]
-            || [property isEqualToString: kCOObjectPackageVersionProperty]
-            || [property isEqualToString: kCOObjectPackageNameProperty])
+        if ([property isEqualToString: kCOItemEntityNameProperty]
+            || [property isEqualToString: kCOItemPackageVersionProperty]
+            || [property isEqualToString: kCOItemPackageNameProperty])
         {
             // HACK
             continue;
@@ -116,7 +116,7 @@
 
 - (BOOL)isAdditionalItem
 {
-    return [[self valueForAttribute: kCOObjectEntityNameProperty] isEqualToString: @"CODictionary"];
+    return [[self valueForAttribute: kCOItemEntityNameProperty] isEqualToString: @"CODictionary"];
 }
 
 @end

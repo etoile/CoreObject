@@ -106,9 +106,9 @@ static void COGraphvizWriteNodeForPathToString(COPath *aPath, NSMutableString *d
 
 static NSString *COPrettyPrintKey(NSString *key)
 {
-    if ([key isEqualToString: kCOObjectEntityNameProperty])
+    if ([key isEqualToString: kCOItemEntityNameProperty])
         return @"<font color=\"red\">entity</font>";
-    else if ([key isEqualToString: kCOObjectIsSharedProperty])
+    else if ([key isEqualToString: kCOItemIsSharedProperty])
         return @"<font color=\"red\">isShared</font>";
     return key;
 }
