@@ -269,11 +269,10 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 
 - (void)setDeleted: (BOOL)deleted
 {
-    [self assertNotZombie];
+    [self checkNotZombie];
+
     if (deleted == self.deleted)
-    {
         return;
-    }
 
     if (deleted)
     {
@@ -348,6 +347,32 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
         md[COPersistentRootName] = [[NSString alloc] initWithString: name];
     }
     self.metadata = md;
+}
+
+#pragma mark Zombie Status -
+
+- (BOOL)isZombie
+{
+    return (_editingContext == nil);
+}
+
+
+- (void)checkNotZombie
+{
+    if (self.isZombie)
+    {
+        [NSException raise: NSInternalInconsistencyException
+                    format: @"You are attempting to call a method of a COPersistentRoot instance "
+                                "that has been detached from its COEditingContext. This should "
+                                "only happen due to buggy application code that hangs on to "
+                                "COPersistentRoot pointers after they are no longer valid."];
+    }
+}
+
+- (void)makeZombie
+{
+    [self checkNotZombie];
+    _editingContext = nil;
 }
 
 #pragma mark Accessing Branches -
@@ -512,11 +537,6 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     [_objectGraphContext discardAllChanges];
 
     ETAssert(!self.hasChanges);
-}
-
-- (BOOL)isZombie
-{
-    return (_editingContext == nil);
 }
 
 #pragma mark Convenience -
@@ -930,21 +950,6 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     [ctx setItemGraph: items];
 
     return ctx;
-}
-
-- (void)assertNotZombie
-{
-    if (self.isZombie)
-    {
-        [NSException raise: NSInternalInconsistencyException
-                    format: @"Method called on zombie COPersistentRoot"];
-    }
-}
-
-- (void)makeZombie
-{
-    [self assertNotZombie];
-    _editingContext = nil;
 }
 
 @end

@@ -742,7 +742,7 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
 
     // Mark the object as a "zombie"
 
-    [anObject markAsRemovedFromContext];
+    [anObject makeZombie];
 
     // Update change tracking
 

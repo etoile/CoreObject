@@ -60,7 +60,7 @@ ETEntityDescription *entityDescriptionForObjectInRepository();
 /** @taskunit Status */
 
 
-- (void)markAsRemovedFromContext;
+- (void)makeZombie;
 
 @property (nonatomic, readonly, getter=isLoadingEnabled) BOOL loadingEnabled;
 

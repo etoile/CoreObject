@@ -115,7 +115,6 @@ extern NSString *const COPersistentRootName;
 /** @taskunit Zombie Status */
 
 
-- (void)assertNotZombie;
 - (void)makeZombie;
 
 @end

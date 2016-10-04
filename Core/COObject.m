@@ -428,9 +428,28 @@ static NSNull *cachedNSNull = nil;
     return (self.persistentRoot != nil);
 }
 
+#pragma mark - Zombie Status
+
 - (BOOL)isZombie
 {
     return _variableStorage == nil;
+}
+
+- (void)checkNotZombie
+{
+    if (self.isZombie)
+    {
+        [NSException raise: NSInternalInconsistencyException
+                    format: @"You are attempting to access a property's variable storage of a "
+                                "COObject instance that has been detached from its COObjectGraphContext. "
+                                "This should only happen due to buggy application code that hangs "
+                                "on to COObject pointers after they are no longer valid."];
+    }
+}
+
+- (void)makeZombie
+{
+    _variableStorage = nil;
 }
 
 #pragma mark - Basic Properties
@@ -854,20 +873,6 @@ static NSNull *cachedNSNull = nil;
     return (!propDesc.persistent && nil != propDesc.opposite && propDesc.opposite.persistent);
 }
 
-- (void)checkIsNotRemovedFromContext
-{
-    // If this assertion fails, it means you are attempting to access a property's variable storage
-    // of a COObject instance that has been "detached" from its COObjectGraphContext (see -markAsRemovedFromContext).
-    //
-    // This should only happen due to buggy application code that hangs on to
-    // COObject pointers after they are no longer valid.
-    //
-    // -markAsRemovedFromContext sets _variableStorage to nil as an indication
-    // that we are a "zombie" object. Another possible check could be:
-    // (self == [_objectGraphContext loadedObjectForUUID: _UUID])
-    ETAssert(_variableStorage != nil);
-}
-
 /**
  * Can return incoming relationships, although they are not stored in the 
  * variable storage. This allows -valueForStorageKey: and -valueForProperty: to 
@@ -879,7 +884,7 @@ static NSNull *cachedNSNull = nil;
 {
     // NOTE: This is just a debugging aid, and the check is only placed
     // here because -valueForVariableStorageKey: is a commonly called method.
-    [self checkIsNotRemovedFromContext];
+    [self checkNotZombie];
 
     ETPropertyDescription *propDesc = [_entityDescription propertyDescriptionForName: key];
 
@@ -1091,7 +1096,7 @@ static NSNull *cachedNSNull = nil;
 {
     // NOTE: This is just a debugging aid, and the check is only placed
     // here because -valueForVariableStorageKey: is a commonly called method.
-    [self checkIsNotRemovedFromContext];
+    [self checkNotZombie];
 
     id value = _variableStorage[key];
 
@@ -1896,18 +1901,19 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
         componentsJoinedByString: @", "];
 }
 
-#pragma mark - Framework Private
+#pragma mark - Cached Relationships
 
 - (CORelationshipCache *)incomingRelationshipCache
 {
     return _incomingRelationshipCache;
 }
 
-- (void)markAsRemovedFromContext
+- (NSSet *)referringObjects
 {
-    // See -checkIsNotRemovedFromContext.
-    _variableStorage = nil;
+    return _incomingRelationshipCache.referringObjects;
 }
+
+#pragma mark - Cross Persistent Root References
 
 /**
  * The -[COObjectGraphContext insertOrUpdateItems:] API may face a situation
@@ -1921,7 +1927,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
  * In this situation, COObjectGraphContext will turn the old object into a zombie,
  * allocate a replacement, find all objects with references to the old object
  * using the relationship cache, and use this method on each of those to fix 
- * up the references to point to the replacement. (not yet implemented).
+ * up the references to point to the replacement.
  */
 - (void)replaceReferencesToObjectIdenticalTo: (COObject *)anObject
                                   withObject: (COObject *)aReplacement
@@ -2109,13 +2115,6 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
 
     self.objectGraphContext.ignoresChangeTrackingNotifications = NO;
     // FIXME: COMutableDictionary
-}
-
-#pragma mark - Debugging / Testing
-
-- (NSSet *)referringObjects
-{
-    return _incomingRelationshipCache.referringObjects;
 }
 
 @end
