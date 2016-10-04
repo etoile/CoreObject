@@ -10,10 +10,10 @@
 
 @class ETUUID;
 
-extern NSString *kCOItemEntityNameProperty;
-extern NSString *kCOItemPackageVersionProperty;
-extern NSString *kCOItemPackageNameProperty;
-extern NSString *kCOItemIsSharedProperty;
+extern NSString *const kCOItemEntityNameProperty;
+extern NSString *const kCOItemPackageVersionProperty;
+extern NSString *const kCOItemPackageNameProperty;
+extern NSString *const kCOItemIsSharedProperty;
 
 /**
  * @group Storage Data Model

@@ -11,10 +11,10 @@
 #import "COPath.h"
 #import "COAttachmentID.h"
 
-NSString *kCOItemEntityNameProperty = @"org.etoile-project.coreobject.entityname";
-NSString *kCOItemPackageVersionProperty = @"org.etoile-project.coreobject.packageversion";
-NSString *kCOItemPackageNameProperty = @"org.etoile-project.coreobject.packagename";
-NSString *kCOItemIsSharedProperty = @"isShared";
+NSString *const kCOItemEntityNameProperty = @"org.etoile-project.coreobject.entityname";
+NSString *const kCOItemPackageVersionProperty = @"org.etoile-project.coreobject.packageversion";
+NSString *const kCOItemPackageNameProperty = @"org.etoile-project.coreobject.packagename";
+NSString *const kCOItemIsSharedProperty = @"isShared";
 
 static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 {

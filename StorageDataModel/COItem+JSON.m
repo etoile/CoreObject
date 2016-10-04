@@ -16,9 +16,9 @@
 // Semi-hack: we store the UUID alongside the real object properties.
 // This property name is reserved for JSON serialization and cannot be used
 // as an actual property name.
-NSString *kCOJSONObjectUUIDProperty = @"org.etoile-project.coreobject.uuid";
-NSString *kCOJSONFormatProperty = @"org.etoile-project.coreobject.json-format";
-NSString *kCOJSONFormat1_0 = @"1.0";
+NSString *const kCOJSONObjectUUIDProperty = @"org.etoile-project.coreobject.uuid";
+NSString *const kCOJSONFormatProperty = @"org.etoile-project.coreobject.json-format";
+NSString *const kCOJSONFormat1_0 = @"1.0";
 // COType -> string
 
 static NSString *arraySuffix = @"-array";

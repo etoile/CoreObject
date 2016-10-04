@@ -366,10 +366,10 @@ static void validateMainBundlePreferredLocalizations()
 
 @end
 
-NSString *kCOCommitMetadataIdentifier = @"kCOCommitMetadataIdentifier";
-NSString *kCOCommitMetadataTypeDescription = @"kCOCommitMetadataTypeDescription";
-NSString *kCOCommitMetadataShortDescription = @"kCOCommitMetadataShortDescription";
-NSString *kCOCommitMetadataShortDescriptionArguments = @"kCOCommitMetadataShortDescriptionArguments";
-NSString *kCOCommitMetadataUndoBaseUUID = @"kCOCommitMetadataUndoBaseUUID";
-NSString *kCOCommitMetadataUndoType = @"kCOCommitMetadataUndoType";
-NSString *kCOCommitMetadataUndoInitialBaseInversed = @"kCOCommitMetadataUndoInitialBaseInversed";
+NSString *const kCOCommitMetadataIdentifier = @"kCOCommitMetadataIdentifier";
+NSString *const kCOCommitMetadataTypeDescription = @"kCOCommitMetadataTypeDescription";
+NSString *const kCOCommitMetadataShortDescription = @"kCOCommitMetadataShortDescription";
+NSString *const kCOCommitMetadataShortDescriptionArguments = @"kCOCommitMetadataShortDescriptionArguments";
+NSString *const kCOCommitMetadataUndoBaseUUID = @"kCOCommitMetadataUndoBaseUUID";
+NSString *const kCOCommitMetadataUndoType = @"kCOCommitMetadataUndoType";
+NSString *const kCOCommitMetadataUndoInitialBaseInversed = @"kCOCommitMetadataUndoInitialBaseInversed";

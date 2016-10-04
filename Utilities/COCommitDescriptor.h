@@ -288,17 +288,17 @@
  * The key used to identify -[COCommitDescriptor identifier] among the commit 
  * metadata.
  */
-extern NSString *kCOCommitMetadataIdentifier;
+extern NSString *const kCOCommitMetadataIdentifier;
 /**
  * The key used to identify -[COCommitDescriptor typeDescription] among the 
  * commit metadata.
  */
-extern NSString *kCOCommitMetadataTypeDescription;
+extern NSString *const kCOCommitMetadataTypeDescription;
 /**
  * The key used to identify -[COCommitDescriptor shortDescription] among the
  * commit metadata.
  */
-extern NSString *kCOCommitMetadataShortDescription;
+extern NSString *const kCOCommitMetadataShortDescription;
 /**
  * The optional key used to identify -[COCommitDescriptor shortDescriptionArguments] 
  * among the commit metadata.
@@ -314,7 +314,7 @@ extern NSString *kCOCommitMetadataShortDescription;
  *
  * See also COCommitDescription Localization documentation section.
  */
-extern NSString *kCOCommitMetadataShortDescriptionArguments;
+extern NSString *const kCOCommitMetadataShortDescriptionArguments;
 /**
  * The optional key that indicates the command group UUID which this commit 
  * selectively applies or undoes.
@@ -328,7 +328,7 @@ extern NSString *kCOCommitMetadataShortDescriptionArguments;
  * <item>kCOCommitMetadataUndoInitialBaseInversed</item>
  * </list>
  */
-extern NSString *kCOCommitMetadataUndoBaseUUID;
+extern NSString *const kCOCommitMetadataUndoBaseUUID;
 /**
  * The optional key used to describe the commit operation (e.g. selective
  * undo/redo or implicit undo due to a pattern undo track manipulation).
@@ -340,7 +340,7 @@ extern NSString *kCOCommitMetadataUndoBaseUUID;
  * kCOCommitMetadataShortDescription + kCOCommitMetadataShortDescriptionArguments 
  * into the short description template for the operation identifier.
  */
-extern NSString *kCOCommitMetadataUndoType;
+extern NSString *const kCOCommitMetadataUndoType;
 /**
  * The optional key that indicates whether the commit was created by inversing 
  * the oldest command found by traversing kCOCommitMetadataUndoBaseUUID (until
@@ -348,4 +348,4 @@ extern NSString *kCOCommitMetadataUndoType;
  *
  * The value is a NSNumber boolean.
  */
-extern NSString *kCOCommitMetadataUndoInitialBaseInversed;
+extern NSString *const kCOCommitMetadataUndoInitialBaseInversed;

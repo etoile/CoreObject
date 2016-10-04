@@ -61,6 +61,6 @@
 
 @end
 
-NSString *kCOCoreObjectErrorDomain = @"kCOCoreObjectErrorDomain";
-NSInteger kCOValidationError = 0;
-NSInteger kCOValidationMultipleErrorsError = 1;
+NSString *const kCOCoreObjectErrorDomain = @"kCOCoreObjectErrorDomain";
+const NSInteger kCOValidationError = 0;
+const NSInteger kCOValidationMultipleErrorsError = 1;

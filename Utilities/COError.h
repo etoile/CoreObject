@@ -84,12 +84,12 @@
  * The error domain to identity errors emitted by CoreObject itself, and not 
  * some other layers such as Foundation or POSIX.
  */
-extern NSString *kCOCoreObjectErrorDomain;
+extern NSString *const kCOCoreObjectErrorDomain;
 /**
  * See -[COError validationResult].
  */
-extern NSInteger kCOValidationError;
+extern const NSInteger kCOValidationError;
 /**
  * See -[COError errors].
  */
-extern NSInteger kCOValidationMultipleErrorsError;
+extern const NSInteger kCOValidationMultipleErrorsError;
