@@ -68,12 +68,6 @@ extern NSString *const kCOItemIsSharedProperty;
 - (id)valueForAttribute: (NSString *)anAttribute;
 
 
-/** @taskunit Accessing Attributes With Subscripting */
-
-
-- (id)objectForKeyedSubscript: (NSString *)key;
-
-
 /** @taskunit Convenience */
 
 
@@ -148,12 +142,6 @@ extern NSString *const kCOItemIsSharedProperty;
     forAttribute: (NSString *)anAttribute
             type: (COType)aType;
 - (void)removeValueForAttribute: (NSString *)anAttribute;
-
-
-/** @taskunit Updating Attributes With Subscripting */
-
-
-- (void)setObject: (id)obj forKeyedSubscript: (NSString *)key;
 
 
 /** @taskunit Convenience */

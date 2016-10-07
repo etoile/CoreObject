@@ -157,11 +157,6 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
     return values[anAttribute];
 }
 
-- (id)objectForKeyedSubscript: (NSString *)key
-{
-    return values[key];
-}
-
 #pragma mark Convenience -
 
 
@@ -480,11 +475,6 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
 {
     [(NSMutableDictionary *)types removeObjectForKey: anAttribute];
     [(NSMutableDictionary *)values removeObjectForKey: anAttribute];
-}
-
-- (void)setObject: (id)obj forKeyedSubscript: (NSString *)key
-{
-    values[key] = obj;
 }
 
 #pragma mark Convenience -
