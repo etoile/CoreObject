@@ -113,7 +113,7 @@ void co_reader_read(const unsigned char *bytes,
             }
             case 's':
             {
-                uint8_t dataLen = readUint8(&bytes[pos]);
+                const uint8_t dataLen = readUint8(&bytes[pos]);
                 pos++;
 
                 NSString *str = [[NSString alloc] initWithBytes: bytes + pos
@@ -125,7 +125,7 @@ void co_reader_read(const unsigned char *bytes,
             }
             case 'S':
             {
-                uint32_t dataLen = readUint32(&bytes[pos]);
+                const uint32_t dataLen = readUint32(&bytes[pos]);
                 pos += 4;
 
                 NSString *str = [[NSString alloc] initWithBytes: bytes + pos
@@ -137,7 +137,7 @@ void co_reader_read(const unsigned char *bytes,
             }
             case 'd':
             {
-                uint8_t dataLen = readUint8(&bytes[pos]);
+                const uint8_t dataLen = readUint8(&bytes[pos]);
                 pos++;
                 callbacks.co_read_bytes(context, bytes + pos, dataLen);
                 pos += dataLen;
@@ -145,7 +145,7 @@ void co_reader_read(const unsigned char *bytes,
             }
             case 'D':
             {
-                uint32_t dataLen = readUint32(&bytes[pos]);
+                const uint32_t dataLen = readUint32(&bytes[pos]);
                 pos += 4;
                 callbacks.co_read_bytes(context, bytes + pos, dataLen);
                 pos += dataLen;
