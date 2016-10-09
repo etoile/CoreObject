@@ -270,7 +270,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
             if (!isPresent)
                 [insertedUUIDs addObject: modifiedUUID];
 
-            int64_t newValue = clientValue + 1;
+            const int64_t newValue = clientValue + 1;
 
             [db_ executeUpdate: @"UPDATE persistentroots SET transactionid = ? WHERE uuid = ?",
                                 @(newValue), [modifiedUUID dataValue]];
@@ -753,14 +753,14 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
         NSLog(@"Merge parent revision not found: %@", aMergeParent);
     }
 
-    BOOL ok = [backing writeItemGraph: anItemTree
-                         revisionUUID: aRevisionUUID
-                         withMetadata: metadata
-                           withParent: parentRevid
-                      withMergeParent: mergeParentRevid
-                           branchUUID: branch
-                   persistentrootUUID: aUUID
-                                error: NULL];
+    const BOOL ok = [backing writeItemGraph: anItemTree
+                               revisionUUID: aRevisionUUID
+                               withMetadata: metadata
+                                 withParent: parentRevid
+                            withMergeParent: mergeParentRevid
+                                 branchUUID: branch
+                         persistentrootUUID: aUUID
+                                      error: NULL];
 
     if (!ok)
     {
@@ -1203,8 +1203,8 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
         if (bs == nil)
             return;
 
-        uint64_t exportsize = bs.fileSize;
-        uint64_t usedsize = [bs.UUID isEqual: aUUID] ? exportsize : 0;
+        const uint64_t exportsize = bs.fileSize;
+        const uint64_t usedsize = [bs.UUID isEqual: aUUID] ? exportsize : 0;
 
         result = @{COPersistentRootAttributeExportSize: @(exportsize),
                    COPersistentRootAttributeUsedSize: @(usedsize)};
