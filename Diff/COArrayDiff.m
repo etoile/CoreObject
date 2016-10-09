@@ -18,11 +18,11 @@ static bool comparefn(size_t i, size_t j, const void *userdata1, const void *use
 
 void CODiffArrays(NSArray *a, NSArray *b, id <CODiffArraysDelegate> delegate, id userInfo)
 {
-    const diffresult_t *const result = diff_arrays(a.count,
-                                                   b.count,
-                                                   comparefn,
-                                                   (__bridge const void *)(a),
-                                                   (__bridge const void *)(b));
+    const diffresult_t *result = diff_arrays(a.count,
+                                             b.count,
+                                             comparefn,
+                                             (__bridge const void *)(a),
+                                             (__bridge const void *)(b));
 
     for (size_t i = 0; i < diff_editcount(result); i++)
     {
