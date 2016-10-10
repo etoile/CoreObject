@@ -242,7 +242,7 @@
                                                          count: NUM_PERSISTENT_ROOTS];
 
 
-    NSTimeInterval creationTime = [[NSDate date] timeIntervalSinceDate: startDate];
+    const NSTimeInterval creationTime = [[NSDate date] timeIntervalSinceDate: startDate];
     NSLog(@"Time to commit %d new persistent roots with undo track: %0.2fs",
           NUM_PERSISTENT_ROOTS,
           creationTime);
@@ -253,13 +253,13 @@
         [self commitSessionWithPersons: proots onUndoTrack: track];
     }
 
-    NSTimeInterval commitTime = [[NSDate date] timeIntervalSinceDate: startDate];
+    const NSTimeInterval commitTime = [[NSDate date] timeIntervalSinceDate: startDate];
     NSLog(@"Time to make %d commits with undo track: %0.2fs", NUM_COMMITS, commitTime);
     startDate = [NSDate date];
 
     [track setCurrentNode: track.nodes.firstObject];
 
-    NSTimeInterval goToFirstNodeTime = [[NSDate date] timeIntervalSinceDate: startDate];
+    const NSTimeInterval goToFirstNodeTime = [[NSDate date] timeIntervalSinceDate: startDate];
     NSLog(@"Time to go to oldest node on undo track: %0.2fs", goToFirstNodeTime);
     startDate = [NSDate date];
 
@@ -267,7 +267,7 @@
 
     [track setCurrentNode: track.nodes.lastObject];
 
-    NSTimeInterval goToLastNodeTime = [[NSDate date] timeIntervalSinceDate: startDate];
+    const NSTimeInterval goToLastNodeTime = [[NSDate date] timeIntervalSinceDate: startDate];
     NSLog(@"Time to go to newest node on undo track: %0.2fs", goToLastNodeTime);
 
     UKTrue(goToLastNodeTime < 5.0); // FIXME: 0.5

@@ -133,7 +133,7 @@ TIME_METHOD(timeToCreateCoreObjectGraph, CREATION_ITERATIONS, [self createCoreOb
     NSTimeInterval timeToCreateFoundationObjectGraph = [self timeToCreateFoundationObjectGraph];
     NSTimeInterval timeToCreateCoreObjectGraph = [self timeToCreateCoreObjectGraph];
 
-    double coreObjectTimesWorse = timeToCreateCoreObjectGraph / timeToCreateFoundationObjectGraph;
+    const double coreObjectTimesWorse = timeToCreateCoreObjectGraph / timeToCreateFoundationObjectGraph;
 
     NSLog(@"Foundation object graph took %f us, core object graph took %f us. CO is %f times worse.",
           timeToCreateFoundationObjectGraph * 1000000,
@@ -158,7 +158,7 @@ TIME_METHOD_WITH_EXPECTED_RESULT(timeToAccessCoreObjectStringProperty,
     NSTimeInterval timeToAccessFoundationObjectStringProperty = [self timeToAccessFoundationObjectStringProperty];
     NSTimeInterval timeToAccessCoreObjectStringProperty = [self timeToAccessCoreObjectStringProperty];
 
-    double coreObjectTimesWorse = timeToAccessCoreObjectStringProperty / timeToAccessFoundationObjectStringProperty;
+    const double coreObjectTimesWorse = timeToAccessCoreObjectStringProperty / timeToAccessFoundationObjectStringProperty;
 
     NSLog(@"Foundation object graph string property acces took %f us, core object graph string property access took %f us. CO is %f times worse.",
           timeToAccessFoundationObjectStringProperty * 1000000,
@@ -183,7 +183,7 @@ TIME_METHOD_WITH_EXPECTED_RESULT(timeToAccessCoreObjectOrderedRelationship,
     NSTimeInterval timeToAccessFoundationObjectOrderedRelationship = [self timeToAccessFoundationObjectOrderedRelationship];
     NSTimeInterval timeToAccessCoreObjectOrderedRelationship = [self timeToAccessCoreObjectOrderedRelationship];
 
-    double coreObjectTimesWorse = timeToAccessCoreObjectOrderedRelationship / timeToAccessFoundationObjectOrderedRelationship;
+    const double coreObjectTimesWorse = timeToAccessCoreObjectOrderedRelationship / timeToAccessFoundationObjectOrderedRelationship;
 
     NSLog(@"Foundation object graph ordered relationship acces took %f us, core object graph ordered relationship access took %f us. CO is %f times worse.",
           timeToAccessFoundationObjectOrderedRelationship * 1000000,
@@ -231,7 +231,7 @@ TIME_METHOD(timeToModifyCoreObjectOrderedRelationship,
     UKObjectsEqual(A(foundationChild1, foundationChild2, foundationChild3),
                    foundationParent.arrayProperty);
 
-    double coreObjectTimesWorse = timeToModifyCoreObjectOrderedRelationship / timeToModifyFoundationObjectOrderedRelationship;
+    const double coreObjectTimesWorse = timeToModifyCoreObjectOrderedRelationship / timeToModifyFoundationObjectOrderedRelationship;
 
     NSLog(@"Foundation relationship modifications took %f us, core object relationship modification took %f us. CO is %f times worse.",
           timeToModifyFoundationObjectOrderedRelationship * US_PER_SECOND,
@@ -262,8 +262,8 @@ static const int DEFAULT_ITERATIONS = 1000;
 
 static NSString *FormatTimeInterval(NSTimeInterval s)
 {
-    double us = s * US_PER_SECOND;
-    double ms = s * 1000.0;
+    const double us = s * US_PER_SECOND;
+    const double ms = s * 1000.0;
     if (ms > 1000)
         return [NSString stringWithFormat: @"%f s", s];
     else if (us > 1000)
@@ -276,7 +276,7 @@ static NSString *FormatTimeInterval(NSTimeInterval s)
        iterations: (NSUInteger)iterations
           message: (NSString *)message
 {
-    NSTimeInterval time = [self timeBlock: aBlock iterations: iterations];
+    const NSTimeInterval time = [self timeBlock: aBlock iterations: iterations];
     NSLog(@"%@ per iteration for '%@'", FormatTimeInterval(time), message);
 }
 

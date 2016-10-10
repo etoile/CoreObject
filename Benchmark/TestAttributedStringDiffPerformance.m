@@ -78,7 +78,7 @@
     NSTimeInterval diffTime = [self timeToDiffAttributedString: as1 withAttributedString: as2];
     NSTimeInterval copyTime = [self timeToCopyObjectGraph: ctx1];
 
-    double diffTimesFaster = copyTime / diffTime;
+    const double diffTimesFaster = copyTime / diffTime;
     UKTrue(diffTimesFaster >= 5);
 
     NSLog(@"COAttributedStringDiff diff with a trivial insertion and %d chunks took %d ms. Copying %d objects took %d ms. Expected diff to be at least 5x faster than copy, was %f x faster.",
