@@ -23,7 +23,7 @@
     op.source = nil;
     op.attributedStringItemGraph = [[COItemGraph alloc] initWithItemGraph: source];
 
-    NSInteger delta = [op applyOperationToAttributedString: target.rootObject withOffset: 0];
+    const NSInteger delta = [op applyOperationToAttributedString: target.rootObject withOffset: 0];
     UKIntsEqual(2, delta);
 
     [self checkCOAttributedString: target.rootObject
@@ -38,7 +38,7 @@
     op.range = NSMakeRange(2, 5);
     op.source = nil;
 
-    NSInteger delta = [op applyOperationToAttributedString: target.rootObject withOffset: 0];
+    const NSInteger delta = [op applyOperationToAttributedString: target.rootObject withOffset: 0];
     UKIntsEqual(-5, delta);
 
     [self checkCOAttributedString: target.rootObject equalsHTML: @"<B>ab</B><I>hi</I>"];
@@ -54,7 +54,7 @@
     op.attributedStringItemGraph = [[COItemGraph alloc] initWithItemGraph: source];
     op.source = nil;
 
-    NSInteger delta = [op applyOperationToAttributedString: target.rootObject withOffset: 0];
+    const NSInteger delta = [op applyOperationToAttributedString: target.rootObject withOffset: 0];
     UKIntsEqual(-3, delta);
 
     [self checkCOAttributedString: target.rootObject
@@ -74,7 +74,7 @@
     op.attributeItemGraph = [[COItemGraph alloc] initWithItemGraph: source];
     op.source = nil;
 
-    NSInteger delta = [op applyOperationToAttributedString: target.rootObject withOffset: 0];
+    const NSInteger delta = [op applyOperationToAttributedString: target.rootObject withOffset: 0];
     UKIntsEqual(0, delta);
 
     [self checkCOAttributedString: target.rootObject equalsHTML: @"Hello <B>World</B>"];
@@ -93,7 +93,7 @@
     op.attributeItemGraph = [[COItemGraph alloc] initWithItemGraph: source];
     op.source = nil;
 
-    NSInteger delta = [op applyOperationToAttributedString: target.rootObject withOffset: 0];
+    const NSInteger delta = [op applyOperationToAttributedString: target.rootObject withOffset: 0];
     UKIntsEqual(0, delta);
 
     [self checkCOAttributedString: target.rootObject equalsHTML: @"<B>Hello </B>World"];

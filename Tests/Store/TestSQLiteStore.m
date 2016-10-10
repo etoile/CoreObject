@@ -695,8 +695,8 @@ static ETUUID *childUUID2;
     [store testingRunBlockInStoreQueue:
         ^()
         {
-            BOOL hasCommitsTable = [store.database tableExists: [NSString stringWithFormat: @"commits-%@", aUUID]];
-            BOOL hasMetadataTable = [store.database tableExists: [NSString stringWithFormat: @"metadata-%@", aUUID]];
+            const BOOL hasCommitsTable = [store.database tableExists: [NSString stringWithFormat: @"commits-%@", aUUID]];
+            const BOOL hasMetadataTable = [store.database tableExists: [NSString stringWithFormat: @"metadata-%@", aUUID]];
 
             if (flag)
             {

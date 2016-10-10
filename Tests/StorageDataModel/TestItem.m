@@ -144,7 +144,7 @@
 
 - (void)testBlob
 {
-    NSUInteger big = UINT8_MAX * 2;
+    const NSUInteger big = UINT8_MAX * 2;
     void *buffer = malloc(big);
 
     NSData *threeBytes = [NSData dataWithBytes: "xyz" length: 3];
