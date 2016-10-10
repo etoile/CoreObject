@@ -18,7 +18,7 @@ static bool comparefn(size_t i, size_t j, const void *userdata1, const void *use
 
 void CODiffArrays(NSArray *a, NSArray *b, id <CODiffArraysDelegate> delegate, id userInfo)
 {
-    const diffresult_t *result = diff_arrays(a.count,
+    diffresult_t *result = diff_arrays(a.count,
                                              b.count,
                                              comparefn,
                                              (__bridge const void *)(a),
@@ -26,7 +26,7 @@ void CODiffArrays(NSArray *a, NSArray *b, id <CODiffArraysDelegate> delegate, id
 
     for (size_t i = 0; i < diff_editcount(result); i++)
     {
-        diffedit_t edit = diff_edit_at_index(result, i);
+        const diffedit_t edit = diff_edit_at_index(result, i);
 
         const NSRange firstRange = NSMakeRange(edit.range_in_a.location, edit.range_in_a.length);
         const NSRange secondRange = NSMakeRange(edit.range_in_b.location, edit.range_in_b.length);
