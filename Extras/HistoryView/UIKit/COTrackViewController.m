@@ -68,7 +68,7 @@
 - (id <COTrackNode>)nodeForRowAtIndexPath: (NSIndexPath *)indexPath
 {
     NSArray *nodes = self.track.nodes;
-    NSInteger reversedIndex = nodes.count - 1 - indexPath.row;
+    const NSInteger reversedIndex = nodes.count - 1 - indexPath.row;
 
     return nodes[reversedIndex];
 }
@@ -107,7 +107,7 @@
 
 - (UITableViewCell *)makeCellForNode: (id <COTrackNode>)node
 {
-    static NSString *TrackCellIdentifier = @"TrackCell";
+    static const NSString *const TrackCellIdentifier = @"TrackCell";
     UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier: TrackCellIdentifier];
 
     if (cell == nil)
