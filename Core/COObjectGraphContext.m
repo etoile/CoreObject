@@ -918,7 +918,7 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
 - (void)replaceObject: (COObject *)anObject withObject: (COObject *)aReplacement
 {
     NSSet *referringObjects = nil;
-    BOOL isUndeletion = (anObject == nil);
+    const BOOL isUndeletion = (anObject == nil);
 
     if (isUndeletion)
     {

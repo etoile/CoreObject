@@ -440,7 +440,7 @@
     // See documentation above
     if (faulting)
     {
-        BOOL isUnloaded = _loadedPersistentRoots[aPersistentRoot.UUID] == nil;
+        const BOOL isUnloaded = _loadedPersistentRoots[aPersistentRoot.UUID] == nil;
 
         ETAssert(aPersistentRoot.deleted || isUnloaded || (aBranch != nil && aBranch.deleted));
     }
@@ -467,7 +467,7 @@
         /* When we are not deleting a persistent root or branch explicitly, but
            reloading persistent roots, we must take in account that branches can
            become deleted when their persistent root doesn't (isDeletion is NO) */
-        BOOL isTargetFaulting = faulting || target.branch.deleted;
+        const BOOL isTargetFaulting = faulting || target.branch.deleted;
         /* Fix references in all branches that belong to persistent roots
            referencing the deleted persistent root (those are relationship sources) */
         NSMutableSet *sourceObjectGraphs = [NSMutableSet new];
@@ -947,7 +947,7 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
                 return;
             }
 
-            int64_t notifTransaction = notifTransactionObj.longLongValue;
+            const int64_t notifTransaction = notifTransactionObj.longLongValue;
 
             /* When we have committed the changes explicitly, we send
                COPersistentRootDidChangeNotification later with

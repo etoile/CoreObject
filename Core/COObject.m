@@ -234,7 +234,7 @@ static NSNull *cachedNSNull = nil;
             continue;
 
         id value = nil;
-        BOOL ivarExists = ETGetInstanceVariableValueForKey(self, &value, propDesc.name);
+        const BOOL ivarExists = ETGetInstanceVariableValueForKey(self, &value, propDesc.name);
 
         if (ivarExists)
             continue;
@@ -598,7 +598,7 @@ static NSNull *cachedNSNull = nil;
 
     COEditingContext *valueEditingContext = value.persistentRoot.editingContext;
     COEditingContext *currentEditingContext = self.persistentRoot.editingContext;
-    BOOL involvesTransientObject = (valueEditingContext == nil || currentEditingContext == nil);
+    const BOOL involvesTransientObject = (valueEditingContext == nil || currentEditingContext == nil);
 
     return (involvesTransientObject || valueEditingContext == currentEditingContext);
 }
@@ -617,8 +617,8 @@ static NSNull *cachedNSNull = nil;
         /* Composite and container are relationship opposite in the metamodel */
         COObject *parent = (propertyDesc.isComposite ? self : value);
         COObject *child = (propertyDesc.isComposite ? value : self);
-        BOOL involvesTransientParent = (parent.persistentRoot == nil);
-        BOOL involvesTransientChild = (child.persistentRoot == nil);
+        const BOOL involvesTransientParent = (parent.persistentRoot == nil);
+        const BOOL involvesTransientChild = (child.persistentRoot == nil);
 
         /* For a composite/container relationship, parent and child can't be 
            references accross object graph contexts (or persistent roots), 
@@ -709,7 +709,7 @@ static NSNull *cachedNSNull = nil;
     }
     else
     {
-        BOOL isDeadRef = [value isKindOfClass: [COPath class]];
+        const BOOL isDeadRef = [value isKindOfClass: [COPath class]];
 
         ETAssert(isDeadRef || [self isObjectGraphContextValidForObject: (COObject *)value
                                                    propertyDescription: propertyDesc]);
@@ -796,9 +796,9 @@ static NSNull *cachedNSNull = nil;
 - (ETValidationResult *)validateValueUsingModel: (id)value forProperty: (NSString *)property
 {
     const char *key = property.UTF8String;
-    size_t keyLength = strlen(key);
+    const size_t keyLength = strlen(key);
     const char *prefix = "validate";
-    size_t prefixLength = strlen(prefix);
+    const size_t prefixLength = strlen(prefix);
     char validator[prefixLength + keyLength + 2];
 
     memcpy(validator, prefix, prefixLength);
@@ -1303,8 +1303,8 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
                                                                                      repo);
     assert(newValueEntityDesc != nil);
 
-    BOOL isValidValue = [propertyDesc.type isValidValue: singleValue
-                                                   type: newValueEntityDesc];
+    const BOOL isValidValue = [propertyDesc.type isValidValue: singleValue
+                                                         type: newValueEntityDesc];
 
     if (isValidValue || isValidDeadReferenceForPropertyDescription(singleValue, propertyDesc))
         return;
@@ -1356,8 +1356,8 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
         return;
 
     ETModelDescriptionRepository *repo = _objectGraphContext.modelDescriptionRepository;
-    BOOL isPersistentRelationship = propertyDesc.isPersistentRelationship;
-    BOOL isValidatableType = ([self serializationGetterForProperty: propertyDesc.name] == NULL);
+    const BOOL isPersistentRelationship = propertyDesc.isPersistentRelationship;
+    const BOOL isValidatableType = ([self serializationGetterForProperty: propertyDesc.name] == NULL);
 
     if (!isValidatableType)
         return;
@@ -1382,7 +1382,7 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
     {
         if (isPersistentRelationship)
         {
-            BOOL isDeadRef = [newValue isKindOfClass: [COPath class]];
+            const BOOL isDeadRef = [newValue isKindOfClass: [COPath class]];
 
             ETAssert(isDeadRef || [self isEditingContextValidForObject: (COObject *)newValue]);
             ETAssert(isDeadRef || [self isObjectGraphContextValidForObject: (COObject *)newValue
@@ -1935,8 +1935,8 @@ static void validateSingleValueConformsToPropertyDescriptionInRepository(id sing
     ETAssert(!(anObject == nil && aReplacement == nil));
     id object = anObject;
     id replacement = aReplacement;
-    BOOL isUndeletion = (anObject == nil);
-    BOOL isDeletion = (aReplacement == nil);
+    const BOOL isUndeletion = (anObject == nil);
+    const BOOL isDeletion = (aReplacement == nil);
 
     if (isDeletion)
     {
