@@ -246,14 +246,26 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
     COThrowExceptionIfNotMutable(_permanentlyMutable, _temporaryMutable);
     COThrowExceptionIfOutOfBounds(self, index, YES);
 
-    NSUInteger backingIndex = [self backingIndex: index];
+    // NSPointerArray on 10.9 (at least) doesn't allow inserting at the end using index == count, so
+    // call addPointer in that case as a workaround.
+    if (index == _externalIndexToBackingIndex.count)
+    {
+        // insert at end
+        [_externalIndexToBackingIndex addPointer: (void *)_backing.count];
+        [_backing addPointer: (__bridge void *)anObject];
+    }
+    else
+    {
+        // insert in the beginning or middle
+        NSUInteger backingIndex = [self backingIndex: index];
 
-    [self shiftBackingIndicesGreaterThanOrEqualTo: backingIndex by: 1];
+        [self shiftBackingIndicesGreaterThanOrEqualTo: backingIndex by: 1];
 
-    [_externalIndexToBackingIndex insertPointer: (void *)backingIndex
-                                        atIndex: index];
-    [_backing insertPointer: (__bridge void *)anObject
-                    atIndex: backingIndex];
+        [_externalIndexToBackingIndex insertPointer: (void *)backingIndex
+                                            atIndex: index];
+        [_backing insertPointer: (__bridge void *)anObject
+                        atIndex: backingIndex];
+    }
 }
 
 - (void)removeLastObject
