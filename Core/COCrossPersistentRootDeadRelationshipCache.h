@@ -56,6 +56,10 @@ NS_ASSUME_NONNULL_BEGIN
  * When a persistent root or branch is unloaded, any matching paths should be 
  * kept in the cache, in case it gets reloaded later (we cannot figure out cross 
  * persistent root incoming relationships from the reloading).
+ *
+ * For referring object graph contexts, when unloaded or finalized, the
+ * deallocation will trigger their removal of their inner objects from the hash
+ * tables in the cache on 10.8 or iOS 6 or higher, which we require.
  */
 - (void)removePath: (COPath *)aPath;
 
