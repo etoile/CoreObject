@@ -82,7 +82,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
 
     if (strcmp(type, @encode(NSPoint)) == 0)
     {
-        NSPoint point = value.pointValue;
+        const NSPoint point = value.pointValue;
         if (NSEqualPoints(point, CONullPoint))
         {
             return @"null-point";
@@ -91,7 +91,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
     }
     else if (strcmp(type, @encode(NSSize)) == 0)
     {
-        NSSize size = value.sizeValue;
+        const NSSize size = value.sizeValue;
         if (NSEqualSizes(size, CONullSize))
         {
             return @"null-size";
@@ -100,7 +100,7 @@ Nil is returned when the value type is unsupported by CoreObject serialization. 
     }
     else if (strcmp(type, @encode(NSRect)) == 0)
     {
-        NSRect rect = value.rectValue;
+        const NSRect rect = value.rectValue;
         if (NSEqualRects(rect, CONullRect))
         {
             return @"null-rect";
@@ -475,9 +475,9 @@ static inline BOOL isSerializableScalarTypeName(NSString *aTypeName)
 - (SEL)serializationGetterForProperty: (NSString *)property
 {
     const char *key = property.UTF8String;
-    size_t keyLength = strlen(key);
+    const size_t keyLength = strlen(key);
     const char *prefix = "serialized";
-    size_t prefixLength = strlen(prefix);
+    const size_t prefixLength = strlen(prefix);
     char getter[prefixLength + keyLength + 1];
 
     memcpy(getter, prefix, prefixLength);
@@ -743,7 +743,7 @@ multivaluedPropertyDescription: (ETPropertyDescription *)aPropertyDesc
                  @"Serialization type doesn't match metamodel");
 
         ETUUID *itemUUID = _additionalStoreItemUUIDs[aPropertyDesc.name];
-        BOOL isNewObjectFromDeserialization = [itemUUID isEqual: null];
+        const BOOL isNewObjectFromDeserialization = [itemUUID isEqual: null];
 
         if (isNewObjectFromDeserialization)
         {
@@ -820,7 +820,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type,
     ETPropertyDescription *aPropertyDesc)
 {
     NSString *typeName = aPropertyDesc.persistentType.name;
-    BOOL isNull = (value == null);
+    const BOOL isNull = (value == null);
     id result = value;
 
     if (isNull)
@@ -834,10 +834,10 @@ static id deserializeUnivalue(COObject *self, id value, COType type,
                                              ofType: type
                                 propertyDescription: aPropertyDesc];
 
-        BOOL isCrossPersistentRootRef = [value isKindOfClass: [COPath class]];
-        BOOL isDeletedCrossPersistentRootRef = isCrossPersistentRootRef
+        const BOOL isCrossPersistentRootRef = [value isKindOfClass: [COPath class]];
+        const BOOL isDeletedCrossPersistentRootRef = isCrossPersistentRootRef
                                                && ([result persistentRoot].deleted || [result branch].deleted);
-        BOOL isDeadCrossPersistentRootRef = (result == nil && isCrossPersistentRootRef);
+        const BOOL isDeadCrossPersistentRootRef = (result == nil && isCrossPersistentRootRef);
 
         result = (isDeadCrossPersistentRootRef || isDeletedCrossPersistentRootRef ? value : result);
 
@@ -904,9 +904,9 @@ static id deserializeUnivalue(COObject *self, id value, COType type,
 - (SEL)serializationSetterForProperty: (NSString *)property
 {
     const char *key = property.UTF8String;
-    size_t keyLength = strlen(key);
+    const size_t keyLength = strlen(key);
     const char *prefix = "setSerialized";
-    size_t prefixLength = strlen(prefix);
+    const size_t prefixLength = strlen(prefix);
     char setter[prefixLength + keyLength + 2];
 
     memcpy(setter, prefix, prefixLength);
@@ -976,7 +976,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type,
 
     }
 
-    BOOL wasSerializedBeforeSchemaMigrationSupport =
+    const BOOL wasSerializedBeforeSchemaMigrationSupport =
         aStoreItem.packageName == nil && [aStoreItem valueForAttribute: kCOItemPackageVersionProperty] == nil;
 
     if (wasSerializedBeforeSchemaMigrationSupport)
@@ -1048,7 +1048,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type,
     id serializedValue = [self serializedValueForValue: value propertyDescription: propertyDesc];
     NSNumber *serializedType = [self serializedTypeForPropertyDescription: propertyDesc
                                                                     value: value];
-    BOOL isSerializedAsAdditionalItem = [_additionalStoreItemUUIDs.allValues containsObject: serializedValue];
+    const BOOL isSerializedAsAdditionalItem = [_additionalStoreItemUUIDs.allValues containsObject: serializedValue];
 
     if (isSerializedAsAdditionalItem)
     {

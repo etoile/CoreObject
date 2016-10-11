@@ -179,7 +179,7 @@
             NSArray *persistentRootUUIDs = persistentRootsByBackingStore[backingUUID];
             NSSet *liveRevisionUUIDs =
                 [aCompactionStrategy liveRevisionUUIDsForPersistentRootUUIDs: persistentRootUUIDs];
-            BOOL canDeleteReachableRevisions = !liveRevisionUUIDs.isEmpty;
+            const BOOL canDeleteReachableRevisions = !liveRevisionUUIDs.isEmpty;
 
             if (canDeleteReachableRevisions)
             {

@@ -44,7 +44,7 @@ void CORegisterAdditionalEntityDescriptions(ETModelDescriptionRepository *repo)
 
 void CORegisterCoreObjectMetamodel(ETModelDescriptionRepository *repo)
 {
-    BOOL wereRegisteredPreviously = ([repo descriptionForName: @"COObject"] != nil);
+    const BOOL wereRegisteredPreviously = ([repo descriptionForName: @"COObject"] != nil);
 
     if (wereRegisteredPreviously)
         return;

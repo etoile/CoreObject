@@ -25,7 +25,7 @@
     if (value == Nil)
         return nil;
 
-    BOOL isClass = ([value class] == value);
+    const BOOL isClass = ([value class] == value);
     NSParameterAssert(isClass && !class_isMetaClass(value));
 
     return NSStringFromClass(value);

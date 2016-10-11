@@ -13,12 +13,12 @@ static BOOL COTopologicalSortVisitNode(id node,
                                        NSMutableSet *unsortedNodes,
                                        NSMutableArray *sortedNodes)
 {
-    BOOL hasCycle = [traversedNodes containsObject: node];
+    const BOOL hasCycle = [traversedNodes containsObject: node];
 
     if (hasCycle)
         return NO;
 
-    BOOL isSorted = [sortedNodes containsObject: node];
+    const BOOL isSorted = [sortedNodes containsObject: node];
 
     if (isSorted)
         return YES;
@@ -27,8 +27,8 @@ static BOOL COTopologicalSortVisitNode(id node,
 
     for (id childNode in [node valueForKey: edgeKey])
     {
-        BOOL success = COTopologicalSortVisitNode(childNode, traversedNodes,
-                                                  edgeKey, unsortedNodes, sortedNodes);
+        const BOOL success = COTopologicalSortVisitNode(childNode, traversedNodes,
+                                                        edgeKey, unsortedNodes, sortedNodes);
 
         if (!success)
             return NO;

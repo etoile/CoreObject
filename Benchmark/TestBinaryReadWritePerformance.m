@@ -23,10 +23,10 @@
 
 @implementation TestBinaryReadWrite
 
-static NSString *beginObject = @"<<begin object>>";
-static NSString *endObject = @"<<end object>>";
-static NSString *beginArray = @"<<begin array>>";
-static NSString *endArray = @"<<end array>>";
+static NSString *const beginObject = @"<<begin object>>";
+static NSString *const endObject = @"<<end object>>";
+static NSString *const beginArray = @"<<begin array>>";
+static NSString *const endArray = @"<<end array>>";
 
 - (void)readObject: (id)anObject
 {

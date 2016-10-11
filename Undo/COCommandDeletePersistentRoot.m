@@ -47,7 +47,7 @@ static NSString *const kCOCommandInitialRevisionID = @"COCommandInitialRevisionI
 - (COCommand *)inverse
 {
     Class inverseClass = [COCommandUndeletePersistentRoot class];
-    BOOL isCreateInverse = (_initialRevisionID != nil);
+    const BOOL isCreateInverse = (_initialRevisionID != nil);
 
     if (isCreateInverse)
     {

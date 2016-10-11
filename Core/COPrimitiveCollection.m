@@ -40,7 +40,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
                                                  NSUInteger index,
                                                  BOOL isInsertion)
 {
-    NSUInteger maxIndex = isInsertion ? self.count : self.count - 1;
+    const NSUInteger maxIndex = isInsertion ? self.count : self.count - 1;
 
     if (index > maxIndex)
     {
@@ -199,13 +199,13 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
     if (!wasTombstone && willBeTombstone)
     {
-        NSUInteger externalI = [self firstExternalIndexGreaterThanOrEqualToBackingIndex: index];
+        const NSUInteger externalI = [self firstExternalIndexGreaterThanOrEqualToBackingIndex: index];
 
         [_externalIndexToBackingIndex removePointerAtIndex: externalI];
     }
     else if (wasTombstone && !willBeTombstone)
     {
-        NSUInteger externalI = [self firstExternalIndexGreaterThanOrEqualToBackingIndex: index];
+        const NSUInteger externalI = [self firstExternalIndexGreaterThanOrEqualToBackingIndex: index];
         if (externalI == NSNotFound)
         {
             // inserting at the end
@@ -239,7 +239,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
 - (void)addObject: (id)anObject
 {
-    NSUInteger count = self.count;
+    const NSUInteger count = self.count;
     [self insertObject: anObject atIndex: (count > 0 ? count : 0)];
 }
 
@@ -261,7 +261,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
     else
     {
         // insert in the beginning or middle
-        NSUInteger backingIndex = [self backingIndex: index];
+        const NSUInteger backingIndex = [self backingIndex: index];
 
         [self shiftBackingIndicesGreaterThanOrEqualTo: backingIndex by: 1];
 
@@ -274,7 +274,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
 - (void)removeLastObject
 {
-    NSUInteger count = self.count;
+    const NSUInteger count = self.count;
 
     if (count == 0)
         return;
@@ -287,7 +287,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
     COThrowExceptionIfNotMutable(_permanentlyMutable, _temporaryMutable);
     COThrowExceptionIfOutOfBounds(self, index, NO);
 
-    NSUInteger backingIndex = [self backingIndex: index];
+    const NSUInteger backingIndex = [self backingIndex: index];
     [_backing removePointerAtIndex: backingIndex];
     [_externalIndexToBackingIndex removePointerAtIndex: index];
 

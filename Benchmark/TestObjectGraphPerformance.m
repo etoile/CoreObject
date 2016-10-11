@@ -63,7 +63,7 @@
 {
     COObjectGraphContext *graph = persistentRoot.objectGraphContext;
     NSArray *itemUUIDS = graph.itemUUIDs;
-    int randNumber = rand();
+    const int randNumber = rand();
     OutlineItem *randomItem = [graph loadedObjectForUUID: itemUUIDS[randNumber % itemUUIDS.count]];
     randomItem.label = [NSString stringWithFormat: @"random number: %d", randNumber];
     [ctx commit];
@@ -88,7 +88,7 @@
     NSTimeInterval timeToMakeIncrementalCommitToPersistentRoot = [self timeToMakeIncrementalCommitToPersistentRoot: persistentRoot];
     NSTimeInterval timeToCommit1KUsingSQLite = [BenchmarkCommon timeToCommit1KUsingSQLite];
 
-    double coreObjectTimesWorse = timeToMakeIncrementalCommitToPersistentRoot / timeToCommit1KUsingSQLite;
+    const double coreObjectTimesWorse = timeToMakeIncrementalCommitToPersistentRoot / timeToCommit1KUsingSQLite;
     UKTrue(coreObjectTimesWorse < 200);
 
     NSLog(@"Took %f ms to commit %d objects",

@@ -129,14 +129,14 @@
 - (void)commitWithGraph: (COItemGraph *)graph parent: (int64_t)parentRevid
 {
     ETUUID *revUUID = [ETUUID UUID];
-    BOOL ok = [backing writeItemGraph: graph
-                         revisionUUID: revUUID
-                         withMetadata: @{}
-                           withParent: parentRevid
-                      withMergeParent: -1
-                           branchUUID: branchUUID
-                   persistentrootUUID: prootUUID
-                                error: NULL];
+    const BOOL ok = [backing writeItemGraph: graph
+                               revisionUUID: revUUID
+                               withMetadata: @{}
+                                 withParent: parentRevid
+                            withMergeParent: -1
+                                 branchUUID: branchUUID
+                         persistentrootUUID: prootUUID
+                                      error: NULL];
     ETAssert(ok);
 }
 

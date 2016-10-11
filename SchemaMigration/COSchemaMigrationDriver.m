@@ -78,7 +78,7 @@ static inline void addObjectForKey(NSMutableDictionary *dict, id object, NSStrin
 - (NSSet *)packagesToMigrateForItem: (COItem *)item
 {
     ETEntityDescription *entity = [_modelDescriptionRepository descriptionForName: item.entityName];
-    BOOL isDeletedEntity = (entity == nil);
+    const BOOL isDeletedEntity = (entity == nil);
 
     /* For a deleted entity, the package versions match between item and packages */
     if (isDeletedEntity)

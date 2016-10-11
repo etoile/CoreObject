@@ -747,7 +747,7 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a,
 
     _beginEditingStackDepth--;
 
-    BOOL reachedZero = (_beginEditingStackDepth == 0);
+    const BOOL reachedZero = (_beginEditingStackDepth == 0);
 
     if (_beginEditingStackDepth < 0)
     {

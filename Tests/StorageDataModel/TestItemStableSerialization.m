@@ -72,7 +72,7 @@
 
 - (id)member: (id)object
 {
-    NSUInteger index = [objects indexOfObject: object];
+    const NSUInteger index = [objects indexOfObject: object];
     if (index != NSNotFound)
     {
         return objects[index];
@@ -124,7 +124,7 @@ static NSData *Data(unsigned char byte)
 
 static NSData *Data2(unsigned char byte1, unsigned char byte2)
 {
-    unsigned char bytes[2] = {byte1, byte2};
+    const unsigned char bytes[2] = {byte1, byte2};
     return [NSData dataWithBytes: &bytes length: 2];
 }
 

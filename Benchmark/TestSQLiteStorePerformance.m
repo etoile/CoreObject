@@ -292,7 +292,7 @@ static int itemChangedAtCommit(int i)
     ETUUID *prootUUID = [self makeDemoPersistentRoot];
     COPersistentRootInfo *proot = [store persistentRootInfoForUUID: prootUUID];
 
-    int itemIndex = itemChangedAtCommit(32);
+    const int itemIndex = itemChangedAtCommit(32);
 
     NSDate *startDate = [NSDate date];
 

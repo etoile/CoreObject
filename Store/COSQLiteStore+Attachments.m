@@ -48,7 +48,7 @@ static NSData *hashItemAtURL(NSURL *aURL)
                                                            error: NULL];
 #endif
 
-    int fd = fh.fileDescriptor;
+    const int fd = fh.fileDescriptor;
 
     unsigned char buf[4096];
 

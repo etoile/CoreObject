@@ -19,17 +19,17 @@ static bool comparefn(size_t i, size_t j, const void *userdata1, const void *use
 void CODiffArrays(NSArray *a, NSArray *b, id <CODiffArraysDelegate> delegate, id userInfo)
 {
     diffresult_t *result = diff_arrays(a.count,
-                                       b.count,
-                                       comparefn,
-                                       (__bridge const void *)(a),
-                                       (__bridge const void *)(b));
+                                             b.count,
+                                             comparefn,
+                                             (__bridge const void *)(a),
+                                             (__bridge const void *)(b));
 
     for (size_t i = 0; i < diff_editcount(result); i++)
     {
-        diffedit_t edit = diff_edit_at_index(result, i);
+        const diffedit_t edit = diff_edit_at_index(result, i);
 
-        NSRange firstRange = NSMakeRange(edit.range_in_a.location, edit.range_in_a.length);
-        NSRange secondRange = NSMakeRange(edit.range_in_b.location, edit.range_in_b.length);
+        const NSRange firstRange = NSMakeRange(edit.range_in_a.location, edit.range_in_a.length);
+        const NSRange secondRange = NSMakeRange(edit.range_in_b.location, edit.range_in_b.length);
 
         switch (edit.type)
         {
@@ -93,8 +93,8 @@ void COApplyEditsToArray(NSMutableArray *array, NSArray *edits)
 
         if ([op isMemberOfClass: [COSequenceInsertion class]])
         {
-            COSequenceInsertion *opp = (COSequenceInsertion *)op;
-            NSRange range = NSMakeRange(op.range.location + i, opp.objects.count);
+            const COSequenceInsertion *const opp = (COSequenceInsertion *)op;
+            const NSRange range = NSMakeRange(op.range.location + i, opp.objects.count);
 
             [array insertObjects: opp.objects
                        atIndexes: [NSIndexSet indexSetWithIndexesInRange: range]];
@@ -103,16 +103,16 @@ void COApplyEditsToArray(NSMutableArray *array, NSArray *edits)
         }
         else if ([op isMemberOfClass: [COSequenceDeletion class]])
         {
-            NSRange range = NSMakeRange(op.range.location + i, op.range.length);
+            const NSRange range = NSMakeRange(op.range.location + i, op.range.length);
 
             [array removeObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: range]];
             nextI -= range.length;
         }
         else if ([op isMemberOfClass: [COSequenceModification class]])
         {
-            COSequenceModification *opp = (COSequenceModification *)op;
-            NSRange deleteRange = NSMakeRange(opp.range.location + i, opp.range.length);
-            NSRange insertRange = NSMakeRange(opp.range.location + i, opp.objects.count);
+            const COSequenceModification *const opp = (COSequenceModification *)op;
+            const NSRange deleteRange = NSMakeRange(opp.range.location + i, opp.range.length);
+            const NSRange insertRange = NSMakeRange(opp.range.location + i, opp.objects.count);
 
             [array removeObjectsAtIndexes: [NSIndexSet indexSetWithIndexesInRange: deleteRange]];
             [array insertObjects: opp.objects

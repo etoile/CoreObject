@@ -33,7 +33,7 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
             self.editingContext.deadRelationshipCache;
 
 
-        BOOL isDeadReference = [obj isKindOfClass: [COPath class]];
+        const BOOL isDeadReference = [obj isKindOfClass: [COPath class]];
 
         if (isDeadReference)
         {
@@ -107,7 +107,7 @@ static inline BOOL isPersistentCoreObjectReferencePropertyDescription(ETProperty
             ETAssert(!propertyInTarget.persistent);
         }
 
-        BOOL isDeadReference = [obj isKindOfClass: [COPath class]];
+        const BOOL isDeadReference = [obj isKindOfClass: [COPath class]];
 
         if (isDeadReference)
         {

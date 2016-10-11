@@ -133,7 +133,7 @@ namespace ManagedFusion
         /// </summary>
         void addRange(Range const &r)
         {
-            size_t l = modified.size();
+            const size_t l = modified.size();
             if (l > 0)
             {
                 Range last = modified[l - 1];
@@ -228,7 +228,7 @@ namespace ManagedFusion
         // The B-Version of the data (modified data) to be compared.
         DiffData<T> DataB(Arrays, sizeB);
 
-        size_t MAX = DataA.Length + DataB.Length + 1;
+        const size_t MAX = DataA.Length + DataB.Length + 1;
         /// vector for the (0,0) to (x,y) search
         std::vector<int> DownVector(2 * MAX + 2);
         /// vector for the (u,v) to (N,M) search
@@ -263,20 +263,20 @@ namespace ManagedFusion
     {
 
         SMSRD ret;
-        int MAX = DataA.Length + DataB.Length + 1;
+        const int MAX = DataA.Length + DataB.Length + 1;
 
-        int DownK = LowerA - LowerB; // the k-line to start the forward search
-        int UpK = UpperA - UpperB; // the k-line to start the reverse search
+        const int DownK = LowerA - LowerB; // the k-line to start the forward search
+        const int UpK = UpperA - UpperB; // the k-line to start the reverse search
 
-        int Delta = (UpperA - LowerA) - (UpperB - LowerB);
-        bool oddDelta = (Delta & 1) != 0;
+        const int Delta = (UpperA - LowerA) - (UpperB - LowerB);
+        const bool oddDelta = (Delta & 1) != 0;
 
         // The vectors in the publication accepts negative indexes. the vectors implemented here are 0-based
         // and are access using a specific offset: UpOffset UpVector and DownOffset for DownVektor
-        int DownOffset = MAX - DownK;
-        int UpOffset = MAX - UpK;
+        const int DownOffset = MAX - DownK;
+        const int UpOffset = MAX - UpK;
 
-        int MaxD = ((UpperA - LowerA + UpperB - LowerB) / 2) + 1;
+        const int MaxD = ((UpperA - LowerA + UpperB - LowerB) / 2) + 1;
 
         // Debug.Write(2, "SMS", String.Format("Search the box: A[{0}-{1}] to B[{2}-{3}]", LowerA, UpperA, LowerB, UpperB));
 

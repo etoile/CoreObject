@@ -108,7 +108,7 @@
 {
     COObjectGraphContext *objectGraphContext = [COObjectGraphContext objectGraphContext];
     COObject *object = [[COObject alloc] initWithObjectGraphContext: objectGraphContext];
-    NSUInteger hash = object.hash;
+    const NSUInteger hash = object.hash;
 
     /* For testing the hash stability with -[NSSet containsObject:], we must 
        insert the objects in the set before object becomes persistent */

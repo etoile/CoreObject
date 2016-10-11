@@ -92,7 +92,7 @@ static void genericSetter(id self, SEL theCmd, id value)
 
     // Get the property
 
-    objc_property_t property = class_getProperty(self, propname);
+    const objc_property_t property = class_getProperty(self, propname);
     if (property != NULL)
     {
         const char *attributes = property_getAttributes(property);

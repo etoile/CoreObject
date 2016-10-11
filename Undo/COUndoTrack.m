@@ -308,7 +308,7 @@ NSString *const kCOUndoTrackName = @"COUndoTrackName";
 
     NSMutableDictionary *md = [aNode.metadata mutableCopy];
     NSNumber *inversedValue = aNode.metadata[kCOCommitMetadataUndoInitialBaseInversed];
-    BOOL inversed = inversedValue == nil || !inversedValue.boolValue;
+    const BOOL inversed = inversedValue == nil || !inversedValue.boolValue;
 
     md[kCOCommitMetadataUndoBaseUUID] = [aNode.UUID stringValue];
     md[kCOCommitMetadataUndoType] = @"org.etoile.CoreObject.selective-undo";
@@ -576,7 +576,7 @@ addToStoreTransaction: (COStoreTransaction *)txn
 
     NSMutableDictionary *md = [aCommand.metadata mutableCopy];
     NSNumber *inversedValue = aCommand.metadata[kCOCommitMetadataUndoInitialBaseInversed];
-    BOOL inversed = inverse && (inversedValue == nil || !inversedValue.boolValue);
+    const BOOL inversed = inverse && (inversedValue == nil || !inversedValue.boolValue);
 
     md[kCOCommitMetadataUndoBaseUUID] = [aCommand.UUID stringValue];
     md[kCOCommitMetadataUndoType] = inverse ? @"org.etoile.CoreObject.undo" : @"org.etoile.CoreObject.redo";
@@ -859,7 +859,7 @@ addToStoreTransaction: (COStoreTransaction *)txn
         if (![inMemoryState isEqual: notifState])
         {
             //NSLog(@"Doing track reload");
-            BOOL needsClearCommandCache = notifState.compacted;
+            const BOOL needsClearCommandCache = notifState.compacted;
 
             if (needsClearCommandCache)
             {

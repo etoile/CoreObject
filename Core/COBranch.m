@@ -972,12 +972,12 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
 
     CORevision *currentRev = [self.editingContext revisionForRevisionUUID: _currentRevisionUUID
                                                        persistentRootUUID: self.persistentRoot.UUID];
-    BOOL isUpToDate = [currentRev isEqual: _revisions.lastObject] && !wasCompactedOrRebased;
+    const BOOL isUpToDate = [currentRev isEqual: _revisions.lastObject] && !wasCompactedOrRebased;
 
     if (isUpToDate)
         return;
 
-    BOOL isNewCommit = [currentRev.parentRevision isEqual: _revisions.lastObject] && !wasCompactedOrRebased;
+    const BOOL isNewCommit = [currentRev.parentRevision isEqual: _revisions.lastObject] && !wasCompactedOrRebased;
 
     if (isNewCommit)
     {
@@ -1039,7 +1039,7 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
         nodeIndex++;
     }
 
-    BOOL hasNoPreviousOrNextNode = (nodeIndex < 0 || nodeIndex >= self.nodes.count);
+    const BOOL hasNoPreviousOrNextNode = (nodeIndex < 0 || nodeIndex >= self.nodes.count);
 
     if (hasNoPreviousOrNextNode)
         return nil;
