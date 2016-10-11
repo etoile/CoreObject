@@ -107,7 +107,7 @@
 
 - (UITableViewCell *)makeCellForNode: (id <COTrackNode>)node
 {
-    static const NSString *const TrackCellIdentifier = @"TrackCell";
+    static NSString *const TrackCellIdentifier = @"TrackCell";
     UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier: TrackCellIdentifier];
 
     if (cell == nil)
