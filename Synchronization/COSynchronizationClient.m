@@ -220,7 +220,7 @@ static void InsertRevisions(NSDictionary *revisionsPlist,
 
     [txn setOldTransactionID: info.transactionID forPersistentRoot: persistentRoot];
 
-    BOOL ok = [aStore commitStoreTransaction: txn];
+    const BOOL ok = [aStore commitStoreTransaction: txn];
 
     ETAssert(ok);
 }
