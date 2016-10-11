@@ -101,9 +101,9 @@ static void validateMainBundlePreferredLocalizations()
 {
     for (NSString *localization in [NSBundle mainBundle].preferredLocalizations)
     {
-        BOOL isTwoLettersISOCode = (localization.length == 2);
-        BOOL isThreeLettersISOCode = (localization.length == 3);
-        BOOL isCompoundLanguageID = (localization.length >= 4
+        const BOOL isTwoLettersISOCode = (localization.length == 2);
+        const BOOL isThreeLettersISOCode = (localization.length == 3);
+        const BOOL isCompoundLanguageID = (localization.length >= 4
             && ([localization characterAtIndex: 2] == '-' || [localization characterAtIndex: 3] == '-'));
         
         NSCAssert(isTwoLettersISOCode || isThreeLettersISOCode || isCompoundLanguageID,
