@@ -16,11 +16,7 @@
 {
     SUPERINIT;
     _pathToReferringObjects = [NSMutableDictionary new];
-#if TARGET_OS_IPHONE
     _referringObjectToPaths = [NSMapTable weakToStrongObjectsMapTable];
-#else
-    _referringObjectToPaths = [NSMapTable mapTableWithWeakToStrongObjects];
-#endif
     return self;
 }
 
@@ -32,14 +28,7 @@
 
     if (referringObjects == nil)
     {
-        // FIXME: If we don't ditch 10.7 support, we need a reverse mapping
-        // from each referringObject to a path set, that can be used to remove
-        // the referring objects when their object graph context is discarded.
-#if TARGET_OS_IPHONE
         referringObjects = [NSHashTable weakObjectsHashTable];
-#else
-        referringObjects = [NSHashTable hashTableWithWeakObjects];
-#endif
 
         _pathToReferringObjects[aPath] = referringObjects;
     }

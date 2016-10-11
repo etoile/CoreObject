@@ -203,15 +203,6 @@ NSString *const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompacte
     {
         [_db close];
     });
-
-#if !(TARGET_OS_IPHONE)
-    // N.B.: We are using deployment target 10.7, so ARC does not manage libdispatch objects.
-    // If we switch to deployment target 10.8, ARC will manage libdispatch objects automatically.
-    // For GNUstep, ARC doesn't manage libdispatch objects since libobjc2 doesn't support it 
-    // currently (we compile CoreObject with -DOS_OBJECT_USE_OBJC=0).
-    dispatch_release(_queue);
-    dispatch_release(_transactionLock);
-#endif
 }
 
 - (BOOL)setupSchema
