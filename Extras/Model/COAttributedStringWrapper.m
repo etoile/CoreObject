@@ -774,6 +774,10 @@ static void LengthOfCommonPrefixAndSuffix(NSString *a,
     }
 }
 
+// GNUstep AppKit compatibility
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmismatched-parameter-types"
+
 - (void)edited: (NSTextStorageEditActions)editedMask
          range: (NSRange)range
 changeInLength: (NSInteger)delta
@@ -781,5 +785,7 @@ changeInLength: (NSInteger)delta
     _lengthDeltaInBatch += delta;
     [super edited: editedMask range: range changeInLength: delta];
 }
+
+#pragma clang diagnostic pop
 
 @end

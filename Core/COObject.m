@@ -122,7 +122,7 @@ static NSNull *cachedNSNull = nil;
 
 #if TARGET_OS_IPHONE
     NSString *imageType = @"UIImage";
-#else
+#elif !defined(GNUSTEP)
     NSString *imageType = @"NSImage";
 #endif
 

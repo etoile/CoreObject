@@ -993,7 +993,7 @@ static id deserializeUnivalue(COObject *self, id value, COType type,
         [NSException raise: NSInvalidArgumentException
                     format: @"-setStoreItem: called with package version %lld on COObject with "
                                 "package version %lu",
-                            aStoreItem.packageVersion,
+                            (long long)aStoreItem.packageVersion,
                             (unsigned long)self.entityDescription.owner.version];
     }
 }

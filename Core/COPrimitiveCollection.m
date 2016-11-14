@@ -139,7 +139,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
 - (id <NSFastEnumeration>)enumerableReferences
 {
-    return _backing;
+    return (id <NSFastEnumeration>)_backing;
 }
 
 - (id)referenceAtIndex: (NSUInteger)index
@@ -571,7 +571,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
 - (id <NSFastEnumeration>)enumerableReferences
 {
-    return _backing;
+    return (id <NSFastEnumeration>) _backing;
 }
 
 - (void)addReference: (id)aReference
