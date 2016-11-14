@@ -662,12 +662,12 @@
 
     OutlineItem *child1 = [doc1.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     [root addObject: child1];
-    [ctx commitWithIdentifier: @"insert-item" undoTrack: _testTrack error: nil];
+    [ctx commitWithIdentifier: @"insert-item" undoTrack: _testTrack error: NULL];
     CORevision *r1 = doc1.currentRevision;
 
     OutlineItem *child2 = [doc1.objectGraphContext insertObjectWithEntityName: @"OutlineItem"];
     [root addObject: child2];
-    [ctx commitWithIdentifier: @"insert-item" undoTrack: _testTrack error: nil];
+    [ctx commitWithIdentifier: @"insert-item" undoTrack: _testTrack error: NULL];
     CORevision *r2 = doc1.currentRevision;
 
     UKObjectsEqual((@[child1, child2]), root.contents);
