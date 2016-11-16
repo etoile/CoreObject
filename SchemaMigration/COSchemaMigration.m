@@ -116,7 +116,7 @@ static NSMutableDictionary *dependencies;
         {
             [NSException raise: NSInvalidArgumentException
                         format: @"Item version %lld doesn't match migration source version %lld",
-                                itemVersion, self.sourceVersion];
+                                (long long)itemVersion, (long long)self.sourceVersion];
         }
     }
 }

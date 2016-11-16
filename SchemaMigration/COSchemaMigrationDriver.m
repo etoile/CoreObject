@@ -309,13 +309,13 @@ static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *
     if (proposedVersion < 0)
     {
         [NSException raise: NSInvalidArgumentException
-                    format: @"Invalid negative schema version %lld", proposedVersion];
+                    format: @"Invalid negative schema version %lld", (long long)proposedVersion];
     }
     if (proposedVersion > destinationVersion)
     {
         [NSException raise: NSInvalidArgumentException
                     format: @"Backward migration from %lld to %lld is not supported by CoreObject",
-                            proposedVersion, destinationVersion];
+                            (long long)proposedVersion, (long long)destinationVersion];
     }
 
     while (proposedVersion < destinationVersion)
@@ -330,7 +330,7 @@ static inline void copySchemaAttributesFromItemWhenOwnedByPackageToItem(COItem *
         {
             [NSException raise: NSInternalInconsistencyException
                         format: @"Missing schema migration from %lld to %lld in %@",
-                                proposedVersion - 1, proposedVersion, packageName];
+                                (long long)(proposedVersion - 1), (long long)proposedVersion, packageName];
         }
 
         [self runDependentMigrationsForMigration: migration];

@@ -45,7 +45,9 @@ CoreObject_OBJC_FILES += $(wildcard Debugging/*.m)
 CoreObject_OBJC_FILES += $(wildcard Extras/Diff/*.m)
 CoreObject_OBJC_FILES += $(wildcard Extras/Model/*.m)
 CoreObject_OBJC_FILES += $(wildcard Extras/ValueTransformers/*.m)
+CoreObject_OBJC_FILES += $(wildcard Localization/*.m)
 CoreObject_OBJC_FILES += $(wildcard Model/*.m)
+CoreObject_OBJC_FILES += $(wildcard SchemaMigration/*.m)
 CoreObject_OBJC_FILES += $(wildcard Store/*.m)
 CoreObject_C_FILES += $(wildcard Store/*.c)
 CoreObject_OBJC_FILES += $(wildcard Undo/*.m)
@@ -64,6 +66,7 @@ CoreObject_OBJC_FILES += $(wildcard Tests/Diff/*.m)
 #CoreObject_OBJC_FILES += $(wildcard Tests/Extras/Model/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Model/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Relationship/*.m)
+CoreObject_OBJC_FILES += $(wildcard Tests/SchemaMigration/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/StorageDataModel/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Store/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Undo/*.m)
@@ -97,6 +100,9 @@ CoreObjectDoc_DOC_FILES = \
 	Model/COGroup.h \
 	Model/COLibrary.h \
 	Model/COTag.h \
+	SchemaMigration/COModelElementMove.h \
+	SchemaMigration/COSchemaMigration.h \
+	SchemaMigration/COSchemaMigrationDriver.h \
 	StorageDataModel/COAttachmentID.h \
 	StorageDataModel/COItemGraph.h \
 	StorageDataModel/COItem.h \
