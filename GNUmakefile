@@ -72,7 +72,8 @@ CoreObject_OBJC_FILES += $(wildcard Tests/TestModelObjects/*.m)
 CoreObject_OBJC_FILES += $(wildcard Tests/Utilities/*.m)
 endif
 
-CoreObject_LANGUAGES = English
+CoreObject_LANGUAGES = English French
+CoreObject_RESOURCE_FILES_DIR = Localization
 CoreObject_LOCALIZED_RESOURCE_FILES = Commits
 
 CoreObjectDoc_MENU_TEMPLATE_FILE = Documentation/Templates/menu.html
