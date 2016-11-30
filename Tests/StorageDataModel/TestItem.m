@@ -82,16 +82,12 @@
     NSNumber *newValueFromDesc = @(roundTripValue.description.doubleValue);
 
 #ifndef GNUSTEP
-    // NOTE: Doesn't matter on GNUstep since newValue is not a NSDecimalNumber, 
-    // and we don't have to convert it into a NSDoubleNumber (unlike on 10.7).
+    // NOTE: Doesn't matter on GNUstep since newValue is not a NSDecimalNumber.
     UKTrue([[NSDecimalNumber defaultBehavior] scale] == NSDecimalNoScale);
 #endif
 
     NSLog(@"Double representation in JSON: %@",
           [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding]);
-
-    /* Rounding is visible in the ouput for numbers that contain more than two 
-       decimals on 10.7 (e.g. 123.45 output is the same for all numbers). */
     NSLog(@"value            doubleValue: %.20f, description: %@, class: %@",
           value.doubleValue, value, [value class]);
     NSLog(@"decimalValue     doubleValue: %.20f, description: %@, class: %@",

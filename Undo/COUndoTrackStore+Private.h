@@ -11,22 +11,22 @@
 @class FMDatabase;
 @class ETUUID;
 
-NSString *const COUndoTrackStoreTrackDidChangeNotification;
+extern NSString *const COUndoTrackStoreTrackDidChangeNotification;
 
 // User info keys for COUndoTrackStoreTrackDidChangeNotification
-NSString *const COUndoTrackStoreTrackName;
+extern NSString *const COUndoTrackStoreTrackName;
 /**
  * UUID string
  */
-NSString *const COUndoTrackStoreTrackHeadCommandUUID;
+extern NSString *const COUndoTrackStoreTrackHeadCommandUUID;
 /**
  * NSNull or UUID string
  */
-NSString *const COUndoTrackStoreTrackCurrentCommandUUID;
+extern NSString *const COUndoTrackStoreTrackCurrentCommandUUID;
 /**
  * NSNumber boolean
  */
-NSString *const COUndoTrackStoreTrackCompacted;
+extern NSString *const COUndoTrackStoreTrackCompacted;
 
 @interface COUndoTrackSerializedCommand : NSObject
 

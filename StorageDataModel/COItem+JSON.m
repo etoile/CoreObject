@@ -167,22 +167,6 @@ static id plistValueForValue(id aValue, COType aType)
 
 // JSON-compatible plist -> COItem attribute value
 
-/* 
- * Returning the parsed value as a NSNumber rather a NSDecimalNumber to ensure 
- * the rounding is the same than the serialized NSNumber object.
- *
- * Without this workaround, 123.456789012 roundtrip doesn't succeed on 10.7 (see
- * -testJSONDoubleEquality in TestItem.m)).
- *
- * For 123.456789012, NSJSONSerialization returns a NSDecimalNumber, but the 
- * rounding doesn't produce the same internal representation than a NSNumber 
- * initialized with the same double value.
- */
-static inline NSNumber *basicNumberFromDecimalNumber(NSNumber *aValue)
-{
-    return @(aValue.description.doubleValue);
-}
-
 static id valueForPrimitivePlistValue(id aValue, COType aType)
 {
     if (aValue == [NSNull null])
@@ -195,7 +179,7 @@ static id valueForPrimitivePlistValue(id aValue, COType aType)
         case kCOTypeInt64:
             return aValue;
         case kCOTypeDouble:
-            return basicNumberFromDecimalNumber(aValue);
+            return aValue;
         case kCOTypeString:
             return aValue;
         case kCOTypeAttachment:
