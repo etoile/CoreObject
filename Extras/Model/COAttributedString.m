@@ -103,12 +103,12 @@
     // Trim off excess characters
 
     COMutableItem *firstChunk = [result itemForUUID: copiedUUIDs[0]];
-    [firstChunk setValue: [[firstChunk valueForAttribute: @"text"] substringFromIndex: excessAtStart]
+    [firstChunk setValue: [firstChunk[@"text"] substringFromIndex: excessAtStart]
             forAttribute: @"text"
                     type: kCOTypeString];
 
     COMutableItem *lastChunk = [result itemForUUID: copiedUUIDs.lastObject];
-    [lastChunk setValue: [[lastChunk valueForAttribute: @"text"] substringToIndex: ([[lastChunk valueForAttribute: @"text"] length] - excessAtEnd)]
+    [lastChunk setValue: [lastChunk[@"text"] substringToIndex: ([lastChunk[@"text"] length] - excessAtEnd)]
            forAttribute: @"text"
                    type: kCOTypeString];
 

@@ -85,11 +85,11 @@ static NSArray *initialUUIDs;
     // Check structure ("copy semantics.pdf" page 10)
 
     COItem *drawingCopyItem = [initialGraph itemForUUID: drawing2];
-    COItem *shape2CopyItem = [initialGraph itemForUUID: [drawingCopyItem valueForAttribute: @"contents"][1]];
-    COItem *shape3CopyItem = [initialGraph itemForUUID: [drawingCopyItem valueForAttribute: @"contents"][0]];
+    COItem *shape2CopyItem = [initialGraph itemForUUID: drawingCopyItem[@"contents"][1]];
+    COItem *shape3CopyItem = [initialGraph itemForUUID: drawingCopyItem[@"contents"][0]];
 
-    COItem *style2CopyItemA = [initialGraph itemForUUID: [shape2CopyItem valueForAttribute: @"refs"][0]];
-    COItem *style2CopyItemB = [initialGraph itemForUUID: [shape3CopyItem valueForAttribute: @"refs"][0]];
+    COItem *style2CopyItemA = [initialGraph itemForUUID: shape2CopyItem[@"refs"][0]];
+    COItem *style2CopyItemB = [initialGraph itemForUUID: shape3CopyItem[@"refs"][0]];
 
     UKNotNil(drawingCopyItem);
     UKFalse([initialUUIDs containsObject: drawingCopyItem.UUID]);
@@ -103,7 +103,7 @@ static NSArray *initialUUIDs;
     UKObjectsSame(style2CopyItemA, style2CopyItemB);
     UKNotNil(style2CopyItemA);
     UKFalse([initialUUIDs containsObject: style2CopyItemA.UUID]);
-    UKObjectsEqual(@"style2", [style2CopyItemA valueForAttribute: @"name"]);
+    UKObjectsEqual(@"style2", style2CopyItemA[@"name"]);
 }
 
 @end

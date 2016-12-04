@@ -148,7 +148,7 @@
 
     [root1 setValue: @"another label" forProperty: kCOLabel];
 
-    UKObjectsEqual(@"root1", [root1Item valueForAttribute: kCOLabel]);
+    UKObjectsEqual(@"root1", root1Item[kCOLabel]);
     UKObjectsEqual(@"another label", [root1 valueForKey: kCOLabel]);
 
     // Check that we can't change the COItem
@@ -213,7 +213,7 @@
 
     // Ensure the change did not affect object in ctx1
 
-    UKObjectsEqual(@"hello", [mutableItem valueForAttribute: kCOLabel]);
+    UKObjectsEqual(@"hello", mutableItem[kCOLabel]);
     UKNil([object valueForKey: kCOLabel]);
 }
 
@@ -711,7 +711,7 @@ doesNotPostNotification: COObjectGraphContextObjectsDidChangeNotification];
 
     // TODO: Perhaps attempting to serialize this should throw an exception?
     COItem *item = root1.storeItem;
-    NSArray *itemContentsArray = [item valueForAttribute: @"contents"];
+    NSArray *itemContentsArray = item[@"contents"];
     UKIntsEqual(1, itemContentsArray.count);
     UKObjectsEqual([NSNull null], itemContentsArray[0]);
 }
@@ -802,7 +802,7 @@ doesNotPostNotification: COObjectGraphContextObjectsDidChangeNotification];
 
     // It should serialize to COBrokenPath
     COItem *item = root1.storeItem;
-    NSArray *itemContentsArray = [item valueForAttribute: @"contents"];
+    NSArray *itemContentsArray = item[@"contents"];
     UKIntsEqual(1, itemContentsArray.count);
     UKTrue([itemContentsArray[0] isBroken]);
 }

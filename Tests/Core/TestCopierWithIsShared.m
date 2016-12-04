@@ -119,13 +119,13 @@ static NSArray *initialUUIDs;
     // Check structure ("copy semantics.pdf" page 9)
 
     COItem *drawingCopyItem = [initialGraph itemForUUID: drawing2];
-    COItem *group1CopyItem = [initialGraph itemForUUID: [drawingCopyItem valueForAttribute: @"contents"][0]];
-    COItem *group2CopyItem = [initialGraph itemForUUID: [drawingCopyItem valueForAttribute: @"contents"][1]];
-    COItem *shape1CopyItem = [initialGraph itemForUUID: [group1CopyItem valueForAttribute: @"contents"][0]];
-    COItem *shape2CopyItem = [initialGraph itemForUUID: [group1CopyItem valueForAttribute: @"contents"][1]];
-    COItem *shape3CopyItem = [initialGraph itemForUUID: [group2CopyItem valueForAttribute: @"contents"][0]];
-    COItem *shape4CopyItem = [initialGraph itemForUUID: [group2CopyItem valueForAttribute: @"contents"][1]];
-    COItem *style2CopyItem = [initialGraph itemForUUID: [shape3CopyItem valueForAttribute: @"refs"][0]];
+    COItem *group1CopyItem = [initialGraph itemForUUID: drawingCopyItem[@"contents"][0]];
+    COItem *group2CopyItem = [initialGraph itemForUUID: drawingCopyItem[@"contents"][1]];
+    COItem *shape1CopyItem = [initialGraph itemForUUID: group1CopyItem[@"contents"][0]];
+    COItem *shape2CopyItem = [initialGraph itemForUUID: group1CopyItem[@"contents"][1]];
+    COItem *shape3CopyItem = [initialGraph itemForUUID: group2CopyItem[@"contents"][0]];
+    COItem *shape4CopyItem = [initialGraph itemForUUID: group2CopyItem[@"contents"][1]];
+    COItem *style2CopyItem = [initialGraph itemForUUID: shape3CopyItem[@"refs"][0]];
 
     UKNotNil(drawingCopyItem);
     UKFalse([initialUUIDs containsObject: drawingCopyItem.UUID]);
@@ -149,17 +149,17 @@ static NSArray *initialUUIDs;
     UKFalse([initialUUIDs containsObject: shape4CopyItem.UUID]);
 
     // Check that the copies of shape1 and shape2 have aliases to the original style1 and style2
-    UKObjectsEqual(style1, [shape1CopyItem valueForAttribute: @"refs"][0]);
-    UKObjectsEqual(style1, [shape2CopyItem valueForAttribute: @"refs"][0]);
+    UKObjectsEqual(style1, shape1CopyItem[@"refs"][0]);
+    UKObjectsEqual(style1, shape2CopyItem[@"refs"][0]);
 
     // The copy of shape3 has a reference to a copy of style2
 
     UKNotNil(style2CopyItem);
     UKFalse([initialUUIDs containsObject: style2CopyItem.UUID]);
-    UKObjectsEqual(@"style2", [style2CopyItem valueForAttribute: @"name"]);
+    UKObjectsEqual(@"style2", style2CopyItem[@"name"]);
 
     // The copy of shape4 should refer to the copy of shape3, not the original
-    UKObjectsEqual(shape3CopyItem.UUID, [shape4CopyItem valueForAttribute: @"refs"][0]);
+    UKObjectsEqual(shape3CopyItem.UUID, shape4CopyItem[@"refs"][0]);
 }
 
 - (void)testCOObjectCopyWithIsSharedUnset

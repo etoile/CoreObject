@@ -240,8 +240,8 @@ static COPath *Path(unsigned char num)
 
     for (NSString *key in asc.attributeNames)
     {
-        id ascValue = [asc valueForAttribute: key];
-        id dscValue = [dsc valueForAttribute: key];
+        id ascValue = asc[key];
+        id dscValue = dsc[key];
 
         UKObjectKindOf(ascValue, NSSet);
         UKObjectKindOf(dscValue, NSSet);
