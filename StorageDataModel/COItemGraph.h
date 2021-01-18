@@ -10,6 +10,8 @@
 @class ETUUID;
 @class COItem, COMutableItem;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * @group Storage Data Model
  * @abstract
@@ -28,21 +30,21 @@
 /**
  * Returns the entry point UUID.
  */
-@property (nonatomic, readonly) ETUUID *rootItemUUID;
+@property (nonatomic, readonly, nullable) ETUUID *rootItemUUID;
 /**
  * Returns an immutable item for the UUID.
  */
-- (COItem *)itemForUUID: (ETUUID *)aUUID;
+- (nullable COItem *)itemForUUID: (ETUUID *)aUUID;
 /**
  * Returns all the item UUIDs in the graph, including -rootItemUUID.
  */
-@property (nonatomic, readonly) NSArray *itemUUIDs;
+@property (nonatomic, readonly) NSArray<ETUUID *> *itemUUIDs;
 /**
  * Returns all the items in the graph.
  *
  * The returned item count is the same than -itemUUIDs.
  */
-@property (nonatomic, readonly) NSArray *items;
+@property (nonatomic, readonly) NSArray<COItem *> *items;
 /**
  * Inserts the items in the graph, or updates existing items when the graph 
  * contains items with matching UUIDs.
@@ -51,7 +53,7 @@
  *
  * May broadcast a change notification, up to the subclass.
  */
-- (void)insertOrUpdateItems: (NSArray *)items;
+- (void)insertOrUpdateItems: (NSArray<COItem *> *)items;
 
 @end
 
@@ -77,16 +79,16 @@
 /** @taskunit Initialization */
 
 
-+ (COItemGraph *)itemGraphWithItemsRootFirst: (NSArray *)items;
++ (COItemGraph *)itemGraphWithItemsRootFirst: (NSArray<COItem *> *)items;
 /**
  * N.B. items doesn't need to contain rootItemUUID.
  */
-- (instancetype)initWithItemForUUID: (NSDictionary *)itemForUUID
-                       rootItemUUID: (ETUUID *)root NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithItemForUUID: (NSDictionary<ETUUID *, COItem *> *)itemForUUID
+                       rootItemUUID: (nullable ETUUID *)root NS_DESIGNATED_INITIALIZER;
 /**
  * N.B. items doesn't need to contain rootItemUUID.
  */
-- (instancetype)initWithItems: (NSArray *)items
+- (instancetype)initWithItems: (NSArray<COItem *> *)items
                  rootItemUUID: (ETUUID *)root;
 - (instancetype)initWithItemGraph: (id <COItemGraph>)aGraph;
 
@@ -97,7 +99,7 @@
 /**
  * See -[COItemGraph rootItemUUID].
  */
-@property (nonatomic, strong) ETUUID *rootItemUUID;
+@property (nonatomic, strong, nullable) ETUUID *rootItemUUID;
 /**
  * See -[COItemGraph itemForUUID:].
  */
@@ -105,17 +107,17 @@
 /**
  * See -[COItemGraph itemUUIDs].
  */
-@property (nonatomic, readonly) NSArray *itemUUIDs;
+@property (nonatomic, readonly) NSArray<ETUUID *> *itemUUIDs;
 /**
  * Returns all the items in the graph.
  *
  * The returned item count is the same than -itemUUIDs.
  */
-@property (nonatomic, readonly) NSArray *items;
+@property (nonatomic, readonly) NSArray<COItem *> *items;
 /**
  * See -[COItemGraph insertOrUpdateItems:].
  */
-- (void)insertOrUpdateItems: (NSArray *)items;
+- (void)insertOrUpdateItems: (NSArray<COItem *> *)items;
 /**
  * Adds the items from the given item graph to the receiver.
  *
@@ -149,4 +151,6 @@ BOOL COItemGraphEqualToItemGraph(id <COItemGraph> first, id <COItemGraph> second
 /**
  * If <code>aGraph.rootItemUUID</code> is nil, returns the empty set.
  */
-NSSet *COItemGraphReachableUUIDs(id <COItemGraph> aGraph);
+NSSet<ETUUID *> *COItemGraphReachableUUIDs(id <COItemGraph> aGraph);
+
+NS_ASSUME_NONNULL_END
