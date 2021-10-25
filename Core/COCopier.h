@@ -32,7 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (ETUUID *)copyItemWithUUID: (ETUUID *)aUUID
                    fromGraph: (id <COItemGraph>)source
-                     toGraph: (id <COItemGraph>)dest NS_RETURNS_NOT_RETAINED;
+                     toGraph: (id <COItemGraph>)dest
+                usesNewUUIDs: (BOOL)usesNewUUIDs NS_RETURNS_NOT_RETAINED;
 /**
  * Copies the given items between two item graphs and returns the UUIDs of the items inserted in 
  * the destination item graph.
@@ -41,7 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (NSArray<ETUUID *> *)copyItemsWithUUIDs: (NSArray<ETUUID *> *)uuids
                                 fromGraph: (id <COItemGraph>)source
-                                  toGraph: (id <COItemGraph>)dest NS_RETURNS_NOT_RETAINED;
+                                  toGraph: (id <COItemGraph>)dest 
+                             usesNewUUIDs: (BOOL)usesNewUUIDs NS_RETURNS_NOT_RETAINED;
 
 @end
 

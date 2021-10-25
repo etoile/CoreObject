@@ -101,18 +101,24 @@
 - (ETUUID *)copyItemWithUUID: (ETUUID *)aUUID
                    fromGraph: (id <COItemGraph>)source
                      toGraph: (id <COItemGraph>)dest
+                usesNewUUIDs: (BOOL) usesNewUUIDs
 {
     NILARG_EXCEPTION_TEST(aUUID);
-    return [self copyItemsWithUUIDs: @[aUUID] fromGraph: source toGraph: dest][0];
+    return [self copyItemsWithUUIDs: @[aUUID] 
+                          fromGraph: source 
+                            toGraph: dest 
+                       usesNewUUIDs: usesNewUUIDs][0];
 }
 
 - (NSArray *)copyItemsWithUUIDs: (NSArray *)uuids
                       fromGraph: (id <COItemGraph>)source
                         toGraph: (id <COItemGraph>)dest
+                   usesNewUUIDs: (BOOL) usesNewUUIDs
 {
     NILARG_EXCEPTION_TEST(uuids);
     NILARG_EXCEPTION_TEST(source);
     NILARG_EXCEPTION_TEST(dest);
+    INVALIDARG_EXCEPTION_TEST(usesNewUUIDs, ![source isEqual: dest])
 
     NSMutableSet *uuidsToCopy = [NSMutableSet new];
 
@@ -127,7 +133,7 @@
 
     for (ETUUID *oldUUID in uuidsToCopy)
     {
-        mapping[oldUUID] = [ETUUID UUID];
+        mapping[oldUUID] = usesNewUUIDs ? [ETUUID UUID] : oldUUID;
     }
 
     NSMutableArray *result = [NSMutableArray array];

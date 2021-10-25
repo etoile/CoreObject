@@ -49,7 +49,8 @@
 
     ETUUID *copyRootUUID = [copier copyItemWithUUID: self.UUID
                                           fromGraph: self.objectGraphContext
-                                            toGraph: result];
+                                            toGraph: result
+                                       usesNewUUIDs: YES];
     result.rootItemUUID = copyRootUUID;
 
     COMutableItem *chunkCopy = [result itemForUUID: copyRootUUID];
