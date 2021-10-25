@@ -81,19 +81,32 @@
     {
         COItem *item = [source itemForUUID: uuid];
 
-        // FIXME: This isn't intuitive... we just copy one layer deep of non-composite references       
+        // FIXME: This isn't intuitive... we just copy one layer deep of non-composite references 
+        // This problem occurs with Dynamic.source, the source node is copied but its relationship 
+        // aren't. Without requiring non-composite relationships to be nullable, copying doesn't 
+        // seem tractable, since we could end up copying the entire graph. For now, I'm disabling 
+        // this code since it breaks when making changes to a pattern element. Making a change 
+        // triggers a new element copy. When the copier encounters a dynamic through Node.dynamics
+        // it requests the referenced item UUIDs to the dynamic item. Dynamic.source appears among 
+        // the referenced item UUIDs, since it's a non-composite reference. The code below then 
+        // attempts to resolve this UUID to an existing reference which already exists since it was 
+        // previously copied by the same code. However since non-composite references are only 
+        // copied one-layer deep, [dest itemForUUID: referenced] results in a crash because 
+        // the source node cannot be serialized due to dead relationships.
         // FIXME: referencedItemUUIDs ignores composite references, which sounds wrong! Test!
-        for (ETUUID *referenced in item.referencedItemUUIDs)
+        /*for (ETUUID *referenced in item.referencedItemUUIDs)
         {
             if (![compositeObjectCopySet containsObject: referenced])
             {
+                // FIXME: Just check UUID existence rather than request the item which can trigger 
+                // a serialization
                 if ([dest itemForUUID: referenced] == nil)
                 {
                     // If not in dest, copy it
                     [result addObject: referenced];
                 }
             }
-        }
+        }*/
     }
     return result;
 }
@@ -141,6 +154,7 @@
     for (ETUUID *uuid in uuidsToCopy)
     {
         COItem *oldItem = [source itemForUUID: uuid];
+        COItem *xItem = [source itemForUUID: uuid];
         COItem *newItem = [oldItem mutableCopyWithNameMapping: mapping];
         [result addObject: newItem];
     }
