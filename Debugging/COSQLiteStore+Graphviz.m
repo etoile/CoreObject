@@ -82,7 +82,7 @@
 
     COPersistentRootInfo *info = [self persistentRootInfoForUUID: aPersistentRoot];
 
-    assert(dispatch_get_current_queue() != queue_);
+    assert(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL) != dispatch_queue_get_label(queue_));
 
     dispatch_sync(queue_, ^()
     {

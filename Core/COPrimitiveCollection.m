@@ -83,10 +83,10 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
 - (NSPointerArray *)makeBacking
 {
-#if TARGET_OS_IPHONE
-    return [NSPointerArray strongObjectsPointerArray];
-#else
+#ifdef GNUSTEP
     return [NSPointerArray pointerArrayWithStrongObjects];
+#else
+    return [NSPointerArray strongObjectsPointerArray];
 #endif
 }
 
@@ -366,19 +366,19 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
 - (NSPointerArray *)makeBacking
 {
-#if TARGET_OS_IPHONE
-    return [NSPointerArray weakObjectsPointerArray];
-#else
+#ifdef GNUSTEP
     return [NSPointerArray pointerArrayWithWeakObjects];
+#else
+    return [NSPointerArray weakObjectsPointerArray];
 #endif
 }
 
 - (NSHashTable *)makeBackingHashTable
 {
-#if TARGET_OS_IPHONE
-    return [NSHashTable weakObjectsHashTable];
-#else
+#ifdef GNUSTEP
     return [NSHashTable hashTableWithWeakObjects];
+#else
+    return [NSHashTable weakObjectsHashTable];
 #endif
 }
 
@@ -672,10 +672,10 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
 - (NSHashTable *)makeBacking
 {
-#if TARGET_OS_IPHONE
-    return [NSHashTable weakObjectsHashTable];
-#else
+#ifdef GNUSTEP
     return [NSHashTable hashTableWithWeakObjects];
+#else
+    return [NSHashTable weakObjectsHashTable];
 #endif
 }
 
