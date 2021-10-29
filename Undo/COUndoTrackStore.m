@@ -14,12 +14,7 @@
 #import "COEndOfUndoTrackPlaceholderNode.h"
 #import "COJSONSerialization.h"
 #import "COSQLiteUtilities.h"
-
-#if TARGET_OS_IPHONE
-
-#import "NSDistributedNotificationCenter.h"
-
-#endif
+#import "CODistributedNotificationCenter.h"
 
 /* For dispatch_get_current_queue() deprecated on iOS (to prevent to people to 
    use it beside debugging) */
@@ -736,7 +731,7 @@ NSString *const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompacte
                                                         object: self
                                                       userInfo: userInfo];
 
-    [[NSDistributedNotificationCenter defaultCenter]
+    [[CODistributedNotificationCenter defaultCenter]
         postNotificationName: COUndoTrackStoreTrackDidChangeNotification
                       object: [_db databasePath]
                     userInfo: userInfo

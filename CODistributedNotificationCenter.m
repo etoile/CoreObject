@@ -5,7 +5,7 @@
     License:  MIT  (see COPYING)
  */
 
-#import "NSDistributedNotificationCenter.h"
+#import "CODistributedNotificationCenter.h"
 
 /**
  * @group iOS
@@ -44,7 +44,9 @@ static CODistributedNotificationCenter *defaultCenter = nil;
                     userInfo: (NSDictionary *)userInfo
           deliverImmediately: (BOOL)deliverImmediately
 {
+#if !(SANDBOXED) && !(TARGET_OS_IPHONE)
     [self postNotificationName: aName object: aSender userInfo: userInfo];
+#endif
 }
 
 @end

@@ -884,7 +884,7 @@ addToStoreTransaction: (COStoreTransaction *)txn
                                                         object: self
                                                       userInfo: userInfo];
     // FIXME: Implement distributed notification support
-    //    [[NSDistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
+    //    [[CODistributedNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootDidChangeNotification
     //                                                                   object: [self.UUID stringValue]
     //                                                                 userInfo: userInfo
     //                                                       deliverImmediately: NO];
