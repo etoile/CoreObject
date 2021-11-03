@@ -23,9 +23,7 @@
 #import "COCrossPersistentRootDeadRelationshipCache.h"
 #import "CORevisionCache.h"
 #import "COStoreTransaction.h"
-#if TARGET_OS_IPHONE
-#import "NSDistributedNotificationCenter.h"
-#endif
+#import "CODistributedNotificationCenter.h"
 
 @implementation COEditingContext
 
@@ -81,7 +79,7 @@
                                                  name: COStorePersistentRootsDidChangeNotification
                                                object: _store];
 
-    [[NSDistributedNotificationCenter defaultCenter]
+    [[CODistributedNotificationCenter defaultCenter]
         addObserver: self
            selector: @selector(distributedStorePersistentRootsDidChange:)
                name: COStorePersistentRootsDidChangeNotification
@@ -117,7 +115,7 @@
 
 - (void)dealloc
 {
-    [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
+    [[CODistributedNotificationCenter defaultCenter] removeObserver: self];
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 }
 
