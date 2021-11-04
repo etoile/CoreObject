@@ -7,21 +7,6 @@
 
 #import "CODistributedNotificationCenter.h"
 
-/**
- * @group iOS
- * @abstract A fake distributed notification center that operates locally.
- *
- * This makes possible to support NSDistributedNotificationCenter API on iOS.
- *
- * On macOS, we use it to keep multiple store instances (using the same UUID)
- * in sync, accross processes and inside the current process. On iOS, this is
- * the same, except we don't support the 'accross processes' case.
- *
- * Note: A store cannot be accessed by multiple applications on iOS, due to the
- * sandboxing restrictions.
- *
- * See also COSQLiteStore and COUndoTrackStore.
- **/
 @implementation CODistributedNotificationCenter
 
 static CODistributedNotificationCenter *defaultCenter = nil;
@@ -39,13 +24,50 @@ static CODistributedNotificationCenter *defaultCenter = nil;
     return defaultCenter;
 }
 
-- (void)postNotificationName: (NSString *)aName
-                      object: (NSString *)aSender
-                    userInfo: (NSDictionary *)userInfo
+- (void)addObserver: (id)observer 
+           selector: (SEL)aSelector 
+               name: (nullable NSNotificationName)aName 
+             object: (nullable NSString *)anObject
+{
+#if !(SANDBOXED) && !(TARGET_OS_IPHONE)
+    [[NSDistributedNotificationCenter defaultCenter] 
+        addObserver: observer
+           selector: aSelector
+               name: aName
+             object: anObject];
+#else
+    [[NSNotificationCenter defaultCenter] 
+        addObserver: observer
+           selector: aSelector
+               name: aName
+             object: anObject]; 
+#endif
+}
+
+- (void)removeObserver: (id)observer {
+#if !(SANDBOXED) && !(TARGET_OS_IPHONE)
+    [[NSDistributedNotificationCenter defaultCenter] removeObserver: observer];
+#else
+    [[NSNotificationCenter defaultCenter] removeObserver: observer];
+#endif
+}
+
+- (void)postNotificationName: (nullable NSNotificationName)aName
+                      object: (nullable NSString *)aSender
+                    userInfo: (nullable NSDictionary *)userInfo
           deliverImmediately: (BOOL)deliverImmediately
 {
 #if !(SANDBOXED) && !(TARGET_OS_IPHONE)
-    [self postNotificationName: aName object: aSender userInfo: userInfo];
+    [[NSDistributedNotificationCenter defaultCenter] 
+        postNotificationName: aName 
+                      object: aSender 
+                    userInfo: userInfo
+          deliverImmediately: deliverImmediately];
+#else
+    [[NSNotificationCenter defaultCenter] 
+        postNotificationName: aName 
+                      object: aSender 
+                    userInfo: userInfo];
 #endif
 }
 
