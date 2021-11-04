@@ -91,8 +91,6 @@ doesNotPostNotification: (NSString *)notif
 - (void)dealloc
 {
 #ifdef DELETE_STORE_AFTER_EACH_TEST_METHOD
-    // FIXME: For Mac OS X 10.7, this is unsupported, SQLite disk errors
-    // (DB Error: 10 "disk I/O error") appear in TestStoreSQLite.m.
     [[self class] deleteStores];
 #endif
 }

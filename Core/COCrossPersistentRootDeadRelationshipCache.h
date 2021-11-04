@@ -59,7 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * For referring object graph contexts, when unloaded or finalized, the
  * deallocation will trigger their removal of their inner objects from the hash 
- * tables in the cache on 10.8 or iOS 6 or higher, but not on 10.7.
+ * tables in the cache on 10.8 or iOS 6 or higher, which we require.
  */
 - (void)removePath: (COPath *)aPath;
 

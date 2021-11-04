@@ -16,11 +16,7 @@
 {
     SUPERINIT;
     _pathToReferringObjects = [NSMutableDictionary new];
-#if GNUSTEP
-    _referringObjectToPaths = [NSMapTable mapTableWithWeakToStrongObjects];
-#else
     _referringObjectToPaths = [NSMapTable weakToStrongObjectsMapTable];
-#endif
     return self;
 }
 
@@ -35,11 +31,7 @@
         // FIXME: If we don't ditch 10.7 support, we need a reverse mapping
         // from each referringObject to a path set, that can be used to remove
         // the referring objects when their object graph context is discarded.
-#ifdef GNUSTEP
-        referringObjects = [NSHashTable hashTableWithWeakObjects];
-#else
         referringObjects = [NSHashTable weakObjectsHashTable];
-#endif
 
         _pathToReferringObjects[aPath] = referringObjects;
     }

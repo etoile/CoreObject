@@ -83,11 +83,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
 - (NSPointerArray *)makeBacking
 {
-#ifdef GNUSTEP
-    return [NSPointerArray pointerArrayWithStrongObjects];
-#else
     return [NSPointerArray strongObjectsPointerArray];
-#endif
 }
 
 - (instancetype)init
@@ -250,7 +246,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
     COThrowExceptionIfNotMutable(_permanentlyMutable, _temporaryMutable);
     COThrowExceptionIfOutOfBounds(self, index, YES);
 
-    // NSPointerArray on 10.7 doesn't allow inserting at the end using index == count, so
+    // NSPointerArray on 10.9 (at least) doesn't allow inserting at the end using index == count, so
     // call addPointer in that case as a workaround.
     if (index == _externalIndexToBackingIndex.count)
     {
@@ -366,20 +362,12 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
 - (NSPointerArray *)makeBacking
 {
-#ifdef GNUSTEP
-    return [NSPointerArray pointerArrayWithWeakObjects];
-#else
     return [NSPointerArray weakObjectsPointerArray];
-#endif
 }
 
 - (NSHashTable *)makeBackingHashTable
 {
-#ifdef GNUSTEP
-    return [NSHashTable hashTableWithWeakObjects];
-#else
     return [NSHashTable weakObjectsHashTable];
-#endif
 }
 
 - (instancetype)initWithObjects: (const id[])objects count: (NSUInteger)count
@@ -672,11 +660,7 @@ static inline void COThrowExceptionIfOutOfBounds(COMutableArray *self,
 
 - (NSHashTable *)makeBacking
 {
-#ifdef GNUSTEP
-    return [NSHashTable hashTableWithWeakObjects];
-#else
     return [NSHashTable weakObjectsHashTable];
-#endif
 }
 
 @end
