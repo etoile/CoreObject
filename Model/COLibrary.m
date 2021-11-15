@@ -87,7 +87,7 @@
     COSmartGroup *group = [[COSmartGroup alloc]
         initWithObjectGraphContext: _internalTransientObjectGraphContext];
     [group setName: _(@"All Objects")];
-    group.targetCollection = [[[self.persistentRoots mappedCollection] rootObject] allObjects];
+    group.targetCollection = [(id)[[self.persistentRoots mappedCollection] rootObject] allObjects];
 #ifdef GNUSTEP
     group.predicate = [NSPredicate predicateWithFormat: @"isLibrary == YES"];
 #else

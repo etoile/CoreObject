@@ -39,9 +39,9 @@ static NSString *ColorToString(NSColor *color)
     NSColor *rgbColor = color;
     CGFloat a, r, g, b;
 
-    // NOTE: iOS does not support device-independent or generic color spaces
+    // NOTE: On iOS, UIColor uses sRGB color space by default
 #if !(TARGET_OS_IPHONE)
-    rgbColor = [color colorUsingColorSpaceName: NSCalibratedRGBColorSpace];
+    rgbColor = [color colorUsingColorSpace: NSColorSpace.sRGBColorSpace];
 #endif
     [rgbColor getRed: &r green: &g blue: &b alpha: &a];
 
@@ -62,7 +62,7 @@ static NSColor *ColorFromString(NSString *color)
 #if TARGET_OS_IPHONE
     return [UIColor colorWithRed: r green: g blue: b alpha: a];
 #else
-    return [NSColor colorWithCalibratedRed: r green: g blue: b alpha: a];
+    return [NSColor colorWithSRGBRed: r green: g blue: b alpha: a];
 #endif
 }
 

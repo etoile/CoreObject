@@ -82,7 +82,7 @@
 
     COPersistentRootInfo *info = [self persistentRootInfoForUUID: aPersistentRoot];
 
-    assert(dispatch_get_current_queue() != queue_);
+    assert(dispatch_queue_get_label(DISPATCH_CURRENT_QUEUE_LABEL) != dispatch_queue_get_label(queue_));
 
     dispatch_sync(queue_, ^()
     {
@@ -178,12 +178,9 @@ void COViewDOTGraphFile(NSString *dotFilePath)
         {
             continue;
         }
-
-        // NOTE: Using NSTask rather than system() breaks 'po [objectGraphContext showGraph]' in LLDB on 10.7 
-        system([[NSString stringWithFormat: @"%@ -Tpdf '%@' -o '%@'",
-                                            executablePath,
-                                            dotFilePath,
-                                            pdfPath] UTF8String]);
+        NSTask *task = [NSTask launchedTaskWithLaunchPath: executablePath
+                                                arguments: @[@"-Tpdf", dotFilePath, @"-o", pdfPath]];
+        [task waitUntilExit];
         [[NSWorkspace sharedWorkspace] openFile: pdfPath];
         break;
     }

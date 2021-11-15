@@ -8,6 +8,7 @@
 #import "COItemGraph.h"
 #import <EtoileFoundation/Macros.h>
 #import <EtoileFoundation/ETUUID.h>
+#import <EtoileFoundation/ETCollection+HOM.h>
 #import "COItem.h"
 #import "COItem+JSON.h"
 #import "COItem+Binary.h"

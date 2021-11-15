@@ -390,7 +390,7 @@ extern NSString *const COPersistentRootAttributeUsedSize;
  *
  * NOTE: Unstable API
  */
-- (NSArray *)revisionInfosForBackingStoreOfPersistentRootUUID: (ETUUID *)aPersistentRoot;
+- (NSArray<CORevisionInfo *> *)revisionInfosForBackingStoreOfPersistentRootUUID: (ETUUID *)aPersistentRoot;
 /**
  * Returns a delta between the given revision IDs.
  * The delta is uses the granularity of single inner objects, but not individual properties.
@@ -420,8 +420,8 @@ extern NSString *const COPersistentRootAttributeUsedSize;
 /**
  * Only returns non-deleted persistent root UUIDs.
  */
-@property (nonatomic, readonly) NSArray *persistentRootUUIDs;
-@property (nonatomic, readonly) NSArray *deletedPersistentRootUUIDs;
+@property (nonatomic, readonly) NSArray<ETUUID *> *persistentRootUUIDs;
+@property (nonatomic, readonly) NSArray<ETUUID *> *deletedPersistentRootUUIDs;
 
 /**
  * @return  a snapshot of the state of a persistent root, or nil if

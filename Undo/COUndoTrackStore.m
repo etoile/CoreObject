@@ -14,12 +14,7 @@
 #import "COEndOfUndoTrackPlaceholderNode.h"
 #import "COJSONSerialization.h"
 #import "COSQLiteUtilities.h"
-
-#if TARGET_OS_IPHONE
-
-#import "NSDistributedNotificationCenter.h"
-
-#endif
+#import "CODistributedNotificationCenter.h"
 
 /* For dispatch_get_current_queue() deprecated on iOS (to prevent to people to 
    use it beside debugging) */
@@ -204,9 +199,7 @@ NSString *const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompacte
         [_db close];
     });
 
-#if !(TARGET_OS_IPHONE)
-    // N.B.: We are using deployment target 10.7, so ARC does not manage libdispatch objects.
-    // If we switch to deployment target 10.8, ARC will manage libdispatch objects automatically.
+#ifdef GNUSTEP
     // For GNUstep, ARC doesn't manage libdispatch objects since libobjc2 doesn't support it 
     // currently (we compile CoreObject with -DOS_OBJECT_USE_OBJC=0).
     dispatch_release(_queue);
@@ -738,7 +731,7 @@ NSString *const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompacte
                                                         object: self
                                                       userInfo: userInfo];
 
-    [[NSDistributedNotificationCenter defaultCenter]
+    [[CODistributedNotificationCenter defaultCenter]
         postNotificationName: COUndoTrackStoreTrackDidChangeNotification
                       object: [_db databasePath]
                     userInfo: userInfo

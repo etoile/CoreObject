@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6001FA89272C3255000FDD6A /* CODistributedNotificationCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 60882F1F197E629F00484033 /* CODistributedNotificationCenter.m */; };
 		6002E21D197FD6B200AC9150 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60882F24197EA24900484033 /* AppKit.framework */; };
 		6002E21E197FD73A00AC9150 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60882F24197EA24900484033 /* AppKit.framework */; };
 		6002E280197FD90300AC9150 /* libSystem.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60F91ED6197D2CA2009F47D7 /* libSystem.dylib */; };
@@ -108,9 +109,9 @@
 		60882F1B197D50C000484033 /* COObjectToArchivedData.m in Sources */ = {isa = PBXBuildFile; fileRef = 608D25F5192B475200BB7461 /* COObjectToArchivedData.m */; };
 		60882F1C197D50CA00484033 /* CORectToString.m in Sources */ = {isa = PBXBuildFile; fileRef = 6633F10D185515F1009CE6F7 /* CORectToString.m */; };
 		60882F1D197D50CE00484033 /* CORectToString.h in Headers */ = {isa = PBXBuildFile; fileRef = 6633F10C185515F1009CE6F7 /* CORectToString.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		60882F20197E629F00484033 /* NSDistributedNotificationCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 60882F1E197E629F00484033 /* NSDistributedNotificationCenter.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		60882F21197E629F00484033 /* NSDistributedNotificationCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 60882F1F197E629F00484033 /* NSDistributedNotificationCenter.m */; };
-		60882F22197E62FC00484033 /* NSDistributedNotificationCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 60882F1E197E629F00484033 /* NSDistributedNotificationCenter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60882F20197E629F00484033 /* CODistributedNotificationCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 60882F1E197E629F00484033 /* CODistributedNotificationCenter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		60882F21197E629F00484033 /* CODistributedNotificationCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 60882F1F197E629F00484033 /* CODistributedNotificationCenter.m */; };
+		60882F22197E62FC00484033 /* CODistributedNotificationCenter.h in Headers */ = {isa = PBXBuildFile; fileRef = 60882F1E197E629F00484033 /* CODistributedNotificationCenter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		60882F25197EA24900484033 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60882F24197EA24900484033 /* AppKit.framework */; };
 		60882F27197EA25600484033 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60882F26197EA25600484033 /* Foundation.framework */; };
 		60882F29197EA26900484033 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60882F28197EA26900484033 /* libsqlite3.dylib */; };
@@ -1080,8 +1081,8 @@
 		6083223619795D18008D9F9D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
 		6083223819795D21008D9F9D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS8.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		6083223C19797DE2008D9F9D /* COCocoaTouchCompatibility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COCocoaTouchCompatibility.h; path = iOS/COCocoaTouchCompatibility.h; sourceTree = SOURCE_ROOT; };
-		60882F1E197E629F00484033 /* NSDistributedNotificationCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSDistributedNotificationCenter.h; path = iOS/NSDistributedNotificationCenter.h; sourceTree = SOURCE_ROOT; };
-		60882F1F197E629F00484033 /* NSDistributedNotificationCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NSDistributedNotificationCenter.m; path = iOS/NSDistributedNotificationCenter.m; sourceTree = SOURCE_ROOT; };
+		60882F1E197E629F00484033 /* CODistributedNotificationCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CODistributedNotificationCenter.h; sourceTree = SOURCE_ROOT; };
+		60882F1F197E629F00484033 /* CODistributedNotificationCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CODistributedNotificationCenter.m; sourceTree = SOURCE_ROOT; };
 		60882F24197EA24900484033 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		60882F26197EA25600484033 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		60882F28197EA26900484033 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
@@ -1702,8 +1703,6 @@
 			isa = PBXGroup;
 			children = (
 				6083223C19797DE2008D9F9D /* COCocoaTouchCompatibility.h */,
-				60882F1E197E629F00484033 /* NSDistributedNotificationCenter.h */,
-				60882F1F197E629F00484033 /* NSDistributedNotificationCenter.m */,
 				60F91EC6197D1D1C009F47D7 /* main.m */,
 				6028484D1BBAB5820094CDB0 /* Default-568h@2x.png */,
 				60F91EC8197D1D7F009F47D7 /* TestCoreObject-Info.plist */,
@@ -2105,6 +2104,8 @@
 		6686BDC712592C1B0065DE1A /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				60882F1E197E629F00484033 /* CODistributedNotificationCenter.h */,
+				60882F1F197E629F00484033 /* CODistributedNotificationCenter.m */,
 				609C00E21704C42200D01AAB /* COError.h */,
 				609C00E31704C42200D01AAB /* COError.m */,
 				6612113E1821986B003AEC29 /* CODateSerialization.h */,
@@ -2605,7 +2606,7 @@
 				60E08D3019792FFA00D1B7AD /* COCommandUndeletePersistentRoot.h in Headers */,
 				60E08D0219792FFA00D1B7AD /* COBookmark.h in Headers */,
 				60E08D3219792FFA00D1B7AD /* COItemGraphEdit.h in Headers */,
-				60882F20197E629F00484033 /* NSDistributedNotificationCenter.h in Headers */,
+				60882F20197E629F00484033 /* CODistributedNotificationCenter.h in Headers */,
 				60B1568F19B861D3006D5EEF /* COObjectGraphContext+Debugging.h in Headers */,
 				60E08D6119792FFA00D1B7AD /* COObjectGraphContext+GarbageCollection.h in Headers */,
 				60E08D5C19792FFA00D1B7AD /* COStoreWriteRevision.h in Headers */,
@@ -2653,7 +2654,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6036436C1B3800B400DC685B /* COHistoryCompaction.h in Headers */,
-				60882F22197E62FC00484033 /* NSDistributedNotificationCenter.h in Headers */,
+				60882F22197E62FC00484033 /* CODistributedNotificationCenter.h in Headers */,
 				609C00801704C2BA00D01AAB /* CORevision.h in Headers */,
 				609C00941704C3DA00D01AAB /* COEditingContext.h in Headers */,
 				603643841B394E8800DC685B /* COUndoTrackHistoryCompaction.h in Headers */,
@@ -2970,7 +2971,7 @@
 				};
 			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "CoreObject" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -3320,7 +3321,7 @@
 				60E08CBA19792F4600D1B7AD /* COBezierPath.m in Sources */,
 				60E08CB419792F4600D1B7AD /* COSQLiteStorePersistentRootBackingStore.m in Sources */,
 				60E08CE119792F4600D1B7AD /* COLeastCommonAncestor.m in Sources */,
-				60882F21197E629F00484033 /* NSDistributedNotificationCenter.m in Sources */,
+				60882F21197E629F00484033 /* CODistributedNotificationCenter.m in Sources */,
 				60E08CAB19792F4600D1B7AD /* CODictionary.m in Sources */,
 				60E08CDF19792F4600D1B7AD /* COSequenceModification.m in Sources */,
 				60E08CBF19792F4600D1B7AD /* COAttributedStringDiff.m in Sources */,
@@ -3594,6 +3595,7 @@
 				663CE29A17C07ED800E729F5 /* COCommandDeleteBranch.m in Sources */,
 				663CE29C17C07ED800E729F5 /* COCommandSetBranchMetadata.m in Sources */,
 				663CE29E17C07ED800E729F5 /* COCommandSetCurrentBranch.m in Sources */,
+				6001FA89272C3255000FDD6A /* CODistributedNotificationCenter.m in Sources */,
 				663CE2A017C07ED800E729F5 /* COCommandSetCurrentVersionForBranch.m in Sources */,
 				663CE2A217C07ED800E729F5 /* COUndoTrackStore.m in Sources */,
 				663CE2B717C0B05900E729F5 /* COEditingContext+Undo.m in Sources */,
@@ -3850,7 +3852,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "iOS/TestCoreObject-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
@@ -3883,7 +3888,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "iOS/TestCoreObject-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
@@ -3921,7 +3929,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "TestCoreObject (iOS) copy2-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
@@ -3954,7 +3965,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "TestCoreObject (iOS) copy2-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
@@ -4099,7 +4113,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "iOS/TestCoreObject-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
@@ -4132,7 +4149,10 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "iOS/TestCoreObject-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/system",
@@ -4176,6 +4196,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 0;
 				DYLIB_CURRENT_VERSION = 5;
 				FRAMEWORK_VERSION = A;
+				GCC_PREPROCESSOR_DEFINITIONS = "SANDBOXED=1";
 				INFOPLIST_FILE = CoreObjectInfo.plist;
 				INSTALL_PATH = "@rpath";
 				OTHER_CFLAGS = (
@@ -4201,6 +4222,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 0;
 				DYLIB_CURRENT_VERSION = 5;
 				FRAMEWORK_VERSION = A;
+				GCC_PREPROCESSOR_DEFINITIONS = "SANDBOXED=1";
 				INFOPLIST_FILE = CoreObjectInfo.plist;
 				INSTALL_PATH = "@rpath";
 				OTHER_CFLAGS = (
@@ -4248,6 +4270,8 @@
 		C01FCF4F08A954540054247B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -4263,8 +4287,8 @@
 				GCC_INSTRUMENT_PROGRAM_FLOW_ARCS = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-DDEBUG";
 				SDKROOT = macosx;
@@ -4279,6 +4303,8 @@
 		C01FCF5008A954540054247B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -4289,8 +4315,8 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				MACOSX_DEPLOYMENT_TARGET = 10.7;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				SDKROOT = macosx;
 				WARNING_CFLAGS = (
 					"-Wall",

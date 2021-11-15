@@ -30,7 +30,7 @@
 
 /** @taskunit Transaction ID */
 
-@property (nonatomic, readonly) NSArray *persistentRootUUIDs;
+@property (nonatomic, readonly) NSArray<ETUUID *> *persistentRootUUIDs;
 
 /**
  * Returns YES if this transaction contains an action affecting the mutable
