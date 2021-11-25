@@ -129,7 +129,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
 - (BOOL)setupSchema
 {
-    assert(dispatch_get_current_queue() == queue_);
+    dispatch_assert_queue(queue_);
 
     [db_ beginDeferredTransaction];
 
@@ -218,7 +218,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 {
     __block BOOL ok = YES;
 
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
 
     NSMutableDictionary *txnIDForPersistentRoot = [[NSMutableDictionary alloc] init];
     NSMutableArray *insertedUUIDs = [[NSMutableArray alloc] init];
@@ -344,7 +344,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 {
     NSMutableArray *result = [NSMutableArray array];
 
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
 
     dispatch_sync(queue_, ^()
     {
@@ -373,7 +373,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
     __block ETUUID *revUUID = nil;
 
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
 
     dispatch_sync(queue_, ^()
     {
@@ -408,7 +408,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
     __block NSArray *result = nil;
 
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
 
     dispatch_sync(queue_, ^()
     {
@@ -427,7 +427,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 {
     __block NSArray *result = nil;
 
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
 
     dispatch_sync(queue_, ^()
     {
@@ -443,7 +443,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 - (ETUUID *)backingUUIDForPersistentRootUUID: (ETUUID *)aUUID
                           createIfNotPresent: (BOOL)createIfNotPresent
 {
-    assert(dispatch_get_current_queue() == queue_);
+    dispatch_assert_queue(queue_);
 
     ETUUID *backingUUID = backingStoreUUIDForPersistentRootUUID_[aUUID];
     if (backingUUID == nil)
@@ -474,7 +474,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 - (COSQLiteStorePersistentRootBackingStore *)backingStoreForPersistentRootUUID: (ETUUID *)aUUID
                                                             createIfNotPresent: (BOOL)createIfNotPresent
 {
-    assert(dispatch_get_current_queue() == queue_);
+    dispatch_assert_queue(queue_);
 
     ETUUID *bsUUID = [self backingUUIDForPersistentRootUUID: aUUID
                                          createIfNotPresent: createIfNotPresent];
@@ -547,7 +547,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
     __block CORevisionInfo *result = nil;
 
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
 
     dispatch_sync(queue_, ^()
     {
@@ -569,7 +569,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
     __block COItemGraph *result = nil;
 
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
 
     dispatch_sync(queue_, ^()
     {
@@ -591,7 +591,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
     __block COItemGraph *result = nil;
 
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
 
     dispatch_sync(queue_, ^()
     {
@@ -608,7 +608,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
     __block ETUUID *result = nil;
 
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
 
     dispatch_sync(queue_, ^()
     {
@@ -633,7 +633,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
                 revisionIDBeingWritten: (ETUUID *)aRevision
             persistentRootBeingWritten: (ETUUID *)aPersistentRoot
 {
-    assert(dispatch_get_current_queue() == queue_);
+    dispatch_assert_queue(queue_);
 
     [db_ savepoint: @"updateSearchIndexesForItemUUIDs"];
 
@@ -691,7 +691,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 {
     NSMutableArray *result = [NSMutableArray array];
 
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
 
     dispatch_sync(queue_, ^()
     {
@@ -723,7 +723,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
                     persistentRootUUID: (ETUUID *)aUUID
                             branchUUID: (ETUUID *)branch
 {
-    assert(dispatch_get_current_queue() == queue_);
+    dispatch_assert_queue(queue_);
 
     COSQLiteStorePersistentRootBackingStore *backing = [self backingStoreForPersistentRootUUID: aUUID
                                                                             createIfNotPresent: YES];
@@ -773,7 +773,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 - (NSArray *)persistentRootUUIDs
 {
     NSMutableArray *result = [NSMutableArray array];
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
 
     dispatch_sync(queue_, ^()
     {
@@ -791,7 +791,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 {
     NSMutableArray *result = [NSMutableArray array];
 
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
 
     dispatch_sync(queue_, ^()
     {
@@ -814,7 +814,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
     __block COPersistentRootInfo *result = nil;
 
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
 
     dispatch_sync(queue_, ^()
     {
@@ -893,7 +893,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
     NILARG_EXCEPTION_TEST(aBranchUUID);
 
     __block ETUUID *prootUUID = nil;
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
 
     dispatch_sync(queue_, ^()
     {
@@ -925,7 +925,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
 - (BOOL)finalizeGarbageAttachments
 {
-    assert(dispatch_get_current_queue() == queue_);
+    dispatch_assert_queue(queue_);
 
     NSMutableSet *garbage = [NSMutableSet setWithArray: self.attachments];
 
@@ -974,7 +974,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 {
     NSMutableArray *results = [NSMutableArray array];
 
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
 
     dispatch_sync(queue_, ^()
     {
@@ -1000,7 +1000,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
 - (BOOL)vacuum
 {
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
     __block BOOL success = NO;
 
     dispatch_sync(queue_, ^()
@@ -1013,7 +1013,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
 - (NSDictionary *)pageStatistics
 {
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
     __block NSDictionary *statistics = nil;
 
     dispatch_sync(queue_, ^()
@@ -1093,7 +1093,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
 - (FMDatabase *)database
 {
-    assert(dispatch_get_current_queue() == queue_);
+    dispatch_assert_queue(queue_);
     return db_;
 }
 
@@ -1186,7 +1186,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 {
     __block NSDictionary *result = nil;
 
-    assert(dispatch_get_current_queue() != queue_);
+    dispatch_assert_queue_not(queue_);
 
     dispatch_sync(queue_, ^()
     {
