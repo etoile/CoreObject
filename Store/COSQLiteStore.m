@@ -1037,19 +1037,22 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
  */
 - (void)postCommitNotificationsWithUserInfo: (NSDictionary *)userInfo
 {
-    ETAssert([NSThread isMainThread]);
     ETAssert([NSPropertyListSerialization propertyList: userInfo
                                       isValidForFormat: NSPropertyListXMLFormat_v1_0]);
 
-    [[NSNotificationCenter defaultCenter] postNotificationName: COStorePersistentRootsDidChangeNotification
-                                                        object: self
-                                                      userInfo: userInfo];
+    dispatch_async(dispatch_get_main_queue(), ^()
+    {
+        [[NSNotificationCenter defaultCenter] 
+            postNotificationName: COStorePersistentRootsDidChangeNotification
+                          object: self
+                        userInfo: userInfo];
 
-    [[CODistributedNotificationCenter defaultCenter]
-        postNotificationName: COStorePersistentRootsDidChangeNotification
-                      object: [self.UUID stringValue]
-                    userInfo: userInfo
-          deliverImmediately: YES];
+        [[CODistributedNotificationCenter defaultCenter]
+            postNotificationName: COStorePersistentRootsDidChangeNotification
+                          object: [self.UUID stringValue]
+                        userInfo: userInfo
+              deliverImmediately: YES];
+    });
 }
 
 - (void)postCommitNotificationsWithTransactionIDForPersistentRootUUID: (NSDictionary *)txnIDForPersistentRoot
