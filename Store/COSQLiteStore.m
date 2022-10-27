@@ -223,7 +223,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
     NSMutableDictionary *txnIDForPersistentRoot = [[NSMutableDictionary alloc] init];
     NSMutableArray *insertedUUIDs = [[NSMutableArray alloc] init];
     NSMutableArray *deletedUUIDs = [[NSMutableArray alloc] init];
-
+    NSLog(@" +++ Commit");
     dispatch_sync(queue_, ^()
     {
         [db_ beginTransaction];
@@ -1034,7 +1034,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 {
     ETAssert([NSPropertyListSerialization propertyList: userInfo
                                       isValidForFormat: NSPropertyListXMLFormat_v1_0]);
-
+    NSLog(@" +++ Post notifs");
     dispatch_async(dispatch_get_main_queue(), ^()
     {
         [[NSNotificationCenter defaultCenter] 
