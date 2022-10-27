@@ -418,7 +418,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
     dispatch_sync(queue_, ^()
     {
         COSQLiteStorePersistentRootBackingStore *backingStore =
-            [self backingStoreForPersistentRootUUID: prootUUID createIfNotPresent: YES];
+            [self backingStoreForPersistentRootUUID: prootUUID createIfNotPresent: NO];
 
         result = [backingStore revisionInfosForBranchUUID: aBranchUUID
                                          headRevisionUUID: headRevUUID
