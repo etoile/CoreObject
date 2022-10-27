@@ -13,6 +13,8 @@
 @class COItem, CORevisionInfo, COItemGraph, COBranchInfo, COPersistentRootInfo;
 @class FMDatabase, COStoreTransaction;
 
+NS_ASSUME_NONNULL_BEGIN
+
 #define BACKING_STORES_SHARE_SAME_SQLITE_DB 1
 
 typedef NS_OPTIONS(NSUInteger, COBranchRevisionReadingOptions)
@@ -375,23 +377,27 @@ extern NSString *const COPersistentRootAttributeUsedSize;
  * 
  * Adding an in-memory cache for this will probably imporant.
  */
-- (CORevisionInfo *)revisionInfoForRevisionUUID: (ETUUID *)aRevision
-                             persistentRootUUID: (ETUUID *)aPersistentRoot;
+- (nullable CORevisionInfo *)revisionInfoForRevisionUUID: (ETUUID *)aRevision
+                                      persistentRootUUID: (ETUUID *)aPersistentRoot;
 /**
  * N.B. This is the only API for discovering divergent revisions
- * (revisions which aren't ancestors of the current revision of a branch)
+ * (revisions which aren't ancestors of the current revision of a branch).
+ * 
+ * Nil is returned when no backing store can be found for the branch UUID.
  *
  * NOTE: Unstable API
  */
-- (NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
+- (nullable NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
                                 options: (COBranchRevisionReadingOptions)options;
 /**
  * Returns all revision infos of the backing store where the given persistent
- * root is stored
+ * root is stored.
+ * 
+ * Nil is returned when no backing store can be found for the persistent root UUID.
  *
  * NOTE: Unstable API
  */
-- (NSArray<CORevisionInfo *> *)revisionInfosForBackingStoreOfPersistentRootUUID: (ETUUID *)aPersistentRoot;
+- (nullable NSArray<CORevisionInfo *> *)revisionInfosForBackingStoreOfPersistentRootUUID: (ETUUID *)aPersistentRoot;
 /**
  * Returns a delta between the given revision IDs.
  * The delta is uses the granularity of single inner objects, but not individual properties.
@@ -401,18 +407,18 @@ extern NSString *const COPersistentRootAttributeUsedSize;
  * In the future if we add an internal in-memory revision cache to COSQLiteStore, this may
  * no longer be of much use.
  */
-- (COItemGraph *)partialItemGraphFromRevisionUUID: (ETUUID *)baseRevid
-                                   toRevisionUUID: (ETUUID *)finalRevid
-                                   persistentRoot: (ETUUID *)aPersistentRoot;
+- (nullable COItemGraph *)partialItemGraphFromRevisionUUID: (ETUUID *)baseRevid
+                                            toRevisionUUID: (ETUUID *)finalRevid
+                                            persistentRoot: (ETUUID *)aPersistentRoot;
 /**
  * Returns the state the inner object graph at a given revision.
  */
-- (COItemGraph *)itemGraphForRevisionUUID: (ETUUID *)aRevisionUUID
-                           persistentRoot: (ETUUID *)aPersistentRoot;
+- (nullable COItemGraph *)itemGraphForRevisionUUID: (ETUUID *)aRevisionUUID
+                                    persistentRoot: (ETUUID *)aPersistentRoot;
 /**
  * Returns the UUID of the root object of the given persistent root.
  */
-- (ETUUID *)rootObjectUUIDForPersistentRoot: (ETUUID *)aPersistentRoot;
+- (nullable ETUUID *)rootObjectUUIDForPersistentRoot: (ETUUID *)aPersistentRoot;
 
 
 /** @taskunit Persistent Root Reading */
@@ -428,8 +434,8 @@ extern NSString *const COPersistentRootAttributeUsedSize;
  * @return  a snapshot of the state of a persistent root, or nil if
  *          the persistent root does not exist.
  */
-- (COPersistentRootInfo *)persistentRootInfoForUUID: (ETUUID *)aUUID;
-- (ETUUID *)persistentRootUUIDForBranchUUID: (ETUUID *)aBranchUUID;
+- (nullable COPersistentRootInfo *)persistentRootInfoForUUID: (ETUUID *)aUUID;
+- (nullable ETUUID *)persistentRootUUIDForBranchUUID: (ETUUID *)aBranchUUID;
 
 
 /** @taskunit Search. API not final. */
@@ -501,7 +507,7 @@ extern NSString *const COPersistentRootAttributeUsedSize;
  * Returns a dictionary of attributes describing the persistent root
  * such as COPersistentRootAttributeExportSize and COPersistentRootAttributeUsedSize
  */
-- (NSDictionary *)attributesForPersistentRootWithUUID: (ETUUID *)aUUID;
+- (nullable NSDictionary *)attributesForPersistentRootWithUUID: (ETUUID *)aUUID;
 
 
 /** @taskunit Description */
@@ -518,3 +524,5 @@ extern NSString *const COPersistentRootAttributeUsedSize;
 @property (nonatomic, readonly) NSString *detailedDescription;
 
 @end
+
+NS_ASSUME_NONNULL_END
