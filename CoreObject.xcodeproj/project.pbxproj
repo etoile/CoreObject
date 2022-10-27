@@ -2920,7 +2920,7 @@
 				6686BDA812592BDA0065DE1A /* Resources */,
 				6686BDA912592BDA0065DE1A /* Sources */,
 				6686BDAA12592BDA0065DE1A /* Frameworks */,
-				66FD34871830B1D900898381 /* ShellScript */,
+				66FD34871830B1D900898381 /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -3194,7 +3194,7 @@
 			shellPath = /bin/sh;
 			shellScript = "# Derived from: https://github.com/gh-unit/gh-unit/blob/master/Scripts/RunTests.sh\n\n# If we aren't running from the command line, then exit\nif [ \"$TESTCOREOBJECT_AUTORUN\" = \"\" ]; then\nexit 0\nfi\n\nexport DYLD_FRAMEWORK_PATH=\"$CONFIGURATION_BUILD_DIR\"\n$TARGET_BUILD_DIR/$EXECUTABLE_PATH\nRETVAL=$?\n\nexit $RETVAL\n";
 		};
-		66FD34871830B1D900898381 /* ShellScript */ = {
+		66FD34871830B1D900898381 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -3202,6 +3202,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4340,6 +4341,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-DDEBUG";
 				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
@@ -4388,6 +4390,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
 				WARNING_CFLAGS = (
 					"-Wall",
 					"-Wextra",
