@@ -7,7 +7,7 @@
 
 #import "FolderWithNoClass.h"
 
-void registerFolderWithNoClassEntityDescriptionIfNeeded()
+void registerFolderWithNoClassEntityDescriptionIfNeeded(void)
 {
     static BOOL registered;
     if (registered)

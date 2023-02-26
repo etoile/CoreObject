@@ -124,8 +124,15 @@ changeInLength: (NSInteger)delta
 
 
 @implementation AbstractTextStorageTests
-
+#ifdef GNUSTEP
 - (void)textStorageWillProcessEditing: (NSNotification *)notification
+
+#else
+- (void)textStorage: (NSTextStorage *)textStorage
+ willProcessEditing: (NSTextStorageEditActions)editedMask
+              range: (NSRange)editedRange
+     changeInLength: (NSInteger)changeInLength
+#endif
 {
     _didProcessEditing = YES;
     _lastEditedRange = as.editedRange;

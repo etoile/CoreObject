@@ -60,7 +60,7 @@
     //  1--2--3
     //      \
     //       4
-    ETUUID *objectUUID;
+    __unused ETUUID *objectUUID;
 
     COPersistentRoot *persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
 

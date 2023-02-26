@@ -102,7 +102,7 @@ extern NSString *const COUndoTrackStoreTrackCompacted;
  *
  * This method must be run in the main thread.
  */
-- (BOOL)commitTransactionWithCompletionHandler: (void (^)())completion;
+- (BOOL)commitTransactionWithCompletionHandler: (void (^)(void))completion;
 
 
 /** @taskunit Managing Undo Tracks */

@@ -777,7 +777,7 @@ static NSNull *cachedNSNull = nil;
 {
     ETPropertyDescription *propertyDesc = [_entityDescription propertyDescriptionForName: key];
     ETPropertyDescription *opposite = propertyDesc.opposite;
-    ETValidationResult *oppositeResult = nil;
+    __unused ETValidationResult *oppositeResult = nil;
 
     if (opposite != nil)
     {
