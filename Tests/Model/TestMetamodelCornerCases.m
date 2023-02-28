@@ -9,6 +9,23 @@
 
 /**
  * This is meant to be a spec for corner cases in the metamodel.
+ *
+ * Q: do we support both aggregate and composite references (EMOF) or just
+ *    composite (FM3)?
+ *
+ * A: Following FM3's design, we don't support aggregate as a separate case.
+ *    The only point of supporting aggregate as a distinct concept from composite
+ *    would be to model relationships where a child can be in two containers
+ *    at once, but the relationship forbids cycles. This could maybe be
+ *    desirable for some kind of relationship representing tagging, but
+ *    until there's a concrete use case we're not supporting it.
+ *
+ *    Quentin: I would say that documenting/encoding a relationship as an
+ *    aggregation doesn't matter for ownership. As a result, it doesn't impact
+ *    the lifetime of the aggregated object and how it gets copied across object
+ *    graphs. So aggregation is useful to understand the relationships between
+ *    the objects but doesn't matter from an implementation/behavior perspective.
+ *    While composite matters from an implementation/behavior perspective.
  */
 @interface TestMetamodelCornerCases : EditingContextTestCase <UKTest>
 @end
@@ -30,31 +47,6 @@
 
     UKObjectsSame(data, [repo entityDescriptionForClass: [NSData class]]);
     UKObjectsSame(attachmentID, [repo entityDescriptionForClass: [COAttachmentID class]]);
-}
-
-/**
- * Q: do we support both aggregate and composite references (EMOF) or just
- *    composite (FM3)?
- *
- * A: Following FM3's design, we don't support aggregate as a separate case.
- *    The only point of supporting aggregate as a distinct concept from composite
- *    would be to model relationships where a child can be in two containers
- *    at once, but the relationship forbids cycles. This could maybe be
- *    desirable for some kind of relationship representing tagging, but
- *    until there's a concrete use case we're not supporting it.
- *
- *    Quentin: I would say that documenting/encoding a relationship as an 
- *    aggregation doesn't matter for ownership. As a result, it doesn't impact 
- *    the lifetime of the aggregated object and how it gets copied across object
- *    graphs. So aggregation is useful to understand the relationships between 
- *    the objects but doesn't matter from an implementation/behavior perspective.
- *    While composite matters from an implementation/behavior perspective.
- */
-- (void)testNoAggregate
-{
-    ETPropertyDescription *testProp = [ETPropertyDescription descriptionWithName: @"contents"
-                                                                        typeName: @"COObject"];
-    UKFalse([testProp respondsToSelector: @selector(setAggregate:)]);
 }
 
 #pragma mark -
