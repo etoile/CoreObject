@@ -1,7 +1,7 @@
 #import "TestCommon.h"
 
-ETUUID *AttributedString1UUID();
-ETUUID *AttributedString2UUID();
+ETUUID *AttributedString1UUID(void);
+ETUUID *AttributedString2UUID(void);
 
 @interface EditingContextTestCase (TestAttributedStringCommon)
 

@@ -120,7 +120,7 @@ static ETUUID *rootUUID;
     NSString *dir = [self tempPathWithName: @"coreobject-index-become-readonly"];
 
     COPersistentRootInfo *info = nil;
-    int64_t changeCount;
+    __unused int64_t changeCount;
 
     @autoreleasepool
     {

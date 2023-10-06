@@ -19,7 +19,7 @@ BOOL IsSetter(const char *selname, size_t sellen);
 BOOL isSerializablePrimitiveValue(id value);
 BOOL isSerializableScalarValue(id value);
 
-ETEntityDescription *entityDescriptionForObjectInRepository();
+ETEntityDescription *entityDescriptionForObjectInRepository(id anObject, ETModelDescriptionRepository *repo);
 
 @interface COObject ()
 

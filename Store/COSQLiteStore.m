@@ -1205,7 +1205,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
     return result;
 }
 
-- (void)testingRunBlockInStoreQueue: (void (^)())aBlock
+- (void)testingRunBlockInStoreQueue: (void (^)(void))aBlock
 {
     dispatch_sync(queue_, aBlock);
 }

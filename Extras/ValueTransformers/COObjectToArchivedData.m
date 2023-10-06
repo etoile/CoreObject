@@ -21,14 +21,18 @@
 
 - (id)transformedValue: (id)value
 {
-    return (value != nil ? [NSKeyedArchiver archivedDataWithRootObject: value] : nil);
+    return (value != nil ? [NSKeyedArchiver archivedDataWithRootObject: value
+                                                 requiringSecureCoding: NO
+                                                                 error: NULL] : nil);
 }
 
 - (id)reverseTransformedValue: (id)value
 {
     NSParameterAssert(value == nil || [value isKindOfClass: [NSData class]]);
 
-    return (value != nil ? [NSKeyedUnarchiver unarchiveObjectWithData: value] : nil);
+    return (value != nil ? [NSKeyedUnarchiver unarchivedObjectOfClass: [NSData class]
+                                                             fromData: value
+                                                                error: NULL] : nil);
 }
 
 @end

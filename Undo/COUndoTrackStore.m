@@ -307,7 +307,7 @@ NSString *const COUndoTrackStoreTrackCompacted = @"COUndoTrackStoreTrackCompacte
     return ok;
 }
 
-- (BOOL)commitTransactionWithCompletionHandler: (void (^)())completion
+- (BOOL)commitTransactionWithCompletionHandler: (void (^)(void))completion
 {
     ETAssert([NSThread isMainThread]);
     __block BOOL ok = NO;

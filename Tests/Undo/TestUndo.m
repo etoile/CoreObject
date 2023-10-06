@@ -736,7 +736,7 @@
 
 - (void)testUndoCoalescing
 {
-    CORevision *r0, *r1, *r2, *r3, *r4, *r5, *r6;
+    CORevision *r0, __unused *r1, *r2, __unused *r3, *r4, *r5, *r6;
     OutlineItem *item = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"].rootObject;
     [ctx commit];
     r0 = item.revision;
