@@ -12,6 +12,8 @@
 @class COObject, COEditingContext, CORevision;
 @protocol COTrackNode;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /** 
  * @group Undo
  * @abstract COTrack is a protocol to present changes on a timeline, 
@@ -85,7 +87,7 @@
  * the track implementation should rely on -nextNodeOnTrackFrom:backwards: as 
  * much as possible.
  */
-@property (nonatomic, readonly) NSArray *nodes;
+@property (nonatomic, readonly) NSArray<id <COTrackNode>> *nodes;
 
 /**
  * Returns the node that follows aNode on the track when back is NO, otherwise
@@ -212,10 +214,12 @@
 /**
  * Returns the parent node of this node, or nil if there is none.
  */
-@property (nonatomic, readonly) id <COTrackNode> parentNode;
+@property (nonatomic, readonly, nullable) id <COTrackNode> parentNode;
 /**
  * Returns the merge parent node of this node, or nil if there is none.
  */
-@property (nonatomic, readonly) id <COTrackNode> mergeParentNode;
+@property (nonatomic, readonly, nullable) id <COTrackNode> mergeParentNode;
 
 @end
+
+NS_ASSUME_NONNULL_END

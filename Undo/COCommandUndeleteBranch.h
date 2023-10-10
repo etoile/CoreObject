@@ -7,6 +7,8 @@
 
 #import <CoreObject/COCommand.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COCommandUndeleteBranch : COCommand
 {
     ETUUID *_branchUUID;
@@ -15,3 +17,5 @@
 @property (nonatomic, readwrite, copy) ETUUID *branchUUID;
 
 @end
+
+NS_ASSUME_NONNULL_END

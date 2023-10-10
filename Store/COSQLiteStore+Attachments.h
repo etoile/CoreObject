@@ -7,10 +7,14 @@
 
 #import <CoreObject/CoreObject.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COSQLiteStore (Attachments)
 
-- (NSURL *)URLForAttachmentID: (COAttachmentID *)aHash;
-- (COAttachmentID *)importAttachmentFromURL: (NSURL *)aURL;
-- (COAttachmentID *)importAttachmentFromData: (NSData *)data;
+- (nullable NSURL *)URLForAttachmentID: (COAttachmentID *)aHash;
+- (nullable COAttachmentID *)importAttachmentFromURL: (NSURL *)aURL;
+- (nullable COAttachmentID *)importAttachmentFromData: (NSData *)data;
 
 @end
+
+NS_ASSUME_NONNULL_END

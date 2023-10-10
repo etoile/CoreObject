@@ -8,13 +8,17 @@
 #import <CoreObject/CoreObject.h>
 #import "CoreObject/COStoreAction.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COStoreWriteRevision : NSObject <COStoreAction>
 
 @property (nonatomic, retain, readwrite) COItemGraph *modifiedItems;
 @property (nonatomic, retain, readwrite) ETUUID *revisionUUID;
-@property (nonatomic, retain, readwrite) ETUUID *parentRevisionUUID;
-@property (nonatomic, retain, readwrite) ETUUID *mergeParentRevisionUUID;
+@property (nonatomic, retain, readwrite, nullable) ETUUID *parentRevisionUUID;
+@property (nonatomic, retain, readwrite, nullable) ETUUID *mergeParentRevisionUUID;
 @property (nonatomic, retain, readwrite) ETUUID *branch;
-@property (nonatomic, retain, readwrite) NSDictionary *metadata;
+@property (nonatomic, retain, readwrite, nullable) NSDictionary<NSString *, id> *metadata;
 
 @end
+
+NS_ASSUME_NONNULL_END

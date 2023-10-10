@@ -9,6 +9,8 @@
 
 @class COUndoTrack, COCommand;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * Goals for the app level undo system:
  *
@@ -56,8 +58,8 @@
 
 // Called from COEditingContext
 
-- (void)recordBeginUndoGroupWithMetadata: (NSDictionary *)metadata;
-- (COCommandGroup *)recordEndUndoGroupWithUndoTrack: (COUndoTrack *)track;
+- (void)recordBeginUndoGroupWithMetadata: (nullable NSDictionary<NSString *, id> *)metadata;
+- (COCommandGroup *)recordEndUndoGroupWithUndoTrack: (nullable COUndoTrack *)track;
 - (void)recordPersistentRootDeletion: (COPersistentRoot *)aPersistentRoot;
 - (void)recordPersistentRootUndeletion: (COPersistentRoot *)aPersistentRoot;
 
@@ -69,7 +71,7 @@
             setCurrentBranch: (COBranch *)aBranch
                    oldBranch: (COBranch *)oldBranch;
 - (void)recordPersistentRootSetMetadata: (COPersistentRoot *)aPersistentRoot
-                            oldMetadata: (id)oldMetadata;
+                            oldMetadata: (nullable NSDictionary<NSString *, id> *)oldMetadata;
 
 // Called from COBranch
 
@@ -80,8 +82,10 @@
                        oldHeadRevisionUUID: (ETUUID *)oldHead
                                   ofBranch: (COBranch *)aBranch;
 - (void)recordBranchSetMetadata: (COBranch *)aBranch
-                    oldMetadata: (id)oldMetadata;
+                    oldMetadata: (nullable NSDictionary<NSString *, id> *)oldMetadata;
 - (void)recordBranchDeletion: (COBranch *)aBranch;
 - (void)recordBranchUndeletion: (COBranch *)aBranch;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -10,6 +10,8 @@
 
 @class COSQLiteStorePersistentRootBackingStore;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * Private methods which are exposed so tests can look at the store internals.
  */
@@ -20,9 +22,9 @@
 
 - (BOOL)writeRevisionWithModifiedItems: (COItemGraph *)anItemTree
                           revisionUUID: (ETUUID *)aRevisionUUID
-                              metadata: (NSDictionary *)metadata
-                      parentRevisionID: (ETUUID *)aParent
-                 mergeParentRevisionID: (ETUUID *)aMergeParent
+                              metadata: (NSDictionary<NSString *, id> *)metadata
+                      parentRevisionID: (nullable ETUUID *)aParent
+                 mergeParentRevisionID: (nullable ETUUID *)aMergeParent
                     persistentRootUUID: (ETUUID *)aUUID
                             branchUUID: (ETUUID *)branch;
 - (COSQLiteStorePersistentRootBackingStore *)backingStoreForPersistentRootUUID: (ETUUID *)aUUID
@@ -30,3 +32,5 @@
 - (void)testingRunBlockInStoreQueue: (void (^)(void))aBlock;
 
 @end
+
+NS_ASSUME_NONNULL_END

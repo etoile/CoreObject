@@ -9,6 +9,8 @@
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COSQLiteStore.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * @group Store
  * @abstract A compaction strategy to free space in a CoreObject store.
@@ -46,7 +48,7 @@
  *
  * To attempt finalizing all persistent roots, return -compactablePersistentRootUUIDs.
  */
-@property (nonatomic, readonly, copy) NSSet *finalizablePersistentRootUUIDs;
+@property (nonatomic, readonly, copy) NSSet<ETUUID *> *finalizablePersistentRootUUIDs;
 /**
  * The persistent roots to be kept when compacting the history, but whose 
  * branches and revisions can be deleted.
@@ -57,7 +59,7 @@
  * If some of these persistent roots are returned among -finalizablePersistentRootUUIDs,
  * they will be finalized if marked as deleted, or compacted otherwise.
  */
-@property (nonatomic, readonly, copy) NSSet *compactablePersistentRootUUIDs;
+@property (nonatomic, readonly, copy) NSSet<ETUUID *> *compactablePersistentRootUUIDs;
 
 
 /** @taskunit Branch Status */
@@ -73,7 +75,7 @@
  *
  * To attempt finalizing all branches, return -compactableBranchUUIDs.
  */
-@property (nonatomic, readonly, copy) NSSet *finalizableBranchUUIDs;
+@property (nonatomic, readonly, copy) NSSet<ETUUID *> *finalizableBranchUUIDs;
 /**
  * The branches to be kept when compacting the history, but whose revisions can 
  * be deleted.
@@ -84,7 +86,7 @@
  * If some of these branches are returned among -finalizableBranchUUIDs and end
  * up being finalized, they will be ignored.
  */
-@property (nonatomic, readonly, copy) NSSet *compactableBranchUUIDs;
+@property (nonatomic, readonly, copy) NSSet<ETUUID *> *compactableBranchUUIDs;
 
 
 /** @taskunit Revision Status */
@@ -103,7 +105,7 @@
  * deleted (not yet implemented). No matter which revisions you return, this 
  * ensures you cannot accidentally create detached branches.
  */
-- (NSSet *)liveRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs;
+- (NSSet<ETUUID *> *)liveRevisionUUIDsForPersistentRootUUIDs: (NSArray<ETUUID *> *)persistentRootUUIDs;
 
 
 /** @taskunit Reacting to Compaction Progresses */
@@ -163,3 +165,5 @@
 - (BOOL)compactHistory: (id <COHistoryCompaction>)aCompactionStrategy;
 
 @end
+
+NS_ASSUME_NONNULL_END

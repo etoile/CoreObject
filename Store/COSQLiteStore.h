@@ -355,6 +355,7 @@ extern NSString *const COPersistentRootAttributeUsedSize;
  * Opens an exisiting, or creates a new CoreObject store at the given file:// URL.
  */
 - (instancetype)initWithURL: (NSURL *)aURL NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
 
 /**
  * Returns the file:// URL the receiver was created with.

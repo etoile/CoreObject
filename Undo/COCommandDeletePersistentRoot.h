@@ -7,6 +7,8 @@
 
 #import <CoreObject/COCommand.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COCommandDeletePersistentRoot : COCommand
 {
 @private
@@ -20,6 +22,8 @@
  * If the command is a undelete inverse or was not obtained using 
  * -[COCommand inverse], returns nil.
  */
-@property (nonatomic, readwrite, copy) ETUUID *initialRevisionID;
+@property (nonatomic, readwrite, copy, nullable) ETUUID *initialRevisionID;
 
 @end
+
+NS_ASSUME_NONNULL_END

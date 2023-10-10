@@ -8,6 +8,10 @@
 #import <CoreObject/CoreObject.h>
 #include <dispatch/dispatch.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 void dispatch_sync_now(dispatch_queue_t queue, dispatch_block_t block);
 
-NSDictionary *pageStatisticsForDatabase(FMDatabase *db);
+NSDictionary<NSString *, NSNumber *> *pageStatisticsForDatabase(FMDatabase *db);
+
+NS_ASSUME_NONNULL_END

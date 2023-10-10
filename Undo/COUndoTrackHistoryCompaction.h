@@ -11,6 +11,8 @@
 
 @class COUndoTrack, COCommandGroup;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /** 
  * @group Undo
  * @abstract A compaction strategy that targets the history located in the undo
@@ -80,6 +82,7 @@
  */
 - (instancetype)initWithUndoTrack: (COUndoTrack *)aTrack
                       upToCommand: (COCommandGroup *)aCommand NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
 
 @property (nonatomic, readonly) COUndoTrack *undoTrack;
 
@@ -105,7 +108,7 @@
  * This method is a debugging utility, it is never used when compacting the 
  * store unlike -liveRevisionUUIDs.
  */
-@property (nonatomic, readonly) NSDictionary *deadRevisionUUIDs;
+@property (nonatomic, readonly) NSDictionary<ETUUID *, ETUUID *> *deadRevisionUUIDs;
 /**
  * The revisions sets to be kept when compacting the history, organized by 
  * persistent root UUID.
@@ -113,7 +116,7 @@
  * These revisions can include dead revisions in their range, see 
  * -deadRevisionUUIDs.
  */
-@property (nonatomic, readonly) NSDictionary *liveRevisionUUIDs;
+@property (nonatomic, readonly) NSDictionary<ETUUID *, ETUUID *> *liveRevisionUUIDs;
 
 /**
  * Returns the dead revisions per persistent root. 
@@ -121,6 +124,8 @@
  * This method is similar to -liveRevisionUUIDsForPersistentRootUUIDs:, but is
  * only available for debugging purpose.
  */
-- (NSSet *)deadRevisionUUIDsForPersistentRootUUIDs: (NSArray *)persistentRootUUIDs;
+- (NSSet<ETUUID *> *)deadRevisionUUIDsForPersistentRootUUIDs: (NSArray<ETUUID *> *)persistentRootUUIDs;
 
 @end
+
+NS_ASSUME_NONNULL_END

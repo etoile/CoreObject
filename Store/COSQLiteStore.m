@@ -107,10 +107,15 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
     return self;
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+
 - (instancetype)init
 {
     return [self initWithURL: nil];
 }
+
+#pragma clang diagnostic pop
 
 - (void)dealloc
 {

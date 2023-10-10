@@ -7,9 +7,10 @@
 
 #import <CoreObject/COCommand.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COCommandUndeletePersistentRoot : COCommand
 @end
-
 
 @interface COCommandCreatePersistentRoot : COCommandUndeletePersistentRoot
 {
@@ -23,3 +24,5 @@
 @property (nonatomic, readwrite, copy) ETUUID *initialRevisionID;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -12,6 +12,8 @@
 @class FMDatabase;
 @class ETUUID;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * @group Undo
  * @abstract A specialized store to persist undo tracks.
@@ -71,7 +73,7 @@
  * raises a NSInvalidArgumentException.
  */
 - (instancetype)initWithURL: (NSURL *)aURL NS_DESIGNATED_INITIALIZER;
-
+- (instancetype)init NS_UNAVAILABLE;
 
 /** @taskunit Basic Properties */
 
@@ -84,3 +86,5 @@
 @property (nonatomic, readonly) NSURL *URL;
 
 @end
+
+NS_ASSUME_NONNULL_END
