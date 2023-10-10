@@ -434,7 +434,7 @@ extern NSString *const COPersistentRootAttributeUsedSize;
  * @return  a snapshot of the state of a persistent root, or nil if
  *          the persistent root does not exist.
  */
-- (nullable COPersistentRootInfo *)persistentRootInfoForUUID: (ETUUID *)aUUID;
+- (nullable COPersistentRootInfo *)persistentRootInfoForUUID: (nullable ETUUID *)aUUID;
 - (nullable ETUUID *)persistentRootUUIDForBranchUUID: (ETUUID *)aBranchUUID;
 
 
