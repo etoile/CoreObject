@@ -8,5 +8,9 @@
 #import <CoreObject/CoreObject.h>
 #import "CoreObject/COStoreAction.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COStoreDeletePersistentRoot : NSObject <COStoreAction>
 @end
+
+NS_ASSUME_NONNULL_END

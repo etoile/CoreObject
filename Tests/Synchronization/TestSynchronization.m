@@ -121,11 +121,11 @@ static ETUUID *branchBUUID;
 
     COBranchInfo *currentBranch = clientInfo.currentBranchInfo;
     COBranchInfo *replicatedBranchA = [[clientInfo branchInfosWithMetadataValue: [branchAUUID stringValue]
-                                                                         forKey: @"replcatedBranch"] firstObject];
+                                                                         forKey: @"replicatedBranch"] firstObject];
 
 
     COBranchInfo *replicatedBranchB = [[clientInfo branchInfosWithMetadataValue: [branchBUUID stringValue]
-                                                                         forKey: @"replcatedBranch"] firstObject];
+                                                                         forKey: @"replicatedBranch"] firstObject];
 
     // Check out the 3 branches
     UKObjectsEqual(branchAUUID, currentBranch.UUID);
@@ -219,7 +219,7 @@ static ETUUID *branchBUUID;
     COBranchInfo *currentBranch = clientInfo.currentBranchInfo;
 
     COBranchInfo *replicatedBranchA = [[clientInfo branchInfosWithMetadataValue: [branchAUUID stringValue]
-                                                                         forKey: @"replcatedBranch"] firstObject];
+                                                                         forKey: @"replicatedBranch"] firstObject];
 
     UKTrue([replicatedBranchA.metadata[@"source"] isEqual: @"server"]);
 
@@ -303,7 +303,7 @@ static ETUUID *branchBUUID;
     
     COBranchInfo *currentBranch = clientCheapCopyInfo.currentBranchInfo;
     COBranchInfo *replicatedCheapCopyBranch = [[clientCheapCopyInfo branchInfosWithMetadataValue: [cheapCopyBranchUUID stringValue]
-                                                                                          forKey: @"replcatedBranch"] firstObject];
+                                                                                          forKey: @"replicatedBranch"] firstObject];
 
     UKObjectsEqual(cheapCopyBranchUUID, currentBranch.UUID);
     UKObjectsNotEqual(cheapCopyBranchUUID, replicatedCheapCopyBranch.UUID);
@@ -381,7 +381,7 @@ static ETUUID *branchBUUID;
     COBranchInfo *currentBranch = serverInfo.currentBranchInfo;
 
     COBranchInfo *replicatedBranchA = [[serverInfo branchInfosWithMetadataValue: [branchAUUID stringValue]
-                                                                         forKey: @"replcatedBranch"] firstObject];
+                                                                         forKey: @"replicatedBranch"] firstObject];
 
     UKTrue([replicatedBranchA.metadata[@"source"] isEqual: @"client"]);
 
@@ -453,7 +453,7 @@ static ETUUID *branchBUUID;
         NSSet *serverRemoteBranches = [serverPersistentRoot.branches filteredCollectionWithBlock: ^(
             COBranch *obj)
         {
-            return (BOOL)(obj.metadata[@"replcatedBranch"] != nil);
+            return (BOOL)(obj.metadata[@"replicatedBranch"] != nil);
         }];
         UKIntsEqual(1, serverRemoteBranches.count);
         COBranch *serverRemoteBranch = [serverRemoteBranches anyObject];
@@ -495,7 +495,7 @@ static ETUUID *branchBUUID;
         NSSet *serverRemoteBranches = [serverPersistentRoot.branches filteredCollectionWithBlock: ^(
             COBranch *obj)
         {
-            return (BOOL)(obj.metadata[@"replcatedBranch"] != nil);
+            return (BOOL)(obj.metadata[@"replicatedBranch"] != nil);
         }];
         UKIntsEqual(1, serverRemoteBranches.count);
         COBranch *serverRemoteBranch = [serverRemoteBranches anyObject];

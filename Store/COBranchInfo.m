@@ -29,9 +29,9 @@
     return nil;
 }
 
-- (ETUUID *)replcatedBranch
+- (ETUUID *)replicatedBranch
 {
-    NSString *value = metadata_[@"replcatedBranch"];
+    NSString *value = metadata_[@"replicatedBranch"];
     if (value != nil)
     {
         return [ETUUID UUIDWithString: value];

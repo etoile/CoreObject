@@ -8,6 +8,8 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/ETUUID.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  *  Info about a commit. Parent revision (maybe nil), metadata, etc.
  *  There's a 1:1 mapping between a CORevisionID and CORevision per store.
@@ -25,14 +27,16 @@
 }
 
 @property (nonatomic, readwrite, copy) ETUUID *revisionUUID;
-@property (nonatomic, readwrite, copy) ETUUID *parentRevisionUUID;
-@property (nonatomic, readwrite, copy) ETUUID *mergeParentRevisionUUID;
+@property (nonatomic, readwrite, copy, nullable) ETUUID *parentRevisionUUID;
+@property (nonatomic, readwrite, copy, nullable) ETUUID *mergeParentRevisionUUID;
 @property (nonatomic, readwrite, copy) ETUUID *persistentRootUUID;
 @property (nonatomic, readwrite, copy) ETUUID *branchUUID;
-@property (readwrite, nonatomic, copy) NSDictionary *metadata;
+@property (readwrite, nonatomic, copy, nullable) NSDictionary<NSString *, id> *metadata;
 @property (nonatomic, readwrite, copy) NSDate *date;
 @property (nonatomic, readonly, strong) id plist;
 
 + (CORevisionInfo *)revisionInfoWithPlist: (id)aPlist;
 
 @end
+
+NS_ASSUME_NONNULL_END

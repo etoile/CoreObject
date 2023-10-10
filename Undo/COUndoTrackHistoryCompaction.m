@@ -65,10 +65,15 @@
     return self;
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+
 - (instancetype)init
 {
     return [self initWithUndoTrack: nil upToCommand: nil];
 }
+
+#pragma clang diagnostic pop
 
 /**
  * Since COUndoTrackStore is almost entirely thread-safe, we could relatively

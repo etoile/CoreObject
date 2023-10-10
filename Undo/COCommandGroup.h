@@ -11,6 +11,8 @@
 @class COCommitDescriptor;
 @class COUndoTrackSerializedCommand;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * @group Undo
  * @abstract A command group represents a commit done in an editing context
@@ -66,18 +68,18 @@
  *
  * Cannot contain COCommandGroup objects.
  */
-@property (nonatomic, readwrite, copy) NSMutableArray *contents;
+@property (nonatomic, readwrite, copy) NSMutableArray<COCommand *> *contents;
 /**
  * The commit metadata.
  */
-@property (nonatomic, readwrite, copy) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy, nullable) NSDictionary<NSString *, id> *metadata;
 /**
  * The commit descriptor matching the commit identifier in -metadata.
  *
  * COCommand overrides -localizedTypeDescription and -localizedShortDescription 
  * to return the equivalent commit descriptor descriptions.
  */
-@property (nonatomic, readonly) COCommitDescriptor *commitDescriptor;
+@property (nonatomic, readonly, nullable) COCommitDescriptor *commitDescriptor;
 /**
  * The UUID of the parent command. 
  *
@@ -100,7 +102,7 @@
  *
  * See also -[COUndoTrack childrenOfNode:].
  */
-@property (nonatomic, readwrite, copy) ETUUID *parentUUID;
+@property (nonatomic, readwrite, copy, nullable) ETUUID *parentUUID;
 /**
  * The commit time.
  */
@@ -115,11 +117,11 @@
  * Returns [COEndOfUndoTrackPlaceholderNode sharedInstance] for the first 
  * recorded COCommandGroup(s) on a track.
  */
-@property (nonatomic, readonly) id <COTrackNode> parentNode;
+@property (nonatomic, readonly, nullable) id <COTrackNode> parentNode;
 /**
  * Returns nil.
  */
-@property (nonatomic, readonly) id <COTrackNode> mergeParentNode;
+@property (nonatomic, readonly, nullable) id <COTrackNode> mergeParentNode;
 
 
 /** @taskunit Applying and Reverting Changes */
@@ -147,7 +149,7 @@
  * Applies the receiver changes directly to a store transaction.
  */
 - (void)addToStoreTransaction: (COStoreTransaction *)txn
-         withRevisionMetadata: (NSDictionary *)metadata
+         withRevisionMetadata: (NSDictionary<NSString *, id> *)metadata
   assumingEditingContextState: (COEditingContext *)ctx;
 
 
@@ -155,12 +157,16 @@
 
 
 /**
+ * Initializes an empty command group with no parent undo track.
+ */
+- (instancetype)init;
+/**
  * <init />
  * Initializes a command group from a serialized represention and with a parent 
  * undo track.
  */
 - (instancetype)initWithSerializedCommand: (COUndoTrackSerializedCommand *)aCommand
-                                    owner: (COUndoTrack *)anOwner NS_DESIGNATED_INITIALIZER;
+                                    owner: (nullable COUndoTrack *)anOwner NS_DESIGNATED_INITIALIZER;
 
 /**
  * Returns a serialized represention.
@@ -168,3 +174,5 @@
 @property (nonatomic, readonly, strong) COUndoTrackSerializedCommand *serializedCommand;
 
 @end
+
+NS_ASSUME_NONNULL_END

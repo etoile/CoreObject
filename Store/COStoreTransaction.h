@@ -7,6 +7,10 @@
 
 #import <CoreObject/CoreObject.h>
 
+@protocol COStoreAction;
+
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * Builder object for creating a batch of changes to write to the store.
  *
@@ -26,7 +30,7 @@
     NSMutableDictionary *_oldTransactionIDForPersistentRootUUID;
 }
 
-@property (nonatomic, readonly, strong) NSMutableArray *operations;
+@property (nonatomic, readonly, strong) NSMutableArray<id <COStoreAction>> *operations;
 
 /** @taskunit Transaction ID */
 
@@ -55,9 +59,9 @@
 
 - (void)writeRevisionWithModifiedItems: (COItemGraph *)anItemTree
                           revisionUUID: (ETUUID *)aRevisionUUID
-                              metadata: (NSDictionary *)metadata
-                      parentRevisionID: (ETUUID *)aParent
-                 mergeParentRevisionID: (ETUUID *)aMergeParent
+                              metadata: (nullable NSDictionary<NSString *, id> *)metadata
+                      parentRevisionID: (nullable ETUUID *)aParent
+                 mergeParentRevisionID: (nullable ETUUID *)aMergeParent
                     persistentRootUUID: (ETUUID *)aUUID
                             branchUUID: (ETUUID *)branch;
 
@@ -66,14 +70,14 @@
 
 
 - (void)createPersistentRootWithUUID: (ETUUID *)persistentRootUUID
-               persistentRootForCopy: (ETUUID *)persistentRootForCopyUUID;
+               persistentRootForCopy: (nullable ETUUID *)persistentRootForCopyUUID;
 /**
  * Convenience method
  */
 - (COPersistentRootInfo *)createPersistentRootCopyWithUUID: (ETUUID *)uuid
-                                  parentPersistentRootUUID: (ETUUID *)aParentPersistentRoot
+                                  parentPersistentRootUUID: (nullable ETUUID *)aParentPersistentRoot
                                                 branchUUID: (ETUUID *)aBranchUUID
-                                          parentBranchUUID: (ETUUID *)aParentBranch
+                                          parentBranchUUID: (nullable ETUUID *)aParentBranch
                                        initialRevisionUUID: (ETUUID *)aRevision;
 /**
  * Convenience method
@@ -81,7 +85,7 @@
 - (COPersistentRootInfo *)createPersistentRootWithInitialItemGraph: (COItemGraph *)contents
                                                               UUID: (ETUUID *)persistentRootUUID
                                                         branchUUID: (ETUUID *)aBranchUUID
-                                                  revisionMetadata: (NSDictionary *)metadata;
+                                                  revisionMetadata: (nullable NSDictionary<NSString *, id> *)metadata;
 
 
 /** @taskunit Persistent Root Modification */
@@ -94,7 +98,7 @@
 - (void)setCurrentBranch: (ETUUID *)aBranch
        forPersistentRoot: (ETUUID *)aRoot;
 - (void)createBranchWithUUID: (ETUUID *)branchUUID
-                parentBranch: (ETUUID *)aParentBranch
+                parentBranch: (nullable ETUUID *)aParentBranch
              initialRevision: (ETUUID *)revId
            forPersistentRoot: (ETUUID *)aRoot;
 /**
@@ -102,13 +106,13 @@
  * You can pass nil for headRev to not change the headRev.
  */
 - (void)setCurrentRevision: (ETUUID *)currentRev
-              headRevision: (ETUUID *)headRev
+              headRevision: (nullable ETUUID *)headRev
                  forBranch: (ETUUID *)aBranch
           ofPersistentRoot: (ETUUID *)aRoot;
-- (void)setMetadata: (NSDictionary *)metadata
+- (void)setMetadata: (nullable NSDictionary<NSString *, id> *)metadata
           forBranch: (ETUUID *)aBranch
    ofPersistentRoot: (ETUUID *)aRoot;
-- (void)setMetadata: (NSDictionary *)metadata
+- (void)setMetadata: (nullable NSDictionary<NSString *, id> *)metadata
   forPersistentRoot: (ETUUID *)aRoot;
 
 
@@ -147,7 +151,9 @@
  *
  * Returns nil if the branch's current revision is not modified in this transaction.
  */
-- (ETUUID *)lastSetCurrentRevisionInTransactionForBranch: (ETUUID *)aBranch
-                                        ofPersistentRoot: (ETUUID *)aRoot;
+- (nullable ETUUID *)lastSetCurrentRevisionInTransactionForBranch: (ETUUID *)aBranch
+                                                 ofPersistentRoot: (ETUUID *)aRoot;
 
 @end
+
+NS_ASSUME_NONNULL_END

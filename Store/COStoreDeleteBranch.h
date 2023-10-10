@@ -8,8 +8,12 @@
 #import <CoreObject/CoreObject.h>
 #import "CoreObject/COStoreAction.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COStoreDeleteBranch : NSObject <COStoreAction>
 
 @property (nonatomic, retain, readwrite) ETUUID *branch;
 
 @end
+
+NS_ASSUME_NONNULL_END

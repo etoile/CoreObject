@@ -10,6 +10,8 @@
 
 @class COUndoTrackStore, COUndoTrackState, COEditingContext, COCommand, COCommandGroup;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * Posted when the undo track content or current command changes, this includes 
  * changes done in another process or in related local track objects (e.g. a
@@ -147,7 +149,7 @@ extern NSString *const kCOUndoTrackName;
  * For example, use this if you want to record the user's name
  * in revisions they commit using the undo track.
  */
-@property (nonatomic, readwrite, copy) NSDictionary *customRevisionMetadata;
+@property (nonatomic, readwrite, copy, nullable) NSDictionary<NSString *, id> *customRevisionMetadata;
 
 
 /** @taskunit Clearing and Coalescing Commands */
@@ -208,12 +210,12 @@ extern NSString *const kCOUndoTrackName;
  *
  * See also -[COCommandGroup sequenceNumber].
  */
-@property (nonatomic, readonly) NSArray *allCommands;
+@property (nonatomic, readonly) NSArray<COCommandGroup *> *allCommands;
 /**
  * Returns all commands that are children of the given node (the order is 
  * undefined).
  */
-- (NSArray *)childrenOfNode: (id <COTrackNode>)aNode;
+- (NSArray<id <COTrackNode>> *)childrenOfNode: (id <COTrackNode>)aNode;
 
 
 /** @taskunit Framework Private */
@@ -241,6 +243,8 @@ extern NSString *const kCOUndoTrackName;
  *
  * If the command has been deleted, returns nil.
  */
-- (COCommandGroup *)commandForUUID: (ETUUID *)aUUID;
+- (nullable COCommandGroup *)commandForUUID: (ETUUID *)aUUID;
 
 @end
+
+NS_ASSUME_NONNULL_END

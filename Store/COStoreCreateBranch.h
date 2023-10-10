@@ -8,6 +8,8 @@
 #import <CoreObject/CoreObject.h>
 #import "CoreObject/COStoreAction.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COStoreCreateBranch : NSObject <COStoreAction>
 
 @property (nonatomic, retain, readwrite) ETUUID *branch;
@@ -15,3 +17,5 @@
 @property (nonatomic, retain, readwrite) ETUUID *initialRevision;
 
 @end
+
+NS_ASSUME_NONNULL_END

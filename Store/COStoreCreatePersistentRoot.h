@@ -8,6 +8,8 @@
 #import <CoreObject/CoreObject.h>
 #import "CoreObject/COStoreAction.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * Creates an empty persistent root (with no branches).
  * If persistentRootForCopy is set, shares a backing store with that persistent
@@ -15,6 +17,8 @@
  */
 @interface COStoreCreatePersistentRoot : NSObject <COStoreAction>
 
-@property (nonatomic, retain, readwrite) ETUUID *persistentRootForCopy;
+@property (nonatomic, retain, readwrite, nullable) ETUUID *persistentRootForCopy;
 
 @end
+
+NS_ASSUME_NONNULL_END
