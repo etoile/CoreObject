@@ -527,7 +527,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
     [_track recordCommand: group2];
     [_track undoNode: (id <COTrackNode>)group1];
 
-    COCommandGroup *undoGroup1 = _track.nodes.lastObject;
+    COCommandGroup *undoGroup1 = (COCommandGroup *)_track.nodes.lastObject;
 
     UKObjectsNotEqual(group1, undoGroup1);
     UKObjectsEqual(group1.parentUndoTrack, undoGroup1.parentUndoTrack);
@@ -553,7 +553,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
     [_track recordCommand: group2];
     [_patternTrack undoNode: _patternTrack.nodes[1]];
 
-    COCommandGroup *undoGroup1 = _patternTrack.nodes.lastObject;
+    COCommandGroup *undoGroup1 = (COCommandGroup *)_patternTrack.nodes.lastObject;
 
     UKObjectsEqual(undoGroup1, _track.nodes.lastObject);
 
@@ -583,7 +583,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
     [_track recordCommand: group2];
     [_track redoNode: (id <COTrackNode>)group1];
 
-    COCommandGroup *redoGroup1 = _track.nodes.lastObject;
+    COCommandGroup *redoGroup1 = (COCommandGroup *)_track.nodes.lastObject;
 
     UKObjectsNotEqual(group1, redoGroup1);
     UKObjectsEqual(group1.parentUndoTrack, redoGroup1.parentUndoTrack);
@@ -609,7 +609,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
     [_track recordCommand: group2];
     [_patternTrack redoNode: (id <COTrackNode>)group1];
 
-    COCommandGroup *redoGroup1 = _patternTrack.nodes.lastObject;
+    COCommandGroup *redoGroup1 = (COCommandGroup *)_patternTrack.nodes.lastObject;
 
     UKObjectsNotEqual(group1, redoGroup1);
     UKObjectsNotEqual(group1.parentUndoTrack, redoGroup1.parentUndoTrack);

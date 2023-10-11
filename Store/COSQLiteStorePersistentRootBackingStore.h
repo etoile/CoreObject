@@ -13,6 +13,8 @@
 @class COItemGraph;
 @class CORevisionInfo;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * Database connection for manipulating a persistent root backing store.
  *
@@ -39,18 +41,19 @@
 - (instancetype)initWithPersistentRootUUID: (ETUUID *)aUUID
                                      store: (COSQLiteStore *)store
                                 useStoreDB: (BOOL)share
-                                     error: (NSError **)error NS_DESIGNATED_INITIALIZER;
+                                     error: (NSError *_Nullable *_Nullable)error NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
 
 @property (nonatomic, readonly) BOOL close;
 
-- (CORevisionInfo *)revisionInfoForRevisionUUID: (ETUUID *)aToken;
+- (nullable CORevisionInfo *)revisionInfoForRevisionUUID: (ETUUID *)aToken;
 
 @property (nonatomic, readonly, strong) ETUUID *UUID;
 @property (nonatomic, readonly, strong) ETUUID *rootUUID;
 
 - (BOOL)hasRevid: (int64_t)revid;
 - (COItemGraph *)itemGraphForRevid: (int64_t)revid;
-- (COItemGraph *)itemGraphForRevid: (int64_t)revid restrictToItemUUIDs: (NSSet *)itemSet;
+- (COItemGraph *)itemGraphForRevid: (int64_t)revid restrictToItemUUIDs: (nullable NSSet<ETUUID *> *)itemSet;
 /**
  * baseRevid must be < finalRevid.
  * returns nil if baseRevid or finalRevid are not valid revisions.
@@ -58,15 +61,15 @@
 - (COItemGraph *)partialItemGraphFromRevid: (int64_t)baseRevid toRevid: (int64_t)finalRevid;
 - (COItemGraph *)partialItemGraphFromRevid: (int64_t)baseRevid
                                    toRevid: (int64_t)revid
-                       restrictToItemUUIDs: (NSSet *)itemSet;
+                       restrictToItemUUIDs: (nullable NSSet<ETUUID *> *)itemSet;
 - (BOOL)writeItemGraph: (COItemGraph *)anItemTree
           revisionUUID: (ETUUID *)aRevisionUUID
-          withMetadata: (NSDictionary *)metadata
+          withMetadata: (nullable NSDictionary<NSString *, id> *)metadata
             withParent: (int64_t)aParent
        withMergeParent: (int64_t)aMergeParent
             branchUUID: (ETUUID *)aBranchUUID
     persistentrootUUID: (ETUUID *)aPersistentRootUUID
-                 error: (NSError **)error;
+                 error: (NSError *_Nullable *_Nullable)error;
 - (NSIndexSet *)revidsFromRevid: (int64_t)baseRevid toRevid: (int64_t)finalRevid;
 /**
  * Unconditionally deletes the specified revisions
@@ -83,10 +86,10 @@
 
 - (int64_t)revidForUUID: (ETUUID *)aUUID;
 - (NSIndexSet *)revidsForUUIDs: (NSArray *)UUIDs;
-- (ETUUID *)revisionUUIDForRevid: (int64_t)aRevid;
-- (NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
-                       headRevisionUUID: (ETUUID *)aHeadRevUUID
-                                options: (COBranchRevisionReadingOptions)options;
+- (nullable ETUUID *)revisionUUIDForRevid: (int64_t)aRevid;
+- (NSArray<CORevisionInfo *> *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
+                                         headRevisionUUID: (nullable ETUUID *)aHeadRevUUID
+                                                  options: (COBranchRevisionReadingOptions)options;
 
 @property (nonatomic, readonly) NSArray *revisionInfos;
 @property (nonatomic, readonly) uint64_t fileSize;
@@ -97,3 +100,5 @@
 @end
 
 NSData *contentsBLOBWithItemTree(id <COItemGraph> itemGraph);
+
+NS_ASSUME_NONNULL_END

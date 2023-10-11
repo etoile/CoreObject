@@ -9,14 +9,16 @@
 
 @class ETUUID;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * Given an NSData produced by AddCommitUUIDAndDataToCombinedCommitData,
  * extracts the UUID : NSData pairs within it and adds them to dest
  */
-void ParseCombinedCommitDataInToUUIDToItemDataDictionary(NSMutableDictionary *dest,
+void ParseCombinedCommitDataInToUUIDToItemDataDictionary(NSMutableDictionary<ETUUID *, NSData *> *dest,
                                                          NSData *commitData,
                                                          BOOL replaceExisting,
-                                                         NSSet *restrictToItemUUIDs);
+                                                         NSSet<ETUUID *>  *_Nullable restrictToItemUUIDs);
 
 /**
  * Adds a COUUID : NSData pair to combinedCommitData
@@ -24,3 +26,5 @@ void ParseCombinedCommitDataInToUUIDToItemDataDictionary(NSMutableDictionary *de
 void AddCommitUUIDAndDataToCombinedCommitData(NSMutableData *combinedCommitData,
                                               ETUUID *uuidToAdd,
                                               NSData *dataToAdd);
+
+NS_ASSUME_NONNULL_END

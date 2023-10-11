@@ -9,6 +9,8 @@
 
 @class ETUUID, COBranchInfo;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * Simple data structure returned by -[COSQLiteStore persistentRootInfoForUUID:]
  * to describe the entire state of a persistent root. It is a lightweight object
@@ -19,16 +21,16 @@
 @private
     ETUUID *uuid_;
     ETUUID *currentBranch_;
-    NSMutableDictionary *branchForUUID_; // COUUID : COBranchInfo
+    NSMutableDictionary<ETUUID *, COBranchInfo *> *branchForUUID_;
     BOOL _deleted;
     int64_t _transactionID;
-    NSDictionary *_metadata;
+    NSDictionary<NSString *, id> *_metadata;
 }
 
-@property (nonatomic, readonly) NSSet *branchUUIDs;
-@property (nonatomic, readonly) NSArray *branches;
+@property (nonatomic, readonly) NSSet<ETUUID *> *branchUUIDs;
+@property (nonatomic, readonly) NSArray<COBranchInfo *> *branches;
 
-- (COBranchInfo *)branchInfoForUUID: (ETUUID *)aUUID;
+- (nullable COBranchInfo *)branchInfoForUUID: (ETUUID *)aUUID;
 
 @property (nonatomic, readonly, strong) COBranchInfo *currentBranchInfo;
 /**
@@ -37,11 +39,13 @@
 @property (nonatomic, readonly) ETUUID *currentRevisionUUID;
 @property (nonatomic, readwrite, copy) ETUUID *UUID;
 @property (nonatomic, readwrite, copy) ETUUID *currentBranchUUID;
-@property (nonatomic, readwrite, copy) NSDictionary *branchForUUID;
+@property (nonatomic, readwrite, copy) NSDictionary<ETUUID *, COBranchInfo *> *branchForUUID;
 @property (nonatomic, readwrite, getter=isDeleted) BOOL deleted;
 @property (nonatomic, readwrite, assign) int64_t transactionID;
-@property (nonatomic, readwrite, copy) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy, nullable) NSDictionary<NSString *, id> *metadata;
 
-- (NSArray *)branchInfosWithMetadataValue: (id)aValue forKey: (NSString *)aKey;
+- (NSArray<COBranchInfo *> *)branchInfosWithMetadataValue: (id)aValue forKey: (NSString *)aKey;
 
 @end
+
+NS_ASSUME_NONNULL_END

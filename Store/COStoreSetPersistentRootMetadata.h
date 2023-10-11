@@ -8,8 +8,12 @@
 #import <CoreObject/CoreObject.h>
 #import "CoreObject/COStoreAction.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COStoreSetPersistentRootMetadata : NSObject <COStoreAction>
 
-@property (nonatomic, retain, readwrite) NSDictionary *metadata;
+@property (nonatomic, retain, readwrite, nullable) NSDictionary<NSString *, id> *metadata;
 
 @end
+
+NS_ASSUME_NONNULL_END

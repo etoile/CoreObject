@@ -11,6 +11,8 @@
 
 @class COEditingContext, COUndoTrack;
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * @group Undo
  * @abstract A command represents a committed change in an editing context
@@ -66,11 +68,11 @@
  *
  * An atomic command belongs to a command group which has a parent command.
  */
-@property (nonatomic, readonly) id <COTrackNode> parentNode;
+@property (nonatomic, readonly, nullable) id <COTrackNode> parentNode;
 /**
  * Returns nil.
  */
-@property (nonatomic, readonly) id <COTrackNode> mergeParentNode;
+@property (nonatomic, readonly, nullable) id <COTrackNode> mergeParentNode;
 
 
 /** @taskunit Applying and Reverting Changes */
@@ -110,7 +112,7 @@
  * Applies the receiver changes directly to a store transaction.
  */
 - (void)addToStoreTransaction: (COStoreTransaction *)txn
-         withRevisionMetadata: (NSDictionary *)metadata
+         withRevisionMetadata: (nullable NSDictionary<NSString *, id> *)metadata
   assumingEditingContextState: (COEditingContext *)ctx;
 
 
@@ -147,3 +149,6 @@
 - (id)copyWithZone: (NSZone *)zone;
 
 @end
+
+NS_ASSUME_NONNULL_END
+

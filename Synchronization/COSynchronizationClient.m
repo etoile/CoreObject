@@ -163,7 +163,7 @@ static void InsertRevisions(NSDictionary *revisionsPlist,
         for (COBranchInfo *branch in info.branches)
         {
             if ([branch.metadata[@"source"] isEqual: serverID]
-                && [branch.metadata[@"replcatedBranch"] isEqual: branchUUIDString])
+                && [branch.metadata[@"replicatedBranch"] isEqual: branchUUIDString])
             {
                 branchToUpdate = branch;
                 break;
@@ -185,7 +185,7 @@ static void InsertRevisions(NSDictionary *revisionsPlist,
                       initialRevision: currentRevisionID
                     forPersistentRoot: persistentRoot];
 
-            [txn setMetadata: @{@"source": serverID, @"replcatedBranch": branchUUIDString}
+            [txn setMetadata: @{@"source": serverID, @"replicatedBranch": branchUUIDString}
                    forBranch: branchUUID
             ofPersistentRoot: persistentRoot];
         }

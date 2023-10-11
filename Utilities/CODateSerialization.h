@@ -7,6 +7,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /**
  * Returns an NSNumber wrapping a long long value for the Java timestamp
  * nearest to the given NSDate. A Java timestamp is in milliseconds since
@@ -14,7 +16,7 @@
  *
  * Throws an excepetion if given nil.
  */
-NSNumber *CODateToJavaTimestamp(NSDate *date);
+NSNumber *CODateToJavaTimestamp(NSDate *_Nullable date);
 
 /**
  * Converts the given NSNumber containing a Java timestamp to an NSDate. 
@@ -22,4 +24,6 @@ NSNumber *CODateToJavaTimestamp(NSDate *date);
  *
  * Throws an excepetion if given nil.
  */
-NSDate *CODateFromJavaTimestamp(NSNumber *date);
+NSDate *CODateFromJavaTimestamp(NSNumber *_Nullable date);
+
+NS_ASSUME_NONNULL_END

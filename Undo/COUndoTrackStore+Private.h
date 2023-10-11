@@ -11,6 +11,8 @@
 @class FMDatabase;
 @class ETUUID;
 
+NS_ASSUME_NONNULL_BEGIN
+
 extern NSString *const COUndoTrackStoreTrackDidChangeNotification;
 
 // User info keys for COUndoTrackStoreTrackDidChangeNotification
@@ -31,9 +33,9 @@ extern NSString *const COUndoTrackStoreTrackCompacted;
 @interface COUndoTrackSerializedCommand : NSObject
 
 @property (nonatomic, readwrite, strong) id JSONData;
-@property (nonatomic, readwrite, copy) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy, nullable) NSDictionary<NSString *, id> *metadata;
 @property (nonatomic, readwrite, copy) ETUUID *UUID;
-@property (nonatomic, readwrite, copy) ETUUID *parentUUID;
+@property (nonatomic, readwrite, copy, nullable) ETUUID *parentUUID;
 @property (nonatomic, readwrite, copy) NSString *trackName;
 @property (nonatomic, readwrite, copy) NSDate *timestamp;
 @property (nonatomic, readwrite, assign) int64_t sequenceNumber;
@@ -44,8 +46,8 @@ extern NSString *const COUndoTrackStoreTrackCompacted;
 @interface COUndoTrackState : NSObject <NSCopying>
 
 @property (nonatomic, readwrite, copy) NSString *trackName;
-@property (nonatomic, readwrite, copy) ETUUID *headCommandUUID;
-@property (nonatomic, readwrite, copy) ETUUID *currentCommandUUID;
+@property (nonatomic, readwrite, copy, nullable) ETUUID *headCommandUUID;
+@property (nonatomic, readwrite, copy, nullable) ETUUID *currentCommandUUID;
 /** 
  * Reports whether a history compaction is underway for this track.
  *
@@ -114,7 +116,7 @@ extern NSString *const COUndoTrackStoreTrackCompacted;
  * Once a track persistent state is saved with -setStateForTrackName:, the
  * track appears in the returned array until -removeTrackWithName: is called.
  */
-@property (nonatomic, readonly) NSArray *trackNames;
+@property (nonatomic, readonly) NSArray<NSString *> *trackNames;
 
 /**
  * Returns the current track names that match a pattern built with '*'.
@@ -123,14 +125,14 @@ extern NSString *const COUndoTrackStoreTrackCompacted;
  *
  * See COPatternUndoTrack which uses this method to discover its child tracks.
  */
-- (NSArray *)trackNamesMatchingGlobPattern: (NSString *)aPattern;
+- (NSArray<NSString *> *)trackNamesMatchingGlobPattern: (NSString *)aPattern;
 /**
  * Returns the persistent state describing a track.
  *
  * When no persistent state exists in the dabase, returns nil. This means the 
  * track has never saved or has been deleted.
  */
-- (COUndoTrackState *)stateForTrackName: (NSString *)aName;
+- (nullable COUndoTrackState *)stateForTrackName: (NSString *)aName;
 /**
  * Updates the persistent state describing a track.
  *
@@ -164,7 +166,7 @@ extern NSString *const COUndoTrackStoreTrackCompacted;
  *
  * If the UUID corresponds to a deleted command, returns nil.
  */
-- (COUndoTrackSerializedCommand *)commandForUUID: (ETUUID *)aUUID;
+- (nullable COUndoTrackSerializedCommand *)commandForUUID: (ETUUID *)aUUID;
 /**
  * Returns UUIDs for all the commands on a given track.
  *
@@ -172,7 +174,7 @@ extern NSString *const COUndoTrackStoreTrackCompacted;
  *
  * See -markCommandsAsDeletedForUUIDs:.
  */
-- (NSArray *)allCommandUUIDsOnTrackWithName: (NSString *)aName;
+- (NSArray<ETUUID *> *)allCommandUUIDsOnTrackWithName: (NSString *)aName;
 
 
 /** @taskunit History Compaction Integration */
@@ -191,7 +193,7 @@ extern NSString *const COUndoTrackStoreTrackCompacted;
  * To run it in the main queue, while a transaction initiated with 
  * -beginTransaction is underway will result in a deadlock.
  */
-- (void)markCommandsAsDeletedForUUIDs: (NSArray *)UUIDs;
+- (void)markCommandsAsDeletedForUUIDs: (NSArray<ETUUID *> *)UUIDs;
 /**
  * Erases commands marked as deleted permanently.
  *
@@ -222,7 +224,7 @@ extern NSString *const COUndoTrackStoreTrackCompacted;
 /**
  * See -[COSQLiteStore pageStatistics].
  */
-@property (nonatomic, readonly) NSDictionary *pageStatistics;
+@property (nonatomic, readonly) NSDictionary<NSString *, NSNumber *> *pageStatistics;
 
 
 /** @task Glob Pattern Matching */
@@ -236,3 +238,5 @@ extern NSString *const COUndoTrackStoreTrackCompacted;
 - (BOOL)string: (NSString *)aString matchesGlobPattern: (NSString *)aPattern;
 
 @end
+
+NS_ASSUME_NONNULL_END

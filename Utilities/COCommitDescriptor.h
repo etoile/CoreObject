@@ -8,6 +8,8 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 /** 
  * @group Utilities
  * @abstract A commit descriptor represents transient and persistent revision 
@@ -148,7 +150,8 @@
  *
  * For a nil argument, raises a NSInvalidArgumentException.
  */
-+ (COCommitDescriptor *)registeredDescriptorForIdentifier: (NSString *)anIdentifier;
++ (nullable COCommitDescriptor *)registeredDescriptorForIdentifier: (NSString *)anIdentifier;
+- (instancetype)init NS_UNAVAILABLE;
 
 
 /** @taskunit Persistent Metadata */
@@ -274,13 +277,13 @@
  *
  * See also -shortDescription.
  */
-- (NSString *)localizedShortDescriptionWithArguments: (NSArray *)args;
+- (NSString *)localizedShortDescriptionWithArguments: (NSArray<NSString *> *)args;
 /**
  * Looks up the commit descriptor from the metadata with 
  * kCOCommitMetadataIdentifier, and returns a localized short description built
  * by this descriptor with commit related metadata.
  */
-+ (NSString *)localizedShortDescriptionFromMetadata: (NSDictionary *)metadata;
++ (NSString *)localizedShortDescriptionFromMetadata: (NSDictionary<NSString *, id> *)metadata;
 
 @end
 
@@ -349,3 +352,5 @@ extern NSString *const kCOCommitMetadataUndoType;
  * The value is a NSNumber boolean.
  */
 extern NSString *const kCOCommitMetadataUndoInitialBaseInversed;
+
+NS_ASSUME_NONNULL_END

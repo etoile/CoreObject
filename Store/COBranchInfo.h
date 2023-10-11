@@ -9,6 +9,8 @@
 
 @class ETUUID;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COBranchInfo : NSObject
 {
 @private
@@ -56,18 +58,20 @@
  * (If there is a real use case for unversioned persistent root metadata,
  *  we can easily re-add it)
  */
-@property (nonatomic, readwrite, copy) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy, nullable) NSDictionary<NSString *, id> *metadata;
 @property (nonatomic, readwrite, getter=isDeleted) BOOL deleted;
-@property (nonatomic, readwrite, copy) ETUUID *parentBranchUUID;
+@property (nonatomic, readwrite, copy, nullable) ETUUID *parentBranchUUID;
 /**
  * In git terminology, if the receiver is "master", returns "origin/master", or
  * nil if there is no corresponding "origin/master"
  */
-@property (nonatomic, readonly) ETUUID *remoteMirror;
+@property (nonatomic, readonly, nullable) ETUUID *remoteMirror;
 /**
  * In git terminology, if the receiver is "origin/master", returns the UUID
  * of the "master" branch in the remote store "origin". Otherwise, returns nil.
  */
-@property (nonatomic, readonly) ETUUID *replcatedBranch;
+@property (nonatomic, readonly, nullable) ETUUID *replicatedBranch;
 
 @end
+
+NS_ASSUME_NONNULL_END

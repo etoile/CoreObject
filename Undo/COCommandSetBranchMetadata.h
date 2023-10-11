@@ -7,6 +7,8 @@
 
 #import <CoreObject/COCommand.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COCommandSetBranchMetadata : COCommand
 {
     ETUUID *_branchUUID;
@@ -15,7 +17,10 @@
 }
 
 @property (nonatomic, readwrite, copy) ETUUID *branchUUID;
-@property (nonatomic, readwrite, copy) NSDictionary *oldMetadata;
-@property (nonatomic, readwrite, copy) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy, nullable) NSDictionary<NSString *, id> *oldMetadata;
+@property (nonatomic, readwrite, copy, nullable) NSDictionary<NSString *, id> *metadata;
 
 @end
+
+NS_ASSUME_NONNULL_END
+

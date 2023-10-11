@@ -9,6 +9,8 @@
 
 @class CORevision;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COCommandSetCurrentVersionForBranch : COCommand
 {
     ETUUID *_branchUUID;
@@ -53,12 +55,14 @@
  *
  * See -[CORevision metadata].
  */
-@property (nonatomic, readonly) NSDictionary *metadata;
+@property (nonatomic, readonly, nullable) NSDictionary<NSString *, id> *metadata;
 /**
  * Returns the short description for the set revision.
  *
  * See -[CORevision localizedShortDescription].
  */
-@property (nonatomic, readonly) NSString *localizedShortDescription;
+@property (nonatomic, readonly, nullable) NSString *localizedShortDescription;
 
 @end
+
+NS_ASSUME_NONNULL_END

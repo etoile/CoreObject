@@ -27,10 +27,15 @@
 
 @dynamic finalizablePersistentRootUUIDs, compactablePersistentRootUUIDs, deadRevisionUUIDs, liveRevisionUUIDs;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-implementations"
+
 - (instancetype)init
 {
     return self;
 }
+
+#pragma clang diagnostic pop
 
 - (void)setFinalizablePersistentRootUUIDs: (NSSet *)finalizablePersistentRootUUIDs
 {

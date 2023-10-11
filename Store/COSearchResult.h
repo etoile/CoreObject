@@ -9,10 +9,14 @@
 
 @class ETUUID;
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COSearchResult : NSObject
 
 @property (nonatomic, readwrite, copy) ETUUID *persistentRoot;
 @property (nonatomic, readwrite, copy) ETUUID *revision;
-@property (nonatomic, readwrite, copy) ETUUID *innerObjectUUID;
+@property (nonatomic, readwrite, copy, nullable) ETUUID *innerObjectUUID;
 
 @end
+
+NS_ASSUME_NONNULL_END

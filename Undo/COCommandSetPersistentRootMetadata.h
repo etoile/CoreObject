@@ -7,13 +7,18 @@
 
 #import <CoreObject/COCommand.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface COCommandSetPersistentRootMetadata : COCommand
 {
     NSDictionary *_oldMetadata;
     NSDictionary *_newMetadata;
 }
 
-@property (nonatomic, readwrite, copy) NSDictionary *oldMetadata;
-@property (nonatomic, readwrite, copy) NSDictionary *metadata;
+@property (nonatomic, readwrite, copy, nullable) NSDictionary<NSString *, id> *oldMetadata;
+@property (nonatomic, readwrite, copy, nullable) NSDictionary<NSString *, id> *metadata;
 
 @end
+
+NS_ASSUME_NONNULL_END
+
