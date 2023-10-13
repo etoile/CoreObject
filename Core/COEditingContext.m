@@ -24,6 +24,7 @@
 #import "CORevisionCache.h"
 #import "COStoreTransaction.h"
 #import "CODistributedNotificationCenter.h"
+#import "COCommand.h"
 
 @implementation COEditingContext
 
@@ -1052,6 +1053,20 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 - (void)setLastTransactionID: (int64_t)lastTransactionID forPersistentRootUUID: (ETUUID *)aUUID
 {
     _lastTransactionIDForPersistentRootUUID[aUUID] = @(lastTransactionID);
+}
+
+#pragma mark Undo Track Integration -
+
+- (void)applyCommand: (COCommand *)command {
+    [command applyToContext: self];
+}
+
+- (void)applyCommand: (COCommand *)command
+  toStoreTransaction: (COStoreTransaction *)txn
+withRevisionMetadata: (nullable NSDictionary<NSString *, id> *)metadata {
+    [command addToStoreTransaction: txn
+              withRevisionMetadata: metadata
+       assumingEditingContextState: self];
 }
 
 @end

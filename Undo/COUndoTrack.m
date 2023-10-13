@@ -35,7 +35,7 @@ NSString *const kCOUndoTrackName = @"COUndoTrackName";
 
 @implementation COUndoTrack
 
-@synthesize name = _name, editingContext = _editingContext;
+@synthesize name = _name, context = _context;
 @synthesize customRevisionMetadata;
 
 
@@ -51,24 +51,23 @@ NSString *const kCOUndoTrackName = @"COUndoTrackName";
 }
 
 + (COUndoTrack *)trackForName: (NSString *)aName
-           withEditingContext: (COEditingContext *)aContext
+                  withContext: (id <COUndoTrackContext>)aContext
 {
-    return [[self alloc] initWithName: aName editingContext: aContext];
+    return [[self alloc] initWithName: aName context: aContext];
 }
 
 + (COUndoTrack *)trackForPattern: (NSString *)aPattern
-              withEditingContext: (COEditingContext *)aContext
+                     withContext: (id <COUndoTrackContext>)aContext
 {
-    return [[COPatternUndoTrack alloc] initWithName: aPattern
-                                     editingContext: aContext];
+    return [[COPatternUndoTrack alloc] initWithName: aPattern context: aContext];
 }
 
 - (instancetype)initWithName: (NSString *)aName
-              editingContext: (COEditingContext *)aContext
+                     context: (id <COUndoTrackContext>)aContext
 {
     SUPERINIT;
     _name = aName;
-    _editingContext = aContext;
+    _context = aContext;
     _trackStateForName = [NSMutableDictionary new];
     _commandsByUUID = [NSMutableDictionary new];
 
@@ -87,7 +86,7 @@ NSString *const kCOUndoTrackName = @"COUndoTrackName";
 
 - (COUndoTrackStore *)store
 {
-    return _editingContext.undoTrackStore;
+    return _context.undoTrackStore;
 }
 
 
@@ -304,7 +303,7 @@ NSString *const kCOUndoTrackName = @"COUndoTrackName";
     INVALIDARG_EXCEPTION_TEST(aNode, [((COCommandGroup *)aNode).trackName isEqual: self.name]);
 
     COCommandGroup *command = ((COCommandGroup *)aNode).inverse;
-    [command applyToContext: _editingContext];
+    [_context applyCommand: command];
 
     NSMutableDictionary *md = [aNode.metadata mutableCopy];
     NSNumber *inversedValue = aNode.metadata[kCOCommitMetadataUndoInitialBaseInversed];
@@ -319,9 +318,9 @@ NSString *const kCOUndoTrackName = @"COUndoTrackName";
         [md addEntriesFromDictionary: self.customRevisionMetadata];
     }
 
-    [_editingContext commitWithMetadata: md
-                              undoTrack: self
-                                  error: NULL];
+    [_context commitWithMetadata: md
+                       undoTrack: self
+                           error: NULL];
 }
 
 - (void)redoNode: (id <COTrackNode>)aNode
@@ -329,8 +328,8 @@ NSString *const kCOUndoTrackName = @"COUndoTrackName";
     INVALIDARG_EXCEPTION_TEST(aNode, [aNode isKindOfClass: [COCommandGroup class]]);
     INVALIDARG_EXCEPTION_TEST(aNode, [((COCommandGroup *)aNode).trackName isEqual: self.name]);
 
-    COCommand *command = (COCommand *)aNode;
-    [command applyToContext: _editingContext];
+    COCommandGroup *command = (COCommandGroup *)aNode;
+    [_context applyCommand: command];
 
     NSMutableDictionary *md = [aNode.metadata mutableCopy];
 
@@ -342,9 +341,9 @@ NSString *const kCOUndoTrackName = @"COUndoTrackName";
         [md addEntriesFromDictionary: self.customRevisionMetadata];
     }
 
-    [_editingContext commitWithMetadata: md
-                              undoTrack: self
-                                  error: NULL];
+    [_context commitWithMetadata: md
+                       undoTrack: self
+                           error: NULL];
 }
 
 
@@ -552,7 +551,7 @@ NSString *const kCOUndoTrackName = @"COUndoTrackName";
     // Set the last transaction IDs so the store will accept our transaction
     for (ETUUID *uuid in txn.persistentRootUUIDs)
     {
-        NSNumber *lastTransactionID = [_editingContext lastTransactionIDForPersistentRootUUID: uuid];
+        NSNumber *lastTransactionID = [_context lastTransactionIDForPersistentRootUUID: uuid];
         if (lastTransactionID != nil)
         {
             [txn setOldTransactionID: lastTransactionID.longLongValue forPersistentRoot: uuid];
@@ -563,7 +562,7 @@ NSString *const kCOUndoTrackName = @"COUndoTrackName";
         // notification mechanism will refresh the in-memory state
     }
 
-    BOOL ok = [_editingContext.store commitStoreTransaction: txn];
+    BOOL ok = [_context.store commitStoreTransaction: txn];
     ETAssert(ok);
 }
 
@@ -587,9 +586,9 @@ addToStoreTransaction: (COStoreTransaction *)txn
         [md addEntriesFromDictionary: self.customRevisionMetadata];
     }
 
-    [commandToApply addToStoreTransaction: txn
-                     withRevisionMetadata: md
-              assumingEditingContextState: _editingContext];
+    [_context applyCommand: commandToApply
+        toStoreTransaction: txn
+      withRevisionMetadata: md];
 
     // Update the current command for this track.
 
@@ -1003,7 +1002,7 @@ static void coalesceOps(NSMutableArray *ops)
 - (void)undoNode: (id <COTrackNode>)aNode
 {
     COUndoTrack *track = [COUndoTrack trackForName: ((COCommandGroup *)aNode).trackName
-                                withEditingContext: self.editingContext];
+                                       withContext: self.context];
     ETAssert(track != nil);
     track.customRevisionMetadata = self.customRevisionMetadata;
     [track undoNode: aNode];
@@ -1012,7 +1011,7 @@ static void coalesceOps(NSMutableArray *ops)
 - (void)redoNode: (id <COTrackNode>)aNode
 {
     COUndoTrack *track = [COUndoTrack trackForName: ((COCommandGroup *)aNode).trackName
-                                withEditingContext: self.editingContext];
+                                       withContext: self.context];
     ETAssert(track != nil);
     track.customRevisionMetadata = self.customRevisionMetadata;
     [track redoNode: aNode];

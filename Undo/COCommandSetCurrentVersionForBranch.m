@@ -296,15 +296,15 @@ static NSString *const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevisionI
 - (CORevision *)oldRevision
 {
     ETAssert(_parentUndoTrack != nil);
-    return [_parentUndoTrack.editingContext revisionForRevisionUUID: _oldRevisionUUID
-                                                 persistentRootUUID: _persistentRootUUID];
+    return [_parentUndoTrack.context revisionForRevisionUUID: _oldRevisionUUID
+                                          persistentRootUUID: _persistentRootUUID];
 }
 
 - (CORevision *)revision
 {
     ETAssert(_parentUndoTrack != nil);
-    return [_parentUndoTrack.editingContext revisionForRevisionUUID: _newRevisionUUID
-                                                 persistentRootUUID: _persistentRootUUID];
+    return [_parentUndoTrack.context revisionForRevisionUUID: _newRevisionUUID
+                                          persistentRootUUID: _persistentRootUUID];
 }
 
 #pragma mark -

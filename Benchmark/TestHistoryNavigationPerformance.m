@@ -68,7 +68,7 @@
 - (void)testGoToOldestAndNewestNodesInHistory
 {
     COUndoTrack *track = [COUndoTrack trackForName: @"TestHistoryNavigationPerformance"
-                                withEditingContext: ctx];
+                                withContext: ctx];
 
     NSDate *startDate = [NSDate date];
     NSArray *proots = [self commitPersistentRootsWithUndoTrack: track
@@ -130,7 +130,7 @@
 - (void)testGoToFirstCommitNodeToReloadManyDeletedPersistentRoots
 {
     COUndoTrack *track = [COUndoTrack trackForName: @"TestHistoryNavigationPerformance"
-                                withEditingContext: ctx];
+                                withContext: ctx];
 
     NSDate *startDate = [NSDate date];
     NSArray *proots = [self commitPersistentRootsWithUndoTrack: track
@@ -164,7 +164,7 @@
 
     COEditingContext *ctx2 = [self newContext];
     COUndoTrack *track2 = [COUndoTrack trackForName: @"TestHistoryNavigationPerformance"
-                                 withEditingContext: ctx2];
+                                 withContext: ctx2];
 
     // Destroy the context to prevent it to catch any distributed notifications
     ctx = nil;
@@ -234,7 +234,7 @@
 - (void)testGoToOldestAndNewestNodesInHistoryWithManyPropertiesPerEntity
 {
     COUndoTrack *track = [COUndoTrack trackForName: @"TestHistoryNavigationPerformance"
-                                withEditingContext: ctx];
+                                withContext: ctx];
 
     NSDate *startDate = [NSDate date];
     NSArray *proots = [self commitPersistentRootsWithUndoTrack: track

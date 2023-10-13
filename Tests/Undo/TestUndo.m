@@ -33,10 +33,10 @@
 {
     SUPERINIT;
 
-    _testTrack = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
-    _setupTrack = [COUndoTrack trackForName: @"setup" withEditingContext: ctx];
-    _rootEditTrack = [COUndoTrack trackForName: @"rootEdit" withEditingContext: ctx];
-    _childEditTrack = [COUndoTrack trackForName: @"childEdit" withEditingContext: ctx];
+    _testTrack = [COUndoTrack trackForName: @"test" withContext: ctx];
+    _setupTrack = [COUndoTrack trackForName: @"setup" withContext: ctx];
+    _rootEditTrack = [COUndoTrack trackForName: @"rootEdit" withContext: ctx];
+    _childEditTrack = [COUndoTrack trackForName: @"childEdit" withContext: ctx];
 
     [_testTrack clear];
     [_setupTrack clear];
@@ -511,11 +511,11 @@
     [ctx commitWithUndoTrack: _setupTrack];
 
     COUndoTrack *workspaceTrack = [COUndoTrack trackForPattern: @"workspace.*"
-                                            withEditingContext: ctx];
+                                            withContext: ctx];
     COUndoTrack *workspaceDoc1Track = [COUndoTrack trackForName: @"workspace.doc1"
-                                             withEditingContext: ctx];
+                                             withContext: ctx];
     COUndoTrack *workspaceDoc2Track = [COUndoTrack trackForName: @"workspace.doc2"
-                                             withEditingContext: ctx];
+                                             withContext: ctx];
     [workspaceTrack clear];
 
     // doc1 commits
@@ -829,7 +829,7 @@
 
 - (COUndoTrack *)trackWithEditingContext: (COEditingContext *)aContext
 {
-    return [[self class] trackForName: self.name withEditingContext: aContext];
+    return [[self class] trackForName: self.name withContext: aContext];
 }
 
 @end

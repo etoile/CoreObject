@@ -119,21 +119,21 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 {
     SUPERINIT;
 
-    _track = [COUndoTrack trackForName: TEST_TRACK withEditingContext: ctx];
+    _track = [COUndoTrack trackForName: TEST_TRACK withContext: ctx];
     [_track clear];
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(trackDidChange:)
                                                  name: COUndoTrackDidChangeNotification
                                                object: _track];
 
-    _track2 = [COUndoTrack trackForName: TEST_TRACK_2 withEditingContext: ctx];
+    _track2 = [COUndoTrack trackForName: TEST_TRACK_2 withContext: ctx];
     [_track2 clear];
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(trackDidChange:)
                                                  name: COUndoTrackDidChangeNotification
                                                object: _track2];
 
-    _patternTrack = [COUndoTrack trackForPattern: TEST_TRACK_STAR withEditingContext: ctx];
+    _patternTrack = [COUndoTrack trackForPattern: TEST_TRACK_STAR withContext: ctx];
     [_patternTrack clear];
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(trackDidChange:)
@@ -178,7 +178,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
     // Check with a second COUndoTrack
 
     COUndoTrack *secondTrackInstance = [COUndoTrack trackForName: TEST_TRACK
-                                              withEditingContext: ctx];
+                                              withContext: ctx];
     UKObjectsNotSame(_track, secondTrackInstance);
     UKObjectsEqual(A(placeholderNode, group), secondTrackInstance.nodes);
     UKObjectsEqual(group, [secondTrackInstance currentNode]);
@@ -212,7 +212,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
     // Check with a second COUndoTrack
 
     COUndoTrack *secondTrackInstance = [COUndoTrack trackForName: TEST_TRACK
-                                              withEditingContext: ctx];
+                                              withContext: ctx];
     UKObjectsNotSame(_track, secondTrackInstance);
     UKObjectsEqual(A(placeholderNode, group1, group2), secondTrackInstance.nodes);
     UKObjectsEqual(group2, [secondTrackInstance currentNode]);
@@ -245,7 +245,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
     // Check with a second COUndoTrack
     {
         COUndoTrack *secondTrackInstance = [COUndoTrack trackForName: TEST_TRACK
-                                                  withEditingContext: ctx];
+                                                  withContext: ctx];
         UKObjectsEqual(A(placeholderNode, group1, group2), secondTrackInstance.nodes);
         UKObjectsEqual(group1, [secondTrackInstance currentNode]);
         UKObjectsEqual(placeholderNode.UUID,
@@ -258,7 +258,7 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
 
     {
         COUndoTrack *secondTrackInstance = [COUndoTrack trackForName: TEST_TRACK
-                                                  withEditingContext: ctx];
+                                                  withContext: ctx];
         UKObjectsEqual(group2, [secondTrackInstance currentNode]);
     }
 }
@@ -397,11 +397,11 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
     UKObjectsEqual(group2a, [_track2 currentNode]);
     UKObjectsEqual(group1b, [_patternTrack currentNode]);
     UKObjectsEqual(group1b,
-                   [[COUndoTrack trackForName: TEST_TRACK withEditingContext: ctx] currentNode]);
+                   [[COUndoTrack trackForName: TEST_TRACK withContext: ctx] currentNode]);
     UKObjectsEqual(group2a, [[COUndoTrack trackForName: TEST_TRACK_2
-                                    withEditingContext: ctx] currentNode]);
+                                    withContext: ctx] currentNode]);
     UKObjectsEqual(group1b, [[COUndoTrack trackForName: TEST_TRACK_STAR
-                                    withEditingContext: ctx] currentNode]);
+                                    withContext: ctx] currentNode]);
 
     [_patternTrack undo];
 
@@ -409,11 +409,11 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
     UKObjectsEqual(group2a, [_track2 currentNode]);
     UKObjectsEqual(group2a, [_patternTrack currentNode]);
     UKObjectsEqual(group1a,
-                   [[COUndoTrack trackForName: TEST_TRACK withEditingContext: ctx] currentNode]);
+                   [[COUndoTrack trackForName: TEST_TRACK withContext: ctx] currentNode]);
     UKObjectsEqual(group2a, [[COUndoTrack trackForName: TEST_TRACK_2
-                                    withEditingContext: ctx] currentNode]);
+                                    withContext: ctx] currentNode]);
     UKObjectsEqual(group2a, [[COUndoTrack trackForName: TEST_TRACK_STAR
-                                    withEditingContext: ctx] currentNode]);
+                                    withContext: ctx] currentNode]);
 
     [_patternTrack undo];
 
@@ -421,11 +421,11 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
     UKObjectsEqual(placeholderNode, [_track2 currentNode]);
     UKObjectsEqual(group1a, [_patternTrack currentNode]);
     UKObjectsEqual(group1a,
-                   [[COUndoTrack trackForName: TEST_TRACK withEditingContext: ctx] currentNode]);
+                   [[COUndoTrack trackForName: TEST_TRACK withContext: ctx] currentNode]);
     UKObjectsEqual(placeholderNode, [[COUndoTrack trackForName: TEST_TRACK_2
-                                            withEditingContext: ctx] currentNode]);
+                                            withContext: ctx] currentNode]);
     UKObjectsEqual(group1a, [[COUndoTrack trackForName: TEST_TRACK_STAR
-                                    withEditingContext: ctx] currentNode]);
+                                    withContext: ctx] currentNode]);
 
     [_patternTrack undo];
 
@@ -433,11 +433,11 @@ static COEndOfUndoTrackPlaceholderNode *placeholderNode = nil;
     UKObjectsEqual(placeholderNode, [_track2 currentNode]);
     UKObjectsEqual(placeholderNode, [_patternTrack currentNode]);
     UKObjectsEqual(placeholderNode,
-                   [[COUndoTrack trackForName: TEST_TRACK withEditingContext: ctx] currentNode]);
+                   [[COUndoTrack trackForName: TEST_TRACK withContext: ctx] currentNode]);
     UKObjectsEqual(placeholderNode, [[COUndoTrack trackForName: TEST_TRACK_2
-                                            withEditingContext: ctx] currentNode]);
+                                            withContext: ctx] currentNode]);
     UKObjectsEqual(placeholderNode, [[COUndoTrack trackForName: TEST_TRACK_STAR
-                                            withEditingContext: ctx] currentNode]);
+                                            withContext: ctx] currentNode]);
 }
 
 /**

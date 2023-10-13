@@ -26,8 +26,8 @@
 
     ctx.unloadingBehavior = COEditingContextUnloadingBehaviorManual;
 
-    _testTrack = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
-    _setupTrack = [COUndoTrack trackForName: @"setup" withEditingContext: ctx];
+    _testTrack = [COUndoTrack trackForName: @"test" withContext: ctx];
+    _setupTrack = [COUndoTrack trackForName: @"setup" withContext: ctx];
     [_testTrack clear];
     [_setupTrack clear];
 

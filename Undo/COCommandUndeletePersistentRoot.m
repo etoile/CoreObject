@@ -93,8 +93,8 @@ static NSString *const kCOCommandInitialRevisionID = @"COCommandInitialRevisionI
 
 - (CORevision *)revision
 {
-    return [_parentUndoTrack.editingContext revisionForRevisionUUID: _initialRevisionID
-                                                 persistentRootUUID: _persistentRootUUID];
+    return [_parentUndoTrack.context revisionForRevisionUUID: _initialRevisionID
+                                     persistentRootUUID: _persistentRootUUID];
 }
 
 

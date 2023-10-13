@@ -27,7 +27,7 @@
 - (instancetype)init
 {
     SUPERINIT;
-    track = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
+    track = [COUndoTrack trackForName: @"test" withContext: ctx];
     [track clear];
 
     // set root to "0" ---- not on undo track

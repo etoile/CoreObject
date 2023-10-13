@@ -40,7 +40,7 @@
 
 - (void)testPersistentRootNotificationOnUndoLocal
 {
-    COUndoTrack *track = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
+    COUndoTrack *track = [COUndoTrack trackForName: @"test" withContext: ctx];
     [track clear];
 
     [persistentRoot1.rootObject setLabel: @"world"];

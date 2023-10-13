@@ -8,9 +8,10 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COPersistentObjectContext.h>
+#import <CoreObject/COUndoTrack.h>
 
 @class COSQLiteStore, COEditingContext, COPersistentRoot, COBranch, COObjectGraphContext, COObject;
-@class COUndoTrackStore, COUndoTrack, COCommandGroup;
+@class COUndoTrackStore, COCommandGroup;
 @class COCrossPersistentRootDeadRelationshipCache, CORevisionCache;
 @class COError;
 
@@ -151,7 +152,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
  * Branch undo/redo can be used to inspect and navigate a single persistent 
  * root history (e.g. in a timeline UI presenting a document history). 
  */
-@interface COEditingContext : NSObject <COPersistentObjectContext>
+@interface COEditingContext : NSObject <COPersistentObjectContext, COUndoTrackContext>
 {
 @private
     COSQLiteStore *_store;
@@ -508,6 +509,23 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
  * See also -[COPersistentObjectContext editingContext].
  */
 @property (nonatomic, readonly) COEditingContext *editingContext;
+
+
+/** @taskunit Framework Private */
+
+
+/**
+ * Applies a command to the editing context (on redoing a change).
+ */
+- (void)applyCommand: (COCommand *)command;
+/**
+ * Applies a command to a store transaction (on undoing change), while
+ * leveraging the editing context state.
+ */
+- (void)applyCommand: (COCommand *)command
+  toStoreTransaction: (COStoreTransaction *)txn
+withRevisionMetadata: (nullable NSDictionary<NSString *, id> *)metadata;
+
 
 @end
 

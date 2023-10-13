@@ -24,7 +24,7 @@
     // This test was triggering some random failures; so run it 10 times
     for (NSUInteger iters = 0; iters < 10; iters++)
     {
-        COUndoTrack *track = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
+        COUndoTrack *track = [COUndoTrack trackForName: @"test" withContext: ctx];
         [track clear];
 
         COPersistentRoot *proot = [ctx insertNewPersistentRootWithEntityName: @"COAttributedString"];
