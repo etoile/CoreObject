@@ -20,6 +20,8 @@
 @property (nonatomic, readwrite, copy) NSDictionary *deadRevisionUUIDs;
 @property (nonatomic, readwrite, copy) NSDictionary *liveRevisionUUIDs;
 
+- (instancetype)init;
+
 @end
 
 
