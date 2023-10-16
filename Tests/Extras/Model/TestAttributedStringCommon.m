@@ -36,7 +36,7 @@
     return ctx1;
 }
 
-ETUUID *AttributedString1UUID()
+ETUUID *AttributedString1UUID(void)
 {
     static ETUUID *uuid;
     static dispatch_once_t onceToken;
@@ -47,7 +47,7 @@ ETUUID *AttributedString1UUID()
     return uuid;
 }
 
-ETUUID *AttributedString2UUID()
+ETUUID *AttributedString2UUID(void)
 {
     static ETUUID *uuid;
     static dispatch_once_t onceToken;

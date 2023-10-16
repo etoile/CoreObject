@@ -97,7 +97,7 @@ static NSString *languageDirectoryForLocalization(NSString *localization, NSBund
 /**
  * See Language and Locale IDs in Apple Internalization Guide.
  */
-static void validateMainBundlePreferredLocalizations()
+static void validateMainBundlePreferredLocalizations(void)
 {
     for (NSString *localization in [NSBundle mainBundle].preferredLocalizations)
     {
