@@ -247,7 +247,7 @@ TIME_METHOD(timeToModifyCoreObjectOrderedRelationship,
 
 // TODO: Timing infrastructure earlier in the file, using macros, looks awful.
 // Convert to use this.
-- (NSTimeInterval)timeBlock: (void (^)())aBlock iterations: (NSUInteger)iterations
+- (NSTimeInterval)timeBlock: (void (^)(void))aBlock iterations: (NSUInteger)iterations
 {
     NSDate *start = [NSDate date];
     for (NSUInteger i = 0; i < iterations; i++)
@@ -272,7 +272,7 @@ static NSString *FormatTimeInterval(NSTimeInterval s)
         return [NSString stringWithFormat: @"%f us", us];
 }
 
-- (void)timeBlock: (void (^)())aBlock
+- (void)timeBlock: (void (^)(void))aBlock
        iterations: (NSUInteger)iterations
           message: (NSString *)message
 {
@@ -281,7 +281,7 @@ static NSString *FormatTimeInterval(NSTimeInterval s)
 }
 
 
-- (void)timeBlock: (void (^)())aBlock message: (NSString *)message
+- (void)timeBlock: (void (^)(void))aBlock message: (NSString *)message
 {
     [self timeBlock: aBlock iterations: DEFAULT_ITERATIONS message: message];
 }
@@ -348,7 +348,7 @@ static const int LARGE_RELATIONSHIP_SIZE = 1000;
     // test -count
 
     NSArray *parentContentsArray = coreobjectParent.contents;
-    __block NSUInteger count = 0;
+    __unused __block NSUInteger count = 0;
     [self timeBlock: ^(void)
                      {
                          count += parentContentsArray.count;
