@@ -91,6 +91,7 @@ doesNotPostNotification: (NSString *)notif
 - (void)dealloc
 {
 #ifdef DELETE_STORE_AFTER_EACH_TEST_METHOD
+    store = nil;
     [[self class] deleteStores];
 #endif
 }

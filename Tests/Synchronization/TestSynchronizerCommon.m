@@ -14,7 +14,10 @@
 {
     SUPERINIT;
 
-    [[[COSQLiteStore alloc] initWithURL: CLIENT_STORE_URL] clearStore];
+    COSQLiteStore *clientStore = [[COSQLiteStore alloc] initWithURL: CLIENT_STORE_URL];
+
+    [clientStore clearStore];
+    clientStore = nil;
 
     serverPersistentRoot = [ctx insertNewPersistentRootWithEntityName: @"UnorderedGroupNoOpposite"];
     serverPersistentRoot.metadata = self.persistentRootMetadataForTest;
@@ -49,6 +52,12 @@
 {
     NSError *error = nil;
 
+    // If objects referencing client store are not deallocated before removing the store file, the
+    // store remains around until dealloc ends and SQLite complains: 'vnode unlinked while in use'.
+    transport = nil;
+    server = nil;
+    client = nil;
+    clientCtx = nil;
     [[NSFileManager defaultManager] removeItemAtURL: CLIENT_STORE_URL error: &error];
     ETAssert(error == nil);
 }

@@ -65,6 +65,7 @@ static ETUUID *branchBUUID;
 {
     NSError *error = nil;
 
+    serverStore = nil;
     [[NSFileManager defaultManager] removeItemAtURL: SERVER_STORE_URL error: &error];
     ETAssert(error == nil);
 }
