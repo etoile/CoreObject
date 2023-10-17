@@ -41,6 +41,14 @@ NS_ASSUME_NONNULL_BEGIN
                name: (nullable NSNotificationName)aName 
              object: (nullable NSString *)anObject;
 /**
+ * Adds a notification handler to be run on a queue for the given selector, notification name and
+ * object identifier.
+ */
+- (id <NSObject>)addObserverForName: (nullable NSNotificationName)aName
+                             object: (nullable id)anObject
+                              queue: (nullable NSOperationQueue *)aQueue
+                         usingBlock: (void (^)(NSNotification *notification))block;
+/**
  * Removes an observer.
  */
 - (void)removeObserver: (id)observer;

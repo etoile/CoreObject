@@ -63,6 +63,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
     url_ = aURL;
     backingStores_ = [[NSMutableDictionary alloc] init];
     backingStoreUUIDForPersistentRootUUID_ = [[NSMutableDictionary alloc] init];
+    _commitLock = dispatch_semaphore_create(1);
     _maxNumberOfDeltaCommits = 50;
 
     __block BOOL ok = YES;
@@ -218,16 +219,25 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
 #pragma mark Transactions -
 
+- (void)beginCommit
+{
+    dispatch_semaphore_wait(_commitLock, DISPATCH_TIME_FOREVER);
+}
+
+- (void)endCommit {
+    dispatch_semaphore_signal(_commitLock);
+}
 
 - (BOOL)commitStoreTransaction: (COStoreTransaction *)aTransaction
 {
-    __block BOOL ok = YES;
-
     dispatch_assert_queue_not(queue_);
+
+    [self beginCommit];
 
     NSMutableDictionary *txnIDForPersistentRoot = [[NSMutableDictionary alloc] init];
     NSMutableArray *insertedUUIDs = [[NSMutableArray alloc] init];
     NSMutableArray *deletedUUIDs = [[NSMutableArray alloc] init];
+    __block BOOL ok = YES;
 
     dispatch_sync(queue_, ^()
     {
@@ -342,6 +352,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
         NSLog(@"Commit failed");
     }
 
+    [self endCommit];
     return ok;
 }
 
@@ -1029,30 +1040,41 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
     return statistics;
 }
 
-/**
- * We could put this code in a block passed to dispatch_async(dispatch_get_main_queue(), theBlock) 
- * and  call dispatch_async() in our  caller, but dispatch_get_main_queue() is only supported for 
- * macOS (not on Linux or elsewhere). In future, GNUstep GUI could create a wrapper queue 
- * around NSRunLoop and set it as _dispatch_main_q.
- */
+// Commit notifications must match the commit order against the database,
+// otherwise with multiple threads/queues committing against the same store
+// object, editing contexts could receive notifications out of order. The
+// most critical issue is incorrect transaction ID per persistent root.
+// 
+// To ensure commit notification order is correct, we must execute store
+// transaction and commit notifications in an atomic way. We can either:
+// 1) post commit notifications with the store queue
+// 2) lock the whole store commit operation
+//
+// The second option was chosen, because commit notifications are then received
+// immediately in the same queue (or thread) than the one used to commit. The
+// first option would require test code to use -wait between commits to be sure
+// editing contexts are up-to-date.
+//
+// When multiple editing contexts are created in different queues or threads,
+// commit notifications must be received with a locking mechanism around
+// editing context mutable state, to protect it  against concurrent access
+// (e.g. mutating persistent roots). The locking mechanism can be the queue
+// on which the editing context was created.
 - (void)postCommitNotificationsWithUserInfo: (NSDictionary *)userInfo
 {
     ETAssert([NSPropertyListSerialization propertyList: userInfo
                                       isValidForFormat: NSPropertyListXMLFormat_v1_0]);
 
-    dispatch_async(dispatch_get_main_queue(), ^()
-    {
-        [[NSNotificationCenter defaultCenter] 
-            postNotificationName: COStorePersistentRootsDidChangeNotification
-                          object: self
-                        userInfo: userInfo];
+    [[NSNotificationCenter defaultCenter]
+        postNotificationName: COStorePersistentRootsDidChangeNotification
+                      object: self
+                    userInfo: userInfo];
 
-        [[CODistributedNotificationCenter defaultCenter]
-            postNotificationName: COStorePersistentRootsDidChangeNotification
-                          object: [self.UUID stringValue]
-                        userInfo: userInfo
-              deliverImmediately: YES];
-    });
+    [[CODistributedNotificationCenter defaultCenter]
+        postNotificationName: COStorePersistentRootsDidChangeNotification
+                      object: [self.UUID stringValue]
+                    userInfo: userInfo
+          deliverImmediately: YES];
 }
 
 - (void)postCommitNotificationsWithTransactionIDForPersistentRootUUID: (NSDictionary *)txnIDForPersistentRoot

@@ -21,6 +21,8 @@
 - (COSQLiteStorePersistentRootBackingStore *)backingStoreForUUID: (ETUUID *)aUUID
                                                            error: (NSError **)error;
 - (BOOL)finalizeGarbageAttachments;
+- (void)beginCommit;
+- (void)endCommit;
 - (void)postCommitNotificationsWithTransactionIDForPersistentRootUUID: (NSDictionary *)txnIDForPersistentRoot
                                               insertedPersistentRoots: (NSArray *)insertedUUIDs
                                                deletedPersistentRoots: (NSArray *)deletedUUIDs
@@ -36,6 +38,8 @@
 {
     NILARG_EXCEPTION_TEST(aCompactionStrategy);
     ETAssert(dispatch_get_current_queue() != queue_);
+    
+    [self beginCommit];
 
     __block NSMutableSet *compactedPersistentRootUUIDs = [NSMutableSet new];
     __block NSMutableSet *finalizedPersistentRootUUIDs = [NSMutableSet new];
@@ -239,14 +243,14 @@
     dispatch_sync_now(dispatch_get_main_queue(), ^()
     {
         [aCompactionStrategy endCompaction: YES];
-
-        [self postCommitNotificationsWithTransactionIDForPersistentRootUUID: @{}
-                                                    insertedPersistentRoots: @[]
-                                                     deletedPersistentRoots: @[]
-                                                   compactedPersistentRoots: compactedPersistentRootUUIDs.allObjects
-                                                   finalizedPersistentRoots: finalizedPersistentRootUUIDs.allObjects];
     });
-
+    [self postCommitNotificationsWithTransactionIDForPersistentRootUUID: @{}
+                                                insertedPersistentRoots: @[]
+                                                 deletedPersistentRoots: @[]
+                                               compactedPersistentRoots: compactedPersistentRootUUIDs.allObjects
+                                               finalizedPersistentRoots: finalizedPersistentRootUUIDs.allObjects];
+    
+    [self endCommit];
     return YES;
 }
 
