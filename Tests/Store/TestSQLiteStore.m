@@ -1065,10 +1065,6 @@ static ETUUID *childUUID2;
 - (void)testWriteRevisionWithNonExistentParent
 {
     COStoreTransaction *txn = [[COStoreTransaction alloc] init];
-
-    // N.B. If the parent revision is not in the store, you have to provide all items
-    // in the revision (not just a delta against the parent)
-
     [txn writeRevisionWithModifiedItems: [self makeBranchAItemTreeAtIndex: BRANCH_LATER]
                            revisionUUID: [ETUUID UUID]
                                metadata: nil
@@ -1077,7 +1073,7 @@ static ETUUID *childUUID2;
                      persistentRootUUID: prootUUID
                              branchUUID: branchAUUID];
     prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
-    UKTrue([store commitStoreTransaction: txn]);
+    UKFalse([store commitStoreTransaction: txn]);
 }
 
 - (void)testWriteRevisionWithNonExistentMergeParent
@@ -1091,7 +1087,7 @@ static ETUUID *childUUID2;
                      persistentRootUUID: prootUUID
                              branchUUID: branchAUUID];
     prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
-    UKTrue([store commitStoreTransaction: txn]);
+    UKFalse([store commitStoreTransaction: txn]);
 }
 
 /**

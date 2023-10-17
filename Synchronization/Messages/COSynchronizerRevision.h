@@ -25,7 +25,8 @@
 
 - (void)writeToTransaction: (COStoreTransaction *)txn
         persistentRootUUID: (ETUUID *)persistentRoot
-                branchUUID: (ETUUID *)branch;
+                branchUUID: (ETUUID *)branch
+           isFirstRevision: (BOOL)isFirst;
 - (instancetype)initWithUUID: (ETUUID *)aUUID
               persistentRoot: (ETUUID *)aPersistentRoot
                        store: (COSQLiteStore *)store

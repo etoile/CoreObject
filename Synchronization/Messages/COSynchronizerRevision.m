@@ -16,11 +16,12 @@
 - (void)writeToTransaction: (COStoreTransaction *)txn
         persistentRootUUID: (ETUUID *)persistentRoot
                 branchUUID: (ETUUID *)branch
+           isFirstRevision: (BOOL)isFirst
 {
     [txn writeRevisionWithModifiedItems: self.modifiedItems
                            revisionUUID: self.revisionUUID
                                metadata: self.metadata
-                       parentRevisionID: self.parentRevisionUUID
+                       parentRevisionID: isFirst ? nil : self.parentRevisionUUID
                   mergeParentRevisionID: nil
                      persistentRootUUID: persistentRoot
                              branchUUID: branch];

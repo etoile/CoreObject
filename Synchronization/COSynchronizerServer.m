@@ -74,7 +74,8 @@
     {
         [rev writeToTransaction: txn
              persistentRootUUID: self.persistentRoot.UUID
-                     branchUUID: self.branch.UUID];
+                     branchUUID: self.branch.UUID
+                isFirstRevision: NO];
     }
     ETAssert([self.persistentRoot.store commitStoreTransaction: txn]);
 

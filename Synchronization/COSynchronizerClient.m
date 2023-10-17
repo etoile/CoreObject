@@ -99,7 +99,8 @@
     {
         [message.currentRevision writeToTransaction: txn
                                  persistentRootUUID: message.persistentRootUUID
-                                         branchUUID: message.branchUUID];
+                                         branchUUID: message.branchUUID
+                                    isFirstRevision: YES];
     }
 
     ETAssert([_ctx.store commitStoreTransaction: txn]);
@@ -197,7 +198,8 @@
         {
             [rev writeToTransaction: txn
                  persistentRootUUID: self.persistentRoot.UUID
-                         branchUUID: self.branch.UUID];
+                         branchUUID: self.branch.UUID
+                    isFirstRevision: NO];
         }
     }
     // TODO: Ideally we'd just do one store commit, instead of two,
