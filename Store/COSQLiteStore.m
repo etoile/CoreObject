@@ -130,6 +130,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
     // For GNUstep, ARC doesn't manage libdispatch objects since libobjc2 doesn't support it 
     // currently (we compile CoreObject with -DOS_OBJECT_USE_OBJC=0).
     dispatch_release(queue_);
+    dispatch_release(_commitLock);
 #endif
 }
 
