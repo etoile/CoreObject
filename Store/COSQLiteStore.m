@@ -430,7 +430,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
     dispatch_sync(queue_, ^()
     {
         COSQLiteStorePersistentRootBackingStore *backingStore =
-            [self backingStoreForPersistentRootUUID: prootUUID createIfNotPresent: YES];
+            [self backingStoreForPersistentRootUUID: prootUUID createIfNotPresent: NO];
 
         result = [backingStore revisionInfosForBranchUUID: aBranchUUID
                                          headRevisionUUID: headRevUUID
@@ -755,12 +755,12 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
     if (aParent != nil && parentRevid == -1)
     {
         NSLog(@"Parent revision not found: %@", aParent);
-        // FIXME: If we're going to support writing revisions with missing parents
-        // we should probably preserve the parent UUID?
+        return NO;
     }
     if (aMergeParent != nil && mergeParentRevid == -1)
     {
         NSLog(@"Merge parent revision not found: %@", aMergeParent);
+        return NO;
     }
 
     const BOOL ok = [backing writeItemGraph: anItemTree
