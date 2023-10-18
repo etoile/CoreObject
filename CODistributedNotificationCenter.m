@@ -44,6 +44,26 @@ static CODistributedNotificationCenter *defaultCenter = nil;
 #endif
 }
 
+- (id <NSObject>)addObserverForName: (NSNotificationName)aName
+                             object: (id)anObject
+                              queue: (NSOperationQueue *)aQueue
+                         usingBlock: (void (^)(NSNotification *notification))block
+{
+#if !(SANDBOXED) && !(TARGET_OS_IPHONE)
+    return [[NSDistributedNotificationCenter defaultCenter]
+        addObserverForName: aName
+                    object: anObject
+                     queue: aQueue
+                usingBlock: block];
+#else
+    return [[NSNotificationCenter defaultCenter]
+        addObserverForName: aName
+                    object: anObject
+                     queue: aQueue
+                usingBlock: block];
+#endif
+}
+
 - (void)removeObserver: (id)observer {
 #if !(SANDBOXED) && !(TARGET_OS_IPHONE)
     [[NSDistributedNotificationCenter defaultCenter] removeObserver: observer];

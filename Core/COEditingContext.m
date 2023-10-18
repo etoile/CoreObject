@@ -74,16 +74,30 @@
     _lastTransactionIDForPersistentRootUUID = [NSMutableDictionary new];
     CORegisterCoreObjectMetamodel(_modelDescriptionRepository);
 
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(storePersistentRootsDidChange:)
-                                                 name: COStorePersistentRootsDidChangeNotification
-                                               object: _store];
+    NSOperationQueue *notifQueue = [NSOperationQueue currentQueue];
+    __weak __typeof__(self) weakSelf = self;
 
+    // If -[COSQLiteStore commitStoreTransaction:] is called with the queue
+    // used to create the editing context, then the notification center calls
+    // the block immediately/synchronously, rather than asynchronously.
+    //
+    // Note: without a delivery queue, NSDistributedNotificationCenter
+    // delivers notifications in the main thread, while NSNotificationCenter
+    // delivers them in the thread where posting occurs.
+    [[NSNotificationCenter defaultCenter]
+        addObserverForName: COStorePersistentRootsDidChangeNotification
+                    object: _store
+                     queue: notifQueue
+                usingBlock: ^(NSNotification *notif) {
+        [weakSelf storePersistentRootsDidChange: notif];
+    }];
     [[CODistributedNotificationCenter defaultCenter]
-        addObserver: self
-           selector: @selector(distributedStorePersistentRootsDidChange:)
-               name: COStorePersistentRootsDidChangeNotification
-             object: nil];
+        addObserverForName: COStorePersistentRootsDidChangeNotification
+                    object: nil
+                     queue: notifQueue
+                usingBlock: ^(NSNotification *notif) {
+        [weakSelf distributedStorePersistentRootsDidChange: notif];
+    }];
 
     return self;
 }
