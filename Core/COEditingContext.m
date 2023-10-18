@@ -1034,11 +1034,16 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
                                 persistentRootUUID: aPersistentRoot];
 }
 
-- (COParentRevisionUUIDs)parentRevisionUUIDsForRevisionUUID:(ETUUID *)aRevisionUUID
-                                         persistentRootUUID:(ETUUID *)aPersistentRoot {
+- (ETUUID *)parentRevisionUUIDForRevisionUUID: (ETUUID *)aRevisionUUID
+                      mergeParentRevisionUUID: (ETUUID **)aMergeParentRevisionUUID
+                           persistentRootUUID: (ETUUID *)aPersistentRoot
+{
     CORevision *rev = [self revisionForRevisionUUID: aRevisionUUID
                                  persistentRootUUID: aPersistentRoot];
-    return (COParentRevisionUUIDs){ rev.parentRevision.UUID, rev.mergeParentRevision.UUID };
+    if (aMergeParentRevisionUUID != NULL) {
+        *aMergeParentRevisionUUID = rev.mergeParentRevision.UUID;
+    }
+    return rev.parentRevision.UUID;
 }
 
 - (COBranch *)branchForUUID: (ETUUID *)aBranch

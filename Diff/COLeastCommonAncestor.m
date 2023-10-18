@@ -17,20 +17,21 @@ void COCollectParentRevisionUUIDsFromInclusiveInto(ETUUID *rev,
 
     [ancestorRevs addObject: rev];
 
-    COParentRevisionUUIDs parentRevUUIDs = 
-        [provider parentRevisionUUIDsForRevisionUUID: rev
-                                  persistentRootUUID: persistentRoot];
+    ETUUID *mergeParentRev;
+    ETUUID *parentRev = [provider parentRevisionUUIDForRevisionUUID: rev
+                                            mergeParentRevisionUUID: &mergeParentRev
+                                                 persistentRootUUID: persistentRoot];
 
-    if (parentRevUUIDs.parent != nil)
+    if (parentRev != nil)
     {
-        COCollectParentRevisionUUIDsFromInclusiveInto(parentRevUUIDs.parent,
+        COCollectParentRevisionUUIDsFromInclusiveInto(parentRev,
                                                       persistentRoot,
                                                       ancestorRevs,
                                                       provider);
     }
-    if (parentRevUUIDs.mergeParent != nil)
+    if (mergeParentRev != nil)
     {
-        COCollectParentRevisionUUIDsFromInclusiveInto(parentRevUUIDs.mergeParent,
+        COCollectParentRevisionUUIDsFromInclusiveInto(mergeParentRev,
                                                       persistentRoot,
                                                       ancestorRevs,
                                                       provider);
@@ -62,15 +63,16 @@ ETUUID *COCommonAncestorRevisionUUIDs(ETUUID *revA,
             {
                 return sibling;
             }
-            COParentRevisionUUIDs parentRevUUIDs =
-                [provider parentRevisionUUIDsForRevisionUUID: sibling
-                                          persistentRootUUID: persistentRoot];
+            ETUUID *mergeParentRev;
+            ETUUID *parentRev = [provider parentRevisionUUIDForRevisionUUID: sibling
+                                                    mergeParentRevisionUUID: &mergeParentRev
+                                                         persistentRootUUID: persistentRoot];
 
-            if (parentRevUUIDs.parent != nil)
-                [nextSiblings addObject: parentRevUUIDs.parent];
+            if (parentRev != nil)
+                [nextSiblings addObject: parentRev];
 
-            if (parentRevUUIDs.mergeParent != nil)
-                [nextSiblings addObject: parentRevUUIDs.mergeParent];
+            if (mergeParentRev != nil)
+                [nextSiblings addObject: mergeParentRev];
         }
 
         [siblings setArray: nextSiblings];
@@ -92,8 +94,9 @@ BOOL CORevisionUUIDEqualToOrParent(ETUUID *revA,
         {
             return YES;
         }
-        rev = [provider parentRevisionUUIDsForRevisionUUID: rev
-                                        persistentRootUUID: persistentRoot].parent;
+        rev = [provider parentRevisionUUIDForRevisionUUID: rev
+                                  mergeParentRevisionUUID: NULL
+                                       persistentRootUUID: persistentRoot];
     }
     return NO;
 }
@@ -112,8 +115,9 @@ NSArray *CORevisionsUUIDsFromExclusiveToInclusive(ETUUID *start,
             return result;
         }
         [result insertObject: rev atIndex: 0];
-        rev = [provider parentRevisionUUIDsForRevisionUUID: rev
-                                        persistentRootUUID: persistentRoot].parent;
+        rev = [provider parentRevisionUUIDForRevisionUUID: rev
+                                  mergeParentRevisionUUID: NULL
+                                       persistentRootUUID: persistentRoot];
     }
     return nil;
 }

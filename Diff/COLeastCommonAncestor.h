@@ -10,15 +10,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef struct
-{
-    ETUUID *_Nullable parent;
-    ETUUID *_Nullable mergeParent;
-} COParentRevisionUUIDs;
-
 @protocol COParentRevisionProvider
-- (COParentRevisionUUIDs)parentRevisionUUIDsForRevisionUUID: (ETUUID *)aRevisionUUID
-                                         persistentRootUUID: (ETUUID *)aPersistentRoot;
+- (nullable ETUUID *)parentRevisionUUIDForRevisionUUID: (ETUUID *)aRevisionUUID
+                               mergeParentRevisionUUID: (ETUUID *_Nullable*_Nullable)aMergeParentRevisionUUID
+                                    persistentRootUUID: (ETUUID *)aPersistentRoot;
 @end
 
 ETUUID *_Nullable COCommonAncestorRevisionUUIDs(ETUUID *revA, 
