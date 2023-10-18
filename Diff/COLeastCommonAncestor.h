@@ -6,23 +6,35 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <CoreObject/COEditingContext.h>
+#import <EtoileFoundation/ETUUID.h>
 
-@class ETUUID;
+NS_ASSUME_NONNULL_BEGIN
 
-@interface COEditingContext (CommonAncestor)
+typedef struct
+{
+    ETUUID *_Nullable parent;
+    ETUUID *_Nullable mergeParent;
+} COParentRevisionUUIDs;
 
-- (ETUUID *)commonAncestorForCommit: (ETUUID *)commitA
-                          andCommit: (ETUUID *)commitB
-                     persistentRoot: (ETUUID *)persistentRoot;
-- (BOOL)       isRevision: (ETUUID *)commitA
-equalToOrParentOfRevision: (ETUUID *)commitB
-           persistentRoot: (ETUUID *)persistentRoot;
-/**
- * As a sepecial case if [start isEqual: end] returns the empty array
- */
-- (NSArray *)revisionUUIDsFromRevisionUUIDExclusive: (ETUUID *)start
-                            toRevisionUUIDInclusive: (ETUUID *)end
-                                     persistentRoot: (ETUUID *)persistentRoot;
-
+@protocol COParentRevisionProvider
+- (COParentRevisionUUIDs)parentRevisionUUIDsForRevisionUUID: (ETUUID *)aRevisionUUID
+                                         persistentRootUUID: (ETUUID *)aPersistentRoot;
 @end
+
+ETUUID *_Nullable COCommonAncestorRevisionUUIDs(ETUUID *revA, 
+                                                ETUUID *revB,
+                                                ETUUID *persistentRoot,
+                                                id <COParentRevisionProvider> provider);
+BOOL CORevisionUUIDEqualToOrParent(ETUUID *revA,
+                                   ETUUID *revB,
+                                   ETUUID *persistentRoot,
+                                   id <COParentRevisionProvider> provider);
+/**
+ * As a special case, if [start isEqual: end] returns the empty array.
+ */
+NSArray<ETUUID *> *CORevisionsUUIDsFromExclusiveToInclusive(ETUUID *start, 
+                                                            ETUUID *end,
+                                                            ETUUID *persistentRoot,
+                                                            id <COParentRevisionProvider> provider);
+
+NS_ASSUME_NONNULL_END

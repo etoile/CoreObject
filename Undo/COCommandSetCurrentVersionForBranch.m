@@ -139,9 +139,10 @@ static NSString *const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevisionI
         branch.currentRevision = [aContext revisionForRevisionUUID: _newRevisionUUID
                                                 persistentRootUUID: _persistentRootUUID];
 
-        if (![aContext isRevision: _newHeadRevisionUUID
-        equalToOrParentOfRevision: _oldHeadRevisionUUID
-                   persistentRoot: _persistentRootUUID])
+        if (!CORevisionUUIDEqualToOrParent(_newHeadRevisionUUID,
+                                           _oldHeadRevisionUUID,
+                                           _persistentRootUUID,
+                                           aContext))
         {
             branch.headRevision = [aContext revisionForRevisionUUID: _newHeadRevisionUUID
                                                  persistentRootUUID: _persistentRootUUID];
@@ -217,9 +218,10 @@ static NSString *const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevisionI
     if ([branchCurrentRevisionUUID isEqual: _oldRevisionUUID] && branch.supportsRevert)
     {
         // TODO: Could be a bottleneck; migrate COLeastCommonAncestor to use the revision cache.
-        if (![aContext isRevision: _newHeadRevisionUUID
-        equalToOrParentOfRevision: _oldHeadRevisionUUID
-                   persistentRoot: _persistentRootUUID])
+        if (!CORevisionUUIDEqualToOrParent(_newHeadRevisionUUID,
+                                           _oldHeadRevisionUUID,
+                                           _persistentRootUUID,
+                                           aContext))
         {
             [txn setCurrentRevision: _newRevisionUUID
                        headRevision: _newHeadRevisionUUID

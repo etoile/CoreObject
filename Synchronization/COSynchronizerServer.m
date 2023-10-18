@@ -78,9 +78,10 @@
     }
     ETAssert([self.persistentRoot.store commitStoreTransaction: txn]);
 
-    if (![branch.editingContext isRevision: self.branch.currentRevision.UUID
-                 equalToOrParentOfRevision: [revs.lastObject revisionUUID]
-                            persistentRoot: self.persistentRoot.UUID])
+    if (!CORevisionUUIDEqualToOrParent(self.branch.currentRevision.UUID,
+                                       [revs.lastObject revisionUUID],
+                                       self.persistentRoot.UUID,
+                                       branch.editingContext))
     {
         // Rebase revs onto the current revisions
 
@@ -88,10 +89,10 @@
 
         ETUUID *source = [revs.lastObject revisionUUID];
         ETUUID *dest = self.branch.currentRevision.UUID;
-
-        ETUUID *lca = [self.persistentRoot.editingContext commonAncestorForCommit: source
-                                                                        andCommit: dest
-                                                                   persistentRoot: self.persistentRoot.UUID];
+        ETUUID *lca = COCommonAncestorRevisionUUIDs(source, 
+                                                    dest,
+                                                    self.persistentRoot.UUID,
+                                                    self.persistentRoot.editingContext);
 
         NSArray *rebasedRevs = [COSynchronizerUtils rebaseRevision: source
                                                       ontoRevision: dest
@@ -173,9 +174,10 @@
     NSMutableArray *revs = [[NSMutableArray alloc] init];
 
     ETAssert(branch.editingContext != nil);
-    NSArray *revUUIDs = [branch.editingContext revisionUUIDsFromRevisionUUIDExclusive: lastConfirmedForClient
-                                                              toRevisionUUIDInclusive: self.branch.currentRevision.UUID
-                                                                       persistentRoot: self.persistentRoot.UUID];
+    NSArray *revUUIDs = CORevisionsUUIDsFromExclusiveToInclusive(lastConfirmedForClient,
+                                                                 self.branch.currentRevision.UUID,
+                                                                 self.persistentRoot.UUID,
+                                                                 branch.editingContext);
 
     if (revUUIDs == nil)
     {

@@ -8,6 +8,7 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 #import <CoreObject/COPersistentObjectContext.h>
+#import <CoreObject/COLeastCommonAncestor.h>
 #import <CoreObject/COUndoTrack.h>
 
 @class COSQLiteStore, COEditingContext, COPersistentRoot, COBranch, COObjectGraphContext, COObject;
@@ -152,7 +153,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
  * Branch undo/redo can be used to inspect and navigate a single persistent 
  * root history (e.g. in a timeline UI presenting a document history). 
  */
-@interface COEditingContext : NSObject <COPersistentObjectContext, COUndoTrackContext>
+@interface COEditingContext : NSObject <COPersistentObjectContext, COParentRevisionProvider, COUndoTrackContext>
 {
 @private
     COSQLiteStore *_store;
