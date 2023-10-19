@@ -8,6 +8,8 @@
 #import <CoreObject/COItemGraph.h>
 #import <EtoileFoundation/EtoileFoundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol CODiffAlgorithm <NSObject>
 
 + (instancetype)diffItemUUIDs: (NSArray *)uuids
@@ -53,6 +55,10 @@
                    withItemGraph: (id <COItemGraph>)b
       modelDescriptionRepository: (ETModelDescriptionRepository *)aRepository
                 sourceIdentifier: (id)aSource;
++ (CODiffManager *)diffItemGraph: (id <COItemGraph>)a
+                   withItemGraph: (id <COItemGraph>)b
+                algorithmClasses: (NSDictionary<NSString *, Class> *)algorithmClasses
+                sourceIdentifier: (id)aSource;
 - (CODiffManager *)diffByMergingWithDiff: (CODiffManager *)otherDiff;
 
 
@@ -89,3 +95,5 @@
 - (void)resolveConflictsFavoringSourceIdentifier: (id)aSource;
 
 @end
+
+NS_ASSUME_NONNULL_END
