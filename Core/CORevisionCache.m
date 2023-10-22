@@ -7,17 +7,17 @@
 
 #import "CORevisionCache.h"
 #import "CORevision.h"
-#import "COEditingContext.h"
+#import "COSQLiteStore.h"
 
 @implementation CORevisionCache
 
-@synthesize parentEditingContext = _parentContext;
+@synthesize store = _store;
 
-- (instancetype)initWithParentEditingContext: (COEditingContext *)aCtx
+- (instancetype)initWithStore:(COSQLiteStore *)aStore
 {
-    NILARG_EXCEPTION_TEST(aCtx);
+    NILARG_EXCEPTION_TEST(aStore);
     SUPERINIT;
-    _parentContext = aCtx;
+    _store = aStore;
     _revisionForRevisionID = [[NSMutableDictionary alloc] init];
     return self;
 }
@@ -27,7 +27,7 @@
 
 - (instancetype)init
 {
-    return [self initWithParentEditingContext: nil];
+    return [self initWithStore: nil];
 }
 
 #pragma clang diagnostic pop
@@ -35,15 +35,13 @@
 - (CORevision *)revisionForRevisionUUID: (ETUUID *)aRevid
                      persistentRootUUID: (ETUUID *)aPersistentRoot
 {
-    ETAssert(_parentContext != nil);
     CORevision *cached = _revisionForRevisionID[aRevid];
 
     if (cached == nil)
     {
-        COSQLiteStore *store = _parentContext.store;
-        ETAssert(store != nil);
-        CORevisionInfo *info = [store revisionInfoForRevisionUUID: aRevid
-                                               persistentRootUUID: aPersistentRoot];
+        ETAssert(_store != nil);
+        CORevisionInfo *info = [_store revisionInfoForRevisionUUID: aRevid
+                                                persistentRootUUID: aPersistentRoot];
 
         if (info == nil)
             return nil;

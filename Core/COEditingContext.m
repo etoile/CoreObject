@@ -68,7 +68,7 @@
     _deadRelationshipCache = [COCrossPersistentRootDeadRelationshipCache new];
     _undoTrackStore = anUndoTrackStore;
     _recordingUndo = YES;
-    _revisionCache = [[CORevisionCache alloc] initWithParentEditingContext: self];
+    _revisionCache = [[CORevisionCache alloc] initWithStore: store];
     _internalTransientObjectGraphContext = [[COObjectGraphContext alloc]
         initWithModelDescriptionRepository: aRepo
                       migrationDriverClass: aDriverClass];

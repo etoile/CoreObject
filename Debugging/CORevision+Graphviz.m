@@ -10,8 +10,8 @@
 
 - (void)show
 {
-    [[[self cache].parentEditingContext.store itemGraphForRevisionUUID: self.UUID
-                                                        persistentRoot: self.persistentRootUUID] showGraph];
+    [[[self cache].store itemGraphForRevisionUUID: self.UUID
+                                   persistentRoot: self.persistentRootUUID] showGraph];
 }
 
 @end
