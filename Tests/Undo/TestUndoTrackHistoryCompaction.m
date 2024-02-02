@@ -15,6 +15,8 @@
 
 @interface COExpectedCompaction : COUndoTrackHistoryCompaction
 
+- (instancetype)init;
+
 @property (nonatomic, readwrite, copy) NSSet *finalizablePersistentRootUUIDs;
 @property (nonatomic, readwrite, copy) NSSet *compactablePersistentRootUUIDs;
 @property (nonatomic, readwrite, copy) NSDictionary *deadRevisionUUIDs;

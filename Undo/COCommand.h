@@ -9,7 +9,7 @@
 #import <EtoileFoundation/ETUUID.h>
 #import <CoreObject/COTrack.h>
 
-@class COEditingContext, COUndoTrack;
+@class COEditingContext, COUndoTrack, COStoreTransaction;
 
 NS_ASSUME_NONNULL_BEGIN
 
