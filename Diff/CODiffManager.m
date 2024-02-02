@@ -129,13 +129,15 @@
         ETAssert(itemB != nil);
         [self checkItem: itemA hasSameEntityNameAsItem: itemB];
 
-        Class diffClass = algorithmClasses[itemB.entityName];
-        NSMutableArray *items = partitionedItemUUIDs[NSStringFromClass(diffClass)];
+        Class customDiffClass = algorithmClasses[itemB.entityName];
+        NSString *diffClass =
+            NSStringFromClass(customDiffClass != nil ? customDiffClass : [COItemGraphDiff class]);
+        NSMutableArray *items = partitionedItemUUIDs[diffClass];
     
         if (items == nil)
         {
             items = [NSMutableArray new];
-            partitionedItemUUIDs[NSStringFromClass(diffClass)] = items;
+            partitionedItemUUIDs[diffClass] = items;
         }
         [items addObject: uuid];
     }
