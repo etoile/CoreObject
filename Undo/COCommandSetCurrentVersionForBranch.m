@@ -217,7 +217,6 @@ static NSString *const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevisionI
 
     if ([branchCurrentRevisionUUID isEqual: _oldRevisionUUID] && branch.supportsRevert)
     {
-        // TODO: Could be a bottleneck; migrate COLeastCommonAncestor to use the revision cache.
         if (!CORevisionUUIDEqualToOrParent(_newHeadRevisionUUID,
                                            _oldHeadRevisionUUID,
                                            _persistentRootUUID,
