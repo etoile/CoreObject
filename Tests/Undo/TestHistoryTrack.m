@@ -25,9 +25,9 @@
 {
     SUPERINIT;
 
-    _workspaceTrack = [COUndoTrack trackForName: @"workspace" withEditingContext: ctx];
-    _doc1Track = [COUndoTrack trackForName: @"doc1" withEditingContext: ctx];
-    _doc2Track = [COUndoTrack trackForName: @"doc2" withEditingContext: ctx];
+    _workspaceTrack = [COUndoTrack trackForName: @"workspace" withContext: ctx];
+    _doc1Track = [COUndoTrack trackForName: @"doc1" withContext: ctx];
+    _doc2Track = [COUndoTrack trackForName: @"doc2" withContext: ctx];
 
     [_workspaceTrack clear];
     [_doc1Track clear];

@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * A track content can be persistent (e.g. a normal undo track or a branch) or 
  * lazily constructed (e.g. a pattern undo track, see 
- * +[COUndoTrack trackForPattern:withEditingContext:]).
+ * +[COUndoTrack trackForPattern:withContext:]).
  *
  * @section Track Node Collection 
  *

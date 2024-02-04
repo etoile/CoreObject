@@ -139,9 +139,10 @@ static NSString *const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevisionI
         branch.currentRevision = [aContext revisionForRevisionUUID: _newRevisionUUID
                                                 persistentRootUUID: _persistentRootUUID];
 
-        if (![aContext isRevision: _newHeadRevisionUUID
-        equalToOrParentOfRevision: _oldHeadRevisionUUID
-                   persistentRoot: _persistentRootUUID])
+        if (!CORevisionUUIDEqualToOrParent(_newHeadRevisionUUID,
+                                           _oldHeadRevisionUUID,
+                                           _persistentRootUUID,
+                                           aContext))
         {
             branch.headRevision = [aContext revisionForRevisionUUID: _newHeadRevisionUUID
                                                  persistentRootUUID: _persistentRootUUID];
@@ -216,10 +217,10 @@ static NSString *const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevisionI
 
     if ([branchCurrentRevisionUUID isEqual: _oldRevisionUUID] && branch.supportsRevert)
     {
-        // TODO: Could be a bottleneck; migrate COLeastCommonAncestor to use the revision cache.
-        if (![aContext isRevision: _newHeadRevisionUUID
-        equalToOrParentOfRevision: _oldHeadRevisionUUID
-                   persistentRoot: _persistentRootUUID])
+        if (!CORevisionUUIDEqualToOrParent(_newHeadRevisionUUID,
+                                           _oldHeadRevisionUUID,
+                                           _persistentRootUUID,
+                                           aContext))
         {
             [txn setCurrentRevision: _newRevisionUUID
                        headRevision: _newHeadRevisionUUID
@@ -296,15 +297,15 @@ static NSString *const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevisionI
 - (CORevision *)oldRevision
 {
     ETAssert(_parentUndoTrack != nil);
-    return [_parentUndoTrack.editingContext revisionForRevisionUUID: _oldRevisionUUID
-                                                 persistentRootUUID: _persistentRootUUID];
+    return [_parentUndoTrack.context revisionForRevisionUUID: _oldRevisionUUID
+                                          persistentRootUUID: _persistentRootUUID];
 }
 
 - (CORevision *)revision
 {
     ETAssert(_parentUndoTrack != nil);
-    return [_parentUndoTrack.editingContext revisionForRevisionUUID: _newRevisionUUID
-                                                 persistentRootUUID: _persistentRootUUID];
+    return [_parentUndoTrack.context revisionForRevisionUUID: _newRevisionUUID
+                                          persistentRootUUID: _persistentRootUUID];
 }
 
 #pragma mark -

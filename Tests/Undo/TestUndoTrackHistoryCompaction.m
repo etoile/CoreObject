@@ -15,6 +15,8 @@
 
 @interface COExpectedCompaction : COUndoTrackHistoryCompaction
 
+- (instancetype)init;
+
 @property (nonatomic, readwrite, copy) NSSet *finalizablePersistentRootUUIDs;
 @property (nonatomic, readwrite, copy) NSSet *compactablePersistentRootUUIDs;
 @property (nonatomic, readwrite, copy) NSDictionary *deadRevisionUUIDs;
@@ -89,7 +91,7 @@
     // NOTE: The name must not start with 'TestUndoTrack', otherwise this
     // conflicts with pattern track tests in TestUndoTrack.m.
     track = [COUndoTrack trackForName: @"TestHistoryCompaction"
-                   withEditingContext: ctx];
+                   withContext: ctx];
     [track clear];
 }
 
@@ -539,13 +541,13 @@
     // NOTE: The name must not start with 'TestUndoTrack', otherwise this
     // conflicts with pattern track tests in TestUndoTrack.m.
     track = [COUndoTrack trackForPattern: @"TestHistoryCompaction/Pattern/*"
-                      withEditingContext: ctx];
+                      withContext: ctx];
     [track clear];
     concreteTrack1 = [COUndoTrack trackForName: @"TestHistoryCompaction/Pattern/1"
-                            withEditingContext: ctx];
+                            withContext: ctx];
     [concreteTrack1 clear];
     concreteTrack2 = [COUndoTrack trackForName: @"TestHistoryCompaction/Pattern/2"
-                            withEditingContext: ctx];
+                            withContext: ctx];
     [concreteTrack2 clear];
 }
 

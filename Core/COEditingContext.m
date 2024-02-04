@@ -24,6 +24,7 @@
 #import "CORevisionCache.h"
 #import "COStoreTransaction.h"
 #import "CODistributedNotificationCenter.h"
+#import "COCommand.h"
 
 @implementation COEditingContext
 
@@ -67,7 +68,7 @@
     _deadRelationshipCache = [COCrossPersistentRootDeadRelationshipCache new];
     _undoTrackStore = anUndoTrackStore;
     _recordingUndo = YES;
-    _revisionCache = [[CORevisionCache alloc] initWithParentEditingContext: self];
+    _revisionCache = [[CORevisionCache alloc] initWithStore: store];
     _internalTransientObjectGraphContext = [[COObjectGraphContext alloc]
         initWithModelDescriptionRepository: aRepo
                       migrationDriverClass: aDriverClass];
@@ -1047,6 +1048,18 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
                                 persistentRootUUID: aPersistentRoot];
 }
 
+- (ETUUID *)parentRevisionUUIDForRevisionUUID: (ETUUID *)aRevisionUUID
+                      mergeParentRevisionUUID: (ETUUID **)aMergeParentRevisionUUID
+                           persistentRootUUID: (ETUUID *)aPersistentRoot
+{
+    CORevision *rev = [self revisionForRevisionUUID: aRevisionUUID
+                                 persistentRootUUID: aPersistentRoot];
+    if (aMergeParentRevisionUUID != NULL) {
+        *aMergeParentRevisionUUID = rev.mergeParentRevision.UUID;
+    }
+    return rev.parentRevision.UUID;
+}
+
 - (COBranch *)branchForUUID: (ETUUID *)aBranch
 {
     if (aBranch != nil)
@@ -1066,6 +1079,20 @@ restrictedToPersistentRoots: (NSArray *)persistentRoots
 - (void)setLastTransactionID: (int64_t)lastTransactionID forPersistentRootUUID: (ETUUID *)aUUID
 {
     _lastTransactionIDForPersistentRootUUID[aUUID] = @(lastTransactionID);
+}
+
+#pragma mark Undo Track Integration -
+
+- (void)applyCommand: (COCommand *)command {
+    [command applyToContext: self];
+}
+
+- (void)applyCommand: (COCommand *)command
+  toStoreTransaction: (COStoreTransaction *)txn
+withRevisionMetadata: (nullable NSDictionary<NSString *, id> *)metadata {
+    [command addToStoreTransaction: txn
+              withRevisionMetadata: metadata
+       assumingEditingContextState: self];
 }
 
 @end

@@ -336,7 +336,7 @@ the following situations at least:
 
 - COUndoTrack
 
-  - Doesn’t work: [[COUndoTrack trackForPattern: @"org.etoile.projectdemo*" withEditingContext: nil] clear];
+  - Doesn’t work: [[COUndoTrack trackForPattern: @"org.etoile.projectdemo*" withContext: nil] clear];
 
   - Perhaps have different commands for a regular commit and a revert.
     It's probably confusing or dangerous that undoing a revert can cause a selective undo (as it can now),
@@ -353,8 +353,8 @@ the following situations at least:
 
   - e.g:
   
-        a = [COUndoTrack trackForName: @"test" withEditingContext: ctx]
-        b = [COUndoTrack trackForName: @"test" withEditingContext: ctx]
+        a = [COUndoTrack trackForName: @"test" withContext: ctx]
+        b = [COUndoTrack trackForName: @"test" withContext: ctx]
         ...
         [ctx commitWithUndoTrack: a]
 

@@ -883,9 +883,10 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
 - (COMergeInfo *)mergeInfoForMergingBranch: (COBranch *)aBranch
 {
     NILARG_EXCEPTION_TEST(aBranch);
-    ETUUID *lca = [self.editingContext commonAncestorForCommit: aBranch.currentRevision.UUID
-                                                     andCommit: self.currentRevision.UUID
-                                                persistentRoot: self.persistentRoot.UUID];
+    ETUUID *lca = COCommonAncestorRevisionUUIDs(aBranch.currentRevision.UUID,
+                                                self.currentRevision.UUID,
+                                                self.persistentRoot.UUID,
+                                                self.editingContext);
     id <COItemGraph> baseGraph = [self.store itemGraphForRevisionUUID: lca
                                                        persistentRoot: self.persistentRoot.UUID];
 
@@ -898,9 +899,10 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
 - (COMergeInfo *)mergeInfoForMergingRevision: (CORevision *)aRevision
 {
     NILARG_EXCEPTION_TEST(aRevision);
-    ETUUID *lca = [self.editingContext commonAncestorForCommit: aRevision.UUID
-                                                     andCommit: self.currentRevision.UUID
-                                                persistentRoot: self.persistentRoot.UUID];
+    ETUUID *lca = COCommonAncestorRevisionUUIDs(aRevision.UUID,
+                                                self.currentRevision.UUID,
+                                                self.persistentRoot.UUID,
+                                                self.editingContext);
     id <COItemGraph> baseGraph = [self.store itemGraphForRevisionUUID: lca
                                                        persistentRoot: self.persistentRoot.UUID];
     id <COItemGraph> mergeGraph = [self.store itemGraphForRevisionUUID: aRevision.UUID

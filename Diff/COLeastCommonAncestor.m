@@ -6,96 +6,107 @@
  */
 
 #import "COLeastCommonAncestor.h"
-#import "COEditingContext+Private.h"
 
-@implementation COEditingContext (CommonAncestor)
-
-- (void)addUUIDAndParents: (ETUUID *)aUUID
-           persistentRoot: (ETUUID *)persistentRoot
-                    toSet: (NSMutableSet *)dest
+void COCollectParentRevisionUUIDsFromInclusiveInto(ETUUID *rev,
+                                              ETUUID *persistentRoot,
+                                              NSMutableSet *ancestorRevs,
+                                              id <COParentRevisionProvider> provider)
 {
-    if ([dest containsObject: aUUID])
+    if ([ancestorRevs containsObject: rev])
         return;
 
-    [dest addObject: aUUID];
+    [ancestorRevs addObject: rev];
 
-    CORevision *revision = [self revisionForRevisionUUID: aUUID persistentRootUUID: persistentRoot];
+    ETUUID *mergeParentRev;
+    ETUUID *parentRev = [provider parentRevisionUUIDForRevisionUUID: rev
+                                            mergeParentRevisionUUID: &mergeParentRev
+                                                 persistentRootUUID: persistentRoot];
 
-    if (revision.parentRevision != nil)
-        [self addUUIDAndParents: revision.parentRevision.UUID
-                 persistentRoot: persistentRoot
-                          toSet: dest];
-
-    if (revision.mergeParentRevision != nil)
-        [self addUUIDAndParents: revision.mergeParentRevision.UUID
-                 persistentRoot: persistentRoot
-                          toSet: dest];
+    if (parentRev != nil)
+    {
+        COCollectParentRevisionUUIDsFromInclusiveInto(parentRev,
+                                                      persistentRoot,
+                                                      ancestorRevs,
+                                                      provider);
+    }
+    if (mergeParentRev != nil)
+    {
+        COCollectParentRevisionUUIDsFromInclusiveInto(mergeParentRev,
+                                                      persistentRoot,
+                                                      ancestorRevs,
+                                                      provider);
+    }
 }
 
-- (ETUUID *)commonAncestorForCommit: (ETUUID *)commitA
-                          andCommit: (ETUUID *)commitB
-                     persistentRoot: (ETUUID *)persistentRoot
+
+ETUUID *COCommonAncestorRevisionUUIDs(ETUUID *revA,
+                                      ETUUID *revB,
+                                      ETUUID *persistentRoot,
+                                      id <COParentRevisionProvider> provider)
 {
     NSMutableSet *ancestorsOfA = [NSMutableSet set];
 
-    [self addUUIDAndParents: commitA persistentRoot: persistentRoot toSet: ancestorsOfA];
+    COCollectParentRevisionUUIDsFromInclusiveInto(revA, persistentRoot, ancestorsOfA, provider);
 
-    // Do a BFS starting at commitB until we hit a commit in ancestorsOfA
+    // Do a BFS starting at revB until we hit a commit in ancestorsOfA
     // TODO: Check whether this makes sense
 
-    NSMutableArray *siblingsArray = [NSMutableArray arrayWithObject: commitB];
+    NSMutableArray *siblings = [NSMutableArray arrayWithObject: revB];
 
-    while (siblingsArray.count > 0)
+    while (siblings.count > 0)
     {
-        NSMutableArray *nextSiblingsArray = [NSMutableArray new];
+        NSMutableArray *nextSiblings = [NSMutableArray new];
 
-        for (ETUUID *sibling in siblingsArray)
+        for (ETUUID *sibling in siblings)
         {
             if ([ancestorsOfA containsObject: sibling])
             {
                 return sibling;
             }
+            ETUUID *mergeParentRev;
+            ETUUID *parentRev = [provider parentRevisionUUIDForRevisionUUID: sibling
+                                                    mergeParentRevisionUUID: &mergeParentRev
+                                                         persistentRootUUID: persistentRoot];
 
-            CORevision *revision = [self revisionForRevisionUUID: sibling
-                                              persistentRootUUID: persistentRoot];
+            if (parentRev != nil)
+                [nextSiblings addObject: parentRev];
 
-            if (revision.parentRevision != nil)
-                [nextSiblingsArray addObject: revision.parentRevision.UUID];
-
-            if (revision.mergeParentRevision != nil)
-                [nextSiblingsArray addObject: revision.mergeParentRevision.UUID];
+            if (mergeParentRev != nil)
+                [nextSiblings addObject: mergeParentRev];
         }
 
-        [siblingsArray setArray: nextSiblingsArray];
+        [siblings setArray: nextSiblings];
     }
 
     // No common ancestor
     return nil;
 }
 
-- (BOOL)       isRevision: (ETUUID *)commitA
-equalToOrParentOfRevision: (ETUUID *)commitB
-           persistentRoot: (ETUUID *)persistentRoot
+BOOL CORevisionUUIDEqualToOrParent(ETUUID *revA,
+                                   ETUUID *revB,
+                                   ETUUID *persistentRoot,
+                                   id <COParentRevisionProvider> provider)
 {
-    ETUUID *rev = commitB;
+    ETUUID *rev = revB;
     while (rev != nil)
     {
-        if ([rev isEqual: commitA])
+        if ([rev isEqual: revA])
         {
             return YES;
         }
-        rev = [self revisionForRevisionUUID: rev
-                         persistentRootUUID: persistentRoot].parentRevision.UUID;
+        rev = [provider parentRevisionUUIDForRevisionUUID: rev
+                                  mergeParentRevisionUUID: NULL
+                                       persistentRootUUID: persistentRoot];
     }
     return NO;
 }
 
-- (NSArray *)revisionUUIDsFromRevisionUUIDExclusive: (ETUUID *)start
-                            toRevisionUUIDInclusive: (ETUUID *)end
-                                     persistentRoot: (ETUUID *)persistentRoot
+NSArray *CORevisionsUUIDsFromExclusiveToInclusive(ETUUID *start,
+                                                  ETUUID *end,
+                                                  ETUUID *persistentRoot,
+                                                  id <COParentRevisionProvider> provider)
 {
     NSMutableArray *result = [[NSMutableArray alloc] init];
-
     ETUUID *rev = end;
     while (rev != nil)
     {
@@ -104,10 +115,9 @@ equalToOrParentOfRevision: (ETUUID *)commitB
             return result;
         }
         [result insertObject: rev atIndex: 0];
-        rev = [self revisionForRevisionUUID: rev
-                         persistentRootUUID: persistentRoot].parentRevision.UUID;
+        rev = [provider parentRevisionUUIDForRevisionUUID: rev
+                                  mergeParentRevisionUUID: NULL
+                                       persistentRootUUID: persistentRoot];
     }
     return nil;
 }
-
-@end

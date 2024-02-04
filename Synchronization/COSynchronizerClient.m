@@ -209,9 +209,10 @@
     // Rebase [self.branch currentRevision] onto the new revisions
 
     const BOOL isCurrentRevDescendentOfServerRev =
-        [_ctx  isRevision: [revs.lastObject revisionUUID]
-equalToOrParentOfRevision: self.branch.currentRevision.UUID
-           persistentRoot: self.persistentRoot.UUID];
+            CORevisionUUIDEqualToOrParent([revs.lastObject revisionUUID],
+                                          self.branch.currentRevision.UUID,
+                                          self.persistentRoot.UUID,
+                                          _ctx);
 
     if (_lastRevisionUUIDInTransitToServer != nil
         && ![self.branch.currentRevision.UUID isEqual: _lastRevisionUUIDInTransitToServer]
@@ -307,9 +308,11 @@ equalToOrParentOfRevision: self.branch.currentRevision.UUID
 
     NSMutableArray *revs = [[NSMutableArray alloc] init];
 
-    NSArray *revUUIDs = [_ctx revisionUUIDsFromRevisionUUIDExclusive: [self lastRevisionUUIDFromServer]
-                                             toRevisionUUIDInclusive: self.branch.currentRevision.UUID
-                                                      persistentRoot: self.persistentRoot.UUID];
+    NSArray *revUUIDs = 
+        CORevisionsUUIDsFromExclusiveToInclusive([self lastRevisionUUIDFromServer],
+                                                 self.branch.currentRevision.UUID,
+                                                 self.persistentRoot.UUID,
+                                                 _ctx);
 
     for (ETUUID *revUUID in revUUIDs)
     {

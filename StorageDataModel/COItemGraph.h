@@ -103,7 +103,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * See -[COItemGraph itemForUUID:].
  */
-- (COMutableItem *)itemForUUID: (ETUUID *)aUUID;
+- (nullable COMutableItem *)itemForUUID: (ETUUID *)aUUID;
 /**
  * See -[COItemGraph itemUUIDs].
  */

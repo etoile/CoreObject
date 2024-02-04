@@ -115,6 +115,63 @@
     return result;
 }
 
++ (NSDictionary *)itemUUIDsPartitionedByDiffAlgorithmNameWithFirstItemGraph: (id <COItemGraph>)a
+                                                            secondItemGraph: (id <COItemGraph>)b
+                                                           algorithmClasses: (NSDictionary<NSString *, Class> *)algorithmClasses
+{
+    NSMutableDictionary *partitionedItemUUIDs = [NSMutableDictionary new];
+
+    for (ETUUID *uuid in b.itemUUIDs)
+    {
+        COItem *itemA = [a itemForUUID: uuid]; // may be nil if the item was inserted in b
+        COItem *itemB = [b itemForUUID: uuid];
+
+        ETAssert(itemB != nil);
+        [self checkItem: itemA hasSameEntityNameAsItem: itemB];
+
+        Class customDiffClass = algorithmClasses[itemB.entityName];
+        NSString *diffClass =
+            NSStringFromClass(customDiffClass != nil ? customDiffClass : [COItemGraphDiff class]);
+        NSMutableArray *items = partitionedItemUUIDs[diffClass];
+    
+        if (items == nil)
+        {
+            items = [NSMutableArray new];
+            partitionedItemUUIDs[diffClass] = items;
+        }
+        [items addObject: uuid];
+    }
+
+    return partitionedItemUUIDs;
+}
+
++ (CODiffManager *)diffItemGraph: (id <COItemGraph>)a
+                   withItemGraph: (id <COItemGraph>)b
+                algorithmClasses: (NSDictionary<NSString *, Class> *)algorithmClasses
+                sourceIdentifier: (id)aSource
+{
+    NSDictionary *partitionedItemUUIDs =
+        [self itemUUIDsPartitionedByDiffAlgorithmNameWithFirstItemGraph: a
+                                                        secondItemGraph: b
+                                                       algorithmClasses: algorithmClasses];
+
+    NSMutableDictionary *subDiffs = [NSMutableDictionary new];
+    for (NSString *algorithmName in partitionedItemUUIDs)
+    {
+        NSArray *itemUUIDs = partitionedItemUUIDs[algorithmName];
+        Class cls = NSClassFromString(algorithmName);
+        id <CODiffAlgorithm> diff = [cls diffItemUUIDs: itemUUIDs
+                                             fromGraph: a
+                                               toGraph: b
+                                      sourceIdentifier: aSource];
+        subDiffs[algorithmName] = diff;
+    }
+
+    CODiffManager *result = [[CODiffManager alloc] init];
+    result.subDiffsByAlgorithmName = subDiffs;
+    return result;
+}
+
 - (instancetype)init
 {
     SUPERINIT;

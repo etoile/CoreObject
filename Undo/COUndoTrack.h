@@ -8,9 +8,25 @@
 #import <Foundation/Foundation.h>
 #import <CoreObject/COTrack.h>
 
-@class COUndoTrackStore, COUndoTrackState, COEditingContext, COCommand, COCommandGroup;
+@class COUndoTrackStore, COUndoTrackState, COUndoTrack, COCommand, COCommandGroup, COError;
 
 NS_ASSUME_NONNULL_BEGIN
+
+@protocol COUndoTrackContext
+@property (nonatomic, readonly, strong) COSQLiteStore *store;
+@property (nonatomic, readonly, strong) COUndoTrackStore *undoTrackStore;
+
+- (nullable NSNumber *)lastTransactionIDForPersistentRootUUID: (ETUUID *)aUUID;
+- (nullable CORevision *)revisionForRevisionUUID: (ETUUID *)aRevid
+                              persistentRootUUID: (ETUUID *)aPersistentRoot;
+- (BOOL)commitWithMetadata: (nullable NSDictionary<NSString *, id> *)metadata
+                 undoTrack: (nullable COUndoTrack *)undoTrack
+                     error: (COError *_Nullable *_Nullable)anError;
+- (void)applyCommand: (COCommandGroup *)command;
+- (void)applyCommand: (COCommandGroup *)command
+  toStoreTransaction: (COStoreTransaction *)txn
+withRevisionMetadata: (nullable NSDictionary<NSString *, id> *)metadata;
+@end
 
 /**
  * Posted when the undo track content or current command changes, this includes 
@@ -96,7 +112,7 @@ extern NSString *const kCOUndoTrackName;
     NSString *_name;
     NSMutableArray *_nodesOnCurrentUndoBranch;
     NSMutableDictionary *_commandsByUUID;
-    COEditingContext *_editingContext;
+    id <COUndoTrackContext> _editingContext;
     NSMutableDictionary *_trackStateForName;
 
     BOOL _coalescing;
@@ -111,10 +127,10 @@ extern NSString *const kCOUndoTrackName;
  * Returns the persistent track bound to the given name, or creates it in case 
  * it doesn't exist yet. 
  *
- * See -editingContext.
+ * See -context.
  */
 + (COUndoTrack *)trackForName: (NSString *)aName
-           withEditingContext: (COEditingContext *)aContext;
+                  withContext: (id <COUndoTrackContext>)aContext;
 /**
  * Returns a non-recordable track that provides a union view over all persistent 
  * tracks that match the given pattern.
@@ -123,10 +139,10 @@ extern NSString *const kCOUndoTrackName;
  * -[COEditingContext commmitWithIdentitifer:metadata:undoTrack:error:], 
  * otherwise the commit raises an exception.
  *
- * See -editingContext.
+ * See -context.
  */
 + (COUndoTrack *)trackForPattern: (NSString *)aPattern
-              withEditingContext: (COEditingContext *)aContext;
+                     withContext: (id <COUndoTrackContext>)aContext;
 
 
 /** @taskunit Basic Properties */
@@ -137,10 +153,10 @@ extern NSString *const kCOUndoTrackName;
  */
 @property (nonatomic, readonly) NSString *name;
 /**
- * The editing context that is changed if -undo, -redo or -setCurrentNode: are 
- * called.
+ * The context that is changed if -undo, -redo or -setCurrentNode: are called.
+ *
  */
-@property (nonatomic, readonly) COEditingContext *editingContext;
+@property (nonatomic, readonly) id <COUndoTrackContext> context;
 /**
  * If set, COUndoTrack will add these keys/values to the revision
  * metadata when it commits a revision in response to -undo/-redo, 

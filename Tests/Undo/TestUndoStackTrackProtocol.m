@@ -28,7 +28,7 @@
 - (instancetype)init
 {
     SUPERINIT;
-    track = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
+    track = [COUndoTrack trackForName: @"test" withContext: ctx];
     [track clear];
 
     persistentRoot = [ctx insertNewPersistentRootWithEntityName: @"OutlineItem"];
@@ -170,7 +170,7 @@
 
 - (void)testEmptyTrack
 {
-    COUndoTrack *emptyTrack = [COUndoTrack trackForName: @"emptyTrack" withEditingContext: ctx];
+    COUndoTrack *emptyTrack = [COUndoTrack trackForName: @"emptyTrack" withContext: ctx];
     [emptyTrack clear];
 
     UKObjectsEqual([COEndOfUndoTrackPlaceholderNode sharedInstance], [emptyTrack currentNode]);

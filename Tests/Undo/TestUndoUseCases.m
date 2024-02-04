@@ -27,7 +27,7 @@
 {
     SUPERINIT;
 
-    _testTrack = [COUndoTrack trackForName: @"test" withEditingContext: ctx];
+    _testTrack = [COUndoTrack trackForName: @"test" withContext: ctx];
     [_testTrack clear];
 
     return self;

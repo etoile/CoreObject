@@ -8,22 +8,22 @@
 #import <Foundation/Foundation.h>
 #import <EtoileFoundation/ETUUID.h>
 
-@class COEditingContext, CORevision;
+@class COSQLiteStore, CORevision;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CORevisionCache : NSObject
 {
 @private
-    COEditingContext __weak *_parentContext;
+    COSQLiteStore *_store;
     NSMutableDictionary *_revisionForRevisionID;
 }
 
 /** @taskunit Framework Private */
 
-@property (nonatomic, readonly, weak) COEditingContext *parentEditingContext;
+@property (nonatomic, readonly) COSQLiteStore *store;
 
-- (instancetype)initWithParentEditingContext: (COEditingContext *)aCtx NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithStore: (COSQLiteStore *)aStore NS_DESIGNATED_INITIALIZER;
 - (nullable CORevision *)revisionForRevisionUUID: (ETUUID *)aRevid
                               persistentRootUUID: (ETUUID *)aPersistentRoot;
 

@@ -79,9 +79,8 @@
     ETAssert(lca != nil);
 
     // Gather the revisions to rebase (between 'lca', exclusive, and 'source', inclusive)
-    NSArray *sourceRevs = [ctx revisionUUIDsFromRevisionUUIDExclusive: lca
-                                              toRevisionUUIDInclusive: source
-                                                       persistentRoot: persistentRoot];
+    NSArray *sourceRevs =
+        CORevisionsUUIDsFromExclusiveToInclusive(lca, source, persistentRoot, ctx);
     ETAssert(sourceRevs != nil);
     ETAssert(sourceRevs.count > 0);
 
