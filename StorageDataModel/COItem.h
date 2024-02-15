@@ -13,6 +13,9 @@
 extern NSString *const kCOItemEntityNameProperty;
 extern NSString *const kCOItemPackageVersionProperty;
 extern NSString *const kCOItemPackageNameProperty;
+extern NSString *const kCOItemDeprecatedEntityNameProperty;
+extern NSString *const kCOItemDeprecatedPackageVersionProperty;
+extern NSString *const kCOItemDeprecatedPackageNameProperty;
 extern NSString *const kCOItemIsSharedProperty;
 
 /**

@@ -8,6 +8,12 @@
 #import "TestCommon.h"
 #import "COItem+Binary.h"
 #import "COItem+JSON.h"
+#import "COJSONSerialization.h"
+
+extern NSString *const kCOJSONObjectUUIDProperty;
+extern NSString *const kCOJSONFormatProperty;
+extern NSString *const kCOJSONDeprecatedObjectUUIDProperty;
+extern NSString *const kCOJSONDeprecatedFormatProperty;
 
 @interface TestItem : NSObject <UKTest>
 {
@@ -319,6 +325,49 @@
               type: kCOTypeSet | kCOTypeString];
 
     [self validateRoundTrips: item];
+}
+
+- (void)testDeprecatedInternalKeys
+{
+    NSDictionary *values = @{
+        kCOItemDeprecatedEntityNameProperty: @"Untitled",
+        kCOItemDeprecatedPackageNameProperty: @"None",
+        kCOItemDeprecatedPackageVersionProperty: @1
+    };
+    NSDictionary *types = @{
+        kCOItemDeprecatedEntityNameProperty: @(kCOTypeString),
+        kCOItemDeprecatedPackageNameProperty: @(kCOTypeString),
+        kCOItemDeprecatedPackageVersionProperty: @(kCOTypeInt64)
+    };
+    COItem *item = [[COItem alloc] initWithUUID: [ETUUID UUID]
+                             typesForAttributes: types
+                            valuesForAttributes: values];
+
+    // Binary roundtrip
+
+    NSData *data = item.dataValue;
+    COItem *roundTrip = [[COItem alloc] initWithData: data];
+
+    UKStringsEqual(@"Untitled", roundTrip.entityName);
+    UKStringsEqual(@"None", roundTrip.packageName);
+    UKIntsEqual(1, roundTrip.packageVersion);
+
+    // JSON roundtrip using old JSON internal keys
+
+    NSMutableDictionary *plist = item.JSONPlist;
+    
+    plist[kCOJSONDeprecatedFormatProperty] = plist[kCOJSONFormatProperty];
+    plist[kCOJSONDeprecatedObjectUUIDProperty] = plist[kCOJSONObjectUUIDProperty];
+    
+    [plist removeObjectForKey: kCOJSONFormatProperty];
+    [plist removeObjectForKey: kCOJSONObjectUUIDProperty];
+
+    roundTrip = [[COItem alloc] initWithJSONData: CODataWithJSONObject(plist, NULL)];
+
+    UKStringsEqual(@"Untitled", roundTrip.entityName);
+    UKStringsEqual(@"None", roundTrip.packageName);
+    UKIntsEqual(1, roundTrip.packageVersion);
+    UKObjectsEqual(item.UUID, roundTrip.UUID);
 }
 
 @end

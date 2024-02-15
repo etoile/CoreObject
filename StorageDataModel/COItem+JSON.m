@@ -16,8 +16,10 @@
 // Semi-hack: we store the UUID alongside the real object properties.
 // This property name is reserved for JSON serialization and cannot be used
 // as an actual property name.
-NSString *const kCOJSONObjectUUIDProperty = @"org.etoile-project.coreobject.uuid";
-NSString *const kCOJSONFormatProperty = @"org.etoile-project.coreobject.json-format";
+NSString *const kCOJSONObjectUUIDProperty = @"_uuid";
+NSString *const kCOJSONFormatProperty = @"_json-format";
+NSString *const kCOJSONDeprecatedObjectUUIDProperty = @"org.etoile-project.coreobject.uuid";
+NSString *const kCOJSONDeprecatedFormatProperty = @"org.etoile-project.coreobject.json-format";
 NSString *const kCOJSONFormat1_0 = @"1.0";
 // COType -> string
 
@@ -240,6 +242,31 @@ static COType importTypeFromPlist(id typeValuePair)
     return aType;
 }
 
+// Migrate internal DNS prefixed keys (old format) to underscore prefixed keys (new format)
+static NSDictionary *migrateInternalKeysFromOldToNewFormat(id aPlist) {
+    if (aPlist[kCOJSONObjectUUIDProperty] != nil)
+    {
+        return aPlist;
+    }
+    NSMutableDictionary *plist = [aPlist isKindOfClass: [NSMutableDictionary class]]
+        ? aPlist
+        : [NSMutableDictionary dictionaryWithDictionary: aPlist];
+
+    plist[kCOItemEntityNameProperty] = plist[kCOItemDeprecatedEntityNameProperty];
+    plist[kCOItemPackageNameProperty] = plist[kCOItemDeprecatedPackageNameProperty];
+    plist[kCOItemPackageVersionProperty] = plist[kCOItemDeprecatedPackageVersionProperty];
+    plist[kCOJSONFormatProperty] = plist[kCOJSONDeprecatedFormatProperty];
+    plist[kCOJSONObjectUUIDProperty] = plist[kCOJSONDeprecatedObjectUUIDProperty];
+    
+    [plist removeObjectForKey: kCOItemDeprecatedEntityNameProperty];
+    [plist removeObjectForKey: kCOItemDeprecatedPackageNameProperty];
+    [plist removeObjectForKey: kCOItemDeprecatedPackageVersionProperty];
+    [plist removeObjectForKey: kCOJSONDeprecatedFormatProperty];
+    [plist removeObjectForKey: kCOJSONDeprecatedObjectUUIDProperty];
+    
+    return plist;
+}
+
 - (id)JSONPlist
 {
     NSMutableDictionary *plistValues = [NSMutableDictionary dictionaryWithCapacity: values.count];
@@ -261,27 +288,28 @@ static COType importTypeFromPlist(id typeValuePair)
 
 - (instancetype)initWithJSONPlist: (id)aPlist
 {
-    ETUUID *aUUID = [ETUUID UUIDWithString: aPlist[kCOJSONObjectUUIDProperty]];
+    NSDictionary *plist = migrateInternalKeysFromOldToNewFormat(aPlist);
+    ETUUID *aUUID = [ETUUID UUIDWithString: plist[kCOJSONObjectUUIDProperty]];
 
     NSMutableDictionary *importedValues = [NSMutableDictionary dictionary];
     NSMutableDictionary *importedTypes = [NSMutableDictionary dictionary];
 
     // Check format
-    if (!(aPlist[kCOJSONFormatProperty] == nil // accept JSON written before format tag was added
-          || [aPlist[kCOJSONFormatProperty] isEqual: kCOJSONFormat1_0]))
+    if (!(plist[kCOJSONFormatProperty] == nil // accept JSON written before format tag was added
+          || [plist[kCOJSONFormatProperty] isEqual: kCOJSONFormat1_0]))
     {
         [NSException raise: NSInvalidArgumentException
                     format: @"Unknown COItem JSON format '%@'",
-                            aPlist[kCOJSONFormatProperty]];
+                            plist[kCOJSONFormatProperty]];
     }
 
-    for (NSString *key in aPlist)
+    for (NSString *key in plist)
     {
         if ([key isEqualToString: kCOJSONObjectUUIDProperty]
             || [key isEqualToString: kCOJSONFormatProperty])
             continue;
 
-        id typeValuePair = aPlist[key];
+        id typeValuePair = plist[key];
 
         importedValues[key] = importValueFromPlist(typeValuePair);
 
