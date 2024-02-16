@@ -428,6 +428,29 @@ static void co_read_null(void *ctx)
     }
 }
 
+// Migrate internal DNS prefixed keys (old format) to underscore prefixed keys (new format)
+static void migrateInternalKeysFromOldToNewFormat(NSMutableDictionary *values, NSMutableDictionary *types) {
+    if (values[kCOItemEntityNameProperty] != nil)
+    {
+        return;
+    }
+    values[kCOItemEntityNameProperty] = values[kCOItemDeprecatedEntityNameProperty];
+    values[kCOItemPackageNameProperty] = values[kCOItemDeprecatedPackageNameProperty];
+    values[kCOItemPackageVersionProperty] = values[kCOItemDeprecatedPackageVersionProperty];
+    
+    [values removeObjectForKey: kCOItemDeprecatedEntityNameProperty];
+    [values removeObjectForKey: kCOItemDeprecatedPackageNameProperty];
+    [values removeObjectForKey: kCOItemDeprecatedPackageVersionProperty];
+    
+    types[kCOItemEntityNameProperty] = types[kCOItemDeprecatedEntityNameProperty];
+    types[kCOItemPackageNameProperty] = types[kCOItemDeprecatedPackageNameProperty];
+    types[kCOItemPackageVersionProperty] = types[kCOItemDeprecatedPackageVersionProperty];
+
+    [types removeObjectForKey: kCOItemDeprecatedEntityNameProperty];
+    [types removeObjectForKey: kCOItemDeprecatedPackageNameProperty];
+    [types removeObjectForKey: kCOItemDeprecatedPackageVersionProperty];
+}
+
 /* Initializers in categories cannot be marked with NS_DESIGNATED_INITIALIZER */
 #pragma clang diagnostic ignored "-Wobjc-designated-initializers"
 
@@ -456,9 +479,10 @@ static void co_read_null(void *ctx)
     uuid = state->uuid;
     types = state->types;
     values = state->values;
-
+    
+    migrateInternalKeysFromOldToNewFormat(values, types);
+    
     return self;
 }
 
 @end
-
