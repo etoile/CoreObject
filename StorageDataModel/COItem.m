@@ -11,9 +11,9 @@
 #import "COPath.h"
 #import "COAttachmentID.h"
 
-NSString *const kCOItemEntityNameProperty = @"_entityName";
-NSString *const kCOItemPackageVersionProperty = @"_packageVersion";
-NSString *const kCOItemPackageNameProperty = @"_packageName";
+NSString *const kCOItemEntityNameProperty = @"_entity-name";
+NSString *const kCOItemPackageVersionProperty = @"_package-version";
+NSString *const kCOItemPackageNameProperty = @"_package-name";
 NSString *const kCOItemDeprecatedEntityNameProperty = @"org.etoile-project.coreobject.entityname";
 NSString *const kCOItemDeprecatedPackageVersionProperty = @"org.etoile-project.coreobject.packageversion";
 NSString *const kCOItemDeprecatedPackageNameProperty = @"org.etoile-project.coreobject.packagename";
