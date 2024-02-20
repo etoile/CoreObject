@@ -133,6 +133,24 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Returns a JSON representation for the entire item graph, where composite references are replaced
+ * with items encoded as JSON dictionaries.
+ *
+ * Objects referenced through composite references don't appear at the top level, unlike in the
+ * default item graph JSON representation.
+ *
+ * The returned JSON is similar to COItemGraphToJSONPropertyList().
+ */
+NSString *COTreeJSONDescription(id <COItemGraph>aGraph);
+/**
+ * Returns a JSON representation for the given item, where composite references are replaced with
+ * items encoded as JSON dictionaries.
+ *
+ * The returned JSON is similar to -[COItem JSONPlist].
+ */
+NSString *COTreeJSONDescriptionFromItem(id <COItemGraph>aGraph, COItem *anItem);
+
+/**
  * For debugging.
  */
 void COValidateItemGraph(id <COItemGraph> aGraph);

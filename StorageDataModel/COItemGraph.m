@@ -155,6 +155,143 @@
 @end
 
 
+void resolveJSONCompositeReferencesToFlatObjects(NSMutableDictionary *object, NSMutableDictionary *list, NSString *rootUUID)
+{
+    for (NSString *property in object.allKeys)
+    {
+        id value = object[property];
+        
+        // Some internal keys are not type/value pairs (_uuid and _json-format)
+        if (![value isKindOfClass: [NSDictionary class]])
+        {
+            continue;
+        }
+        NSDictionary *pair = value;
+
+        // Each property in JSON format is a dictionary containing a single type/value pair
+        for (NSString *type in pair)
+        {
+            id value = pair[type];
+
+            if ([type hasPrefix: @"composite"])
+            {
+                if ([type hasSuffix: @"array"] || [type hasSuffix: @"set"])
+                {
+                    id oldValue = value;
+                    id newValue = [oldValue mappedCollectionWithBlock: ^(NSString *uuid) {
+                        NSDictionary *object = list[uuid];
+                        list[uuid] = nil;
+                        return object != nil ? object : uuid;
+                    }];
+                    
+                    for (id child in newValue)
+                    {
+                        resolveJSONCompositeReferencesToFlatObjects(child, list, false);
+                    }
+                    
+                    value = newValue;
+                }
+                else
+                {
+                    ETUUID *uuid = value;
+                    NSMutableDictionary *object = list[uuid];
+
+                    resolveJSONCompositeReferencesToFlatObjects(object, list, false);
+                    list[uuid] = nil;
+                    value = object != nil ? object : uuid;
+                }
+            }
+            object[property] = nil;
+            object[[NSString stringWithFormat: @"%@ (%@)", property, type]] = value;
+        }
+    }
+
+    object[@"_json-format"] = nil;
+}
+
+void flattenJSONObjectList(NSMutableDictionary *list, NSString *rootItemUUID)
+{
+    for (NSString *uuid in list)
+    {
+        if ([uuid isEqualToString: rootItemUUID])
+        {
+            continue;
+        }
+        NSMutableDictionary *object = list[uuid];
+
+        for (NSString *property in object.allKeys) {
+            id value = object[property];
+
+            // Some internal keys are not type/value pair (_uuid and _json-format)
+            if (![value isKindOfClass: [NSDictionary class]])
+            {
+                continue;
+            }
+            NSDictionary *pair = value;
+            
+            // Each property in JSON format is a dictionary containing a single type/value pair
+            for (NSString *type in pair)
+            {
+                object[property] = nil;
+                object[[NSString stringWithFormat: @"%@ (%@)", property, type]] = pair[type];
+            }
+        }
+        object[@"_json-format"] = nil;
+    }
+}
+
+id treeJSONPlist(id <COItemGraph> aGraph)
+{
+    id json = COItemGraphToJSONPropertyList(aGraph);
+
+    if (aGraph.rootItemUUID == nil)
+    {
+        return json;
+    }
+    NSString *rootUUID = aGraph.rootItemUUID.stringValue;
+    NSMutableDictionary *list = json[@"objects"];
+    NSMutableDictionary *root = list[rootUUID];
+    
+    resolveJSONCompositeReferencesToFlatObjects(root, list, rootUUID);
+    flattenJSONObjectList(list, rootUUID);
+
+    return json;
+}
+
+NSString *COTreeJSONDescription(id <COItemGraph> aGraph)
+{
+    NSData *data = [NSJSONSerialization dataWithJSONObject: treeJSONPlist(aGraph)
+                                                   options: NSJSONWritingPrettyPrinted
+                                                     error: NULL];
+    return [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
+}
+
+id treeJSONPlistFromItem(id <COItemGraph> aGraph, COItem *anItem)
+{
+    id json = COItemGraphToJSONPropertyList(aGraph);
+
+    if ([aGraph itemForUUID: anItem.UUID] == nil)
+    {
+        return @{};
+    }
+    NSString *nodeUUID = anItem.UUID.stringValue;
+    NSMutableDictionary *list = json[@"objects"];
+    NSMutableDictionary *node = list[nodeUUID];
+
+    resolveJSONCompositeReferencesToFlatObjects(node, json, nodeUUID);
+    flattenJSONObjectList(list, nodeUUID);
+
+    return node;
+}
+
+NSString *COTreeJSONDescriptionFromItem(id <COItemGraph> aGraph, COItem *anItem)
+{
+    NSData *data = [NSJSONSerialization dataWithJSONObject: treeJSONPlistFromItem(aGraph, anItem)
+                                                   options: NSJSONWritingPrettyPrinted
+                                                     error: NULL];
+    return [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
+}
+
 /**
  * For debugging
  */
