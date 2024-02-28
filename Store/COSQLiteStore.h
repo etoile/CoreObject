@@ -389,7 +389,7 @@ extern NSString *const COPersistentRootAttributeUsedSize;
  *
  * By default, returns NO and allows to write revisions with higher schema versions than the store.
  */
-@property (nonatomic, readonly) BOOL enforcesSchemaVersion;
+@property (nonatomic, readwrite) BOOL enforcesSchemaVersion;
 
 
 /** @taskunit Revision Reading */

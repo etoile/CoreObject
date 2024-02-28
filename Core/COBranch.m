@@ -369,7 +369,6 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
     return [self.editingContext branchForUUID: _parentBranchUUID];
 }
 
-
 #pragma mark Persistent Root and Object Graph -
 
 - (COEditingContext *)editingContext

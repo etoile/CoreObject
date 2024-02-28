@@ -1103,6 +1103,74 @@ static ETUUID *childUUID2;
     UKFalse([store commitStoreTransaction: txn]);
 }
 
+- (void)testWriteRevisionWithoutEnforcedSchemaVersion
+{
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    ETUUID *revUUID = [ETUUID UUID];
+    [txn writeRevisionWithModifiedItems: [self makeBranchAItemTreeAtIndex: BRANCH_LATER]
+                           revisionUUID: revUUID
+                               metadata: nil
+                       parentRevisionID: initialRevisionUUID
+                  mergeParentRevisionID: nil
+                     persistentRootUUID: prootUUID
+                             branchUUID: branchAUUID
+                          schemaVersion: 1];
+    prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
+    UKTrue([store commitStoreTransaction: txn]);
+
+    [store migrateRevisionsToVersion: 1
+                         withHandler: ^COItemGraph *(COItemGraph *oldItemGraph, int64_t oldVersion, int64_t newVersion) {
+        return oldItemGraph;
+    }];
+    UKIntsEqual(1, store.schemaVersion);
+
+    [txn writeRevisionWithModifiedItems: [self makeBranchAItemTreeAtIndex: BRANCH_LATER]
+                           revisionUUID: [ETUUID UUID]
+                               metadata: nil
+                       parentRevisionID: revUUID
+                  mergeParentRevisionID: nil
+                     persistentRootUUID: prootUUID
+                             branchUUID: branchAUUID
+                          schemaVersion: 0];
+    prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
+    UKFalse([store commitStoreTransaction: txn]);
+}
+
+- (void)testWriteRevisionWithEnforcedSchemaVersion
+{
+    store.enforcesSchemaVersion = YES;
+
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    ETUUID *revUUID = [ETUUID UUID];
+    [txn writeRevisionWithModifiedItems: [self makeBranchAItemTreeAtIndex: BRANCH_LATER]
+                           revisionUUID: revUUID
+                               metadata: nil
+                       parentRevisionID: initialRevisionUUID
+                  mergeParentRevisionID: nil
+                     persistentRootUUID: prootUUID
+                             branchUUID: branchAUUID
+                          schemaVersion: 1];
+    prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
+    UKFalse([store commitStoreTransaction: txn]);
+    
+    [store migrateRevisionsToVersion: 1
+                         withHandler: ^COItemGraph *(COItemGraph *oldItemGraph, int64_t oldVersion, int64_t newVersion) {
+        return oldItemGraph;
+    }];
+    UKIntsEqual(1, store.schemaVersion);
+    
+    [txn writeRevisionWithModifiedItems: [self makeBranchAItemTreeAtIndex: BRANCH_LATER]
+                           revisionUUID: [ETUUID UUID]
+                               metadata: nil
+                       parentRevisionID: revUUID
+                  mergeParentRevisionID: nil
+                     persistentRootUUID: prootUUID
+                             branchUUID: branchAUUID
+                          schemaVersion: 1];
+    prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
+    UKTrue([store commitStoreTransaction: txn]);
+}
+
 /**
  * check that the store can retrieve the item graph for a (persistentRoot, revisionUUID) pair
  * even if persistentRoot has been permanently deleted, and persistentRoot != the backing store UUID.
