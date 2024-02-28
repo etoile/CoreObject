@@ -30,8 +30,8 @@
 		6025EA3B1B60E960007DD28B /* COSQLiteUtilities.h in Headers */ = {isa = PBXBuildFile; fileRef = 6025EA381B60E960007DD28B /* COSQLiteUtilities.h */; };
 		6025EA3C1B60E960007DD28B /* COSQLiteUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 6025EA391B60E960007DD28B /* COSQLiteUtilities.m */; };
 		6025EA3D1B60E960007DD28B /* COSQLiteUtilities.m in Sources */ = {isa = PBXBuildFile; fileRef = 6025EA391B60E960007DD28B /* COSQLiteUtilities.m */; };
-		602837AF1A334A2100D7B0D1 /* TestSchemaMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 602837AE1A334A2100D7B0D1 /* TestSchemaMigration.m */; };
-		602837B01A334A2100D7B0D1 /* TestSchemaMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 602837AE1A334A2100D7B0D1 /* TestSchemaMigration.m */; };
+		602837AF1A334A2100D7B0D1 /* TestRevisionMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 602837AE1A334A2100D7B0D1 /* TestRevisionMigration.m */; };
+		602837B01A334A2100D7B0D1 /* TestRevisionMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 602837AE1A334A2100D7B0D1 /* TestRevisionMigration.m */; };
 		6028484E1BBAB5820094CDB0 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6028484D1BBAB5820094CDB0 /* Default-568h@2x.png */; };
 		603447901C5008A6008A1B9D /* TestHistoryNavigationPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 6034478F1C5008A6008A1B9D /* TestHistoryNavigationPerformance.m */; };
 		6036436C1B3800B400DC685B /* COHistoryCompaction.h in Headers */ = {isa = PBXBuildFile; fileRef = 6036436A1B3800B400DC685B /* COHistoryCompaction.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -806,6 +806,8 @@
 		66EF4276186251A800E15C59 /* TestDiffCAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = 66EF4275186251A800E15C59 /* TestDiffCAPI.m */; };
 		66F1985919667265001EAEB0 /* TestMetamodelCornerCases.m in Sources */ = {isa = PBXBuildFile; fileRef = 66F1985819667265001EAEB0 /* TestMetamodelCornerCases.m */; };
 		66F1BE841BB1D9C900CC9E23 /* TestSQLiteBackingStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 66F1BE831BB1D9C900CC9E23 /* TestSQLiteBackingStore.m */; };
+		66F8FBBD2B8F2B8900C758CF /* TestSchemaMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 66F8FBB22B8F2B8900C758CF /* TestSchemaMigration.m */; };
+		66F8FBBE2B8F2B8900C758CF /* TestSchemaMigration.m in Sources */ = {isa = PBXBuildFile; fileRef = 66F8FBB22B8F2B8900C758CF /* TestSchemaMigration.m */; };
 		66FB15DA17AB31F6003BFC9B /* COObject+Accessors.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FB15D817AB31F5003BFC9B /* COObject+Accessors.m */; };
 		66FD348B1830B84C00898381 /* COSynchronizerJSONServer.m in Sources */ = {isa = PBXBuildFile; fileRef = 66FD34891830B84C00898381 /* COSynchronizerJSONServer.m */; };
 		66FD348E1830BB3800898381 /* COSynchronizerJSONClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 66FD348C1830BB3800898381 /* COSynchronizerJSONClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1053,7 +1055,7 @@
 		601FD946188944360002F957 /* HACKING.md */ = {isa = PBXFileReference; lastKnownFileType = text; path = HACKING.md; sourceTree = "<group>"; };
 		6025EA381B60E960007DD28B /* COSQLiteUtilities.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSQLiteUtilities.h; path = Store/COSQLiteUtilities.h; sourceTree = "<group>"; };
 		6025EA391B60E960007DD28B /* COSQLiteUtilities.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSQLiteUtilities.m; path = Store/COSQLiteUtilities.m; sourceTree = "<group>"; };
-		602837AE1A334A2100D7B0D1 /* TestSchemaMigration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSchemaMigration.m; path = Tests/SchemaMigration/TestSchemaMigration.m; sourceTree = SOURCE_ROOT; };
+		602837AE1A334A2100D7B0D1 /* TestRevisionMigration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestRevisionMigration.m; path = Tests/SchemaMigration/TestRevisionMigration.m; sourceTree = SOURCE_ROOT; };
 		6028484D1BBAB5820094CDB0 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Default-568h@2x.png"; path = "../iOS/Default-568h@2x.png"; sourceTree = "<group>"; };
 		6034478F1C5008A6008A1B9D /* TestHistoryNavigationPerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestHistoryNavigationPerformance.m; path = Benchmark/TestHistoryNavigationPerformance.m; sourceTree = "<group>"; };
 		6036436A1B3800B400DC685B /* COHistoryCompaction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COHistoryCompaction.h; path = Store/COHistoryCompaction.h; sourceTree = "<group>"; };
@@ -1473,6 +1475,7 @@
 		66EF4275186251A800E15C59 /* TestDiffCAPI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestDiffCAPI.m; sourceTree = "<group>"; };
 		66F1985819667265001EAEB0 /* TestMetamodelCornerCases.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestMetamodelCornerCases.m; sourceTree = "<group>"; };
 		66F1BE831BB1D9C900CC9E23 /* TestSQLiteBackingStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestSQLiteBackingStore.m; sourceTree = "<group>"; };
+		66F8FBB22B8F2B8900C758CF /* TestSchemaMigration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestSchemaMigration.m; sourceTree = "<group>"; };
 		66FB15D817AB31F5003BFC9B /* COObject+Accessors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "COObject+Accessors.m"; path = "Core/COObject+Accessors.m"; sourceTree = "<group>"; };
 		66FD34881830B84C00898381 /* COSynchronizerJSONServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = COSynchronizerJSONServer.h; path = Synchronization/COSynchronizerJSONServer.h; sourceTree = "<group>"; };
 		66FD34891830B84C00898381 /* COSynchronizerJSONServer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = COSynchronizerJSONServer.m; path = Synchronization/COSynchronizerJSONServer.m; sourceTree = "<group>"; };
@@ -1655,7 +1658,8 @@
 		602837A31A3349FE00D7B0D1 /* Schema Migration */ = {
 			isa = PBXGroup;
 			children = (
-				602837AE1A334A2100D7B0D1 /* TestSchemaMigration.m */,
+				66F8FBB22B8F2B8900C758CF /* TestSchemaMigration.m */,
+				602837AE1A334A2100D7B0D1 /* TestRevisionMigration.m */,
 			);
 			name = "Schema Migration";
 			path = Tests/Store;
@@ -3394,13 +3398,14 @@
 				60F91F20197D32E2009F47D7 /* Tag.m in Sources */,
 				6061B8331C524DF100813C18 /* Person.m in Sources */,
 				60F91EE6197D324B009F47D7 /* TestUndoUseCases.m in Sources */,
-				602837B01A334A2100D7B0D1 /* TestSchemaMigration.m in Sources */,
+				602837B01A334A2100D7B0D1 /* TestRevisionMigration.m in Sources */,
 				60F91F22197D32E2009F47D7 /* Child.m in Sources */,
 				60F91F0A197D3282009F47D7 /* TestDiffManager.m in Sources */,
 				60F91EF0197D326D009F47D7 /* TestSQLiteStoreMultiPersistentRoots.m in Sources */,
 				60F91EEF197D326D009F47D7 /* TestSQLiteStoreErrorHandling.m in Sources */,
 				60F91F2B197D32E2009F47D7 /* UnivaluedGroupContent.m in Sources */,
 				60F91F37197D32E9009F47D7 /* TestAttributedStringWrapper.m in Sources */,
+				66F8FBBE2B8F2B8900C758CF /* TestSchemaMigration.m in Sources */,
 				60CB08201A05075F00C25B80 /* ObjectWithTransientState.m in Sources */,
 				60F91F08197D3282009F47D7 /* TestArrayDiff.m in Sources */,
 				60F91F26197D32E2009F47D7 /* UnivaluedGroupNoOpposite.m in Sources */,
@@ -3707,6 +3712,7 @@
 				66D96C70178AE41500D1553C /* TestCommon.m in Sources */,
 				66E451D617CC461F00205679 /* OutlineItem.m in Sources */,
 				66E40D641836D08D00E5B4A7 /* TestPersistentRoot.m in Sources */,
+				66F8FBBD2B8F2B8900C758CF /* TestSchemaMigration.m in Sources */,
 				66F1985919667265001EAEB0 /* TestMetamodelCornerCases.m in Sources */,
 				66101164184D8C67001A3E24 /* UnivaluedGroupWithOpposite.m in Sources */,
 				66E40D7B1836D08E00E5B4A7 /* TestUndoUseCases.m in Sources */,
@@ -3752,7 +3758,7 @@
 				6610112F184D2D8A001A3E24 /* TestKeyedAttribute.m in Sources */,
 				66E40D6B1836D08D00E5B4A7 /* TestBinaryReadWrite.m in Sources */,
 				664F27A4188F4E9600DF36FC /* TestSQLiteStoreRevisionInfos.m in Sources */,
-				602837AF1A334A2100D7B0D1 /* TestSchemaMigration.m in Sources */,
+				602837AF1A334A2100D7B0D1 /* TestRevisionMigration.m in Sources */,
 				66EEA00A19D1ECB8005A35DE /* TestSynchronizerImmediateDelivery.m in Sources */,
 				6621BF101847F06D000809CF /* Parent.m in Sources */,
 			);

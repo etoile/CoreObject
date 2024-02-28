@@ -15,6 +15,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef COItemGraph *_Nonnull (^COMigrationHandler)(COItemGraph *oldItemGraph, int64_t oldVersion, int64_t newVersion);
+
 #define BACKING_STORES_SHARE_SAME_SQLITE_DB 1
 
 typedef NS_OPTIONS(NSUInteger, COBranchRevisionReadingOptions)
@@ -345,6 +347,7 @@ extern NSString *const COPersistentRootAttributeUsedSize;
 @private
     NSURL *url_;
     ETUUID *_uuid;
+    BOOL _enforcesSchemaVersion;
     FMDatabase *db_;
     NSMutableDictionary *backingStores_; // COUUID (backing store UUID => COCQLiteStorePersistentRootBackingStore)
     NSMutableDictionary *backingStoreUUIDForPersistentRootUUID_;
@@ -357,7 +360,9 @@ extern NSString *const COPersistentRootAttributeUsedSize;
 /**
  * Opens an exisiting, or creates a new CoreObject store at the given file:// URL.
  */
-- (instancetype)initWithURL: (NSURL *)aURL NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithURL: (NSURL *)aURL
+      enforcesSchemaVersion: (BOOL)enforcesSchemaVersion NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithURL: (NSURL *)aURL;
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
@@ -365,6 +370,26 @@ extern NSString *const COPersistentRootAttributeUsedSize;
  */
 @property (nonatomic, readonly, strong) NSURL *URL;
 @property (nonatomic, readonly, strong) ETUUID *UUID;
+/**
+ * The schema version after the last run migration with -migrateRevisionsToVersion:withHandler:.
+ *
+ * If no migration has been run, the schema version is 0.
+ *
+ * You can write revisions with a higher schema version, but not with a lower one. As a result,
+ * CORevisionInfo.schemaVersion is always equal or greater than COSQLiteStore.schemaVersion.
+ *
+ * If you want to only write revisions with the same schema version than the store, then set
+ * enforcesSchemaVersion to YES. In this case, -commitStoreTransaction: fails and returns NO, when
+ * COStoreTransaction.schemaVersion is more recent than the store schema version.
+ */
+@property (nonatomic, readonly) int64_t schemaVersion;
+/**
+ * Whether transactions handed to -commitStoreTransaction: must use the same schema version than
+ * the store.
+ *
+ * By default, returns NO and allows to write revisions with higher schema versions than the store.
+ */
+@property (nonatomic, readonly) BOOL enforcesSchemaVersion;
 
 
 /** @taskunit Revision Reading */
@@ -388,8 +413,8 @@ extern NSString *const COPersistentRootAttributeUsedSize;
  *
  * NOTE: Unstable API
  */
-- (nullable NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
-                                options: (COBranchRevisionReadingOptions)options;
+- (nullable NSArray<CORevisionInfo *> *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
+                                                           options: (COBranchRevisionReadingOptions)options;
 /**
  * Returns all revision infos of the backing store where the given persistent
  * root is stored.
@@ -437,6 +462,12 @@ extern NSString *const COPersistentRootAttributeUsedSize;
  */
 - (nullable COPersistentRootInfo *)persistentRootInfoForUUID: (nullable ETUUID *)aUUID;
 - (nullable ETUUID *)persistentRootUUIDForBranchUUID: (ETUUID *)aBranchUUID;
+
+
+/** @taskunit Migrating Schema */
+
+
+- (BOOL)migrateRevisionsToVersion: (int64_t)newVersion withHandler: (COMigrationHandler)handler;
 
 
 /** @taskunit Search. API not final. */

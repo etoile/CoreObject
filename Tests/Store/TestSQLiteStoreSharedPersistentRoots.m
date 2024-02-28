@@ -59,7 +59,8 @@ static ETUUID *rootUUID;
     prootA = [txn createPersistentRootWithInitialItemGraph: [self prootAitemTree]
                                                       UUID: [ETUUID UUID]
                                                 branchUUID: [ETUUID UUID]
-                                          revisionMetadata: nil];
+                                          revisionMetadata: nil
+                                             schemaVersion: 0];
 
     ETUUID *prootBBranchUUID = [ETUUID UUID];
 
@@ -77,7 +78,8 @@ static ETUUID *rootUUID;
                        parentRevisionID: prootA.currentRevisionUUID
                   mergeParentRevisionID: nil
                      persistentRootUUID: prootB.UUID
-                             branchUUID: prootBBranchUUID];
+                             branchUUID: prootBBranchUUID
+                          schemaVersion: 0];
 
     [txn setCurrentRevision: prootBRev
                headRevision: prootBRev

@@ -92,6 +92,7 @@ static void DFSInsertRevisions(NSMutableSet *revisionUUIDsToHandle,
     ETUUID *parentRevid = RevisionUUIDFromString(parentString);
     ETUUID *mergeParentRevid = RevisionUUIDFromString(mergeParentString);
     ETUUID *branchUUID = [ETUUID UUIDWithString: revDict[@"info"][@"branchUUID"]];
+    int64_t schemaVersion = ((NSNumber *)revDict[@"info"][@"schemaVersion"]).longLongValue;
 
     [txn writeRevisionWithModifiedItems: graph
                            revisionUUID: revisionUUID
@@ -99,7 +100,8 @@ static void DFSInsertRevisions(NSMutableSet *revisionUUIDsToHandle,
                        parentRevisionID: parentRevid
                   mergeParentRevisionID: mergeParentRevid
                      persistentRootUUID: persistentRoot
-                             branchUUID: branchUUID];
+                             branchUUID: branchUUID
+                          schemaVersion: schemaVersion];
 }
 
 static void InsertRevisions(NSDictionary *revisionsPlist,

@@ -93,8 +93,19 @@
     ETUUID *currentDest = dest;
     for (ETUUID *sourceRev in sourceRevs)
     {
-        NSDictionary *sourceMetadata = [store revisionInfoForRevisionUUID: sourceRev
-                                                       persistentRootUUID: persistentRoot].metadata;
+        CORevisionInfo *sourceRevInfo = [store revisionInfoForRevisionUUID: source
+                                                        persistentRootUUID: persistentRoot];
+        CORevisionInfo *destRevInfo = [store revisionInfoForRevisionUUID: dest
+                                                      persistentRootUUID: persistentRoot];
+        CORevisionInfo *lcaRevInfo = [store revisionInfoForRevisionUUID: lca
+                                                     persistentRootUUID: persistentRoot];
+        
+        // NOTE: If we want to support schema migration on-demand when loading item graphs, then
+        // the migration code must be called before diffing/merging item graphs below.
+        NSAssert(sourceRevInfo.schemaVersion == destRevInfo.schemaVersion
+              && sourceRevInfo.schemaVersion == lcaRevInfo.schemaVersion,
+                 @"Mismatched schema versions between merged revisions for rebase");
+        
         id <COItemGraph> currentSourceGraph = [cache graphForUUID: sourceRev];
         id <COItemGraph> currentDestGraph = [cache graphForUUID: currentDest];
         id <COItemGraph> currentLCAGraph = [cache graphForUUID: currentLCA];
@@ -125,11 +136,12 @@
         [newRevids addObject: nextRev];
         [txn writeRevisionWithModifiedItems: mergeResult
                                revisionUUID: nextRev
-                                   metadata: sourceMetadata
+                                   metadata: sourceRevInfo.metadata
                            parentRevisionID: currentDest
                       mergeParentRevisionID: nil
                          persistentRootUUID: persistentRoot
-                                 branchUUID: branch];
+                                 branchUUID: branch
+                              schemaVersion: sourceRevInfo.schemaVersion];
 
         [cache setGraph: mergeResult forUUID: nextRev];
         currentDest = nextRev;

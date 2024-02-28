@@ -78,7 +78,7 @@ typedef NSArray *(^COMigrationBlock)(COSchemaMigration *migration, NSArray *stor
  * The metamodel describes a persistency schema. COItem includes a copy of the
  * persistency schema along its property values, that's why items can be
  * migrated towards the metamodel attached to a COObjectGraphContext without 
- * requiring older metamodel verions to be present in memory.
+ * requiring older metamodel versions to be present in memory.
  *
  * When using entities from other packages (outside of your control), the inner 
  * object arrangment can define an implicit schema. For example, a tree of

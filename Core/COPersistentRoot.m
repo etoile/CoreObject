@@ -686,11 +686,13 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
             // FIXME: check both _objectGraphContext and branch.objectGraphContext
             // FIXME: After, update the other graph with the contents of the one we committed
             COItemGraph *graphCopy = [[COItemGraph alloc] initWithItemGraph: graphCtx];
+            int64_t schemaVersion = _editingContext.modelDescriptionRepository.version;
 
             _persistentRootInfo = [txn createPersistentRootWithInitialItemGraph: graphCopy
                                                                            UUID: _UUID
                                                                      branchUUID: self.currentBranch.UUID
-                                                               revisionMetadata: metadata];
+                                                               revisionMetadata: metadata
+                                                                  schemaVersion: schemaVersion];
         }
         else
         {
@@ -715,6 +717,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
                                                         initialRevisionUUID: newRevisionUUID];
 
                 COItemGraph *modifiedItems;
+
                 if (currentBranchObjectGraphHasChanges)
                 {
                     modifiedItems = _objectGraphContext.modifiedItemsSnapshot;
@@ -731,7 +734,8 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
                                    parentRevisionID: _cheapCopyRevisionUUID
                               mergeParentRevisionID: nil
                                  persistentRootUUID: _UUID
-                                         branchUUID: self.currentBranch.UUID];
+                                         branchUUID: self.currentBranch.UUID
+                                      schemaVersion: self.editingContext.modelDescriptionRepository.version];
             }
             else
             {

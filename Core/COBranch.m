@@ -700,6 +700,7 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
             }
 
             ETUUID *revUUID = [ETUUID UUID];
+            int64_t schemaVersion = self.editingContext.modelDescriptionRepository.version;
 
             [txn writeRevisionWithModifiedItems: modifiedItems
                                    revisionUUID: revUUID
@@ -707,7 +708,8 @@ NSString *const kCOBranchLabel = @"COBranchLabel";
                                parentRevisionID: _currentRevisionUUID
                           mergeParentRevisionID: mergeParent
                              persistentRootUUID: _persistentRoot.UUID
-                                     branchUUID: _UUID];
+                                     branchUUID: _UUID
+                                  schemaVersion: schemaVersion];
 
             [txn setCurrentRevision: revUUID
                        headRevision: revUUID

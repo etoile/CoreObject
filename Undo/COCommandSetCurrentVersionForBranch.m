@@ -276,7 +276,8 @@ static NSString *const kCOCommandNewHeadRevisionID = @"COCommandNewHeadRevisionI
                            parentRevisionID: branchCurrentRevisionUUID
                       mergeParentRevisionID: nil
                          persistentRootUUID: _persistentRootUUID
-                                 branchUUID: _branchUUID];
+                                 branchUUID: _branchUUID
+                              schemaVersion: aContext.modelDescriptionRepository.version];
 
         // N.B. newHeadRevisionID is intentionally ignored here, it only applies
         // if we were able to do a non-selective undo.

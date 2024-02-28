@@ -60,12 +60,14 @@ static ETUUID *tagUUID;
     docProot = [txn createPersistentRootWithInitialItemGraph: [self docItemTree]
                                                         UUID: [ETUUID UUID]
                                                   branchUUID: [ETUUID UUID]
-                                            revisionMetadata: nil];
+                                            revisionMetadata: nil
+                                               schemaVersion: 0];
 
     tagProot = [txn createPersistentRootWithInitialItemGraph: [self tagItemTreeWithDocProoUUID: docProot.UUID]
                                                         UUID: [ETUUID UUID]
                                                   branchUUID: [ETUUID UUID]
-                                            revisionMetadata: nil];
+                                            revisionMetadata: nil
+                                               schemaVersion: 0];
     docProotChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: docProot.UUID];
     tagProotChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: tagProot.UUID];
 
