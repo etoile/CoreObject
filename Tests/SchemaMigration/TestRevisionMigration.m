@@ -99,6 +99,9 @@
 
         for (COItem *oldItem in oldItemGraph.items)
         {
+            // Check items migrated in prior revisions don't leak into the old item graph
+            UKIntsEqual(oldVersion, oldItem.packageVersion);
+
             COMutableItem *newItem = [oldItem mutableCopy];
             BOOL isParent = ![[newItem valueForAttribute: @"contents"] isEmpty];
             
