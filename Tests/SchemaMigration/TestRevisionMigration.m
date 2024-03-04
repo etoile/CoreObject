@@ -117,7 +117,7 @@ COItemGraph *(^handler)(COItemGraph *, int64_t, int64_t) = ^COItemGraph *(COItem
 
 - (void)testSingleBranchInSinglePersistentRoot
 {
-    // Persistent root 1 - revid 0 (snapshot)
+    // revid 0 (snapshot)
     CORevision *rev = nil;
     OutlineItem *parent = [self insertNewPersistentRoot];
     OutlineItem *child = parent.contents[0];
@@ -129,9 +129,8 @@ COItemGraph *(^handler)(COItemGraph *, int64_t, int64_t) = ^COItemGraph *(COItem
     UKIntsEqual(0, ctx.store.schemaVersion);
     UKIntsEqual(0, rev.schemaVersion);
     
-    // Persistent root 1 - revid 1
+    // revid 1
     parent.isShared = YES;
-    parent.label = @"Parent";
     [ctx commit];
     rev = [parent revision];
     
@@ -147,7 +146,7 @@ COItemGraph *(^handler)(COItemGraph *, int64_t, int64_t) = ^COItemGraph *(COItem
                 forPersistentRootUUID: parent.persistentRoot.UUID
                expectingRevisionCount: 2];
     
-    // Persistent root 1 - revid 0
+    // revid 0
     COEditingContext *newCtx =
         [[COEditingContext alloc] initWithStore: ctx.store
                      modelDescriptionRepository: [self addingCityPropertyToModelDescriptionRepository: 1]];
@@ -163,7 +162,7 @@ COItemGraph *(^handler)(COItemGraph *, int64_t, int64_t) = ^COItemGraph *(COItem
     UKStringsEqual(@"Child", newChild.label);
     UKStringsEqual(@"Chicago", [newChild valueForProperty: @"city"]);
     
-    // Persistent root 1 - revid 1
+    // revid 1
     [newParent.branch moveToPreviousRevision];
 
     UKFalse(newParent.isShared);
@@ -181,6 +180,7 @@ COItemGraph *(^handler)(COItemGraph *, int64_t, int64_t) = ^COItemGraph *(COItem
     OutlineItem *parent1 = [self insertNewPersistentRoot];
     OutlineItem *child1 = parent1.contents[0];
     parent1.label = @"Parent (1)";
+    child1.label = @"Child (1)";
     [ctx commit];
 
     // Persistent root 1 - revid 1
@@ -192,6 +192,7 @@ COItemGraph *(^handler)(COItemGraph *, int64_t, int64_t) = ^COItemGraph *(COItem
     OutlineItem *child2 = parent2.contents[0];
     parent2.label = @"Parent (2)";
     parent2.isShared = YES;
+    child2.label = @"Child (2)";
     [ctx commit];
         
     // Persistent root 2 - revid 3
@@ -217,7 +218,7 @@ COItemGraph *(^handler)(COItemGraph *, int64_t, int64_t) = ^COItemGraph *(COItem
         [[COEditingContext alloc] initWithStore: ctx.store
                      modelDescriptionRepository: [self addingCityPropertyToModelDescriptionRepository: 1]];
     
-    // Persistent Root 1 - revid 4
+    // Persistent root 1 - revid 4
     COObjectGraphContext *newGraph1 =
         [newCtx persistentRootForUUID: parent1.persistentRoot.UUID].objectGraphContext;
     OutlineItem *newParent1 = [newGraph1 loadedObjectForUUID: parent1.UUID];
@@ -226,19 +227,19 @@ COItemGraph *(^handler)(COItemGraph *, int64_t, int64_t) = ^COItemGraph *(COItem
     UKFalse(newParent1.isShared);
     UKFalse(newChild1.isShared);
     
-    // Persistent Root 1 - revid 1
+    // Persistent root 1 - revid 1
     [newParent1.branch moveToPreviousRevision];
 
     UKTrue(newParent1.isShared);
     UKFalse(newChild1.isShared);
     
-    // Persistent Root 1 - revid 0
+    // Persistent root 1 - revid 0
     [newParent1.branch moveToPreviousRevision];
 
     UKFalse(newParent1.isShared);
     UKFalse(newChild1.isShared);
     
-    // Persistent Root 2 - revid 3
+    // Persistent root 2 - revid 3
     COObjectGraphContext *newGraph2 =
         [newCtx persistentRootForUUID: parent2.persistentRoot.UUID].objectGraphContext;
     OutlineItem *newParent2 = [newGraph2 loadedObjectForUUID: parent2.UUID];
@@ -247,12 +248,120 @@ COItemGraph *(^handler)(COItemGraph *, int64_t, int64_t) = ^COItemGraph *(COItem
     UKTrue(newParent2.isShared);
     UKTrue(newChild2.isShared);
     
-    // Persistent Root 2 - revid 2
+    // Persistent root 2 - revid 2
     [newParent2.branch moveToPreviousRevision];
 
     UKTrue(newParent2.isShared);
     UKFalse(newChild2.isShared);
     
+}
+
+- (void)testMultipleBranchesInMultiplePersistentRoots
+{
+
+    // Branch 1 - revid 0 (snapshot)
+    OutlineItem *parent1 = [self insertNewPersistentRoot];
+    OutlineItem *child1 = parent1.contents[0];
+    parent1.label = @"Parent (1)";
+    child1.label = @"Child (1)";
+    [ctx commit];
+
+    // Branch 1 - revid 1
+    parent1.isShared = YES;
+    [ctx commit];
+    
+    // Branch 2 - revid 2 (snapshot)
+    OutlineItem *parent2 = [parent1.branch makeBranchWithLabel: @"Branch 2"].objectGraphContext.rootObject;
+    OutlineItem *child2 = parent2.contents[0];
+    parent2.label = @"Parent (2)";
+    parent2.isShared = YES;
+    child2.label = @"Child (2)";
+    [ctx commit];
+    
+    // Branch 3 - revid 3 (snapshot)
+    OutlineItem *parent3 = [parent2.branch makeBranchWithLabel: @"Branch 3"].objectGraphContext.rootObject;
+    OutlineItem *child3 = parent3.contents[0];
+    parent3.label = @"Parent (3)";
+    parent3.isShared = YES;
+    child3.label = @"Child (3)";
+    child3.isShared = YES;
+    [ctx commit];
+    
+    // Branch 1 - revid 4
+    parent1.isShared = NO;
+    [ctx commit];
+    
+    // Branch 2 - revid 5
+    parent2.isShared = NO;
+    child2.isShared = YES;
+    [ctx commit];
+    
+    // Branch 3 - revid 6
+    child3.isShared = NO;
+    [ctx commit];
+
+    // Migration
+    [ctx.store migrateRevisionsToVersion: 1
+                             withHandler: handler];
+    
+    [self checkStoreMigratedToVersion: 1
+                forPersistentRootUUID: parent1.persistentRoot.UUID
+               expectingRevisionCount: 7];
+    
+    COEditingContext *newCtx =
+        [[COEditingContext alloc] initWithStore: ctx.store
+                     modelDescriptionRepository: [self addingCityPropertyToModelDescriptionRepository: 1]];
+    
+    // Branch 1 - revid 4
+    COObjectGraphContext *newGraph1 =
+        [[newCtx persistentRootForUUID: parent1.persistentRoot.UUID] branchForUUID: parent1.branch.UUID].objectGraphContext;
+    OutlineItem *newParent1 = [newGraph1 loadedObjectForUUID: parent1.UUID];
+    OutlineItem *newChild1 = [newGraph1 loadedObjectForUUID: child1.UUID];
+    
+    UKFalse(newParent1.isShared);
+    UKFalse(newChild1.isShared);
+    
+    // Branch 1 - revid 1
+    [newParent1.branch moveToPreviousRevision];
+
+    UKTrue(newParent1.isShared);
+    UKFalse(newChild1.isShared);
+    
+    // Branch 1 - revid 0
+    [newParent1.branch moveToPreviousRevision];
+
+    UKFalse(newParent1.isShared);
+    UKFalse(newChild1.isShared);
+    
+    // Branch 2 - revid 5
+    COObjectGraphContext *newGraph2 = 
+        [[newCtx persistentRootForUUID: parent2.persistentRoot.UUID] branchForUUID: parent2.branch.UUID].objectGraphContext;
+    OutlineItem *newParent2 = [newGraph2 loadedObjectForUUID: parent2.UUID];
+    OutlineItem *newChild2 = [newGraph2 loadedObjectForUUID: child2.UUID];
+    
+    UKFalse(newParent2.isShared);
+    UKTrue(newChild2.isShared);
+    
+    // Branch 2 - revid 2
+    [newParent2.branch moveToPreviousRevision];
+
+    UKTrue(newParent2.isShared);
+    UKFalse(newChild2.isShared);
+
+    // Branch 3 - revid 6
+    COObjectGraphContext *newGraph3 =
+        [[newCtx persistentRootForUUID: parent3.persistentRoot.UUID] branchForUUID: parent3.branch.UUID].objectGraphContext;
+    OutlineItem *newParent3 = [newGraph3 loadedObjectForUUID: parent3.UUID];
+    OutlineItem *newChild3 = [newGraph3 loadedObjectForUUID: child3.UUID];
+    
+    UKTrue(newParent3.isShared);
+    UKFalse(newChild3.isShared);
+    
+    // Branch 2 - revid 3
+    [newParent3.branch moveToPreviousRevision];
+
+    UKTrue(newParent3.isShared);
+    UKTrue(newChild3.isShared);
 }
 
 @end
