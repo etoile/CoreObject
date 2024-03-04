@@ -659,59 +659,53 @@ static NSData *Sha1Data(NSData *data)
     return ok;
 }
 
-- (int64_t)rewriteRevid: (int64_t)revid
-          withItemGraph: (COItemGraph *)newItemGraph
-                version: (int64_t)newVersion
-     migratedItemGraphs: (NSDictionary *)migratedItemGraphs
-    lastBytesInDeltaRun: (int64_t)lastBytesInDeltaRun
+- (BOOL)rewriteRevid: (int64_t)revid
+       withItemGraph: (COItemGraph *)newItemGraph
+             version: (int64_t)newVersion
+     parentItemGraph: (COItemGraph *)newParentItemGraph
+              parent: (int64_t)parent
+           deltabase: (int64_t)deltabase
 {
-    FMResultSet *rs = [db_ executeQuery:
-        [NSString stringWithFormat: @"SELECT parent, deltabase FROM %@ WHERE revid = ?", [self tableName]],
-        @(revid)];
-    int64_t bytesInDeltaRun = -1;
-
-    while ([rs next])
+    NSParameterAssert(revid >= 0);
+    NSParameterAssert(newItemGraph != nil);
+    NSParameterAssert(newVersion >= 0);
+    NSParameterAssert(newParentItemGraph != nil || parent == -1);
+    NSParameterAssert(parent >= -1);
+    NSParameterAssert(deltabase >= 0);
+    const int64_t parentDeltabase = [self deltabaseForRowid: parent];
+    const BOOL delta = parentDeltabase != -1 && deltabase == parentDeltabase;
+    NSData *contentsBlob = nil;
+    
+    if (delta)
     {
-        const int64_t parent = [rs longLongIntForColumnIndex: 0];
-        const int64_t deltabase = [rs longLongIntForColumnIndex: 1];
-        const int64_t parentDeltabase = [self deltabaseForRowid: parent];
-        const BOOL delta = parentDeltabase != -1 && deltabase == parentDeltabase;
-        NSData *contentsBlob;
-        
-        if (delta)
-        {
-            COItemGraph *parentItemGraph = migratedItemGraphs[@(parent)];
-            NSMutableSet *partialItems = [NSMutableSet setWithArray: newItemGraph.items];
+        NSMutableSet *partialItems = [NSMutableSet setWithArray: newItemGraph.items];
 
-            // Remove all parent revision items that remain the same in the current revision
-            [partialItems minusSet: [NSSet setWithArray: parentItemGraph.items]];
+        // Remove all parent revision items that remain the same in the current revision
+        [partialItems minusSet: [NSSet setWithArray: newParentItemGraph.items]];
 
-            COItemGraph *partialItemGraph =
-                [[COItemGraph alloc] initWithItems: partialItems.allObjects
-                                      rootItemUUID: newItemGraph.rootItemUUID];
-            
-            contentsBlob = contentsBLOBWithItemTree(partialItemGraph);
-            bytesInDeltaRun = lastBytesInDeltaRun + contentsBlob.length;
-        }
-        else
-        {
-            contentsBlob = contentsBLOBWithItemTree(newItemGraph);
-            bytesInDeltaRun = contentsBlob.length;
-        }
+        COItemGraph *partialItemGraph =
+            [[COItemGraph alloc] initWithItems: partialItems.allObjects
+                                  rootItemUUID: newItemGraph.rootItemUUID];
         
-        BOOL ok = [db_ executeUpdate: [NSString stringWithFormat:
-            @"UPDATE %@ SET contents = ?, hash = ?, bytesInDeltaRun = ?, version = ? WHERE revid = ?",
-            [self tableName]],
-            contentsBlob, Sha1Data(contentsBlob), @(bytesInDeltaRun), @(newVersion), @(revid)];
-        
-        if (!ok)
-        {
-            [self rollback];
-            return -1;
-        }
+        contentsBlob = contentsBLOBWithItemTree(partialItemGraph);
+    }
+    else
+    {
+        contentsBlob = contentsBLOBWithItemTree(newItemGraph);
     }
     
-    return bytesInDeltaRun;
+    BOOL ok = [db_ executeUpdate: [NSString stringWithFormat:
+        @"UPDATE %@ SET contents = ?, hash = ?, version = ? WHERE revid = ?",
+        [self tableName]],
+        contentsBlob, Sha1Data(contentsBlob), @(newVersion), @(revid)];
+    
+    if (!ok)
+    {
+        [self rollback];
+        return NO;
+    }
+    
+    return YES;
 }
 
 - (int64_t)schemaVersionForRevid: (int64_t)revid
@@ -730,29 +724,60 @@ static NSData *Sha1Data(NSData *data)
 {
     NSIndexSet *revids = [self revidsUsedRange];
     NSMutableDictionary *migratedItemGraphs = [NSMutableDictionary dictionary];
-    int64_t __block lastBytesInDeltaRun = 0;
+    BOOL __block ok = FALSE;
 
     [self beginTransaction];
 
-    [revids enumerateIndexesUsingBlock: ^(NSUInteger revid, BOOL * _Nonnull stop) {
-        COItemGraph *oldItemGraph = [self itemGraphForRevid: revid];
-        int64_t oldVersion = [self schemaVersionForRevid: revid];
-        COItemGraph *newItemGraph = handler(oldItemGraph, oldVersion, newVersion);
+    [revids enumerateIndexesWithOptions: NSEnumerationReverse usingBlock: ^(NSUInteger revid, BOOL * _Nonnull stop) {
+        FMResultSet *rs = [db_ executeQuery:
+            [NSString stringWithFormat: @"SELECT parent, deltabase FROM %@ WHERE revid = ?", [self tableName]],
+            @(revid)];
+        int64_t parent = -1;
+        int64_t deltabase = 1;
         
-        lastBytesInDeltaRun = [self  rewriteRevid: revid
-                                    withItemGraph: newItemGraph
-                                          version: newVersion
-                               migratedItemGraphs: migratedItemGraphs
-                              lastBytesInDeltaRun: lastBytesInDeltaRun];
+        if ([rs next])
+        {
+            parent = [rs longLongIntForColumnIndex: 0];
+            deltabase = [rs longLongIntForColumnIndex: 1];
+        }
+        [rs close];
 
-        if (lastBytesInDeltaRun == -1) {
+        COItemGraph *newItemGraph = migratedItemGraphs[@(revid)];;
+        COItemGraph *newParentItemGraph = migratedItemGraphs[@(parent)];
+        
+        if (newItemGraph == nil)
+        {
+            COItemGraph *oldItemGraph = [self itemGraphForRevid: revid];
+            int64_t oldVersion = [self schemaVersionForRevid: revid];
+            
+            newItemGraph = handler(oldItemGraph, oldVersion, newVersion);
+            // Not needed, but this ensures migratedItemGraphs.count == revids.count
+            migratedItemGraphs[@(parent)] = newItemGraph;
+        }
+        if (newParentItemGraph == nil)
+        {
+            COItemGraph *oldParentItemGraph = [self itemGraphForRevid: parent];
+            int64_t oldVersion = [self schemaVersionForRevid: parent];
+
+            newParentItemGraph = handler(oldParentItemGraph, oldVersion, newVersion);
+            migratedItemGraphs[@(parent)] = newParentItemGraph;
+        }
+        
+        ok = [self  rewriteRevid: revid
+                   withItemGraph: newItemGraph
+                         version: newVersion
+                 parentItemGraph: newParentItemGraph
+                          parent: parent
+                       deltabase: deltabase];
+
+        if (!ok) {
             *stop = YES;
             return;
         }
-        migratedItemGraphs[@(revid)] = newItemGraph;
+
     }];
     
-    if (lastBytesInDeltaRun == -1) {
+    if (!ok) {
         return NO;
     }
 
