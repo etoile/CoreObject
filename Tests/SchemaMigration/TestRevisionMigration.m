@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014 Quentin Mathé
+    Copyright (C) 2024 Quentin Mathe
 
     Date:  February 2024
     License:  MIT  (see COPYING)
