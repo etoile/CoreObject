@@ -1009,7 +1009,7 @@ const int64_t currentVersion = 2;
         self.schemaVersion = newVersion;
     });
 
-    return YES;
+    return result;
 }
 
 #pragma mark Writing persistent roots -

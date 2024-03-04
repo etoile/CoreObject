@@ -748,16 +748,20 @@ static NSData *Sha1Data(NSData *data)
         if (newItemGraph == nil)
         {
             COItemGraph *oldItemGraph = [self itemGraphForRevid: revid];
+            ETAssert(oldItemGraph != nil);
             int64_t oldVersion = [self schemaVersionForRevid: revid];
+            ETAssert(oldVersion >= 0);
             
             newItemGraph = handler(oldItemGraph, oldVersion, newVersion);
             // Not needed, but this ensures migratedItemGraphs.count == revids.count
-            migratedItemGraphs[@(parent)] = newItemGraph;
+            migratedItemGraphs[@(revid)] = newItemGraph;
         }
-        if (newParentItemGraph == nil)
+        if (newParentItemGraph == nil && parent >= 0)
         {
             COItemGraph *oldParentItemGraph = [self itemGraphForRevid: parent];
+            ETAssert(oldParentItemGraph != nil);
             int64_t oldVersion = [self schemaVersionForRevid: parent];
+            ETAssert(oldVersion >= 0);
 
             newParentItemGraph = handler(oldParentItemGraph, oldVersion, newVersion);
             migratedItemGraphs[@(parent)] = newParentItemGraph;
