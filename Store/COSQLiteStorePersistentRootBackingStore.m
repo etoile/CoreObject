@@ -1062,8 +1062,8 @@ static NSData *Sha1Data(NSData *data)
 - (NSArray *)revisionInfos
 {
     FMResultSet *rs = [db_ executeQuery: [NSString stringWithFormat:
-        @"SELECT revid, parent, branchuuid, persistentrootuuid, metadata, timestamp, mergeparent, uuid "
-            "FROM %@ ORDER BY revid DESC",
+        @"SELECT revid, parent, branchuuid, persistentrootuuid, metadata, timestamp, mergeparent, uuid, version "
+        "FROM %@ ORDER BY revid DESC",
         [self tableName]]];
 
     NSUInteger suggestedMaxRevCount = 50000;
