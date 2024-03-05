@@ -655,6 +655,8 @@
 		66550C0717D51D9000327657 /* TestSQLiteStorePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550C0617D51D9000327657 /* TestSQLiteStorePerformance.m */; };
 		66550C0917D51E8F00327657 /* TestBinaryReadWritePerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66550C0817D51E8F00327657 /* TestBinaryReadWritePerformance.m */; };
 		66568C92189598BB0075FD9A /* TestMultiplePersistentRootPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 66568C91189598BB0075FD9A /* TestMultiplePersistentRootPerformance.m */; };
+		665A77252B95DC0B0057CD07 /* TestRevisionRewritingPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 665A771A2B95DB3C0057CD07 /* TestRevisionRewritingPerformance.m */; };
+		665A77262B95DC0C0057CD07 /* TestRevisionRewritingPerformance.m in Sources */ = {isa = PBXBuildFile; fileRef = 665A771A2B95DB3C0057CD07 /* TestRevisionRewritingPerformance.m */; };
 		6660B3961839522B009007FD /* TestSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 6660B3951839522B009007FD /* TestSerialization.m */; };
 		6660B3A01839659D009007FD /* COAttachmentID.h in Headers */ = {isa = PBXBuildFile; fileRef = 6660B39E1839659D009007FD /* COAttachmentID.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6660B3A11839659D009007FD /* COAttachmentID.m in Sources */ = {isa = PBXBuildFile; fileRef = 6660B39F1839659D009007FD /* COAttachmentID.m */; };
@@ -1316,6 +1318,7 @@
 		66550C0617D51D9000327657 /* TestSQLiteStorePerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestSQLiteStorePerformance.m; path = Benchmark/TestSQLiteStorePerformance.m; sourceTree = "<group>"; };
 		66550C0817D51E8F00327657 /* TestBinaryReadWritePerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestBinaryReadWritePerformance.m; path = Benchmark/TestBinaryReadWritePerformance.m; sourceTree = "<group>"; };
 		66568C91189598BB0075FD9A /* TestMultiplePersistentRootPerformance.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TestMultiplePersistentRootPerformance.m; path = Benchmark/TestMultiplePersistentRootPerformance.m; sourceTree = "<group>"; };
+		665A771A2B95DB3C0057CD07 /* TestRevisionRewritingPerformance.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestRevisionRewritingPerformance.m; sourceTree = "<group>"; };
 		6660B3951839522B009007FD /* TestSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestSerialization.m; sourceTree = "<group>"; };
 		6660B39E1839659D009007FD /* COAttachmentID.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = COAttachmentID.h; sourceTree = "<group>"; };
 		6660B39F1839659D009007FD /* COAttachmentID.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = COAttachmentID.m; sourceTree = "<group>"; };
@@ -2032,6 +2035,7 @@
 				66E6824018B972C4003294EB /* BenchmarkCommon.m */,
 				66E6826018BA9B5D003294EB /* TestObjectPerformance.m */,
 				66488DEF18DA3F6D009F4C55 /* TestAttributedStringDiffPerformance.m */,
+				665A771A2B95DB3C0057CD07 /* TestRevisionRewritingPerformance.m */,
 				6034478F1C5008A6008A1B9D /* TestHistoryNavigationPerformance.m */,
 			);
 			name = Benchmark;
@@ -3229,6 +3233,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6061B8E91C57E91300813C18 /* BenchmarkCommon.m in Sources */,
+				665A77252B95DC0B0057CD07 /* TestRevisionRewritingPerformance.m in Sources */,
 				6061B8EB1C57E91300813C18 /* TestAttributedStringDiffPerformance.m in Sources */,
 				6061B8F01C57E93000813C18 /* Person.m in Sources */,
 				6061B8E41C57E91300813C18 /* main.m in Sources */,
@@ -3511,6 +3516,7 @@
 				664F279D188E683400DF36FC /* TestSynchronizerPerformance.m in Sources */,
 				66550C0317D51D1800327657 /* TestCommon.m in Sources */,
 				66550BF817D51CB800327657 /* TestObjectGraphPerformance.m in Sources */,
+				665A77262B95DC0C0057CD07 /* TestRevisionRewritingPerformance.m in Sources */,
 				66E6826118BA9B5D003294EB /* TestObjectPerformance.m in Sources */,
 				66D7980917ED18A200B07A2A /* BenchmarkItem.m in Sources */,
 				603447901C5008A6008A1B9D /* TestHistoryNavigationPerformance.m in Sources */,
