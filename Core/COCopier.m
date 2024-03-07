@@ -111,7 +111,8 @@
     BOOL copiesNonCompositeReferences = (options & COCopierCopiesNonCompositeReferencesMissingInDestination)
                                      || (options & COCopierCopiesNonCompositeReferencesExistingInDestination);
     
-    if (copiesNonCompositeReferences) {
+    if (copiesNonCompositeReferences)
+    {
         for (ETUUID *uuid in compositeItemUUIDs)
         {
             [self collectNonCompositeItemUUIDsToCopyForItem: [source itemForUUID: uuid]

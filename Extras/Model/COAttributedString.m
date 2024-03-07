@@ -96,10 +96,13 @@
                                      excessCharactersAtEnd: &excessAtEnd];
 
     COCopier *copier = [COCopier new];
+    COCopierOptions options = COCopierUsesNewUUIDs
+        | COCopierCopiesNonCompositeReferencesMissingInDestination
+        | COCopierCopiesNonCompositeReferencesExistingInDestination;
     NSArray *copiedUUIDs = [copier copyItemsWithUUIDs: chunkUUIDS
                                             fromGraph: self.objectGraphContext
                                               toGraph: result
-                                              options: COCopierUsesNewUUIDs];
+                                              options: options];
 
     // Trim off excess characters
 
@@ -205,14 +208,15 @@
 
     // Create a new chunk for the right side, copying from the left side so we also copy the
     // attributes.
-    // FIXME: Since attributes aren't referred to with a composite rel'n, currently
-    // they are being aliased and not copied.
 
     COCopier *copier = [COCopier new];
+    COCopierOptions options = COCopierUsesNewUUIDs
+        | COCopierCopiesNonCompositeReferencesMissingInDestination
+        | COCopierCopiesNonCompositeReferencesExistingInDestination;
     ETUUID *rightChunkUUID = [copier copyItemWithUUID: chunk.UUID
                                             fromGraph: self.objectGraphContext
                                               toGraph: self.objectGraphContext
-                                              options: COCopierUsesNewUUIDs];
+                                              options: options];
     COAttributedStringChunk *rightChunk = [self.objectGraphContext loadedObjectForUUID: rightChunkUUID];
     rightChunk.text = rightString;
 

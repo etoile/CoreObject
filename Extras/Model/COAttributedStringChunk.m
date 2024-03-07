@@ -46,11 +46,13 @@
 {
     COItemGraph *result = [[COItemGraph alloc] init];
     COCopier *copier = [[COCopier alloc] init];
-
+    COCopierOptions options = COCopierUsesNewUUIDs
+        | COCopierCopiesNonCompositeReferencesMissingInDestination
+        | COCopierCopiesNonCompositeReferencesExistingInDestination;
     ETUUID *copyRootUUID = [copier copyItemWithUUID: self.UUID
                                           fromGraph: self.objectGraphContext
                                             toGraph: result
-                                            options: COCopierUsesNewUUIDs];
+                                            options: options];
     result.rootItemUUID = copyRootUUID;
 
     COMutableItem *chunkCopy = [result itemForUUID: copyRootUUID];

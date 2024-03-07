@@ -41,7 +41,7 @@ typedef NS_OPTIONS(NSInteger, COCopierOptions) {
      * You should usually not use it alone, but in combination with
      * COCopierCopiesNonCompositeReferencesMissingInDestination.
      */
-    COCopierCopiesNonCompositeReferencesExistingInDestination = 8
+    COCopierCopiesNonCompositeReferencesExistingInDestination = 16
 };
 
 /**
