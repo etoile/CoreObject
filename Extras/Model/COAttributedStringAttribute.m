@@ -40,7 +40,8 @@
     COCopier *copier = [COCopier new];
     ETUUID *copyUUID = [copier copyItemWithUUID: self.UUID
                                       fromGraph: self.objectGraphContext
-                                        toGraph: result];
+                                        toGraph: result
+                                        options: COCopierUsesNewUUIDs];
     result.rootItemUUID = copyUUID;
 
     return result;

@@ -44,9 +44,9 @@
     return result.allObjects;
 }
 
-- (void)collectItemAndAllDescendents: (ETUUID *)aUUID
-                               inSet: (NSMutableSet *)dest
-                           fromGraph: (id <COItemGraph>)source
+- (void)collectUUIDsForItemAndAllDescendents: (ETUUID *)aUUID
+                                       inSet: (NSMutableSet *)dest
+                                   fromGraph: (id <COItemGraph>)source
 {
     if ([dest containsObject: aUUID])
         return;
@@ -55,47 +55,87 @@
 
     for (ETUUID *child in [self directDescendentItemUUIDsForUUID: aUUID fromGraph: source])
     {
-        [self collectItemAndAllDescendents: child
-                                     inSet: dest
-                                 fromGraph: source];
+        [self collectUUIDsForItemAndAllDescendents: child
+                                             inSet: dest
+                                         fromGraph: source];
     }
 }
 
-- (NSSet *)itemAndAllDescendents: (ETUUID *)aUUID
-                       fromGraph: (id <COItemGraph>)source
+- (NSSet *)UUIDsForItemAndAllDescendents: (ETUUID *)aUUID
+                               fromGraph: (id <COItemGraph>)source
 {
     NSMutableSet *result = [NSMutableSet set];
-    [self collectItemAndAllDescendents: aUUID inSet: result fromGraph: source];
+    [self collectUUIDsForItemAndAllDescendents: aUUID inSet: result fromGraph: source];
     return result;
 }
 
-
-- (NSSet *)itemUUIDsToCopyForItemItemWithUUID: (ETUUID *)aUUID
-                                    fromGraph: (id <COItemGraph>)source
-                                      toGraph: (id <COItemGraph>)dest
+- (void)collectNonCompositeItemUUIDsToCopyForItem: (COItem *)item
+                                            inSet: (NSMutableSet *)result
+                                        fromGraph: (id <COItemGraph>)source
+                                          toGraph: (id <COItemGraph>)dest
+                                    destItemUUIDs: (NSSet *)destItemUUIDs
+                                          options: (COCopierOptions)options
 {
-    NSSet *compositeObjectCopySet = [self itemAndAllDescendents: aUUID fromGraph: source];
-    NSMutableSet *result = [NSMutableSet setWithSet: compositeObjectCopySet];
-
-    for (ETUUID *uuid in compositeObjectCopySet)
+    for (ETUUID *reference in item.referencedItemUUIDs)
     {
-        COItem *item = [source itemForUUID: uuid];
-
-        // FIXME: This isn't intuitive... we just copy one layer deep of non-composite references       
-        // FIXME: referencedItemUUIDs ignores composite references, which sounds wrong! Test!
-        for (ETUUID *referenced in item.referencedItemUUIDs)
+        if ([result containsObject: reference])
+            continue;
+        
+        // Don't use -itemForUUID: to check existence, since it can trigger a serialization
+        if ([destItemUUIDs containsObject: reference])
         {
-            if (![compositeObjectCopySet containsObject: referenced])
-            {
-                if ([dest itemForUUID: referenced] == nil)
-                {
-                    // If not in dest, copy it
-                    [result addObject: referenced];
-                }
+            if (options & COCopierCopiesNonCompositeReferencesExistingInDestination) {
+                [result addObject: reference];
             }
+        } else if (options & COCopierCopiesNonCompositeReferencesMissingInDestination) {
+            [result addObject: reference];
+        }
+        
+        [self collectNonCompositeItemUUIDsToCopyForItem: [source itemForUUID: reference]
+                                                  inSet: result
+                                              fromGraph: source
+                                                toGraph: dest
+                                          destItemUUIDs: destItemUUIDs
+                                                options: options];
+    }
+}
+
+- (NSSet *)itemUUIDsToCopyForItemWithUUID: (ETUUID *)aUUID
+                                fromGraph: (id <COItemGraph>)source
+                                  toGraph: (id <COItemGraph>)dest
+                                  options: (COCopierOptions)options
+{
+    NSSet *compositeItemUUIDs = [self UUIDsForItemAndAllDescendents: aUUID fromGraph: source];
+    NSMutableSet *result = [NSMutableSet setWithSet: compositeItemUUIDs];
+    NSSet *destItemUUIDs = [NSSet setWithArray: dest.itemUUIDs];
+    BOOL copiesNonCompositeReferences = (options & COCopierCopiesNonCompositeReferencesMissingInDestination)
+                                     || (options & COCopierCopiesNonCompositeReferencesExistingInDestination);
+    
+    if (copiesNonCompositeReferences) {
+        for (ETUUID *uuid in compositeItemUUIDs)
+        {
+            [self collectNonCompositeItemUUIDsToCopyForItem: [source itemForUUID: uuid]
+                                                      inSet: result
+                                                  fromGraph: source
+                                                    toGraph: dest
+                                              destItemUUIDs: destItemUUIDs
+                                                    options: options];
         }
     }
+
     return result;
+}
+
+- (ETUUID *)copyItemWithUUID: (ETUUID *)aUUID
+                   fromGraph: (id <COItemGraph>)source
+                     toGraph: (id <COItemGraph>)dest
+                     options: (COCopierOptions)options
+{
+    NILARG_EXCEPTION_TEST(aUUID);
+    return [self copyItemsWithUUIDs: @[aUUID] 
+                          fromGraph: source 
+                            toGraph: dest 
+                            options: options][0];
 }
 
 - (ETUUID *)copyItemWithUUID: (ETUUID *)aUUID
@@ -103,12 +143,16 @@
                      toGraph: (id <COItemGraph>)dest
 {
     NILARG_EXCEPTION_TEST(aUUID);
-    return [self copyItemsWithUUIDs: @[aUUID] fromGraph: source toGraph: dest][0];
+    return [self copyItemsWithUUIDs: @[aUUID]
+                          fromGraph: source
+                            toGraph: dest
+                            options: COCopierUsesNewUUIDs][0];
 }
 
 - (NSArray *)copyItemsWithUUIDs: (NSArray *)uuids
                       fromGraph: (id <COItemGraph>)source
                         toGraph: (id <COItemGraph>)dest
+                        options: (COCopierOptions)options
 {
     NILARG_EXCEPTION_TEST(uuids);
     NILARG_EXCEPTION_TEST(source);
@@ -118,30 +162,34 @@
 
     for (ETUUID *uuid in uuids)
     {
-        [uuidsToCopy unionSet: [self itemUUIDsToCopyForItemItemWithUUID: uuid
-                                                              fromGraph: source
-                                                                toGraph: dest]];
+        [uuidsToCopy unionSet: [self itemUUIDsToCopyForItemWithUUID: uuid
+                                                          fromGraph: source
+                                                            toGraph: dest
+                                                            options: options]];
     }
 
     NSMutableDictionary *mapping = [NSMutableDictionary dictionary];
 
     for (ETUUID *oldUUID in uuidsToCopy)
     {
-        mapping[oldUUID] = [ETUUID UUID];
+        mapping[oldUUID] = (options & COCopierUsesNewUUIDs) ? [ETUUID UUID] : oldUUID;
     }
 
-    NSMutableArray *result = [NSMutableArray array];
+    NSMutableArray *items = [NSMutableArray array];
+    NSMutableArray *itemUUIDs = [NSMutableArray array];
 
     for (ETUUID *uuid in uuidsToCopy)
     {
         COItem *oldItem = [source itemForUUID: uuid];
-        COItem *newItem = [oldItem mutableCopyWithNameMapping: mapping];
-        [result addObject: newItem];
+        COItem *newItem = [oldItem mutableCopyWithUUIDMapping: mapping];
+
+        [items addObject: newItem];
+        [itemUUIDs addObject: newItem.UUID];
     }
 
-    [dest insertOrUpdateItems: result];
+    [dest insertOrUpdateItems: items];
 
-    return [uuids mappedCollectionWithBlock: ^(id inputUUID) { return mapping[inputUUID]; }];
+    return itemUUIDs;
 }
 
 @end

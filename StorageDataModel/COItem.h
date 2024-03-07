@@ -111,7 +111,7 @@ extern NSString *const kCOItemIsSharedProperty;
 /**
  * Returns a mutable item.
  */
-- (id)mutableCopyWithNameMapping: (NSDictionary *)aMapping;
+- (id)mutableCopyWithUUIDMapping: (NSDictionary *)aMapping;
 
 @end
 

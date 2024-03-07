@@ -98,7 +98,8 @@
     COCopier *copier = [COCopier new];
     NSArray *copiedUUIDs = [copier copyItemsWithUUIDs: chunkUUIDS
                                             fromGraph: self.objectGraphContext
-                                              toGraph: result];
+                                              toGraph: result
+                                              options: COCopierUsesNewUUIDs];
 
     // Trim off excess characters
 
@@ -210,7 +211,8 @@
     COCopier *copier = [COCopier new];
     ETUUID *rightChunkUUID = [copier copyItemWithUUID: chunk.UUID
                                             fromGraph: self.objectGraphContext
-                                              toGraph: self.objectGraphContext];
+                                              toGraph: self.objectGraphContext
+                                              options: COCopierUsesNewUUIDs];
     COAttributedStringChunk *rightChunk = [self.objectGraphContext loadedObjectForUUID: rightChunkUUID];
     rightChunk.text = rightString;
 
