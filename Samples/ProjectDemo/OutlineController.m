@@ -739,8 +739,7 @@ objectValueForTableColumn: (NSTableColumn *)column
 
             ETUUID *destUUID = [copier copyItemWithUUID: [outlineItem UUID]
                                               fromGraph: [outlineItem objectGraphContext]
-                                                toGraph: [self objectGraphContext]
-                                                options: COCopierUsesNewUUIDs];
+                                                toGraph: [self objectGraphContext]];
 
             OutlineItem *copy = (OutlineItem *)[[self objectGraphContext] loadedObjectForUUID: destUUID];
 
