@@ -111,7 +111,7 @@ static NSArray *initialUUIDs;
 - (void)testCopyWithinContext
 {
     UKIntsEqual(9, initialGraph.itemUUIDs.count);
-    COCopierOptions options = COCopierUsesNewUUIDs | COCopierCopiesNonCompositeReferencesMissingInDestination;
+    COCopierOptions options = COCopierCopiesNonCompositeReferencesMissingInDestination;
     ETUUID *drawing2 = [copier copyItemWithUUID: drawing
                                       fromGraph: initialGraph
                                         toGraph: initialGraph
@@ -190,7 +190,7 @@ static NSArray *initialUUIDs;
 
     b.isShared = YES;
 
-    COCopierOptions options = COCopierUsesNewUUIDs | COCopierCopiesNonCompositeReferencesMissingInDestination;
+    COCopierOptions options = COCopierCopiesNonCompositeReferencesMissingInDestination;
     ETUUID *aCopyUUID = [copier copyItemWithUUID: a.UUID fromGraph: ctx toGraph: ctx options: options];
     id aCopy = [ctx loadedObjectForUUID: aCopyUUID];
 
@@ -209,7 +209,7 @@ static NSArray *initialUUIDs;
 
     b.isShared = NO;
 
-    COCopierOptions options = COCopierUsesNewUUIDs | COCopierCopiesNonCompositeReferencesMissingInDestination;
+    COCopierOptions options = COCopierCopiesNonCompositeReferencesMissingInDestination;
     ETUUID *aCopyUUID = [copier copyItemWithUUID: a.UUID fromGraph: ctx toGraph: ctx options: options];
     id aCopy = [ctx loadedObjectForUUID: aCopyUUID];
 

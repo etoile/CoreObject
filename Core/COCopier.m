@@ -147,7 +147,7 @@
     return [self copyItemsWithUUIDs: @[aUUID]
                           fromGraph: source
                             toGraph: dest
-                            options: COCopierUsesNewUUIDs][0];
+                            options: 0][0];
 }
 
 - (NSArray *)copyItemsWithUUIDs: (NSArray *)uuids
@@ -173,7 +173,7 @@
 
     for (ETUUID *oldUUID in uuidsToCopy)
     {
-        mapping[oldUUID] = (options & COCopierUsesNewUUIDs) ? [ETUUID UUID] : oldUUID;
+        mapping[oldUUID] = (options & COCopierReusesSourceUUIDs) ? oldUUID :  [ETUUID UUID];
     }
 
     NSMutableArray *items = [NSMutableArray array];

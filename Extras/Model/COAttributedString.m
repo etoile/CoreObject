@@ -96,9 +96,8 @@
                                      excessCharactersAtEnd: &excessAtEnd];
 
     COCopier *copier = [COCopier new];
-    COCopierOptions options = COCopierUsesNewUUIDs
-        | COCopierCopiesNonCompositeReferencesMissingInDestination
-        | COCopierCopiesNonCompositeReferencesExistingInDestination;
+    COCopierOptions options = COCopierCopiesNonCompositeReferencesMissingInDestination
+                            | COCopierCopiesNonCompositeReferencesExistingInDestination;
     NSArray *copiedUUIDs = [copier copyItemsWithUUIDs: chunkUUIDS
                                             fromGraph: self.objectGraphContext
                                               toGraph: result
@@ -210,9 +209,8 @@
     // attributes.
 
     COCopier *copier = [COCopier new];
-    COCopierOptions options = COCopierUsesNewUUIDs
-        | COCopierCopiesNonCompositeReferencesMissingInDestination
-        | COCopierCopiesNonCompositeReferencesExistingInDestination;
+    COCopierOptions options = COCopierCopiesNonCompositeReferencesMissingInDestination
+                            | COCopierCopiesNonCompositeReferencesExistingInDestination;
     ETUUID *rightChunkUUID = [copier copyItemWithUUID: chunk.UUID
                                             fromGraph: self.objectGraphContext
                                               toGraph: self.objectGraphContext

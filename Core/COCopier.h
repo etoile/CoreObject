@@ -16,12 +16,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 typedef NS_OPTIONS(NSInteger, COCopierOptions) {
     /**
-     ** Whether copies have different UUIDs in destination than original items in source.
+     * Whether copies keep using the same UUIDs in destination than original items in source.
      *
-     * This is useful to duplicate items when source and destination are the same. You can also use 
-     * it to implement copy/paste semantics whether source and destination are the same or not.
+     * You should omit this option to implement cut/copy/paste semantics, whether source and 
+     * destination are the same or not.
      */
-    COCopierUsesNewUUIDs = 2,
+    COCopierReusesSourceUUIDs = 2,
     /**
      * Whether items reachable through non composite references are copied, when they dont'
      * exist in the destination.
@@ -62,8 +62,6 @@ typedef NS_OPTIONS(NSInteger, COCopierOptions) {
  * destination item graph.
  *
  * If source and destination item graphs are identical, the item is duplicated.
- *
- * COCopierUsesNewUUIDs option is used. For more control over COCopier options, use -copyItemWithUUID:fromGraph:toGraph:options:.
  */
 - (ETUUID *)copyItemWithUUID: (ETUUID *)aUUID
                    fromGraph: (id <COItemGraph>)source

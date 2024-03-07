@@ -46,9 +46,8 @@
 {
     COItemGraph *result = [[COItemGraph alloc] init];
     COCopier *copier = [[COCopier alloc] init];
-    COCopierOptions options = COCopierUsesNewUUIDs
-        | COCopierCopiesNonCompositeReferencesMissingInDestination
-        | COCopierCopiesNonCompositeReferencesExistingInDestination;
+    COCopierOptions options = COCopierCopiesNonCompositeReferencesMissingInDestination
+                            | COCopierCopiesNonCompositeReferencesExistingInDestination;
     ETUUID *copyRootUUID = [copier copyItemWithUUID: self.UUID
                                           fromGraph: self.objectGraphContext
                                             toGraph: result

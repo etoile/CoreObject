@@ -43,9 +43,8 @@
 {
     NSDate *start = [NSDate date];
     COObjectGraphContext *tempObjectGraph = [COObjectGraphContext new];
-    COCopierOptions options = COCopierUsesNewUUIDs
-        | COCopierCopiesNonCompositeReferencesMissingInDestination
-        | COCopierCopiesNonCompositeReferencesExistingInDestination;
+    COCopierOptions options = COCopierCopiesNonCompositeReferencesMissingInDestination
+                            | COCopierCopiesNonCompositeReferencesExistingInDestination;
 
     (void)[[COCopier new] copyItemWithUUID: objectGraph.rootItemUUID
                                  fromGraph: objectGraph
