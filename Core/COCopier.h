@@ -58,7 +58,7 @@ typedef NS_OPTIONS(NSInteger, COCopierOptions) {
 @interface COCopier : NSObject
 
 /**
- * Copies a single item between two item graphs and returns the UUID of the item inserted in the
+ * Copies a single item between two item graphs and returns the UUID of these items in the
  * destination item graph.
  *
  * If source and destination item graphs are identical, the item is duplicated.
@@ -67,7 +67,7 @@ typedef NS_OPTIONS(NSInteger, COCopierOptions) {
                    fromGraph: (id <COItemGraph>)source
                      toGraph: (id <COItemGraph>)dest NS_RETURNS_NOT_RETAINED;
 /**
- * Copies a single item between two item graphs and returns the UUID of the item inserted in the 
+ * Copies a single item between two item graphs and returns the UUID of these item in the 
  * destination item graph.
  *
  * If source and destination item graphs are identical, the item is duplicated.
@@ -77,8 +77,8 @@ typedef NS_OPTIONS(NSInteger, COCopierOptions) {
                      toGraph: (id <COItemGraph>)dest
                      options: (COCopierOptions)options NS_RETURNS_NOT_RETAINED;
 /**
- * Copies the given items between two item graphs and returns the UUIDs of the items inserted in 
- * the destination item graph.
+ * Copies the given items between two item graphs and returns the UUIDs of these items in the
+ * destination item graph.
  *
  * If source and destination item graphs are identical, the items are duplicated.
  */

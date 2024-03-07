@@ -177,7 +177,6 @@
     }
 
     NSMutableArray *items = [NSMutableArray array];
-    NSMutableArray *itemUUIDs = [NSMutableArray array];
 
     for (ETUUID *uuid in uuidsToCopy)
     {
@@ -185,7 +184,6 @@
         COItem *newItem = [oldItem mutableCopyWithUUIDMapping: mapping];
 
         [items addObject: newItem];
-        [itemUUIDs addObject: newItem.UUID];
     }
 
     [dest insertOrUpdateItems: items];
