@@ -189,7 +189,7 @@
 
     [dest insertOrUpdateItems: items];
 
-    return itemUUIDs;
+    return [uuids mappedCollectionWithBlock: ^(id inputUUID) { return mapping[inputUUID]; }];
 }
 
 @end
