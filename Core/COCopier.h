@@ -13,6 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * Options to control COCopier behavior.
+ *
+ * If COCopierCopiesNonCompositeReferencesExistingInDestination is not among copy options,
+ * kCOIsSharedItemProperty can be set to NO to copy an existing item rather an aliasing it.
  */
 typedef NS_OPTIONS(NSInteger, COCopierOptions) {
     /**
@@ -37,6 +40,11 @@ typedef NS_OPTIONS(NSInteger, COCopierOptions) {
      * the destination.
      *
      * Be careful with this option, the entire source item graph can be copied into the destination.
+     *
+     * If COCopierReusesSourceUUID is used, then copying updates existing items in the destination
+     * rather than creating new items.
+     *
+     * This option causes kCOIsSharedItemProperty to be ignored.
      *
      * You should usually not use it alone, but in combination with
      * COCopierCopiesNonCompositeReferencesMissingInDestination.
