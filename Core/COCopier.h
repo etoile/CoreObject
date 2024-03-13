@@ -12,6 +12,47 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
+ * Options to control COCopier behavior.
+ *
+ * If COCopierCopiesNonCompositeReferencesExistingInDestination is not among copy options,
+ * kCOIsSharedItemProperty can be set to NO to copy an existing item rather an aliasing it.
+ */
+typedef NS_OPTIONS(NSInteger, COCopierOptions) {
+    /**
+     * Whether copies keep using the same UUIDs in destination than original items in source.
+     *
+     * You should omit this option to implement cut/copy/paste semantics, whether source and 
+     * destination are the same or not.
+     */
+    COCopierReusesSourceUUIDs = 2,
+    /**
+     * Whether items reachable through non composite references are copied, when they dont'
+     * exist in the destination.
+     *
+     * Be careful with this option, the entire source item graph can be copied into the destination.
+     *
+     * Can be used alone and in combination with
+     * COCopierCopiesNonCompositeReferencesExistingInDestination.
+     */
+    COCopierCopiesNonCompositeReferencesMissingInDestination = 4,
+    /**
+     * Whether items reachable through non composite references are copied, when they exist in the
+     * the destination.
+     *
+     * Be careful with this option, the entire source item graph can be copied into the destination.
+     *
+     * If COCopierReusesSourceUUID is used, then copying updates existing items in the destination
+     * rather than creating new items.
+     *
+     * This option causes kCOIsSharedItemProperty to be ignored.
+     *
+     * You should usually not use it alone, but in combination with
+     * COCopierCopiesNonCompositeReferencesMissingInDestination.
+     */
+    COCopierCopiesNonCompositeReferencesExistingInDestination = 16
+};
+
+/**
  * @group Core
  * @abstract Metamodel-driven copy support
  *
@@ -25,7 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface COCopier : NSObject
 
 /**
- * Copies a single item between two item graphs and returns the UUID of the item inserted in the 
+ * Copies a single item between two item graphs and returns the UUID of these items in the
  * destination item graph.
  *
  * If source and destination item graphs are identical, the item is duplicated.
@@ -34,14 +75,25 @@ NS_ASSUME_NONNULL_BEGIN
                    fromGraph: (id <COItemGraph>)source
                      toGraph: (id <COItemGraph>)dest NS_RETURNS_NOT_RETAINED;
 /**
- * Copies the given items between two item graphs and returns the UUIDs of the items inserted in 
- * the destination item graph.
+ * Copies a single item between two item graphs and returns the UUID of these item in the 
+ * destination item graph.
+ *
+ * If source and destination item graphs are identical, the item is duplicated.
+ */
+- (ETUUID *)copyItemWithUUID: (ETUUID *)aUUID
+                   fromGraph: (id <COItemGraph>)source
+                     toGraph: (id <COItemGraph>)dest
+                     options: (COCopierOptions)options NS_RETURNS_NOT_RETAINED;
+/**
+ * Copies the given items between two item graphs and returns the UUIDs of these items in the
+ * destination item graph.
  *
  * If source and destination item graphs are identical, the items are duplicated.
  */
 - (NSArray<ETUUID *> *)copyItemsWithUUIDs: (NSArray<ETUUID *> *)uuids
                                 fromGraph: (id <COItemGraph>)source
-                                  toGraph: (id <COItemGraph>)dest NS_RETURNS_NOT_RETAINED;
+                                  toGraph: (id <COItemGraph>)dest 
+                                  options: (COCopierOptions)options NS_RETURNS_NOT_RETAINED;
 
 @end
 

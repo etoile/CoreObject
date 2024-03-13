@@ -111,9 +111,11 @@ static NSArray *initialUUIDs;
 - (void)testCopyWithinContext
 {
     UKIntsEqual(9, initialGraph.itemUUIDs.count);
+    COCopierOptions options = COCopierCopiesNonCompositeReferencesMissingInDestination;
     ETUUID *drawing2 = [copier copyItemWithUUID: drawing
                                       fromGraph: initialGraph
-                                        toGraph: initialGraph];
+                                        toGraph: initialGraph
+                                        options: options];
     UKIntsEqual(17, initialGraph.itemUUIDs.count);
 
     // Check structure ("copy semantics.pdf" page 9)
@@ -188,7 +190,8 @@ static NSArray *initialUUIDs;
 
     b.isShared = YES;
 
-    ETUUID *aCopyUUID = [copier copyItemWithUUID: a.UUID fromGraph: ctx toGraph: ctx];
+    COCopierOptions options = COCopierCopiesNonCompositeReferencesMissingInDestination;
+    ETUUID *aCopyUUID = [copier copyItemWithUUID: a.UUID fromGraph: ctx toGraph: ctx options: options];
     id aCopy = [ctx loadedObjectForUUID: aCopyUUID];
 
     UKIntsEqual(3, ctx.itemUUIDs.count);
@@ -206,7 +209,8 @@ static NSArray *initialUUIDs;
 
     b.isShared = NO;
 
-    ETUUID *aCopyUUID = [copier copyItemWithUUID: a.UUID fromGraph: ctx toGraph: ctx];
+    COCopierOptions options = COCopierCopiesNonCompositeReferencesMissingInDestination;
+    ETUUID *aCopyUUID = [copier copyItemWithUUID: a.UUID fromGraph: ctx toGraph: ctx options: options];
     id aCopy = [ctx loadedObjectForUUID: aCopyUUID];
 
     UKIntsEqual(4, ctx.itemUUIDs.count);

@@ -237,10 +237,13 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
         COType type = [self typeForAttribute: key];
         if (COTypePrimitivePart(type) == kCOTypeReference)
         {
-            for (ETUUID *embedded in [self allObjectsForAttribute: key])
+            for (id reference in [self allObjectsForAttribute: key])
             {
-                // FIXME: May return COPath!
-                [result addObject: embedded];
+                // Ignore cross-persistent root references
+                if ([reference isKindOfClass: [COPath class]])
+                    continue;
+
+                [result addObject: reference];
             }
         }
     }
@@ -261,10 +264,6 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
             {
                 // Ignore cross-persistent root references
                 if ([aChild isKindOfClass: [COPath class]])
-                    continue;
-
-                // Ignore NSNull (that means the relationship is set to nil)
-                if ([aChild isKindOfClass: [NSNull class]])
                     continue;
 
                 [result addObject: aChild];
@@ -343,7 +342,7 @@ static NSDictionary *copyValueDictionary(NSDictionary *input, BOOL mutable)
                            valuesForAttributes: values];
 }
 
-- (id)mutableCopyWithNameMapping: (NSDictionary *)aMapping
+- (id)mutableCopyWithUUIDMapping: (NSDictionary *)aMapping
 {
     COMutableItem *aCopy = [self mutableCopy];
 

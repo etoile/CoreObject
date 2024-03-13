@@ -43,10 +43,13 @@
 {
     NSDate *start = [NSDate date];
     COObjectGraphContext *tempObjectGraph = [COObjectGraphContext new];
+    COCopierOptions options = COCopierCopiesNonCompositeReferencesMissingInDestination
+                            | COCopierCopiesNonCompositeReferencesExistingInDestination;
 
     (void)[[COCopier new] copyItemWithUUID: objectGraph.rootItemUUID
                                  fromGraph: objectGraph
-                                   toGraph: tempObjectGraph];
+                                   toGraph: tempObjectGraph
+                                   options: options];
 
     NSTimeInterval time = [[NSDate date] timeIntervalSinceDate: start];
     return time;
