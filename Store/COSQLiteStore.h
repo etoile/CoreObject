@@ -497,6 +497,14 @@ extern NSString *const COPersistentRootAttributeUsedSize;
 /** @taskunit Transactions */
 
 
+/**
+ * Commits changes to multiple persistent roots (or targeting multiple branches per persistent root)
+ * in a single transaction.
+ *
+ * Once the commit succeeds, posts COStorePersistentRootsDidChangeNotification on the thread or
+ * queue used to call -commitStoreTransaction:. If you want to handle this commit notification on
+ * another thread/queue, use -[NSNotificationCenter addObserverForName:object:queue:usingBlock:].
+ */
 - (BOOL)commitStoreTransaction: (COStoreTransaction *)aTransaction;
 - (void)clearStore;
 
