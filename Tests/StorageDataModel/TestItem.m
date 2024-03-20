@@ -307,6 +307,22 @@ extern NSString *const kCOJSONDeprecatedFormatProperty;
     UKObjectsNotEqual(item2, item1);
 }
 
+// This test ensures token buffer can be resized in writeSetContents(), without resulting in invalid
+// token pointers, see https://github.com/etoile/CoreObject/pull/83#issuecomment-1979878040.
+- (void)testLargeSet
+{
+    COMutableItem *item1 = [COMutableItem item];
+    NSMutableSet *set = [NSMutableSet set];
+
+    for (int i = 0; i <= 250; i++)
+    {
+        [set addObject: [ETUUID UUID]];
+    }
+    [item1 setValue: set forAttribute: @"set" type: kCOTypeReference | kCOTypeSet];
+
+    [self validateRoundTrips: item1];
+}
+
 - (void)testEmptyObject
 {
     COMutableItem *item1 = [COMutableItem item];
