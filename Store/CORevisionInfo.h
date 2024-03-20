@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
     ETUUID *_mergeParentRevisionID;
     ETUUID *_persistentRootUUID;
     ETUUID *_branchUUID;
+    int64_t _schemaVersion;
     NSDictionary *_metadata;
     NSDate *_date;
 }
@@ -31,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readwrite, copy, nullable) ETUUID *mergeParentRevisionUUID;
 @property (nonatomic, readwrite, copy) ETUUID *persistentRootUUID;
 @property (nonatomic, readwrite, copy) ETUUID *branchUUID;
+@property (nonatomic, readwrite) int64_t schemaVersion;
 @property (readwrite, nonatomic, copy, nullable) NSDictionary<NSString *, id> *metadata;
 @property (nonatomic, readwrite, copy) NSDate *date;
 @property (nonatomic, readonly, strong) id plist;

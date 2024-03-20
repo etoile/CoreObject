@@ -174,7 +174,6 @@ extern NSString *const COObjectGraphContextEndBatchChangeNotification;
 {
 @private
     ETModelDescriptionRepository *_modelDescriptionRepository;
-    Class _migrationDriverClass;
     COBranch *__weak _branch;
     COPersistentRoot *__weak _persistentRoot;
     ETUUID *_futureBranchUUID;
@@ -216,7 +215,7 @@ extern NSString *const COObjectGraphContextEndBatchChangeNotification;
 - (instancetype)initWithBranch: (COBranch *)aBranch;
 /**
  * Initializes a transient object graph context using the given model
- * description repository and migration driver.
+ * description repository.
  *
  * To register your metamodel in the model description repository, see
  * -[COEditingContext initWithStore:modelDescriptionRepository:]. This 
@@ -225,11 +224,8 @@ extern NSString *const COObjectGraphContextEndBatchChangeNotification;
  * If you intend to pass the object graph to 
  * -[COEditingContext insertNewPersistentRootWithRootObject:], the repository 
  * must be the same than the one used by the editing context.
- *
- * The migration driver class must be a subclass of COSchemaMigrationDriver.
  */
-- (instancetype)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
-                              migrationDriverClass: (Class)aDriverClass;
+- (instancetype)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo;
 /**
  * Returns a new transient object graph context using the main model description 
  * repository.
@@ -264,7 +260,7 @@ extern NSString *const COObjectGraphContextEndBatchChangeNotification;
 @property (nonatomic, readonly) BOOL isObjectGraphContext;
 
 
-/** @taskunit Metamodel Access and Migration Support */
+/** @taskunit Metamodel Access */
 
 
 /**
@@ -272,12 +268,6 @@ extern NSString *const COObjectGraphContextEndBatchChangeNotification;
  * describes all the objects managed by the context.
  */
 @property (nonatomic, readonly) ETModelDescriptionRepository *modelDescriptionRepository;
-/**
- * The migration driver used to migrate items to the latest package versions.
- *
- * For more details, see -[COEditingContext migrationDriverClass].
- */
-@property (nonatomic, readonly) Class migrationDriverClass;
 
 
 /** @taskunit Related Persistency Management Objects */

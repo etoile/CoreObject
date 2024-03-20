@@ -374,7 +374,6 @@
                                    modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]]);
     UKRaisesException([[COEditingContext alloc] initWithStore: nil
                                    modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]
-                                         migrationDriverClass: [COSchemaMigrationDriver class]
                                                undoTrackStore: [COUndoTrackStore defaultStore]]);
     UKRaisesException([[COEditingContext alloc] init]);
 }
@@ -384,7 +383,6 @@
     // Will retain the store as argument but not release it due to the exception
     UKRaisesException([[COEditingContext alloc] initWithStore: store
                                    modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]
-                                         migrationDriverClass: [COSchemaMigrationDriver class]
                                                undoTrackStore: nil]);
 }
 

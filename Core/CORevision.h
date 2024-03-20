@@ -83,6 +83,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) NSDate *date;
 /**
+ * Returns the schema version for this revision.
+ */
+@property (nonatomic, readonly) int64_t schemaVersion;
+/**
  * Returns the metadata attached to the revision at commit time. 
  */
 @property (nonatomic, readonly, copy) NSDictionary *metadata;

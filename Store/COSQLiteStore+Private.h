@@ -26,7 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
                       parentRevisionID: (nullable ETUUID *)aParent
                  mergeParentRevisionID: (nullable ETUUID *)aMergeParent
                     persistentRootUUID: (ETUUID *)aUUID
-                            branchUUID: (ETUUID *)branch;
+                            branchUUID: (ETUUID *)branch
+                         schemaVersion: (int64_t)aVersion;
 - (COSQLiteStorePersistentRootBackingStore *)backingStoreForPersistentRootUUID: (ETUUID *)aUUID
                                                             createIfNotPresent: (BOOL)createIfNotPresent;
 - (void)testingRunBlockInStoreQueue: (void (^)(void))aBlock;

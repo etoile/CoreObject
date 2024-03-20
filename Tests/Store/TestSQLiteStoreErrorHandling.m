@@ -95,7 +95,8 @@ static ETUUID *rootUUID;
         [txn createPersistentRootWithInitialItemGraph: [self makeInitialItemGraph]
                                                  UUID: [ETUUID UUID]
                                            branchUUID: [ETUUID UUID]
-                                     revisionMetadata: nil];
+                                     revisionMetadata: nil
+                                        schemaVersion: 0];
 #if BACKING_STORES_SHARE_SAME_SQLITE_DB == 1
         UKTrue([store commitStoreTransaction: txn]);
 #else
@@ -136,7 +137,8 @@ static ETUUID *rootUUID;
         info = [txn createPersistentRootWithInitialItemGraph: [self makeInitialItemGraph]
                                                         UUID: [ETUUID UUID]
                                                   branchUUID: [ETUUID UUID]
-                                            revisionMetadata: nil];
+                                            revisionMetadata: nil
+                                               schemaVersion: 0];
         changeCount = [txn setOldTransactionID: -1 forPersistentRoot: info.UUID];
         UKTrue([store commitStoreTransaction: txn]);
 
@@ -173,7 +175,8 @@ static ETUUID *rootUUID;
                                parentRevisionID: info.currentRevisionUUID
                           mergeParentRevisionID: nil
                              persistentRootUUID: info.UUID
-                                     branchUUID: info.currentBranchUUID];
+                                     branchUUID: info.currentBranchUUID
+                                  schemaVersion: 0];
             UKFalse([store commitStoreTransaction: txn]);
         }
 

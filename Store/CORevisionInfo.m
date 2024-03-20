@@ -15,6 +15,7 @@
 @synthesize persistentRootUUID = _persistentRootUUID;
 @synthesize branchUUID = _branchUUID;
 @synthesize metadata = _metadata;
+@synthesize schemaVersion = _schemaVersion;
 @synthesize date = _date;
 
 - (BOOL)isEqual: (id)object
@@ -49,6 +50,7 @@
              @"parentRevisionID": _parentRevisionID != nil ? [_parentRevisionID stringValue] : [NSNull null],
              @"mergeParentRevisionID": _mergeParentRevisionID != nil ? [_mergeParentRevisionID stringValue] : [NSNull null],
              @"branchUUID": [_branchUUID stringValue],
+             @"schemaVersion": @(_schemaVersion),
              @"metadata": _metadata != nil ? _metadata : [NSNull null],
              @"date": [[[NSDateFormatter alloc] init] stringFromDate: _date]};
 }
@@ -77,6 +79,7 @@
     }
 
     info.branchUUID = [ETUUID UUIDWithString: aPlist[@"branchUUID"]];
+    info.schemaVersion = ((NSNumber *)aPlist[@"schemaVersion"]).longLongValue;
     info.metadata = (aPlist[@"metadata"] != [NSNull null]) ? aPlist[@"metadata"] : nil;
     info.date = [[[NSDateFormatter alloc] init] dateFromString: aPlist[@"date"]];
     return info;

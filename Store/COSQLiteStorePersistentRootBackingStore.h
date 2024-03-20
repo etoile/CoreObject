@@ -33,6 +33,10 @@ NS_ASSUME_NONNULL_BEGIN
     ETUUID *_rootObjectUUID;
 }
 
++ (void)migrateForBackingUUID: (ETUUID *)uuid
+                      inStore: (COSQLiteStore *)store
+                  fromVersion: (int64_t)version;
+
 /**
  * @param
  *      aPath the pathn of a directory where the backing store
@@ -65,12 +69,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)writeItemGraph: (COItemGraph *)anItemTree
           revisionUUID: (ETUUID *)aRevisionUUID
           withMetadata: (nullable NSDictionary<NSString *, id> *)metadata
-            withParent: (int64_t)aParent
-       withMergeParent: (int64_t)aMergeParent
+                parent: (int64_t)aParent
+           mergeParent: (int64_t)aMergeParent
             branchUUID: (ETUUID *)aBranchUUID
-    persistentrootUUID: (ETUUID *)aPersistentRootUUID
+    persistentRootUUID: (ETUUID *)aPersistentRootUUID
+         schemaVersion: (int64_t)aVersion
                  error: (NSError *_Nullable *_Nullable)error;
 - (NSIndexSet *)revidsFromRevid: (int64_t)baseRevid toRevid: (int64_t)finalRevid;
+//- (BOOL)rewriteRevisionUUID: (ETUUID *)aRevisionUUID
+//              withItemGraph: (COItemGraph *)anItemGraph;
+- (BOOL)migrateRevisionsToVersion: (int64_t)newVersion withHandler: (COMigrationHandler)handler;
+
 /**
  * Unconditionally deletes the specified revisions
  */

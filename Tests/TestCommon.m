@@ -288,7 +288,6 @@ doesNotPostNotification: (NSString *)notif
 
     ctx = [[COEditingContext alloc] initWithStore: store
                        modelDescriptionRepository: [ETModelDescriptionRepository mainRepository]
-                             migrationDriverClass: [COSchemaMigrationDriver class]
                                    undoTrackStore: undoStore];
     return self;
 }
@@ -347,7 +346,6 @@ doesNotPostNotification: (NSString *)notif
 {
     return [[COEditingContext alloc] initWithStore: [[COSQLiteStore alloc] initWithURL: ctx.store.URL]
                         modelDescriptionRepository: ctx.modelDescriptionRepository
-                              migrationDriverClass: [COSchemaMigrationDriver class]
                                     undoTrackStore: ctx.undoTrackStore];
 }
 

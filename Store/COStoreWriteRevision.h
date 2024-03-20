@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, retain, readwrite, nullable) ETUUID *parentRevisionUUID;
 @property (nonatomic, retain, readwrite, nullable) ETUUID *mergeParentRevisionUUID;
 @property (nonatomic, retain, readwrite) ETUUID *branch;
+@property (nonatomic, assign, readwrite) int64_t schemaVersion;
 @property (nonatomic, retain, readwrite, nullable) NSDictionary<NSString *, id> *metadata;
 
 @end

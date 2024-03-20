@@ -11,7 +11,7 @@
 
 @implementation COSynchronizerRevision
 
-@synthesize modifiedItems, revisionUUID, parentRevisionUUID, metadata, date;
+@synthesize modifiedItems, revisionUUID, parentRevisionUUID, schemaVersion, metadata, date;
 
 - (void)writeToTransaction: (COStoreTransaction *)txn
         persistentRootUUID: (ETUUID *)persistentRoot
@@ -24,7 +24,8 @@
                        parentRevisionID: isFirst ? nil : self.parentRevisionUUID
                   mergeParentRevisionID: nil
                      persistentRootUUID: persistentRoot
-                             branchUUID: branch];
+                             branchUUID: branch
+                          schemaVersion: schemaVersion];
 }
 
 - (instancetype)initWithUUID: (ETUUID *)aUUID
@@ -51,6 +52,7 @@
 
     self.revisionUUID = aUUID;
     self.parentRevisionUUID = info.parentRevisionUUID;
+    self.schemaVersion = info.schemaVersion;
     self.metadata = info.metadata;
     self.date = info.date;
 
@@ -66,6 +68,7 @@
     {
         result[@"parentRevisionUUID"] = [self.parentRevisionUUID stringValue];
     }
+    result[@"schemaVersion"] = @(self.schemaVersion);
     if (self.metadata != nil)
     {
         result[@"metadata"] = self.metadata;
@@ -81,6 +84,7 @@
     self.modifiedItems = COItemGraphFromJSONPropertyLisy(aPropertyList[@"modifiedItems"]);
     self.revisionUUID = [ETUUID UUIDWithString: aPropertyList[@"revisionUUID"]];
     self.parentRevisionUUID = aPropertyList[@"parentRevisionUUID"] != nil ? [ETUUID UUIDWithString: aPropertyList[@"parentRevisionUUID"]] : nil;
+    self.schemaVersion = ((NSNumber *)aPropertyList[@"schemaVersion"]).longLongValue;
     self.metadata = aPropertyList[@"metadata"];
     self.date = CODateFromJavaTimestamp(aPropertyList[@"date"]);
     return self;

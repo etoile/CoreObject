@@ -173,7 +173,8 @@ static ETUUID *childUUID2;
     proot = [txn createPersistentRootWithInitialItemGraph: [self makeInitialItemTree]
                                                      UUID: [ETUUID UUID]
                                                branchUUID: [ETUUID UUID]
-                                         revisionMetadata: [self initialMetadata]];
+                                         revisionMetadata: [self initialMetadata]
+                                            schemaVersion: 0];
     prootUUID = proot.UUID;
     initialBranchUUID = proot.currentBranchUUID;
     initialRevisionUUID = proot.currentRevisionUUID;
@@ -202,7 +203,8 @@ static ETUUID *childUUID2;
                            parentRevisionID: (i == 0) ? initialRevisionUUID : branchARevisionUUIDs.lastObject
                       mergeParentRevisionID: nil
                          persistentRootUUID: prootUUID
-                                 branchUUID: branchAUUID];
+                                 branchUUID: branchAUUID
+                              schemaVersion: 0];
 
         [branchARevisionUUIDs addObject: revid];
     }
@@ -219,7 +221,8 @@ static ETUUID *childUUID2;
                            parentRevisionID: (i == 0) ? initialRevisionUUID : branchBRevisionUUIDs.lastObject
                       mergeParentRevisionID: nil
                          persistentRootUUID: prootUUID
-                                 branchUUID: branchBUUID];
+                                 branchUUID: branchBUUID
+                              schemaVersion: 0];
 
         [branchBRevisionUUIDs addObject: revid];
     }
@@ -579,7 +582,8 @@ static ETUUID *childUUID2;
                            parentRevisionID: initialRevisionUUID
                       mergeParentRevisionID: nil
                          persistentRootUUID: prootUUID
-                                 branchUUID: branchAUUID];
+                                 branchUUID: branchAUUID
+                              schemaVersion: 0];
 
         [txn setCurrentRevision: withAttachment
                    headRevision: withAttachment
@@ -634,7 +638,8 @@ static ETUUID *childUUID2;
                            parentRevisionID: initialRevisionUUID
                       mergeParentRevisionID: nil
                          persistentRootUUID: prootUUID
-                                 branchUUID: branchAUUID];
+                                 branchUUID: branchAUUID
+                              schemaVersion: 0];
 
         [txn setCurrentRevision: referencedRevision
                    headRevision: referencedRevision
@@ -664,7 +669,8 @@ static ETUUID *childUUID2;
                            parentRevisionID: initialRevisionUUID
                       mergeParentRevisionID: nil
                          persistentRootUUID: prootUUID
-                                 branchUUID: branchAUUID];
+                                 branchUUID: branchAUUID
+                              schemaVersion: 0];
         [self updateChangeCountAndCommitTransaction: txn];
     }
 
@@ -964,7 +970,8 @@ static ETUUID *childUUID2;
                        parentRevisionID: initialRevisionUUID
                   mergeParentRevisionID: nil
                      persistentRootUUID: prootUUID
-                             branchUUID: branchAUUID];
+                             branchUUID: branchAUUID
+                          schemaVersion: 0];
     [self updateChangeCountAndCommitTransaction: txn];
 
     // This could be useful for committing markers/tags. The very first
@@ -992,7 +999,8 @@ static ETUUID *childUUID2;
     COPersistentRootInfo *otherPersistentRoot = [txn createPersistentRootWithInitialItemGraph: [self makeInitialItemTree]
                                                                                          UUID: [ETUUID UUID]
                                                                                    branchUUID: [ETUUID UUID]
-                                                                             revisionMetadata: nil];
+                                                                             revisionMetadata: nil
+                                                                                schemaVersion: 0];
     [txn createBranchWithUUID: branchBUUID
                  parentBranch: nil
               initialRevision: otherPersistentRoot.currentRevisionUUID
@@ -1023,7 +1031,8 @@ static ETUUID *childUUID2;
                        parentRevisionID: initialRevisionUUID
                   mergeParentRevisionID: nil
                      persistentRootUUID: prootUUID
-                             branchUUID: branchAUUID];
+                             branchUUID: branchAUUID
+                          schemaVersion: 0];
 
     prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
     UKFalse([store commitStoreTransaction: txn]);
@@ -1038,7 +1047,8 @@ static ETUUID *childUUID2;
                        parentRevisionID: initialRevisionUUID
                   mergeParentRevisionID: nil
                      persistentRootUUID: prootUUID
-                             branchUUID: branchAUUID];
+                             branchUUID: branchAUUID
+                          schemaVersion: 0];
 
     prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
     UKFalse([store commitStoreTransaction: txn]);
@@ -1058,7 +1068,8 @@ static ETUUID *childUUID2;
                        parentRevisionID: initialRevisionUUID
                   mergeParentRevisionID: nil
                      persistentRootUUID: prootUUID
-                             branchUUID: branchAUUID];
+                             branchUUID: branchAUUID
+                          schemaVersion: 0];
     UKTrue([store commitStoreTransaction: txn]);
 }
 
@@ -1071,7 +1082,8 @@ static ETUUID *childUUID2;
                        parentRevisionID: [ETUUID UUID]
                   mergeParentRevisionID: nil
                      persistentRootUUID: prootUUID
-                             branchUUID: branchAUUID];
+                             branchUUID: branchAUUID
+                          schemaVersion: 0];
     prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
     UKFalse([store commitStoreTransaction: txn]);
 }
@@ -1085,9 +1097,78 @@ static ETUUID *childUUID2;
                        parentRevisionID: initialRevisionUUID
                   mergeParentRevisionID: [ETUUID UUID]
                      persistentRootUUID: prootUUID
-                             branchUUID: branchAUUID];
+                             branchUUID: branchAUUID
+                          schemaVersion: 0];
     prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
     UKFalse([store commitStoreTransaction: txn]);
+}
+
+- (void)testWriteRevisionWithoutEnforcedSchemaVersion
+{
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    ETUUID *revUUID = [ETUUID UUID];
+    [txn writeRevisionWithModifiedItems: [self makeBranchAItemTreeAtIndex: BRANCH_LATER]
+                           revisionUUID: revUUID
+                               metadata: nil
+                       parentRevisionID: initialRevisionUUID
+                  mergeParentRevisionID: nil
+                     persistentRootUUID: prootUUID
+                             branchUUID: branchAUUID
+                          schemaVersion: 1];
+    prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
+    UKTrue([store commitStoreTransaction: txn]);
+
+    [store migrateRevisionsToVersion: 1
+                         withHandler: ^COItemGraph *(COItemGraph *oldItemGraph, int64_t oldVersion, int64_t newVersion) {
+        return oldItemGraph;
+    }];
+    UKIntsEqual(1, store.schemaVersion);
+
+    [txn writeRevisionWithModifiedItems: [self makeBranchAItemTreeAtIndex: BRANCH_LATER]
+                           revisionUUID: [ETUUID UUID]
+                               metadata: nil
+                       parentRevisionID: revUUID
+                  mergeParentRevisionID: nil
+                     persistentRootUUID: prootUUID
+                             branchUUID: branchAUUID
+                          schemaVersion: 0];
+    prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
+    UKFalse([store commitStoreTransaction: txn]);
+}
+
+- (void)testWriteRevisionWithEnforcedSchemaVersion
+{
+    store.enforcesSchemaVersion = YES;
+
+    COStoreTransaction *txn = [[COStoreTransaction alloc] init];
+    ETUUID *revUUID = [ETUUID UUID];
+    [txn writeRevisionWithModifiedItems: [self makeBranchAItemTreeAtIndex: BRANCH_LATER]
+                           revisionUUID: revUUID
+                               metadata: nil
+                       parentRevisionID: initialRevisionUUID
+                  mergeParentRevisionID: nil
+                     persistentRootUUID: prootUUID
+                             branchUUID: branchAUUID
+                          schemaVersion: 1];
+    prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
+    UKFalse([store commitStoreTransaction: txn]);
+    
+    [store migrateRevisionsToVersion: 1
+                         withHandler: ^COItemGraph *(COItemGraph *oldItemGraph, int64_t oldVersion, int64_t newVersion) {
+        return oldItemGraph;
+    }];
+    UKIntsEqual(1, store.schemaVersion);
+    
+    [txn writeRevisionWithModifiedItems: [self makeBranchAItemTreeAtIndex: BRANCH_LATER]
+                           revisionUUID: [ETUUID UUID]
+                               metadata: nil
+                       parentRevisionID: revUUID
+                  mergeParentRevisionID: nil
+                     persistentRootUUID: prootUUID
+                             branchUUID: branchAUUID
+                          schemaVersion: 1];
+    prootChangeCount = [txn setOldTransactionID: prootChangeCount forPersistentRoot: prootUUID];
+    UKTrue([store commitStoreTransaction: txn]);
 }
 
 /**
@@ -1135,7 +1216,8 @@ static ETUUID *childUUID2;
                            parentRevisionID: initialRevisionUUID
                       mergeParentRevisionID: nil
                          persistentRootUUID: cheapCopyUUID1
-                                 branchUUID: cheapCopyBranchUUID1];
+                                 branchUUID: cheapCopyBranchUUID1
+                              schemaVersion: 0];
 
         cheapCopy1TransactionID = [txn setOldTransactionID: cheapCopy1.transactionID
                                          forPersistentRoot: cheapCopyUUID1];

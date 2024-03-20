@@ -109,13 +109,12 @@ static inline void writePrimitiveValue(co_buffer_t *dest, id aValue, COType aTyp
  * the bytes pointed to by tokenA are considered less than, equal to, or greater than
  * the bytes pointed to by tokenB.
  */
-static int comparePointersToBinaryWriterTokens(const void *ptrA, const void *ptrB)
+static int comparePointersToBinaryWriterTokens(void *pointer, const void *offsetA, const void *offsetB)
 {
-    const unsigned char **tokenA = (const unsigned char **)ptrA;
-    const unsigned char **tokenB = (const unsigned char **)ptrB;
-
-    size_t tokenALength = co_reader_length_of_token(*tokenA);
-    size_t tokenBLength = co_reader_length_of_token(*tokenB);
+    const void *tokenA = pointer + *(size_t *)offsetA;
+    const void *tokenB = pointer + *(size_t *)offsetB;
+    size_t tokenALength = co_reader_length_of_token(tokenA);
+    size_t tokenBLength = co_reader_length_of_token(tokenB);
     assert(tokenALength > 0 && tokenBLength > 0);
 
     if (tokenALength < tokenBLength)
@@ -132,7 +131,7 @@ static int comparePointersToBinaryWriterTokens(const void *ptrA, const void *ptr
          limited interest since a sort order based on character numbers is
          almost never culturally valid.
          */
-        return memcmp(*tokenA, *tokenB, tokenALength);
+        return memcmp(tokenA, tokenB, tokenALength);
     }
     else
     {
@@ -153,6 +152,9 @@ static inline void writeArrayContents(co_buffer_t *dest,
     }
 }
 
+// We use pointer offsets to reference tokens in order to prevent pointers to become invalid, when
+// token buffer is resized, see -[TestItem testLargetSet] and
+// https://github.com/etoile/CoreObject/pull/83#issuecomment-1979878040.
 static inline void writeSetContents(co_buffer_t *dest, NSSet *aSet, COType aType, co_buffer_t *temp)
 {
     assert([aSet isKindOfClass: [NSSet class]]);
@@ -162,16 +164,17 @@ static inline void writeSetContents(co_buffer_t *dest, NSSet *aSet, COType aType
 
     co_buffer_clear(temp);
 
-    const unsigned char **tokenPointers = malloc(sizeof(const unsigned char *) * setCount);
+    size_t *tokenPointerOffsets = malloc(sizeof(unsigned char *) * setCount);
 
     // First, write each primitive value to the temporary byte buffer 'temp',
-    // also storing the pointer to the start of each token in the tokenPointers array
+    // also storing the pointer offset inside 'temp' to the start of each token
+    // in the tokenPointerOffsets array.
     {
         size_t i = 0;
+        
         for (id obj in aSet)
         {
-            tokenPointers[i++] = co_buffer_get_data(temp) + co_buffer_get_length(temp);
-
+            tokenPointerOffsets[i++] = co_buffer_get_length(temp);
             writePrimitiveValue(temp, obj, aType);
         }
     }
@@ -179,22 +182,24 @@ static inline void writeSetContents(co_buffer_t *dest, NSSet *aSet, COType aType
     // Sort the tokenPointers using a simple comparison function that
     // uses the length of the token and the byte-for-byte values of the tokens
 
-    qsort(tokenPointers,
+    qsort_r(tokenPointerOffsets,
           setCount,
-          sizeof(const unsigned char *),
+          sizeof(size_t),
+          (void *)co_buffer_get_data(temp),
           comparePointersToBinaryWriterTokens);
 
     // Copy the sorted tokens into the dest buffer
 
     for (size_t i = 0; i < setCount; i++)
     {
-        const unsigned char *tokenPointer = tokenPointers[i];
+        const size_t offset = tokenPointerOffsets[i];
+        const unsigned char *tokenPointer = co_buffer_get_data(temp) + offset;
         const size_t tokenLength = co_reader_length_of_token(tokenPointer);
 
         co_buffer_write(dest, tokenPointer, tokenLength);
     }
 
-    free(tokenPointers);
+    free(tokenPointerOffsets);
 }
 
 

@@ -63,7 +63,9 @@ NS_ASSUME_NONNULL_BEGIN
                       parentRevisionID: (nullable ETUUID *)aParent
                  mergeParentRevisionID: (nullable ETUUID *)aMergeParent
                     persistentRootUUID: (ETUUID *)aUUID
-                            branchUUID: (ETUUID *)branch;
+                            branchUUID: (ETUUID *)branch
+                         schemaVersion: (int64_t)aVersion;
+- (BOOL)matchesSchemaVersion: (int64_t)aVersion;
 
 
 /** @taskunit Persistent Root Creation */
@@ -85,7 +87,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (COPersistentRootInfo *)createPersistentRootWithInitialItemGraph: (COItemGraph *)contents
                                                               UUID: (ETUUID *)persistentRootUUID
                                                         branchUUID: (ETUUID *)aBranchUUID
-                                                  revisionMetadata: (nullable NSDictionary<NSString *, id> *)metadata;
+                                                  revisionMetadata: (nullable NSDictionary<NSString *, id> *)metadata
+                                                     schemaVersion: (int64_t)aVersion;
 
 
 /** @taskunit Persistent Root Modification */

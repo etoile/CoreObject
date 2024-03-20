@@ -51,7 +51,7 @@
 {
     return [[super propertyNames] arrayByAddingObjectsFromArray:
         @[@"UUID", @"date", @"type", @"localizedTypeDescription",
-          @"localizedShortDescription", @"metadata"]];
+          @"localizedShortDescription", @"schemaVersion", @"metadata"]];
 }
 
 - (ETUUID *)UUID
@@ -105,11 +105,10 @@
     return _revisionInfo.date;
 }
 
-// TODO: Implement it in the metadata for the new store
-// Formalize the concept of similar operations belonging to a common kind...
-// For example:
-// - major edit vs minor edit
-// - Item Mutation that includes Add Item, Remove Item, Insert Item etc.
+- (int64_t)schemaVersion
+{
+    return _revisionInfo.schemaVersion;
+}
 
 - (NSDictionary *)metadata
 {

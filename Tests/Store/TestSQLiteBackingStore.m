@@ -132,10 +132,11 @@
     const BOOL ok = [backing writeItemGraph: graph
                                revisionUUID: revUUID
                                withMetadata: @{}
-                                 withParent: parentRevid
-                            withMergeParent: -1
+                                     parent: parentRevid
+                                mergeParent: -1
                                  branchUUID: branchUUID
-                         persistentrootUUID: prootUUID
+                         persistentRootUUID: prootUUID
+                              schemaVersion: 0
                                       error: NULL];
     ETAssert(ok);
 }

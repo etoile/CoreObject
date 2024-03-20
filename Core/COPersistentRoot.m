@@ -103,8 +103,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     else
     {
         _objectGraphContext = [[COObjectGraphContext alloc]
-            initWithModelDescriptionRepository: aCtxt.modelDescriptionRepository
-                          migrationDriverClass: aCtxt.migrationDriverClass];
+            initWithModelDescriptionRepository: aCtxt.modelDescriptionRepository];
     }
     [_objectGraphContext setPersistentRoot: self];
 
@@ -686,11 +685,13 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
             // FIXME: check both _objectGraphContext and branch.objectGraphContext
             // FIXME: After, update the other graph with the contents of the one we committed
             COItemGraph *graphCopy = [[COItemGraph alloc] initWithItemGraph: graphCtx];
+            int64_t schemaVersion = _editingContext.modelDescriptionRepository.version;
 
             _persistentRootInfo = [txn createPersistentRootWithInitialItemGraph: graphCopy
                                                                            UUID: _UUID
                                                                      branchUUID: self.currentBranch.UUID
-                                                               revisionMetadata: metadata];
+                                                               revisionMetadata: metadata
+                                                                  schemaVersion: schemaVersion];
         }
         else
         {
@@ -715,6 +716,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
                                                         initialRevisionUUID: newRevisionUUID];
 
                 COItemGraph *modifiedItems;
+
                 if (currentBranchObjectGraphHasChanges)
                 {
                     modifiedItems = _objectGraphContext.modifiedItemsSnapshot;
@@ -731,7 +733,8 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
                                    parentRevisionID: _cheapCopyRevisionUUID
                               mergeParentRevisionID: nil
                                  persistentRootUUID: _UUID
-                                         branchUUID: self.currentBranch.UUID];
+                                         branchUUID: self.currentBranch.UUID
+                                      schemaVersion: self.editingContext.modelDescriptionRepository.version];
             }
             else
             {
@@ -942,8 +945,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 - (COObjectGraphContext *)objectGraphContextForPreviewingRevision: (CORevision *)aRevision
 {
     COObjectGraphContext *ctx = [[COObjectGraphContext alloc]
-        initWithModelDescriptionRepository: _editingContext.modelDescriptionRepository
-                      migrationDriverClass: _editingContext.migrationDriverClass];
+        initWithModelDescriptionRepository: _editingContext.modelDescriptionRepository];
     id <COItemGraph> items = [self.store itemGraphForRevisionUUID: aRevision.UUID
                                                    persistentRoot: _UUID];
 

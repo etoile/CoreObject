@@ -39,20 +39,28 @@ NSString *const kCOStoreURL = @"COStoreURL";
 NSString *const COPersistentRootAttributeExportSize = @"COPersistentRootAttributeExportSize";
 NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeUsedSize";
 
+const int64_t currentVersion = 2;
+
 
 @interface COSQLiteStore (AttachmentsPrivate)
 
 @property (nonatomic, readonly) NSArray *attachments;
 - (BOOL)deleteAttachment: (COAttachmentID *)hash;
-
 @end
 
 
 @implementation COSQLiteStore
 
+@synthesize UUID = _uuid;
 @synthesize maxNumberOfDeltaCommits = _maxNumberOfDeltaCommits;
+@synthesize enforcesSchemaVersion = _enforcesSchemaVersion;
 
 - (instancetype)initWithURL: (NSURL *)aURL
+{
+    return [self initWithURL: aURL enforcesSchemaVersion: NO];
+}
+
+- (instancetype)initWithURL: (NSURL *)aURL enforcesSchemaVersion: (BOOL)enforcesSchemaVersion
 {
     NILARG_EXCEPTION_TEST(aURL);
     SUPERINIT;
@@ -61,6 +69,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
                                                                 self] UTF8String], NULL);
 
     url_ = aURL;
+    _enforcesSchemaVersion = enforcesSchemaVersion;
     backingStores_ = [[NSMutableDictionary alloc] init];
     backingStoreUUIDForPersistentRootUUID_ = [[NSMutableDictionary alloc] init];
     _commitLock = dispatch_semaphore_create(1);
@@ -95,9 +104,9 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
             }
         }
 
-        // Set up schema
+        // Set up store schema
 
-        ok = [self setupSchema];
+        ok = [self setUpStore];
     });
 
     if (!ok)
@@ -134,7 +143,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 #endif
 }
 
-- (BOOL)setupSchema
+- (BOOL)setUpStore
 {
     dispatch_assert_queue(queue_);
 
@@ -142,18 +151,28 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
     /* Store Metadata tables (including schema version) */
 
+    // Format version applies to the internal store structure, while schema
+    // version applies to the user content represented as item graphs and 
+    // saved in the store.
     if (![db_ tableExists: @"storeMetadata"])
     {
         _uuid = [ETUUID UUID];
-        [db_ executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER, uuid BLOB)"];
-        [db_ executeUpdate: @"INSERT INTO storeMetadata VALUES(1, ?)", [_uuid dataValue]];
+        [db_ executeUpdate: @"CREATE TABLE storeMetadata(format_version INTEGER, uuid BLOB, schema_version INTEGER)"];
+        [db_ executeUpdate: @"INSERT INTO storeMetadata VALUES(?, ?, ?)",
+                            @(currentVersion), [_uuid dataValue], @(0)];
     }
     else
     {
-        int version = [db_ intForQuery: @"SELECT version FROM storeMetadata"];
-        if (1 != version)
+        int version = [db_ intForQuery: @"SELECT format_version FROM storeMetadata"];
+
+        // First store format version was 1
+        if (version >= 1 && version <= currentVersion)
         {
-            NSLog(@"Error, store version %d, only version 1 is supported", version);
+            [self migrateStoreToVersion: currentVersion];
+        }
+        else
+        {
+            NSLog(@"Error, store format version %d cannot be migrated to %lld", version, currentVersion);
             [db_ rollback];
             return NO;
         }
@@ -210,13 +229,48 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
     return YES;
 }
 
+- (void)migrateStoreToVersion: (int64_t)aVersion
+{
+    int64_t version = aVersion;
+
+    for (int64_t version = aVersion;version < currentVersion; version++)
+    {
+        if (version == 1)
+        {
+            [db_ executeUpdate: @"ALTER TABLE storeMetadata ADD COLUMN schema_version INTEGER"];
+            [db_ executeUpdate: @"ALTER TABLE storeMetadata RENAME COLUMN version TO format_version"];
+            [db_ executeUpdate: @"UPDATE storeMetadata SET format_version = 2, schema_version = 0"];
+            
+            if (BACKING_STORES_SHARE_SAME_SQLITE_DB) {
+                continue;
+            }
+            
+            for (ETUUID *backingUUID in [self allBackingUUIDs])
+            {
+                [COSQLiteStorePersistentRootBackingStore migrateForBackingUUID: backingUUID
+                                                                       inStore: self
+                                                                   fromVersion: version];
+            }
+        }
+    }
+    ETAssert(version == currentVersion);
+}
+
 - (NSURL *)URL
 {
     return url_;
 }
 
-@synthesize UUID = _uuid;
+- (int64_t)schemaVersion
+{
+    return [db_ numberForQuery: @"SELECT schema_version FROM storeMetadata"].longLongValue;
+}
 
+- (void)setSchemaVersion: (int64_t)aVersion
+{
+    BOOL ok = [db_ executeUpdate: @"UPDATE storeMetadata SET schema_version = ?", @(aVersion)];
+    ETAssert(ok);
+}
 
 #pragma mark Transactions -
 
@@ -243,6 +297,12 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
     dispatch_sync(queue_, ^()
     {
         [db_ beginTransaction];
+        
+        if (_enforcesSchemaVersion && ![aTransaction matchesSchemaVersion: self.schemaVersion]) {
+            ok = NO;
+            [db_ rollback];
+            return;
+        }
 
         // update the last transaction field before we commit.
 
@@ -359,27 +419,23 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
 - (NSArray *)allBackingUUIDs
 {
+    dispatch_assert_queue(queue_);
+
     NSMutableArray *result = [NSMutableArray array];
+    FMResultSet *rs = [db_ executeQuery: @"SELECT DISTINCT backingstore FROM persistentroot_backingstores"];
+    sqlite3_stmt *statement = [[rs statement] statement];
 
-    dispatch_assert_queue_not(queue_);
-
-    dispatch_sync(queue_, ^()
+    while ([rs next])
     {
-        FMResultSet *rs = [db_ executeQuery: @"SELECT DISTINCT backingstore FROM persistentroot_backingstores"];
-        sqlite3_stmt *statement = [[rs statement] statement];
+        const void *data = sqlite3_column_blob(statement, 0);
+        const int dataSize = sqlite3_column_bytes(statement, 0);
 
-        while ([rs next])
-        {
-            const void *data = sqlite3_column_blob(statement, 0);
-            const int dataSize = sqlite3_column_bytes(statement, 0);
+        assert(dataSize == 16);
 
-            assert(dataSize == 16);
-
-            ETUUID *uuid = [[ETUUID alloc] initWithUUID: data];
-            [result addObject: uuid];
-        }
-        [rs close];
-    });
+        ETUUID *uuid = [[ETUUID alloc] initWithUUID: data];
+        [result addObject: uuid];
+    }
+    [rs close];
 
     return result;
 }
@@ -739,6 +795,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
                  mergeParentRevisionID: (ETUUID *)aMergeParent
                     persistentRootUUID: (ETUUID *)aUUID
                             branchUUID: (ETUUID *)branch
+                         schemaVersion: (int64_t)aVersion
 {
     dispatch_assert_queue(queue_);
 
@@ -766,10 +823,11 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
     const BOOL ok = [backing writeItemGraph: anItemTree
                                revisionUUID: aRevisionUUID
                                withMetadata: metadata
-                                 withParent: parentRevid
-                            withMergeParent: mergeParentRevid
+                                     parent: parentRevid
+                                mergeParent: mergeParentRevid
                                  branchUUID: branch
-                         persistentrootUUID: aUUID
+                         persistentRootUUID: aUUID
+                              schemaVersion: aVersion
                                       error: NULL];
 
     if (!ok)
@@ -927,6 +985,35 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
     });
 
     return prootUUID;
+}
+
+#pragma mark Migrating Schema -
+
+- (BOOL)migrateRevisionsToVersion: (int64_t)newVersion withHandler: (COMigrationHandler)handler
+{
+    dispatch_assert_queue_not(queue_);
+    
+    BOOL __block result = NO;
+
+    dispatch_sync(queue_, ^()
+    {
+        for (ETUUID *backingUUID in [self allBackingUUIDs])
+        {
+            COSQLiteStorePersistentRootBackingStore *backingStore =
+                [self backingStoreForUUID: backingUUID error: NULL];
+            
+            result = [backingStore migrateRevisionsToVersion: newVersion withHandler: handler];
+
+            if (!result)
+            {
+                return;
+            }
+        }
+        
+        self.schemaVersion = newVersion;
+    });
+
+    return result;
 }
 
 #pragma mark Writing persistent roots -
@@ -1136,8 +1223,15 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
 
 - (NSString *)detailedDescription
 {
+    NSArray __block *backingUUIDs = @[];
     NSMutableString *result = [NSMutableString string];
     [result appendFormat: @"<COSQLiteStore at %@ (UUID: %@)\n", self.URL, self.UUID];
+    
+    dispatch_sync(queue_, ^()
+    {
+        backingUUIDs = [self allBackingUUIDs];
+    });
+    
     for (ETUUID *backingUUID in [self allBackingUUIDs])
     {
         [result appendFormat: @"\t backing UUID %@ (containing ", backingUUID];
@@ -1207,7 +1301,7 @@ NSString *const COPersistentRootAttributeUsedSize = @"COPersistentRootAttributeU
         [backingStores_ removeAllObjects];
         [backingStoreUUIDForPersistentRootUUID_ removeAllObjects];
 
-        [self setupSchema];
+        [self setUpStore];
     });
 }
 
