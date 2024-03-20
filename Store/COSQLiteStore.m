@@ -151,25 +151,28 @@ const int64_t currentVersion = 2;
 
     /* Store Metadata tables (including schema version) */
 
+    // Format version applies to the internal store structure, while schema
+    // version applies to the user content represented as item graphs and 
+    // saved in the store.
     if (![db_ tableExists: @"storeMetadata"])
     {
         _uuid = [ETUUID UUID];
-        [db_ executeUpdate: @"CREATE TABLE storeMetadata(version INTEGER, uuid BLOB, schema_version INTEGER)"];
+        [db_ executeUpdate: @"CREATE TABLE storeMetadata(format_version INTEGER, uuid BLOB, schema_version INTEGER)"];
         [db_ executeUpdate: @"INSERT INTO storeMetadata VALUES(?, ?, ?)",
                             @(currentVersion), [_uuid dataValue], @(0)];
     }
     else
     {
-        int version = [db_ intForQuery: @"SELECT version FROM storeMetadata"];
+        int version = [db_ intForQuery: @"SELECT format_version FROM storeMetadata"];
 
-        // First store version was 1
+        // First store format version was 1
         if (version >= 1 && version <= currentVersion)
         {
             [self migrateStoreToVersion: currentVersion];
         }
         else
         {
-            NSLog(@"Error, store version %d cannot be migrated to %lld", version, currentVersion);
+            NSLog(@"Error, store format version %d cannot be migrated to %lld", version, currentVersion);
             [db_ rollback];
             return NO;
         }
@@ -235,7 +238,8 @@ const int64_t currentVersion = 2;
         if (version == 1)
         {
             [db_ executeUpdate: @"ALTER TABLE storeMetadata ADD COLUMN schema_version INTEGER"];
-            [db_ executeUpdate: @"UPDATE storeMetadata SET version = 2, schema_version = 0"];
+            [db_ executeUpdate: @"ALTER TABLE storeMetadata RENAME COLUMN version TO format_version"];
+            [db_ executeUpdate: @"UPDATE storeMetadata SET format_version = 2, schema_version = 0"];
             
             if (BACKING_STORES_SHARE_SAME_SQLITE_DB) {
                 continue;
