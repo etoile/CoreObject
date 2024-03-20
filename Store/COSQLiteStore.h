@@ -467,6 +467,68 @@ extern NSString *const COPersistentRootAttributeUsedSize;
 /** @taskunit Migrating Schema */
 
 
+/**
+ * Migrates the entire store history to a more recent schema version.
+ *
+ * For each store, there is a schema version saved in the store metadata. When 
+ * serializing objects, it's important to store this schema version in
+ * COItem.packageVersion too. In this way, it's easy to know the schema
+ * version, even when the source store is unknown for the items. For instance,
+ * when sending items over network or saving them to a file.
+ *
+ * If COItem.packageVersion isn't the same than the store schema version,
+ * you are responsible to define a mapping between packages versions and store
+ * schema versions.
+ *
+ * It's recommended to apply migrations in a linear fashion to ensure there is 
+ * only a single  migration code path between two versions (even when they are
+ * separated by many intermediate versions). Here is a code example that shows
+ * how to implement the handler block:
+ *
+ * <code>
+ * int64_t version = oldVersion;
+ * NSArray *newItems = oldItems;
+ *
+ * while (version < newVersion) {
+ *   switch (version) {
+ *   case 0:
+ *      newItems = migrateToV1(newItems);
+ *      break;
+ *   case 1:
+ *      newItems = migrateToV2(newItems);
+ *      break;
+ *   default:
+ *      abort();
+ *   }
+ *   version++;
+ * }
+ *
+ * return [[COItemGraph alloc] initWithItems: newItems
+ *                              rootItemUUID: oldItemGraph.rootItemUUID];
+ * </code>
+ *
+ * During the migrations, arbitary complex operations are supported:
+ * - rename property
+ * - add property
+ * - delete property
+ * - move property
+ * - set property
+ * - rename entity
+ * - add entity
+ * - delete entity
+ * - split entity
+ * - merge entities
+ *
+ * You are reponsible to ensure the schema remains consistent accross items 
+ * sharing the same entity.
+ *
+ * Adding a property is supported without incrementing the schema version. In 
+ * this case, the updated deserialization code must check whether the property
+ * is missing in the item or not. If missing, the deserialization code falls
+ * back on a default value. This doesn't work when removing properties, because
+ * older app versions using the old schema are not going to be able to
+ * deserialize an item where a property is missing.
+ */
 - (BOOL)migrateRevisionsToVersion: (int64_t)newVersion withHandler: (COMigrationHandler)handler;
 
 
