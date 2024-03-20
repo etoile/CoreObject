@@ -14,7 +14,6 @@
 #import "COObject+Private.h"
 #import "COMetamodel.h"
 #import "COSerialization.h"
-#import "COSchemaMigrationDriver.h"
 #import "COPersistentRoot.h"
 #import "COBranch.h"
 #import "COBranch+Private.h"
@@ -61,7 +60,6 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
 @implementation COObjectGraphContext
 
 @synthesize modelDescriptionRepository = _modelDescriptionRepository;
-@synthesize migrationDriverClass = _migrationDriverClass;
 @synthesize rootItemUUID = _rootItemUUID;
 @synthesize insertedObjectUUIDs = _insertedObjectUUIDs;
 @synthesize updatedObjectUUIDs = _updatedObjectUUIDs;
@@ -70,11 +68,7 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
 
 - (instancetype)initWithBranch: (COBranch *)aBranch
     modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
-          migrationDriverClass: (Class)aDriverClass
 {
-    INVALIDARG_EXCEPTION_TEST(aDriverClass,
-                              aDriverClass == Nil || [aDriverClass isSubclassOfClass: [COSchemaMigrationDriver class]]);
-
     SUPERINIT;
     _loadedObjects = [[NSMutableDictionary alloc] init];
     _objectsByAdditionalItemUUIDs = [[NSMutableDictionary alloc] init];
@@ -93,40 +87,26 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
         CORegisterCoreObjectMetamodel(aRepo);
     }
     _modelDescriptionRepository = aRepo;
-    if (aDriverClass == Nil)
-    {
-        _migrationDriverClass = _persistentRoot.editingContext.migrationDriverClass;
-    }
-    else
-    {
-        _migrationDriverClass = aDriverClass;
-    }
 
     ETAssert(_modelDescriptionRepository != nil);
-    ETAssert(_migrationDriverClass != Nil);
 
     return self;
 }
 
 - (instancetype)initWithBranch: (COBranch *)aBranch
 {
-    return [self initWithBranch: aBranch modelDescriptionRepository: nil migrationDriverClass: Nil];
+    return [self initWithBranch: aBranch modelDescriptionRepository: nil];
 }
 
 - (instancetype)initWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
-                              migrationDriverClass: (Class)aDriverClass
 {
     NILARG_EXCEPTION_TEST(aRepo);
-    NILARG_EXCEPTION_TEST(aDriverClass);
-    return [self initWithBranch: nil
-     modelDescriptionRepository: aRepo
-           migrationDriverClass: aDriverClass];
+    return [self initWithBranch: nil modelDescriptionRepository: aRepo];
 }
 
 - (instancetype)init
 {
-    return [self initWithModelDescriptionRepository: [ETModelDescriptionRepository mainRepository]
-                               migrationDriverClass: [COSchemaMigrationDriver class]];
+    return [self initWithModelDescriptionRepository: [ETModelDescriptionRepository mainRepository]];
 }
 
 + (COObjectGraphContext *)objectGraphContext
@@ -136,8 +116,7 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
 
 + (COObjectGraphContext *)objectGraphContextWithModelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
 {
-    return [[self alloc] initWithModelDescriptionRepository: aRepo
-                                       migrationDriverClass: [COSchemaMigrationDriver class]];
+    return [[self alloc] initWithModelDescriptionRepository: aRepo];
 }
 
 - (void)dealloc
@@ -511,10 +490,7 @@ NSString *const COObjectGraphContextEndBatchChangeNotification = @"COObjectGraph
     // We could also change -[COObjectGraphContext itemForUUID:] to search
     // itemGraph during the loading rather than the loaded objects (but that's
     // roughly the same than we do currently).
-    COSchemaMigrationDriver *migrationDriver = [[self.migrationDriverClass alloc]
-        initWithModelDescriptionRepository: self.modelDescriptionRepository];
-    NSArray *migratedItems = [migrationDriver migrateItems: itemGraph.items];
-    _loadingItemGraph = [[COItemGraph alloc] initWithItems: migratedItems
+    _loadingItemGraph = [[COItemGraph alloc] initWithItems: itemGraph.items
                                               rootItemUUID: itemGraph.rootItemUUID];
     // TODO: Decide how we update the change tracking in regard to additional items.
 

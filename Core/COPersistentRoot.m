@@ -103,8 +103,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
     else
     {
         _objectGraphContext = [[COObjectGraphContext alloc]
-            initWithModelDescriptionRepository: aCtxt.modelDescriptionRepository
-                          migrationDriverClass: aCtxt.migrationDriverClass];
+            initWithModelDescriptionRepository: aCtxt.modelDescriptionRepository];
     }
     [_objectGraphContext setPersistentRoot: self];
 
@@ -946,8 +945,7 @@ NSString *const COPersistentRootName = @"org.etoile.coreobject.name";
 - (COObjectGraphContext *)objectGraphContextForPreviewingRevision: (CORevision *)aRevision
 {
     COObjectGraphContext *ctx = [[COObjectGraphContext alloc]
-        initWithModelDescriptionRepository: _editingContext.modelDescriptionRepository
-                      migrationDriverClass: _editingContext.migrationDriverClass];
+        initWithModelDescriptionRepository: _editingContext.modelDescriptionRepository];
     id <COItemGraph> items = [self.store itemGraphForRevisionUUID: aRevision.UUID
                                                    persistentRoot: _UUID];
 

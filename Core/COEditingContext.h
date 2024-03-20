@@ -158,7 +158,6 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
 @private
     COSQLiteStore *_store;
     ETModelDescriptionRepository *_modelDescriptionRepository;
-    Class _migrationDriverClass;
     /** Loaded (or inserted) persistent roots by UUID */
     NSMutableDictionary *_loadedPersistentRoots;
     COEditingContextUnloadingBehavior _unloadingBehavior;
@@ -202,7 +201,7 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
  * <init />
  * Initializes a context which persists its content in the given store,
  * manages it using the metamodel provided by the model description repository 
- * and migration driver, and whose undo tracks are backed by the last store argument.
+ * and whose undo tracks are backed by the last store argument.
  *
  * When COObject entity description doesn't appear in the repository, this 
  * initializer invokes +newEntityDescription on COObject and its subclasses, 
@@ -217,12 +216,9 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
  * -[ETModelDescriptionRepository registerEntityDescriptionsForClasses:resolveNow:].
  *
  * The repository must contain a COObject entitydescription.
- *
- * The migration driver class must be a subclass of COSchemaMigrationDriver.
  */
 - (instancetype)initWithStore: (COSQLiteStore *)store
    modelDescriptionRepository: (ETModelDescriptionRepository *)aRepo
-         migrationDriverClass: (Class)aDriverClass
                undoTrackStore: (COUndoTrackStore *)aUndoTrackStore NS_DESIGNATED_INITIALIZER;
 /**
  * Initializes a context which persists its content in the given store, and
@@ -279,15 +275,6 @@ typedef NS_ENUM(NSUInteger, COEditingContextUnloadingBehavior)
  * describes all the persistent objects editable in the context.
  */
 @property (nonatomic, readonly, strong) ETModelDescriptionRepository *modelDescriptionRepository;
-/**
- * The migration driver used to migrate items to the latest package versions.
- *
- * By default, returns COSchemaMigrationDriver.
- *
- * You should usually use COSchemaMigration rather than writing your own custom 
- * migration driver subclass.
- */
-@property (nonatomic, readonly) Class migrationDriverClass;
 /**
  * Returns the store backing the undo tracks initialized with the receiver.
  */
