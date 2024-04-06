@@ -186,7 +186,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * See -[CORevision metadata].
  */
-@property (nonatomic, readonly, copy) NSDictionary *metadata;
+@property (nonatomic, readonly, copy) NSDictionary<NSString *, id> *metadata;
 /**
  * See -[CORevision UUID].
  */
