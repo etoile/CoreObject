@@ -61,14 +61,31 @@ static ETUUID *uuid;
     return nil;
 }
 
+- (COCommitDescriptor *)commitDescriptor
+{
+    return [COCommitDescriptor registeredDescriptorForIdentifier: @"org.etoile.CoreObject.initial-state"];
+}
+
 - (NSString *)localizedTypeDescription
 {
-    return _(@"Unknown");
+    COCommitDescriptor *descriptor = self.commitDescriptor;
+
+    if (descriptor == nil)
+        return self.metadata[kCOCommitMetadataTypeDescription];
+
+    return descriptor.localizedTypeDescription;
 }
 
 - (NSString *)localizedShortDescription
 {
-    return _(@"Initial state");
+    COCommitDescriptor *descriptor = self.commitDescriptor;
+
+    if (descriptor == nil)
+        return self.metadata[kCOCommitMetadataShortDescription];
+    
+    NSArray *args = self.metadata[kCOCommitMetadataShortDescriptionArguments];
+
+    return [descriptor localizedShortDescriptionWithArguments: args];
 }
 
 - (id <COTrackNode>)parentNode

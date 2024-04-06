@@ -6,6 +6,12 @@
 
 	"descriptors":
 	{
+		"initial-state":
+		{
+			"type": "history",
+			"shortDescription": "Initial state"
+		},
+		
 		"selective-undo":
 		{
 			"type": "history",

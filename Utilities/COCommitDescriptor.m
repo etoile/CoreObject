@@ -116,15 +116,21 @@ static void validateMainBundlePreferredLocalizations(void)
                            typeTable: (NSMutableDictionary *)aTypeTable
                   localizationTables: (NSMutableDictionary *)someLocalizationTables
 {
-    NSMutableSet *commitsFiles = [NSMutableSet new];
-    NSMutableSet *stringsFiles = [NSMutableSet new];
-    /* For the test suite on GNUstep, resources are packaged in the test bundle 
-       (it doesn't link the CoreObject framework) */
+    NSMutableArray *commitsFiles = [NSMutableArray new];
+    NSMutableArray *stringsFiles = [NSMutableArray new];
+    NSMutableArray *bundles = [[NSBundle allFrameworks] mutableCopy];
+    NSArray *frameworkIdentifiers = (id)[[bundles mappedCollection] bundleIdentifier];
     NSBundle *coreObjectBundle = [NSBundle bundleForClass: self];
-    NSArray *bundles =
-        [@[[NSBundle mainBundle],
-           coreObjectBundle] arrayByAddingObjectsFromArray: [NSBundle allFrameworks]];
     
+    // For the test suite on GNUstep, resources are packaged in the test bundle, which doesn't link
+    // the CoreObject framework
+    if (![frameworkIdentifiers containsObject: coreObjectBundle.bundleIdentifier])
+    {
+        [bundles addObject: coreObjectBundle];
+    }
+    // Add the main bundle last in case it contains a custom org.etoile.CoreObject.json
+    [bundles addObject: [NSBundle mainBundle]];
+
     validateMainBundlePreferredLocalizations();
 
     for (NSBundle *bundle in bundles)
