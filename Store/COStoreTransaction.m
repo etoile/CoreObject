@@ -93,6 +93,7 @@
                  mergeParentRevisionID: (ETUUID *)aMergeParent
                     persistentRootUUID: (ETUUID *)aUUID
                             branchUUID: (ETUUID *)branch
+                         schemaVersion: (int64_t)aVersion
 {
     NILARG_EXCEPTION_TEST(anItemTree);
     NILARG_EXCEPTION_TEST(anItemTree.rootItemUUID);
@@ -101,6 +102,7 @@
     NSParameterAssert(aMergeParent == nil || [aMergeParent isKindOfClass: [ETUUID class]]);
     NSParameterAssert([aUUID isKindOfClass: [ETUUID class]]);
     NSParameterAssert([branch isKindOfClass: [ETUUID class]]);
+    NSParameterAssert(aVersion > -1);
 
     COStoreWriteRevision *op = [[COStoreWriteRevision alloc] init];
     op.modifiedItems = anItemTree;
@@ -110,9 +112,28 @@
     op.mergeParentRevisionUUID = aMergeParent;
     op.persistentRoot = aUUID;
     op.branch = branch;
+    op.schemaVersion = aVersion;
     [self addOperation: op];
 }
 
+- (BOOL)matchesSchemaVersion: (int64_t)aVersion {
+    for (id <COStoreAction>op in operations)
+    {
+        if (![op isKindOfClass: [COStoreWriteRevision class]])
+        {
+            continue;
+        }
+        COStoreWriteRevision *write = op;
+
+        if (write.schemaVersion != aVersion) {
+            NSLog(@"Mismatched schema version between store (%lld) and write action (%lld): %@",
+                write.schemaVersion, aVersion, write);
+            return NO;
+        }
+    }
+    
+    return YES;
+}
 
 #pragma mark Persistent Root Creation -
 
@@ -176,6 +197,7 @@
                                                               UUID: (ETUUID *)persistentRootUUID
                                                         branchUUID: (ETUUID *)aBranchUUID
                                                   revisionMetadata: (NSDictionary *)metadata
+                                                     schemaVersion: (int64_t)aVersion
 {
     NILARG_EXCEPTION_TEST(contents);
     NILARG_EXCEPTION_TEST(persistentRootUUID);
@@ -189,7 +211,8 @@
                         parentRevisionID: nil
                    mergeParentRevisionID: nil
                       persistentRootUUID: persistentRootUUID
-                              branchUUID: aBranchUUID];
+                              branchUUID: aBranchUUID
+                           schemaVersion: aVersion];
 
     return [self createPersistentRootCopyWithUUID: persistentRootUUID
                          parentPersistentRootUUID: nil

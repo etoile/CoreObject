@@ -15,6 +15,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef COItemGraph *_Nonnull (^COMigrationHandler)(COItemGraph *oldItemGraph, int64_t oldVersion, int64_t newVersion);
+
 #define BACKING_STORES_SHARE_SAME_SQLITE_DB 1
 
 typedef NS_OPTIONS(NSUInteger, COBranchRevisionReadingOptions)
@@ -345,6 +347,7 @@ extern NSString *const COPersistentRootAttributeUsedSize;
 @private
     NSURL *url_;
     ETUUID *_uuid;
+    BOOL _enforcesSchemaVersion;
     FMDatabase *db_;
     NSMutableDictionary *backingStores_; // COUUID (backing store UUID => COCQLiteStorePersistentRootBackingStore)
     NSMutableDictionary *backingStoreUUIDForPersistentRootUUID_;
@@ -357,7 +360,9 @@ extern NSString *const COPersistentRootAttributeUsedSize;
 /**
  * Opens an exisiting, or creates a new CoreObject store at the given file:// URL.
  */
-- (instancetype)initWithURL: (NSURL *)aURL NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithURL: (NSURL *)aURL
+      enforcesSchemaVersion: (BOOL)enforcesSchemaVersion NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithURL: (NSURL *)aURL;
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
@@ -365,6 +370,26 @@ extern NSString *const COPersistentRootAttributeUsedSize;
  */
 @property (nonatomic, readonly, strong) NSURL *URL;
 @property (nonatomic, readonly, strong) ETUUID *UUID;
+/**
+ * The schema version after the last run migration with -migrateRevisionsToVersion:withHandler:.
+ *
+ * If no migration has been run, the schema version is 0.
+ *
+ * You can write revisions with a higher schema version, but not with a lower one. As a result,
+ * CORevisionInfo.schemaVersion is always equal or greater than COSQLiteStore.schemaVersion.
+ *
+ * If you want to only write revisions with the same schema version than the store, then set
+ * enforcesSchemaVersion to YES. In this case, -commitStoreTransaction: fails and returns NO, when
+ * COStoreTransaction.schemaVersion is more recent than the store schema version.
+ */
+@property (nonatomic, readonly) int64_t schemaVersion;
+/**
+ * Whether transactions handed to -commitStoreTransaction: must use the same schema version than
+ * the store.
+ *
+ * By default, returns NO and allows to write revisions with higher schema versions than the store.
+ */
+@property (nonatomic, readwrite) BOOL enforcesSchemaVersion;
 
 
 /** @taskunit Revision Reading */
@@ -388,8 +413,8 @@ extern NSString *const COPersistentRootAttributeUsedSize;
  *
  * NOTE: Unstable API
  */
-- (nullable NSArray *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
-                                options: (COBranchRevisionReadingOptions)options;
+- (nullable NSArray<CORevisionInfo *> *)revisionInfosForBranchUUID: (ETUUID *)aBranchUUID
+                                                           options: (COBranchRevisionReadingOptions)options;
 /**
  * Returns all revision infos of the backing store where the given persistent
  * root is stored.
@@ -437,6 +462,74 @@ extern NSString *const COPersistentRootAttributeUsedSize;
  */
 - (nullable COPersistentRootInfo *)persistentRootInfoForUUID: (nullable ETUUID *)aUUID;
 - (nullable ETUUID *)persistentRootUUIDForBranchUUID: (ETUUID *)aBranchUUID;
+
+
+/** @taskunit Migrating Schema */
+
+
+/**
+ * Migrates the entire store history to a more recent schema version.
+ *
+ * For each store, there is a schema version saved in the store metadata. When 
+ * serializing objects, it's important to store this schema version in
+ * COItem.packageVersion too. In this way, it's easy to know the schema
+ * version, even when the source store is unknown for the items. For instance,
+ * when sending items over network or saving them to a file.
+ *
+ * If COItem.packageVersion isn't the same than the store schema version,
+ * you are responsible to define a mapping between packages versions and store
+ * schema versions.
+ *
+ * It's recommended to apply migrations in a linear fashion to ensure there is 
+ * only a single  migration code path between two versions (even when they are
+ * separated by many intermediate versions). Here is a code example that shows
+ * how to implement the handler block:
+ *
+ * <code>
+ * int64_t version = oldVersion;
+ * NSArray *newItems = oldItems;
+ *
+ * while (version < newVersion) {
+ *   switch (version) {
+ *   case 0:
+ *      newItems = migrateToV1(newItems);
+ *      break;
+ *   case 1:
+ *      newItems = migrateToV2(newItems);
+ *      break;
+ *   default:
+ *      abort();
+ *   }
+ *   version++;
+ * }
+ *
+ * return [[COItemGraph alloc] initWithItems: newItems
+ *                              rootItemUUID: oldItemGraph.rootItemUUID];
+ * </code>
+ *
+ * During the migrations, arbitary complex operations are supported:
+ * - rename property
+ * - add property
+ * - delete property
+ * - move property
+ * - set property
+ * - rename entity
+ * - add entity
+ * - delete entity
+ * - split entity
+ * - merge entities
+ *
+ * You are reponsible to ensure the schema remains consistent accross items 
+ * sharing the same entity.
+ *
+ * Adding a property is supported without incrementing the schema version. In 
+ * this case, the updated deserialization code must check whether the property
+ * is missing in the item or not. If missing, the deserialization code falls
+ * back on a default value. This doesn't work when removing properties, because
+ * older app versions using the old schema are not going to be able to
+ * deserialize an item where a property is missing.
+ */
+- (BOOL)migrateRevisionsToVersion: (int64_t)newVersion withHandler: (COMigrationHandler)handler;
 
 
 /** @taskunit Search. API not final. */

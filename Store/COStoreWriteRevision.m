@@ -10,7 +10,7 @@
 
 @implementation COStoreWriteRevision
 
-@synthesize modifiedItems, revisionUUID, parentRevisionUUID, mergeParentRevisionUUID, persistentRoot, branch, metadata;
+@synthesize modifiedItems, revisionUUID, parentRevisionUUID, mergeParentRevisionUUID, persistentRoot, branch, schemaVersion, metadata;
 
 - (BOOL)execute: (COSQLiteStore *)store inTransaction: (COStoreTransaction *)aTransaction
 {
@@ -20,7 +20,8 @@
                                 parentRevisionID: parentRevisionUUID
                            mergeParentRevisionID: mergeParentRevisionUUID
                               persistentRootUUID: persistentRoot
-                                      branchUUID: branch];
+                                      branchUUID: branch
+                                   schemaVersion: schemaVersion];
 }
 
 @end

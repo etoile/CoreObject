@@ -93,49 +93,56 @@ static ETUUID *b1A, *b1B, *b2A;
                        parentRevisionID: nil
                   mergeParentRevisionID: nil
                      persistentRootUUID: p1
-                             branchUUID: b1A];
+                             branchUUID: b1A
+                          schemaVersion: 0];
     [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"1"]
                            revisionUUID: r1
                                metadata: nil
                        parentRevisionID: r0
                   mergeParentRevisionID: nil
                      persistentRootUUID: p1
-                             branchUUID: b1A];
+                             branchUUID: b1A
+                          schemaVersion: 0];
     [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"2"]
                            revisionUUID: r2
                                metadata: nil
                        parentRevisionID: r1
                   mergeParentRevisionID: nil
                      persistentRootUUID: p1
-                             branchUUID: b1B];
+                             branchUUID: b1B
+                          schemaVersion: 0];
     [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"3"]
                            revisionUUID: r3
                                metadata: nil
                        parentRevisionID: r2
                   mergeParentRevisionID: nil
                      persistentRootUUID: p1
-                             branchUUID: b1B];
+                             branchUUID: b1B
+                          schemaVersion: 0];
     [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"4"]
                            revisionUUID: r4
                                metadata: nil
                        parentRevisionID: r3
                   mergeParentRevisionID: nil
                      persistentRootUUID: p1
-                             branchUUID: b1B];
+                             branchUUID: b1B
+                          schemaVersion: 0];
     [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"5"]
                            revisionUUID: r5
                                metadata: nil
                        parentRevisionID: r2
                   mergeParentRevisionID: nil
                      persistentRootUUID: p1
-                             branchUUID: b1B];
+                             branchUUID: b1B
+                          schemaVersion: 0];
     [txn writeRevisionWithModifiedItems: [self itemGraphWithLabel: @"6"]
                            revisionUUID: r6
                                metadata: nil
                        parentRevisionID: r0
                   mergeParentRevisionID: nil
                      persistentRootUUID: p2
-                             branchUUID: b2A];
+                             branchUUID: b2A
+                          schemaVersion: 0];
 
     ETAssert([store commitStoreTransaction: txn]);
 

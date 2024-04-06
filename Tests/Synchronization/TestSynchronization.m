@@ -76,7 +76,8 @@ static ETUUID *branchBUUID;
     COPersistentRootInfo *serverInfo = [txn createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
                                                                                 UUID: persistentRootUUID
                                                                           branchUUID: branchAUUID
-                                                                    revisionMetadata: nil];
+                                                                    revisionMetadata: nil
+                                                                       schemaVersion: 0];
     UKNotNil(serverInfo);
     [txn createBranchWithUUID: branchBUUID
                  parentBranch: nil
@@ -164,7 +165,8 @@ static ETUUID *branchBUUID;
     COPersistentRootInfo *serverInfo = [txn createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
                                                                                 UUID: persistentRootUUID
                                                                           branchUUID: branchAUUID
-                                                                    revisionMetadata: nil];
+                                                                    revisionMetadata: nil
+                                                                       schemaVersion: 0];
     serverChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: persistentRootUUID];
     UKTrue([serverStore commitStoreTransaction: txn]);
 
@@ -190,7 +192,8 @@ static ETUUID *branchBUUID;
                        parentRevisionID: serverInfo.currentRevisionUUID
                   mergeParentRevisionID: nil
                      persistentRootUUID: persistentRootUUID
-                             branchUUID: branchAUUID];
+                             branchUUID: branchAUUID
+                          schemaVersion: 0];
 
     [txn setCurrentRevision: serverCommit2
                headRevision: nil
@@ -264,7 +267,8 @@ static ETUUID *branchBUUID;
                        parentRevisionID: serverCheapCopyInfo.currentRevisionUUID
                   mergeParentRevisionID: nil
                      persistentRootUUID: cheapCopyUUID
-                             branchUUID: branchAUUID];
+                             branchUUID: branchAUUID
+                          schemaVersion: 0];
 
     [txn setCurrentRevision: serverCommit2
                headRevision: nil
@@ -325,7 +329,8 @@ static ETUUID *branchBUUID;
     COPersistentRootInfo *serverInfo = [txn createPersistentRootWithInitialItemGraph: [self itemGraphWithLabel: @"1"]
                                                                                 UUID: persistentRootUUID
                                                                           branchUUID: branchAUUID
-                                                                    revisionMetadata: nil];
+                                                                    revisionMetadata: nil
+                                                                       schemaVersion: 0];
     serverChangeCount = [txn setOldTransactionID: -1 forPersistentRoot: persistentRootUUID];
     UKTrue([serverStore commitStoreTransaction: txn]);
 
@@ -353,7 +358,8 @@ static ETUUID *branchBUUID;
                        parentRevisionID: serverInfo.currentRevisionUUID
                   mergeParentRevisionID: nil
                      persistentRootUUID: persistentRootUUID
-                             branchUUID: branchAUUID];
+                             branchUUID: branchAUUID
+                          schemaVersion: 0];
 
     [txn setCurrentRevision: clientCommit2
                headRevision: nil

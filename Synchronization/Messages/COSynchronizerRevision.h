@@ -20,6 +20,7 @@
 @property (nonatomic, readwrite, strong) COItemGraph *modifiedItems;
 @property (nonatomic, readwrite, copy) ETUUID *revisionUUID;
 @property (nonatomic, readwrite, copy) ETUUID *parentRevisionUUID;
+@property (nonatomic, readwrite) int64_t schemaVersion;
 @property (nonatomic, readwrite, copy) NSDictionary *metadata;
 @property (nonatomic, readwrite, copy) NSDate *date;
 
