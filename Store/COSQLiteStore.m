@@ -163,12 +163,23 @@ const int64_t currentVersion = 2;
     }
     else
     {
-        int version = [db_ intForQuery: @"SELECT format_version FROM storeMetadata"];
+        int formatVersionColumnCount =
+            [db_ intForQuery: @"SELECT COUNT(*) FROM pragma_table_info('storeMetadata') WHERE name='format_version'"];
+        int version = 0;
+
+        if (formatVersionColumnCount == 1)
+        {
+            version = [db_ intForQuery: @"SELECT format_version FROM storeMetadata"];
+        }
+        else
+        {
+            version = [db_ intForQuery: @"SELECT version FROM storeMetadata"];
+        }
 
         // First store format version was 1
         if (version >= 1 && version <= currentVersion)
         {
-            [self migrateStoreToVersion: currentVersion];
+            [self migrateStoreFromVersion: version];
         }
         else
         {
@@ -229,11 +240,9 @@ const int64_t currentVersion = 2;
     return YES;
 }
 
-- (void)migrateStoreToVersion: (int64_t)aVersion
+- (void)migrateStoreFromVersion: (int64_t)aVersion
 {
-    int64_t version = aVersion;
-
-    for (int64_t version = aVersion;version < currentVersion; version++)
+    for (int64_t version = aVersion; version < currentVersion; version++)
     {
         if (version == 1)
         {
@@ -241,7 +250,7 @@ const int64_t currentVersion = 2;
             [db_ executeUpdate: @"ALTER TABLE storeMetadata RENAME COLUMN version TO format_version"];
             [db_ executeUpdate: @"UPDATE storeMetadata SET format_version = 2, schema_version = 0"];
             
-            if (BACKING_STORES_SHARE_SAME_SQLITE_DB) {
+            if (!BACKING_STORES_SHARE_SAME_SQLITE_DB) {
                 continue;
             }
             
@@ -253,7 +262,7 @@ const int64_t currentVersion = 2;
             }
         }
     }
-    ETAssert(version == currentVersion);
+    ETAssert([db_ intForQuery: @"SELECT format_version FROM storeMetadata"] == currentVersion);
 }
 
 - (NSURL *)URL

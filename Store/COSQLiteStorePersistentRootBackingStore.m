@@ -149,8 +149,8 @@
 
     if (version == 1)
     {
-        NSString *tableName = [NSString stringWithFormat: @"commits-%@", uuid];
-        [db executeUpdate: @"ALTER TABLE %@ ADD COLUMN version INTEGER DEFAULT 0", tableName];
+        NSString *tableName = [NSString stringWithFormat: @"`commits-%@`", uuid];
+        [db executeUpdate: [NSString stringWithFormat: @"ALTER TABLE %@ ADD COLUMN version INTEGER DEFAULT 0", tableName]];
     }
 }
 
