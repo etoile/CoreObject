@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol CODiffAlgorithm <NSObject>
 
-+ (instancetype)diffItemUUIDs: (NSArray *)uuids
++ (instancetype)diffItemUUIDs: (NSArray<ETUUID *> *)uuids
                     fromGraph: (id <COItemGraph>)a
                       toGraph: (id <COItemGraph>)b
              sourceIdentifier: (id)aSource;
@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  * Returns ETUUID : COItem dictionary
  */
-- (NSDictionary *)addedOrUpdatedItemsForApplyingTo: (id <COItemGraph>)dest;
+- (NSDictionary<ETUUID *, COItem *> *)addedOrUpdatedItemsForApplyingTo: (id <COItemGraph>)dest;
 
 /**
  * Returns whether the diff contains any edits.
